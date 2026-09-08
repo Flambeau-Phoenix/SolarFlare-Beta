@@ -2,6 +2,9 @@
 ![SolarFlare Geaux Menu Preview](https://i.postimg.cc/5t9DymZB/Solar-Flare-Pic3.png)
 
 # SolarFlare — Beta v1
+This mod uses the HLX Modding Framework by https://github.com/laymain found here: https://hlx-framework.github.io/  
+
+---
 
 SolarFlare is a customizable HUD addon for Farever, built around three main features: **ResourceTracker, Auras, and Geaux**. Keep resources, skill readiness, and visual alerts where you want them on screen.
 
