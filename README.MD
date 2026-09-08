@@ -1,3 +1,6 @@
+![SolarFlare HUD Preview](https://i.postimg.cc/ydv50Sz0/Solar-Flare1.png)
+![SolarFlare Geaux Menu Preview](https://i.postimg.cc/5t9DymZB/Solar-Flare-Pic3.png)
+
 # SolarFlare — Beta v1
 
 SolarFlare is a customizable HUD addon for Farever, built around three main features: **ResourceTracker, Auras, and Geaux**. Keep resources, skill readiness, and visual alerts where you want them on screen.
@@ -51,6 +54,7 @@ Build a personal skill-monitoring grid with the icons you want to watch:
 - Undo/redo and JSON layout import/export.
 
 **Start here:** F6 → Geaux → Show Geaux grid → Open Geaux Builder. Assign skills from the catalog and arrange your slots.
+You can also use Aura to make alerts for single spells if you want.
 
 The gameplay grid is display-only: clicking it does not cast skills. Assignments and slot editing happen in Geaux Builder.
 
@@ -78,6 +82,7 @@ hlx/mods/solarflare/
         └── supplied atlases, logos, and icon files
 ```
 
+Just copy the HLX folder & libhl64.dll to your game folder and you're yet.
 Keep the supplied asset folders intact. `atlas.png/json` contains skill and UI artwork; `atlas2.png/json` contains target portraits. Start Farever and press **F6**.
 
 ## Move and resize your HUD
