@@ -1,4 +1,5 @@
-[SolarFlare v1.1b Update](https://i.postimg.cc/SN5fS2TQ/image.png)](https://www.youtube.com/watch?v=KIcw0sf8AKA)
+
+[![SolarFlare v1.1b Update](https://i.postimg.cc/SN5fS2TQ/image.png)](https://www.youtube.com/watch?v=KIcw0sf8AKA)
 
 ---
 
