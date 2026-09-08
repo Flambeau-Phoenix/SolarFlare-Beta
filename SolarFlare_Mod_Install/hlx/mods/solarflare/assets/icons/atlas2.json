@@ -1,0 +1,3945 @@
+{
+  "meta": {
+    "width": 4096,
+    "height": 5632,
+    "total_packed": 492
+  },
+  "frames": {
+    "Abigail.png": {
+      "x": 0,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "BaseHero.png": {
+      "x": 256,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bee_Prisoner.png": {
+      "x": 512,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bee_Prisoner1.png": {
+      "x": 768,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bee_Z1_FS.png": {
+      "x": 1024,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bee_Z1D.png": {
+      "x": 1280,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bee_Z1W.png": {
+      "x": 1536,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bee_Z1W_2.png": {
+      "x": 1792,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bee_Z1W_3.png": {
+      "x": 2048,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bee_Z1W_E.png": {
+      "x": 2304,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bee_Z1W_U.png": {
+      "x": 2560,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bee_Z2W.png": {
+      "x": 2816,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bee_Z2W_U.png": {
+      "x": 2560,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Bees_Mokshi.png": {
+      "x": 512,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Boar_Z1W.png": {
+      "x": 3072,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Boar_Z1W_E.png": {
+      "x": 3328,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Boar_Z2W.png": {
+      "x": 3584,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Boar_Z2W_2.png": {
+      "x": 3840,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Boar_Z2W_E.png": {
+      "x": 0,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Boar_Z2W_U.png": {
+      "x": 256,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Boar_Z4W_E.png": {
+      "x": 3840,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Cannon_Mokshi.png": {
+      "x": 512,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "CannonHoney.png": {
+      "x": 512,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "CannonPlant.png": {
+      "x": 768,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ChaoticPortal.png": {
+      "x": 1024,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ChaoticPortalPhrixes.png": {
+      "x": 1024,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Cleodora.png": {
+      "x": 1280,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Cleodora_Champion.png": {
+      "x": 1536,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Cleodora_Champion2.png": {
+      "x": 1792,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Cleodora_Champion3.png": {
+      "x": 2048,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Cleodora_ChampionEgg.png": {
+      "x": 2304,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Cleodora_Feeder.png": {
+      "x": 2560,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Crabgantua.png": {
+      "x": 2816,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z1D.png": {
+      "x": 2816,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z1W.png": {
+      "x": 3072,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z1W_2.png": {
+      "x": 3328,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z1W_3.png": {
+      "x": 3584,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z1W_5.png": {
+      "x": 3840,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z1W_E.png": {
+      "x": 0,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z1W_E_2.png": {
+      "x": 256,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z1W_E_3.png": {
+      "x": 512,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z1W_FS.png": {
+      "x": 768,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z1W_FS_1.png": {
+      "x": 768,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z1W_U.png": {
+      "x": 1024,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z2D_2.png": {
+      "x": 1280,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z2W.png": {
+      "x": 1536,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crab_Z2W_E.png": {
+      "x": 1792,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crabgantua.png": {
+      "x": 1024,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crawler_Z1W_E.png": {
+      "x": 2048,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z1W_Bow.png": {
+      "x": 2304,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z1W_Captain_E.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z1W_Captain_U.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z1W_Sword.png": {
+      "x": 2816,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Beekeeper.png": {
+      "x": 3072,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Beekeeper2.png": {
+      "x": 3072,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Bow.png": {
+      "x": 2304,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Bow_2.png": {
+      "x": 2304,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Captain_E.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Captain_E_2.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Captain_U.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Captain_U_2.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Captain_U_3.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Captain_U_4.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Captain_U_5.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Captain_U_6.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Monk.png": {
+      "x": 3328,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Monk_2.png": {
+      "x": 3328,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Peasant.png": {
+      "x": 3584,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Peasant_2.png": {
+      "x": 3584,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Peasant_E.png": {
+      "x": 3584,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Peasant_FS.png": {
+      "x": 3584,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Sword.png": {
+      "x": 2816,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z2W_Sword_2.png": {
+      "x": 2816,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3_Fist.png": {
+      "x": 3840,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3_Fist_U.png": {
+      "x": 3840,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3_Fist_U1.png": {
+      "x": 3840,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3_Fist_U2.png": {
+      "x": 3840,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3D_Bow.png": {
+      "x": 2304,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3D_Captain.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3D_Captain1.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3D_Captain2.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3D_GA.png": {
+      "x": 0,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3D_Sword.png": {
+      "x": 2816,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Bow.png": {
+      "x": 2304,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Bow_FS.png": {
+      "x": 2304,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Captain_U.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Captain_U_1.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Captain_U_2.png": {
+      "x": 2560,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Caster.png": {
+      "x": 256,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Caster_E.png": {
+      "x": 512,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Daggers.png": {
+      "x": 768,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Daggers_2.png": {
+      "x": 768,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Daggers_E.png": {
+      "x": 768,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Daggers_FS.png": {
+      "x": 768,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_GA.png": {
+      "x": 0,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_GA_2.png": {
+      "x": 0,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_GA_E.png": {
+      "x": 0,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_GA_U.png": {
+      "x": 0,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Monk.png": {
+      "x": 3328,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Monk_U.png": {
+      "x": 3328,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Monk_U1.png": {
+      "x": 3328,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Monk_U2.png": {
+      "x": 3328,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Peasant.png": {
+      "x": 3584,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Peasant_U.png": {
+      "x": 3584,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Sword.png": {
+      "x": 2816,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crimson_Z3W_Sword_E.png": {
+      "x": 2816,
+      "y": 512,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Crocopork_Z1W.png": {
+      "x": 1024,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Rift_Claws.png": {
+      "x": 1280,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Rift_Claws_Major.png": {
+      "x": 1536,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Rift_Spear_Major.png": {
+      "x": 1792,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z1_Claws_Soulstone.png": {
+      "x": 2048,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z1_Spear_Soulstone.png": {
+      "x": 2304,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z2_Claws_Soulstone.png": {
+      "x": 2560,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z2_Spear_Soulstone_Leg.png": {
+      "x": 2816,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z3W_Claws.png": {
+      "x": 1280,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z3W_Claws_Big.png": {
+      "x": 1536,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z3W_Claws_E.png": {
+      "x": 3072,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z3W_Claws_E_1.png": {
+      "x": 3328,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z3W_Claws_FS.png": {
+      "x": 3584,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z3W_Spear.png": {
+      "x": 1280,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z3W_Spear_Big.png": {
+      "x": 1792,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Demon_Z3W_Spear_E.png": {
+      "x": 1792,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonDog_Beige.png": {
+      "x": 3840,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonDog_Blue.png": {
+      "x": 0,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonDog_Blue02.png": {
+      "x": 256,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonDog_Orange.png": {
+      "x": 512,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonDog_Purple.png": {
+      "x": 768,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonDog_Red.png": {
+      "x": 1024,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonHunterMira.png": {
+      "x": 1280,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonHunterRumi.png": {
+      "x": 1536,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonHunterZoey.png": {
+      "x": 1792,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonSuperElite.png": {
+      "x": 2048,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonSuperElite_Fairy.png": {
+      "x": 2304,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonSuperElite_Fairy_FalseClone.png": {
+      "x": 2560,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonSuperElite_Fairy_Guardian.png": {
+      "x": 1536,
+      "y": 768,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "DemonSuperElite_Fairy_TrueClone.png": {
+      "x": 2304,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z2W_Azuram.png": {
+      "x": 2816,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z3D.png": {
+      "x": 3072,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z3W.png": {
+      "x": 3072,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z3W_E.png": {
+      "x": 3328,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z3W_RamPatrol01.png": {
+      "x": 3584,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z3W_RamPatrol02.png": {
+      "x": 3840,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z3W_RamPatrol03.png": {
+      "x": 3584,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z3W_RamPatrol04.png": {
+      "x": 3072,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z3W_RamPatrol05.png": {
+      "x": 3072,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z3W_RamPatrol06.png": {
+      "x": 0,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z3W_RamPatrol07.png": {
+      "x": 3840,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dog_Z3W_RamPatrol08.png": {
+      "x": 3584,
+      "y": 1024,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dummy.png": {
+      "x": 256,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dummy_FX.png": {
+      "x": 1024,
+      "y": 256,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dummy_Runner.png": {
+      "x": 3072,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Dummy_Support.png": {
+      "x": 512,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Egglektra.png": {
+      "x": 768,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z1_FS_Earth.png": {
+      "x": 1024,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z1_FS_Earth_2.png": {
+      "x": 1024,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z1_FS_Underwater.png": {
+      "x": 1280,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z1D_Earth.png": {
+      "x": 1536,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z1D_Lava.png": {
+      "x": 1792,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z1W_Earth.png": {
+      "x": 1024,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z1W_Earth_2.png": {
+      "x": 2048,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z1W_Earth_U.png": {
+      "x": 2304,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z1W_Underwater.png": {
+      "x": 1280,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z2_FS.png": {
+      "x": 1024,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z2_FS_Lava.png": {
+      "x": 1792,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z2_FS_Lava_2.png": {
+      "x": 1792,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z2D_Underwater.png": {
+      "x": 2560,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z2W.png": {
+      "x": 2816,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z2W_2.png": {
+      "x": 2816,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z2W_Lava.png": {
+      "x": 1792,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z2W_Lava_2.png": {
+      "x": 1792,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z2W_Underwater.png": {
+      "x": 3072,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z2W_Underwater_U.png": {
+      "x": 3328,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Elemental_Z3W_Earth_U.png": {
+      "x": 2816,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z1_FS.png": {
+      "x": 3584,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z1D_Claws.png": {
+      "x": 512,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z1D_GreatMace.png": {
+      "x": 3584,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z1D_Spear.png": {
+      "x": 3840,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z1W_Claws.png": {
+      "x": 0,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z1W_Claws_E.png": {
+      "x": 256,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z1W_GreatMace.png": {
+      "x": 3584,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z1W_GreatMace_E.png": {
+      "x": 512,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z1W_Spear.png": {
+      "x": 768,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z1W_Spear_U.png": {
+      "x": 1024,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z1W_Tank.png": {
+      "x": 1280,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z2_FS_Tank_2.png": {
+      "x": 3840,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z2W_Champ_E.png": {
+      "x": 1536,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z2W_Claws.png": {
+      "x": 512,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z2W_FS_Tank.png": {
+      "x": 1280,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z2W_GreatMace.png": {
+      "x": 1792,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z2W_GreatMace_E.png": {
+      "x": 3584,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z2W_GreatMace_U.png": {
+      "x": 2048,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z2W_GreatMace_U_2.png": {
+      "x": 2048,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z2W_Spear.png": {
+      "x": 3840,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z2W_Spear_U.png": {
+      "x": 1024,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieBee_Z2W_Tank.png": {
+      "x": 1280,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieDemon_Rift_Caster.png": {
+      "x": 2304,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieDemon_Rift_Caster_Major.png": {
+      "x": 2560,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieDemon_Z1_Soulstone_Leg.png": {
+      "x": 2816,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieDemon_Z2_Soulstone.png": {
+      "x": 3072,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieDemon_Z3W_Caster.png": {
+      "x": 2304,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieDemon_Z3W_Caster_Big.png": {
+      "x": 2560,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieDemon_Z3W_Caster_E.png": {
+      "x": 2560,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "FaerieDemon_Z3W_Caster_E1.png": {
+      "x": 2560,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Fly_Demon_Rift.png": {
+      "x": 3328,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Fly_Demon_Z3W.png": {
+      "x": 3328,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Frog_Blue.png": {
+      "x": 3584,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Frog_BlueGreen.png": {
+      "x": 3840,
+      "y": 1536,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Frog_BluePurple.png": {
+      "x": 0,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Frog_Brown.png": {
+      "x": 256,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Frog_Demon.png": {
+      "x": 512,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Frog_Green.png": {
+      "x": 768,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Frog_RedOrange.png": {
+      "x": 1024,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Frog_Spark.png": {
+      "x": 1280,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Frog_Yellow.png": {
+      "x": 1536,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Gatsbee.png": {
+      "x": 1792,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "GiantCrab_Z1W_U.png": {
+      "x": 2048,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Goat_Beige01.png": {
+      "x": 2304,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Goat_Beige02.png": {
+      "x": 2560,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Goat_Black.png": {
+      "x": 2816,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Goat_Brown.png": {
+      "x": 3072,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Goat_Demon.png": {
+      "x": 3328,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Goat_Grey.png": {
+      "x": 3584,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Goat_Spark.png": {
+      "x": 3840,
+      "y": 1792,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golcano.png": {
+      "x": 0,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golcano_Minion.png": {
+      "x": 256,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z1_FS.png": {
+      "x": 512,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z1_FS_2.png": {
+      "x": 512,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z1W_Earth1.png": {
+      "x": 768,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z1W_Earth_2.png": {
+      "x": 1024,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z1W_Earth_E.png": {
+      "x": 1280,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z1W_Earth_E_2.png": {
+      "x": 1536,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2_FS.png": {
+      "x": 1792,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2_FS_2.png": {
+      "x": 1792,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2_FS_FireExplosive.png": {
+      "x": 256,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2_FS_FireExplosive_2.png": {
+      "x": 256,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2D_FireExplosive.png": {
+      "x": 2048,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2D_FireExplosive_2.png": {
+      "x": 256,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2W_E.png": {
+      "x": 2304,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2W_E_2.png": {
+      "x": 2560,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2W_FireExplosive.png": {
+      "x": 2048,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2W_FireExplosive_2.png": {
+      "x": 2048,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2W_FireExplosive_E.png": {
+      "x": 256,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2W_FireExplosive_E_2.png": {
+      "x": 256,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2W_U.png": {
+      "x": 2816,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2W_Wind1.png": {
+      "x": 1792,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Golem_Z2W_Wind2.png": {
+      "x": 1792,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "HildaLambert.png": {
+      "x": 3072,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "HunterShepherd.png": {
+      "x": 3328,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ImpDemon_Elite_Red.png": {
+      "x": 3584,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ImpDemon_GreyBlue.png": {
+      "x": 3840,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ImpDemon_Red.png": {
+      "x": 0,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ImpDemon_Rift.png": {
+      "x": 0,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ImpDemon_Rift_Major.png": {
+      "x": 3584,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ImpDemon_Summoned.png": {
+      "x": 3840,
+      "y": 2048,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ImpDemon_Z1_Soulstone.png": {
+      "x": 256,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ImpDemon_Z2_Soulstone.png": {
+      "x": 512,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ImpDemon_Z3W.png": {
+      "x": 768,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ImpDemon_Z3W_FS.png": {
+      "x": 1024,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Ogre_Prisoner.png": {
+      "x": 1280,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Prisoner.png": {
+      "x": 1536,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Ratsar_Caster.png": {
+      "x": 1792,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z1D_Daggers.png": {
+      "x": 2048,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z1D_FS_Caster.png": {
+      "x": 1792,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z1D_Mace.png": {
+      "x": 2304,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z1W_Caster.png": {
+      "x": 2560,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z1W_Caster_2.png": {
+      "x": 2816,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z1W_Daggers.png": {
+      "x": 3072,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z1W_Daggers_2.png": {
+      "x": 3328,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z1W_Mace.png": {
+      "x": 3584,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z1W_Mace_2.png": {
+      "x": 3840,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z1W_Mace_U.png": {
+      "x": 0,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z2D_Caster.png": {
+      "x": 2816,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z2D_Mace_2.png": {
+      "x": 2304,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z2W_Caster.png": {
+      "x": 256,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z2W_Daggers.png": {
+      "x": 2048,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Kobold_Z2W_Mace.png": {
+      "x": 512,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Ladybug_Blue.png": {
+      "x": 768,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Ladybug_Demon.png": {
+      "x": 1024,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Ladybug_Green.png": {
+      "x": 1280,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Ladybug_Purple.png": {
+      "x": 1536,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Ladybug_Red.png": {
+      "x": 1792,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Ladybug_Spark.png": {
+      "x": 2048,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Ladybug_Yellow.png": {
+      "x": 2304,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Lizard_Blue.png": {
+      "x": 2560,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Lizard_BlueOrange.png": {
+      "x": 2816,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Lizard_Demon.png": {
+      "x": 3072,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Lizard_Green.png": {
+      "x": 3328,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Lizard_RedOrange.png": {
+      "x": 3584,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Lizard_Spark.png": {
+      "x": 3840,
+      "y": 2560,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Lizard_Yellow.png": {
+      "x": 0,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Ogre_Prisoner.png": {
+      "x": 256,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Prisonner.png": {
+      "x": 512,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1D_Caster.png": {
+      "x": 768,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1D_Claws.png": {
+      "x": 1024,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1D_FS_Healer.png": {
+      "x": 1280,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1D_Spear.png": {
+      "x": 1536,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1W_Caster.png": {
+      "x": 1792,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1W_Caster_3.png": {
+      "x": 2048,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1W_Claws.png": {
+      "x": 512,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1W_Claws_2.png": {
+      "x": 1280,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1W_E_Spear.png": {
+      "x": 2304,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1W_FS.png": {
+      "x": 2560,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1W_Spear.png": {
+      "x": 2816,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1W_Spear_3.png": {
+      "x": 3072,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z1W_U_Caster.png": {
+      "x": 3328,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z2D_Caster.png": {
+      "x": 3584,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z2D_Healer.png": {
+      "x": 3840,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z2D_Spear.png": {
+      "x": 0,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z2D_Tank.png": {
+      "x": 256,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z2W_Caster.png": {
+      "x": 512,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z2W_Claws.png": {
+      "x": 3840,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z2W_E_Spear_2.png": {
+      "x": 768,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z2W_FS_Tank.png": {
+      "x": 1024,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z2W_Healer.png": {
+      "x": 1280,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z2W_Spear.png": {
+      "x": 1280,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Manfish_Z2W_Sword.png": {
+      "x": 1536,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Mokshi.png": {
+      "x": 1792,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "MountGoat_01.png": {
+      "x": 2048,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "MountGoat_02.png": {
+      "x": 2304,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "MountGoat_03.png": {
+      "x": 2560,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "MountGoat_04.png": {
+      "x": 2816,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "MountWolf_01.png": {
+      "x": 3072,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "MountWolf_04.png": {
+      "x": 3328,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "MountWolf_06.png": {
+      "x": 3584,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "MunsterChuck.png": {
+      "x": 3840,
+      "y": 3072,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Nepsilon.png": {
+      "x": 0,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreHuman_Z2W_Peasant.png": {
+      "x": 256,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreHuman_Z2W_Peasant_E.png": {
+      "x": 256,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreHuman_Z3D_GM.png": {
+      "x": 512,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreHuman_Z3W_Claws_U.png": {
+      "x": 768,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreHuman_Z3W_GM.png": {
+      "x": 512,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreHuman_Z3W_GM_E.png": {
+      "x": 1024,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreHuman_Z3W_GM_FS.png": {
+      "x": 512,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreHuman_Z3W_Peasant.png": {
+      "x": 256,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreKobold_Z1D_Claws.png": {
+      "x": 1280,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreKobold_Z1D_FS_Claws.png": {
+      "x": 1536,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreKobold_Z1W_Claws.png": {
+      "x": 1280,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreKobold_Z1W_Claws_3.png": {
+      "x": 1792,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreKobold_Z1W_Claws_U.png": {
+      "x": 2048,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreKobold_Z1W_E_Claws.png": {
+      "x": 2304,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreKobold_Z2D_Docker.png": {
+      "x": 2560,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreKobold_Z2W_Claws.png": {
+      "x": 2816,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreKobold_Z2W_GM.png": {
+      "x": 3072,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreManfish_Z1D_Claws.png": {
+      "x": 3328,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreManfish_Z1W_Claws.png": {
+      "x": 256,
+      "y": 2816,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreManfish_Z1W_Claws_U.png": {
+      "x": 3584,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreManfish_Z1W_FS_Claws.png": {
+      "x": 3840,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreManfish_Z2D_Claws.png": {
+      "x": 0,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreManfish_Z2W_Claws.png": {
+      "x": 256,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreManfish_Z2W_Claws_E.png": {
+      "x": 0,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "OgreManfish_Z2W_FS_Claws.png": {
+      "x": 3840,
+      "y": 3328,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Phrixes.png": {
+      "x": 512,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "PunchingBag.png": {
+      "x": 768,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "PunchingBagArmor.png": {
+      "x": 768,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "PunchingBagInvulnerable.png": {
+      "x": 768,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "PunchingBagMagicRes.png": {
+      "x": 768,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "PunchingBagShield.png": {
+      "x": 768,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "R1KoboldBoss_Sparkling.png": {
+      "x": 1536,
+      "y": 1280,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Rabbit_Brown.png": {
+      "x": 1024,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Rabbit_Demon.png": {
+      "x": 1280,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Rabbit_EarlyAccess_Spark.png": {
+      "x": 1536,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Rabbit_Green.png": {
+      "x": 1792,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Rabbit_Grey.png": {
+      "x": 2048,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Rabbit_Pink.png": {
+      "x": 2304,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Rabbit_Spark.png": {
+      "x": 2560,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Rabbit_Yellow.png": {
+      "x": 2816,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Rabbit_Yellow02.png": {
+      "x": 3072,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Ratsar.png": {
+      "x": 3328,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Reblochonk.png": {
+      "x": 3584,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "RobinHoof.png": {
+      "x": 3840,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "RobinHoofDog01.png": {
+      "x": 0,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sheep_Beige.png": {
+      "x": 256,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sheep_Black.png": {
+      "x": 512,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sheep_Black02.png": {
+      "x": 768,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sheep_Brown.png": {
+      "x": 1024,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sheep_Brown02.png": {
+      "x": 1280,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sheep_Demon.png": {
+      "x": 1536,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sheep_Spark.png": {
+      "x": 1792,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ShiroNext_Pirate.png": {
+      "x": 2048,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "ShiroNext_Pirate1.png": {
+      "x": 2304,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Skunk_Z1W.png": {
+      "x": 2560,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Skunk_Z1W_2.png": {
+      "x": 2816,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Skunk_Z1W_FS.png": {
+      "x": 3072,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Skunk_Z1W_FS_2.png": {
+      "x": 3072,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Skunk_Z1W_U.png": {
+      "x": 3328,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Demonic_Z3W.png": {
+      "x": 3584,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Demonic_Z3W_E.png": {
+      "x": 3840,
+      "y": 3840,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1D_Honey.png": {
+      "x": 0,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1D_Honey_NoXP.png": {
+      "x": 0,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1D_U.png": {
+      "x": 256,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1W.png": {
+      "x": 512,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1W_2.png": {
+      "x": 768,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1W_4.png": {
+      "x": 1024,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1W_E.png": {
+      "x": 256,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1W_E_2.png": {
+      "x": 1280,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1W_FS.png": {
+      "x": 1536,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1W_FS_2.png": {
+      "x": 1536,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1W_Honey.png": {
+      "x": 0,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z1W_U.png": {
+      "x": 1792,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z2W_FS.png": {
+      "x": 1536,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Slime_Z3W.png": {
+      "x": 2048,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Spirit_Z2W_Claws.png": {
+      "x": 2304,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Spirit_Z2W_Claws2.png": {
+      "x": 2560,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Spirit_Z2W_Claws_E.png": {
+      "x": 2816,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Spirit_Z2W_Claws_E2.png": {
+      "x": 3072,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Spirit_Z2W_FS_Claws.png": {
+      "x": 3328,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Spirit_Z3W_Claws.png": {
+      "x": 3584,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Spirit_Z3W_Claws_E.png": {
+      "x": 3840,
+      "y": 4096,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "SpongeBlob.png": {
+      "x": 0,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_DarkRice_Z2W.png": {
+      "x": 256,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Garlic_Z2W.png": {
+      "x": 512,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Garlic_Z2W_2.png": {
+      "x": 768,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Onion_Z2_FS.png": {
+      "x": 1024,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Onion_Z2W.png": {
+      "x": 1024,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Onion_Z2W_2.png": {
+      "x": 1280,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Rice_Z2_FS.png": {
+      "x": 1536,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Rice_Z2W.png": {
+      "x": 1536,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Rice_Z2W_E.png": {
+      "x": 1792,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Rice_Z2W_Plantivore.png": {
+      "x": 2048,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Rice_Z2W_Plantivore_2.png": {
+      "x": 2304,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Rice_Z2W_Plantivore_3.png": {
+      "x": 2560,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Rice_Z2W_Plantivore_4.png": {
+      "x": 2816,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Rice_Z2W_Plantivore_5.png": {
+      "x": 1792,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Rice_Z2W_Plantivore_6.png": {
+      "x": 1792,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Rice_Z2W_U.png": {
+      "x": 3072,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Turnip_Z2W.png": {
+      "x": 3328,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Sprout_Turnip_Z2W_2.png": {
+      "x": 3584,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Squirrel_Blue.png": {
+      "x": 3840,
+      "y": 4352,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Squirrel_Brown.png": {
+      "x": 0,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Squirrel_Demon.png": {
+      "x": 256,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Squirrel_Green.png": {
+      "x": 512,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Squirrel_Grey.png": {
+      "x": 768,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Squirrel_Red.png": {
+      "x": 1024,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Squirrel_Spark.png": {
+      "x": 1280,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Staff_SummonDemon_Imp.png": {
+      "x": 1536,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "StinkBug_Blue.png": {
+      "x": 1792,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "StinkBug_Demon.png": {
+      "x": 2048,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "StinkBug_Green.png": {
+      "x": 2304,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "StinkBug_Purple.png": {
+      "x": 2560,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "StinkBug_RedOrange.png": {
+      "x": 2816,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "StinkBug_Spark.png": {
+      "x": 3072,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Summon_Bee.png": {
+      "x": 1536,
+      "y": 0,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Summon_Imp.png": {
+      "x": 0,
+      "y": 2304,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Swarowl_Bat.png": {
+      "x": 3328,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_BaseNPC_01.png": {
+      "x": 3584,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_Crocopork_Spark.png": {
+      "x": 3840,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_FaerieBee.png": {
+      "x": 0,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_FaerieSwarowl_Z3W_Claws.png": {
+      "x": 256,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_Fly_Demon_Elite.png": {
+      "x": 512,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_Kobold_Tank.png": {
+      "x": 768,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_Kobold_Z2W_Tank.png": {
+      "x": 768,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_OgreBagon_Beige.png": {
+      "x": 1024,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_OgreBagon_BlueGrey.png": {
+      "x": 1280,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_OgreBagon_Brown.png": {
+      "x": 1536,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_OgreBagon_Brown02.png": {
+      "x": 1792,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_OgreBagon_DarkBlue.png": {
+      "x": 2048,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_OgreBagon_Grey.png": {
+      "x": 2304,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_OgreBagon_Spark.png": {
+      "x": 2560,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_ProfessionTrainer.png": {
+      "x": 2816,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_Slime_King.png": {
+      "x": 3072,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_SnowPanther_Black.png": {
+      "x": 3328,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_SnowPanther_DarkBrown.png": {
+      "x": 3584,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_SnowPanther_Grey.png": {
+      "x": 3840,
+      "y": 4864,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_SnowPanther_LightBrown.png": {
+      "x": 0,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_SnowPanther_Spark.png": {
+      "x": 256,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_SnowPanther_White.png": {
+      "x": 512,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_SnowPanther_Yellow.png": {
+      "x": 768,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_Sprout_Garlic_Spark.png": {
+      "x": 1024,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_Sprout_Onion_Spark.png": {
+      "x": 1280,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_Sprout_Turnip_Spark.png": {
+      "x": 1280,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_StableMaster.png": {
+      "x": 1536,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_Toad.png": {
+      "x": 3584,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "TODO_WanderingMerchant.png": {
+      "x": 1792,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Totem_BeaconOfHope.png": {
+      "x": 1536,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Totem_Tidal.png": {
+      "x": 1536,
+      "y": 4608,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Turtle_Blue.png": {
+      "x": 2048,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Turtle_Demon.png": {
+      "x": 2304,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Turtle_Green.png": {
+      "x": 2560,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Turtle_Grey.png": {
+      "x": 2816,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Turtle_Pink.png": {
+      "x": 3072,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Turtle_Red.png": {
+      "x": 3328,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Turtle_Spark.png": {
+      "x": 3584,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Turtle_Yellow.png": {
+      "x": 3840,
+      "y": 5120,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Ulserous.png": {
+      "x": 0,
+      "y": 5376,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Wolf_Z1W.png": {
+      "x": 256,
+      "y": 5376,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Wolf_Z1W_Alpha.png": {
+      "x": 512,
+      "y": 5376,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Wolf_Z1W_E.png": {
+      "x": 768,
+      "y": 5376,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Wolf_Z2W.png": {
+      "x": 1024,
+      "y": 5376,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Wolf_Z2W_2.png": {
+      "x": 1280,
+      "y": 5376,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Wolf_Z2W_U.png": {
+      "x": 1536,
+      "y": 5376,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "Wolf_Z3W.png": {
+      "x": 1792,
+      "y": 5376,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    },
+    "YellowRabbits.png": {
+      "x": 3072,
+      "y": 3584,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 4096,
+      "atlas_h": 5632
+    }
+  }
+}

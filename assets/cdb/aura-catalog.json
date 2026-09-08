@@ -1,0 +1,346 @@
+{
+  "source": "D:/FareverDevSpace/Farever/res.light.pak#data.cdb",
+  "skills": [
+    {
+      "id": "Warrior_Rage_Strike",
+      "name": "Raging Smash",
+      "duration": 0.4,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "x": 0,
+        "y": 0,
+        "size": 96
+      }
+    },
+    {
+      "id": "Mage_RayOfSpark",
+      "name": "Spark Beam",
+      "cooldown": 10,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "x": 0,
+        "y": 0,
+        "size": 96
+      }
+    },
+    {
+      "id": "Priest_Sig_DivineIntervention",
+      "name": "Judgment",
+      "duration": 0.45,
+      "cooldown": 12,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "x": 0,
+        "y": 0,
+        "size": 96
+      }
+    },
+    {
+      "id": "Rogue_Sig_Finisher",
+      "name": "Finisher",
+      "duration": 0.45,
+      "cooldown": 8,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "x": 0,
+        "y": 0,
+        "size": 96
+      }
+    },
+    {
+      "id": "Mage_Talent_ConduitResidues",
+      "name": "Conduit Residues",
+      "gfx": {
+        "file": "UI/icons/Mage_talent.png",
+        "x": 8,
+        "y": 2,
+        "size": 48
+      }
+    },
+    {
+      "id": "Mage_Talent_Chaincast",
+      "name": "Chaincast",
+      "gfx": {
+        "file": "UI/icons/Mage_talent.png",
+        "x": 0,
+        "y": 0,
+        "size": 48
+      }
+    },
+    {
+      "id": "Priest_Prayer_Life",
+      "name": "Prayer: Life",
+      "cooldown": 1,
+      "channelDuration": 1.5,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "x": 0,
+        "y": 2,
+        "size": 96
+      }
+    },
+    {
+      "id": "Priest_Prayer_Shield",
+      "name": "Prayer: Virtue",
+      "cooldown": 1,
+      "channelDuration": 1.5,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "x": 2,
+        "y": 2,
+        "size": 96
+      }
+    },
+    {
+      "id": "Priest_Prayer_Smite",
+      "name": "Prayer: Smite",
+      "cooldown": 1,
+      "channelDuration": 1.5,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "x": 1,
+        "y": 2,
+        "size": 96
+      }
+    },
+    {
+      "id": "FaerieEliteDemon_NightRain",
+      "name": "Night Rain",
+      "duration": 4.4,
+      "cooldown": 12,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "FaerieEliteDemon_Auto",
+      "name": "",
+      "duration": 5,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "FaerieEliteDemon_Teleport",
+      "name": "Teleport",
+      "duration": 4.4,
+      "cooldown": 12,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "FairieSuperElite_Clones",
+      "name": "Deceitful Illusions",
+      "channelDuration": 2.0,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "SuperEliteDemon_FireWall",
+      "name": "",
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "FaerieEliteDemon_Clone_Auto",
+      "name": "",
+      "channelDuration": 2.4,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "FaerieEliteDemon_FalseClone_Explosion",
+      "name": "",
+      "duration": 0,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "FaerieEliteDemon_TrueClone_Aoe",
+      "name": "",
+      "channelDuration": 2.4,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "Demon_Claws_Auto",
+      "name": "",
+      "duration": 2.25,
+      "cooldown": 3,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "Demon_Claws_Skill",
+      "name": "",
+      "duration": 3,
+      "cooldown": 9,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "SuperEliteDemon_Auto",
+      "name": "Strike",
+      "duration": 4,
+      "cooldown": 1,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "SuperEliteDemon_Slam",
+      "name": "Slam",
+      "duration": 5.6,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "SuperEliteDemon_Leap",
+      "name": "Leap",
+      "duration": 3,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "SuperEliteDemon_Storm",
+      "name": "Chaos Storm",
+      "observedDuration": 12,
+      "channelDuration": 15.0,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "SuperEliteDemon_Bomb",
+      "name": "Bomb",
+      "cooldown": 25,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "FaerieEliteDemon_NightRain_Status",
+      "name": "Chaos Scar",
+      "maxStacks": 15,
+      "stackVar": 0.25,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "x": 16,
+        "y": 2,
+        "size": 48
+      }
+    },
+    {
+      "id": "FaerieEliteDemon_Teleport_Cloud_Area",
+      "name": "",
+      "duration": 60,
+      "gfx": {
+        "file": null,
+        "x": null,
+        "y": null,
+        "size": null
+      }
+    },
+    {
+      "id": "FairieSuperElite_Clones_Stealth",
+      "name": "",
+      "duration": 1000,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "x": 5,
+        "y": 0,
+        "size": 96
+      }
+    },
+    {
+      "id": "SuperEliteDemon_Bomb_Status",
+      "name": "",
+      "duration": 5,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "x": 5,
+        "y": 0,
+        "size": 96
+      }
+    },
+    {
+      "id": "SuperEliteDemon_Rage_Status",
+      "name": "",
+      "duration": -1,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "x": 0,
+        "y": 1,
+        "size": 96
+      }
+    },
+    {
+      "id": "SuperEliteDemon_Status_Stackable",
+      "name": "Chaos Scar",
+      "duration": 30,
+      "maxStacks": 15,
+      "stackVar": 0.2,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "x": 16,
+        "y": 2,
+        "size": 48
+      }
+    }
+  ]
+}

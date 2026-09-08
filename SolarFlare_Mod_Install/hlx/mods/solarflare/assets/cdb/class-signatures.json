@@ -1,0 +1,322 @@
+{
+  "skills": [
+    {
+      "id": "Warrior_Rage_Strike",
+      "name": "Raging Smash",
+      "duration": 0.4,
+      "cooldown": null,
+      "type": 17,
+      "nature": 2,
+      "flags": 0,
+      "vars": {
+        "damage": 0.5,
+        "threshold": 0.2,
+        "dur1": 3
+      },
+      "aiProps": null,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "x": 0,
+        "y": 0,
+        "size": 96
+      },
+      "steps": [
+        {
+          "id": null,
+          "on": 0,
+          "type": 11,
+          "delay": null,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 9,
+          "delay": null,
+          "duration": 0.15,
+          "range": 5.5,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 8,
+          "delay": null,
+          "duration": 0.2,
+          "range": 0.7,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 4,
+          "delay": 0.3,
+          "duration": null,
+          "range": 4,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 1,
+          "type": 1,
+          "delay": null,
+          "duration": "dur1",
+          "range": "",
+          "targetSkill": null,
+          "summon": null
+        }
+      ]
+    },
+    {
+      "id": "Mage_RayOfSpark",
+      "name": "Spark Beam",
+      "duration": null,
+      "cooldown": 10,
+      "type": 17,
+      "nature": 3,
+      "flags": 0,
+      "vars": {
+        "dur1": 1,
+        "var3": 0.2
+      },
+      "aiProps": null,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "x": 0,
+        "y": 0,
+        "size": 96
+      },
+      "steps": [
+        {
+          "id": "ChannelTick",
+          "on": 0,
+          "type": 22,
+          "delay": 0.2,
+          "duration": "dur1",
+          "range": 40,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 11,
+          "delay": 0.2,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 11,
+          "delay": 0.2,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 14,
+          "delay": null,
+          "duration": -1,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": "SparkRegen",
+          "on": 13,
+          "type": 12,
+          "delay": null,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 1,
+          "type": 1,
+          "delay": null,
+          "duration": 0.5,
+          "range": "",
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": "M2_Area",
+          "on": 13,
+          "type": 4,
+          "delay": null,
+          "duration": null,
+          "range": 5,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": "M2_HitDmg",
+          "on": 13,
+          "type": 6,
+          "delay": null,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": "M3_SelfHeal",
+          "on": 13,
+          "type": 12,
+          "delay": null,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        }
+      ]
+    },
+    {
+      "id": "Priest_Sig_DivineIntervention",
+      "name": "Judgment",
+      "duration": 0.45,
+      "cooldown": 12,
+      "type": 17,
+      "nature": 3,
+      "flags": 0,
+      "vars": {},
+      "aiProps": null,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "x": 0,
+        "y": 0,
+        "size": 96
+      },
+      "steps": [
+        {
+          "id": "ProcDelay",
+          "on": 0,
+          "type": 0,
+          "delay": 0.25,
+          "duration": null,
+          "range": 0,
+          "targetSkill": null,
+          "summon": null
+        }
+      ],
+      "facts": {
+        "checkEnabled": "var priest = ownerHero?.priest; if(priest == null) return Reason.Invalid; if(priest.getChargedPrayerCount() == 0) return Reason.RequireActivePrayer; return Reason.Ok;"
+      }
+    },
+    {
+      "id": "Rogue_Sig_Finisher",
+      "name": "Finisher",
+      "duration": 0.45,
+      "cooldown": 8,
+      "type": 17,
+      "nature": 2,
+      "flags": 0,
+      "vars": {
+        "var1": 0.3
+      },
+      "aiProps": null,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "x": 0,
+        "y": 0,
+        "size": 96
+      },
+      "steps": [
+        {
+          "id": null,
+          "on": 0,
+          "type": 8,
+          "delay": null,
+          "duration": 0.15,
+          "range": 2,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 13,
+          "type": 8,
+          "delay": 0.15,
+          "duration": 0.05,
+          "range": 2,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 14,
+          "delay": null,
+          "duration": 0.2,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 8,
+          "delay": 0.2,
+          "duration": 0.1,
+          "range": 12,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 8,
+          "delay": 0.25,
+          "duration": 0.23,
+          "range": 2,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 11,
+          "delay": 0.15,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": "Damage",
+          "on": 0,
+          "type": 4,
+          "delay": 0.2,
+          "duration": 0.25,
+          "range": 14,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": "ConsumeCP",
+          "on": 0,
+          "type": null,
+          "delay": 0.22,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        }
+      ]
+    }
+  ]
+}

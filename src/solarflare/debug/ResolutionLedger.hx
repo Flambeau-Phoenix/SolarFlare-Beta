@@ -1,0 +1,348 @@
+﻿package solarflare.debug;
+
+import solarflare.FieldWalk;
+import solarflare.ProbeHit;
+import imgui.ref.BoolRef;
+import sys.io.File;
+
+/**
+ * Opt-in production-resolve ledger. Armed flag is saved in solarflare.json.
+ * Aggregates winners in memory; JSONL flushes pending deltas ~2s.
+ */
+@:keep
+class ResolutionLedger {
+	public static var enabled = new BoolRef(false);
+	public static var lastPath:String = "";
+	public static var lastLabel:String = "resolution-ledger idle";
+	public static var lastJson:String = "{}";
+
+	static inline var FLUSH_S:Float = 2.0;
+	static inline var SNAP_S:Float = 2.0;
+
+	static var aggs:Map<String, LedgerAgg> = new Map();
+	static var order:Array<String> = [];
+	static var buf:Array<String> = [];
+	static var jsonlPath:String = "";
+	static var snapPath:String = "";
+	static var lastFlush:Float = 0;
+	static var lastSnapWrite:Float = 0;
+	static var ready:Bool = false;
+	static var dirty:Bool = false;
+	static var lastArmed:Bool = false;
+
+	public static function keep():Void {
+		ensure();
+		ResolutionCatalog.keep();
+	}
+
+	public static function armed():Bool {
+		return enabled != null && enabled.get();
+	}
+
+	public static function tick():Void {
+		var on = armed();
+		if (on != lastArmed) {
+			lastArmed = on;
+			try
+				solarflare.ui.SettingsStore.markDirty()
+			catch (_:Dynamic) {}
+		}
+		if (!on) {
+			if (buf.length > 0)
+				flush();
+			return;
+		}
+		ensure();
+		var now = stamp();
+		if (dirty && now - lastFlush >= FLUSH_S)
+			flush();
+		if (now - lastSnapWrite >= SNAP_S)
+			writeSnapshot();
+	}
+
+	public static function note(key:String):ResolutionNote {
+		var n = new ResolutionNote();
+		n.key = key != null ? key : "";
+		return n;
+	}
+
+	public static function commit(n:ResolutionNote):Void {
+		if (!armed() || n == null || n.key == null || n.key.length == 0)
+			return;
+		ensure();
+		var def = ResolutionCatalog.get(n.key);
+		var method = n.method != null ? n.method : "";
+		var step = n.step != null ? n.step : "";
+		var nameWon = n.nameWon != null ? n.nameWon : "";
+		var hook = n.hook != null ? n.hook : "";
+		var aggKey = n.key + "|" + method + "|" + step + "|" + nameWon + "|" + hook;
+		var agg = aggs.get(aggKey);
+		if (agg == null) {
+			agg = new LedgerAgg();
+			agg.key = n.key;
+			agg.method = method;
+			agg.step = step;
+			agg.nameWon = nameWon;
+			agg.hook = hook;
+			if (def != null) {
+				agg.feature = def.feature;
+				agg.element = def.element;
+				agg.reason = def.reason;
+				agg.importance = def.importance;
+			} else {
+				agg.feature = "";
+				agg.element = "";
+				agg.reason = "uncataloged";
+				agg.importance = "P4";
+			}
+			aggs.set(aggKey, agg);
+			order.push(aggKey);
+		}
+		agg.hits++;
+		agg.src = n.src != null ? n.src : agg.src;
+		agg.payloadType = n.payloadType != null && n.payloadType.length > 0 ? n.payloadType : agg.payloadType;
+		agg.payloadRole = n.payloadRole != null && n.payloadRole.length > 0 ? n.payloadRole : agg.payloadRole;
+		if (n.args != null && n.args.length > 0)
+			agg.args = n.args;
+		if (n.kind != null && n.kind.length > 0)
+			agg.kind = n.kind;
+		if (n.preview != null && n.preview.length > 0)
+			agg.preview = n.preview;
+		mergeTried(agg, n.tried);
+		mergeNames(agg, n.namesTried);
+		agg.t = stamp();
+		agg.pending++;
+		dirty = true;
+		lastLabel = n.key + " " + method + (step.length > 0 ? "/" + step : "") + " n=" + Std.string(agg.hits);
+		lastJson = rowJson(agg, agg.hits);
+		// JSONL is flushed from tick() as pending deltas — never append per observe.
+	}
+
+	/**
+	 * Hot-path record: increment an existing winner without allocating ResolutionNote.
+	 * First sighting still goes through commit via a tiny note.
+	 */
+	public static function touch(key:String, method:String, src:String, nameWon:String, kind:String, preview:String, step:String = "", hook:String = ""):Void {
+		if (!armed() || key == null || key.length == 0)
+			return;
+		ensure();
+		var st = step != null ? step : "";
+		var hk = hook != null ? hook : "";
+		var nm = nameWon != null ? nameWon : "";
+		var aggKey = key + "|" + method + "|" + st + "|" + nm + "|" + hk;
+		var agg = aggs.get(aggKey);
+		if (agg != null) {
+			agg.hits++;
+			agg.pending++;
+			if (preview != null && preview.length > 0)
+				agg.preview = preview;
+			if (src != null && src.length > 0)
+				agg.src = src;
+			agg.t = stamp();
+			dirty = true;
+			return;
+		}
+		var n = new ResolutionNote();
+		n.key = key;
+		n.method = method;
+		n.src = src != null ? src : "";
+		n.nameWon = nm;
+		n.step = st;
+		n.hook = hk;
+		n.kind = kind != null ? kind : "";
+		n.preview = preview != null ? preview : "";
+		commit(n);
+	}
+
+	public static function rowsForDraw():Array<LedgerAgg> {
+		var out:Array<LedgerAgg> = [];
+		var i = 0;
+		while (i < order.length) {
+			var a = aggs.get(order[i]);
+			if (a != null)
+				out.push(a);
+			i++;
+		}
+		return out;
+	}
+
+	public static function fieldStep(obj:Dynamic, name:String):String {
+		if (!armed() || obj == null || name == null)
+			return "miss";
+		try {
+			var hit:ProbeHit = FieldWalk.probeNamed(obj, name);
+			if (hit != null && hit.step != null)
+				return hit.step;
+		} catch (_:Dynamic) {
+			return "throw";
+		}
+		return "miss";
+	}
+
+	public static function clip(s:String, n:Int):String {
+		if (s == null)
+			return "";
+		if (s.length <= n)
+			return s;
+		return s.substr(0, n);
+	}
+
+	static function mergeTried(agg:LedgerAgg, tried:Array<Dynamic>):Void {
+		if (tried == null)
+			return;
+		var i = 0;
+		while (i < tried.length) {
+			var t:Dynamic = tried[i];
+			var m = "";
+			var nm = "";
+			try
+				m = t.method
+			catch (_:Dynamic) {}
+			try
+				nm = t.name
+			catch (_:Dynamic) {}
+			var token = m + ":" + nm;
+			if (token != ":" && !agg.triedSeen.exists(token)) {
+				agg.triedSeen.set(token, true);
+				agg.tried.push({method: m, name: nm});
+			}
+			i++;
+		}
+	}
+
+	static function mergeNames(agg:LedgerAgg, names:Array<String>):Void {
+		if (names == null)
+			return;
+		var i = 0;
+		while (i < names.length) {
+			var nm = names[i];
+			if (nm != null && nm.length > 0 && agg.namesTried.indexOf(nm) < 0)
+				agg.namesTried.push(nm);
+			i++;
+		}
+	}
+
+	static function rowJson(agg:LedgerAgg, hitCount:Int):String {
+		return haxe.Json.stringify({
+			type: "resolution-ledger",
+			event: "hit",
+			v: 1,
+			key: agg.key,
+			feature: agg.feature,
+			element: agg.element,
+			reason: agg.reason,
+			importance: agg.importance,
+			method: agg.method,
+			step: agg.step,
+			nameWon: agg.nameWon,
+			namesTried: agg.namesTried,
+			tried: agg.tried,
+			hook: agg.hook,
+			payload: {type: agg.payloadType, role: agg.payloadRole},
+			args: agg.args,
+			kind: agg.kind,
+			preview: agg.preview,
+			src: agg.src,
+			t: Math.round(agg.t * 100) / 100,
+			hits: hitCount
+		});
+	}
+
+	static function flush():Void {
+		if (jsonlPath.length == 0)
+			return;
+		var i = 0;
+		while (i < order.length) {
+			var a = aggs.get(order[i]);
+			if (a != null && a.pending > 0) {
+				buf.push(rowJson(a, a.pending));
+				a.pending = 0;
+			}
+			i++;
+		}
+		if (buf.length == 0)
+			return;
+		try {
+			var chunk = buf.join("\n") + "\n";
+			buf = [];
+			var out = File.append(jsonlPath);
+			out.writeString(chunk);
+			out.close();
+			lastFlush = stamp();
+			dirty = false;
+		} catch (_:Dynamic) {}
+	}
+
+	static function writeSnapshot():Void {
+		lastSnapWrite = stamp();
+		if (snapPath.length == 0)
+			return;
+		var rows:Array<Dynamic> = [];
+		var i = 0;
+		while (i < order.length) {
+			var a = aggs.get(order[i]);
+			if (a != null) {
+				try
+					rows.push(haxe.Json.parse(rowJson(a, a.hits)))
+				catch (_:Dynamic) {}
+			}
+			i++;
+		}
+		try {
+			File.saveContent(snapPath, haxe.Json.stringify({
+				type: "resolution-ledger",
+				event: "summary",
+				v: 1,
+				at: Date.now().toString(),
+				label: lastLabel,
+				path: jsonlPath,
+				catalog: ResolutionCatalog.toJsonRows(),
+				rows: rows
+			}));
+		} catch (_:Dynamic) {}
+	}
+
+	static function ensure():Void {
+		if (ready)
+			return;
+		ready = true;
+		ResolutionCatalog.keep();
+		jsonlPath = solarflare.ui.SettingsStore.logFile("resolution-ledger.jsonl");
+		snapPath = solarflare.ui.SettingsStore.logFile("resolution-ledger.json");
+		lastPath = jsonlPath;
+	}
+
+	static function stamp():Float {
+		try
+			return haxe.Timer.stamp()
+		catch (_:Dynamic)
+			return Date.now().getTime() / 1000.0;
+	}
+}
+
+@:keep
+class LedgerAgg {
+	public var key:String = "";
+	public var feature:String = "";
+	public var element:String = "";
+	public var reason:String = "";
+	public var importance:String = "";
+	public var method:String = "";
+	public var step:String = "";
+	public var nameWon:String = "";
+	public var namesTried:Array<String> = [];
+	public var tried:Array<Dynamic> = [];
+	public var triedSeen:Map<String, Bool> = new Map();
+	public var hook:String = "";
+	public var payloadType:String = "";
+	public var payloadRole:String = "";
+	public var args:Array<String> = [];
+	public var kind:String = "";
+	public var preview:String = "";
+	public var src:String = "";
+	public var t:Float = 0;
+	public var hits:Int = 0;
+	public var pending:Int = 0;
+
+	public function new() {}
+}

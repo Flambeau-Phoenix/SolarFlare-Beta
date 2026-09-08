@@ -1,0 +1,2000 @@
+{
+  "source": "D:/FareverDevSpace/Farever/res.light.pak#data.cdb",
+  "notes": [
+    "Class talents are skill rows with props.talent (type 21).",
+    "cooldownReductionPct is a flat CooldownReduction affix (usually 3% rank 1 / 6% rank 2).",
+    "reduceWeaponSkills / reduceNamedSkill are proc CDR from talent scripts, not a global haste stat.",
+    "affectedSkills come from texts.refs and reduceCooldown(Skill.Id) in scripts.",
+    "Live remaining CD still comes from Skill getters / onTriggerCD; this table is observation metadata."
+  ],
+  "talents": [
+    {
+      "id": "Mage_Talent_Amplification",
+      "name": "Amplification",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Attack]s deal ::damage%:: increased critical damage.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_ChainStrike",
+      "name": "Chainstrike",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_Chaincast_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Damage dealt by your [Attack]s increased by ::damage%:: while you are under ::ref_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_Chaincast",
+      "name": "Chaincast",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_Chaincast_Status",
+        "Mage_Talent_Chaincast_Accum_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Using ::var1:: [Skill]s grants you ::ref_name:: for ::ref_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_ConcentratedPower",
+      "name": "Concentrated Power",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:SpellPenetration",
+        "stat:SpellPenetration"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "SpellPenetration",
+          "val": 5.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "SpellPenetration",
+          "val": 10.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[SpellPenetration] increased by ::val1::%.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_ConduitLifebolt",
+      "name": "Conduit: Lifebolt",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_ConduitLifebolt_Conduit"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Unlocks a new Conduit : Lifebolt.\n\nLaunches a lifebolt healing the nearest wounded ally for ::ref_heal::.\n\nActivates when you consume [Spark] above the gauge threshold.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_ConduitResidues",
+      "name": "Conduit Residues",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.25,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Triggering [Conduit]s has a ::chance:: chance to regenerate ::var1:: [Spark] points.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_ConduitSparkExplosion",
+      "name": "Conduit: Spark Explosion",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_ConduitSparkExplosion_Conduit"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Unlocks a new Conduit : Spark Explosion.\n\nExplodes, dealing ::ref_dmg:: to nearby enemies.\n\nActivates when you consume [Spark] above the gauge threshold.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_Discipline",
+      "name": "Discipline",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "stat:MagicMastery",
+        "stat:PhysicalMastery"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "MagicMastery",
+          "val": 5.0,
+          "ref": "TAttribute_Flat"
+        },
+        {
+          "attribute": "PhysicalMastery",
+          "val": 1.0,
+          "ref": "TAttribute_Flat"
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[MagicMastery] increased by ::val1%::.\n\n[PhysicalMastery] increased by ::var2%:: of your [MagicMastery].",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_EchoingLife",
+      "name": "Echoing Life",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_Chaincast_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: increases the healing effect of your next [WeaponSkill] by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_ExpandedSpirit",
+      "name": "Expanded Spirit",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:MaxSpark",
+        "stat:MaxSpark"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "MaxSpark",
+          "val": 10.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "MaxSpark",
+          "val": 20.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Increases your maximum [Spark] gauge by ::var1:: points.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_FerventWizard",
+      "name": "Fervent Wizard",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:Fervor",
+        "stat:Fervor"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "Fervor",
+          "val": 1.5,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "Fervor",
+          "val": 3.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[Fervor] increased by ::val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_FlowingVitality",
+      "name": "Flowing Vitality",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "While in combat, heal yourself for ::var1%:: of your [MaxHealth] every ::var2:: [Spark] point spent.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_HighVoltage",
+      "name": "High Voltage",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_Chaincast_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Consuming ::ref_name:: causes your next [ComboAttack] to critically strike.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_InfiniteResources",
+      "name": "Infinite Resources",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "While in combat, regenerates ::var1:: [Spark] point every ::dur1::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_KineticSurge",
+      "name": "Kinetic Surge",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_Chaincast_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: increases the [Physical] damage of your next [WeaponSkill] by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_LifeCurrent",
+      "name": "Life Current",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_Chaincast_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.1,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Any healing effect you provide has a ::chance:: chance to regenerate ::var1:: [Spark] points.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_NimbleFingers",
+      "name": "Nimble Fingers",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "reduceWeaponSkills",
+        "reduceNamedSkill"
+      ],
+      "scope": "skill",
+      "affectedSkills": [
+        "s"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.07,
+      "reduceSeconds": 0.5,
+      "selfCooldown": null,
+      "desc": "Your [Attack]s have a ::chance:: chance to reduce the cooldown of your [WeaponSkill]s by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_PowerCircuit",
+      "name": "Power Circuit",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_PowerCircuit_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[Magic] critical strikes increase your chance to land [Physical] critical strikes by ::ref_chance:: for ::ref_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_ProdigiousMind",
+      "name": "Prodigious Mind",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.25,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [WeaponSkill]s have a ::chance:: chance to recover ::var1%:: of their [Spark] cost.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_Reverberate",
+      "name": "Reverberate",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_Chaincast_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Consuming ::ref_name:: triggers your [Conduit]s twice.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_SparkFlask",
+      "name": "Spark Flask",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[RefillableFlask] regenerates ::var1:: [Spark] points.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_TemporalCompression",
+      "name": "Temporal Compression",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "reduceWeaponSkills",
+        "reduceNamedSkill"
+      ],
+      "scope": "skill",
+      "affectedSkills": [
+        "s"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.02,
+      "reduceSeconds": 1.0,
+      "selfCooldown": null,
+      "desc": "Each [Spark] point spent has a ::chance:: chance to reduce the cooldown of your [WeaponSkill]s by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_Authority",
+      "name": "Authority",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Prayer_Smite"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: damage is increased by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_BlessedSpirituality",
+      "name": "Blessed Spirituality",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Sunlight_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.15,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Readying a [Prayer] has a ::chance:: chance of granting you ::ref_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_BurningRays",
+      "name": "Burning Rays",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Sunlight_Status",
+        "Priest_Talent_BurningRays_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "If ::ref_name:: critically strikes, it leaves a burn dealing ::damage%:: of the damage dealt over ::ref2_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_CrusadersResolve",
+      "name": "Crusader's Resolve",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:Armor",
+        "stat:Armor"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "Armor",
+          "val": 0.04,
+          "ref": "TAttribute_ARatio",
+          "maxRank": 1
+        },
+        {
+          "attribute": "Armor",
+          "val": 0.08,
+          "ref": "TAttribute_ARatio",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Armor] is increased by ::val1%:: and the threat generated by your [Magic] damage by ::var1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_FerventDefender",
+      "name": "Fervent Defender",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:Fervor",
+        "stat:Fervor"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "Fervor",
+          "val": 1.5,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "Fervor",
+          "val": 3.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[Fervor] increased by ::val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_LuminousBastion",
+      "name": "Luminous Bastion",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Sunlight_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Blocking grants you ::ref_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_MeltingFaith",
+      "name": "Melting Faith",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_MeltingFaith_Status",
+        "Priest_Talent_Sunlight_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref2_name:: reduces the [MagicArmor] and [Armor] of the enemy hit by ::ref_val1%:: for ::ref_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_MightyExecutioner",
+      "name": "Might of the Executioner",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Attack]s deal ::damage%:: increased critical damage.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_OppressiveRays",
+      "name": "Oppressive Rays",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Sunlight_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.1,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: has a ::chance:: additional chance to critically strike.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_PiercingLight",
+      "name": "Piercing Light",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Sunlight_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: ignores ::damage%:: of [MagicArmor].",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_PiousAdept",
+      "name": "Pious Adept",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:MagicMastery",
+        "stat:MagicMastery"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "MagicMastery",
+          "val": 2.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "MagicMastery",
+          "val": 4.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[MagicMastery] increased by ::val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_PotentFortitude",
+      "name": "Potent Fortitude",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Prayer_Shield"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "The [Shield] of ::ref_name:: increases your [PhysicalMastery] by ::var1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_Prosecutor",
+      "name": "Prosecutor",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "reduceNamedSkill"
+      ],
+      "scope": "skill",
+      "affectedSkills": [
+        "Priest_Sig_DivineIntervention"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.15,
+      "reduceSeconds": 0.5,
+      "selfCooldown": null,
+      "desc": "Your critical [Attack]s have a ::chance:: chance to reduce the cooldown of ::ref_name:: by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_PurgingStrikes",
+      "name": "Purging Strikes",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Sunlight_Status",
+        "Priest_Talent_PurgingStrikes_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.25,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your own ::ref_name:: empowers you for ::ref2_duration::, causing all your [Attack]s to deal an additional ::ref2_dmg::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_Radiance",
+      "name": "Radiance",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Sunlight_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your own ::ref_name:: damage is increased by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_SharpMind",
+      "name": "Sharp Mind",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "cooldownReductionPct"
+      ],
+      "scope": "global",
+      "affectedSkills": [],
+      "cooldownReduction": [
+        {
+          "attribute": "CooldownReduction",
+          "val": 3.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "CooldownReduction",
+          "val": 6.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "affixes": [
+        {
+          "attribute": "CooldownReduction",
+          "val": 3.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "CooldownReduction",
+          "val": 6.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[CooldownReduction] increased by ::val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_SolarDevotion",
+      "name": "Solar Devotion",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Sunlight_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "You can trigger ::ref_name:: effects without consuming it anymore.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_SoothingRays",
+      "name": "Soothing Rays",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Sunlight_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: heals for ::damage%:: of the damage dealt.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_SunHalo",
+      "name": "Sun Halo",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Sunlight_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: deals ::damage%:: of its damage to nearby enemies.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_Sunlight",
+      "name": "Sunlight",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[Skill]s that affect allies empower them for ::ref_duration:: with ::ref_name::. The next [ComboAttack] consum ::ref_name:: to deal an additional ::ref_dmg::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_SwiftJustice",
+      "name": "Swift Justice",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "reduceWeaponSkills",
+        "reduceNamedSkill"
+      ],
+      "scope": "skill",
+      "affectedSkills": [
+        "Priest_Talent_Sunlight_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": 1.0,
+      "selfCooldown": null,
+      "desc": "::ref_name:: reduces the cooldown of [WeaponSkill]s by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_ZealousFighter",
+      "name": "Zealous Fighter",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.04,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Attack]s have an additional ::chance:: chance to critically strike.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_AcidicSplatter",
+      "name": "Acidic Splatter",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Sig_Finisher",
+        "Rogue_Talent_AcidicSplatter_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.2,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: has a ::chance:: chance per [ComboPoint] to spread acid to enemies, poisoning them for ::ref2_dmg:: over ::ref2_duration:: while reducing their [MagicArmor] by ::ref2_val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Adrenaline",
+      "name": "Adrenaline",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Adrenaline_Status",
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [MoveSpeedFactor] is increased by ::ref_val1%:: as long as an enemy is affected by ::ref2_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_AtrophicPoison",
+      "name": "Atrophic Poison",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: reduces all damage dealt by affected enemies by ::damage%:: per stack.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_BullyingTheWeak",
+      "name": "Bullying the Weak",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Damage dealt to poisoned enemies increased by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_CheatDeath",
+      "name": "Cheat Death",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "reduceNamedSkill",
+        "selfCooldown"
+      ],
+      "scope": "skill",
+      "affectedSkills": [
+        "Rogue_Talent_CheatDeath_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": 120.0,
+      "desc": "Damage that should kill you leaves you at ::var1%:: of your [MaxHealth]. For ::ref_duration::, you take ::ref_val1%:: reduced damage. (::cooldown:: cooldown).",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_CripplingPoison",
+      "name": "Crippling Poison",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "The first time ::ref_name:: reaches the maximum number of stacks on an enemy, it stuns them for ::dur1::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_DeadlyPoison",
+      "name": "Deadly Poison",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.02,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: has a ::chance:: chance per stack to critically strike.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Envenom",
+      "name": "Envenom",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 1.0,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [ComboAttack] always applies ::ref_name:: to the target and to nearby enemies.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_FinishTheJob",
+      "name": "Finish the Job",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.05,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Attack]s have an additional ::chance:: chance to critically strike poisoned enemies.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Footwork",
+      "name": "Footwork",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:DodgeChance",
+        "stat:DodgeChance"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "DodgeChance",
+          "val": 3.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "DodgeChance",
+          "val": 6.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[DodgeChance] increased by ::val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_ImprovedMixture",
+      "name": "Improved Mixture",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: now stacks up to ::var1:: times.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_IntentToKill",
+      "name": "Intent to Kill",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Gain ::var1:: [ComboPoint]s when an enemy affected by your ::ref_name:: dies.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_LeechingPoison",
+      "name": "Leeching Poison",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: heals you for ::damage%:: of the damage dealt.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_LethalDose",
+      "name": "Lethal Dose",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Damage dealt by your poisons increased by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison",
+      "name": "Lethal Poison",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.2,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Attack]s have a ::chance:: chance to apply a stack of ::ref_name::, poisoning them for ::ref_dmg:: over ::ref_duration::, stacking up to ::ref_stacks::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_NoxiousStrategem",
+      "name": "Noxious Stratagem",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "reduceWeaponSkills",
+        "reduceNamedSkill"
+      ],
+      "scope": "skill",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.07,
+      "reduceSeconds": 0.5,
+      "selfCooldown": null,
+      "desc": "::ref_name:: damage has a ::chance:: chance to reduce the cooldown of your [WeaponSkill]s by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_OpportunityStrike",
+      "name": "Opportunity Strike",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.5,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [BasicAttack]s applying ::ref_name:: have a ::chance:: chance to strike again.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_RegeneratingMiasmas",
+      "name": "Regenerating Miasmas",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Heals you for ::var1%:: of your [MaxHealth] when you kill an enemy affected by ::ref1_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_UpTheAnte",
+      "name": "Up the Ante",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "cooldownReductionPct"
+      ],
+      "scope": "global",
+      "affectedSkills": [],
+      "cooldownReduction": [
+        {
+          "attribute": "CooldownReduction",
+          "val": 3.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "CooldownReduction",
+          "val": 6.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "affixes": [
+        {
+          "attribute": "CooldownReduction",
+          "val": 3.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "CooldownReduction",
+          "val": 6.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[CooldownReduction] increased by ::val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_VenomInfusion",
+      "name": "Venom Infusion",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.25,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [WeaponSkill]s have a ::chance:: chance to apply ::ref_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_VenomousFinisher",
+      "name": "Venomous Finisher",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Sig_Finisher",
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: always applied ::ref2_name:: and deals ::damage%:: increased damage for each stack.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_VirulentMagic",
+      "name": "Virulent Magic",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Excess applications of ::ref_name:: will deal ::dmg::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_ExposedEssence",
+      "name": "Exposed Essence",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "You ignore ::var1%:: of bleeding enemies' [MagicArmor] and [Armor].",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Hemorrhage",
+      "name": "Hemorrhage",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Hemorrhage_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Physical] [CriticalStrike]s make the enemies bleed for ::damage%:: of the damage dealt over ::ref_dur::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_RashSoul",
+      "name": "Rash Soul",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "cooldownReductionPct"
+      ],
+      "scope": "global",
+      "affectedSkills": [],
+      "cooldownReduction": [
+        {
+          "attribute": "CooldownReduction",
+          "val": 3.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "CooldownReduction",
+          "val": 6.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "affixes": [
+        {
+          "attribute": "CooldownReduction",
+          "val": 3.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "CooldownReduction",
+          "val": 6.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[CooldownReduction] increased by ::val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_RedTempo",
+      "name": "Red Tempo",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "reduceWeaponSkills"
+      ],
+      "scope": "weaponSkills",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.12,
+      "reduceSeconds": 1.0,
+      "selfCooldown": null,
+      "desc": "Damage from bleeding effects have a ::chance:: chance to reduce the cooldown of all your [WeaponSkill]s by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_SecondWind",
+      "name": "Second Wind",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "selfCooldown"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_RageShield_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": 120.0,
+      "desc": "Damage that should kill you leaves you at ::var1:: [Health] and grants you the effects of ::ref_name:: (::cooldown:: cooldown).",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Bloodfeast",
+      "name": "Bloodfeast",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Hemorrhage_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: heals you for ::damage%:: of the damage dealt.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Bloodletting",
+      "name": "Bloodletting",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Damage dealt by your bleeding effects increased by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Bruise",
+      "name": "Bruise",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Bruise_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Physical] critical strikes increase all [Physical] damage suffered by enemies by ::ref_damage%:: for ::ref_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_CrackingBlood",
+      "name": "Cracking Blood",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Hemorrhage_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.35,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Damage from ::ref_name:: has a ::chance:: chance to deal an additional ::dmg::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_CrippingBloodloss",
+      "name": "Crippling Bloodloss",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Hemorrhage_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: reduces all damage dealt by affected enemies by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Exsanguination",
+      "name": "Exsanguination",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Hemorrhage_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.1,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: has a ::chance:: chance to critically strike.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_FightingSpirit",
+      "name": "Fighting Spirit",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:CritChance",
+        "stat:CritChance"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "CritChance",
+          "val": 2.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "CritChance",
+          "val": 4.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[CritChance] increased by ::val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_HoldTheLine",
+      "name": "Hold the Line",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_HoldTheLine_Status",
+        "Warrior_Talent_RageShield_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Damage dealt increased by ::ref_damage%:: and damage suffered reduced by ::ref_damage%:: while ::ref2_name:: is active.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_HoldTheLine_Status",
+      "name": "",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:DamageModifier",
+        "stat:DamageModifier",
+        "stat:DamageTakenModifier",
+        "stat:DamageTakenModifier"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "DamageModifier",
+          "val": 0.03,
+          "ref": "TAttribute_ARatio",
+          "maxRank": 1
+        },
+        {
+          "attribute": "DamageModifier",
+          "val": 0.06,
+          "ref": "TAttribute_ARatio",
+          "minRank": 2
+        },
+        {
+          "attribute": "DamageTakenModifier",
+          "val": -0.03,
+          "ref": "TAttribute_ARatio",
+          "maxRank": 1
+        },
+        {
+          "attribute": "DamageTakenModifier",
+          "val": -0.06,
+          "ref": "TAttribute_ARatio",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_InfusedWound",
+      "name": "Infused Wound",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Hemorrhage_Status",
+        "Warrior_Talent_InfusedWound_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Magic] critical strikes apply a sparked version of ::ref_name:: for ::damage%:: of the damage dealt over ::ref2_duration::.\n\nBenefits from all ::ref_name::-related [Talent]s.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_MagicConduction",
+      "name": "Magic Conduction",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Hemorrhage_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[Magic] damage dealt to enemies affected by ::ref_name:: increased by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_MasterAtArms",
+      "name": "Master-at-arms",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Attack]s deal ::damage%:: increased critical damage.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_RageShield",
+      "name": "Rage Shield",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Hemorrhage_Status",
+        "Warrior_Talent_RageShield_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "When you apply ::ref_name::, you gain a [Shield] absorbing an amount equal to ::var1%:: of your [MaxHealth] for ::ref2_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_SeasonedSoldier",
+      "name": "Seasoned Soldier",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Physical] critical strikes grant ::var1:: [Rage].",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Sever",
+      "name": "Sever",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [WeaponSkill]s deal ::damage%:: increased critical damage.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_ShatteredRage",
+      "name": "Shattered Rage",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_RageShield_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "When ::ref_name:: is destroyed, you deal ::dmg:: to nearby enemies.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_SurgeOfViolence",
+      "name": "Surge of Violence",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Rage_Strike"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.25,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [ComboAttack] has a ::chance:: chance to allow your next ::ref_name:: to critically strike and cost no [Rage].",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_ZealousWarrior",
+      "name": "Zealous Warrior",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:Fervor",
+        "stat:Fervor"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "Fervor",
+          "val": 2.0,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "Fervor",
+          "val": 4.0,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[Fervor] increased by ::val1%::.",
+      "rankDescs": []
+    }
+  ],
+  "cooldownTalents": [
+    "Mage_Talent_NimbleFingers",
+    "Mage_Talent_TemporalCompression",
+    "Priest_Talent_Prosecutor",
+    "Priest_Talent_SharpMind",
+    "Priest_Talent_SwiftJustice",
+    "Rogue_Talent_CheatDeath",
+    "Rogue_Talent_NoxiousStrategem",
+    "Rogue_Talent_UpTheAnte",
+    "Warrior_RashSoul",
+    "Warrior_RedTempo",
+    "Warrior_SecondWind"
+  ]
+}
