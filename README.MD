@@ -54,6 +54,7 @@ Build a personal skill-monitoring grid with the icons you want to watch:
 - Undo/redo and JSON layout import/export.
 
 **Start here:** F6 → Geaux → Show Geaux grid → Open Geaux Builder. Assign skills from the catalog and arrange your slots.
+You can also use Aura to make alerts for single spells if you want.
 
 The gameplay grid is display-only: clicking it does not cast skills. Assignments and slot editing happen in Geaux Builder.
 
@@ -81,6 +82,7 @@ hlx/mods/solarflare/
         └── supplied atlases, logos, and icon files
 ```
 
+Just copy the HLX folder & libhl64.dll to your game folder and you're yet.
 Keep the supplied asset folders intact. `atlas.png/json` contains skill and UI artwork; `atlas2.png/json` contains target portraits. Start Farever and press **F6**.
 
 ## Move and resize your HUD
