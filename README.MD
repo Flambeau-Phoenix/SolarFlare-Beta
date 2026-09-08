@@ -1,6 +1,9 @@
 ![SolarFlare HUD Preview](https://i.postimg.cc/ydv50Sz0/Solar-Flare1.png)
 ![SolarFlare Geaux Menu Preview](https://i.postimg.cc/5t9DymZB/Solar-Flare-Pic3.png)
 
+---
+Auras is super scuffed, the sliders broke when I upgraded my gui. I'll upload a fix in the next few days
+---
 # SolarFlare — Beta v1
 This mod uses the HLX Modding Framework by https://github.com/laymain found here: https://hlx-framework.github.io/  
 
