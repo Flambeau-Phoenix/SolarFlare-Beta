@@ -1,5 +1,5 @@
 
-<video src="https://www.youtube.com/watch?v=KIcw0sf8AKA" autoplay muted loop playsinline width="100%"></video>
+<video src="https://www.youtube.com/watch?v=KIcw0sf8AKA"></video>
 
 ---
 
