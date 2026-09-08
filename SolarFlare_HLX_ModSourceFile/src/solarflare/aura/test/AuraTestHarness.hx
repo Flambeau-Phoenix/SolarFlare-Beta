@@ -72,12 +72,12 @@ class AuraTestHarness {
 		ImGui.spacing();
 
 		// Knobs
-		if (ImGui.sliderFloat("Health %##th_hp", simHpPercent, 0, 100, "%.0f%%")) {}
-		if (ImGui.sliderFloat("Rage %##th_rage", simRagePercent, 0, 100, "%.0f%%")) {}
-		if (ImGui.sliderFloat("Mana %##th_mana", simManaPercent, 0, 100, "%.0f%%")) {}
-		if (ImGui.sliderFloat("Shield %##th_shield", simShieldPercent, 0, 100, "%.0f%%")) {}
+		if (solarflare.ui.BuilderSlider.draw("Health %##th_hp", simHpPercent, 0, 100, "%.0f%%")) {}
+		if (solarflare.ui.BuilderSlider.draw("Rage %##th_rage", simRagePercent, 0, 100, "%.0f%%")) {}
+		if (solarflare.ui.BuilderSlider.draw("Mana %##th_mana", simManaPercent, 0, 100, "%.0f%%")) {}
+		if (solarflare.ui.BuilderSlider.draw("Shield %##th_shield", simShieldPercent, 0, 100, "%.0f%%")) {}
 		if (ImGui.sliderInt("Combo Points##th_combo", simComboCount, 0, 5)) {}
-		if (ImGui.sliderFloat("Cooldown Left (s)##th_cd", simCooldownRemain, 0, 30, "%.1fs")) {}
+		if (solarflare.ui.BuilderSlider.draw("Cooldown Left (s)##th_cd", simCooldownRemain, 0, 30, "%.1fs")) {}
 
 		ImGui.separator();
 

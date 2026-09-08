@@ -21,7 +21,6 @@ import imgui.Enums.ImGuiStyleVar;
  * Conversational condition cards: "Show when [signal] is [op] [value]".
  */
 class AuraConditionEditor {
-	static inline var MAX_PICKER_RESULTS:Int = 80;
 
 	public static function draw(a:AuraDef):Void {
 		if (a == null)
@@ -112,7 +111,7 @@ class AuraConditionEditor {
 			return "Empty condition";
 		var d = AuraSignalCatalog.find(c.signal);
 		var sigLabel = d != null ? d.label : (c.signal.length > 0 ? c.signal : "Signal");
-		var subLabel = c.subjectLabel.length > 0 ? c.subjectLabel : (c.subject.length > 0 ? c.subject : "");
+		var subLabel = subjectName(c);
 		var subjectPart = subLabel.length > 0 ? " (" + subLabel + ")" : "";
 		var opStr = friendlyOp(c.op);
 		var valStr = formatValue(c, d);
@@ -225,7 +224,6 @@ class AuraConditionEditor {
 
 		d = AuraSignalCatalog.find(c.signal);
 		if (d != null && d.subjectKind.length > 0) {
-			ImGui.sameLine();
 			drawSubjectInline(a, c, ui, d.subjectKind, tag);
 		}
 
@@ -246,28 +244,28 @@ class AuraConditionEditor {
 					}
 				case Percent:
 					ImGui.setNextItemWidth(100);
-					if (ImGui.sliderFloat("##cond_pct_" + tag, ui.percentRef, 0, 100, "%.0f%%")) {
+					if (solarflare.ui.BuilderSlider.draw("##cond_pct_" + tag, ui.percentRef, 0, 100, "%.0f%%")) {
 						ui.pullPercent(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
 					}
 				case Count:
 					ImGui.setNextItemWidth(90);
-					if (ImGui.sliderFloat("##cond_cnt_" + tag, ui.numberRef, 0, 100, "%.0f")) {
+					if (solarflare.ui.BuilderSlider.draw("##cond_cnt_" + tag, ui.numberRef, 0, 100, "%.0f")) {
 						ui.pull(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
 					}
 				case Duration:
 					ImGui.setNextItemWidth(100);
-					if (ImGui.sliderFloat("##cond_dur_" + tag, ui.numberRef, 0, 60, "%.1fs")) {
+					if (solarflare.ui.BuilderSlider.draw("##cond_dur_" + tag, ui.numberRef, 0, 60, "%.1fs")) {
 						ui.pull(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
 					}
 				default:
 					ImGui.setNextItemWidth(90);
-					if (ImGui.sliderFloat("##cond_num_" + tag, ui.numberRef, 0, 100, "%.1f")) {
+					if (solarflare.ui.BuilderSlider.draw("##cond_num_" + tag, ui.numberRef, 0, 100, "%.1f")) {
 						ui.pull(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
@@ -300,102 +298,56 @@ class AuraConditionEditor {
 		}
 	}
 
-	static function drawSubjectInline(a:AuraDef, c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String):Void {
-		var preview = c.subjectLabel.length > 0 ? c.subjectLabel : (c.subject.length > 0 ? c.subject : "pick…");
-		ImGui.setNextItemWidth(120);
-		if (ImGui.beginCombo("##cond_subj_" + tag, preview)) {
-			drawSubjectPicker(a, c, ui, kind, tag);
-			ImGui.endCombo();
-		}
+	static function subjectName(c:AuraConditionDef):String {
+		var name = solarflare.cdb.AuraCatalog.label(c.subject);
+		if (solarflare.cdb.AuraCatalog.validName(name)) return name;
+		return solarflare.cdb.AuraCatalog.validName(c.subjectLabel) ? c.subjectLabel : c.subject;
 	}
 
-	static function drawSubjectPicker(a:AuraDef, c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String):Void {
-		if (kind == "unit") {
-			drawUnitSubjectPicker(a, c, ui, tag);
+	static function drawSubjectInline(a:AuraDef, c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String):Void {
+		// Catalog names are owned strings, independent of live actors / skill-book objects.
+		var name = subjectName(c);
+		if (name.length > 0) c.subjectLabel = name;
+		var pickerLabel = kind == "unit" ? "Select Unit" : (kind.indexOf("skill") >= 0 ? "Select Skill" : "Select Status");
+		if (ImGui.button(pickerLabel + "##pick_" + tag))
+			ImGui.openPopup("##subjects_" + tag);
+		ImGui.textWrapped(name.length > 0 ? name + " [" + c.subject + "]" : "No selection");
+		ImGui.setNextWindowSize(ImGui.vec2(620, 500), imgui.Enums.ImGuiCond.Appearing);
+		if (!ImGui.beginPopup("##subjects_" + tag)) return;
+		try {
+		ImGui.text("Select " + kind + " by name or ID");
+		if (ImGui.inputText("Search##subject_search_" + tag, ui.searchBuf, AuraConditionUiState.SEARCH_BUF))
+			ui.search = ByteUtil.readString(ui.searchBuf, AuraConditionUiState.SEARCH_BUF, true).toLowerCase();
+		ImGui.textDisabled("Saved IDs remain selected even when unit or skill is absent.");
+		solarflare.ui.HudChrome.safeChild("##subject_list_" + tag, ImGui.vec2(0, 0), 0, function() {
+		{
+			for (entry in solarflare.cdb.AuraCatalog.entries)
+				if (entry.kind == (kind == "unit" ? "unit" : (kind.indexOf("skill") >= 0 ? "skill" : "statustype")))
+					drawSubjectRow(c, ui, entry.id, entry.name, tag);
+		}
+		}, ImGuiChildFlags.Borders);
+		} catch (e:Dynamic) {
+			ImGui.endPopup();
+			throw e;
+		}
+		ImGui.endPopup();
+	}
+
+	static function drawSubjectRow(c:AuraConditionDef, ui:AuraConditionUiState, id:String, name:String, tag:String):Void {
+		if (ui.search.length > 0 && (id + " " + name).toLowerCase().indexOf(ui.search) < 0) return;
+		if (!ImGui.isRectVisible(ImGui.vec2(ImGui.getContentRegionAvail().x, 28))) {
+			ImGui.dummy(ImGui.vec2(1, 28));
 			return;
 		}
-		if (kind == "skill" || kind.indexOf("skill") >= 0) {
-			for (i in 0...GeauxCache.bookIds.length) {
-				if (i > MAX_PICKER_RESULTS) break;
-				var id = GeauxCache.bookIds[i];
-				var label = i < GeauxCache.bookLabels.length ? GeauxCache.bookLabels[i] : id;
-				if (ImGui.selectable(label + "##subj_" + tag + id, c.subject == id)) {
-					c.subject = id;
-					c.subjectLabel = label;
-					ui.sync(c);
-					ui.flashContext();
-					SettingsStore.markDirty();
-				}
-			}
-		} else {
-			var ids = CdbAuraTable.allIds();
-			var labels = CdbAuraTable.allLabels();
-			for (i in 0...ids.length) {
-				if (i > MAX_PICKER_RESULTS) break;
-				var label = i < labels.length ? labels[i] : ids[i];
-				if (ImGui.selectable(label + "##subj_" + tag + ids[i], c.subject == ids[i])) {
-					c.subject = ids[i];
-					c.subjectLabel = label;
-					ui.sync(c);
-					ui.flashContext();
-					SettingsStore.markDirty();
-				}
-			}
-		}
-	}
-
-	static function drawUnitSubjectPicker(a:AuraDef, c:AuraConditionDef, ui:AuraConditionUiState, tag:String):Void {
-		var recentIds = RecentTargetCache.ids();
-		var recentLabels = RecentTargetCache.labels();
-		if (recentIds.length > 0) {
-			ImGui.separatorText("Recent");
-			var i = 0;
-			while (i < recentIds.length) {
-				var id = recentIds[i];
-				var label = i < recentLabels.length ? recentLabels[i] : id;
-				var cdb = CdbUnitNames.lookup(id);
-				if (cdb.length > 0 && (label == id || label.length == 0))
-					label = cdb;
-				if (ImGui.selectable(label + "##subj_recent_" + tag + id, c.subject == id)) {
-					c.subject = id;
-					c.subjectLabel = label;
-					ui.sync(c);
-					ui.flashContext();
-					SettingsStore.markDirty();
-				}
-				i++;
-			}
-			ImGui.separatorText("All units");
-		}
-		var ids = CdbUnitNames.allIds();
-		var labels = CdbUnitNames.allLabels();
-		var shown = 0;
-		var j = 0;
-		while (j < ids.length) {
-			if (shown >= MAX_PICKER_RESULTS)
-				break;
-			var id = ids[j];
-			var label = j < labels.length ? labels[j] : id;
-			// Skip duplicates already listed under Recent.
-			var skip = false;
-			var r = 0;
-			while (r < recentIds.length) {
-				if (recentIds[r] == id) {
-					skip = true;
-					break;
-				}
-				r++;
-			}
-			if (!skip) {
-				if (ImGui.selectable(label + "##subj_unit_" + tag + id, c.subject == id)) {
-					c.subject = id;
-					c.subjectLabel = label;
-					ui.sync(c);
-					SettingsStore.markDirty();
-				}
-				shown++;
-			}
-			j++;
+		if (!solarflare.ui.GameIcons.imageKey(id, 28, 28)) ImGui.dummy(ImGui.vec2(28, 28));
+		ImGui.sameLine();
+		if (ImGui.selectable(name + " [" + id + "]##subject_" + tag + id, c.subject == id)) {
+			c.subject = id;
+			c.subjectLabel = name;
+			ui.sync(c);
+			ui.flashContext();
+			SettingsStore.markDirty();
+			ImGui.closeCurrentPopup();
 		}
 	}
 

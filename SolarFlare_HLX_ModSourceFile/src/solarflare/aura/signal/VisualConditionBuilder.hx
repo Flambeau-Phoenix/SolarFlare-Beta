@@ -327,13 +327,13 @@ class VisualConditionBuilder {
 					}
 				case Percent:
 					editFloat.set(c.numberValue * 100);
-					if (ImGui.sliderFloat("Threshold##node_pct", editFloat, 0, 100, "%.0f%%")) {
+					if (solarflare.ui.BuilderSlider.draw("Threshold##node_pct", editFloat, 0, 100, "%.0f%%")) {
 						c.numberValue = editFloat.get() * 0.01;
 						changed = true;
 					}
 				default:
 					editFloat.set(c.numberValue);
-					if (ImGui.sliderFloat("Value##node_num", editFloat, 0, 100, "%.1f")) {
+					if (solarflare.ui.BuilderSlider.draw("Value##node_num", editFloat, 0, 100, "%.1f")) {
 						c.numberValue = editFloat.get();
 						changed = true;
 					}

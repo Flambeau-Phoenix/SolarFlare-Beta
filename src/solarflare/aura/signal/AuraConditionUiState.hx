@@ -16,7 +16,7 @@ class AuraConditionUiState {
 	public var focusUntil:Float = 0;
 	var bound:AuraConditionDef;
 	public function new() {
-		numberRef = new FloatRef(0); percentRef = new FloatRef(0); boolRef = new BoolRef(false); negateRef = new BoolRef(false); searchBuf = new hl.Bytes(SEARCH_BUF);
+		numberRef = new FloatRef(0); percentRef = new FloatRef(0); boolRef = new BoolRef(false); negateRef = new BoolRef(false); searchBuf = new hl.Bytes(SEARCH_BUF); solarflare.ui.ByteUtil.clearBytes(searchBuf, SEARCH_BUF);
 	}
 	public function bind(c:AuraConditionDef):Void { if (bound != c) { bound = c; sync(c); } }
 	public function sync(c:AuraConditionDef):Void { if (c == null) return; numberRef.set(c.numberValue); percentRef.set(c.numberValue * 100); boolRef.set(c.boolValue); negateRef.set(c.negate); }

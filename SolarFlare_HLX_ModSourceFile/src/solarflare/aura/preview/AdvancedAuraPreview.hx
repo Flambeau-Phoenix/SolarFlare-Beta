@@ -13,7 +13,7 @@ import solarflare.ui.effects.EffectHelpers;
 class AdvancedAuraPreview {
 	public var progress = new FloatRef(0.65);
 	public var stacks = new IntRef(3);
-	public var autoPlay:Bool = true;
+	public var autoPlay:Bool = false;
 	public var animSpeed = new FloatRef(0.8);
 	var animTime:Float = 0.0;
 
@@ -36,14 +36,16 @@ class AdvancedAuraPreview {
 			progress.set(animTime);
 		}
 
-		var size = Math.min(width * 0.5, height * 0.7);
-		if (size < 40) size = 40;
-		if (size > 140) size = 140;
+		var drawW = a.w.get() * a.scale.get();
+		var drawH = a.h.get() * a.scale.get();
+		var fit = Math.min(1, Math.min((width - 20) / drawW, (height - 48) / drawH));
+		drawW *= fit;
+		drawH *= fit;
+		var size = Math.min(drawW, drawH);
+		var cx = canvasPos.x + (width - drawW) * 0.5;
+		var cy = canvasPos.y + (height - 48 - drawH) * 0.5;
 
-		var cx = canvasPos.x + (width - size) * 0.5;
-		var cy = canvasPos.y + (height - size) * 0.28;
-
-		AuraVisualRenderer.draw(drawList, a, cx, cy, size, size, progress.get(), stacks.get(), stacks.get(), false);
+		AuraVisualRenderer.draw(drawList, a, cx, cy, drawW, drawH, progress.get(), stacks.get(), stacks.get(), false);
 
 		var barW = width - 40;
 		var barH = 6;

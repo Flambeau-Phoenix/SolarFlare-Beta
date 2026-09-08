@@ -76,6 +76,7 @@ class AuraConfig {
 			a.invert.set(true);
 		if (d.requireAfford == false)
 			a.requireAfford.set(false);
+		a.alwaysOn.set(d.alwaysOn == true);
 		if (d.dormant == true)
 			a.dormant.set(true);
 		if (d.visual == false)
@@ -251,8 +252,8 @@ class AuraConfig {
 		ImGui.separatorText("Window");
 		if (ImGui.checkbox("Enabled##aben" + a.id, a.enabled)) SettingsStore.markDirty();
 		a.chrome.drawToggles("aura_builder_" + a.id);
-		if (ImGui.sliderFloat("Width##abw" + a.id, a.w, 32, 720, "%.0f px")) { a.sizeDirty = true; SettingsStore.markDirty(); }
-		if (ImGui.sliderFloat("Height##abh" + a.id, a.h, 24, 480, "%.0f px")) { a.sizeDirty = true; SettingsStore.markDirty(); }
+		if (solarflare.ui.BuilderSlider.draw("Width##abw" + a.id, a.w, 32, 720, "%.0f px")) { a.sizeDirty = true; SettingsStore.markDirty(); }
+		if (solarflare.ui.BuilderSlider.draw("Height##abh" + a.id, a.h, 24, 480, "%.0f px")) { a.sizeDirty = true; SettingsStore.markDirty(); }
 		ImGui.separatorText("Identity");
 		if (a.rule == null && ImGui.checkbox("Invert##abinv" + a.id, a.invert)) SettingsStore.markDirty();
 		if (ImGui.inputText("Name##abnm" + a.id, a.nameBuf, AuraDef.NAME_BUF)) {
@@ -288,15 +289,15 @@ class AuraConfig {
 		ImGui.sameLine();
 		if (ImGui.checkbox("Audio (DRM)##aud" + a.id, a.audio))
 			SettingsStore.markDirty();
-		if (ImGui.sliderFloat("Hold (s, 0=CDB)##hold" + a.id, a.durRef, 0, 12, "%.1f")) {
+		if (solarflare.ui.BuilderSlider.draw("Hold (s, 0=CDB)##hold" + a.id, a.durRef, 0, 12, "%.1f")) {
 			a.duration = a.durRef.get();
 			SettingsStore.markDirty();
 		}
-		if (ImGui.sliderFloat("Scale##sc" + a.id, a.scale, 0.5, 2.5, "%.2f")) {
+		if (solarflare.ui.BuilderSlider.draw("Scale##sc" + a.id, a.scale, 0.5, 2.5, "%.2f")) {
 			a.sizeDirty = true;
 			SettingsStore.markDirty();
 		}
-		if (ImGui.sliderFloat("Volume (DRM)##vol" + a.id, a.volume, 0, 1, "%.2f"))
+		if (solarflare.ui.BuilderSlider.draw("Volume (DRM)##vol" + a.id, a.volume, 0, 1, "%.2f"))
 			SettingsStore.markDirty();
 		if (ImGui.inputText("Announce##ann" + a.id, a.announceBuf, AuraDef.ANN_BUF)) {
 			a.announce = bytesToString(a.announceBuf, AuraDef.ANN_BUF);
@@ -407,7 +408,7 @@ class AuraConfig {
 					}
 					ImGui.endCombo();
 				}
-				if (ImGui.sliderFloat("Hold (s)##fxh" + tag, e.holdRef, 0.1, 12, "%.1f")) {
+				if (solarflare.ui.BuilderSlider.draw("Hold (s)##fxh" + tag, e.holdRef, 0.1, 12, "%.1f")) {
 					e.hold = e.holdRef.get();
 					SettingsStore.markDirty();
 				}
@@ -420,7 +421,7 @@ class AuraConfig {
 				if (e.kind == AuraEffect.KIND_ICON) {
 					if (ImGui.checkbox("Glow##fxg" + tag, e.glow))
 						SettingsStore.markDirty();
-					if (ImGui.sliderFloat("Alpha##fxa" + tag, e.alpha, 0.1, 1, "%.2f"))
+					if (solarflare.ui.BuilderSlider.draw("Alpha##fxa" + tag, e.alpha, 0.1, 1, "%.2f"))
 						SettingsStore.markDirty();
 				}
 				if (ImGui.button("Remove effect##fxrm" + tag)) {
@@ -625,12 +626,12 @@ class AuraConfig {
 				}
 				ImGui.endCombo();
 			}
-			if (ImGui.sliderFloat("Percent##pct" + a.id, a.pctRef, 1, 99, "%.0f")) {
+			if (solarflare.ui.BuilderSlider.draw("Percent##pct" + a.id, a.pctRef, 1, 99, "%.0f")) {
 				a.pct = a.pctRef.get();
 				SettingsStore.markDirty();
 			}
 		} else if (a.trigger == "combo" || a.trigger == "chaincast" || a.trigger == "conduit") {
-			if (ImGui.sliderFloat("At least##th" + a.id, a.pctRef, 1, 6, "%.0f")) {
+			if (solarflare.ui.BuilderSlider.draw("At least##th" + a.id, a.pctRef, 1, 6, "%.0f")) {
 				a.pct = a.pctRef.get();
 				SettingsStore.markDirty();
 			}
@@ -666,13 +667,13 @@ class AuraConfig {
 					a.pct = 1;
 					a.pctRef.set(1);
 				}
-				if (ImGui.sliderFloat("At least N stacks##st" + a.id, a.pctRef, 1, 15, "%.0f")) {
+				if (solarflare.ui.BuilderSlider.draw("At least N stacks##st" + a.id, a.pctRef, 1, 15, "%.0f")) {
 					a.pct = a.pctRef.get();
 					SettingsStore.markDirty();
 				}
 			}
 			if ((a.trigger == "combatlog" || a.trigger == "status") && !a.dormant.get()) {
-				if (ImGui.sliderFloat("Hold (s, 0=CDB)##dur" + a.id, a.durRef, 0, 12, "%.1f")) {
+				if (solarflare.ui.BuilderSlider.draw("Hold (s, 0=CDB)##dur" + a.id, a.durRef, 0, 12, "%.1f")) {
 					a.duration = a.durRef.get();
 					SettingsStore.markDirty();
 				}

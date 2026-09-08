@@ -59,10 +59,10 @@ class AuraBuilder {
 	var advancedPreview = new solarflare.aura.preview.AdvancedAuraPreview();
 	var centerTab:Int = 0;
 	var mainTab:Int = 0;
+	var looksTab:Int = 0;
 	var logicSubTab:Int = 0;
 
 	static inline var JSON_BUF:Int = 32768;
-	static inline var MAX_ICON_RESULTS:Int = 60;
 	var exportBuf = new hl.Bytes(JSON_BUF);
 	var importBuf = new hl.Bytes(JSON_BUF);
 	var exportString:String = "";
@@ -190,6 +190,7 @@ class AuraBuilder {
 			return;
 		}
 
+		drawWindowToggles(a, "quick");
 		// Step flow: conditions first, appearance as the final stage.
 		ImGui.pushStyleVar(imgui.Enums.ImGuiStyleVar.FrameRounding, 12);
 		if (mainTab == 0) {
@@ -264,18 +265,20 @@ class AuraBuilder {
 		advancedPreview.draw(a, prevW, 150);
 		ImGui.separator();
 
-		if (ImGui.collapsingHeader("Appearance##ab_acc_app", imgui.Enums.ImGuiTreeNodeFlags.DefaultOpen))
-			drawAppearance(a);
-		if (ImGui.collapsingHeader("Window & Size##ab_acc_win"))
-			drawWindowLayout(a);
-		if (ImGui.collapsingHeader("Behavior##ab_acc_beh")) {
-			drawBehavior(a);
-			drawDrmSound(a, false);
+		var sections = ["Appearance", "Window & Size", "Behavior", "Effects", "Share"];
+		for (i in 0...sections.length) {
+			if (i > 0) ImGui.sameLine();
+			if (ImGui.selectable(sections[i] + "##ab_section_" + i, looksTab == i, 0, ImGui.vec2(125, 28))) looksTab = i;
 		}
-		if (ImGui.collapsingHeader("Advanced Effects##ab_acc_fx"))
-			cfg.drawEffects(a, false);
-		if (ImGui.collapsingHeader("Import / Export##ab_acc_io"))
-			drawShare(a);
+		ImGui.separator();
+		switch (looksTab) {
+			case 0: drawAppearance(a);
+			case 1: drawWindowLayout(a);
+			case 2: drawBehavior(a); drawDrmSound(a, false);
+			case 3: cfg.drawEffects(a, false);
+			case 4: drawShare(a);
+		}
+
 	}
 
 	function drawBatchToolbar():Void {
@@ -421,7 +424,10 @@ class AuraBuilder {
 		}
 
 		ImGui.separator();
-		ImGui.beginChild("##ab_list_child", ImGui.vec2(0, 0));
+		HudChrome.safeChild("##ab_list_child", ImGui.vec2(0, 0), 0, drawAuraList);
+	}
+
+	function drawAuraList():Void {
 		var visibleIds:Array<String> = [];
 		var visibleIndices:Array<Int> = [];
 		for (i in 0...cfg.auras.length) {
@@ -434,7 +440,9 @@ class AuraBuilder {
 		for (vi in 0...visibleIndices.length) {
 			var i = visibleIndices[vi];
 			var a = cfg.auras[i];
+			if (a == null) continue;
 			ImGui.pushID_Str(a.id);
+			try {
 
 			// Eye toggle
 			var eyeLabel = a.enabled.get() ? "O##ab_eye" : "-##ab_eye";
@@ -477,15 +485,19 @@ class AuraBuilder {
 				}
 				SettingsStore.markDirty();
 			}
+			} catch (e:Dynamic) {
+				ImGui.popID();
+				throw e;
+			}
 			ImGui.popID();
 		}
 		if (visibleIndices.length == 0)
 			ImGui.textDisabled("No auras match.");
-		ImGui.endChild();
 	}
 
 	function drawAuraItemContextMenu(index:Int, a:AuraDef):Void {
 		if (ImGui.beginPopup("ab_ctx_pop_" + a.id) || ImGui.beginPopupContextItem("##ab_ctx_" + a.id, 1)) {
+			try {
 			ImGui.separatorText('${a.name}');
 			if (ImGui.menuItem(a.enabled.get() ? "Disable Aura" : "Enable Aura")) {
 				a.enabled.set(!a.enabled.get());
@@ -509,6 +521,7 @@ class AuraBuilder {
 			if (a.isCounter.get() && ImGui.menuItem("Reset Counter")) {
 				a.counterValue = 0;
 				a.stacks = 1;
+				SettingsStore.markDirty();
 				ToastManager.info('Counter reset for ${a.name}');
 			}
 			ImGui.separator();
@@ -518,6 +531,10 @@ class AuraBuilder {
 				selected = cfg.auras.length > 0 ? Std.int(Math.min(index, cfg.auras.length - 1)) : -1;
 				SettingsStore.markDirty();
 				ToastManager.info('Deleted ${a.name}');
+			}
+			} catch (e:Dynamic) {
+				ImGui.endPopup();
+				throw e;
 			}
 			ImGui.endPopup();
 		}
@@ -655,17 +672,36 @@ class AuraBuilder {
 			if (ImGui.checkbox("Stack / Count Badge##ab_fx_stacks", a.stackCounter)) SettingsStore.markDirty();
 		}
 		opacityPercent.set(a.opacity.get() * 100);
-		if (ImGui.sliderFloat("Visual Opacity##ab_opacity", opacityPercent, 10, 100, "%.0f%%")) {
+		if (solarflare.ui.BuilderSlider.draw("Visual Opacity##ab_opacity", opacityPercent, 10, 100, "%.0f%%")) {
 			a.opacity.set(opacityPercent.get() * 0.01);
 			SettingsStore.markDirty();
 		}
-		if (ImGui.sliderFloat("Scale##ab_scale", a.scale, 0.5, 2.5, "%.2fx")) { a.sizeDirty = true; SettingsStore.markDirty(); }
+		if (solarflare.ui.BuilderSlider.draw("Scale##ab_scale", a.scale, 0.5, 2.5, "%.2fx")) { a.sizeDirty = true; SettingsStore.markDirty(); }
+	}
+
+	function drawWindowToggles(a:AuraDef, area:String):Void {
+		ImGui.pushID_Str("ab_window_controls_" + area);
+		if (ImGui.checkbox("Show Aura##ab_visible", a.enabled)) {
+			if (a.enabled.get()) a.visual.set(true);
+			SettingsStore.markDirty();
+		}
+		ImGui.sameLine();
+		if (ImGui.checkbox("Lock##ab_lock", a.chrome.locked)) {
+			cfg.unlockAll.set(false);
+			SettingsStore.markDirty();
+		}
+		ImGui.sameLine();
+		if (ImGui.checkbox("Always On##ab_always", a.alwaysOn)) SettingsStore.markDirty();
+		ImGui.sameLine();
+		if (ImGui.checkbox("Transparent##ab_transparent", a.chrome.transparent)) SettingsStore.markDirty();
+		ImGui.popID();
 	}
 
 	function drawWindowLayout(a:AuraDef):Void {
-		a.chrome.drawToggles("aura_builder_" + a.id);
-		if (ImGui.sliderFloat("Width##ab_w", a.w, 32, 720, "%.0f px")) { a.sizeDirty = true; SettingsStore.markDirty(); }
-		if (ImGui.sliderFloat("Height##ab_h", a.h, 24, 480, "%.0f px")) { a.sizeDirty = true; SettingsStore.markDirty(); }
+		drawWindowToggles(a, "layout");
+		ImGui.textWrapped("Always On keeps display visible; conditions still drive counters and alerts.");
+		if (solarflare.ui.BuilderSlider.draw("Width##ab_w", a.w, 32, 720, "%.0f px")) { a.sizeDirty = true; SettingsStore.markDirty(); }
+		if (solarflare.ui.BuilderSlider.draw("Height##ab_h", a.h, 24, 480, "%.0f px")) { a.sizeDirty = true; SettingsStore.markDirty(); }
 		if (ImGui.checkbox("Show Key Reminder##ab_show_key", a.showKey)) SettingsStore.markDirty();
 		if (a.showKey.get() && ImGui.inputText("Key Text##ab_key", a.keyBuf, AuraDef.KEY_BUF)) {
 			a.keyText = AuraDef.sanitizeKey(readBytes(a.keyBuf, AuraDef.KEY_BUF));
@@ -713,10 +749,10 @@ class AuraBuilder {
 			a.plate = "";
 			SettingsStore.markDirty();
 		}
-		if (ImGui.collapsingHeader("Browse Icon Catalog##ab_icon_catalog")) {
+		{
 			if (ImGui.inputText("Search Icons##ab_icon_search", iconSearchBuf, 80))
 				iconSearch = readBytes(iconSearchBuf, 80).toLowerCase();
-			ImGui.beginChild("##ab_icon_results", ImGui.vec2(0, 180), ImGuiChildFlags.Borders);
+			ImGui.beginChild("##ab_icon_results", ImGui.vec2(0, 300), ImGuiChildFlags.Borders);
 			drawIconCandidates(a);
 			ImGui.endChild();
 		}
@@ -724,40 +760,19 @@ class AuraBuilder {
 
 	function drawIconCandidates(a:AuraDef):Void {
 		var shown = 0;
-		var frame = AuraEngine.signalFrame();
-		if (frame != null) {
-			for (i in 0...frame.skillCount) {
-				if (shown >= MAX_ICON_RESULTS) break;
-				var s = frame.skills[i];
-				if (!matchesIcon(s.rawId, s.label)) continue;
-				var iconKey = s.aliasId != null && s.aliasId.length > 0 ? s.aliasId : s.rawId;
-				drawIconChoice(a, iconKey, s.label, "action bar", s.rawId); shown++;
-			}
+		for (entry in solarflare.cdb.AuraCatalog.entries) {
+			if (!matchesIcon(entry.id, entry.name)) continue;
+			drawIconChoice(a, entry.id, entry.name, entry.kind);
+			shown++;
 		}
-		for (i in 0...GeauxCache.bookIds.length) {
-			if (shown >= MAX_ICON_RESULTS) break;
-			var id = GeauxCache.coerceSkillId(GeauxCache.bookIds[i]);
-			var label = i < GeauxCache.bookLabels.length ? GeauxCache.bookLabels[i] : id;
-			if (!matchesIcon(id, label)) continue;
-			var iconKey = i < GeauxCache.bookIconIds.length && GeauxCache.bookIconIds[i].length > 0
-				? GeauxCache.bookIconIds[i] : id;
-			drawIconChoice(a, iconKey, label, "book", id); shown++;
-		}
-		var ids = CdbAuraTable.allIds();
-		var labels = CdbAuraTable.allLabels();
-		for (i in 0...ids.length) {
-			if (shown >= MAX_ICON_RESULTS) break;
-			var label = i < labels.length ? labels[i] : ids[i];
-			if (!matchesIcon(ids[i], label)) continue;
-			drawIconChoice(a, ids[i], label, "status"); shown++;
-		}
-		if (shown == 0)
-			ImGui.textDisabled("No matching icons. Try an exact custom icon ID.");
-		else if (shown >= MAX_ICON_RESULTS)
-			ImGui.textDisabled("Showing the first " + MAX_ICON_RESULTS + " matches. Refine the search for more.");
+		ImGui.textDisabled(shown + " matching icons");
 	}
 
 	function drawIconChoice(a:AuraDef, id:String, label:String, source:String, fallbackId:String = ""):Void {
+		if (!ImGui.isRectVisible(ImGui.vec2(ImGui.getContentRegionAvail().x, 28))) {
+			ImGui.dummy(ImGui.vec2(1, 28));
+			return;
+		}
 		var thumbnailId = id;
 		var hasArt = GameIcons.imageKey(thumbnailId, 28, 28);
 		if (!hasArt && fallbackId.length > 0 && fallbackId != thumbnailId) {
@@ -798,7 +813,7 @@ class AuraBuilder {
 				}
 			ImGui.endCombo();
 		}
-		if (mode == "onRiseHold" && ImGui.sliderFloat("Alert Duration##ab_hold", a.durRef, 0.5, 10, "%.1f s")) {
+		if (mode == "onRiseHold" && solarflare.ui.BuilderSlider.draw("Alert Duration##ab_hold", a.durRef, 0.5, 10, "%.1f s")) {
 			a.duration = a.durRef.get();
 			for (e in a.effects) if (e != null) {
 				e.hold = a.duration; e.holdRef.set(a.duration);
@@ -808,10 +823,11 @@ class AuraBuilder {
 		if (ImGui.checkbox("Count each time the conditions become true##ab_counter", a.isCounter))
 			SettingsStore.markDirty();
 		if (a.isCounter.get()) {
-			ImGui.textDisabled("Session count: " + a.counterValue + " (resets when the mod restarts)");
+			ImGui.textDisabled("Saved count: " + a.counterValue);
 			ImGui.sameLine();
 			if (ImGui.smallButton("Reset Count##ab_reset_count")) {
 				a.counterValue = 0; a.stacks = 1;
+				SettingsStore.markDirty();
 			}
 		}
 
@@ -826,7 +842,7 @@ class AuraBuilder {
 				a.bannerText = readBytes(a.bannerBuf, AuraDef.BANNER_BUF);
 				SettingsStore.markDirty();
 			}
-			if (ImGui.sliderFloat("Alert size##ab_boss_alert_scale", a.bannerScale, 1, 3, "%.1fx"))
+			if (solarflare.ui.BuilderSlider.draw("Alert size##ab_boss_alert_scale", a.bannerScale, 1, 3, "%.1fx"))
 				SettingsStore.markDirty();
 		}
 	}
@@ -855,7 +871,7 @@ class AuraBuilder {
 				ImGui.endCombo();
 			}
 			volumePercent.set(a.volume.get() * 100);
-			if (ImGui.sliderFloat("DRM Sound Volume##ab_volume", volumePercent, 0, 100, "%.0f%%")) {
+			if (solarflare.ui.BuilderSlider.draw("DRM Sound Volume##ab_volume", volumePercent, 0, 100, "%.0f%%")) {
 				a.volume.set(volumePercent.get() * 0.01);
 				SettingsStore.markDirty();
 			}

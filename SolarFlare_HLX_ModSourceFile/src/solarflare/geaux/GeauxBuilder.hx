@@ -129,6 +129,8 @@ class GeauxBuilder {
 		}
 
 		ImGui.sameLine();
+		if (ImGui.checkbox("Lock Bar##gb_top_lock", cfg.chrome.locked)) SettingsStore.markDirty();
+		ImGui.sameLine();
 		FeatureProfiles.drawToolbar(host, "geaux", "geaux_builder");
 
 		ImGui.sameLine(0, 14);
@@ -236,27 +238,27 @@ class GeauxBuilder {
 		var style = cfg.style != null ? cfg.style : (cfg.style = new GeauxStyle());
 
 		UiChrome.subHeader("Layout (match in-game bar)");
-		if (ImGui.sliderFloat("Outer Padding##gb_st_pad", style.padding, 0, 32, "%.0f px")) {
+		if (solarflare.ui.BuilderSlider.draw("Outer Padding##gb_st_pad", style.padding, 0, 32, "%.0f px")) {
 			cfg.sizeDirty = true;
 			SettingsStore.markDirty();
 		}
-		if (ImGui.sliderFloat("Cell Gap##gb_st_gap", style.gap, 0, 24, "%.0f px"))
+		if (solarflare.ui.BuilderSlider.draw("Cell Gap##gb_st_gap", style.gap, 0, 24, "%.0f px"))
 			SettingsStore.markDirty();
-		if (ImGui.sliderFloat("Cell Border##gb_st_border", style.border, 0, 6, "%.1f px"))
+		if (solarflare.ui.BuilderSlider.draw("Cell Border##gb_st_border", style.border, 0, 6, "%.1f px"))
 			SettingsStore.markDirty();
-		if (ImGui.sliderFloat("Cell Rounding##gb_st_round", style.rounding, 0, 16, "%.0f px"))
+		if (solarflare.ui.BuilderSlider.draw("Cell Rounding##gb_st_round", style.rounding, 0, 16, "%.0f px"))
 			SettingsStore.markDirty();
-		if (ImGui.sliderFloat("Icon Scale##gb_st_glyph", style.glyphScale, 0.5, 1.4, "%.2f"))
+		if (solarflare.ui.BuilderSlider.draw("Icon Scale##gb_st_glyph", style.glyphScale, 0.5, 1.4, "%.2f"))
 			SettingsStore.markDirty();
-		if (ImGui.sliderFloat("Window Alpha##gb_st_alpha", style.bgAlpha, 0, 1, "%.2f"))
+		if (solarflare.ui.BuilderSlider.draw("Window Alpha##gb_st_alpha", style.bgAlpha, 0, 1, "%.2f"))
 			SettingsStore.markDirty();
 
 		UiChrome.subHeader("Bar Size");
-		if (ImGui.sliderFloat("Width##gb_st_w", cfg.width, GeauxConfig.MIN_W, GeauxConfig.MAX_W, "%.0f px")) {
+		if (solarflare.ui.BuilderSlider.draw("Width##gb_st_w", cfg.width, GeauxConfig.MIN_W, GeauxConfig.MAX_W, "%.0f px")) {
 			cfg.sizeDirty = true;
 			SettingsStore.markDirty();
 		}
-		if (ImGui.sliderFloat("Height##gb_st_h", cfg.height, GeauxConfig.MIN_H, GeauxConfig.MAX_H, "%.0f px")) {
+		if (solarflare.ui.BuilderSlider.draw("Height##gb_st_h", cfg.height, GeauxConfig.MIN_H, GeauxConfig.MAX_H, "%.0f px")) {
 			cfg.sizeDirty = true;
 			SettingsStore.markDirty();
 		}

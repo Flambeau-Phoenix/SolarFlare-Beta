@@ -31,7 +31,7 @@ import imgui.ref.FloatRef;
  */
 class ConfigPanel {
 	static inline var HUB_LOGO:String = GameIcons.HUB_LOGO;
-	static inline var HUB_LOGO_MAX_W:Single = 280;
+	static inline var HUB_LOGO_MAX_W:Single = 180;
 	static inline var HUB_LOGO_ASPECT:Single = 526.0 / 1071.0;
 	static inline var HUB_LOGO_U0:Single = 137.0 / 1400.0;
 	static inline var HUB_LOGO_V0:Single = 156.0 / 900.0;
@@ -67,6 +67,9 @@ class ConfigPanel {
 	public var hubW:FloatRef;
 	public var hubH:FloatRef;
 	public var hubSizeDirty = true;
+	public var rememberHubLayout = new BoolRef(true);
+	var lastHubX:Float = Math.NaN;
+	var lastHubY:Float = Math.NaN;
 
 	public var dbgMetrics:BoolRef;
 	public var dbgLog:BoolRef;
@@ -94,8 +97,8 @@ class ConfigPanel {
 
 	public function new() {
 		open = new BoolRef(true);
-		hubW = new FloatRef(360);
-		hubH = new FloatRef(420);
+		hubW = new FloatRef(720);
+		hubH = new FloatRef(820);
 		dbgMetrics = new BoolRef(false);
 		dbgLog = new BoolRef(false);
 		showSaber = new BoolRef(false);
@@ -277,15 +280,27 @@ class ConfigPanel {
 		pollToolShortcuts();
 
 		if (open.get()) {
-			ImGui.setNextWindowSizeConstraints(ImGui.vec2(280, 200), ImGui.vec2(1920, 1200));
-			var vis = ToolWindow.beginWithMenuBar("SolarFlare###SolarFlare.Hub", open, hubW.get(), hubH.get());
+			ImGui.setNextWindowSizeConstraints(ImGui.vec2(520, 600), ImGui.vec2(1920, 1200));
+			var vis = ToolWindow.beginWithMenuBar("SolarFlare###SolarFlare.Hub", open,
+				Math.max(720, hubW.get()), Math.max(820, hubH.get()), false, rememberHubLayout.get());
 			if (vis) {
+				var pos = ImGui.getWindowPos();
+				var size = ImGui.getWindowSize();
+				if (rememberHubLayout.get() && (pos.x != lastHubX || pos.y != lastHubY
+					|| size.x != hubW.get() || size.y != hubH.get())) {
+					lastHubX = pos.x;
+					lastHubY = pos.y;
+					hubW.set(size.x);
+					hubH.set(size.y);
+					SettingsStore.markDirty();
+				}
 				drawHubMenuBar();
 				drawHubLogo();
 				ImGui.separator();
 				drawModuleTabs();
 				ImGui.separator();
-				drawActiveModule();
+				HudChrome.safeChild("##hub_active_settings", ImGui.vec2(0, 0), 0, drawActiveModule,
+					imgui.Enums.ImGuiChildFlags.Borders | imgui.Enums.ImGuiChildFlags.AutoResizeY | imgui.Enums.ImGuiChildFlags.AlwaysUseWindowPadding);
 				ImGui.separator();
 				if (ImGui.collapsingHeader("Show")) {
 					if (ImGui.checkbox("Show Geaux##hub_geaux_on", geaux.enabled)) {
@@ -300,18 +315,6 @@ class ConfigPanel {
 						visCheck("Show Lightsaber##hub_saber_show", lightsaber.hidden, showSaber);
 					if (auras != null && ImGui.checkbox("Show Auras##hub_aura_show", auras.enabled))
 						SettingsStore.markDirty();
-					if (vitals != null) {
-						ImGui.separatorText("Resources");
-						resourceQuickRow("Health", "health", vitals.hpHidden, vitals.chrome);
-						resourceQuickRow("Rage", "rage", vitals.rageHidden, vitals.rageChrome);
-						resourceQuickRow("Mana/Spark", "mana", vitals.manaHidden, vitals.manaChrome);
-						resourceQuickRow("Prayers", "prayers", vitals.prayersHidden, vitals.prayersChrome);
-						resourceQuickRow("Combo Points", "combo", combo.hidden, combo.chrome);
-						resourceQuickRow("Attack Combo", "attack", attackCombo.hidden, attackCombo.chrome);
-						resourceQuickRow("Current Target", "target", target.hidden, target.chrome);
-						resourceQuickRow("Chaincast", "chaincast", chaincast.hidden, chaincast.chrome);
-						resourceQuickRow("Conduits", "conduit", conduit.hidden, conduit.chrome);
-					}
 					if (launchers != null) {
 						ImGui.separatorText("Launchers");
 						visCheck("Show F6 MENU button##hub_f6b", launchers.f6.hidden, showF6Btn);
@@ -327,6 +330,8 @@ class ConfigPanel {
 				}
 
 				if (ImGui.collapsingHeader("Workspace & Docking Layout")) {
+					if (ImGui.checkbox("Remember F6 position and size##hub_remember", rememberHubLayout))
+						SettingsStore.markDirty();
 					ImGui.text('Layout Mode: ${solarflare.ui.DockingHelper.isWindowDocked() ? "Docked Tabbed Workspace" : "Floating Windows"}');
 					ImGui.textWrapped("Drag tool windows onto each other or screen edges. Layout persists in imgui.ini.");
 					if (ImGui.button("Save Layout Now##sf_save_dock", ImGui.vec2(130, 26)))
@@ -444,94 +449,37 @@ class ConfigPanel {
 		ImGui.setCursorPosX(startX + (avail.x - w) * 0.5);
 		var p = ImGui.getCursorScreenPos();
 		var dl = ImGui.getWindowDrawList();
-		drawHubLogoBackdrop(dl, p.x, p.y, w, h);
+
 		if (!GameIcons.imageKeyUv(HUB_LOGO, w, h, HUB_LOGO_U0, HUB_LOGO_V0, HUB_LOGO_U1, HUB_LOGO_V1))
 			ImGui.dummy(ImGui.vec2(w, h));
-		drawHubFlareLine(dl, p.x, p.y, w, h);
+
 		ImGui.setCursorPosX(startX);
-	}
-
-	/** Soft sun glow behind the wordmark — sits under "SOLAR", pulses gently. */
-	static function drawHubLogoBackdrop(dl:Dynamic, x:Single, y:Single, w:Single, h:Single):Void {
-		var t = ImGui.getTime();
-		var pulse = 0.55 + 0.45 * Math.sin(t * 1.65);
-		var cx:Single = x + w * 0.30;
-		var cy:Single = y + h * 0.42;
-		var r:Single = h * 0.58;
-		var aOuter = Std.int((0.10 + 0.10 * pulse) * 255);
-		var aMid = Std.int((0.16 + 0.14 * pulse) * 255);
-		var aCore = Std.int((0.22 + 0.18 * pulse) * 255);
-		ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), r * 1.15, UiCol.rgb(0xFFA028, aOuter), 32);
-		ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), r * 0.82, UiCol.rgb(0xFFC040, aMid), 28);
-		ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), r * 0.48, UiCol.rgb(0xFFE060, aCore), 24);
-		// Ray accents
-		var rayA = Std.int((0.18 + 0.22 * pulse) * 255);
-		var rayCol = UiCol.rgb(0xFFD040, rayA);
-		var i = 0;
-		while (i < 10) {
-			var ang = i * Math.PI / 5 + t * 0.15;
-			var c = Math.cos(ang);
-			var s = Math.sin(ang);
-			ImGui.ImDrawList_AddLine(dl,
-				ImGui.vec2(cx + c * r * 0.42, cy + s * r * 0.42),
-				ImGui.vec2(cx + c * r * 1.05, cy + s * r * 1.05),
-				rayCol, 1.6);
-			i++;
-		}
-	}
-
-	/** Faint solar-flare underline under the wordmark — mirrors the logo stroke with a live pulse. */
-	static function drawHubFlareLine(dl:Dynamic, x:Single, y:Single, w:Single, h:Single):Void {
-		var t = ImGui.getTime();
-		var y0:Single = y + h * 0.78;
-		var x0:Single = x + w * 0.18;
-		var x1:Single = x + w * 0.94;
-		var amp:Single = h * 0.045;
-		var pulse = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(t * 2.4));
-		var a = Std.int((0.25 + 0.45 * pulse) * 255);
-		var col = UiCol.rgb(0xFF8C20, a);
-		var colHot = UiCol.rgb(0xFFC040, Std.int(a * 0.7));
-		var prevX:Single = x0;
-		var prevY:Single = y0;
-		var segs = 28;
-		var i = 1;
-		while (i <= segs) {
-			var u = i / segs;
-			var px:Single = x0 + (x1 - x0) * u;
-			var wave = Math.sin(u * Math.PI * 2.2 + t * 3.1) * amp
-				+ Math.sin(u * Math.PI * 5.0 - t * 2.0) * amp * 0.35;
-			var py:Single = y0 + wave;
-			ImGui.ImDrawList_AddLine(dl, ImGui.vec2(prevX, prevY), ImGui.vec2(px, py), col, 2.2);
-			if (i % 3 == 0)
-				ImGui.ImDrawList_AddLine(dl, ImGui.vec2(prevX, prevY + 1.5), ImGui.vec2(px, py + 1.5), colHot, 1.1);
-			prevX = px;
-			prevY = py;
-			i++;
-		}
 	}
 
 	/** Feature selection changes the option surface in-place; editors are secondary windows. */
 	function drawModuleTabs():Void {
-		moduleTab("Resources", TAB_RESOURCES);
-		ImGui.sameLine();
-		moduleTab("Geaux", TAB_GEAUX);
-		ImGui.sameLine();
-		moduleTab("Attack Combo", TAB_ATTACK);
-		ImGui.sameLine();
-		moduleTab("Auras", TAB_AURAS);
-		if (moduleTab("Notebook", TAB_NOTEBOOK))
-			notebook.open.set(true);
-		ImGui.sameLine();
-		moduleTab("Lightsaber", TAB_LIGHTSABER);
-		ImGui.sameLine();
-		moduleTab("Combat Log", TAB_COMBAT_LOG);
-		ImGui.sameLine();
-		moduleTab("Theme", TAB_THEME);
+		var labels = ["Resources", "Geaux", "Attack Combo", "Auras", "Notebook", "Lightsaber", "Combat Log", "Theme"];
+		var ids = [TAB_RESOURCES, TAB_GEAUX, TAB_ATTACK, TAB_AURAS, TAB_NOTEBOOK, TAB_LIGHTSABER, TAB_COMBAT_LOG, TAB_THEME];
+		var available = ImGui.getContentRegionAvail().x;
+		var used:Float = 0;
+		for (i in 0...ids.length) {
+			var width = Math.max(110, ImGui.calcTextSize(labels[i]).x + 28);
+			if (used > 0 && used + 10 + width <= available) {
+				ImGui.sameLine();
+				used += 10;
+			} else used = 0;
+			if (moduleTab(labels[i], ids[i]) && ids[i] == TAB_NOTEBOOK) notebook.open.set(true);
+			used += width;
+		}
 	}
 
 	function moduleTab(label:String, id:Int):Bool {
-		var shown = activeHubTab == id ? "[" + label + "]" : label;
-		if (ImGui.button(shown + "##hub_tab_" + id)) {
+		var selected = activeHubTab == id;
+		var width:Single = Math.max(110, ImGui.calcTextSize(label).x + 28);
+		var clicked = selected
+			? UiChrome.accentButton(label + "##hub_tab_" + id, ImGui.vec2(width, 38))
+			: UiChrome.ghostButton(label + "##hub_tab_" + id, ImGui.vec2(width, 38));
+		if (clicked) {
 			activeHubTab = id;
 			SettingsStore.markDirty();
 			return true;
@@ -550,12 +498,12 @@ class ConfigPanel {
 					SettingsStore.markDirty();
 				}
 				if (geaux.chrome != null) geaux.chrome.drawToggles("tab_geaux");
-				if (UiChrome.accentButton("Open Geaux Builder##tab_geaux_open", ImGui.vec2(-1, 36)))
+				if (UiChrome.accentButton("Open Geaux Builder##tab_geaux_open", ImGui.vec2(-1, 40)))
 					geauxBuilder.open.set(true);
 			case TAB_ATTACK:
 				ImGui.textWrapped("Weapon attack-chain overlay.");
 				visCheck("Show Attack Combo##tab_attack_show", attackCombo.hidden, showAttack);
-				if (ImGui.button("Open Attack Combo settings##tab_attack_open", ImGui.vec2(-1, 0)))
+				if (UiChrome.accentButton("Open Attack Combo settings##tab_attack_open", ImGui.vec2(-1, 40)))
 					resourceTracker.openFor("attack");
 			case TAB_AURAS:
 				FeatureProfiles.drawToolbar(this, "auras", "hub_auras");
@@ -563,34 +511,27 @@ class ConfigPanel {
 				if (ImGui.checkbox("Enable aura system##tab_aura_show", auras.enabled))
 					SettingsStore.markDirty();
 				ImGui.text(Std.string(auras.auras.length) + " aura(s) configured");
-				if (UiChrome.accentButton("Open Aura Builder##tab_aura_open", ImGui.vec2(-1, 36)))
+				if (UiChrome.accentButton("Open Aura Builder##tab_aura_open", ImGui.vec2(-1, 40)))
 					auraBuilder.open.set(true);
 			case TAB_NOTEBOOK:
 				ImGui.textWrapped("The Notebook opens when you select this tab. Pages auto-save while you type and are stored separately in notebook.json.");
 			case TAB_LIGHTSABER:
 				ImGui.textWrapped("Local combat-log DPS meter settings.");
 				visCheck("Show Lightsaber##tab_saber_show", lightsaber.hidden, showSaber);
-				if (ImGui.button("Lightsaber options##tab_saber_open", ImGui.vec2(-1, 0)))
+				if (UiChrome.accentButton("Lightsaber options##tab_saber_open", ImGui.vec2(-1, 40)))
 					lightsaber.open.set(true);
 			case TAB_COMBAT_LOG:
 				ImGui.textWrapped("Skill casts and resolved combat events.");
-				if (ImGui.button("Combat Log options##tab_log_open", ImGui.vec2(-1, 0)))
+				if (UiChrome.accentButton("Combat Log options##tab_log_open", ImGui.vec2(-1, 40)))
 					combatLog.open.set(true);
-				ImGui.separatorText("Current Target");
-				ImGui.textWrapped("Live target name and HP bar from the same observe path.");
-				visCheck("Show Current Target##tab_tgt_show", target.hidden, showTarget);
-				if (ImGui.button("Current Target options##tab_tgt_open", ImGui.vec2(-1, 0)))
-					target.open.set(true);
 			case TAB_THEME:
 				ThemePalette.drawThemeEditorPane();
 			default:
 				FeatureProfiles.drawToolbar(this, "resources", "hub_resources");
-				ImGui.textWrapped("Resource windows are independent; configure each one without leaving F6.");
-				resourceQuickRow("Health", "tab_health", vitals.hpHidden, vitals.chrome);
-				resourceQuickRow("Rage", "tab_rage", vitals.rageHidden, vitals.rageChrome);
-				resourceQuickRow("Mana/Spark", "tab_mana", vitals.manaHidden, vitals.manaChrome);
-				resourceQuickRow("Prayers", "tab_prayers", vitals.prayersHidden, vitals.prayersChrome);
-				if (ImGui.button("Open Resource Tracker Builder##tab_rt_open", ImGui.vec2(-1, 0)))
+				ImGui.textWrapped("Configure resources and class trackers in the Resource Tracker Builder.");
+				resourceQuickRow("Target Frame", "target", target.hidden, target.chrome);
+
+				if (UiChrome.accentButton("Open Resource Tracker Builder##tab_rt_open", ImGui.vec2(-1, 40)))
 					resourceTracker.open.set(true);
 		}
 	}
@@ -620,14 +561,16 @@ class ConfigPanel {
 	}
 
 	function resourceQuickRow(label:String, id:String, hidden:BoolRef, chrome:HudChrome):Void {
-		ImGui.text(label);
+		ImGui.spacing();
+		UiChrome.subHeader(label);
 		if (ImGui.checkbox("Hide##hub_rt_hide_" + id, hidden)) SettingsStore.markDirty();
 		ImGui.sameLine();
 		if (ImGui.checkbox("Lock##hub_rt_lock_" + id, chrome.locked)) SettingsStore.markDirty();
 		ImGui.sameLine();
 		if (ImGui.checkbox("Transparent##hub_rt_trans_" + id, chrome.transparent)) SettingsStore.markDirty();
-		ImGui.sameLine();
-		if (ImGui.smallButton("Settings##hub_rt_settings_" + id)) resourceTracker.openFor(id);
+		if (ImGui.button("Settings##hub_rt_settings_" + id, ImGui.vec2(-1, 0)))
+			resourceTracker.openFor(StringTools.startsWith(id, "tab_") ? id.substr(4) : id);
+		ImGui.separator();
 	}
 
 	static function bytesToString(bytes:hl.Bytes, cap:Int):String {

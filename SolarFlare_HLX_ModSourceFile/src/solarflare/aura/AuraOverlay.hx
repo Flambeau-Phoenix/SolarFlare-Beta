@@ -63,7 +63,7 @@ class AuraOverlay {
 		if (h < 24)
 			h = 24;
 		ImGui.setNextWindowBgAlpha(0);
-		ImGui.setNextWindowSizeConstraints(ImGui.vec2(24, 24), ImGui.vec2(480, 480));
+		ImGui.setNextWindowSizeConstraints(ImGui.vec2(24, 24), ImGui.vec2(720 * sc, 480 * sc));
 		if (a.chrome != null && a.chrome.takeExpandDirty())
 			a.sizeDirty = true;
 		if (a.sizeDirty) {
@@ -136,6 +136,7 @@ class AuraOverlay {
 						}
 						if (a.isCounter.get() && ImGui.menuItem("Reset Counter##la_rst_" + a.id)) {
 							a.counterValue = 0; a.stacks = 1;
+							SettingsStore.markDirty();
 							ToastManager.info('${a.name} counter reset');
 						}
 						ImGui.separator();

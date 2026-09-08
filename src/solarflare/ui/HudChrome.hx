@@ -93,11 +93,13 @@ class HudChrome {
 
 	/** Always pairs beginChild/endChild; swallows draw throws so the stack stays balanced. */
 	public static function safeChild(id:String, size:imgui.Vec2, flags:Int, draw:Void->Void, childFlags:Int = 0):Void {
-		ImGui.beginChild(id, size, childFlags, flags);
+		var shown = ImGui.beginChild(id, size, childFlags, flags);
 		try {
-			if (draw != null)
+			if (shown && draw != null)
 				draw();
-		} catch (_:Dynamic) {}
+		} catch (e:Dynamic) {
+			trace('SolarFlare child $id: $e');
+		}
 		ImGui.endChild();
 	}
 
@@ -290,18 +292,18 @@ class HudChrome {
 			WindowEffects.gradientHeader(dl, wp.x, wp.y, ws.x, STRIP + 2, topCol, bottomCol);
 
 			var accentCol = ImGui.colorConvertFloat4ToU32(theme.accent);
-			WindowEffects.glowLine(dl, wp.x + 4, wp.y + STRIP + 1, ws.x - 8, accentCol, 1.5);
+			ImGui.ImDrawList_AddLine(dl, ImGui.vec2(wp.x + 4, wp.y + STRIP + 1), ImGui.vec2(wp.x + ws.x - 4, wp.y + STRIP + 1), accentCol, 1);
 		}
 
 		var sunX:Single = wp.x + 3;
 		var sunY:Single = wp.y + ((STRIP + 2) - SUN) * 0.5;
-		if (!isTransparent())
-			WindowEffects.spotlight(dl, sunX + SUN * 0.5, sunY + SUN * 0.5, 16,
-				ImGui.colorConvertFloat4ToU32(theme.accent), 0.16);
 		if (!isLocked())
 			pollSunGrip(sunX, sunY);
-		if (!isTransparent())
-			blitSun(sunX, sunY);
+		if (!isTransparent()) {
+			var gripCol = ImGui.colorConvertFloat4ToU32(theme.text);
+			for (i in 0...3)
+				ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(sunX + 3 + i * 4, sunY + SUN * 0.5), 1, gripCol, 8);
+		}
 
 		var closeHit = false;
 		if (onClose != null) {
@@ -332,9 +334,7 @@ class HudChrome {
 			var titleX:Single = wp.x + (ws.x - ts.x) * 0.5;
 			var titleY:Single = wp.y + ((STRIP + 2) - ts.y) * 0.5;
 			var textCol = ImGui.colorConvertFloat4ToU32(theme.text);
-			var glowCol = ImGui.colorConvertFloat4ToU32(theme.accent);
-			WindowEffects.spotlight(dl, titleX + ts.x * 0.5, titleY + ts.y * 0.5, Math.max(ts.x * 0.4, 20), glowCol, 0.1);
-			EnhancedText.glowStroke(dl, ImGui.vec2(titleX, titleY), caption, textCol, glowCol, 2.2);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(titleX, titleY), textCol, caption);
 		}
 		ImGui.setCursorPos(start);
 		ImGui.dummy(ImGui.vec2(0, STRIP));

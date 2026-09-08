@@ -76,7 +76,7 @@ class AuraEffects {
 		if (anyWin && !a.visual.get())
 			showWin = false;
 
-		a.show = showWin;
+		a.show = a.visual.get() && (showWin || a.alwaysOn.get());
 		a.alertShow = showAlert;
 		a.alertText = alertText;
 		a.iconGlow = iconGlow;
@@ -84,7 +84,10 @@ class AuraEffects {
 		a.progress = prog;
 		var rise = hit && !a.condWas;
 		if (rise && a.isCounter != null && a.isCounter.get()) {
-			a.counterValue++;
+			if (a.counterValue < 2147483647) {
+				a.counterValue++;
+				solarflare.ui.SettingsStore.markDirty();
+			}
 			a.stacks = a.counterValue;
 		}
 

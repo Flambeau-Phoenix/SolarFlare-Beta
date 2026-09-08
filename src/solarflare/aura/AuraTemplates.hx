@@ -13,6 +13,7 @@ class AuraTemplates {
 		a.announce = "Boss Kills";
 		a.syncAnnounceBuf();
 		a.isCounter.set(true);
+		a.alwaysOn.set(true);
 		a.counterValue = 0;
 		a.region = "text";
 		a.showIcon.set(true);
@@ -22,10 +23,10 @@ class AuraTemplates {
 		var r = new AuraRuleDef();
 		r.mode = "all";
 		var c = new AuraConditionDef();
-		c.signal = "status.present";
-		c.op = "present";
-		c.subject = "boss_slain";
-		c.subjectLabel = "Boss Slain";
+		c.signal = "combat.killKindMatches";
+		c.op = "is";
+		c.subject = "";
+		c.subjectLabel = "";
 		r.conditions.push(c);
 		a.rule = r;
 

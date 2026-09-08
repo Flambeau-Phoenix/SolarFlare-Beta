@@ -16,7 +16,7 @@ import solarflare.ui.VitalsConfig;
  * their live overlays.
  */
 class ResourcePreviewRenderer {
-	static var ALL_IDS = ["health", "rage", "mana", "prayers", "combo", "attack", "target", "chaincast", "conduit"];
+	static var ALL_IDS = ["target", "health", "attack", "rage", "mana", "prayers", "combo", "chaincast", "conduit"];
 	var hp = new VitalSnap();
 	var rage = new VitalSnap();
 	var mana = new VitalSnap();
@@ -35,7 +35,7 @@ class ResourcePreviewRenderer {
 
 	public function drawAll(state:PreviewState, cfg:ConfigPanel, width:Single):Void {
 		for (id in ALL_IDS) {
-			ImGui.textDisabled(labelOf(id));
+			solarflare.ui.UiChrome.heading(labelOf(id), 1);
 			drawElement(id, state, cfg, width, 34);
 		}
 	}
@@ -45,6 +45,8 @@ class ResourcePreviewRenderer {
 			return;
 		if (width < 40)
 			width = 40;
+		var left = ImGui.getCursorPosX();
+		ImGui.setCursorPosX(left + Math.max(0, (ImGui.getContentRegionAvail().x - width) * 0.5));
 		switch (id) {
 			case "health":
 				syncHp(s);
@@ -74,6 +76,11 @@ class ResourcePreviewRenderer {
 			default:
 				ImGui.textDisabled("Select a resource to preview.");
 		}
+		ImGui.setCursorPosX(left);
+		// Register the restored cursor (including trailing item spacing) before EndChild.
+		ImGui.pushStyleVar(imgui.Enums.ImGuiStyleVar.ItemSpacing, ImGui.vec2(0, 0));
+		ImGui.dummy(ImGui.vec2(0, 0));
+		ImGui.popStyleVar();
 	}
 
 	static function drawTargetPreview(cfg:ConfigPanel, width:Single, height:Single):Void {

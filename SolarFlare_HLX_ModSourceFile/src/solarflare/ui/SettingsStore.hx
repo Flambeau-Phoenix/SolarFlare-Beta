@@ -183,11 +183,13 @@ class SettingsStore {
 	}
 
 	static function dumpUiState(cfg:ConfigPanel):Dynamic {
-		return {hubOpen: cfg != null && cfg.open != null ? cfg.open.get() : false, hubTab: cfg != null ? cfg.profileUiTab() : 0};
+		return {hubOpen: cfg != null && cfg.open != null ? cfg.open.get() : false, hubTab: cfg != null ? cfg.profileUiTab() : 0,
+			rememberHubLayout: cfg != null ? cfg.rememberHubLayout.get() : true};
 	}
 
 	static function applyUiState(cfg:ConfigPanel, data:Dynamic):Void {
 		if (cfg == null || data == null) return;
+		setBool(cfg.rememberHubLayout, data.rememberHubLayout);
 		try if (data.hubOpen != null) cfg.open.set(data.hubOpen == true) catch (_:Dynamic) {}
 		try if (data.hubTab != null) cfg.applyProfileUiTab(Std.int(data.hubTab)) catch (_:Dynamic) {}
 	}
@@ -449,7 +451,8 @@ class SettingsStore {
 		return {
 			on: on,
 			unlock: unlock,
-			list: auraList(c)
+			list: auraList(c),
+			auraCounter: solarflare.aura.AuraCounterState.dump(c.auras)
 		};
 	}
 
@@ -476,6 +479,7 @@ class SettingsStore {
 		if (source.unlock != null)
 			setBool(c.unlockAll, source.unlock);
 		solarflare.aura.AuraConfig.applyListDump(c, source);
+		solarflare.aura.AuraCounterState.apply(c.auras, Reflect.field(source, "auraCounter"));
 	}
 
 	static function chromeDump(c:HudChrome):Dynamic {

@@ -437,6 +437,7 @@ class AuraEngine {
 			invert: boolRef(a.invert, false),
 			requireAfford: boolRef(a.requireAfford, true),
 			dormant: boolRef(a.dormant, false),
+			alwaysOn: boolRef(a.alwaysOn, false),
 			visual: boolRef(a.visual, true),
 			audio: boolRef(a.audio, false),
 			cue: safeString(a.cue),

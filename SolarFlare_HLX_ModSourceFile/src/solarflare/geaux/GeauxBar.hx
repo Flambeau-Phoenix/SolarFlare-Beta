@@ -83,10 +83,18 @@ class GeauxBar {
 		var gap:Single = cfg.style.gap.get();
 		if (gap < 0) gap = 0;
 		var avail = ImGui.getContentRegionAvail();
-		var cell:Single = (avail.x - gap * (cols - 1)) / cols;
-		if (cell > 64) cell = 64;
-		if (cell < 28) cell = 28;
-		var origin = ImGui.getCursorScreenPos();
+		var previewScale:Single = Math.min(1, avail.x / cfg.width.get());
+		var pad:Single = Math.max(0, cfg.style.padding.get()) * previewScale;
+		gap *= previewScale;
+		var previewW:Single = cfg.width.get() * previewScale;
+		var previewH:Single = cfg.height.get() * previewScale;
+		var cell:Single = Math.max(1, Math.min((previewW - pad * 2 - gap * (cols - 1)) / cols,
+			(previewH - pad * 2 - gap * (rows - 1)) / rows));
+		var frameOrigin = ImGui.getCursorScreenPos();
+		ImGui.ImDrawList_AddRectFilled(ImGui.getWindowDrawList(), frameOrigin,
+			ImGui.vec2(frameOrigin.x + previewW, frameOrigin.y + previewH),
+			ImGui.colorConvertFloat4ToU32(cfg.style.windowBgCol(cfg.chrome.transparent.get() ? 0 : cfg.style.bgAlpha.get())), 4);
+		var origin = ImGui.vec2(frameOrigin.x + pad, frameOrigin.y + pad);
 		var rounding:Single = Math.max(0, cfg.style.rounding.get());
 		var borderW:Single = Math.max(0, cfg.style.border.get());
 		var count = rows * cols;
@@ -181,8 +189,8 @@ class GeauxBar {
 					onCellRightClick(idx);
 			}
 		}
-		ImGui.setCursorScreenPos(origin);
-		ImGui.dummy(ImGui.vec2(cell * cols + gap * (cols - 1), cell * rows + gap * (rows - 1)));
+		ImGui.setCursorScreenPos(frameOrigin);
+		ImGui.dummy(ImGui.vec2(previewW, previewH));
 	}
 
 	function drawWindow(cfg:GeauxConfig):Void {
@@ -351,7 +359,7 @@ class GeauxBar {
 		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + size, y + size), ImGui.colorConvertFloat4ToU32(fill), rounding);
 		if (pickable && hovered) {
 			solarflare.ui.VectorGlow.rect(dl, x, y, size, size, UiCol.rgb(0xFFAA22), rounding, 2.0);
-		} else {
+		} else if (borderW > 0) {
 			ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + size, y + size), ImGui.colorConvertFloat4ToU32(border), rounding, borderW);
 		}
 
@@ -370,7 +378,7 @@ class GeauxBar {
 			GeauxGlyphs.draw(dl, gx, gy, gSize, glyph, lit);
 			drewIcon = true;
 		} else if (present && snapId.length > 0) {
-			var pad:Single = size * 0.12;
+			var pad:Single = (size - size * 0.76 * gScale) * 0.5;
 			var iconSize:Single = size - pad * 2;
 			if (iconSize < 8)
 				iconSize = size;

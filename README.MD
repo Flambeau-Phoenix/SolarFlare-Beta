@@ -1,13 +1,38 @@
-![SolarFlare HUD Preview](https://i.postimg.cc/ydv50Sz0/Solar-Flare1.png)
-![SolarFlare Geaux Menu Preview](https://i.postimg.cc/5t9DymZB/Solar-Flare-Pic3.png)
+[SolarFlare v1.1b Update](https://i.postimg.cc/SN5fS2TQ/image.png)](https://www.youtube.com/watch?v=KIcw0sf8AKA)
 
 ---
-Auras is super scuffed, the sliders broke when I upgraded my gui. I'll upload a fix in the next few days
+
+# SolarFlare — v1.1 Beta - Current Changelog -
+
+### v1.1b Changelog ###
+
+## Added
+
+* **Searchable Catalogs:** Added searchable catalogs for 516 units, 955 skills, and a complete icon list, with thumbnails displayed where available.
+* **Persistent Aura Counters:** Added profile-persistent Aura counters so your counters persist when logging in and out. You can reset them in the aura builder.
+* **Always On Option:** Added a radio button to enable "Always On" for auras like unit kill counts.
+* **Window Persistence:** Automatic window size and position saving for the F6 menu. You don't have to resize a tiny window each time you login.
+* **Aura Window Controls:** Added quick options atop the aura builder for window hide/transparent/always on.
+* **Visual Polish:** Added highlighted settings cog icons to the Resource Tracker. Removed the old vector suns everywhere. They were a proof of concept that stuck, same reason sliders were scuffed.
+
+## Changed
+
+* **F6 Menu Layout:** Reorganized menu structure; moved **Show/Hide** and **Lock** options higher up for quicker access.
+* **Panel Navigation:** Replaced appearance dropdowns with dedicated button-selected panels.
+* **Slider Formatting:** Fraction sliders now display and adjust using percentages.
+* **Aura Preview Behavior:** Aura previews now default to a paused state upon opening.
+* **UI Clean-up:** Simplified section headings, reduced visual clutter, and improved Resource Tracker spacing with centered previews.
+* **Data Isolation:** Saved IDs now operate independently from live units. This means your counters will not lose their configurations because their unit id was lost in the ledger.
+
+## Fixed
+
+* Fixed Geaux texture scaling and size preview rendering. The sliders work now.
+* Fixed Aura skill and unit name resolution, including support for unequipped skills.
+* Resolved ImGui child-window clipping and preview boundary errors.
+
+
 ---
-# SolarFlare — Beta v1
 This mod uses the HLX Modding Framework by https://github.com/laymain found here: https://hlx-framework.github.io/  
-
----
 
 SolarFlare is a customizable HUD addon for Farever, built around three main features: **ResourceTracker, Auras, and Geaux**. Keep resources, skill readiness, and visual alerts where you want them on screen.
 

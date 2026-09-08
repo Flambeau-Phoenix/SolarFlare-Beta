@@ -40,6 +40,7 @@ class ModEntry {
 	static function keepRoots():Void {
 		solarflare.cdb.CdbNames.keep();
 		solarflare.cdb.CdbUnitNames.keep();
+		solarflare.cdb.AuraCatalog.keep();
 		solarflare.cdb.CdbAuraTable.keep();
 		solarflare.geaux.GeauxCdTable.keep();
 		solarflare.geaux.GeauxTalentTable.keep();

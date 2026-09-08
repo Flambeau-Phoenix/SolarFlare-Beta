@@ -29,6 +29,8 @@ class AuraDef {
 
 	/** Alert-style: invisible until rising-edge, hold for duration, then dormant again. */
 	public var dormant:BoolRef;
+	/** Keep presentation visible while triggers continue to count normally. */
+	public var alwaysOn = new BoolRef(false);
 	/** DRM-parity toggles (visual used live; audio/cue/volume stored for DRM export). */
 	public var visual:BoolRef;
 	public var audio:BoolRef;

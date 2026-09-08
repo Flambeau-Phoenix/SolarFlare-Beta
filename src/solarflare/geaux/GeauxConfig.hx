@@ -609,17 +609,17 @@ class GeauxStyle {
 	public function drawEditor():Bool {
 		var dirty = false;
 		if (ImGui.collapsingHeader("Look")) {
-			if (ImGui.sliderFloat("Padding##geaux", padding, 0, 32, "%.0f px"))
+			if (solarflare.ui.BuilderSlider.draw("Padding##geaux", padding, 0, 32, "%.0f px"))
 				dirty = true;
-			if (ImGui.sliderFloat("Gap##geaux", gap, 0, 16, "%.0f px"))
+			if (solarflare.ui.BuilderSlider.draw("Gap##geaux", gap, 0, 16, "%.0f px"))
 				dirty = true;
-			if (ImGui.sliderFloat("Rounding##geaux", rounding, 0, 16, "%.1f"))
+			if (solarflare.ui.BuilderSlider.draw("Rounding##geaux", rounding, 0, 16, "%.1f"))
 				dirty = true;
-			if (ImGui.sliderFloat("Border##geaux", border, 0.5, 4, "%.1f"))
+			if (solarflare.ui.BuilderSlider.draw("Border##geaux", border, 0.5, 4, "%.1f"))
 				dirty = true;
-			if (ImGui.sliderFloat("Window alpha##geaux", bgAlpha, 0, 1, "%.2f"))
+			if (solarflare.ui.BuilderSlider.draw("Window alpha##geaux", bgAlpha, 0, 1, "%.2f"))
 				dirty = true;
-			if (ImGui.sliderFloat("Glyph scale##geaux", glyphScale, 0.5, 1.4, "%.2f"))
+			if (solarflare.ui.BuilderSlider.draw("Glyph scale##geaux", glyphScale, 0.5, 1.4, "%.2f"))
 				dirty = true;
 
 			ImGui.separatorText("Attention & Effects");
