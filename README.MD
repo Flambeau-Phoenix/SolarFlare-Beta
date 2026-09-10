@@ -1,3 +1,4 @@
+
 https://raw.githubusercontent.com/Flambeau-Phoenix/SolarFlare-Beta-v1/master/Aura_Proc.mp4
 
 ![Minions in Combat Log](https://i.postimg.cc/Gp2y6gpY/Minion-Crit-and-Kill.png)
