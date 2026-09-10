@@ -3,10 +3,14 @@
 
 # SolarFlare — v1.2 Beta - Current Changelog -
 
-### SolarFlare - v1.2b - Changelog ### 
+### SolarFlare - v1.2b - Changelog
 
 ## Added
 
+* **Minion Attribution System:** Summon damage now properly credits the parent hero via `ent.Foe.summonOwner` / `summonSourceSkill` (`CombatOwnership`). Fully covers summons including *Eternal Flower Heart* (`Trinket_Bee`), *Pocket Hive* (`GM_MassGrab_Passive` → `Summon_Bee`), and *Silhouette of Almar* (`Staff_SummonDemon_Skill2` → `Summon_Imp`).
+* **Minion Reporting & Logging:** Added a sortable **Minion** (`minionName`) table column to the overlay and exposed the `minion` field in JSON exports.
+* **Damage Observation & Hooks:** Added `noteInflict` on outgoing hits from `Unit.onInflictDamage` (handling bee/imp as self) to dedupe against receive-side hits, `DamageObservation` to suppress duplicate `Foe` → `Unit` `onReceiveDamage` events for identical payloads, and `maxDamageTakenRecent` windowed helper for aura evaluation.
+* **Enemy Cast Feed:** Added `noteCast` tracking for engaged foes, routing `BaseSkill.doStop` events into `EnemyCastCache` (`aura/event.cast`).
 * **Aura Templates & Signals:** Added a dedicated **Status on me** aura template and expanded the aura catalog (skills, statuses, fxset) for improved search and ranking.
 * **Shared Overlay Renderers:** Introduced `ChaincastRenderer` and unified the `ConduitOverlay.drawSlotRow` path to ensure builder previews identically mirror live HUD elements.
 * **Skill Charge HUD Elements:** Added support for Geaux skill charges on bar snaps, featuring an optional charge digit and lit/hide rules to display remaining ammo during cooldown regen.
@@ -14,6 +18,10 @@
 
 ## Changed
 
+* **Damage Source & Ownership Resolution:** Rebuilt source resolution order (`sourceUnit` → `serverSource` → `source` → `ctx.owner` → skill owner) and expanded event capture to trigger whenever an attacker or victim is owned by the local hero.
+* **Receive Hook Architecture:** Refactored receive hooks into a paired prefix/postfix model with a shared observation gate across `Hero`, `Unit`, and `Foe`.
+* **Lightsaber Ingestion:** Parser now accepts parent-credited `ROLE_YOU` and `ROLE_PLAYER` lines, preserving the minion label.
+* **Overlay & Editor Cleanup:** Added sortable Minion column and streamlined the editor contents draw path.
 * **Aura Builder UX:** Reorganized the signal catalog into dedicated groups (e.g., explicit "on me" status labels, isolated Instant Cast group), added clearer subject picker tooltips, and removed `skill.specialReady` from the picker (legacy configurations remain supported).
 * **Aura Lifecycle Observation:** Updated local hero status tracking to leverage lifecycle hooks (`init`, stacks, duration, remove, net mark) with dirty-wake sampling; `skill.instantReady` now queries `shouldPlayInstantly`, pre-warms only `*_Proc` IDs, and falls back to `getStatusCount(skillId_Proc)`.
 * **Resource Tracker Previews:** Chaincast previews now share the live badge, icon rail, and stack visibility settings (`N/4` or `READY`). Conduit previews reliably respect configured pip shapes with inset skill icons rather than generic dark diamond placeholders.
@@ -21,20 +29,23 @@
 
 ## Fixed
 
-* **Chaincast Label Formatting:** Resolved an issue where skill labels displayed raw byte strings (e.g., `(bytes : ???, length : N)`) across the next-cast list, Add Skill menu, spend picker, and live hints.
-* **Conduit Lighting:** Fixed an issue preventing equipped Sparkmaster conduit slots from rendering at full brightness based on equipped counts or active Power stacks.
+* Fixed minion damage credit where `Unit.onInflictDamage` previously dropped bee and imp hits by requiring `isLocalHero(self)`.
+* Fixed missing projectile damage sources (e.g., honey-bolts) by properly falling back to `ctx.owner`.
+* Fixed Chaincast skill labels displaying raw byte strings (e.g., `(bytes : ???, length : N)`) across the next-cast list, Add Skill menu, spend picker, and live hints.
+* Fixed Conduit overlay lighting to ensure equipped Sparkmaster conduit slots render at full brightness based on equipped counts or active Power stacks.
 
 ---
 
-## User Configuration Notes
+## Technical & User Notes
 
+* **Minion Attribution:** Attribution relies strictly on runtime `summonOwner`; there are no per-summon skill hooks. `get_networkPropSummonOwner` returns a network Int and is not used for combat crediting.
 * **Pyroclasm Setup:** For free-cast windows, configure **Instant Cast** with subject `Staff_Craft_S1`, or **Status** targeting `Staff_Craft_S1_Proc`.
 * **Buff/Debuff Tracking:** Use **Statuses → Buff/debuff on me** (`status.present`) paired with active status IDs for encounters (e.g., bombs, elite affixes).
 * **Logging:** Restoring or opening the Resolution Ledger / Payload Probe panels no longer records automatically. Click **Start recording** when capturing session data.
 
 ---
 
-### v1.1b Changelog ###
+### SolarFlare - v1.1b - Changelog
 
 ## Added
 
@@ -59,7 +70,6 @@
 * Fixed Geaux texture scaling and size preview rendering. The sliders work now.
 * Fixed Aura skill and unit name resolution, including support for unequipped skills.
 * Resolved ImGui child-window clipping and preview boundary errors.
-
 
 ---
 This mod uses the HLX Modding Framework by https://github.com/laymain found here: https://hlx-framework.github.io/  
