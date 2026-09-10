@@ -1,0 +1,12 @@
+-cp src
+-resource assets/cdb/aura-catalog.json@aura-catalog
+-lib farever-gamelib
+-lib hlx-runtime
+-lib hl-imgui
+-lib format
+-lib hscript
+-lib json2object
+-dce full
+-debug
+-main solarflare.ModEntry
+-hl solarflare.hl
