@@ -1,4 +1,5 @@
-![Aura Instant Cast Proc](https://i.postimg.cc/Kjnktd09/Farever-3b-GZn-Ith-GG-ezgif-com-video-to-gif-converter-(1).gif)
+![Aura instant cast proc](https://i.postimg.cc/PqDn2TkN/Farever-3b-GZn-Ith-GG-ezgif-com-video-to-gif-converter.gif)
+
 ![Minions in Combat Log](https://i.postimg.cc/Gp2y6gpY/Minion-Crit-and-Kill.png)
 
 # SolarFlare — v1.2 Beta - Current Changelog -
