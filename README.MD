@@ -13,7 +13,7 @@
 * **Enemy Cast Feed:** Added `noteCast` tracking for engaged foes, routing `BaseSkill.doStop` events into `EnemyCastCache` (`aura/event.cast`).
 * **Aura Templates & Signals:** Added a dedicated **Status on me** aura template and expanded the aura catalog (skills, statuses, fxset) for improved search and ranking.
 * **Shared Overlay Renderers:** Introduced `ChaincastRenderer` and unified the `ConduitOverlay.drawSlotRow` path to ensure builder previews identically mirror live HUD elements.
-* **Skill Charge HUD Elements:** Added support for Geaux skill charges on bar snaps, featuring an optional charge digit and lit/hide rules to display remaining ammo during cooldown regen.
+* **Skill Charge HUD Elements:** Added support for Geaux skill charges on bar snaps, featuring an optional charge digit and lit/hide rules to display remaining charges during cooldown regen.
 * **Skill Hygiene:** Added automated skill ID coercion and JSON sanitization (`coerceSkillId`) across settings load, save, and rotation edits.
 
 ## Changed
