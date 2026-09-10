@@ -2,24 +2,38 @@
 
 import solarflare.EngineSkillId;
 import solarflare.FieldWalk;
-import solarflare.HealthCache;
 
 /**
  * Frozen local-hero status snaps for AuraEngine. Observe-only: typed getStatus /
  * BaseSkill duration getters, then FieldWalk list walk. Draw never reads this.
  */
 class AuraStatusCache {
-	public static inline var MAX:Int = 48;
+	public static inline var MAX:Int = solarflare.aura.signal.AuraSignalFrame.MAX_STATUSES;
 	public static var snaps:Array<AuraStatusSnap> = [];
 	public static var count:Int = 0;
+	public static var domainKnown:Bool = false;
+	/** Full container length before scan cap; -1 when unavailable. */
+	public static var containerLength:Int = -1;
+	static var sampledHero:Dynamic;
+
+	public static function reset():Void {
+		snaps = []; count = 0; domainKnown = false; sampledHero = null;
+		containerLength = -1;
+	}
+
+	public static function isCurrent(hero:Dynamic):Bool return hero != null && sampledHero == hero;
 
 	public static function sample(hero:Dynamic):Void {
-		snaps = [];
-		count = 0;
+		reset();
 		if (hero == null)
 			return;
+		sampledHero = hero;
+		if (solarflare.debug.ResolutionLedger.armed())
+			solarflare.debug.ResolutionLedger.touch("status.sample", "observe", "AuraStatusCache.sample", "hero", "bool", "true");
+		// Query configured IDs first so list truncation cannot hide requested procs.
+		for (id in solarflare.ObserveDemand.statusIds) lookupTyped(id);
 		walkList(hero, "statuses");
-		if (count < 1)
+		if (containerLength < 0)
 			walkList(hero, "statusList");
 	}
 
@@ -29,30 +43,34 @@ class AuraStatusCache {
 		var i = 0;
 		while (i < count) {
 			var s = snaps[i];
-			if (s != null && matches(s, want))
+			if (s != null && s.known && s.present && matches(s, want))
 				return s;
 			i++;
 		}
-		return lookupTyped(want);
+		return null;
 	}
 
 	static function walkList(owner:Dynamic, name:String):Void {
 		var arr = FieldWalk.extractObject(owner, name);
 		if (arr == null)
 			return;
-		var len = FieldWalk.arrayLen(arr);
-		if (len > MAX)
-			len = MAX;
+		var len = FieldWalk.arrayLen(arr, -1);
+		if (len < 0) return;
+		containerLength = len;
+		var complete = len <= MAX;
+		if (len > MAX) len = MAX;
 		var i = 0;
 		while (i < len) {
-			ingest(FieldWalk.arrayAt(arr, i));
+			var item = FieldWalk.arrayAt(arr, i);
+			if (item == null || ingest(item) == null) complete = false;
 			i++;
 		}
+		domainKnown = domainKnown || complete;
 	}
 
-	static function ingest(item:Dynamic):Void {
+	static function ingest(item:Dynamic):AuraStatusSnap {
 		if (item == null || count >= MAX)
-			return;
+			return null;
 		var snap = new AuraStatusSnap();
 		pushId(snap, EngineSkillId.ofSkill(item));
 		pushId(snap, skillIdOf(item));
@@ -61,38 +79,56 @@ class AuraStatusCache {
 		pushId(snap, FieldWalk.extractString(inf, "script"));
 		pushId(snap, FieldWalk.extractString(item, "kind"));
 		if (snap.ids.length == 0)
-			return;
+			return null;
 		snap.id = snap.ids[0];
+		var replace:AuraStatusSnap = null;
+		for (existing in snaps) {
+			if (!matches(existing, snap.id)) continue;
+			if (existing.known) return existing;
+			replace = existing; break;
+		}
 		snap.stacks = readStacks(item);
 		var rp = solarflare.SkillRemain.read(item);
 		snap.progress = rp.valid ? rp.progress : 1;
 		snap.left = rp.left;
-		snaps.push(snap);
-		count++;
+		snap.durationKnown = rp.valid;
+		if (replace != null) snaps[snaps.indexOf(replace)] = snap;
+		else { snaps.push(snap); count++; }
+		return snap;
 	}
 
 	static function lookupTyped(want:String):AuraStatusSnap {
-		var hero = HealthCache.localHero;
+		var hero = sampledHero;
 		if (hero == null)
 			return null;
-		var st:Dynamic = null;
+		if (count >= MAX) return null;
+		var snap:AuraStatusSnap = null;
 		try {
-			var h:ent.Hero = cast hero;
-			st = h.getStatus(want, null);
-			if (st == null) {
-				var asGo:ent.GameObject = cast hero;
-				st = h.getStatus(want, asGo);
-			}
+			var h:ent.GameObject = cast hero;
+			var n = h.getStatusCount(want, null);
+			if (n > 0) snap = ingest(h.getStatus(want, null));
+			if (snap == null) {
+				snap = new AuraStatusSnap();
+				snap.id = want; snap.ids = [want];
+				snap.present = n > 0; snap.stacks = n;
+				snaps.push(snap); count++;
+			} else pushId(snap, want);
 		} catch (_:Dynamic) {
-			st = null;
+			snap = new AuraStatusSnap();
+			snap.id = want; snap.ids = [want]; snap.known = false; snap.present = false;
+			snaps.push(snap); count++;
 		}
-		if (st == null)
-			return null;
-		var before = count;
-		ingest(st);
-		if (count > before)
-			return snaps[count - 1];
-		return null;
+		if (solarflare.debug.ResolutionLedger.armed() && snap != null)
+			solarflare.debug.ResolutionLedger.touch(
+				"status.present",
+				"typed",
+				"AuraStatusCache.lookupTyped",
+				want,
+				"bool",
+				snap.present ? "true" : "false",
+				snap.known ? "known" : "unknown"
+			);
+		return snap;
 	}
 
 	static function readStacks(item:Dynamic):Int {
@@ -168,8 +204,6 @@ class AuraStatusCache {
 				continue;
 			var hl = have.toLowerCase();
 			if (hl == wl)
-				return true;
-			if (wl.length >= 8 && hl.indexOf(wl) >= 0)
 				return true;
 			i++;
 		}

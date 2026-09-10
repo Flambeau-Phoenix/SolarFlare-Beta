@@ -311,13 +311,14 @@ class HudChrome {
 			var closeY:Single = wp.y + ((STRIP + 2) - CLOSE) * 0.5;
 			if (!isLocked())
 				closeHit = pollCloseButton(closeX, closeY);
-			if (!isTransparent())
-				drawCloseGlyph(closeX, closeY);
+			drawCloseGlyph(closeX, closeY);
 		}
 
 		ImGui.setCursorPos(saved);
-		if (closeHit)
+		if (closeHit) {
 			onClose();
+			return false;
+		}
 
 		if (!showBody) {
 			ImGui.dummy(ImGui.vec2(SUN + CLOSE + 12, STRIP));
@@ -489,7 +490,7 @@ class HudChrome {
 		if (!CursorCaptureFix.cursorFree)
 			return false;
 		ImGui.setCursorScreenPos(ImGui.vec2(px, py));
-		return ImGui.invisibleButton(CLOSE_ID, ImGui.vec2(CLOSE, CLOSE), ImGuiButtonFlags.AllowOverlap);
+		return ImGui.invisibleButton(CLOSE_ID, ImGui.vec2(CLOSE, CLOSE));
 	}
 
 	function toggleCollapsed():Void {

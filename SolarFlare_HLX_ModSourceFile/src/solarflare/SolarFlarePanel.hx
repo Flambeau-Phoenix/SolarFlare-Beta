@@ -142,7 +142,7 @@ class SolarFlarePanel {
 		if (now - lastFastPollSec >= 0.033) {
 			lastFastPollSec = now;
 			try {
-				if (ObserveDemand.resourceBars || ObserveDemand.auras || ObserveDemand.prayers
+				if (ObserveDemand.resourceBars || ObserveDemand.auras || ObserveDemand.auraBuilderOpen || ObserveDemand.prayers
 					|| ObserveDemand.comboPoints || ObserveDemand.chaincast || ObserveDemand.conduit)
 					HealthHooks.observeLocal();
 			} catch (_:Dynamic) {}
@@ -160,19 +160,22 @@ class SolarFlarePanel {
 			lastHeavyPollSec = now;
 
 			try {
-				if (ObserveDemand.geaux || ObserveDemand.geauxBuilder) {
+				// Warm liveById when script-ready Auras or Aura builder need Geaux.
+				if (ObserveDemand.geaux || ObserveDemand.geauxBuilder || ObserveDemand.auras || ObserveDemand.aurasNeedInstant
+					|| ObserveDemand.aurasNeedSpecial || ObserveDemand.auraBuilderOpen) {
 					config.geaux.ensureSlots();
 					GeauxCache.sample(HealthCache.localHero, config.geaux.visibleCount(), config.geaux.slotIds);
 				}
 			} catch (_:Dynamic) {}
 
 			try {
-				if (ObserveDemand.targetHud || ObserveDemand.combatLog)
+				if (ObserveDemand.targetHud || ObserveDemand.combatLog || ObserveDemand.aurasNeedTarget
+					|| ObserveDemand.auraBuilderOpen)
 					CombatLogCache.tick(HealthCache.localHero);
 			} catch (_:Dynamic) {}
 
 			try {
-				if (ObserveDemand.auras)
+				if (ObserveDemand.auras || ObserveDemand.auraBuilderOpen)
 					solarflare.aura.AuraEngine.tick(config.auras);
 			} catch (_:Dynamic) {}
 
@@ -220,7 +223,7 @@ class SolarFlarePanel {
 				}
 			} catch (_:Dynamic) {}
 			try {
-				if (ResolutionLedger.enabled.get())
+				if (ResolutionLedger.armed())
 					ResolutionLedger.tick();
 			} catch (_:Dynamic) {}
 			try {

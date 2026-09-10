@@ -1,4 +1,5 @@
 -cp src
+-resource assets/cdb/aura-catalog.json@aura-catalog
 -lib farever-gamelib
 -lib hlx-runtime
 -lib hl-imgui

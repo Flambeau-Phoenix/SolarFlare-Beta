@@ -143,17 +143,17 @@ class FieldWalk {
 		return fallback;
 	}
 
-	public static function arrayLen(arr:Dynamic):Int {
+	public static function arrayLen(arr:Dynamic, fallback:Int = 0):Int {
 		arr = unwrapArray(arr);
 		if (arr == null)
-			return 0;
+			return fallback;
 		try {
-			var n:Int = untyped arr.length;
-			return n;
+			var n:Dynamic = untyped arr.length;
+			if (n != null && Math.isFinite(n) && n >= 0) return Std.int(n);
 		} catch (_:Dynamic) {}
 		try {
-			var n = Std.int(extractNumber(arr, "length", 0));
-			if (n > 0)
+			var n = Std.int(extractNumber(arr, "length", -1));
+			if (n >= 0)
 				return n;
 		} catch (_:Dynamic) {}
 		try {
@@ -165,7 +165,7 @@ class FieldWalk {
 					return Std.int((v : Float));
 			}
 		} catch (_:Dynamic) {}
-		return 0;
+		return fallback;
 	}
 
 	public static function arrayAt(arr:Dynamic, i:Int):Dynamic {

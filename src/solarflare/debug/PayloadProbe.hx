@@ -13,9 +13,16 @@ import sys.io.File;
 @:keep
 class PayloadProbe {
 	public static var enabled = new BoolRef(false);
+	/** Write JSONL / snapshots. Session-only; defaults off. Separate from panel open. */
+	public static var recording = new BoolRef(false);
 	public static var lastPath:String = "";
 	public static var lastLabel:String = "payload-probe idle";
 	public static var lastJson:String = "{}";
+	/** Session-only last skill.instantReady observation. */
+	public static var lastInstantSkillId:String = "";
+	public static var lastInstantKnown:Bool = false;
+	public static var lastInstantReady:Bool = false;
+	public static var lastInstantAt:Float = 0;
 
 	static inline var RING:Int = 12;
 	static inline var MIN_GAP:Float = 0.125;
@@ -23,7 +30,7 @@ class PayloadProbe {
 
 	static var dmgNames:Array<String> = [
 		"amount", "critical", "kill", "block", "skillId", "stepId", "baseSkill", "source", "target",
-		"serverSource", "ctx"
+		"serverSource", "ctx", "sourceUnit", "targetUnit"
 	];
 	static var skillNames:Array<String> = [
 		"kind", "script", "inf", "owner", "parent",
@@ -42,7 +49,8 @@ class PayloadProbe {
 		"player", "receiver", "target", "to"
 	];
 	static var unitNames:Array<String> = [
-		"health", "maxHealth", "name", "kind", "isMe", "player", "targetUnit"
+		"health", "maxHealth", "name", "kind", "isMe", "player", "targetUnit",
+		"summonOwner", "summonSourceSkill", "get_networkPropSummonOwner"
 	];
 	static var spineNames:Array<String> = ["me", "hero", "layer", "world", "gui", "connectionInfo"];
 	static var configNames:Array<String> = ["mapId", "activityID", "difficulty"];
@@ -85,7 +93,33 @@ class PayloadProbe {
 	}
 
 	public static function armed():Bool {
-		return enabled != null && enabled.get();
+		return recording != null && recording.get();
+	}
+
+	public static function startRecording():Void {
+		recording.set(true);
+		lastLabel = "payload-probe recording";
+	}
+
+	public static function stopRecording():Void {
+		if (!armed())
+			return;
+		recording.set(false);
+		flush();
+		writeSnapshot();
+		lastLabel = "payload-probe stopped";
+	}
+
+	public static function clearSession():Void {
+		snaps = [];
+		writeAt = 0;
+		count = 0;
+		buf = [];
+		lastJson = "{}";
+		lastInstantSkillId = "";
+		lastInstantKnown = false;
+		lastInstantReady = false;
+		lastLabel = armed() ? "payload-probe recording (cleared)" : "payload-probe idle";
 	}
 
 	public static function capture(src:String, obj:Dynamic):Void {
@@ -110,8 +144,53 @@ class PayloadProbe {
 					j++;
 				}
 			}
+		} else {
+			// Hit path: nest source / ctx.owner so bee summonOwner shows in probe JSONL.
+			nestUnit(rows, obj, "source");
+			nestUnit(rows, obj, "serverSource");
+			nestUnit(rows, obj, "target");
+			var ctx = FieldWalk.extractObject(obj, "ctx");
+			if (ctx != null)
+				nestUnit(rows, ctx, "owner", "ctx.owner");
+			var base = FieldWalk.extractObject(obj, "baseSkill");
+			if (base != null) {
+				var own = FieldWalk.extractObject(base, "owner");
+				if (own != null)
+					nestUnitDirect(rows, own, "baseSkill.owner");
+			}
 		}
 		pushSnap(src, pack, rows, now);
+	}
+
+	static function nestUnit(rows:Array<ProbeRow>, parent:Dynamic, field:String, ?prefix:String):Void {
+		var child = FieldWalk.extractObject(parent, field);
+		if (child == null)
+			return;
+		nestUnitDirect(rows, child, prefix != null ? prefix : field);
+	}
+
+	static function nestUnitDirect(rows:Array<ProbeRow>, unit:Dynamic, prefix:String):Void {
+		if (unit == null || rows == null)
+			return;
+		var extra = probeObj(unit, unitNames);
+		var j = 0;
+		while (j < extra.length) {
+			var r = extra[j];
+			r.name = prefix + "." + r.name;
+			rows.push(r);
+			j++;
+		}
+		var owner = FieldWalk.extractObject(unit, "summonOwner");
+		if (owner != null) {
+			var ownRows = probeObj(owner, ["name", "kind", "isMe", "health"]);
+			var k = 0;
+			while (k < ownRows.length) {
+				var orow = ownRows[k];
+				orow.name = prefix + ".summonOwner." + orow.name;
+				rows.push(orow);
+				k++;
+			}
+		}
 	}
 
 	public static function captureStatus(obj:Dynamic):Void {
@@ -141,6 +220,16 @@ class PayloadProbe {
 			i++;
 		}
 		pushSnap("status", "Status", rows, now);
+	}
+
+	/** Session-only one-liner for skill.instantReady / shouldPlayInstantly. */
+	public static function noteInstant(skillId:String, known:Bool, ready:Bool):Void {
+		if (!armed())
+			return;
+		lastInstantSkillId = skillId != null ? skillId : "";
+		lastInstantKnown = known;
+		lastInstantReady = ready;
+		lastInstantAt = stamp();
 	}
 
 	public static function captureChat(obj:Dynamic):Void {

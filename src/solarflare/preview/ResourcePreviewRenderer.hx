@@ -2,6 +2,8 @@ package solarflare.preview;
 
 import imgui.ImGui;
 import solarflare.attackcombo.AttackComboRenderer;
+import solarflare.chaincast.ChaincastRenderer;
+import solarflare.conduit.Conduit;
 import solarflare.preview.VitalsRenderer;
 import solarflare.ui.ConfigPanel;
 import solarflare.ui.EnhancedText;
@@ -68,11 +70,11 @@ class ResourcePreviewRenderer {
 			case "target":
 				drawTargetPreview(cfg, width, height);
 			case "chaincast":
-				PipShapes.drawCount(width, height, PreviewState.CHAIN_SLOTS, s.chainShownCount(), false, PipShapes.DIAMOND,
-					s.chainReady ? "READY" : Std.string(s.chainShownCount()), null);
+				var showBadge = cfg.chaincast == null || cfg.chaincast.showStackBadge == null
+					|| cfg.chaincast.showStackBadge.get();
+				ChaincastRenderer.drawHead(width, height, s.chainShownCount(), s.chainReady, showBadge, s.chainPulse);
 			case "conduit":
-				PipShapes.drawCount(width, height, s.conduitSlotCount, s.conduitFilled, cfg.conduit.vertical.get(),
-					cfg.conduit.shape.get(), s.conduitLabel(), null);
+				drawConduitPreview(s, cfg, width, height);
 			default:
 				ImGui.textDisabled("Select a resource to preview.");
 		}
@@ -105,6 +107,33 @@ class ResourcePreviewRenderer {
 		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x0, barY), ImGui.vec2(x0 + barW * 0.72, barY + barH), UiCol.rgb(0x44CC55), 3);
 		var ts = ImGui.calcTextSize("72%");
 		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x0 + (barW - ts.x) * 0.5, barY + (barH - ts.y) * 0.5), 0xFFFFFFFF, "72%");
+	}
+
+	static function drawConduitPreview(s:PreviewState, cfg:ConfigPanel, width:Single, height:Single):Void {
+		var n = s.conduitSlotCount;
+		if (n < 1)
+			n = 3;
+		var amounts = new Array<Float>();
+		var iconIds = new Array<String>();
+		var stackLabels = new Array<String>();
+		var i = 0;
+		while (i < n) {
+			var slot = s.conduitSlots != null && i < s.conduitSlots.length ? s.conduitSlots[i] : null;
+			var id = slot != null && slot.id != null ? slot.id : "";
+			var stacks = slot != null ? slot.stacks : 0;
+			var power = slot != null && slot.power;
+			var filled = slot != null && (slot.filled || id.length > 0);
+			var amt:Float = filled ? 1 : 0;
+			amounts.push(amt);
+			iconIds.push(id);
+			if (power && stacks > 0)
+				stackLabels.push(Std.string(stacks));
+			else
+				stackLabels.push("");
+			i++;
+		}
+		ConduitOverlay.drawSlotRow(width, height, n, amounts, iconIds, stackLabels, cfg.conduit.vertical.get(),
+			cfg.conduit.shape.get(), s.conduitLabel());
 	}
 
 	function syncHp(s:PreviewState):Void {

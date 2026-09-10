@@ -4,10 +4,6 @@ import solarflare.aura.AuraDef;
 import solarflare.aura.AuraEngine;
 import solarflare.aura.signal.AuraSignalDescriptor;
 import solarflare.aura.signal.AuraValueKind;
-import solarflare.cdb.CdbAuraTable;
-import solarflare.cdb.CdbUnitNames;
-import solarflare.geaux.GeauxCache;
-import solarflare.target.RecentTargetCache;
 import solarflare.ui.SettingsStore;
 import solarflare.ui.ByteUtil;
 import solarflare.ui.UiChrome;
@@ -68,13 +64,15 @@ class AuraConditionEditor {
 				: ImGui.vec4(0.35, 0.75, 0.45, 0.9);
 			ImGui.pushStyleColor(ImGuiCol.Border, border);
 			ImGui.pushStyleVar(ImGuiStyleVar.ChildBorderSize, 2.0);
+			ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, ImGui.vec2(8, 6));
+			ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, ImGui.vec2(6, 4));
 			ImGui.beginChild("##condition_card_" + c.uiKey, ImGui.vec2(0, 0),
 				ImGuiChildFlags.Borders | ImGuiChildFlags.AutoResizeY | ImGuiChildFlags.AlwaysUseWindowPadding, 0);
 			try {
 				removed = drawConditionCard(a, r, c, ci);
 			} catch (_:Dynamic) {}
 			ImGui.endChild();
-			ImGui.popStyleVar();
+			ImGui.popStyleVar(3);
 			ImGui.popStyleColor();
 			var cardUi = ci < a.conditionUi.length ? a.conditionUi[ci] : null;
 			if (cardUi != null && cardUi.focusUntil > haxe.Timer.stamp()) {
@@ -115,7 +113,7 @@ class AuraConditionEditor {
 		var subjectPart = subLabel.length > 0 ? " (" + subLabel + ")" : "";
 		var opStr = friendlyOp(c.op);
 		var valStr = formatValue(c, d);
-		var stmt = sigLabel + subjectPart + " is " + opStr + " " + valStr;
+		var stmt = sigLabel + subjectPart + " " + opStr + " " + valStr;
 		if (c.negate)
 			stmt = "not (" + stmt + ")";
 		return stmt;
@@ -129,8 +127,11 @@ class AuraConditionEditor {
 			case "neq": "not equal to";
 			case "gte": "at least";
 			case "gt": "above";
-			case "is": "";
-			case "isNot": "not";
+			case "is": "is";
+			case "isNot": "is not";
+			case "within": "within";
+			case "present": "present";
+			case "absent": "absent";
 			default: op;
 		};
 	}
@@ -223,12 +224,25 @@ class AuraConditionEditor {
 		}
 
 		d = AuraSignalCatalog.find(c.signal);
+		if (d != null && (d.id == "status.count" || d.id == "status.overflow"))
+			ImGui.textDisabled("Count is full character status container length. Overflow means more than " + AuraSignalFrame.MAX_STATUSES + " entries; it is not a buff limit.");
+		if (d != null && (d.id == "status.present" || d.id == "status.stacks" || d.id == "status.durationLeft" || d.id == "status.durationProgress"))
+			ImGui.textDisabled("Pick a status ID on you (search _Status / _Proc, or use Currently on your character).");
+		if (d != null && d.id == "skill.instantReady")
+			ImGui.textDisabled("Skill script shouldPlayInstantly. Subject = skill ID (e.g. Staff_Craft_S1). For any buff on you, prefer Statuses → Buff/debuff on me.");
+		if (d != null && d.id == "event.cast.recent")
+			ImGui.textDisabled("Seconds since an enemy (in combat with you) cast this skill. Use within for a window (e.g. within 5s).");
+		if (d != null && d.id == "event.cast.active")
+			ImGui.textDisabled("True while that enemy skill is still running/channeling (e.g. FairieSuperElite_Clones).");
+		if (d != null && d.id == "combat.damageTakenRecent")
+			ImGui.textDisabled("Largest single hit amount taken by you in the last 5 seconds.");
+		if (d != null && d.id == "skill.specialReady")
+			ImGui.textDisabled("Legacy: shouldHighlightSkill (recast/highlight). Prefer Statuses or Instant cast.");
+		d = AuraSignalCatalog.find(c.signal);
 		if (d != null && d.subjectKind.length > 0) {
 			drawSubjectInline(a, c, ui, d.subjectKind, tag);
 		}
 
-		ImGui.sameLine();
-		ImGui.text("is");
 		ImGui.sameLine();
 		if (d != null)
 			drawOperatorInline(c, ui, d, tag);
@@ -278,11 +292,15 @@ class AuraConditionEditor {
 	}
 
 	static function drawOperatorInline(c:AuraConditionDef, ui:AuraConditionUiState, d:AuraSignalDescriptor, tag:String):Void {
-		var ops = switch (d.kind) {
-			case Boolean: ["is", "isNot"];
-			case Percent, Count, Duration: ["lt", "lte", "eq", "gte", "gt"];
-			default: ["eq", "neq", "lt", "lte", "gt", "gte"];
-		};
+		var ops:Array<String>;
+		if (d != null && d.id == "event.cast.recent")
+			ops = ["within", "lt", "lte", "eq", "gte", "gt"];
+		else
+			ops = switch (d.kind) {
+				case Boolean: ["is", "isNot"];
+				case Percent, Count, Duration: ["lt", "lte", "eq", "gte", "gt"];
+				default: ["eq", "neq", "lt", "lte", "gt", "gte"];
+			};
 		var label = friendlyOp(c.op);
 		if (label.length == 0) label = c.op;
 		ImGui.setNextItemWidth(110);
@@ -308,7 +326,8 @@ class AuraConditionEditor {
 		// Catalog names are owned strings, independent of live actors / skill-book objects.
 		var name = subjectName(c);
 		if (name.length > 0) c.subjectLabel = name;
-		var pickerLabel = kind == "unit" ? "Select Unit" : (kind.indexOf("skill") >= 0 ? "Select Skill" : "Select Status");
+		var pickerLabel = kind == "unit" ? "Select Unit"
+			: (kind.indexOf("skill") >= 0 ? "Select Skill" : "Select Status Skill");
 		if (ImGui.button(pickerLabel + "##pick_" + tag))
 			ImGui.openPopup("##subjects_" + tag);
 		ImGui.textWrapped(name.length > 0 ? name + " [" + c.subject + "]" : "No selection");
@@ -319,12 +338,11 @@ class AuraConditionEditor {
 		if (ImGui.inputText("Search##subject_search_" + tag, ui.searchBuf, AuraConditionUiState.SEARCH_BUF))
 			ui.search = ByteUtil.readString(ui.searchBuf, AuraConditionUiState.SEARCH_BUF, true).toLowerCase();
 		ImGui.textDisabled("Saved IDs remain selected even when unit or skill is absent.");
-		solarflare.ui.HudChrome.safeChild("##subject_list_" + tag, ImGui.vec2(0, 0), 0, function() {
-		{
-			for (entry in solarflare.cdb.AuraCatalog.entries)
-				if (entry.kind == (kind == "unit" ? "unit" : (kind.indexOf("skill") >= 0 ? "skill" : "statustype")))
-					drawSubjectRow(c, ui, entry.id, entry.name, tag);
+		if (kind == "status") {
+			ImGui.textWrapped("Select a status on your character, or search its exact ID. Pyroclasm instant cast: Staff_Craft_S1_Proc. The casting skill and applied status can have different IDs.");
 		}
+		solarflare.ui.HudChrome.safeChild("##subject_list_" + tag, ImGui.vec2(0, 0), 0, function() {
+			drawSubjectList(c, ui, kind, tag);
 		}, ImGuiChildFlags.Borders);
 		} catch (e:Dynamic) {
 			ImGui.endPopup();
@@ -333,15 +351,87 @@ class AuraConditionEditor {
 		ImGui.endPopup();
 	}
 
-	static function drawSubjectRow(c:AuraConditionDef, ui:AuraConditionUiState, id:String, name:String, tag:String):Void {
-		if (ui.search.length > 0 && (id + " " + name).toLowerCase().indexOf(ui.search) < 0) return;
+	static function drawSubjectList(c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String):Void {
+		var statusSkills:Array<{id:String, name:String, kind:String}> = [];
+		var otherSkills:Array<{id:String, name:String, kind:String}> = [];
+		var categories:Array<{id:String, name:String, kind:String}> = [];
+		var units:Array<{id:String, name:String, kind:String}> = [];
+		for (entry in solarflare.cdb.AuraCatalog.entries) {
+			if (!solarflare.cdb.AuraCatalog.matchesSubject(entry.kind, kind))
+				continue;
+			if (!solarflare.cdb.AuraCatalog.matchesSearch(entry.id, entry.name, ui.search))
+				continue;
+			if (kind == "status") {
+				var rank = solarflare.cdb.AuraCatalog.statusPickRank(entry.id, entry.kind);
+				if (rank == 0)
+					statusSkills.push(entry);
+				else if (rank == 2)
+					otherSkills.push(entry);
+				else
+					categories.push(entry);
+			} else if (entry.kind == "unit") {
+				units.push(entry);
+			} else {
+				otherSkills.push(entry);
+			}
+		}
+		var shown = 0;
+		if (kind == "status") {
+			var observed:Array<{id:String, name:String, kind:String}> = [];
+			var frame = AuraEngine.signalFrame();
+			if (frame != null) for (i in 0...frame.statusCount) {
+				var status = frame.statuses[i];
+				if (!status.known || !status.present) continue;
+				var label = solarflare.cdb.AuraCatalog.label(status.rawId);
+				if (solarflare.cdb.AuraCatalog.matchesSearch(status.rawId, label, ui.search))
+					observed.push({id: status.rawId, name: label, kind: "active status"});
+			}
+			shown += drawSubjectSection(c, ui, tag + "_live", "Currently on your character", observed);
+			shown += drawSubjectSection(c, ui, tag, "Status / Proc IDs", statusSkills);
+			shown += drawSubjectSection(c, ui, tag, "Other skills", otherSkills);
+			shown += drawSubjectSection(c, ui, tag, "Broad categories (rarely match live IDs)", categories);
+		} else if (kind == "unit") {
+			var recent:Array<{id:String, name:String, kind:String}> = [];
+			var rids = solarflare.target.RecentTargetCache.ids();
+			var rlabs = solarflare.target.RecentTargetCache.labels();
+			var ri = 0;
+			while (ri < rids.length) {
+				var rid = rids[ri];
+				var rlab = ri < rlabs.length ? rlabs[ri] : rid;
+				if (solarflare.cdb.AuraCatalog.matchesSearch(rid, rlab, ui.search))
+					recent.push({id: rid, name: rlab, kind: "recent target"});
+				ri++;
+			}
+			shown += drawSubjectSection(c, ui, tag + "_recent", "Recent targets", recent);
+			shown += drawSubjectSection(c, ui, tag, "Units", units);
+		} else {
+			shown += drawSubjectSection(c, ui, tag, "Skills", otherSkills);
+		}
+		ImGui.textDisabled(shown + " matching");
+	}
+
+	static function drawSubjectSection(c:AuraConditionDef, ui:AuraConditionUiState, tag:String, title:String,
+			rows:Array<{id:String, name:String, kind:String}>):Int {
+		if (rows == null || rows.length == 0)
+			return 0;
+		ImGui.separatorText(title + " (" + rows.length + ")");
+		var n = 0;
+		for (entry in rows) {
+			drawSubjectRow(c, ui, entry.id, entry.name, entry.kind, tag);
+			n++;
+		}
+		return n;
+	}
+
+	static function drawSubjectRow(c:AuraConditionDef, ui:AuraConditionUiState, id:String, name:String, entryKind:String, tag:String):Void {
 		if (!ImGui.isRectVisible(ImGui.vec2(ImGui.getContentRegionAvail().x, 28))) {
 			ImGui.dummy(ImGui.vec2(1, 28));
 			return;
 		}
 		if (!solarflare.ui.GameIcons.imageKey(id, 28, 28)) ImGui.dummy(ImGui.vec2(28, 28));
 		ImGui.sameLine();
-		if (ImGui.selectable(name + " [" + id + "]##subject_" + tag + id, c.subject == id)) {
+		var kindTag = entryKind == "statustype" ? "category" : entryKind;
+		if (ImGui.selectable(name + " [" + id + "] · " + kindTag + "##subject_" + tag + id, c.subject == id)) {
 			c.subject = id;
 			c.subjectLabel = name;
 			ui.sync(c);

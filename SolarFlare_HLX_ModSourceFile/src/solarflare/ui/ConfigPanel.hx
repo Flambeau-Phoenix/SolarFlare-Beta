@@ -174,7 +174,6 @@ class ConfigPanel {
 		if (chaincast != null) registerInteractive(chaincast.open);
 		if (conduit != null) registerInteractive(conduit.open);
 		if (localTime != null) registerInteractive(localTime.open);
-		if (combatLog != null) registerInteractive(combatLog.open);
 		if (target != null) registerInteractive(target.open);
 		if (attackCombo != null) registerInteractive(attackCombo.open);
 		if (lightsaber != null) {
@@ -346,11 +345,11 @@ class ConfigPanel {
 					ImGui.checkbox("Performance monitor##sf_perf", solarflare.ui.PerformanceMonitor.open);
 					ImGui.checkbox("Metrics window##sf_metrics", dbgMetrics);
 					ImGui.checkbox("Debug log window##sf_dbglog", dbgLog);
-					ImGui.checkbox("Payload probe##sf_payload", solarflare.debug.PayloadProbe.enabled);
-					ImGui.textWrapped("Session only (not saved). Hit/cast/chat payloads + GameApp spine.");
-					if (ImGui.checkbox("Resolution ledger##sf_ledger", solarflare.debug.ResolutionLedger.enabled))
+					ImGui.checkbox("Payload probe panel##sf_payload", solarflare.debug.PayloadProbe.enabled);
+					ImGui.textWrapped("Opens panel only. Start/Stop recording inside the panel — session-only, not saved.");
+					if (ImGui.checkbox("Resolution ledger panel##sf_ledger", solarflare.debug.ResolutionLedger.enabled))
 						SettingsStore.markDirty();
-					ImGui.textWrapped("Saved in solarflare.json. JSONL: hlx/mods/solarflare/logs/resolution-ledger.jsonl");
+					ImGui.textWrapped("Panel open can be saved. Recording never auto-starts. JSONL: hlx/mods/solarflare/logs/");
 					if (solarflare.debug.FieldWalkLog.lastPath.length > 0)
 						ImGui.text(solarflare.debug.FieldWalkLog.lastPath);
 					if (ImGui.smallButton("Copy FieldWalk log path##sf_fwlog"))
@@ -371,9 +370,6 @@ class ConfigPanel {
 			try auraBuilder.draw() catch (_:Dynamic) {}
 		}
 		trackProfileWindowState();
-		if (combatLog != null) {
-			try combatLog.draw() catch (_:Dynamic) {}
-		}
 		if (target != null) {
 			try target.draw() catch (_:Dynamic) {}
 		}
@@ -522,8 +518,7 @@ class ConfigPanel {
 					lightsaber.open.set(true);
 			case TAB_COMBAT_LOG:
 				ImGui.textWrapped("Skill casts and resolved combat events.");
-				if (UiChrome.accentButton("Combat Log options##tab_log_open", ImGui.vec2(-1, 40)))
-					combatLog.open.set(true);
+				combatLog.drawEditorContents();
 			case TAB_THEME:
 				ThemePalette.drawThemeEditorPane();
 			default:

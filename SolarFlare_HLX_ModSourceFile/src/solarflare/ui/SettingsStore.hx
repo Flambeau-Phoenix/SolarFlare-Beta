@@ -392,13 +392,31 @@ class SettingsStore {
 	public static function chaincastDump(c:ChaincastConfig):Dynamic {
 		if (c == null)
 			return {};
+		var rotOut:Array<String> = [];
+		if (c.rotation != null) {
+			for (r in c.rotation) {
+				var id = GeauxCache.coerceSkillId(r);
+				if (id.length == 0)
+					id = cleanJsonString(r);
+				if (id.length > 0 && GeauxCache.isUsableSkillId(id))
+					rotOut.push(id);
+			}
+			c.rotation = rotOut;
+		}
+		var spend = GeauxCache.coerceSkillId(c.spendId);
+		if (spend.length == 0)
+			spend = cleanJsonString(c.spendId);
+		if (spend.length > 0 && !GeauxCache.isUsableSkillId(spend))
+			spend = "";
+		c.spendId = spend;
 		return {
 			hidden: c.hidden.get(),
 			w: c.width.get(),
 			h: c.height.get(),
 			title: c.title,
-			rot: c.rotation,
-			spend: c.spendId,
+			rot: rotOut,
+			spend: spend,
+			showStackBadge: c.showStackBadge.get(),
 			chrome: chromeDump(c.chrome)
 		};
 	}
@@ -693,17 +711,24 @@ class SettingsStore {
 				if (len > ChaincastConfig.MAX_ROT)
 					len = ChaincastConfig.MAX_ROT;
 				while (i < len) {
-					var id = Std.string(rot[i]);
-					if (id != null && id.length > 1 && id != "null")
+					var id = GeauxCache.coerceSkillId(rot[i]);
+					if (id.length == 0)
+						id = cleanJsonString(rot[i]);
+					if (id.length > 0 && GeauxCache.isUsableSkillId(id))
 						c.rotation.push(id);
 					i++;
 				}
 			}
 		} catch (_:Dynamic) {}
 		try {
-			if (data.spend != null)
-				c.spendId = Std.string(data.spend);
+			if (data.spend != null) {
+				var spend = GeauxCache.coerceSkillId(data.spend);
+				if (spend.length == 0)
+					spend = cleanJsonString(data.spend);
+				c.spendId = (spend.length > 0 && GeauxCache.isUsableSkillId(spend)) ? spend : "";
+			}
 		} catch (_:Dynamic) {}
+		setBool(c.showStackBadge, data.showStackBadge);
 		c.sizeDirty = true;
 		applyChrome(c.chrome, data.chrome);
 	}

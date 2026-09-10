@@ -25,6 +25,10 @@ class GeauxSlotSnap {
 	public var cdLeft:Float = 0;
 	public var cdMax:Float = 0;
 	public var remaining:Float = 0;
+	/** Live remaining charges; 0 when skill has no charge pool. */
+	public var charges:Int = 0;
+	/** Live max charges; 0 = not a charged skill (draw skips). */
+	public var chargesMax:Int = 0;
 	/** Frozen PNG stems — draw must not call findSkillById. */
 	public var iconCandidates:Array<String> = [];
 
@@ -517,6 +521,16 @@ class GeauxCache {
 		if (script.length > 0 && liveById.exists(script))
 			return liveById.get(script);
 		return null;
+	}
+
+	/** Live Skill pointer from identity map (Geaux sample / noteUse). Null if never remembered. */
+	public static function liveSkill(id:String):Dynamic {
+		if (id == null || id.length == 0)
+			return null;
+		var k = sanitizeSkillId(id);
+		if (k.length == 0)
+			return null;
+		return cachedSkill(k);
 	}
 
 	public static function weaponSnaps():Array<GeauxSlotSnap> {
@@ -1878,6 +1892,8 @@ class GeauxCache {
 		snap.cdLeft = 0;
 		snap.cdMax = 0;
 		snap.remaining = 0;
+		snap.charges = 0;
+		snap.chargesMax = 0;
 		snap.iconCandidates = [];
 	}
 
@@ -2908,17 +2924,27 @@ class GeauxCache {
 			return;
 		if (!snap.present || snap.id == null || snap.id.length == 0) {
 			snap.affordable = true;
+			snap.charges = 0;
+			snap.chargesMax = 0;
 			return;
 		}
 		if (solarflare.PrayerCache.isPrayerId(snap.id)) {
 			snap.affordable = snap.ready;
+			snap.charges = 0;
+			snap.chargesMax = 0;
 			return;
 		}
 		var skill:Dynamic = bindSlotSkill(hero, snap);
 		if (skill != null) {
 			applyCooldown(heroDyn, snap, skill);
-			ledgerSkillCharges(snap, skill);
+			applySkillCharges(snap, skill);
+		} else {
+			snap.charges = 0;
+			snap.chargesMax = 0;
 		}
+		// Charge pools: regenerating a charge is not "unusable" while ammo remains.
+		if (snap.chargesMax > 0)
+			snap.ready = snap.charges > 0;
 		applyAffordSnap(hero, snap, skill);
 	}
 
@@ -3260,23 +3286,36 @@ class GeauxCache {
 			L.touch("geaux.slot.id", "typed", "GeauxCache." + src, "id", "string", solarflare.debug.ResolutionLedger.clip(snap.id, 48));
 	}
 
-	/** D1 discovery only: typed live charges, sampled in Geaux's existing observe pass. */
-	static function ledgerSkillCharges(snap:GeauxSlotSnap, skill:Dynamic):Void {
-		if (snap == null || skill == null || !solarflare.debug.ResolutionLedger.armed() || !snapOnBar(snap))
+	/**
+	 * Freeze live charge pool onto the snap for ImGui. Ordinary single-CD skills
+	 * leave chargesMax at 0 so draw skips. Prefer live max only (no CDB fake UI).
+	 */
+	static function applySkillCharges(snap:GeauxSlotSnap, skill:Dynamic):Void {
+		if (snap == null) {
+			return;
+		}
+		snap.charges = 0;
+		snap.chargesMax = 0;
+		if (skill == null)
 			return;
 		try {
 			var typed:st.skill.Skill = cast skill;
 			if (typed == null)
 				return;
 			var max = typed.getMaxCharges();
-			// Ignore ordinary single-cooldown skills: D1 needs a real charge pool.
 			if (max <= 0)
 				return;
 			var current = typed.getCurrentCharges();
-			var L = solarflare.debug.ResolutionLedger;
-			var key = snap.id != null ? snap.id : "";
-			L.touch("geaux.slot.charges", "typed", "GeauxCache.ledgerSkillCharges", "getCurrentCharges", "number", Std.string(current), key);
-			L.touch("geaux.slot.chargesMax", "typed", "GeauxCache.ledgerSkillCharges", "getMaxCharges", "number", Std.string(max), key);
+			if (current < 0)
+				current = 0;
+			snap.charges = current;
+			snap.chargesMax = max;
+			if (solarflare.debug.ResolutionLedger.armed() && snapOnBar(snap)) {
+				var L = solarflare.debug.ResolutionLedger;
+				var key = snap.id != null ? snap.id : "";
+				L.touch("geaux.slot.charges", "typed", "GeauxCache.applySkillCharges", "getCurrentCharges", "number", Std.string(current), key);
+				L.touch("geaux.slot.chargesMax", "typed", "GeauxCache.applySkillCharges", "getMaxCharges", "number", Std.string(max), key);
+			}
 		} catch (_:Dynamic) {}
 	}
 
@@ -3826,9 +3865,13 @@ class GeauxCache {
 
 	static function labelOf(skill:Dynamic, id:String):String {
 		var shown = solarflare.EngineSkillId.ofSkill(skill);
-		if (shown.length > 0)
+		if (shown.length > 0 && isCleanLabel(shown))
 			return shown;
-		return solarflare.EngineSkillId.display(id);
+		var clean = sanitizeSkillId(id);
+		var disp = solarflare.EngineSkillId.display(clean.length > 0 ? clean : id);
+		if (disp.length > 0 && isCleanLabel(disp))
+			return disp;
+		return isCleanLabel(clean) ? clean : "";
 	}
 
 	/** Confirmed engine id for UI (never `{bytes…}` dumps or menu names). */

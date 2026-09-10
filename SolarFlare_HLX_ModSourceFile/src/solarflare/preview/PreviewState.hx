@@ -135,8 +135,8 @@ class PreviewState {
 		s.conduitFilled = 2;
 		s.conduitPower = 0;
 		s.conduitSlots = [
-			slot("", true, 0, false),
-			slot("", true, 0, false),
+			slot("Mage_Conduit_Projectile", true, 1, false),
+			slot("Mage_Talent_ConduitSparkExplosion_Conduit", true, 1, false),
 			slot("", false, 0, false)
 		];
 		return s;
@@ -243,9 +243,9 @@ class PreviewState {
 		s.conduitFilled = 3;
 		s.conduitPower = 0;
 		s.conduitSlots = [
-			slot("", true, 0, false),
-			slot("", true, 0, false),
-			slot("", true, 0, false)
+			slot("Mage_Conduit_Projectile", true, 1, false),
+			slot("Mage_Talent_ConduitSparkExplosion_Conduit", true, 1, false),
+			slot("Mage_Talent_ConduitLifebolt_Conduit", true, 1, false)
 		];
 		return s;
 	}
@@ -297,9 +297,9 @@ class PreviewState {
 		s.conduitFilled = 3;
 		s.conduitPower = 20;
 		s.conduitSlots = [
-			slot("", true, 6, true),
-			slot("", true, 6, true),
-			slot("", true, 6, true)
+			slot("Mage_Conduit_Power", true, 20, true),
+			slot("Mage_Conduit_Projectile", true, 1, false),
+			slot("Mage_Talent_ConduitSparkExplosion_Conduit", true, 1, false)
 		];
 		return s;
 	}

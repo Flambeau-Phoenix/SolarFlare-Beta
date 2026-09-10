@@ -31,6 +31,7 @@ class LightsaberSkillRow {
 	public var id:String = "";
 	public var label:String = "";
 	public var player:String = "";
+	public var minion:String = "";
 	public var damage:Float = 0;
 	public var hits:Int = 0;
 	public var crits:Int = 0;
@@ -58,6 +59,7 @@ class LightsaberHit {
 	public var t:Float = 0;
 	public var skillId:String = "";
 	public var source:String = "";
+	public var minion:String = "";
 	public var target:String = "";
 	public var amount:Float = 0;
 	public var crit:Bool = false;
@@ -73,6 +75,7 @@ class LightsaberHit {
 		h.t = jsonFloat(o, "t");
 		h.skillId = jsonFieldStr(o, "skill");
 		h.source = jsonFieldStr(o, "src");
+		h.minion = jsonFieldStr(o, "minion");
 		h.target = jsonFieldStr(o, "tgt");
 		h.amount = jsonFloat(o, "amt");
 		h.crit = jsonBool(o, "crit");
@@ -165,7 +168,7 @@ class LightsaberMeter {
 	public var skills:Array<LightsaberSkillRow> = [];
 
 	var byId:Map<String, LightsaberSkillRow> = new Map();
-	var lastIngestT:Float = 0;
+	var lastIngestSequence:Float = 0;
 	var groupByCaster:Bool;
 	var writeLog:Bool;
 
@@ -174,7 +177,7 @@ class LightsaberMeter {
 		this.writeLog = writeLog;
 	}
 
-	public function reset():Void {
+	public function reset(discardPending:Bool = true):Void {
 		active = false;
 		ended = false;
 		totalDamage = 0;
@@ -186,7 +189,8 @@ class LightsaberMeter {
 		startedAt = 0;
 		skills = [];
 		byId = new Map();
-		lastIngestT = 0;
+		if (discardPending)
+			lastIngestSequence = CombatLogCache.latestSequence;
 		if (writeLog)
 			LightsaberLog.clearLive();
 	}
@@ -198,13 +202,13 @@ class LightsaberMeter {
 	}
 
 	public function noteHit(amount:Float, skillId:String, skillLabel:String, nowSec:Float, crit:Bool = false,
-			source:String = "", target:String = "", targetHp:Float = 0, targetMaxHp:Float = 0):Void {
+			source:String = "", minion:String = "", target:String = "", targetHp:Float = 0, targetMaxHp:Float = 0):Void {
 		if (!LightsaberCache.enabled)
 			return;
-		if (amount <= 0 || Math.isNaN(amount))
+		if (amount <= 0 || !Math.isFinite(amount))
 			return;
 		if (!active || ended) {
-			reset();
+			reset(false);
 			active = true;
 			ended = false;
 			startedAt = nowSec;
@@ -231,15 +235,16 @@ class LightsaberMeter {
 		if (confirmed.length == 0) {
 			unattribDamage += amount;
 			if (writeLog)
-				LightsaberLog.push(nowSec, "", who, target, amount, crit, targetHp, targetMaxHp);
+				LightsaberLog.push(nowSec, "", who, minion, target, amount, crit, targetHp, targetMaxHp);
 			return;
 		}
 
-		var key = groupByCaster ? LightsaberCache.skillKey(who, confirmed) : confirmed;
+		var key = (groupByCaster ? LightsaberCache.skillKey(who, confirmed) : confirmed) + "\u001f" + minion;
 		var row = byId.get(key);
 		if (row == null) {
 			row = new LightsaberSkillRow(confirmed, confirmed);
 			row.player = who;
+			row.minion = minion;
 			byId.set(key, row);
 			skills.push(row);
 		} else if (row.player.length == 0)
@@ -252,7 +257,7 @@ class LightsaberMeter {
 			row.maxHit = amount;
 		sortSkills();
 		if (writeLog)
-			LightsaberLog.push(nowSec, confirmed, who, target, amount, crit, targetHp, targetMaxHp);
+			LightsaberLog.push(nowSec, confirmed, who, minion, target, amount, crit, targetHp, targetMaxHp);
 	}
 
 	public function tick(nowSec:Float):Void {
@@ -310,19 +315,18 @@ class LightsaberMeter {
 			return;
 		LightsaberCache.refreshName();
 		var lines = CombatLogCache.recentAll();
-		var maxT = lastIngestT;
+		var maxSequence = lastIngestSequence;
 		for (line in lines) {
+			if (line == null || line.sequence <= lastIngestSequence)
+				continue;
+			if (line.sequence > maxSequence)
+				maxSequence = line.sequence;
 			if (!ok(line))
 				continue;
-			if (line.t <= lastIngestT)
-				continue;
 			noteHit(line.amount, line.skillId, line.skillLabel, line.t, line.crit, LightsaberCache.casterName(line),
-				line.targetName, line.targetHp, line.targetMaxHp);
-			if (line.t > maxT)
-				maxT = line.t;
+				line.minionName, line.targetName, line.targetHp, line.targetMaxHp);
 		}
-		if (maxT > lastIngestT)
-			lastIngestT = maxT;
+		lastIngestSequence = maxSequence;
 	}
 
 	function sortSkills():Void {
@@ -378,8 +382,8 @@ class LightsaberCache {
 	}
 
 	public static function noteHit(amount:Float, skillId:String, skillLabel:String, nowSec:Float, crit:Bool = false,
-			source:String = "", target:String = "", targetHp:Float = 0, targetMaxHp:Float = 0):Void {
-		you.noteHit(amount, skillId, skillLabel, nowSec, crit, source, target, targetHp, targetMaxHp);
+			source:String = "", minion:String = "", target:String = "", targetHp:Float = 0, targetMaxHp:Float = 0):Void {
+		you.noteHit(amount, skillId, skillLabel, nowSec, crit, source, minion, target, targetHp, targetMaxHp);
 	}
 
 	public static function tick(nowSec:Float):Void {
@@ -408,6 +412,8 @@ class LightsaberCache {
 		who = UniqueHeroName.rejectClass(line.sourceName);
 		if (who.length > 0)
 			return who;
+		if (line.sourceRole != CombatLogCache.ROLE_YOU)
+			return "?";
 		who = UniqueHeroName.rejectClass(playerName);
 		if (who.length > 0)
 			return who;
@@ -490,12 +496,13 @@ class LightsaberLog {
 		sealed = false;
 	}
 
-	public static function push(t:Float, skillId:String, source:String, target:String, amount:Float, crit:Bool,
+	public static function push(t:Float, skillId:String, source:String, minion:String, target:String, amount:Float, crit:Bool,
 			targetHp:Float, targetMaxHp:Float):Void {
 		var h = new LightsaberHit();
 		h.t = t;
 		h.skillId = LightsaberHit.jsonSafe(skillId);
 		h.source = LightsaberHit.jsonSafe(source);
+		h.minion = LightsaberHit.jsonSafe(minion);
 		h.target = LightsaberHit.jsonSafe(target);
 		h.amount = amount;
 		h.crit = crit;
@@ -548,6 +555,7 @@ class LightsaberLog {
 					t: LightsaberHit.round2(h.t),
 					skill: LightsaberHit.jsonSafe(h.skillId),
 					src: LightsaberHit.jsonSafe(h.source),
+					minion: LightsaberHit.jsonSafe(h.minion),
 					tgt: LightsaberHit.jsonSafe(h.target),
 					amt: LightsaberHit.round2(h.amount),
 					crit: h.crit,
@@ -590,7 +598,7 @@ class LightsaberConfig {
 		if (!open.get())
 			return;
 		ImGui.setNextWindowSize(ImGui.vec2(380, 0), ImGuiCond.FirstUseEver);
-		if (HudChrome.beginPanel("Lightsaber", open, "Lightsaber")) {
+		if (HudChrome.beginPanel("Lightsaber", open, "Lightsaber options")) {
 			ImGui.text("Local meter is always You. GetRifty clock is independent.");
 			ImGui.text("In that rift tracks hero players in the instance only.");
 			if (ImGui.checkbox("In that rift meter", showRiftMeter))
@@ -626,25 +634,43 @@ class LightsaberConfig {
 }
 
 /**
- * Local-only damage ingest helpers for Lightsaber.
- * Called from HealthHooks.onInflictDamage (same postfix) — no second hook.
+ * Legacy direct ingest — preferred path is CombatLogCache.noteInflict → ingestYou.
+ * Kept for `-dce full` / ModEntry.keep; no second Unit postfix.
  */
 class LightsaberHooks {
 	/** Keep reachable under `-dce full`. */
 	public static function keep():Void {}
 
 	public static function ingest(self:Dynamic, dmgObj:Dynamic):Void {
-		if (self == null || dmgObj == null || !HealthCache.isLocalHero(self))
+		if (self == null || dmgObj == null)
 			return;
 		try {
+			var credited = solarflare.combatlog.CombatOwnership.resolve(self, FieldWalk.extractObject, ownerOfSkill);
+			if (!HealthCache.isLocalHero(credited))
+				return;
 			var amount = readAmount(dmgObj);
 			if (amount <= 0)
 				return;
 			var skillId = solarflare.EngineSkillId.ofSkill(dmgObj);
 			if (skillId.length == 0)
 				skillId = readSkillId(dmgObj);
-			LightsaberCache.noteHit(amount, skillId, skillId, nowSec(), false, HealthCache.heroName);
+			var minion = "";
+			if (credited != null && (cast self : Dynamic) != (cast credited : Dynamic)) {
+				var kind = FieldWalk.extractString(self, "kind", "");
+				if (kind.length > 0)
+					minion = kind;
+			}
+			LightsaberCache.noteHit(amount, skillId, skillId, nowSec(), false, HealthCache.heroName, minion);
 		} catch (_:Dynamic) {}
+	}
+
+	static function ownerOfSkill(skill:Dynamic):Dynamic {
+		if (skill == null)
+			return null;
+		var o = FieldWalk.extractObject(skill, "owner");
+		if (o != null)
+			return o;
+		return FieldWalk.extractObject(skill, "parent");
 	}
 
 	static function nowSec():Float {
@@ -758,12 +784,10 @@ class LightsaberOverlay {
 				showBody = cfg.chrome.beginBody(function() {
 					cfg.hidden.set(true);
 					SettingsStore.markDirty();
-				}, function() {
-					drawSaberTitleLeading(cfg);
-				}, "");
-			} else
-				drawSaberTitleLeading(cfg);
+				}, null, "Lightsaber");
+			}
 			if (showBody) {
+				drawSaberTitleLeading(cfg);
 				if (GetRiftyCache.inInstance) {
 					if (ImGui.checkbox("In that rift##saber_win_rift", cfg.showRiftMeter))
 						SettingsStore.markDirty();
@@ -934,11 +958,12 @@ class LightsaberOverlay {
 
 	function drawSkillTable(tableId:String, m:LightsaberMeter):Void {
 		var total = m.totalDamage > 0 ? m.totalDamage : 1;
-		var headers = ["Player", "Skill", "Dmg", "%", "Hits", "Crit", "Max"];
+		var headers = ["Player", "Minion", "Skill", "Dmg", "%", "Hits", "Crit", "Max"];
 		var cells:Array<Array<String>> = [];
 		for (row in m.skills) {
 			cells.push([
 				row.player,
+				row.minion,
 				row.label,
 				formatNum(row.damage),
 				Std.string(Std.int((row.damage / total) * 100)),
@@ -950,7 +975,7 @@ class LightsaberOverlay {
 		var mins = minTableColumns(headers, cells);
 		var flags = ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit
 			| ImGuiTableFlags.Resizable;
-		if (!ImGui.beginTable(tableId, 7, flags, ImGui.vec2(0, 0)))
+		if (!ImGui.beginTable(tableId, 8, flags, ImGui.vec2(0, 0)))
 			return;
 		setupTableColumns(tableId, headers, mins);
 		ImGui.tableHeadersRow();
@@ -1099,10 +1124,11 @@ class LightsaberLogViewer {
 
 			var flags = ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY
 				| ImGuiTableFlags.SizingStretchProp;
-			if (ImGui.beginTable("saber_log", 7, flags)) {
+			if (ImGui.beginTable("saber_log", 8, flags)) {
 				ImGui.tableSetupColumn("Time", ImGuiTableColumnFlags.WidthFixed, 56);
 				ImGui.tableSetupColumn("Skill", ImGuiTableColumnFlags.WidthStretch);
 				ImGui.tableSetupColumn("Player", ImGuiTableColumnFlags.WidthFixed, 140);
+				ImGui.tableSetupColumn("Minion", ImGuiTableColumnFlags.WidthFixed, 120);
 				ImGui.tableSetupColumn("Target", ImGuiTableColumnFlags.WidthFixed, 110);
 				ImGui.tableSetupColumn("Dmg", ImGuiTableColumnFlags.WidthFixed, 56);
 				ImGui.tableSetupColumn("Crit", ImGuiTableColumnFlags.WidthFixed, 40);
@@ -1132,6 +1158,8 @@ class LightsaberLogViewer {
 		ImGui.text(h.skillId);
 		ImGui.tableNextColumn();
 		ImGui.text(h.source);
+		ImGui.tableNextColumn();
+		ImGui.text(h.minion);
 		ImGui.tableNextColumn();
 		ImGui.text(h.target);
 		ImGui.tableNextColumn();

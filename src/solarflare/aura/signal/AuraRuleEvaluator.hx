@@ -30,6 +30,7 @@ class AuraRuleEvaluator {
 			case "is": v.boolValue == c.boolValue; case "isNot": v.boolValue != c.boolValue;
 			case "eq" if (v.kind == Identity): v.stringValue == c.stringValue;
 			case "neq" if (v.kind == Identity): v.stringValue != c.stringValue;
+			case "within": finite(v.numberValue, c.numberValue) ? v.numberValue <= c.numberValue + EPS : null;
 			case "lt": finite(v.numberValue, c.numberValue) ? v.numberValue < c.numberValue : null;
 			case "lte": finite(v.numberValue, c.numberValue) ? v.numberValue <= c.numberValue + EPS : null;
 			case "eq": finite(v.numberValue, c.numberValue) ? Math.abs(v.numberValue - c.numberValue) <= EPS : null;

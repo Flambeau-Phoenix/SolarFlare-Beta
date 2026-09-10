@@ -361,13 +361,6 @@ class ConduitOverlay {
 			n = ConduitCache.DEFAULT_SLOTS;
 		if (n > ConduitCache.MAX_SLOTS)
 			n = ConduitCache.MAX_SLOTS;
-		var label = "0";
-		if (ConduitCache.valid) {
-			if (ConduitCache.powerStacks > 0)
-				label = Std.string(ConduitCache.powerStacks);
-			else
-				label = Std.string(ConduitCache.filledCount);
-		}
 		var amounts = new Array<Float>();
 		var iconIds = new Array<String>();
 		var stackLabels = new Array<String>();
@@ -376,28 +369,31 @@ class ConduitOverlay {
 			var snap:ConduitSlotSnap = null;
 			if (ConduitCache.slots != null && i < ConduitCache.slots.length)
 				snap = ConduitCache.slots[i];
-			var filled = snap != null && snap.filled;
+			var id = snap != null && snap.id != null ? snap.id : "";
 			var stacks = snap != null ? snap.stacks : 0;
 			var power = snap != null && snap.power;
-			var amt:Float = 0;
-			if (filled) {
-				if (power)
-					amt = stacks > 0 ? 1 : 0.45;
-				else
-					amt = stacks > 0 ? 1 : 0.7;
-			}
+			// Lit by equipped Sparkmaster slots (how many the player has), not proc stacks.
+			var amt:Float = id.length > 0 ? 1 : 0;
 			amounts.push(amt);
-			iconIds.push(filled && snap.id.length > 0 ? snap.id : "");
+			iconIds.push(id);
 			if (power && stacks > 0)
 				stackLabels.push(Std.string(stacks));
 			else
 				stackLabels.push("");
 			i++;
 		}
+		var label = "0";
+		if (ConduitCache.valid) {
+			if (ConduitCache.powerStacks > 0)
+				label = Std.string(ConduitCache.powerStacks);
+			else
+				label = Std.string(ConduitCache.filledCount);
+		}
 		drawSlotRow(rowW, rowH, n, amounts, iconIds, stackLabels, cfg.vertical.get(), cfg.shape.get(), label);
 	}
 
-	static function drawSlotRow(rowW:Single, rowH:Single, n:Int, amounts:Array<Float>, iconIds:Array<String>,
+	/** Shared live + Resource Tracker Builder presentation. */
+	public static function drawSlotRow(rowW:Single, rowH:Single, n:Int, amounts:Array<Float>, iconIds:Array<String>,
 			stackLabels:Array<String>, vertical:Bool, shape:Int, label:String):Void {
 		shape = PipShapes.normalize(shape);
 		var origin = ImGui.getCursorScreenPos();
@@ -493,34 +489,33 @@ class ConduitOverlay {
 			dimBorder.w + (litBorder.w - dimBorder.w) * bt);
 		var fillU = ImGui.colorConvertFloat4ToU32(fill);
 		var borderU = ImGui.colorConvertFloat4ToU32(border);
-		var tex:hl.I64 = 0;
-		if (iconId != null && iconId.length > 0)
-			tex = GameIcons.get(iconId);
-		if (tex != (0 : hl.I64)) {
-			var side:Single = Math.min(w, h) * 0.92;
-			if (side < 6)
-				side = 6;
-			var tint = a > 0.55 ? GameIcons.tintReady(true) : GameIcons.tintReady(false);
-			GameIcons.draw(dl, tex, cx - side * 0.5, cy - side * 0.5, side, tint);
-		} else {
-			switch (shape) {
-				case PipShapes.CIRCLE:
-					ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 24);
-					ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 24, 1.25);
-				case PipShapes.RING:
-					var thick:Single = Math.max(1.5, rad * 0.22);
-					ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 24, thick);
-					if (a > 0.02)
-						ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad * (0.35 + 0.55 * a), fillU, 24);
-				case PipShapes.HEX:
-					ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 6);
-					ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 6, 1.25);
-				case PipShapes.DIAMOND:
-					ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 4);
-					ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 4, 1.25);
-				default:
-					ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), fillU, 3);
-					ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), borderU, 3, 1);
+		switch (shape) {
+			case PipShapes.CIRCLE:
+				ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 24);
+				ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 24, 1.25);
+			case PipShapes.RING:
+				var thick:Single = Math.max(1.5, rad * 0.22);
+				ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 24, thick);
+				if (a > 0.02)
+					ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad * (0.35 + 0.55 * a), fillU, 24);
+			case PipShapes.HEX:
+				ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 6);
+				ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 6, 1.25);
+			case PipShapes.DIAMOND:
+				ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 4);
+				ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 4, 1.25);
+			default:
+				ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), fillU, 3);
+				ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), borderU, 3, 1);
+		}
+		if (iconId != null && iconId.length > 0) {
+			var tex:hl.I64 = GameIcons.get(iconId);
+			if (tex != (0 : hl.I64)) {
+				var side:Single = Math.min(w, h) * 0.62;
+				if (side < 6)
+					side = 6;
+				var tint = a > 0.55 ? GameIcons.tintReady(true) : GameIcons.tintReady(false);
+				GameIcons.draw(dl, tex, cx - side * 0.5, cy - side * 0.5, side, tint);
 			}
 		}
 		if (stackText != null && stackText.length > 0) {

@@ -640,9 +640,15 @@ class HealthHooks {
 	 * Leaf receive path (condensed: ent.Hero.onReceiveDamage). Incoming hits update local vitals.
 	 * Native: (self, a0:st.skill.DamageResult):Void
 	 */
+	@:hlx.prefix(ent.Hero.onReceiveDamage)
+	static function beforeHeroReceiveDamage(self:Dynamic, dmgObj:Dynamic):hlx.runtime.HlxPrefixControl {
+		solarflare.combatlog.CombatLogHooks.beginDamage(dmgObj);
+		return hlx.runtime.HlxPrefixControl.Continue;
+	}
+
 	@:hlx.postfix(ent.Hero.onReceiveDamage)
 	static function onHeroReceiveDamage(self:Dynamic, dmgObj:Dynamic, result:Void):Void {
-		solarflare.combatlog.CombatLogCache.noteHit(self, dmgObj);
+		solarflare.combatlog.CombatLogHooks.endDamage(self, dmgObj);
 		if (!HealthCache.isLocalHero(self))
 			return;
 		try {
@@ -716,15 +722,22 @@ class HealthHooks {
 	/**
 	 * Native: ent.Unit.onInflictDamage(a0:st.skill.DamageResult):Void
 	 * Postfix N+1: (self, damageResult, result:Void)
+	 * CheatSheet Phase 0 DPS path — `self` is attacker (hero or owned summon).
 	 */
 	@:hlx.postfix(ent.Unit.onInflictDamage)
 	static function onInflictDamage(self:Dynamic, dmgObj:Dynamic, result:Void):Void {
-		if (self == null || !HealthCache.isLocalHero(self))
+		if (self == null || dmgObj == null)
 			return;
-		try {
-			var hero:ent.Hero = cast self;
-			HealthCache.set(hero.get_health(), hero.get_maxHealth());
-		} catch (_:Dynamic) {}
+		if (HealthCache.isLocalHero(self)) {
+			try {
+				var hero:ent.Hero = cast self;
+				HealthCache.set(hero.get_health(), hero.get_maxHealth());
+			} catch (_:Dynamic) {}
+		}
+		// Credit bee/imp/… via summonOwner; Lightsaber ingests ROLE_YOU combat-log lines.
+		try
+			solarflare.combatlog.CombatLogCache.noteInflict(self, dmgObj)
+		catch (_:Dynamic) {}
 	}
 
 	static function sampleChaincast(heroDyn:Dynamic):Void {

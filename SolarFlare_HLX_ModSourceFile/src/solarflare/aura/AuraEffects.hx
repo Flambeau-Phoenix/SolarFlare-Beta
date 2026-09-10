@@ -96,6 +96,49 @@ class AuraEffects {
 		a.condWas = hit;
 	}
 
+	/** Drop live alert presentation + hold timers (disable / Large typed off). */
+	public static function clearAlertRuntime(a:AuraDef):Void {
+		if (a == null)
+			return;
+		a.alertShow = false;
+		a.alertText = "";
+		if (a.effects == null)
+			return;
+		for (e in a.effects) {
+			if (e == null)
+				continue;
+			if (e.kind == AuraEffect.KIND_ALERT) {
+				e.until = 0;
+				e.stickyArmed = false;
+			}
+		}
+	}
+
+	/** Suspend window + alert presentation for a disabled aura/system. */
+	public static function clearPresentation(a:AuraDef):Void {
+		if (a == null)
+			return;
+		a.show = false;
+		clearAlertRuntime(a);
+	}
+
+	/** Disable Large typed / boss_alert channel and clear live text. */
+	public static function disableLargeTypedAlert(a:AuraDef):Void {
+		if (a == null)
+			return;
+		if (a.showBanner != null)
+			a.showBanner.set(false);
+		if (a.effects != null) {
+			for (e in a.effects) {
+				if (e == null || e.kind != AuraEffect.KIND_ALERT)
+					continue;
+				if (e.id == "boss_alert" || e.id == null || e.id.length == 0)
+					e.enabled.set(false);
+			}
+		}
+		clearAlertRuntime(a);
+	}
+
 	static function evalWhen(e:AuraEffect, hit:Bool, known:Bool, now:Float, a:AuraDef):Bool {
 		if (!known && e.when != AuraEffect.WHEN_ON_RISE_HOLD && e.when != AuraEffect.WHEN_ON_FALL_HOLD
 			&& e.when != AuraEffect.WHEN_STICKY) {

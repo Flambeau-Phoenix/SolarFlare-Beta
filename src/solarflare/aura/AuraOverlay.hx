@@ -165,8 +165,10 @@ class AuraOverlay {
 	}
 
 	function drawAlert(a:AuraDef):Void {
-		var large = a.showBanner != null && a.showBanner.get();
-		var msg = large && a.bannerText != null && StringTools.trim(a.bannerText).length > 0
+		// Large typed alert is the only live text-alert channel; off = no draw.
+		if (a.showBanner == null || !a.showBanner.get())
+			return;
+		var msg = a.bannerText != null && StringTools.trim(a.bannerText).length > 0
 			? a.bannerText : (a.alertText != null && a.alertText.length > 0 ? a.alertText : a.displayLabel());
 		var opacity:Single = a.opacity != null ? a.opacity.get() : 1;
 		if (opacity < 0) opacity = 0;
@@ -181,15 +183,12 @@ class AuraOverlay {
 		ImGui.setNextWindowPos(ImGui.vec2(ax, ay), ImGuiCond.Always);
 		ImGui.setNextWindowBgAlpha(0.72 * opacity);
 		if (ImGui.begin("SolarFlare AuraAlert " + a.id, null, flags)) {
-			if (large) {
-				var scale:Single = a.bannerScale != null ? a.bannerScale.get() : 1.15;
-				if (scale < 1) scale = 1;
-				if (scale > 3) scale = 3;
-				ImGui.pushFont(ImGui.getFont(), ImGui.getFontSize() * (1.75 + scale));
-				ImGui.textColored(ImGui.vec4(1, 0.92, 0.45, opacity), msg);
-				ImGui.popFont();
-			} else
-				ImGui.textColored(ImGui.vec4(1, 0.92, 0.45, opacity), msg);
+			var scale:Single = a.bannerScale != null ? a.bannerScale.get() : 1.15;
+			if (scale < 1) scale = 1;
+			if (scale > 3) scale = 3;
+			ImGui.pushFont(ImGui.getFont(), ImGui.getFontSize() * (1.75 + scale));
+			ImGui.textColored(ImGui.vec4(1, 0.92, 0.45, opacity), msg);
+			ImGui.popFont();
 			ImGui.end();
 		}
 	}

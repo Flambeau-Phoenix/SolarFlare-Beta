@@ -53,6 +53,7 @@ class AuraBuilder {
 	var scopeFilter:String = "All";
 	var iconSearchBuf = new hl.Bytes(80);
 	var iconSearch:String = "";
+	var iconKindFilter:String = "All";
 
 	var visualBuilder = new solarflare.aura.signal.VisualConditionBuilder();
 	var testHarness = new solarflare.aura.test.AuraTestHarness();
@@ -405,6 +406,10 @@ class AuraBuilder {
 
 		if (atCap) ImGui.beginDisabled();
 		if (ImGui.beginCombo("##ab_templates", "Starter template...")) {
+			if (ImGui.selectable("Status on me", false)) { snapshot("Add Template"); addTemplate(AuraTemplates.createStatusOnMeAlert()); ToastManager.success("Template: Status on me"); }
+			if (ImGui.selectable("Pyroclasm Proc", false)) { snapshot("Add Template"); addTemplate(AuraTemplates.createPyroclasmProcAlert()); ToastManager.success("Template: Pyroclasm Proc"); }
+			if (ImGui.selectable("Enemy Spell Cast", false)) { snapshot("Add Template"); addTemplate(AuraTemplates.createEnemySpellCastAlert()); ToastManager.success("Template: Enemy Spell Cast"); }
+			if (ImGui.selectable("Enemy Channel Active", false)) { snapshot("Add Template"); addTemplate(AuraTemplates.createEnemyChannelActiveAlert()); ToastManager.success("Template: Enemy Channel Active"); }
 			if (ImGui.selectable("Emergency Low Health", false)) { snapshot("Add Template"); addTemplate(AuraTemplates.createEmergencyLowHpAlert()); ToastManager.success("Template: Low Health"); }
 			if (ImGui.selectable("Skill Cooldown Ready", false)) { snapshot("Add Template"); addTemplate(AuraTemplates.createSkillReadyAlert()); ToastManager.success("Template: Skill Ready"); }
 			if (ImGui.selectable("Buff / Debuff Stacks", false)) { snapshot("Add Template"); addTemplate(AuraTemplates.createBuffStackTracker()); ToastManager.success("Template: Stack Tracker"); }
@@ -752,6 +757,14 @@ class AuraBuilder {
 		{
 			if (ImGui.inputText("Search Icons##ab_icon_search", iconSearchBuf, 80))
 				iconSearch = readBytes(iconSearchBuf, 80).toLowerCase();
+			ImGui.sameLine();
+			ImGui.setNextItemWidth(110);
+			if (ImGui.beginCombo("##ab_icon_kind", iconKindFilter)) {
+				for (k in ["All", "Units", "Skills", "Status skills", "Categories", "Icons"])
+					if (ImGui.selectable(k + "##ab_icon_kind_" + k, iconKindFilter == k))
+						iconKindFilter = k;
+				ImGui.endCombo();
+			}
 			ImGui.beginChild("##ab_icon_results", ImGui.vec2(0, 300), ImGuiChildFlags.Borders);
 			drawIconCandidates(a);
 			ImGui.endChild();
@@ -761,6 +774,7 @@ class AuraBuilder {
 	function drawIconCandidates(a:AuraDef):Void {
 		var shown = 0;
 		for (entry in solarflare.cdb.AuraCatalog.entries) {
+			if (!matchesIconKind(entry.id, entry.kind)) continue;
 			if (!matchesIcon(entry.id, entry.name)) continue;
 			drawIconChoice(a, entry.id, entry.name, entry.kind);
 			shown++;
@@ -833,8 +847,11 @@ class AuraBuilder {
 
 		ImGui.separatorText("Boss Mod Alert");
 		if (ImGui.checkbox("Large typed alert##ab_boss_alert", a.showBanner)) {
-			if (a.showBanner.get() && !hasAlertEffect(a))
-				a.effects.push(new AuraEffect("boss_alert", AuraEffect.KIND_ALERT, AuraEffect.WHEN_ON_RISE_HOLD));
+			if (a.showBanner.get()) {
+				if (!hasAlertEffect(a))
+					a.effects.push(new AuraEffect("boss_alert", AuraEffect.KIND_ALERT, AuraEffect.WHEN_ON_RISE_HOLD));
+			} else
+				AuraEffects.disableLargeTypedAlert(a);
 			SettingsStore.markDirty();
 		}
 		if (a.showBanner.get()) {
@@ -1022,7 +1039,23 @@ class AuraBuilder {
 	}
 
 	function matchesIcon(id:String, label:String):Bool {
-		return iconSearch.length == 0 || contains(id, iconSearch) || contains(label, iconSearch);
+		return solarflare.cdb.AuraCatalog.matchesSearch(id, label, iconSearch);
+	}
+
+	function matchesIconKind(id:String, kind:String):Bool {
+		if (iconKindFilter == "All" || iconKindFilter == null || iconKindFilter.length == 0)
+			return true;
+		if (iconKindFilter == "Units")
+			return kind == "unit";
+		if (iconKindFilter == "Skills")
+			return kind == "skill";
+		if (iconKindFilter == "Status skills")
+			return kind == "skill" && solarflare.cdb.AuraCatalog.statusPickRank(id, kind) == 0;
+		if (iconKindFilter == "Categories")
+			return kind == "statustype";
+		if (iconKindFilter == "Icons")
+			return kind == "icon";
+		return true;
 	}
 
 	static function contains(value:String, query:String):Bool {

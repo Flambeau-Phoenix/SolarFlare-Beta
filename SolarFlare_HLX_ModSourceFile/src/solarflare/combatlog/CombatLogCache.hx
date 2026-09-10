@@ -2,6 +2,7 @@
 
 import solarflare.HealthCache;
 import solarflare.FieldWalk;
+import solarflare.cdb.CdbUnitNames;
 import solarflare.geaux.GeauxCache;
 import solarflare.target.TargetSnap;
 import solarflare.target.RecentTargetCache;
@@ -26,6 +27,7 @@ class CombatLogCache {
 	static var lines:Array<CombatLogLine> = [];
 	static var writeAt:Int = 0;
 	static var count:Int = 0;
+	public static var latestSequence(default, null):Float = 0;
 	static var currentTarget:Dynamic = null;
 	static var lastTargetRef:Dynamic = null;
 	static var targetSnap:TargetSnap = new TargetSnap();
@@ -44,6 +46,33 @@ class CombatLogCache {
 		var k = pendingKillKind;
 		pendingKillKind = "";
 		return k != null ? k : "";
+	}
+
+	/**
+	 * Max hit amount on the local hero within the last `windowSec` seconds.
+	 * Used by combat.damageTakenRecent aura signal.
+	 */
+	public static function maxDamageTakenRecent(windowSec:Float):Float {
+		if (windowSec < 0.05)
+			windowSec = 0.05;
+		var now = haxe.Timer.stamp();
+		var best:Float = 0;
+		var n = count < CAP ? count : CAP;
+		var i = 0;
+		while (i < n) {
+			var idx = count < CAP ? i : (writeAt + i) % CAP;
+			var line = lines[idx];
+			i++;
+			if (line == null || line.kind != KIND_HIT)
+				continue;
+			if (line.targetRole != ROLE_YOU)
+				continue;
+			if (now - line.t > windowSec)
+				continue;
+			if (line.amount > best)
+				best = line.amount;
+		}
+		return best;
 	}
 
 	/**
@@ -76,8 +105,9 @@ class CombatLogCache {
 		if (solarflare.debug.ResolutionLedger.armed() && currentTarget != null)
 			solarflare.debug.ResolutionLedger.touch("combat.target", "typed", "CombatLogCache.tick", "getTarget", "string", "obj");
 
-		// Combat-log-only: keep pointer for involvesCurrentTarget; skip HUD snap work.
-		if (!solarflare.ObserveDemand.targetHud) {
+		// Combat-log-only: keep pointer for involvesCurrentTarget; skip HUD snap unless auras need target.
+		if (!solarflare.ObserveDemand.targetHud && !solarflare.ObserveDemand.aurasNeedTarget
+			&& !solarflare.ObserveDemand.auraBuilderOpen) {
 			if (currentTarget != lastTargetRef)
 				lastTargetRef = currentTarget;
 			return;
@@ -197,12 +227,14 @@ class CombatLogCache {
 			if (bs.isPassive())
 				return;
 		} catch (_:Dynamic) {}
-		var owner = ownerOfSkill(skill);
+		var owner = CombatOwnership.resolve(ownerOfSkill(skill), extractObject, ownerOfSkill);
 		var aim = aimOfSkill(skill);
 		if (!shouldCapture(owner, aim))
 			return;
 		var sid = skillIdOf(skill);
 		pushCast(sid, owner, aim);
+		if (classify(owner) == ROLE_ENEMY)
+			solarflare.aura.EnemyCastCache.noteStart(skill, sid);
 		if (solarflare.debug.ResolutionLedger.armed())
 			solarflare.debug.ResolutionLedger.note("combat.cast.skillId")
 				.withMethod("engine")
@@ -220,12 +252,35 @@ class CombatLogCache {
 		try
 			solarflare.debug.PayloadProbe.capture("hit", dmg)
 		catch (_:Dynamic) {}
-		var source = sourceOfDamage(dmg);
+		var rawSource = sourceCandidateOfDamage(dmg);
+		var source = CombatOwnership.resolve(rawSource, extractObject, ownerOfSkill);
+		var minion = minionNameOf(rawSource, source);
 		var target = targetOfDamage(dmg, victim);
-		if (!shouldCapture(source, target))
+		if (!shouldCapture(source, target) && !shouldCapture(rawSource, target))
 			return;
 		var skill = skillOfDamage(dmg);
-		pushHit(skill, source, target, dmg);
+		pushHit(skill, source, minion, target, dmg);
+	}
+
+	/**
+	 * CheatSheet Phase 0 DPS path: `ent.Unit.onInflictDamage` — attacker is `self`.
+	 * Credits owned summons (bee/imp/…) to summonOwner; dedupes against receive-side noteHit.
+	 */
+	public static function noteInflict(attacker:Dynamic, dmg:Dynamic):Void {
+		if (attacker == null || dmg == null)
+			return;
+		try
+			solarflare.debug.PayloadProbe.capture("hit", dmg)
+		catch (_:Dynamic) {}
+		var source = CombatOwnership.resolve(attacker, extractObject, ownerOfSkill);
+		if (source == null)
+			source = attacker;
+		var minion = minionNameOf(attacker, source);
+		var target = targetOfDamage(dmg, null);
+		if (!shouldCapture(source, target) && !shouldCapture(attacker, target))
+			return;
+		var skill = skillOfDamage(dmg);
+		pushHit(skill, source, minion, target, dmg);
 	}
 
 	public static function linesForDraw(cfg:CombatLogConfig):Array<CombatLogLine> {
@@ -267,12 +322,11 @@ class CombatLogCache {
 		commit(line);
 	}
 
-	static function pushHit(skillId:String, source:Dynamic, target:Dynamic, dmg:Dynamic):Void {
+	static function pushHit(skillId:String, source:Dynamic, minion:String, target:Dynamic, dmg:Dynamic):Void {
 		var amount = extractNumber(dmg, "amount", 0);
 		var line = beginLine(KIND_HIT, skillId, source, target, amount);
+		line.minionName = minion;
 		fillDamage(line, dmg);
-		if (isDupe(line.kind, line.skillId, line.sourceName, line.targetName, line.amount, line.t))
-			return;
 		if (line.kill)
 			noteKillOf(target);
 		commit(line);
@@ -384,6 +438,7 @@ class CombatLogCache {
 	}
 
 	static function commit(line:CombatLogLine):Void {
+		line.sequence = ++latestSequence;
 		if (lines.length < CAP) {
 			lines.push(line);
 			writeAt = lines.length % CAP;
@@ -415,12 +470,24 @@ class CombatLogCache {
 	static function shouldCapture(a:Dynamic, b:Dynamic):Bool {
 		if (HealthCache.isLocalHero(a) || HealthCache.isLocalHero(b))
 			return true;
+		if (ownedByLocalHero(a) || ownedByLocalHero(b))
+			return true;
 		if (sameUnit(a, currentTarget) || sameUnit(b, currentTarget))
 			return true;
 		var me = HealthCache.localHero;
 		if (me == null)
 			return false;
 		return inCombatWithLocal(a, me) || inCombatWithLocal(b, me);
+	}
+
+	static function ownedByLocalHero(unit:Dynamic):Bool {
+		if (unit == null)
+			return false;
+		var owner = CombatOwnership.summonOwnerOf(unit, extractObject);
+		if (HealthCache.isLocalHero(owner))
+			return true;
+		var credited = CombatOwnership.resolve(unit, extractObject, ownerOfSkill);
+		return HealthCache.isLocalHero(credited);
 	}
 
 	static function inCombatWithLocal(unit:Dynamic, me:Dynamic):Bool {
@@ -578,17 +645,35 @@ class CombatLogCache {
 		return extractObject(skill, "aimTarget");
 	}
 
-	static function sourceOfDamage(dmg:Dynamic):Dynamic {
-		var src = extractObject(dmg, "serverSource");
-		if (src != null)
-			return src;
+	static function sourceCandidateOfDamage(dmg:Dynamic):Dynamic {
+		var src:Dynamic = null;
 		try {
 			var dr:st.skill.DamageResult = dmg;
 			src = dr.get_sourceUnit();
-			if (src != null)
-				return src;
 		} catch (_:Dynamic) {}
-		return extractObject(dmg, "source");
+		if (src == null)
+			src = extractObject(dmg, "serverSource");
+		if (src == null)
+			src = extractObject(dmg, "source");
+		// Projectile / honey-bolt path: docs list ctx.owner as source fallback.
+		if (src == null) {
+			var ctx = extractObject(dmg, "ctx");
+			src = extractObject(ctx, "owner");
+		}
+		if (src == null)
+			src = ownerOfSkill(extractObject(dmg, "baseSkill"));
+		return src;
+	}
+
+	/** Display minion only when runtime ownership changed its credited source. */
+	static function minionNameOf(rawSource:Dynamic, creditedSource:Dynamic):String {
+		if (rawSource == null || sameUnit(rawSource, creditedSource))
+			return "";
+		var kind = unitKindId(rawSource);
+		if (kind.length == 0)
+			return "";
+		var label = CdbUnitNames.lookup(kind);
+		return label.length > 0 ? label : unitName(rawSource);
 	}
 
 	static function targetOfDamage(dmg:Dynamic, victim:Dynamic):Dynamic {

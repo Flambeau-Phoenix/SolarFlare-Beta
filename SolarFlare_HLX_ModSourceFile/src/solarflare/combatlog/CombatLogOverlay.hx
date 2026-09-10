@@ -54,7 +54,6 @@ class CombatLogOverlay {
 				cfg.hidden.set(true);
 				solarflare.ui.SettingsStore.markDirty();
 			}, null, "Combat Log")) {
-			ImGui.separatorText("Combat log");
 			var rows = CombatLogCache.linesForDraw(cfg);
 			var avail = ImGui.getContentRegionAvail();
 			drawRows(rows, avail.x, avail.y);
@@ -70,11 +69,12 @@ class CombatLogOverlay {
 		var tbl = ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp
 			| ImGuiTableFlags.NoPadOuterX | ImGuiTableFlags.Hideable | ImGuiTableFlags.Resizable
 			| ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable;
-		if (!ImGui.beginTable("clog_rows", 11, tbl, ImGui.vec2(width, height)))
+		if (!ImGui.beginTable("clog_rows", 12, tbl, ImGui.vec2(width, height)))
 			return;
 		ImGui.tableSetupColumn("Time", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.DefaultSort, 62);
 		ImGui.tableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed, 44);
 		ImGui.tableSetupColumn("Source", ImGuiTableColumnFlags.WidthStretch, 0.18);
+		ImGui.tableSetupColumn("Minion", ImGuiTableColumnFlags.WidthStretch, 0.15);
 		ImGui.tableSetupColumn("Skill", ImGuiTableColumnFlags.WidthStretch, 0.22);
 		ImGui.tableSetupColumn("Target", ImGuiTableColumnFlags.WidthStretch, 0.18);
 		ImGui.tableSetupColumn("Damage", ImGuiTableColumnFlags.WidthFixed, 56);
@@ -83,6 +83,7 @@ class CombatLogOverlay {
 		ImGui.tableSetupColumn("Kill", ImGuiTableColumnFlags.WidthFixed, 40);
 		ImGui.tableSetupColumn("Dmg", ImGuiTableColumnFlags.WidthFixed, 52);
 		ImGui.tableSetupColumn("HP", ImGuiTableColumnFlags.WidthFixed, 64);
+		ImGui.tableSetupScrollFreeze(0, 1);
 		ImGui.tableHeadersRow();
 
 		var specs = ImGui.tableGetSortSpecs();
@@ -110,20 +111,22 @@ class CombatLogOverlay {
 					case 2:
 						cmp = a.sourceName < b.sourceName ? -1 : (a.sourceName > b.sourceName ? 1 : 0);
 					case 3:
-						cmp = a.skillName < b.skillName ? -1 : (a.skillName > b.skillName ? 1 : 0);
+						cmp = a.minionName < b.minionName ? -1 : (a.minionName > b.minionName ? 1 : 0);
 					case 4:
-						cmp = a.targetName < b.targetName ? -1 : (a.targetName > b.targetName ? 1 : 0);
+						cmp = a.skillName < b.skillName ? -1 : (a.skillName > b.skillName ? 1 : 0);
 					case 5:
-						cmp = a.amount < b.amount ? -1 : (a.amount > b.amount ? 1 : 0);
+						cmp = a.targetName < b.targetName ? -1 : (a.targetName > b.targetName ? 1 : 0);
 					case 6:
-						cmp = (a.crit ? 1 : 0) - (b.crit ? 1 : 0);
-					case 7:
-						cmp = a.blockAmt < b.blockAmt ? -1 : (a.blockAmt > b.blockAmt ? 1 : 0);
-					case 8:
-						cmp = (a.kill ? 1 : 0) - (b.kill ? 1 : 0);
-					case 9:
 						cmp = a.amount < b.amount ? -1 : (a.amount > b.amount ? 1 : 0);
+					case 7:
+						cmp = (a.crit ? 1 : 0) - (b.crit ? 1 : 0);
+					case 8:
+						cmp = a.blockAmt < b.blockAmt ? -1 : (a.blockAmt > b.blockAmt ? 1 : 0);
+					case 9:
+						cmp = (a.kill ? 1 : 0) - (b.kill ? 1 : 0);
 					case 10:
+						cmp = a.amount < b.amount ? -1 : (a.amount > b.amount ? 1 : 0);
+					case 11:
 						cmp = a.targetHp < b.targetHp ? -1 : (a.targetHp > b.targetHp ? 1 : 0);
 				}
 				return sortAsc ? cmp : -cmp;
@@ -153,6 +156,9 @@ class CombatLogOverlay {
 
 		ImGui.tableNextColumn();
 		textCol(srcCol, actorWithPlayer(line.sourceRole, line.sourceName, line.sourcePlayer));
+
+		ImGui.tableNextColumn();
+		ImGui.text(line.minionName);
 
 		ImGui.tableNextColumn();
 		var skill = line.skillName.length > 0 ? line.skillName : (line.skillLabel.length > 0 ? line.skillLabel : line.skillId);

@@ -33,17 +33,27 @@ class AuraEngine {
 	public static function signalFrame():AuraSignalFrame return frame;
 
 	public static function tick(cfg:AuraConfig):Void {
-		if (cfg == null || !cfg.enabled.get() || cfg.auras == null || cfg.auras.length == 0)
+		if (cfg == null || cfg.auras == null)
 			return;
+		if (!cfg.enabled.get() && !solarflare.ObserveDemand.auraBuilderOpen) {
+			clearAllPresentation(cfg);
+			return;
+		}
 		var now = stamp();
 		var hot = frame != null && frame.statusCount > 0;
-		if (solarflare.ObserveDemand.dueAuraStatus(now, hot)) {
+		if (!AuraStatusCache.isCurrent(HealthCache.localHero) || solarflare.ObserveDemand.dueAuraStatus(now, hot)) {
 			try
 				AuraStatusCache.sample(HealthCache.localHero)
 			catch (_:Dynamic) {}
 		}
 		initialize();
+		if (solarflare.ObserveDemand.aurasNeedEnemyCast)
+			EnemyCastCache.tick(now);
 		AuraSignalFrameBuilder.build(frame, now);
+		if (!cfg.enabled.get()) {
+			clearAllPresentation(cfg);
+			return;
+		}
 		var n = cfg.auras.length;
 		if (n > MAX)
 			n = MAX;
@@ -54,8 +64,21 @@ class AuraEngine {
 			catch (_:Dynamic) {
 				var a = cfg.auras[i];
 				if (a != null)
-					a.show = false;
+					AuraEffects.clearPresentation(a);
 			}
+			i++;
+		}
+	}
+
+	static function clearAllPresentation(cfg:AuraConfig):Void {
+		if (cfg == null || cfg.auras == null)
+			return;
+		var i = 0;
+		var n = cfg.auras.length;
+		if (n > MAX)
+			n = MAX;
+		while (i < n) {
+			AuraEffects.clearPresentation(cfg.auras[i]);
 			i++;
 		}
 	}
@@ -63,7 +86,7 @@ class AuraEngine {
 	static function eval(a:AuraDef, now:Float):Void {
 		if (a == null || !a.enabled.get()) {
 			if (a != null)
-				a.show = false;
+				AuraEffects.clearPresentation(a);
 			return;
 		}
 		a.resolvedIcon = "";

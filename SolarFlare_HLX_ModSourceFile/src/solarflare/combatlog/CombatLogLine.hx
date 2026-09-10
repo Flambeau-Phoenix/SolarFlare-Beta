@@ -1,12 +1,15 @@
 ﻿package solarflare.combatlog;
 
 class CombatLogLine {
+	public var sequence:Float = 0;
 	public var kind:Int = 0;
 	public var skillId:String = "";
 	public var skillName:String = "";
 	public var skillLabel:String = "";
 	public var sourceName:String = "";
 	public var sourcePlayer:String = "";
+	/** Summoned unit that dealt hit; source remains credited owner. */
+	public var minionName:String = "";
 	public var targetName:String = "";
 	public var targetPlayer:String = "";
 	public var sourceRole:Int = 0;
@@ -57,6 +60,7 @@ class CombatLogLine {
 			skillName: jsonStr(skillName.length > 0 ? skillName : skillLabel),
 			sourcePlayer: jsonStr(sourcePlayer),
 			source: jsonStr(sourceName),
+			minion: jsonStr(minionName),
 			sourceRole: sourceRole,
 			targetPlayer: jsonStr(targetPlayer),
 			target: jsonStr(targetName),
@@ -106,10 +110,10 @@ class CombatLogLine {
 	}
 
 	static function round1(v:Float):Float {
-		return Math.round(v * 10) / 10;
+		return Math.isFinite(v) ? Math.ffloor(v * 10 + 0.5) / 10 : 0;
 	}
 
 	static function round2(v:Float):Float {
-		return Math.round(v * 100) / 100;
+		return Math.isFinite(v) ? Math.ffloor(v * 100 + 0.5) / 100 : 0;
 	}
 }

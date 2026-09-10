@@ -90,6 +90,10 @@ class ResolutionCatalog {
 		add("chat.sender", "Chat", "senderName", "Incoming chat sender", "P2");
 		add("chat.channel", "Chat", "channelLabel", "Incoming chat channel", "P2");
 		add("status.remain", "Aura", "statusRemain", "Status / BaseSkill remaining duration", "P2");
+		add("status.present", "Aura", "statusPresent", "Typed getStatusCount / list match for aura status.present", "P2");
+		add("status.sample", "Aura", "statusSample", "AuraStatusCache sample / dirty-wake reconcile", "P2");
+		add("status.hook", "Aura", "statusHook", "Local Status lifecycle dirty-wake postfix", "P2");
+		add("skill.instantReady", "Aura", "instantReady", "SkillScript.shouldPlayInstantly / owner *_Proc status", "P2");
 		add("getrifty.inInstance", "GetRifty", "riftFlag", "Show instance remain vs portal schedule", "P2");
 		add("getrifty.remain", "GetRifty", "instanceRemain", "Instance time remaining text", "P2");
 		add("identity.heroName", "Identity", "heroName", "Local hero display name / resource profiles", "P3");

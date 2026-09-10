@@ -23,10 +23,14 @@ class AuraSignalCatalog {
 		add("skill.inCooldown", "Skill in cooldown", "Skills", Boolean, "skill");
 		add("skill.cooldownLeft", "Skill cooldown left", "Skills", Duration, "skill");
 		add("skill.cooldownProgress", "Skill cooldown progress", "Skills", Percent, "skill");
-		add("status.present", "Status present", "Statuses", Boolean, "status");
-		add("status.stacks", "Status stacks", "Statuses", Count, "status");
-		add("status.durationLeft", "Status duration left", "Statuses", Duration, "status");
-		add("status.durationProgress", "Status duration progress", "Statuses", Percent, "status");
+		// skill.specialReady (shouldHighlightSkill) kept in reader for legacy saves; not offered in picker.
+		add("skill.instantReady", "Instant cast ready (skill script)", "Instant cast", Boolean, "skill");
+		add("status.present", "Buff/debuff on me", "Statuses", Boolean, "status");
+		add("status.stacks", "Stacks on me", "Statuses", Count, "status");
+		add("status.durationLeft", "Duration left on me", "Statuses", Duration, "status");
+		add("status.durationProgress", "Duration progress on me", "Statuses", Percent, "status");
+		add("status.count", "Status container count", "Statuses", Count);
+		add("status.overflow", "Status scan overflow", "Statuses", Boolean);
 		add("prayer.charged", "Charged prayers", "Class mechanics", Count);
 		add("prayer.lifeReady", "Life prayer ready", "Class mechanics", Boolean);
 		add("prayer.shieldReady", "Shield prayer ready", "Class mechanics", Boolean);
@@ -48,6 +52,11 @@ class AuraSignalCatalog {
 		add("target.isElite", "Target is elite", "Target", Boolean);
 		add("target.hpRatio", "Target HP percent", "Target", Percent);
 		add("combat.killKindMatches", "Kill of unit kind", "Combat", Boolean, "unit");
+		add("combat.damageTakenRecent", "Recent damage taken (max hit)", "Combat", Number);
+		add("event.cast.recent", "Enemy cast age (seconds)", "Enemy casts", Duration, "skill");
+		add("event.cast.active", "Enemy cast/channel active", "Enemy casts", Boolean, "skill");
+		add("skill.charges", "Skill charges remaining", "Skills", Count, "skill");
+		add("skill.chargesMax", "Skill charges max", "Skills", Count, "skill");
 		add("custom.script", "Custom Haxe Expression", "Scripting", Boolean, "script");
 	}
 	static function add(id:String, label:String, group:String, kind:AuraValueKind, subjectKind:String = ""):Void

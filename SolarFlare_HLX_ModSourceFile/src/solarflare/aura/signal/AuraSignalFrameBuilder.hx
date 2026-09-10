@@ -36,13 +36,28 @@ class AuraSignalFrameBuilder {
 		var kk = CombatLogCache.consumeKillKind();
 		frame.killKind = kk;
 		frame.killKnown = kk.length > 0;
+		frame.damageTakenRecent = CombatLogCache.maxDamageTakenRecent(5.0);
+		frame.damageTakenKnown = true;
 		addSkills(frame, GeauxCache.slots); addSkills(frame, GeauxCache.weapons); addSkills(frame, GeauxCache.signatures);
-		frame.statusDomainKnown = frame.heroKnown;
+		if (solarflare.ObserveDemand.aurasNeedInstant)
+			ensureSkillSubjects(frame, solarflare.ObserveDemand.instantSkillIds);
+		if (solarflare.ObserveDemand.aurasNeedSpecial)
+			ensureSkillSubjects(frame, solarflare.ObserveDemand.specialSkillIds);
+		if (solarflare.ObserveDemand.aurasNeedEnemyCast)
+			fillEnemyCasts(frame, now);
+		if (solarflare.ObserveDemand.aurasNeedInstant)
+			fillInstantReady(frame);
+		if (solarflare.ObserveDemand.aurasNeedSpecial)
+			fillSpecialReady(frame);
+		frame.statusDomainKnown = AuraStatusCache.isCurrent(HealthCache.localHero) && AuraStatusCache.domainKnown;
+		frame.setStatusContainerLength(AuraStatusCache.isCurrent(HealthCache.localHero) ? AuraStatusCache.containerLength : -1);
 		var n = AuraStatusCache.count; if (n > AuraSignalFrame.MAX_STATUSES) n = AuraSignalFrame.MAX_STATUSES;
 		for (i in 0...n) {
 			var src = AuraStatusCache.snaps[i]; if (src == null || src.id == null || src.id.length == 0) continue;
 			var dst = frame.statuses[frame.statusCount++]; dst.rawId = src.id; dst.label = "";
-			dst.stacks = src.stacks; dst.durationLeft = src.left; dst.durationProgress = clamp01(src.progress); dst.known = true;
+			dst.ids = src.ids.copy(); dst.present = src.present; dst.durationKnown = src.durationKnown;
+			dst.stacks = src.stacks; dst.durationLeft = src.left; dst.durationProgress = clamp01(src.progress);
+			dst.known = src.known && AuraStatusCache.isCurrent(HealthCache.localHero);
 		}
 	}
 
@@ -73,8 +88,147 @@ class AuraSignalFrameBuilder {
 			if (frame.findSkill(src.id) != null) continue;
 			var dst = frame.skills[frame.skillCount++]; dst.rawId = src.id; dst.aliasId = src.iconId; dst.label = src.label;
 			dst.ready = src.ready; dst.affordable = src.affordable; dst.cooldownLeft = src.cdLeft;
-			dst.cooldownProgress = clamp01(src.remaining); dst.inCooldown = !src.ready || src.cdLeft > 0.05; dst.known = true;
+			dst.cooldownProgress = clamp01(src.remaining); dst.inCooldown = !src.ready || src.cdLeft > 0.05;
+			dst.charges = src.charges; dst.chargesMax = src.chargesMax; dst.known = true;
 		}
 	}
+
+	/** Append demanded script-ready subjects even when not on Geaux bar strips. */
+	static function ensureSkillSubjects(frame:AuraSignalFrame, ids:Array<String>):Void {
+		if (ids == null) return;
+		for (id in ids) {
+			if (id == null || id.length == 0 || frame.skillCount >= AuraSignalFrame.MAX_SKILLS) continue;
+			if (frame.findSkill(id) != null) continue;
+			var dst = frame.skills[frame.skillCount++];
+			dst.rawId = id;
+			dst.aliasId = "";
+			dst.label = solarflare.cdb.AuraCatalog.label(id);
+			dst.ready = false;
+			dst.affordable = false;
+			dst.cooldownLeft = 0;
+			dst.cooldownProgress = 0;
+			dst.inCooldown = false;
+			dst.instantReady = false;
+			dst.instantReadyKnown = false;
+			dst.specialReady = false;
+			dst.specialReadyKnown = false;
+			dst.known = true;
+		}
+	}
+
+	static function fillInstantReady(frame:AuraSignalFrame):Void {
+		var ids = solarflare.ObserveDemand.instantSkillIds;
+		if (ids == null || ids.length == 0) {
+			// Demand on but no subjects yet — still scan known snaps if any condition lacks subject.
+			var i = 0;
+			while (i < frame.skillCount) {
+				var dst = frame.skills[i];
+				if (dst != null && dst.known)
+					readScriptReady(dst, dst.rawId, true, false);
+				i++;
+			}
+			return;
+		}
+		for (id in ids) {
+			var dst = frame.findSkill(id);
+			if (dst == null || !dst.known)
+				continue;
+			readScriptReady(dst, id, true, true);
+		}
+	}
+
+	static function fillSpecialReady(frame:AuraSignalFrame):Void {
+		var ids = solarflare.ObserveDemand.specialSkillIds;
+		if (ids == null || ids.length == 0)
+			return;
+		for (id in ids) {
+			var dst = frame.findSkill(id);
+			if (dst == null || !dst.known)
+				continue;
+			readScriptReady(dst, id, false, true);
+		}
+	}
+
+	static function readScriptReady(dst:SkillSignalSnap, skillId:String, instant:Bool, probe:Bool):Void {
+		var ready = false;
+		var known = false;
+		try {
+			var skill = GeauxCache.liveSkill(skillId);
+			if (skill != null) {
+				var bs:st.skill.BaseSkill = skill;
+				var sc:script.SkillScript = bs.script;
+				if (sc != null) {
+					ready = instant ? sc.shouldPlayInstantly() : sc.shouldHighlightSkill();
+					known = true;
+				}
+			}
+		} catch (_:Dynamic) {}
+		// Pyroclasm-style scripts: shouldPlayInstantly == owner.getStatusCount(Skill.*_Proc)>0.
+		// Fallback when script virtual path misses but the proc status is live on the hero.
+		if (instant && !ready) {
+			try {
+				var hero = HealthCache.localHero;
+				if (hero != null) {
+					var h:ent.GameObject = cast hero;
+					var procId = skillId + "_Proc";
+					var n = h.getStatusCount(procId, null);
+					if (n > 0) {
+						ready = true;
+						known = true;
+					} else if (!known) {
+						known = true; // typed count succeeded; absence is known false
+					}
+				}
+			} catch (_:Dynamic) {}
+		}
+		if (instant) {
+			dst.instantReady = ready;
+			dst.instantReadyKnown = known;
+		} else {
+			dst.specialReady = ready;
+			dst.specialReadyKnown = known;
+		}
+		if (probe && instant) {
+			try
+				solarflare.debug.PayloadProbe.noteInstant(skillId, known, ready)
+			catch (_:Dynamic) {}
+		}
+		if (instant && solarflare.debug.ResolutionLedger.armed())
+			solarflare.debug.ResolutionLedger.touch(
+				"skill.instantReady",
+				known ? "script" : "miss",
+				"AuraSignalFrameBuilder.readScriptReady",
+				skillId,
+				"bool",
+				ready ? "true" : "false",
+				known ? "known" : "unknown"
+			);
+	}
+
+	static function fillEnemyCasts(frame:AuraSignalFrame, now:Float):Void {
+		var ids = solarflare.ObserveDemand.castSkillIds;
+		if (ids == null || ids.length == 0) {
+			// Builder open / demand without subjects: expose all known cache entries.
+			fillCastFromCache(frame, null);
+			return;
+		}
+		for (id in ids) {
+			if (id == null || id.length == 0 || frame.castCount >= AuraSignalFrame.MAX_CASTS)
+				continue;
+			if (frame.findCast(id) != null)
+				continue;
+			var dst = frame.casts[frame.castCount++];
+			dst.skillId = id;
+			dst.known = true;
+			dst.active = solarflare.aura.EnemyCastCache.isActive(id);
+			var age = solarflare.aura.EnemyCastCache.ageOf(id);
+			dst.age = Math.isFinite(age) ? age : 1e9;
+		}
+	}
+
+	static function fillCastFromCache(frame:AuraSignalFrame, onlyId:String):Void {
+		// Demand without allowlist: still nothing to list until noteStart; leave empty.
+	}
+
 	static inline function clamp01(v:Float):Float return v < 0 ? 0 : (v > 1 ? 1 : v);
 }

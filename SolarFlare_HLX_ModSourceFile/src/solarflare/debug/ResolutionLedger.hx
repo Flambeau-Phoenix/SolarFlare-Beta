@@ -6,12 +6,16 @@ import imgui.ref.BoolRef;
 import sys.io.File;
 
 /**
- * Opt-in production-resolve ledger. Armed flag is saved in solarflare.json.
- * Aggregates winners in memory; JSONL flushes pending deltas ~2s.
+ * Opt-in production-resolve ledger. Panel open is separate from recording.
+ * Recording is session-only (never persisted) so logs do not grow across launches.
+ * Aggregates winners in memory; JSONL flushes pending deltas ~2s while recording.
  */
 @:keep
 class ResolutionLedger {
+	/** Show the overlay panel (may be restored from settings). */
 	public static var enabled = new BoolRef(false);
+	/** Write JSONL / snapshots. Session-only; defaults off. */
+	public static var recording = new BoolRef(false);
 	public static var lastPath:String = "";
 	public static var lastLabel:String = "resolution-ledger idle";
 	public static var lastJson:String = "{}";
@@ -28,30 +32,51 @@ class ResolutionLedger {
 	static var lastSnapWrite:Float = 0;
 	static var ready:Bool = false;
 	static var dirty:Bool = false;
-	static var lastArmed:Bool = false;
+	static var lastRecording:Bool = false;
 
 	public static function keep():Void {
 		ensure();
 		ResolutionCatalog.keep();
 	}
 
+	/** True only while the user explicitly started recording. */
 	public static function armed():Bool {
-		return enabled != null && enabled.get();
+		return recording != null && recording.get();
+	}
+
+	public static function startRecording():Void {
+		recording.set(true);
+		lastLabel = "resolution-ledger recording";
+	}
+
+	public static function stopRecording():Void {
+		if (!armed())
+			return;
+		recording.set(false);
+		flush();
+		writeSnapshot();
+		lastLabel = "resolution-ledger stopped";
+	}
+
+	/** Clear in-memory aggs (does not delete log files). */
+	public static function clearSession():Void {
+		aggs = new Map();
+		order = [];
+		buf = [];
+		dirty = false;
+		lastJson = "{}";
+		lastLabel = armed() ? "resolution-ledger recording (cleared)" : "resolution-ledger idle";
 	}
 
 	public static function tick():Void {
 		var on = armed();
-		if (on != lastArmed) {
-			lastArmed = on;
-			try
-				solarflare.ui.SettingsStore.markDirty()
-			catch (_:Dynamic) {}
-		}
-		if (!on) {
-			if (buf.length > 0)
+		if (on != lastRecording) {
+			lastRecording = on;
+			if (!on)
 				flush();
-			return;
 		}
+		if (!on)
+			return;
 		ensure();
 		var now = stamp();
 		if (dirty && now - lastFlush >= FLUSH_S)

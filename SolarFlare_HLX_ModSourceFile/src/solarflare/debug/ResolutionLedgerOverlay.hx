@@ -11,17 +11,30 @@ import imgui.Enums.ImGuiWindowFlags;
 
 /**
  * Layer 2: draw frozen ResolutionLedger aggs. No live engine walks.
+ * Panel open (enabled) is separate from recording (armed).
  */
 class ResolutionLedgerOverlay {
 	public function new() {}
 
 	public function draw(cursorFree:Bool = true):Void {
-		if (!ResolutionLedger.armed())
+		if (ResolutionLedger.enabled == null || !ResolutionLedger.enabled.get())
 			return;
 		ImGui.setNextWindowSize(ImGui.vec2(720, 380), ImGuiCond.FirstUseEver);
 		var extraFlags = cursorFree ? 0 : ImGuiWindowFlags.NoInputs;
 		if (HudChrome.beginPanel("Resolution ledger##hm_rl", ResolutionLedger.enabled, "Resolution ledger", extraFlags)) {
-			ImGui.text("Production winners (engine / typed / FieldWalk). Not Payload probe.");
+			ImGui.textWrapped("Production winners (engine / typed / FieldWalk). Recording is session-only and does not auto-start.");
+			if (ResolutionLedger.armed()) {
+				if (ImGui.button("Stop recording##hm_rl_stop"))
+					ResolutionLedger.stopRecording();
+			} else {
+				if (ImGui.button("Start recording##hm_rl_start"))
+					ResolutionLedger.startRecording();
+			}
+			ImGui.sameLine();
+			if (ImGui.button("Clear session##hm_rl_clear"))
+				ResolutionLedger.clearSession();
+			ImGui.text(ResolutionLedger.armed() ? "Recording ON — JSONL flushes while armed." : "Idle — panel open only; no log growth.");
+			ImGui.separator();
 			ImGui.text(ResolutionLedger.lastLabel);
 			if (ResolutionLedger.lastPath.length > 0)
 				ImGui.text(ResolutionLedger.lastPath);
@@ -29,7 +42,9 @@ class ResolutionLedgerOverlay {
 				ImGui.setClipboardText(ResolutionLedger.lastJson);
 			var rows = ResolutionLedger.rowsForDraw();
 			if (rows.length == 0)
-				ImGui.text("Armed. Play: vitals, Geaux CD, a hit/cast, chat, rift if available.");
+				ImGui.text(ResolutionLedger.armed()
+					? "Recording. Play: vitals, Geaux CD, a hit/cast, chat, rift if available."
+					: "Start recording to capture winners.");
 			else
 				drawRows(rows);
 		}

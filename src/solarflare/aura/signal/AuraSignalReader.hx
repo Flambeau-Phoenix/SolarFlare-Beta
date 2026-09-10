@@ -17,8 +17,8 @@ class AuraSignalReader {
 			case "resource.generic.ratio": percent(out, frame.genericKnown, frame.genericRatio);
 			case "resource.combo.count": count(out, frame.comboKnown, frame.comboCount, frame.comboMax > 0 ? frame.comboCount / frame.comboMax : 0);
 			case "resource.combo.atMax": bool(out, frame.comboKnown, frame.comboMax > 0 && frame.comboCount >= frame.comboMax);
-			case "skill.ready", "skill.affordable", "skill.inCooldown", "skill.cooldownLeft", "skill.cooldownProgress": readSkill(frame, signal, subject, out);
-			case "status.present", "status.stacks", "status.durationLeft", "status.durationProgress": readStatus(frame, signal, subject, out);
+			case "skill.ready", "skill.affordable", "skill.inCooldown", "skill.cooldownLeft", "skill.cooldownProgress", "skill.instantReady", "skill.specialReady", "skill.charges", "skill.chargesMax": readSkill(frame, signal, subject, out);
+			case "status.count", "status.overflow", "status.present", "status.stacks", "status.durationLeft", "status.durationProgress": AuraStatusSignalReader.read(frame, signal, subject, out);
 			case "prayer.charged": count(out, frame.prayerKnown, frame.prayerCharged);
 			case "prayer.lifeReady": bool(out, frame.prayerKnown, frame.prayerLifeReady);
 			case "prayer.shieldReady": bool(out, frame.prayerKnown, frame.prayerShieldReady);
@@ -40,6 +40,8 @@ class AuraSignalReader {
 			case "target.isElite": bool(out, frame.targetKnown && frame.targetValid, frame.targetIsElite);
 			case "target.hpRatio": percent(out, frame.targetKnown && frame.targetValid, frame.targetRatio);
 			case "combat.killKindMatches": bool(out, frame.killKnown, kindEq(frame.killKind, subject));
+			case "combat.damageTakenRecent": number(out, frame.damageTakenKnown, frame.damageTakenRecent);
+			case "event.cast.recent", "event.cast.active": readCast(frame, signal, subject, out);
 			case "custom.script": bool(out, true, solarflare.scripting.ScriptEngine.evalBool(subject, frame));
 			default: out.code = UNKNOWN_SIGNAL;
 		}
@@ -61,18 +63,27 @@ class AuraSignalReader {
 			case "skill.inCooldown": bool(out, true, s.inCooldown);
 			case "skill.cooldownLeft": duration(out, true, s.cooldownLeft, s.cooldownProgress);
 			case "skill.cooldownProgress": percent(out, true, s.cooldownProgress, s.cooldownLeft);
+			case "skill.instantReady": bool(out, s.instantReadyKnown, s.instantReady);
+			case "skill.specialReady": bool(out, s.specialReadyKnown, s.specialReady);
+			case "skill.charges": count(out, s.chargesMax > 0, s.charges);
+			case "skill.chargesMax": count(out, s.chargesMax > 0, s.chargesMax);
 			default:
 		}
 	}
-	static function readStatus(frame:AuraSignalFrame, signal:String, subject:String, out:AuraResolvedValue):Void {
-		if (!frame.statusDomainKnown) { out.code = UNKNOWN_DOMAIN; return; }
-		var s = frame.findStatus(subject);
-		if (signal == "status.present") { out.present = s != null; bool(out, true, s != null); return; }
-		if (s == null || !s.known) { out.code = MISSING_SUBJECT; return; }
+	static function readCast(frame:AuraSignalFrame, signal:String, subject:String, out:AuraResolvedValue):Void {
+		var c = frame.findCast(subject);
+		if (c == null || !c.known) {
+			if (signal == "event.cast.active") {
+				bool(out, true, false);
+				return;
+			}
+			// No cast yet: known miss for within (age larger than any window).
+			duration(out, true, 1e9);
+			return;
+		}
 		switch (signal) {
-			case "status.stacks": count(out, true, s.stacks, s.durationProgress);
-			case "status.durationLeft": duration(out, true, s.durationLeft, s.durationProgress);
-			case "status.durationProgress": percent(out, true, s.durationProgress, s.durationLeft);
+			case "event.cast.recent": duration(out, true, c.age);
+			case "event.cast.active": bool(out, true, c.active);
 			default:
 		}
 	}

@@ -271,6 +271,8 @@ class GeauxBuilder {
 			SettingsStore.markDirty();
 		if (ImGui.checkbox("Keybind Chips##gb_st_hk", style.showHotkeys))
 			SettingsStore.markDirty();
+		if (ImGui.checkbox("Remaining Charges##gb_st_ch", style.showCharges))
+			SettingsStore.markDirty();
 		if (ImGui.checkbox("Group Tags##gb_st_tags", style.showGroupTags))
 			SettingsStore.markDirty();
 

@@ -328,14 +328,18 @@ class GeauxBar {
 		var present = snap != null && snap.present;
 		var ready = present && snap.ready;
 		var affordable = !present || snap.affordable != false;
-		var onCd = present && (!ready || snap.cdLeft > 0.05 || snap.remaining > 0.02);
-		// Preserve the assignment hit target, but draw no cell while the skill is cooling down.
-		if (present && onCd && style.hideOnCooldown()) {
+		var hasCharges = present && snap.chargesMax > 0 && snap.charges > 0;
+		var onCd = present && (snap.cdLeft > 0.05 || snap.remaining > 0.02 || (!ready && !hasCharges));
+		// Hide only when truly unavailable: empty charge pool or non-charged on CD.
+		var hideForCd = onCd && !hasCharges;
+		if (present && hideForCd && style.hideOnCooldown()) {
 			return {clicked: clicked, rightClicked: rightClicked, hovered: hovered};
 		}
-		var lit = present && ready && (affordable || !style.dimOnNoResource.get());
-		if (present && onCd && !style.shouldDimOnCooldown() && style.effectiveCdDisplay() == GeauxStyle.CD_SHOW_FULL)
+		// Lit while usable ammo remains (pinwheel may still show regen).
+		var lit = present && (ready || hasCharges) && (affordable || !style.dimOnNoResource.get());
+		if (present && onCd && !hasCharges && !style.shouldDimOnCooldown() && style.effectiveCdDisplay() == GeauxStyle.CD_SHOW_FULL)
 			lit = true;
+		var showCdFx = !style.hideOnCooldown() || hasCharges;
 		var group = snap != null && snap.group != null ? snap.group : "";
 		var snapId = present && snap.id != null ? GeauxCache.sanitizeSkillId(snap.id) : "";
 		if (present && snapId.length == 0)
@@ -350,7 +354,7 @@ class GeauxBar {
 
 		if (present && lit && affordable) {
 			solarflare.ui.VectorGlow.radial(dl, x + size * 0.5, y + size * 0.5, size * 0.55, 0x33FFB833, 0.45, 5);
-		} else if (present && onCd && snap.cdLeft <= 1.2 && snap.cdLeft > 0.05) {
+		} else if (present && onCd && !hasCharges && snap.cdLeft <= 1.2 && snap.cdLeft > 0.05) {
 			var pulseAlpha = 0.25 + 0.25 * Math.sin(ImGui.getTime() * 8.0);
 			var pulseCol = 0x00FFFF | (Std.int(pulseAlpha * 255) << 24);
 			solarflare.ui.VectorGlow.radial(dl, x + size * 0.5, y + size * 0.5, size * 0.5, pulseCol, 0.4, 4);
@@ -436,17 +440,28 @@ class GeauxBar {
 			}
 		}
 
-		if (present && style.showPinwheel.get() && snap.remaining > 0.02 && !style.hideOnCooldown()
+		if (present && style.showPinwheel.get() && showCdFx && snap.remaining > 0.02
 			&& (snap.cdLeft > 0.05 || snap.remaining < 0.98))
 			drawPinwheel(dl, x, y, size, snap.remaining);
 
-		if (present && style.showCdText.get() && onCd && snap.cdLeft > 0.05 && !style.hideOnCooldown()) {
+		if (present && style.showCdText.get() && showCdFx && onCd && snap.cdLeft > 0.05) {
 			var secs = Std.int(Math.ceil(snap.cdLeft));
 			var num = Std.string(secs);
 			var ns = ImGui.calcTextSize(num);
 			var ny:Single = drewIcon ? y + size * 0.72 : y + size * 0.58;
 			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + (size - ns.x) * 0.5, ny),
 				ImGui.colorConvertFloat4ToU32(style.cdTextCol()), num);
+		}
+
+		if (present && style.showCharges.get() && snap.chargesMax > 0) {
+			var ch = Std.string(snap.charges);
+			var cs = ImGui.calcTextSize(ch);
+			var cx:Single = x + size - cs.x - 3;
+			var cy:Single = y + size - cs.y - 2;
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(cx + 1, cy + 1),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.85)), ch);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(cx, cy),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.95, 0.98, 1.0, lit ? 1 : 0.75)), ch);
 		}
 
 		// User-defined keybind reminder (Key##hk fields) — not the skill name.

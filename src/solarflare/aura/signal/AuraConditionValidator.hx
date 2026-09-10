@@ -33,15 +33,21 @@ class AuraConditionValidator {
 	public static function isValidOperator(op:String, d:AuraSignalDescriptor):Bool {
 		if (d == null || op == null) return false;
 		if (d.id == "status.present") return op == "present" || op == "absent";
+		if (d.id == "event.cast.recent" && op == "within") return true;
 		return switch (d.kind) {
-			case Number | Percent | Count | Duration: op == "lt" || op == "lte" || op == "eq" || op == "neq" || op == "gte" || op == "gt";
+			case Number | Percent | Count | Duration: op == "lt" || op == "lte" || op == "eq" || op == "neq" || op == "gte" || op == "gt" || (d.kind == Duration && op == "within");
 			case Boolean: op == "is" || op == "isNot";
 			case Identity: op == "eq" || op == "neq";
 		};
 	}
 	public static function defaultOperator(d:AuraSignalDescriptor):String {
-		if (d == null) return ""; if (d.id == "status.present") return "present";
+		if (d == null) return "";
+		if (d.id == "status.present") return "present";
+		if (d.id == "event.cast.recent") return "within";
 		return switch (d.kind) { case Boolean: "is"; case Identity: "eq"; default: "gte"; };
+	}
+	public static function isEventOperator(op:String):Bool {
+		return op == "within";
 	}
 	static function coerce(v:Float, kind:AuraValueKind):Float {
 		if (!Math.isFinite(v)) v = 0;

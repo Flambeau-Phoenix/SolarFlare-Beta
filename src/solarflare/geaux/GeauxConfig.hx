@@ -564,6 +564,7 @@ class GeauxStyle {
 	public var showCdText = new BoolRef(true);
 	public var showPinwheel = new BoolRef(true);
 	public var showHotkeys = new BoolRef(true);
+	public var showCharges = new BoolRef(true);
 	public var dimOnCd = new BoolRef(true);
 	public var cdDisplay = new IntRef(CD_SHOW_DIM);
 	public var dimOnNoResource = new BoolRef(true);
@@ -654,6 +655,8 @@ class GeauxStyle {
 			if (ImGui.checkbox("Show cooldown pinwheel", showPinwheel))
 				dirty = true;
 			if (ImGui.checkbox("Show key overlays", showHotkeys))
+				dirty = true;
+			if (ImGui.checkbox("Show remaining charges", showCharges))
 				dirty = true;
 			if (showHotkeys.get())
 				ImGui.textWrapped("Type a Key next to each slot (e.g. 1, Q, F) - drawn as a high-contrast chip on the icon.");
@@ -787,6 +790,7 @@ class GeauxStyle {
 			showCdText: showCdText.get(),
 			showPinwheel: showPinwheel.get(),
 			showHotkeys: showHotkeys.get(),
+			showCharges: showCharges.get(),
 			dimOnCd: dimOnCd.get(),
 			cdDisplay: cdDisplay.get(),
 			dimOnNoResource: dimOnNoResource.get(),
@@ -818,6 +822,7 @@ class GeauxStyle {
 		setBool(showCdText, data.showCdText);
 		setBool(showPinwheel, data.showPinwheel);
 		setBool(showHotkeys, data.showHotkeys);
+		setBool(showCharges, data.showCharges);
 		setBool(dimOnCd, data.dimOnCd);
 		setBool(dimOnNoResource, data.dimOnNoResource);
 		if (data.cdDisplay != null) {
