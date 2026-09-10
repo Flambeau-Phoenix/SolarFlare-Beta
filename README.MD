@@ -3,7 +3,7 @@
 
 # SolarFlare — v1.2 Beta - Current Changelog -
 
-### SolarFlare - v1.2b - Current Changelog ### 
+### SolarFlare - v1.2b - Changelog ### 
 
 ## Added
 
