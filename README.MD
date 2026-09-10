@@ -1,4 +1,6 @@
-![Aura instant cast proc](https://i.postimg.cc/PqDn2TkN/Farever-3b-GZn-Ith-GG-ezgif-com-video-to-gif-converter.gif)
+<p align="center">
+  <img src="https://i.postimg.cc/PqDn2TkN/Farever-3b-GZn-Ith-GG-ezgif-com-video-to-gif-converter.gif" alt="Aura instant cast proc" width="750">
+</p>
 
 ![Minions in Combat Log](https://i.postimg.cc/Gp2y6gpY/Minion-Crit-and-Kill.png)
 
