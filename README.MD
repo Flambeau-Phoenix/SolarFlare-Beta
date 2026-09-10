@@ -1,6 +1,5 @@
-<p align="center">
-  <img src="https://i.postimg.cc/PqDn2TkN/Farever-3b-GZn-Ith-GG-ezgif-com-video-to-gif-converter.gif" alt="Aura instant cast proc" width="750">
-</p>
+
+https://raw.githubusercontent.com/Flambeau-Phoenix/SolarFlare-Beta-v1/master/Aura_Proc.mp4
 
 ![Minions in Combat Log](https://i.postimg.cc/Gp2y6gpY/Minion-Crit-and-Kill.png)
 
