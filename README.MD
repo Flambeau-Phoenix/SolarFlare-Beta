@@ -1,8 +1,38 @@
-[![SolarFlare v1.1b Update](https://i.postimg.cc/SN5fS2TQ/image.png)](https://www.youtube.com/watch?v=KIcw0sf8AKA)
+![Aura Instant Cast Proc](https://i.postimg.cc/Kjnktd09/Farever-3b-GZn-Ith-GG-ezgif-com-video-to-gif-converter-(1).gif)
+![Minions in Combat Log](https://i.postimg.cc/Gp2y6gpY/Minion-Crit-and-Kill.png)
+
+# SolarFlare — v1.2 Beta - Current Changelog -
+
+### SolarFlare - v1.2b - Current Changelog ### 
+
+## Added
+
+* **Aura Templates & Signals:** Added a dedicated **Status on me** aura template and expanded the aura catalog (skills, statuses, fxset) for improved search and ranking.
+* **Shared Overlay Renderers:** Introduced `ChaincastRenderer` and unified the `ConduitOverlay.drawSlotRow` path to ensure builder previews identically mirror live HUD elements.
+* **Skill Charge HUD Elements:** Added support for Geaux skill charges on bar snaps, featuring an optional charge digit and lit/hide rules to display remaining ammo during cooldown regen.
+* **Skill Hygiene:** Added automated skill ID coercion and JSON sanitization (`coerceSkillId`) across settings load, save, and rotation edits.
+
+## Changed
+
+* **Aura Builder UX:** Reorganized the signal catalog into dedicated groups (e.g., explicit "on me" status labels, isolated Instant Cast group), added clearer subject picker tooltips, and removed `skill.specialReady` from the picker (legacy configurations remain supported).
+* **Aura Lifecycle Observation:** Updated local hero status tracking to leverage lifecycle hooks (`init`, stacks, duration, remove, net mark) with dirty-wake sampling; `skill.instantReady` now queries `shouldPlayInstantly`, pre-warms only `*_Proc` IDs, and falls back to `getStatusCount(skillId_Proc)`.
+* **Resource Tracker Previews:** Chaincast previews now share the live badge, icon rail, and stack visibility settings (`N/4` or `READY`). Conduit previews reliably respect configured pip shapes with inset skill icons rather than generic dark diamond placeholders.
+* **Debug Tool Controls:** Decoupled panel visibility from capture state in Payload Probe and Resolution Ledger. Recording is strictly manual, session-only, and gated by `armed()` to prevent uncontrolled JSONL growth.
+
+## Fixed
+
+* **Chaincast Label Formatting:** Resolved an issue where skill labels displayed raw byte strings (e.g., `(bytes : ???, length : N)`) across the next-cast list, Add Skill menu, spend picker, and live hints.
+* **Conduit Lighting:** Fixed an issue preventing equipped Sparkmaster conduit slots from rendering at full brightness based on equipped counts or active Power stacks.
 
 ---
 
-# SolarFlare — v1.1 Beta - Current Changelog -
+## User Configuration Notes
+
+* **Pyroclasm Setup:** For free-cast windows, configure **Instant Cast** with subject `Staff_Craft_S1`, or **Status** targeting `Staff_Craft_S1_Proc`.
+* **Buff/Debuff Tracking:** Use **Statuses → Buff/debuff on me** (`status.present`) paired with active status IDs for encounters (e.g., bombs, elite affixes).
+* **Logging:** Restoring or opening the Resolution Ledger / Payload Probe panels no longer records automatically. Click **Start recording** when capturing session data.
+
+---
 
 ### v1.1b Changelog ###
 
