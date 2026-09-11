@@ -93,6 +93,9 @@ class GeauxCache {
 	/** Vanilla action-bar Skill / SkillButton pinned by id (layout / equip). Observe polls these pointers only. */
 	static var barSkillById:Map<String, Dynamic> = new Map();
 	static var barBtnById:Map<String, Dynamic> = new Map();
+	/** Cached HUD bar roots after first successful resolve — skip full HUD crawl on later layouts. */
+	static var cachedBarRoots:Array<Dynamic> = null;
+	static var iconCandidatesCache:Map<String, Array<String>> = new Map();
 	static var cdMaxFieldWin:String = "";
 	static var cdPoll = new GeauxCdPoll();
 
@@ -224,6 +227,11 @@ class GeauxCache {
 		solarflare.ObserveDemand.markGeauxDirty();
 	}
 
+	/** Drop cached HUD roots (zone unload / hero change). Next layout rediscovers. */
+	public static function invalidateBarRoots():Void {
+		cachedBarRoots = null;
+	}
+
 	public static function sample(heroDyn:Dynamic, visibleCount:Int, overrides:Array<String> = null):Void {
 		if (visibleCount < 0)
 			visibleCount = 0;
@@ -238,9 +246,12 @@ class GeauxCache {
 			bookLabels = [];
 			bookGroups = [];
 			liveById = new Map();
+			barSkillById = new Map();
+			barBtnById = new Map();
 			costsById = new Map();
 			costsKnown = new Map();
 			costSpecsById = new Map();
+			cachedBarRoots = null;
 			layoutDirty = true;
 			layoutHero = null;
 			layoutCount = -1;
@@ -257,6 +268,8 @@ class GeauxCache {
 			heroChanged = (cast heroDyn : Dynamic) != (cast layoutHero : Dynamic)
 		catch (_:Dynamic)
 			heroChanged = true;
+		if (heroChanged)
+			cachedBarRoots = null;
 		var now = nowStamp();
 		// Layout only on dirty / identity / slot-count change; rare time fallback for missed dirty edges.
 		if (layoutDirty || heroChanged || layoutCount != visibleCount || okey != layoutOverrideKey
@@ -308,6 +321,8 @@ class GeauxCache {
 	/** HUD walk + slot identity. Throttled. Not for draw(). */
 	static function refreshLayout(heroDyn:Dynamic, visibleCount:Int, overrides:Array<String>):Void {
 		liveById = new Map();
+		barSkillById = new Map();
+		barBtnById = new Map();
 		costsById = new Map();
 		costsKnown = new Map();
 		costSpecsById = new Map();
@@ -594,14 +609,20 @@ class GeauxCache {
 		hudWalkNodes = 0;
 		hudHero = hero;
 		try {
-			var hud = resolveHud();
-			var bottom = plainField(hud, "bottomBar");
-			walkActionBarAll(plainField(bottom, "skillBar"), 0);
-			walkActionBarAll(plainField(bottom, "heroBar"), 0);
-			walkActionBarAll(plainField(bottom, "heroBarPad"), 0);
-			walkActionBarAll(bottom, 0);
-			walkActionBarAll(plainField(hud, "widgets"), 0);
-			walkActionBarAll(plainField(hud, "skillBar"), 0);
+			ensureBarRoots();
+			if (cachedBarRoots != null) {
+				for (root in cachedBarRoots)
+					walkActionBarAll(root, 0);
+			}
+			// Dead HUD after zone reload — one full rediscover.
+			if (hudWalkNodes == 0) {
+				cachedBarRoots = null;
+				ensureBarRoots();
+				if (cachedBarRoots != null) {
+					for (root in cachedBarRoots)
+						walkActionBarAll(root, 0);
+				}
+			}
 		} catch (_:Dynamic) {}
 		hudHero = null;
 
@@ -996,6 +1017,37 @@ class GeauxCache {
 			} catch (_:Dynamic) {}
 		}
 		return hud;
+	}
+
+	/** Resolve bottomBar / skillBar roots once; HUD tree is static after boot. */
+	static function ensureBarRoots():Void {
+		if (cachedBarRoots != null)
+			return;
+		var roots:Array<Dynamic> = [];
+		try {
+			var hud = resolveHud();
+			if (hud == null)
+				return;
+			var bottom = plainField(hud, "bottomBar");
+			pushBarRoot(roots, plainField(bottom, "skillBar"));
+			pushBarRoot(roots, plainField(bottom, "heroBar"));
+			pushBarRoot(roots, plainField(bottom, "heroBarPad"));
+			pushBarRoot(roots, bottom);
+			pushBarRoot(roots, plainField(hud, "widgets"));
+			pushBarRoot(roots, plainField(hud, "skillBar"));
+		} catch (_:Dynamic) {}
+		if (roots.length > 0)
+			cachedBarRoots = roots;
+	}
+
+	static function pushBarRoot(roots:Array<Dynamic>, node:Dynamic):Void {
+		if (node == null)
+			return;
+		for (have in roots) {
+			if (have == node)
+				return;
+		}
+		roots.push(node);
 	}
 
 	static function walkActionBarAll(node:Dynamic, depth:Int):Void {
@@ -2097,6 +2149,13 @@ class GeauxCache {
 
 	/** Candidate PNG stems for a skill (script id, kind, HASH, aliases). Script-style first. */
 	public static function iconIdCandidates(id:String, skill:Dynamic = null):Array<String> {
+		if (id == null || id.length == 0)
+			return [];
+		if (skill == null) {
+			var cached = iconCandidatesCache.get(id);
+			if (cached != null)
+				return cached;
+		}
 		var raw:Array<String> = [];
 		addAlias(raw, preferScriptId(id, skill));
 		addAlias(raw, id);
@@ -2133,6 +2192,8 @@ class GeauxCache {
 		}
 		for (c in raw)
 			addAlias(out, c);
+		if (skill == null)
+			iconCandidatesCache.set(id, out);
 		return out;
 	}
 

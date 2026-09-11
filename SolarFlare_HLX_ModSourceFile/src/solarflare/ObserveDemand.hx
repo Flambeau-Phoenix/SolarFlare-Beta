@@ -43,6 +43,12 @@ class ObserveDemand {
 	public static var targetPtrDirty:Bool = true;
 	/** Local Status lifecycle / net status sync — StatusObserveHooks. */
 	public static var auraStatusDirty:Bool = true;
+	/** Rebuild statusIds / instant/special/cast subject lists when aura config mutates. */
+	public static var statusDemandDirty:Bool = true;
+	static var rawNeedInstant:Bool = false;
+	static var rawNeedSpecial:Bool = false;
+	static var rawNeedEnemyCast:Bool = false;
+	static var rawNeedTarget:Bool = false;
 
 	static var lastOverlayReconcile:Float = 0;
 	static var lastIdentityReconcile:Float = 0;
@@ -79,26 +85,41 @@ class ObserveDemand {
 		geaux = cfg.geaux != null && cfg.geaux.enabled.get();
 		geauxBuilder = cfg.geauxBuilder != null && cfg.geauxBuilder.open.get();
 		auras = cfg.auras != null && cfg.auras.enabled.get() && cfg.auras.auras != null && cfg.auras.auras.length > 0;
-		statusIds = [];
-		if (cfg.auras != null) auraRulesNeedStatus(cfg);
-		aurasNeedInstant = auras && auraRulesNeedInstant(cfg);
-		aurasNeedSpecial = auras && auraRulesNeedSpecial(cfg);
-		aurasNeedEnemyCast = auras && auraRulesNeedEnemyCast(cfg);
-		aurasNeedTarget = auras && auraRulesNeedTarget(cfg);
-		// Instant-ready scripts gate on owner *_Proc only (not bare skill / *_Status).
-		if (aurasNeedInstant) {
-			for (id in instantSkillIds)
-				pushStatusId(id + "_Proc");
-		}
 		auraBuilderOpen = cfg.auraBuilder != null && cfg.auraBuilder.open.get();
-		aurasNeedStatus = statusIds.length > 0 || auraBuilderOpen;
-		if (auraBuilderOpen) {
-			aurasNeedEnemyCast = true;
-			aurasNeedTarget = true;
+		if (statusDemandDirty) {
+			statusDemandDirty = false;
+			while (statusIds.length > 0)
+				statusIds.pop();
+			while (instantSkillIds.length > 0)
+				instantSkillIds.pop();
+			while (specialSkillIds.length > 0)
+				specialSkillIds.pop();
+			while (castSkillIds.length > 0)
+				castSkillIds.pop();
+			if (cfg.auras != null)
+				auraRulesNeedStatus(cfg);
+			rawNeedInstant = auraRulesNeedInstant(cfg);
+			rawNeedSpecial = auraRulesNeedSpecial(cfg);
+			rawNeedEnemyCast = auraRulesNeedEnemyCast(cfg);
+			rawNeedTarget = auraRulesNeedTarget(cfg);
+			// Instant-ready scripts gate on owner *_Proc only (not bare skill / *_Status).
+			if (rawNeedInstant) {
+				for (id in instantSkillIds)
+					pushStatusId(id + "_Proc");
+			}
 		}
+		aurasNeedInstant = auras && rawNeedInstant;
+		aurasNeedSpecial = auras && rawNeedSpecial;
+		aurasNeedEnemyCast = (auras && rawNeedEnemyCast) || auraBuilderOpen;
+		aurasNeedTarget = (auras && rawNeedTarget) || auraBuilderOpen;
+		aurasNeedStatus = statusIds.length > 0 || auraBuilderOpen;
 		getRifty = cfg.getRifty != null && !cfg.getRifty.hidden.get();
 		var saberRift = cfg.lightsaber != null && !cfg.lightsaber.hidden.get() && cfg.lightsaber.showRiftMeter.get();
 		riftFlag = getRifty || combatLog || saberRift;
+	}
+
+	public static function markStatusDemandDirty():Void {
+		statusDemandDirty = true;
 	}
 
 	static function auraRulesNeedStatus(cfg:ConfigPanel):Bool {
@@ -139,10 +160,13 @@ class ObserveDemand {
 	}
 
 	static function looksLikeStatusId(id:String):Bool {
-		var low = id.toLowerCase();
-		return StringTools.endsWith(low, "_status") || StringTools.endsWith(low, "_proc")
-			|| StringTools.endsWith(low, "status") || low.indexOf("_status_") >= 0
-			|| low.indexOf("status_") >= 0 || low.indexOf("_proc_") >= 0;
+		// Case-stable engine suffixes — no toLowerCase alloc.
+		return StringTools.endsWith(id, "_Status") || StringTools.endsWith(id, "_status")
+			|| StringTools.endsWith(id, "_Proc") || StringTools.endsWith(id, "_proc")
+			|| StringTools.endsWith(id, "Status") || StringTools.endsWith(id, "status")
+			|| id.indexOf("_Status_") >= 0 || id.indexOf("_status_") >= 0
+			|| id.indexOf("Status_") >= 0 || id.indexOf("status_") >= 0
+			|| id.indexOf("_Proc_") >= 0 || id.indexOf("_proc_") >= 0;
 	}
 
 	static function auraRulesNeedInstant(cfg:ConfigPanel):Bool {

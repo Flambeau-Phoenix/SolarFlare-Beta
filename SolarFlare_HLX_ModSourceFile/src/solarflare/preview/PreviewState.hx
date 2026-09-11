@@ -23,6 +23,13 @@ class PreviewState {
 	public var hpMax:Float = 1;
 	public var hpValid:Bool = false;
 	public var hpShield:Float = 0;
+	var hpOverlayCache:String = "";
+	var hpOverlayCur:Int = -1;
+	var hpOverlayMax:Int = -1;
+	var hpOverlayShield:Int = -1;
+	var rageLabelCache:String = "";
+	var rageLabelCur:Int = -1;
+	var rageLabelMax:Int = -1;
 
 	// Rage ----------------------------------------------------------------
 	public var rage:Float = 0;
@@ -334,11 +341,19 @@ class PreviewState {
 	public function hpOverlay():String {
 		if (!hpValid)
 			return "HP --";
-		var base = Std.string(Std.int(hpCurrent)) + " / " + Std.string(Std.int(hpMax));
+		var c = Std.int(hpCurrent);
+		var m = Std.int(hpMax);
 		var s = Std.int(hpShield);
+		if (c == hpOverlayCur && m == hpOverlayMax && s == hpOverlayShield && hpOverlayCache.length > 0)
+			return hpOverlayCache;
+		hpOverlayCur = c;
+		hpOverlayMax = m;
+		hpOverlayShield = s;
 		if (s > 0)
-			base += " (+" + Std.string(s) + ")";
-		return base;
+			hpOverlayCache = c + " / " + m + " (+" + s + ")";
+		else
+			hpOverlayCache = c + " / " + m;
+		return hpOverlayCache;
 	}
 
 	public function rageRatio():Float {
@@ -348,7 +363,14 @@ class PreviewState {
 	public function rageLabel():String {
 		if (!rageValid)
 			return "Rage";
-		return Std.string(Std.int(rage)) + " / " + Std.string(Std.int(rageMax));
+		var c = Std.int(rage);
+		var m = Std.int(rageMax);
+		if (c == rageLabelCur && m == rageLabelMax && rageLabelCache.length > 0)
+			return rageLabelCache;
+		rageLabelCur = c;
+		rageLabelMax = m;
+		rageLabelCache = c + " / " + m;
+		return rageLabelCache;
 	}
 
 	public function resourceValid():Bool {

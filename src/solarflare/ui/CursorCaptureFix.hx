@@ -4,8 +4,6 @@ import imgui.ImGui;
 import imgui.ImGui.ImGuiIO;
 import imgui.Enums.ImGuiConfigFlags;
 import imgui.Enums.ImGuiWindowFlags;
-import hlx.runtime.HlxPrefixControl;
-import hlx.runtime.HlxPrefixResult;
 
 /**
  * Look-lock input gating while Farever retains native-cursor ownership.
@@ -175,36 +173,58 @@ class CursorCaptureFix {
 		return untyped io;
 	}
 
-	/** Keep Farever input/cursor ownership behind any visible interactive mod tool. */
+	/** Observation prefix — always Continue. Capture uses WantCapture / NoInputs / Heaps cancel. */
 	@:hlx.prefix(client.UnitController.isInputBlocked)
-	static function beforeIsInputBlocked(instance:client.UnitController):HlxPrefixResult<Bool> {
-		return interactiveActive ? SkipWith(true) : Continue;
+	static function beforeIsInputBlocked(instance:client.UnitController):hlx.runtime.HlxPrefixControl {
+		try {
+			if (instance == null)
+				return hlx.runtime.HlxPrefixControl.Continue;
+		} catch (_:Dynamic) {}
+		return hlx.runtime.HlxPrefixControl.Continue;
 	}
 
-	/** Prevent game 2D UI below ImGui from receiving clicks, releases, or wheel input. */
 	@:hlx.prefix(h2d.Scene.handleEvent)
-	static function beforeSceneHandleEvent(instance:h2d.Scene, event:hxd.Event, prev:Dynamic):HlxPrefixResult<Dynamic> {
-		return interactiveActive ? SkipWith(null) : Continue;
+	static function beforeSceneHandleEvent(instance:h2d.Scene, event:hxd.Event, prev:Dynamic):hlx.runtime.HlxPrefixControl {
+		try {
+			if (instance == null || event == null)
+				return hlx.runtime.HlxPrefixControl.Continue;
+		} catch (_:Dynamic) {}
+		return hlx.runtime.HlxPrefixControl.Continue;
 	}
 
 	@:hlx.prefix(client.BaseCamera.onEvent)
-	static function beforeBaseCameraOnEvent(instance:client.BaseCamera, event:hxd.Event):HlxPrefixControl {
-		return interactiveActive ? Skip : Continue;
+	static function beforeBaseCameraOnEvent(instance:client.BaseCamera, event:hxd.Event):hlx.runtime.HlxPrefixControl {
+		try {
+			if (instance == null || event == null)
+				return hlx.runtime.HlxPrefixControl.Continue;
+		} catch (_:Dynamic) {}
+		return hlx.runtime.HlxPrefixControl.Continue;
 	}
 
-	/** An open mod editor owns free-cursor mode independently of game windows. */
 	@:hlx.prefix(ui.Hud.shouldFreeCursor)
-	static function beforeHudShouldFreeCursor(instance:ui.Hud):HlxPrefixResult<Bool> {
-		return interactiveActive ? SkipWith(true) : Continue;
+	static function beforeHudShouldFreeCursor(instance:ui.Hud):hlx.runtime.HlxPrefixControl {
+		try {
+			if (instance == null)
+				return hlx.runtime.HlxPrefixControl.Continue;
+		} catch (_:Dynamic) {}
+		return hlx.runtime.HlxPrefixControl.Continue;
 	}
 
 	@:hlx.prefix(lib.Input.allBlocked)
-	static function beforeInputAllBlocked():HlxPrefixResult<Bool> {
-		return interactiveActive ? SkipWith(true) : Continue;
+	static function beforeInputAllBlocked():hlx.runtime.HlxPrefixControl {
+		try {
+			if (!ENABLED)
+				return hlx.runtime.HlxPrefixControl.Continue;
+		} catch (_:Dynamic) {}
+		return hlx.runtime.HlxPrefixControl.Continue;
 	}
 
 	@:hlx.prefix(ui.BaseUI.isBlockingAllInputs)
-	static function beforeUIBlockingAllInputs(instance:ui.BaseUI):HlxPrefixResult<Bool> {
-		return interactiveActive ? SkipWith(true) : Continue;
+	static function beforeUIBlockingAllInputs(instance:ui.BaseUI):hlx.runtime.HlxPrefixControl {
+		try {
+			if (instance == null)
+				return hlx.runtime.HlxPrefixControl.Continue;
+		} catch (_:Dynamic) {}
+		return hlx.runtime.HlxPrefixControl.Continue;
 	}
 }

@@ -63,6 +63,9 @@ class SettingsStore {
 
 	public static function markDirty():Void {
 		dirty = true;
+		try
+			solarflare.ObserveDemand.markStatusDemandDirty()
+		catch (_:Dynamic) {}
 	}
 
 	public static function isDirty():Bool {
@@ -86,6 +89,9 @@ class SettingsStore {
 			apply(cfg, data);
 			FeatureProfiles.load(cfg, data);
 			applyUiState(cfg, Reflect.field(data, "uiState"));
+			try
+				solarflare.ObserveDemand.markStatusDemandDirty()
+			catch (_:Dynamic) {}
 		} catch (_:Dynamic) {}
 	}
 

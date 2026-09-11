@@ -15,6 +15,7 @@ class FieldWalkMacro {
 	static var seeds:Array<String> = [
 		"ent.Hero", "ent.Foe", "ent.Unit", "ent.GameObject", "ent.Entity",
 		"ent.HeroAttributes", "ent.UnitAttributes",
+		"ent.hero.PriestComponent", "ent.hero.MageComponent",
 		"st.skill.Skill", "st.skill.BaseSkill", "st.skill.Status", "st.skill.HitData",
 		"st.skill.ScriptHitData", "st.skill.DamageResult", "st.skill.BaseSkillAccess",
 		"st.Player", "st.GameLayer", "st.State", "st.BaseState",
@@ -162,7 +163,7 @@ class FieldWalkMacro {
 	}
 
 	static function parentPath(t:Type):String {
-		t = Context.follow(t, false);
+		t = Context.follow(t, true);
 		return switch (t) {
 			case TInst(c, _):
 				var ct = c.get();
@@ -174,13 +175,17 @@ class FieldWalkMacro {
 				if (at.type == null)
 					return "";
 				typePath(at.type);
+			case TType(td, _):
+				parentPath(td.get().type);
+			case TLazy(f):
+				parentPath(f());
 			default:
 				"";
 		};
 	}
 
 	static function typePath(t:Type):String {
-		return switch (Context.follow(t, false)) {
+		return switch (Context.follow(t, true)) {
 			case TInst(c, _): classPath(c.get());
 			case TAbstract(a, _): absPath(a.get());
 			case TEnum(e, _):

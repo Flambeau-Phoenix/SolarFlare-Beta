@@ -7,6 +7,7 @@
 class EngineSkillId {
 	static var ready:Bool = false;
 	static var hashToScript:Map<String, String> = new Map();
+	static var displayCache:Map<String, String> = new Map();
 
 	public static function keep():Void {
 		ensure();
@@ -14,16 +15,23 @@ class EngineSkillId {
 
 	/** Full engine id, or "" if not confirmed. */
 	public static function display(id:String):String {
+		if (id == null || id.length == 0)
+			return "";
+		var cached = displayCache.get(id);
+		if (cached != null)
+			return cached;
 		ensure();
 		var s = clean(id);
-		if (s.length == 0)
-			return "";
-		var mapped = hashToScript.get(s);
-		if (mapped != null && mapped.length > 0)
-			return mapped;
-		if (isScriptStyle(s))
-			return s;
-		return "";
+		var result = "";
+		if (s.length > 0) {
+			var mapped = hashToScript.get(s);
+			if (mapped != null && mapped.length > 0)
+				result = mapped;
+			else if (isScriptStyle(s))
+				result = s;
+		}
+		displayCache.set(id, result);
+		return result;
 	}
 
 	public static function ofSkill(skill:Dynamic):String {
@@ -129,10 +137,10 @@ class EngineSkillId {
 			return false;
 		if (s.indexOf("{") >= 0 || s.indexOf("}") >= 0)
 			return false;
-		var low = s.toLowerCase();
-		if (low.indexOf("bytes") >= 0)
+		// Avoid toLowerCase alloc — dump markers appear in known casings.
+		if (s.indexOf("bytes") >= 0 || s.indexOf("Bytes") >= 0)
 			return false;
-		if (low.indexOf("haxe.io") >= 0)
+		if (s.indexOf("haxe.io") >= 0 || s.indexOf("haxe.Io") >= 0)
 			return false;
 		return true;
 	}
@@ -140,23 +148,12 @@ class EngineSkillId {
 	static function field(obj:Dynamic, name:String):Dynamic {
 		if (obj == null || name == null)
 			return null;
-		try
-			return Reflect.field(obj, "_" + name)
-		catch (_:Dynamic) {}
-		try
-			return Reflect.field(obj, name)
-		catch (_:Dynamic) {}
-		return null;
+		return FieldWalk.extractObject(obj, name);
 	}
 
 	static function stringField(obj:Dynamic, name:String):String {
-		var v = field(obj, name);
-		if (v == null)
+		if (obj == null || name == null)
 			return "";
-		try {
-			if (Std.isOfType(v, String))
-				return cast v;
-		} catch (_:Dynamic) {}
-		return "";
+		return FieldWalk.extractString(obj, name, "");
 	}
 }

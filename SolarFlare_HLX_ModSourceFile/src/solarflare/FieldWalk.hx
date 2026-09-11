@@ -18,6 +18,8 @@ class FieldWalk {
 	static var namedWins:Map<String, FieldWin> = new Map();
 	static var memCache:Map<String, ResolvedMember> = new Map();
 	static var memMiss:Map<String, Bool> = new Map();
+	/** Live type#method with no callable anywhere on the parent chain. */
+	static var chainMiss:Map<String, Bool> = new Map();
 	/** type#name pairs with no backing `_name` / `name` field — skip repeat resolveField work. */
 	static var fieldMiss:Map<String, Bool> = new Map();
 	static var mapGetMems:Array<ResolvedMember> = null;
@@ -226,12 +228,14 @@ class FieldWalk {
 			var win = namedWins.get(key);
 			if (win != null) {
 				var cached = applyWin(obj, name, win);
-				if (usable(cached)) {
+				// Step already validated once — null check only (no Reflect.isFunction every frame).
+				if (cached != null) {
 					hit.step = win.step;
 					hit.value = cached;
 					hit.usable = true;
 					return hit;
 				}
+				namedWins.remove(key);
 			}
 		}
 		var threw = false;
@@ -362,6 +366,9 @@ class FieldWalk {
 		if (obj == null || methodName == null || methodName.length == 0)
 			return null;
 		var t = liveTypeName(obj);
+		var chainKey = t + "#" + methodName;
+		if (chainMiss.exists(chainKey))
+			return null;
 		var guard = 0;
 		while (t != null && t.length > 0 && guard < 12) {
 			var mem = memberOf(t, methodName);
@@ -375,6 +382,7 @@ class FieldWalk {
 			t = FieldWalkGraph.parentOf(t);
 			guard++;
 		}
+		chainMiss.set(chainKey, true);
 		return null;
 	}
 
@@ -437,8 +445,14 @@ class FieldWalk {
 		if (v == null)
 			return false;
 		try {
-			if (Reflect.isFunction(v))
-				return false;
+			switch (Type.typeof(v)) {
+				case TFunction:
+					return false;
+				case TNull:
+					return false;
+				default:
+					return true;
+			}
 		} catch (_:Dynamic) {}
 		return true;
 	}
@@ -454,12 +468,11 @@ class FieldWalk {
 	}
 }
 
-/** Cached FieldWalk winner for one live type + property. */
+/** Cached FieldWalk winner for one live type + property. Never stores Dynamic payloads. */
 class FieldWin {
 	public var step:String = "";
 	public var getter:String = "";
 	public var mem:ResolvedMember;
-	public var value:Dynamic = null;
 
 	public function new() {}
 }

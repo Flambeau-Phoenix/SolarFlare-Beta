@@ -53,6 +53,7 @@ class ConduitCache {
 	public static var powerStacks:Int = 0;
 	public static var powerLeft:Float = 0;
 	public static var slots:Array<ConduitSlotSnap> = [];
+	static var lookupKeys:Array<String> = [];
 
 	static var powerKey:String = "Mage_Conduit_Power";
 	static var powerHash:String = "";
@@ -73,7 +74,12 @@ class ConduitCache {
 		filledCount = 0;
 		powerStacks = 0;
 		powerLeft = 0;
-		slots = [];
+		ensureCacheSlots();
+		var i = 0;
+		while (i < slots.length) {
+			resetSlot(slots[i]);
+			i++;
+		}
 	}
 
 	public static function noteMage():Void {
@@ -82,9 +88,24 @@ class ConduitCache {
 			slotCount = DEFAULT_SLOTS;
 	}
 
+	static function ensureCacheSlots():Void {
+		if (slots == null)
+			slots = [];
+		while (slots.length < MAX_SLOTS)
+			slots.push(new ConduitSlotSnap());
+	}
+
+	static function resetSlot(snap:ConduitSlotSnap):Void {
+		if (snap == null)
+			return;
+		snap.id = "";
+		snap.filled = false;
+		snap.stacks = 0;
+		snap.power = false;
+	}
+
 	public static function setSlots(next:Array<ConduitSlotSnap>, nSlots:Int, filled:Int, power:Int, left:Float):Void {
-		if (next == null)
-			next = [];
+		ensureCacheSlots();
 		var n = nSlots;
 		if (n < 1)
 			n = DEFAULT_SLOTS;
@@ -98,7 +119,24 @@ class ConduitCache {
 		var f = filled;
 		if (f < 0)
 			f = 0;
-		slots = next;
+		var i = 0;
+		while (i < n) {
+			var dst = slots[i];
+			var src = (next != null && i < next.length) ? next[i] : null;
+			if (src == null)
+				resetSlot(dst);
+			else {
+				dst.id = src.id;
+				dst.filled = src.filled;
+				dst.stacks = src.stacks;
+				dst.power = src.power;
+			}
+			i++;
+		}
+		while (i < slots.length) {
+			resetSlot(slots[i]);
+			i++;
+		}
 		slotCount = n;
 		filledCount = f;
 		powerStacks = p;
@@ -131,12 +169,7 @@ class ConduitCache {
 
 	public static function lookupIds():Array<String> {
 		ensureHashes();
-		var out = [powerKey, projectileKey, sparkKey, lifeKey];
-		pushIfNew(out, powerHash);
-		pushIfNew(out, projectileHash);
-		pushIfNew(out, sparkHash);
-		pushIfNew(out, lifeHash);
-		return out;
+		return lookupKeys;
 	}
 
 	public static function isPowerKind(id:String):Bool {
@@ -146,7 +179,7 @@ class ConduitCache {
 		ensureHashes();
 		if (s == powerKey || (powerHash.length > 0 && s == powerHash))
 			return true;
-		return s.toLowerCase().indexOf("mage_conduit_power") >= 0;
+		return s.indexOf("Mage_Conduit_Power") >= 0 || s.indexOf("mage_conduit_power") >= 0;
 	}
 
 	public static function isConduitKind(id:String):Bool {
@@ -164,14 +197,14 @@ class ConduitCache {
 			return true;
 		if (lifeHash.length > 0 && s == lifeHash)
 			return true;
-		var low = s.toLowerCase();
-		if (low.indexOf("mage_conduit_") >= 0)
-			return true;
-		if (low.indexOf("mage_talent_conduit") >= 0)
-			return true;
-		if (low.indexOf("conduit_shard") >= 0 || low.indexOf("conduitshard") >= 0)
-			return true;
-		return false;
+		return s.indexOf("Mage_Conduit_") >= 0
+			|| s.indexOf("mage_conduit_") >= 0
+			|| s.indexOf("Mage_Talent_Conduit") >= 0
+			|| s.indexOf("mage_talent_conduit") >= 0
+			|| s.indexOf("conduit_shard") >= 0
+			|| s.indexOf("Conduit_Shard") >= 0
+			|| s.indexOf("conduitshard") >= 0
+			|| s.indexOf("ConduitShard") >= 0;
 	}
 
 	public static function canonical(id:String):String {
@@ -217,6 +250,11 @@ class ConduitCache {
 			if (h != null && h.length > 0)
 				lifeHash = h;
 		} catch (_:Dynamic) {}
+		lookupKeys = [powerKey, projectileKey, sparkKey, lifeKey];
+		pushIfNew(lookupKeys, powerHash);
+		pushIfNew(lookupKeys, projectileHash);
+		pushIfNew(lookupKeys, sparkHash);
+		pushIfNew(lookupKeys, lifeHash);
 	}
 }
 

@@ -38,7 +38,50 @@ class HealthCache {
 	public static var resourceGen:Int = 0;
 
 	public static function setLocalHero(hero:Dynamic):Void {
+		if (hero == null) {
+			clearLocalHero();
+			return;
+		}
+		if (localHero != null && (cast localHero : Dynamic) != (cast hero : Dynamic))
+			clearLocalHero();
 		localHero = hero;
+	}
+
+	/** Drop pinned hero on zone unload / null Player.hero so HL can collect the prior stage. */
+	public static function clearLocalHero():Void {
+		localHero = null;
+		try
+			solarflare.geaux.GeauxCache.invalidateBarRoots()
+		catch (_:Dynamic) {}
+	}
+
+	/**
+	 * Observe-loop GC gate. Null / destroyed / identity change drops the pin so the
+	 * nursery can collect the prior stage's entity graph.
+	 */
+	public static function releaseStaleLocalHero(app:GameApp):Void {
+		var pinned = localHero;
+		if (pinned == null)
+			return;
+		var live:Dynamic = null;
+		try {
+			if (app != null)
+				live = app.hero;
+		} catch (_:Dynamic) {
+			clearLocalHero();
+			return;
+		}
+		if (live == null || (cast live : Dynamic) != (cast pinned : Dynamic)) {
+			clearLocalHero();
+			return;
+		}
+		try {
+			var hero:ent.Hero = cast pinned;
+			if (hero == null)
+				clearLocalHero();
+		} catch (_:Dynamic) {
+			clearLocalHero();
+		}
 	}
 
 	public static function setIdentity(name:String, region:String, uid:String = null):Void {
@@ -53,15 +96,15 @@ class HealthCache {
 	public static function isLocalHero(unit:Dynamic):Bool {
 		if (unit == null)
 			return false;
-		// condensed_signatures: ent.Hero.isMyHero() — leaf identity, not pointer compare alone
+		if (localHero != null && (cast unit : Dynamic) == (cast localHero : Dynamic))
+			return true;
+		// condensed_signatures: ent.Hero.isMyHero() — leaf identity when localHero unset / remapped
 		try {
 			var hero:ent.Hero = cast unit;
 			if (hero.isMyHero())
 				return true;
 		} catch (_:Dynamic) {}
-		if (localHero == null)
-			return false;
-		return (cast unit : Dynamic) == (cast localHero : Dynamic);
+		return false;
 	}
 
 	public static function set(currentHp:Float, maxHp:Float):Void {
@@ -274,13 +317,16 @@ class PrayerCache {
 		ensureHashes();
 		if (id == lifeKey || id == shieldKey || id == smiteKey)
 			return true;
-		var s = id.toLowerCase();
-		return s.indexOf("prayer_life") >= 0
-			|| s.indexOf("prayer_shield") >= 0
-			|| s.indexOf("prayer_smite") >= 0
-			|| s == "priest_prayer_life"
-			|| s == "priest_prayer_shield"
-			|| s == "priest_prayer_smite";
+		// Engine ids are fixed casing; avoid toLowerCase alloc on hot combat/UI path.
+		return id.indexOf("prayer_life") >= 0
+			|| id.indexOf("Prayer_Life") >= 0
+			|| id.indexOf("prayer_shield") >= 0
+			|| id.indexOf("Prayer_Shield") >= 0
+			|| id.indexOf("prayer_smite") >= 0
+			|| id.indexOf("Prayer_Smite") >= 0
+			|| id == "priest_prayer_life"
+			|| id == "priest_prayer_shield"
+			|| id == "priest_prayer_smite";
 	}
 
 	public static function prayerKind(id:String):String {
@@ -293,12 +339,11 @@ class PrayerCache {
 			return "shield";
 		if (id == smiteKey)
 			return "smite";
-		var s = id.toLowerCase();
-		if (s.indexOf("prayer_life") >= 0 || s == "priest_prayer_life")
+		if (id.indexOf("prayer_life") >= 0 || id.indexOf("Prayer_Life") >= 0 || id == "priest_prayer_life")
 			return "life";
-		if (s.indexOf("prayer_shield") >= 0 || s == "priest_prayer_shield")
+		if (id.indexOf("prayer_shield") >= 0 || id.indexOf("Prayer_Shield") >= 0 || id == "priest_prayer_shield")
 			return "shield";
-		if (s.indexOf("prayer_smite") >= 0 || s == "priest_prayer_smite")
+		if (id.indexOf("prayer_smite") >= 0 || id.indexOf("Prayer_Smite") >= 0 || id == "priest_prayer_smite")
 			return "smite";
 		return "";
 	}
@@ -378,14 +423,15 @@ class PrayerCache {
 			spendAll();
 			return;
 		}
-		var s = id.toLowerCase();
-		if (id == lifeKey || s.indexOf("prayer_life") >= 0 || s == "life" || s == "heal") {
+		var kind = prayerKind(id);
+		if (kind == "life" || id == "life" || id == "heal" || id == "Life" || id == "Heal") {
 			active = true;
 			lifeReady = true;
-		} else if (id == shieldKey || s.indexOf("prayer_shield") >= 0 || s == "shield" || s.indexOf("virtue") >= 0) {
+		} else if (kind == "shield" || id == "shield" || id == "Shield"
+			|| id.indexOf("virtue") >= 0 || id.indexOf("Virtue") >= 0) {
 			active = true;
 			shieldReady = true;
-		} else if (id == smiteKey || s.indexOf("prayer_smite") >= 0 || s == "smite") {
+		} else if (kind == "smite" || id == "smite" || id == "Smite") {
 			active = true;
 			smiteReady = true;
 		}
@@ -398,15 +444,20 @@ class PrayerCache {
 	static function isJudgementKind(kind:String):Bool {
 		if (kind == null || kind.length == 0)
 			return false;
-		if (kind == judgmentKey)
+		if (kind == judgmentKey || kind == JUDGMENT_SCRIPT)
 			return true;
-		var s = kind.toLowerCase();
-		return s.indexOf("divineintervention") >= 0
-			|| s.indexOf("divine_intervention") >= 0
-			|| s.indexOf("sig_divine") >= 0
-			|| s.indexOf("priest_sig") >= 0
-			|| s.indexOf("judgement") >= 0
-			|| s.indexOf("judgment") >= 0;
+		return kind.indexOf("DivineIntervention") >= 0
+			|| kind.indexOf("divineintervention") >= 0
+			|| kind.indexOf("Divine_Intervention") >= 0
+			|| kind.indexOf("divine_intervention") >= 0
+			|| kind.indexOf("Sig_Divine") >= 0
+			|| kind.indexOf("sig_divine") >= 0
+			|| kind.indexOf("Priest_Sig") >= 0
+			|| kind.indexOf("priest_sig") >= 0
+			|| kind.indexOf("Judgement") >= 0
+			|| kind.indexOf("judgement") >= 0
+			|| kind.indexOf("Judgment") >= 0
+			|| kind.indexOf("judgment") >= 0;
 	}
 
 	static function skillKind(skill:Dynamic):String {

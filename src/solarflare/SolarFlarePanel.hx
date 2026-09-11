@@ -126,6 +126,10 @@ class SolarFlarePanel {
 		if (app == null)
 			return;
 
+		try
+			HealthCache.releaseStaleLocalHero(app)
+		catch (_:Dynamic) {}
+
 		CursorCaptureFix.apply(app);
 		if (prevCursorFree && !CursorCaptureFix.cursorFree) {
 			try
