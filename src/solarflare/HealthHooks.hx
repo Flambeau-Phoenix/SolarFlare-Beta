@@ -13,15 +13,47 @@ class HealthHooks {
 	/** Keep this class reachable under `-dce full` so the postfixes are retained. */
 	public static function keep():Void {}
 
+	/** Reused Sparkmaster slot snaps — no per-call Array / ConduitSlotSnap alloc. */
+	static var conduitScratch:Array<ConduitSlotSnap> = null;
+	static var conduitProcScratch:Array<ConduitProcSnap> = null;
+	static var conduitProcCount:Int = 0;
+	static var conduitSeenScratch:Array<String> = null;
+	static var conduitSeenCount:Int = 0;
+	static inline var MAX_CONDUIT_PROCS:Int = 16;
+
+	static function ensureConduitScratch():Void {
+		if (conduitScratch == null) {
+			conduitScratch = [];
+			var i = 0;
+			while (i < ConduitCache.MAX_SLOTS) {
+				conduitScratch.push(new ConduitSlotSnap());
+				i++;
+			}
+		}
+		if (conduitProcScratch == null) {
+			conduitProcScratch = [];
+			var j = 0;
+			while (j < MAX_CONDUIT_PROCS) {
+				conduitProcScratch.push(new ConduitProcSnap());
+				j++;
+			}
+		}
+		if (conduitSeenScratch == null)
+			conduitSeenScratch = [];
+	}
+
 	/**
-	 * Layer 1 per-present poll of HUD resource bars from identity-only `HealthCache.localHero`.
-	 * Overlay subsystems (prayers / combo / chaincast / conduit / identity) resample on `st.Player.update`.
+	 * Layer 1 light poll: mana/shield (no setter postfixes) from identity-only `localHero`.
+	 * HP / rage / spark are mutator-driven; releaseStale runs from the observe loop.
 	 */
 	public static function observeLocal():Void {
 		var heroDyn = HealthCache.localHero;
 		if (heroDyn == null)
 			return;
-		sampleResources(heroDyn, "HealthHooks.observeLocal", "", "localHero");
+		if (ObserveDemand.resourceBars || ObserveDemand.auras) {
+			sampleMana(heroDyn);
+			sampleShield(heroDyn);
+		}
 	}
 
 	@:hlx.postfix(st.Player.update)
@@ -420,17 +452,23 @@ class HealthHooks {
 		ledgerNum("health.spark", "fieldwalk", "HealthHooks.sampleSpark", "spark", s, "ent.HeroAttributes", "attr");
 	}
 
+	/**
+	 * Typed `Unit.getShield` is authority (ledger: positive absorb always typed across zones).
+	 * FieldWalk `shield` only on cast/call failure — never when getShield returns 0.
+	 */
 	static function sampleShield(heroDyn:Dynamic):Void {
 		var amount = 0.0;
 		var method = "typed";
 		var name = "getShield";
+		var typedOk = false;
 		try {
 			var hero:ent.Unit = cast heroDyn;
 			amount = hero.getShield();
+			typedOk = true;
 		} catch (_:Dynamic) {
 			amount = 0;
 		}
-		if (amount <= 0) {
+		if (!typedOk) {
 			amount = FieldWalk.extractNumber(heroDyn, "shield", 0);
 			method = "fieldwalk";
 			name = "shield";
@@ -993,12 +1031,22 @@ class HealthHooks {
 			ConduitCache.clear();
 			return;
 		}
+		ensureConduitScratch();
 		try {
 			var hero:ent.Hero = cast heroDyn;
 			var mage = hero.get_mage();
-			var snaps = new Array<ConduitSlotSnap>();
+			var snaps = conduitScratch;
 			var nSlots = ConduitCache.DEFAULT_SLOTS;
 			var filled = 0;
+			var i = 0;
+			while (i < ConduitCache.MAX_SLOTS) {
+				var snap = snaps[i];
+				snap.id = "";
+				snap.filled = false;
+				snap.stacks = 0;
+				snap.power = false;
+				i++;
+			}
 			if (mage != null) {
 				var cap = 0;
 				try
@@ -1008,14 +1056,14 @@ class HealthHooks {
 				if (cap < 1 || cap > ConduitCache.MAX_SLOTS)
 					cap = 0;
 				var lastFilled = -1;
-				var i = 0;
+				i = 0;
 				while (i < ConduitCache.MAX_SLOTS) {
 					var skill:Dynamic = null;
 					try
 						skill = mage.getConduitSlot(i)
 					catch (_:Dynamic)
 						skill = null;
-					var snap = new ConduitSlotSnap();
+					var snap = snaps[i];
 					if (skill != null) {
 						var id = skillIdOf(skill);
 						snap.id = ConduitCache.canonical(id);
@@ -1026,7 +1074,6 @@ class HealthHooks {
 						if (snap.filled)
 							lastFilled = i;
 					}
-					snaps.push(snap);
 					i++;
 				}
 				if (cap > 0)
@@ -1037,21 +1084,13 @@ class HealthHooks {
 					nSlots = ConduitCache.DEFAULT_SLOTS;
 				if (nSlots > ConduitCache.MAX_SLOTS)
 					nSlots = ConduitCache.MAX_SLOTS;
-				while (snaps.length > nSlots)
-					snaps.pop();
-			} else {
-				var i = 0;
-				while (i < nSlots) {
-					snaps.push(new ConduitSlotSnap());
-					i++;
-				}
 			}
 			var power = 0;
 			var left = 0.0;
-			var procs = collectConduitProcs(heroDyn, hero);
+			collectConduitProcs(heroDyn, hero);
 			var pi = 0;
-			while (pi < procs.length) {
-				var p = procs[pi];
+			while (pi < conduitProcCount) {
+				var p = conduitProcScratch[pi];
 				pi++;
 				if (p.power && p.stacks > power) {
 					power = p.stacks;
@@ -1059,29 +1098,24 @@ class HealthHooks {
 				}
 			}
 			var si = 0;
-			while (si < snaps.length) {
+			while (si < nSlots) {
 				var snap = snaps[si];
 				si++;
 				if (!snap.filled)
 					continue;
 				filled++;
-				var match = findProcForSlot(procs, snap.id);
+				var match = findProcForSlot(snap.id);
 				if (match != null)
 					snap.stacks = match.stacks;
 				else if (snap.power)
 					snap.stacks = power;
 			}
 			if (power > 0 && filled == 0) {
-				var extra = new ConduitSlotSnap();
+				var extra = snaps[0];
 				extra.id = ConduitCache.powerId();
 				extra.filled = true;
 				extra.power = true;
 				extra.stacks = power;
-				if (snaps.length < 1)
-					snaps.push(extra);
-				else {
-					snaps[0] = extra;
-				}
 				filled = 1;
 				if (nSlots < 1)
 					nSlots = 1;
@@ -1093,42 +1127,66 @@ class HealthHooks {
 		}
 	}
 
-	static function findProcForSlot(procs:Array<ConduitProcSnap>, slotId:String):ConduitProcSnap {
-		if (procs == null || slotId == null || slotId.length == 0)
+	static function findProcForSlot(slotId:String):ConduitProcSnap {
+		if (slotId == null || slotId.length == 0 || conduitProcCount < 1)
 			return null;
-		var want = ConduitCache.canonical(slotId).toLowerCase();
-		for (p in procs) {
-			var have = ConduitCache.canonical(p.id).toLowerCase();
-			if (have == want)
+		var want = ConduitCache.canonical(slotId);
+		var pi = 0;
+		while (pi < conduitProcCount) {
+			var p = conduitProcScratch[pi];
+			pi++;
+			var have = ConduitCache.canonical(p.id);
+			if (ConduitCache.idEq(have, want))
 				return p;
-			if (want.length > 4 && have.indexOf(want) >= 0)
+			if (want.length > 4 && ConduitCache.idContains(have, want))
 				return p;
-			if (have.length > 4 && want.indexOf(have) >= 0)
+			if (have.length > 4 && ConduitCache.idContains(want, have))
 				return p;
 		}
 		return null;
 	}
 
-	static function collectConduitProcs(heroDyn:Dynamic, hero:ent.Hero):Array<ConduitProcSnap> {
-		var out = new Array<ConduitProcSnap>();
-		var seen = new Map<String, Bool>();
-		ingestConduitList(heroDyn, "statuses", out, seen);
-		if (out.length < 1)
-			ingestConduitList(heroDyn, "statusList", out, seen);
+	static function collectConduitProcs(heroDyn:Dynamic, hero:ent.Hero):Void {
+		conduitProcCount = 0;
+		conduitSeenCount = 0;
+		ingestConduitList(heroDyn, "statuses");
+		if (conduitProcCount < 1)
+			ingestConduitList(heroDyn, "statusList");
 		if (hero != null) {
 			for (id in ConduitCache.lookupIds()) {
-				if (seen.exists(id) || seen.exists(ConduitCache.canonical(id)))
+				if (seenHas(id) || seenHas(ConduitCache.canonical(id)))
 					continue;
 				var st = findHeroStatus(hero, id);
 				if (st == null)
 					continue;
-				ingestConduitItem(st, out, seen);
+				ingestConduitItem(st);
 			}
 		}
-		return out;
 	}
 
-	static function ingestConduitList(owner:Dynamic, name:String, out:Array<ConduitProcSnap>, seen:Map<String, Bool>):Void {
+	static function seenHas(key:String):Bool {
+		if (key == null || key.length == 0)
+			return false;
+		var i = 0;
+		while (i < conduitSeenCount) {
+			if (conduitSeenScratch[i] == key)
+				return true;
+			i++;
+		}
+		return false;
+	}
+
+	static function seenAdd(key:String):Void {
+		if (key == null || key.length == 0 || seenHas(key))
+			return;
+		if (conduitSeenCount < conduitSeenScratch.length)
+			conduitSeenScratch[conduitSeenCount] = key;
+		else
+			conduitSeenScratch.push(key);
+		conduitSeenCount++;
+	}
+
+	static function ingestConduitList(owner:Dynamic, name:String):Void {
 		var arr = FieldWalk.extractObject(owner, name);
 		if (arr == null)
 			return;
@@ -1137,13 +1195,13 @@ class HealthHooks {
 			len = 64;
 		var i = 0;
 		while (i < len) {
-			ingestConduitItem(FieldWalk.arrayAt(arr, i), out, seen);
+			ingestConduitItem(FieldWalk.arrayAt(arr, i));
 			i++;
 		}
 	}
 
-	static function ingestConduitItem(item:Dynamic, out:Array<ConduitProcSnap>, seen:Map<String, Bool>):Void {
-		if (item == null)
+	static function ingestConduitItem(item:Dynamic):Void {
+		if (item == null || conduitProcCount >= MAX_CONDUIT_PROCS)
 			return;
 		var id = skillIdOf(item);
 		if (!ConduitCache.isConduitKind(id))
@@ -1151,11 +1209,11 @@ class HealthHooks {
 		var key = ConduitCache.canonical(id);
 		if (key.length == 0)
 			key = id;
-		if (seen.exists(key))
+		if (seenHas(key))
 			return;
-		seen.set(key, true);
-		seen.set(id, true);
-		var snap = new ConduitProcSnap();
+		seenAdd(key);
+		seenAdd(id);
+		var snap = conduitProcScratch[conduitProcCount];
 		snap.id = key;
 		snap.stacks = readStatusStacks(item);
 		if (snap.stacks < 1)
@@ -1163,7 +1221,7 @@ class HealthHooks {
 		var dur = solarflare.SkillRemain.read(item);
 		snap.left = dur.left;
 		snap.power = ConduitCache.isPowerKind(key);
-		out.push(snap);
+		conduitProcCount++;
 	}
 
 	static function readStatusStacks(item:Dynamic):Int {

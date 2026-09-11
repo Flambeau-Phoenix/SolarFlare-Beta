@@ -41,6 +41,65 @@ class HealthCache {
 		localHero = hero;
 	}
 
+	/**
+	 * Drop the localHero pin on stage/map transitions so HashLink can reclaim the prior
+	 * entity graph. Called every fast observe cadence — not menu-gated.
+	 */
+	public static function releaseStaleLocalHero(app:GameApp):Void {
+		if (localHero == null)
+			return;
+		var appHero:Dynamic = null;
+		if (app != null) {
+			try
+				appHero = untyped app.hero
+			catch (_:Dynamic)
+				appHero = null;
+			if (appHero == null) {
+				try
+					appHero = untyped app.me
+				catch (_:Dynamic)
+					appHero = null;
+			}
+		}
+		if (app == null || appHero == null) {
+			clearLocalHeroPin();
+			return;
+		}
+		if ((cast appHero : Dynamic) != (cast localHero : Dynamic)) {
+			clearLocalHeroPin();
+			return;
+		}
+		if (unitDestroyed(localHero))
+			clearLocalHeroPin();
+	}
+
+	static function clearLocalHeroPin():Void {
+		localHero = null;
+		valid = false;
+		rageValid = false;
+		manaValid = false;
+		sparkValid = false;
+		shield = 0;
+	}
+
+	static function unitDestroyed(unit:Dynamic):Bool {
+		if (unit == null)
+			return true;
+		// Prefer explicit destroyed flag; do not treat isDead as stage release (death UI still needs the pin).
+		try {
+			if (FieldWalk.extractBool(unit, "destroyed"))
+				return true;
+		} catch (_:Dynamic) {}
+		try {
+			var go:ent.GameObject = cast unit;
+			// Touch a typed method so a freed/invalid object fails the cast/call path.
+			go.isDead();
+			return false;
+		} catch (_:Dynamic) {
+			return true;
+		}
+	}
+
 	public static function setIdentity(name:String, region:String, uid:String = null):Void {
 		if (name != null)
 			heroName = name;
@@ -53,15 +112,15 @@ class HealthCache {
 	public static function isLocalHero(unit:Dynamic):Bool {
 		if (unit == null)
 			return false;
-		// condensed_signatures: ent.Hero.isMyHero() — leaf identity, not pointer compare alone
+		// Pointer-first vs pinned localHero — avoid isMyHero trampoline on every hot check.
+		if (localHero != null && (cast unit : Dynamic) == (cast localHero : Dynamic))
+			return true;
 		try {
 			var hero:ent.Hero = cast unit;
 			if (hero.isMyHero())
 				return true;
 		} catch (_:Dynamic) {}
-		if (localHero == null)
-			return false;
-		return (cast unit : Dynamic) == (cast localHero : Dynamic);
+		return false;
 	}
 
 	public static function set(currentHp:Float, maxHp:Float):Void {

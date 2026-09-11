@@ -140,11 +140,13 @@ class EngineSkillId {
 	static function field(obj:Dynamic, name:String):Dynamic {
 		if (obj == null || name == null)
 			return null;
+		try {
+			var v = HlxRuntime.resolveField(obj, "_" + name);
+			if (v != null)
+				return v;
+		} catch (_:Dynamic) {}
 		try
-			return Reflect.field(obj, "_" + name)
-		catch (_:Dynamic) {}
-		try
-			return Reflect.field(obj, name)
+			return HlxRuntime.resolveField(obj, name)
 		catch (_:Dynamic) {}
 		return null;
 	}

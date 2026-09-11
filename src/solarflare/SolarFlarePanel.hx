@@ -138,9 +138,12 @@ class SolarFlarePanel {
 		var now = nowSec();
 		ObserveDemand.publish(config);
 
-		// Fast cadence (~30 Hz): HP/resources; overlay reconcile is demand+dirty gated inside.
+		// Fast cadence (~30 Hz): release stale pin every tick; light mana/shield poll when demanded.
 		if (now - lastFastPollSec >= 0.033) {
 			lastFastPollSec = now;
+			try
+				HealthCache.releaseStaleLocalHero(app)
+			catch (_:Dynamic) {}
 			try {
 				if (ObserveDemand.resourceBars || ObserveDemand.auras || ObserveDemand.auraBuilderOpen || ObserveDemand.prayers
 					|| ObserveDemand.comboPoints || ObserveDemand.chaincast || ObserveDemand.conduit)

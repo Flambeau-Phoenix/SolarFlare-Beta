@@ -4,8 +4,6 @@ import imgui.ImGui;
 import imgui.ImGui.ImGuiIO;
 import imgui.Enums.ImGuiConfigFlags;
 import imgui.Enums.ImGuiWindowFlags;
-import hlx.runtime.HlxPrefixControl;
-import hlx.runtime.HlxPrefixResult;
 
 /**
  * Look-lock input gating while Farever retains native-cursor ownership.
@@ -16,6 +14,9 @@ import hlx.runtime.HlxPrefixResult;
  * When the cursor is free AND an interactive tool is open, claim keyboard+mouse
  * capture and cancel Heaps key events so Farever hotkeys (inventory, abilities)
  * do not fire under the UI. Alt / F6 / F12 still reach the game/mod toggles.
+ *
+ * HLX 0.0.7: no SkipWith / HlxPrefixResult prefixes — capture is WantCapture*,
+ * NoInputs window flags, and Heaps event cancel only.
  */
 class CursorCaptureFix {
 	public static inline var ENABLED:Bool = true;
@@ -173,38 +174,5 @@ class CursorCaptureFix {
 
 	static inline function addressOf(io:ImGuiIO):haxe.Int64 {
 		return untyped io;
-	}
-
-	/** Keep Farever input/cursor ownership behind any visible interactive mod tool. */
-	@:hlx.prefix(client.UnitController.isInputBlocked)
-	static function beforeIsInputBlocked(instance:client.UnitController):HlxPrefixResult<Bool> {
-		return interactiveActive ? SkipWith(true) : Continue;
-	}
-
-	/** Prevent game 2D UI below ImGui from receiving clicks, releases, or wheel input. */
-	@:hlx.prefix(h2d.Scene.handleEvent)
-	static function beforeSceneHandleEvent(instance:h2d.Scene, event:hxd.Event, prev:Dynamic):HlxPrefixResult<Dynamic> {
-		return interactiveActive ? SkipWith(null) : Continue;
-	}
-
-	@:hlx.prefix(client.BaseCamera.onEvent)
-	static function beforeBaseCameraOnEvent(instance:client.BaseCamera, event:hxd.Event):HlxPrefixControl {
-		return interactiveActive ? Skip : Continue;
-	}
-
-	/** An open mod editor owns free-cursor mode independently of game windows. */
-	@:hlx.prefix(ui.Hud.shouldFreeCursor)
-	static function beforeHudShouldFreeCursor(instance:ui.Hud):HlxPrefixResult<Bool> {
-		return interactiveActive ? SkipWith(true) : Continue;
-	}
-
-	@:hlx.prefix(lib.Input.allBlocked)
-	static function beforeInputAllBlocked():HlxPrefixResult<Bool> {
-		return interactiveActive ? SkipWith(true) : Continue;
-	}
-
-	@:hlx.prefix(ui.BaseUI.isBlockingAllInputs)
-	static function beforeUIBlockingAllInputs(instance:ui.BaseUI):HlxPrefixResult<Bool> {
-		return interactiveActive ? SkipWith(true) : Continue;
 	}
 }

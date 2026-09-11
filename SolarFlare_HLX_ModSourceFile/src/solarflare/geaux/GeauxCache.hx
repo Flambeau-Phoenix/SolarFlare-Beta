@@ -79,6 +79,8 @@ class GeauxCache {
 	static inline var LAYOUT_S:Float = 2.0; // rare fallback only; prefer dirty/hero/slot change
 	static inline var TELEMETRY_IDLE_S:Float = 0.12; // ~8 Hz idle
 	static inline var TELEMETRY_HOT_S:Float = 0.05; // ~20 Hz while CD/drag/builder/dirty
+	/** Rare GameLib CD reconcile; pinwheel normally advances from cdUntil (onTriggerCD/reduce/reset). */
+	static inline var LIVE_CD_SAFETY_S:Float = 1.0;
 	static var layoutAt:Float = 0;
 	static var layoutDirty:Bool = true;
 	static var layoutHero:Dynamic = null;
@@ -89,6 +91,10 @@ class GeauxCache {
 	static var equipDirty:Bool = true;
 	static var telemetryAt:Float = 0;
 	static var telemetryDirty:Bool = true;
+	/** Force writeCooldownFromSkill once after layout / hero change / safety timer / builder. */
+	static var seedLiveCd:Bool = true;
+	static var liveCdSafetyAt:Float = 0;
+	static var liveCdPollThisTick:Bool = false;
 
 	/** Vanilla action-bar Skill / SkillButton pinned by id (layout / equip). Observe polls these pointers only. */
 	static var barSkillById:Map<String, Dynamic> = new Map();
@@ -247,6 +253,7 @@ class GeauxCache {
 			layoutOverrideKey = "";
 			telemetryAt = 0;
 			telemetryDirty = true;
+			seedLiveCd = true;
 			for (i in 0...visibleCount)
 				clearSlot(slots[i], i);
 			return;
@@ -269,6 +276,7 @@ class GeauxCache {
 			refreshLayout(heroDyn, visibleCount, overrides);
 			equipDirty = true;
 			telemetryDirty = true;
+			seedLiveCd = true;
 		}
 		var telemInterval = telemetryInterval();
 		if (telemetryDirty || now >= telemetryAt) {
@@ -333,13 +341,21 @@ class GeauxCache {
 		freezeSlotIcons(visibleCount);
 	}
 
-	/** Per-observe: one slot loop binds Skill, cooldown, and afford. HUD / cdUntil never write snaps. */
+	/**
+	 * Per-observe: bind Skill, afford, charges; CD from cdUntil when seeded.
+	 * GameLib getCooldown* only on builder / post-layout seed / ~1 Hz safety.
+	 */
 	static function tickTelemetry(heroDyn:Dynamic):Void {
 		var now = nowStamp();
 		if (equipDirty || now >= equipAt) {
 			rememberEquipped(heroDyn);
 			equipDirty = false;
 			equipAt = now + EQUIP_S;
+		}
+		liveCdPollThisTick = solarflare.ObserveDemand.geauxBuilder || seedLiveCd || now >= liveCdSafetyAt;
+		if (liveCdPollThisTick) {
+			seedLiveCd = false;
+			liveCdSafetyAt = now + LIVE_CD_SAFETY_S;
 		}
 		tickSlots(heroDyn);
 	}
@@ -1493,6 +1509,8 @@ class GeauxCache {
 		else {
 			rememberSkill(skill, snap.id);
 			applyCooldown(hero, snap, skill);
+			if (snap.cdLeft > 0.05)
+				syncTrackedFromLive(snap.id, snap.cdLeft, snap.cdMax);
 		}
 		dest.push(snap);
 	}
@@ -1942,6 +1960,8 @@ class GeauxCache {
 			return;
 		}
 		applyCooldown(hero, snap, skill);
+		if (snap.cdLeft > 0.05)
+			syncTrackedFromLive(snap.id, snap.cdLeft, snap.cdMax);
 	}
 
 	static function parseSkillish(item:Dynamic):{id:String, label:String, skill:Dynamic} {
@@ -2262,6 +2282,7 @@ class GeauxCache {
 			}
 		}
 		ledgerEngineCd("noteTriggerCd", "st.skill.Skill.onTriggerCD", ids[0], dur);
+		overlayTrackedForIds(ids);
 	}
 
 	/** ENGINE_TELEMETRY_MAP: Skill.reduceCooldown — CDR / early reset (Bonethrow). */
@@ -2282,6 +2303,7 @@ class GeauxCache {
 			if (left <= 0.05) {
 				for (id in ids)
 					removeTracked(id);
+				clearSnapCdForIds(ids);
 				ledgerEngineCd("noteReduceCd", "st.skill.Skill.reduceCooldown", ids[0], 0);
 				return;
 			}
@@ -2301,6 +2323,7 @@ class GeauxCache {
 				}
 			}
 			ledgerEngineCd("noteReduceCd", "st.skill.Skill.reduceCooldown", ids[0], left);
+			overlayTrackedForIds(ids);
 			return;
 		}
 		if (Math.isNaN(seconds) || seconds == 0)
@@ -2327,6 +2350,7 @@ class GeauxCache {
 		}
 		ledgerEngineCd("noteReduceCd", "st.skill.Skill.reduceCooldown", ids[0],
 			Math.isNaN(trackedLeft) ? 0 : trackedLeft);
+		overlayTrackedForIds(ids);
 	}
 
 	/** ENGINE_TELEMETRY_MAP: Skill.resetCooldown. */
@@ -2338,6 +2362,7 @@ class GeauxCache {
 		var ids = skillIdAliases(skill);
 		for (id in ids)
 			removeTracked(id);
+		clearSnapCdForIds(ids);
 		var shown = ids.length > 0 ? ids[0] : "";
 		ledgerEngineCd("noteResetCd", "st.skill.Skill.resetCooldown", shown, 0);
 	}
@@ -2935,8 +2960,16 @@ class GeauxCache {
 			return;
 		}
 		var skill:Dynamic = bindSlotSkill(hero, snap);
-		if (skill != null) {
+		if (liveCdPollThisTick && skill != null) {
 			applyCooldown(heroDyn, snap, skill);
+			if (snap.cdLeft > 0.05)
+				syncTrackedFromLive(snap.id, snap.cdLeft, snap.cdMax);
+			else
+				removeTracked(snap.id);
+		} else {
+			applyTrackedToSnap(snap);
+		}
+		if (skill != null) {
 			applySkillCharges(snap, skill);
 		} else {
 			snap.charges = 0;
@@ -3343,16 +3376,12 @@ class GeauxCache {
 		var left = until - now;
 		if (left <= 0.05) {
 			removeTracked(snap.id);
-			if (snap.cdLeft <= 0.05) {
-				snap.cdLeft = 0;
-				snap.remaining = 0;
-				snap.ready = true;
-			}
+			snap.cdLeft = 0;
+			snap.remaining = 0;
+			snap.ready = true;
+			ledgerGeauxCd("engine", "applyTrackedToSnap", "cdUntil", "st.skill.Skill.onTriggerCD", snap);
 			return;
 		}
-		// Never raise remaining above a good live poll. Overlay when live is 0 (stub) or tracked is lower (CDR).
-		if (snap.cdLeft > 0.05 && left >= snap.cdLeft - 0.02)
-			return;
 		snap.cdLeft = left;
 		var max = cdMaxForId(snap.id);
 		if (max < left)
@@ -3396,6 +3425,57 @@ class GeauxCache {
 			applyTrackedToSnap(slots[i]);
 			i++;
 		}
+	}
+
+	/** Immediate snap write after CD postfix so HUD does not wait for the next telemetry tick. */
+	static function overlayTrackedForIds(ids:Array<String>):Void {
+		if (ids == null || ids.length == 0)
+			return;
+		var i = 0;
+		while (i < count) {
+			var snap = slots[i];
+			i++;
+			if (snap == null || !snap.present || snap.id == null || snap.id.length == 0)
+				continue;
+			if (idMatchesAliases(snap.id, ids) || (snap.iconId != null && snap.iconId != snap.id && idMatchesAliases(snap.iconId, ids)))
+				applyTrackedToSnap(snap);
+		}
+	}
+
+	static function clearSnapCdForIds(ids:Array<String>):Void {
+		if (ids == null || ids.length == 0)
+			return;
+		var i = 0;
+		while (i < count) {
+			var snap = slots[i];
+			i++;
+			if (snap == null || !snap.present || snap.id == null || snap.id.length == 0)
+				continue;
+			if (!(idMatchesAliases(snap.id, ids) || (snap.iconId != null && snap.iconId != snap.id && idMatchesAliases(snap.iconId, ids))))
+				continue;
+			snap.cdLeft = 0;
+			snap.remaining = 0;
+			snap.ready = true;
+			ledgerGeauxCd("engine", "noteResetCd", "resetCooldown", "st.skill.Skill.resetCooldown", snap);
+		}
+	}
+
+	static function idMatchesAliases(id:String, aliases:Array<String>):Bool {
+		if (id == null || id.length == 0 || aliases == null)
+			return false;
+		for (a in aliases) {
+			if (a == null || a.length == 0)
+				continue;
+			if (a == id)
+				return true;
+			var script = classSignatureScriptId(a);
+			if (script.length > 0 && script == id)
+				return true;
+			var idScript = classSignatureScriptId(id);
+			if (idScript.length > 0 && idScript == a)
+				return true;
+		}
+		return false;
 	}
 
 	static function syncTrackedFromLive(id:String, left:Float, max:Float):Void {

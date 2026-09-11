@@ -64,7 +64,24 @@ class ConduitCache {
 	static var lifeHash:String = "";
 	static var hashesReady:Bool = false;
 
+	static function ensureSlots():Void {
+		if (slots.length >= MAX_SLOTS)
+			return;
+		while (slots.length < MAX_SLOTS)
+			slots.push(new ConduitSlotSnap());
+	}
+
+	static function resetSlot(s:ConduitSlotSnap):Void {
+		if (s == null)
+			return;
+		s.id = "";
+		s.filled = false;
+		s.stacks = 0;
+		s.power = false;
+	}
+
 	public static function clear():Void {
+		ensureSlots();
 		active = false;
 		current = 0;
 		max = POWER_MAX;
@@ -73,7 +90,11 @@ class ConduitCache {
 		filledCount = 0;
 		powerStacks = 0;
 		powerLeft = 0;
-		slots = [];
+		var i = 0;
+		while (i < slots.length) {
+			resetSlot(slots[i]);
+			i++;
+		}
 	}
 
 	public static function noteMage():Void {
@@ -82,9 +103,12 @@ class ConduitCache {
 			slotCount = DEFAULT_SLOTS;
 	}
 
+	/**
+	 * Copy first `nSlots` entries from `next` into the stable `slots` buffer.
+	 * Does not take ownership of `next` (scratch-safe).
+	 */
 	public static function setSlots(next:Array<ConduitSlotSnap>, nSlots:Int, filled:Int, power:Int, left:Float):Void {
-		if (next == null)
-			next = [];
+		ensureSlots();
 		var n = nSlots;
 		if (n < 1)
 			n = DEFAULT_SLOTS;
@@ -98,7 +122,24 @@ class ConduitCache {
 		var f = filled;
 		if (f < 0)
 			f = 0;
-		slots = next;
+		var i = 0;
+		while (i < n) {
+			var dst = slots[i];
+			var src = next != null && i < next.length ? next[i] : null;
+			if (src == null)
+				resetSlot(dst);
+			else {
+				dst.id = src.id != null ? src.id : "";
+				dst.filled = src.filled;
+				dst.stacks = src.stacks;
+				dst.power = src.power;
+			}
+			i++;
+		}
+		while (i < slots.length) {
+			resetSlot(slots[i]);
+			i++;
+		}
 		slotCount = n;
 		filledCount = f;
 		powerStacks = p;
@@ -146,7 +187,7 @@ class ConduitCache {
 		ensureHashes();
 		if (s == powerKey || (powerHash.length > 0 && s == powerHash))
 			return true;
-		return s.toLowerCase().indexOf("mage_conduit_power") >= 0;
+		return idContains(s, "mage_conduit_power");
 	}
 
 	public static function isConduitKind(id:String):Bool {
@@ -164,14 +205,60 @@ class ConduitCache {
 			return true;
 		if (lifeHash.length > 0 && s == lifeHash)
 			return true;
-		var low = s.toLowerCase();
-		if (low.indexOf("mage_conduit_") >= 0)
+		if (idContains(s, "mage_conduit_"))
 			return true;
-		if (low.indexOf("mage_talent_conduit") >= 0)
+		if (idContains(s, "mage_talent_conduit"))
 			return true;
-		if (low.indexOf("conduit_shard") >= 0 || low.indexOf("conduitshard") >= 0)
+		if (idContains(s, "conduit_shard") || idContains(s, "conduitshard"))
 			return true;
 		return false;
+	}
+
+	/** Case-insensitive substring without allocating a lowercased copy. */
+	public static function idContains(hay:String, needle:String):Bool {
+		if (hay == null || needle == null || needle.length == 0 || hay.length < needle.length)
+			return false;
+		var lim = hay.length - needle.length;
+		var i = 0;
+		while (i <= lim) {
+			var j = 0;
+			while (j < needle.length) {
+				var a = hay.charCodeAt(i + j);
+				var b = needle.charCodeAt(j);
+				if (a >= 65 && a <= 90)
+					a += 32;
+				if (b >= 65 && b <= 90)
+					b += 32;
+				if (a != b)
+					break;
+				j++;
+			}
+			if (j == needle.length)
+				return true;
+			i++;
+		}
+		return false;
+	}
+
+	/** Case-insensitive equality without allocating. */
+	public static function idEq(a:String, b:String):Bool {
+		if (a == b)
+			return true;
+		if (a == null || b == null || a.length != b.length)
+			return false;
+		var i = 0;
+		while (i < a.length) {
+			var ca = a.charCodeAt(i);
+			var cb = b.charCodeAt(i);
+			if (ca >= 65 && ca <= 90)
+				ca += 32;
+			if (cb >= 65 && cb <= 90)
+				cb += 32;
+			if (ca != cb)
+				return false;
+			i++;
+		}
+		return true;
 	}
 
 	public static function canonical(id:String):String {
