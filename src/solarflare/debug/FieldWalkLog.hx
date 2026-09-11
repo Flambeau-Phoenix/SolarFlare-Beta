@@ -1,6 +1,5 @@
 package solarflare.debug;
 
-import sys.FileSystem;
 import sys.io.File;
 
 /**
@@ -79,11 +78,17 @@ class FieldWalkLog {
 		var chunk = buf.join("\n") + "\n";
 		buf = [];
 		try {
-			var existing = "";
-			if (FileSystem.exists(jsonlPath))
-				existing = File.getContent(jsonlPath);
-			File.saveContent(jsonlPath, existing + chunk);
+			var out = File.append(jsonlPath);
+			out.writeString(chunk);
+			out.close();
 		} catch (_:Dynamic) {}
+	}
+
+	/** Reset dedupe state for a new probe/ledger recording session. */
+	public static function clearSession():Void {
+		seen = new Map();
+		buf = [];
+		dumpedParents = false;
 	}
 
 	static function ensure():Void {

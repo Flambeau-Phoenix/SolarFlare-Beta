@@ -359,7 +359,7 @@ class AuraConditionEditor {
 		for (entry in solarflare.cdb.AuraCatalog.entries) {
 			if (!solarflare.cdb.AuraCatalog.matchesSubject(entry.kind, kind))
 				continue;
-			if (!solarflare.cdb.AuraCatalog.matchesSearch(entry.id, entry.name, ui.search))
+			if (!solarflare.cdb.AuraCatalog.entryMatchesSearch(entry, ui.search))
 				continue;
 			if (kind == "status") {
 				var rank = solarflare.cdb.AuraCatalog.statusPickRank(entry.id, entry.kind);

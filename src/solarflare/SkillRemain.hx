@@ -7,8 +7,11 @@ import hlx.runtime.ResolvedMember;
  * FieldWalk, then resolveMember. Draw must never call this.
  */
 class SkillRemain {
+	/** Sentinel left value when Status.isInfinite is true. */
+	public static inline var INFINITE_LEFT:Float = -1;
+
 	static var PACK:Array<String> = [
-		"remaining", "timeLeft", "durationLeft", "duration", "elapsed", "cdUntil", "progress"
+		"remaining", "timeLeft", "durationLeft", "elapsed", "cdUntil", "progress"
 	];
 
 	static var extraNames:Array<String> = [];
@@ -19,9 +22,14 @@ class SkillRemain {
 	static var evalMem:ResolvedMember;
 	static var memReady:Bool = false;
 
-	public static function read(item:Dynamic):{progress:Float, left:Float, valid:Bool} {
+	public static function read(item:Dynamic):{progress:Float, left:Float, valid:Bool, infinite:Bool} {
 		if (item == null)
 			return miss();
+		var status = statusRemain(item);
+		if (usable(status)) {
+			ledgerRemain("typed", status.infinite ? "isInfinite" : "Status.getDurationLeft", status, item);
+			return status;
+		}
 		var typed = typedRemain(item);
 		if (usable(typed)) {
 			ledgerRemain("typed", "getDurationLeft", typed, item);
@@ -79,7 +87,39 @@ class SkillRemain {
 		extraNames.push(s);
 	}
 
-	static function typedRemain(item:Dynamic):{progress:Float, left:Float, valid:Bool} {
+	/** Status-first path matching EventHorizon AuraTracker candidates. */
+	static function statusRemain(item:Dynamic):{progress:Float, left:Float, valid:Bool, infinite:Bool} {
+		try {
+			var st:st.skill.Status = item;
+			try {
+				if (st.isInfinite())
+					return {progress: 1, left: INFINITE_LEFT, valid: true, infinite: true};
+			} catch (_:Dynamic) {}
+			var left = 0.0;
+			try
+				left = st.getDurationLeft()
+			catch (_:Dynamic)
+				left = 0;
+			var prog = Math.NaN;
+			try
+				prog = st.getDurationProgress()
+			catch (_:Dynamic)
+				prog = Math.NaN;
+			var max = 0.0;
+			try {
+				var info = st.getStatusInfo();
+				if (info != null) {
+					var d:Float = info.duration;
+					if (d > 0.05)
+						max = d;
+				}
+			} catch (_:Dynamic) {}
+			return finish(left, prog, max, false);
+		} catch (_:Dynamic) {}
+		return miss();
+	}
+
+	static function typedRemain(item:Dynamic):{progress:Float, left:Float, valid:Bool, infinite:Bool} {
 		try {
 			var bs:st.skill.BaseSkill = item;
 			var left = 0.0;
@@ -92,12 +132,12 @@ class SkillRemain {
 				prog = bs.getDurationProgress()
 			catch (_:Dynamic)
 				prog = Math.NaN;
-			return finish(left, prog, 0);
+			return finish(left, prog, 0, false);
 		} catch (_:Dynamic) {}
 		return miss();
 	}
 
-	static function elapsedRemain(item:Dynamic):{progress:Float, left:Float, valid:Bool} {
+	static function elapsedRemain(item:Dynamic):{progress:Float, left:Float, valid:Bool, infinite:Bool} {
 		var elapsed = callFloat(item, elapsedMem, "getElapsedTime");
 		var max = callFloat(item, baseMem, "getBaseDuration");
 		if (!(max > 0.05))
@@ -107,10 +147,10 @@ class SkillRemain {
 		var left = max - elapsed;
 		if (left < 0)
 			left = 0;
-		return finish(left, left / max, max);
+		return finish(left, left / max, max, false);
 	}
 
-	static function infoRemain(item:Dynamic):{progress:Float, left:Float, valid:Bool} {
+	static function infoRemain(item:Dynamic):{progress:Float, left:Float, valid:Bool, infinite:Bool} {
 		try {
 			var st:st.skill.Status = item;
 			var info:Dynamic = st.getStatusInfo();
@@ -121,7 +161,7 @@ class SkillRemain {
 		return miss();
 	}
 
-	static function walkRemain(obj:Dynamic):{progress:Float, left:Float, valid:Bool} {
+	static function walkRemain(obj:Dynamic):{progress:Float, left:Float, valid:Bool, infinite:Bool} {
 		if (obj == null)
 			return miss();
 		var names = PACK.concat(extraNames);
@@ -129,6 +169,12 @@ class SkillRemain {
 		var max = FieldWalk.extractNumber(obj, "duration", 0);
 		if (!(max > 0.05))
 			max = FieldWalk.extractNumber(obj, "baseDuration", 0);
+		// Prefer remaining-named fields; treat bare "duration" as max, not left.
+		if (!(left > 0) && max > 0.05) {
+			var elapsed = FieldWalk.extractNumber(obj, "elapsed", Math.NaN);
+			if (!Math.isNaN(elapsed) && elapsed >= 0)
+				left = max - elapsed;
+		}
 		var until = FieldWalk.extractNumber(obj, "cdUntil", -1);
 		if (until > 100) {
 			var now = gameNow();
@@ -138,10 +184,10 @@ class SkillRemain {
 		var prog = FieldWalk.extractNumber(obj, "progress", Math.NaN);
 		if (Math.isNaN(prog))
 			prog = FieldWalk.extractNumber(obj, "durationProgress", Math.NaN);
-		return finish(left, prog, max);
+		return finish(left, prog, max, false);
 	}
 
-	static function resolvedRemain(item:Dynamic):{progress:Float, left:Float, valid:Bool} {
+	static function resolvedRemain(item:Dynamic):{progress:Float, left:Float, valid:Bool, infinite:Bool} {
 		ensureMems();
 		var left = callFloat(item, leftMem, "getDurationLeft");
 		var prog = callFloat(item, progMem, "getDurationProgress");
@@ -153,10 +199,12 @@ class SkillRemain {
 			if (!Math.isNaN(elapsed) && elapsed >= 0)
 				left = max - elapsed;
 		}
-		return finish(left, prog, max);
+		return finish(left, prog, max, false);
 	}
 
-	static function finish(left:Float, prog:Float, max:Float):{progress:Float, left:Float, valid:Bool} {
+	static function finish(left:Float, prog:Float, max:Float, infinite:Bool):{progress:Float, left:Float, valid:Bool, infinite:Bool} {
+		if (infinite)
+			return {progress: 1, left: INFINITE_LEFT, valid: true, infinite: true};
 		var l = left;
 		if (Math.isNaN(l) || l < 0)
 			l = 0;
@@ -173,24 +221,26 @@ class SkillRemain {
 			p = 1;
 		if (p < 0)
 			p = 0;
+		// Known when seconds remain, mid-progress, or a fresh/full timer with positive left.
 		var valid = l > 0.02 || (p > 0.001 && p < 0.999);
 		if (!valid)
 			return miss();
-		return {progress: p, left: l, valid: true};
+		return {progress: p, left: l, valid: true, infinite: false};
 	}
 
-	static function usable(r:{progress:Float, left:Float, valid:Bool}):Bool {
+	static function usable(r:{progress:Float, left:Float, valid:Bool, infinite:Bool}):Bool {
 		return r != null && r.valid;
 	}
 
-	static function miss():{progress:Float, left:Float, valid:Bool} {
-		return {progress: 1, left: 0, valid: false};
+	static function miss():{progress:Float, left:Float, valid:Bool, infinite:Bool} {
+		return {progress: 1, left: 0, valid: false, infinite: false};
 	}
 
-	static function ledgerRemain(method:String, name:String, r:{progress:Float, left:Float, valid:Bool}, item:Dynamic):Void {
+	static function ledgerRemain(method:String, name:String, r:{progress:Float, left:Float, valid:Bool, infinite:Bool}, item:Dynamic):Void {
 		if (r == null || !solarflare.debug.ResolutionLedger.armed())
 			return;
-		solarflare.debug.ResolutionLedger.touch("status.remain", method, "SkillRemain.read", name, "number", Std.string(Math.round(r.left * 1000) / 1000));
+		var val = r.infinite ? "inf" : Std.string(Math.round(r.left * 1000) / 1000);
+		solarflare.debug.ResolutionLedger.touch("status.remain", method, "SkillRemain.read", name, "number", val);
 	}
 
 	static function callFloat(item:Dynamic, mem:ResolvedMember, method:String):Float {

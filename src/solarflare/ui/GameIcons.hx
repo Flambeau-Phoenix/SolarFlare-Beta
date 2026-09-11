@@ -422,7 +422,9 @@ class GameIcons {
 			} else {
 				ImGui.image(texId, ImGui.vec2(w, h));
 			}
+			// Restore layout cursor; Dummy so EndChild does not see a bare SetCursorScreenPos extend.
 			ImGui.setCursorScreenPos(saved);
+			ImGui.dummy(ImGui.vec2(0.01, 0.01));
 			if (pushed) {
 				ImGui.popStyleVar(1);
 				pushed = false;

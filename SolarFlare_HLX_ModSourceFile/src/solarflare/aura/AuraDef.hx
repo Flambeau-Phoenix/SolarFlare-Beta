@@ -44,6 +44,12 @@ class AuraDef {
 	public var scale:FloatRef;
 	public var showIcon:BoolRef;
 	public var progressRing:BoolRef;
+	/** Integer seconds (or ∞) overlaid on the icon. */
+	public var showCountdown:BoolRef;
+	/** Vertical fuse bar that drains with remaining time. */
+	public var showFuse:BoolRef;
+	/** Prefer live status duration when known; else fixed Display Duration hold. */
+	public var followBuffDuration:BoolRef;
 	public var stackCounter:BoolRef;
 	public var showLabel:BoolRef;
 	public var isCounter:BoolRef;
@@ -74,6 +80,9 @@ class AuraDef {
 	public var show:Bool;
 	public var until:Float;
 	public var progress:Float;
+	/** Seconds left for countdown draw; SkillRemain.INFINITE_LEFT when infinite. */
+	public var timeLeft:Float;
+	public var timerInfinite:Bool;
 	public var stacks:Int;
 	public var resolvedIcon:String;
 	public var lastHitAt:Float;
@@ -134,6 +143,9 @@ class AuraDef {
 		showBanner = new BoolRef(false);
 		showIcon = new BoolRef(true);
 		progressRing = new BoolRef(true);
+		showCountdown = new BoolRef(false);
+		showFuse = new BoolRef(false);
+		followBuffDuration = new BoolRef(true);
 		stackCounter = new BoolRef(false);
 		showLabel = new BoolRef(true);
 		isCounter = new BoolRef(false);
@@ -155,6 +167,8 @@ class AuraDef {
 		show = false;
 		until = 0;
 		progress = 0;
+		timeLeft = Math.NaN;
+		timerInfinite = false;
 		stacks = 1;
 		resolvedIcon = "";
 		lastHitAt = 0;

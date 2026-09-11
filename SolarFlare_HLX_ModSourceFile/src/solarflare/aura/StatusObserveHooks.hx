@@ -74,8 +74,6 @@ class StatusObserveHooks {
 			if (bs != null && bs.kind != null)
 				id = bs.kind;
 		} catch (_:Dynamic) {}
-		if (id.length == 0)
-			id = FieldWalk.extractString(statusDyn, "kind");
 		solarflare.debug.ResolutionLedger.touch(
 			"status.hook",
 			"postfix",

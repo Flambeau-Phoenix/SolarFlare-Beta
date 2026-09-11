@@ -118,6 +118,12 @@ class AuraConfig {
 			a.showIcon.set(false);
 		if (d.progressRing == false)
 			a.progressRing.set(false);
+		if (d.showCountdown == true)
+			a.showCountdown.set(true);
+		if (d.showFuse == true)
+			a.showFuse.set(true);
+		if (d.followBuffDuration == false)
+			a.followBuffDuration.set(false);
 		if (d.stackCounter == true)
 			a.stackCounter.set(true);
 		if (d.showLabel == false)

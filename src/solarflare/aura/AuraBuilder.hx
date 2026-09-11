@@ -675,6 +675,10 @@ class AuraBuilder {
 			if (ImGui.checkbox("Progress Ring##ab_fx_ring", a.progressRing)) SettingsStore.markDirty();
 			ImGui.sameLine();
 			if (ImGui.checkbox("Stack / Count Badge##ab_fx_stacks", a.stackCounter)) SettingsStore.markDirty();
+			if (ImGui.checkbox("Countdown##ab_fx_countdown", a.showCountdown)) SettingsStore.markDirty();
+			ImGui.sameLine();
+			if (ImGui.checkbox("Fuse##ab_fx_fuse", a.showFuse)) SettingsStore.markDirty();
+			ImGui.textDisabled("Countdown = seconds left. Fuse = draining bar. Follow buff uses live status time.");
 		}
 		opacityPercent.set(a.opacity.get() * 100);
 		if (solarflare.ui.BuilderSlider.draw("Visual Opacity##ab_opacity", opacityPercent, 10, 100, "%.0f%%")) {
@@ -827,13 +831,18 @@ class AuraBuilder {
 				}
 			ImGui.endCombo();
 		}
-		if (mode == "onRiseHold" && solarflare.ui.BuilderSlider.draw("Alert Duration##ab_hold", a.durRef, 0.5, 10, "%.1f s")) {
+		var wantDuration = mode == "onRiseHold" || (a.showBanner != null && a.showBanner.get());
+		if (wantDuration && solarflare.ui.BuilderSlider.draw("Display Duration##ab_hold", a.durRef, 0.5, 10, "%.1f s")) {
 			a.duration = a.durRef.get();
 			for (e in a.effects) if (e != null) {
 				e.hold = a.duration; e.holdRef.set(a.duration);
 			}
 			SettingsStore.markDirty();
 		}
+		if (wantDuration)
+			ImGui.textDisabled("Fixed hold for cast timers. Follow buff uses live status time when known.");
+		if (ImGui.checkbox("Follow buff duration when known##ab_follow_buff", a.followBuffDuration))
+			SettingsStore.markDirty();
 		if (ImGui.checkbox("Count each time the conditions become true##ab_counter", a.isCounter))
 			SettingsStore.markDirty();
 		if (a.isCounter.get()) {
@@ -850,6 +859,12 @@ class AuraBuilder {
 			if (a.showBanner.get()) {
 				if (!hasAlertEffect(a))
 					a.effects.push(new AuraEffect("boss_alert", AuraEffect.KIND_ALERT, AuraEffect.WHEN_ON_RISE_HOLD));
+				var hold = a.duration > 0.05 ? a.duration : 1.5;
+				for (e in a.effects) {
+					if (e == null || e.kind != AuraEffect.KIND_ALERT) continue;
+					e.hold = hold; e.holdRef.set(hold); e.enabled.set(true);
+				}
+				a.durRef.set(hold); a.duration = hold;
 			} else
 				AuraEffects.disableLargeTypedAlert(a);
 			SettingsStore.markDirty();

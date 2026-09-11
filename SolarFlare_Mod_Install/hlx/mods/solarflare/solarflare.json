@@ -1,0 +1,6366 @@
+{
+  "v": 20,
+  "activeTheme": "purple_gold",
+  "customTheme": {
+    "accent": [
+      0.930000007,
+      0.699999988,
+      0.219999999,
+      1
+    ],
+    "border": [
+      0.5,
+      0.379999995,
+      0.720000029,
+      0.720000029
+    ],
+    "cellBg": [
+      0.104999997,
+      0.075000003,
+      0.180000007,
+      1
+    ],
+    "dimOverlay": [
+      0.0250000004,
+      0.0179999992,
+      0.0500000007,
+      0.620000005
+    ],
+    "text": [
+      0.959999979,
+      0.939999998,
+      1,
+      1
+    ],
+    "textDisabled": [
+      0.579999983,
+      0.540000021,
+      0.680000007,
+      1
+    ],
+    "titleBg": [
+      0.159999996,
+      0.0900000036,
+      0.300000012,
+      0.980000019
+    ],
+    "windowBg": [
+      0.0549999997,
+      0.0430000015,
+      0.0920000002,
+      1
+    ]
+  },
+  "vitals": {
+    "chrome": {
+      "collapsed": false,
+      "lock": true,
+      "sun": true,
+      "trans": true,
+      "x": 938,
+      "y": 962
+    },
+    "hpH": 71,
+    "hpHidden": false,
+    "hpStyle": 0,
+    "hpVert": true,
+    "hpW": 195,
+    "layout": 0,
+    "manaChrome": {
+      "collapsed": false,
+      "lock": false,
+      "sun": true,
+      "trans": false,
+      "x": 40,
+      "y": 270
+    },
+    "manaH": 44,
+    "manaHidden": true,
+    "manaStyle": 0,
+    "manaVert": false,
+    "manaW": 220,
+    "prayersChrome": {
+      "collapsed": false,
+      "lock": true,
+      "sun": true,
+      "trans": true,
+      "x": 994,
+      "y": 917
+    },
+    "prayersH": 86,
+    "prayersHidden": false,
+    "prayersW": 142,
+    "rageChrome": {
+      "collapsed": false,
+      "lock": true,
+      "sun": true,
+      "trans": true,
+      "x": 1368,
+      "y": 1004
+    },
+    "rageH": 56,
+    "rageHidden": true,
+    "rageStyle": 11,
+    "rageVert": false,
+    "rageW": 80
+  },
+  "localTime": {
+    "chrome": {
+      "collapsed": false,
+      "lock": false,
+      "sun": true,
+      "trans": false,
+      "x": 20,
+      "y": 20
+    },
+    "h": 48,
+    "on": false,
+    "w": 160
+  },
+  "geaux": {
+    "chrome": {
+      "collapsed": false,
+      "lock": true,
+      "sun": true,
+      "trans": true,
+      "x": 1398,
+      "y": 613
+    },
+    "cols": 3,
+    "glyphs": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "h": 122,
+    "hotkeys": [
+      "2",
+      "3",
+      "Q",
+      "MB",
+      "4",
+      "G"
+    ],
+    "on": true,
+    "rows": 2,
+    "slots": [
+      "Shield_OrbitWater_S1",
+      "Spear_Eruption_Skill1",
+      "Priest_FaithfulWinds",
+      "Priest_Sig_DivineIntervention",
+      "Spear_Eruption_Skill2",
+      "Priest_Crusader"
+    ],
+    "style": {
+      "bgAlpha": 0.850000024,
+      "border": 1.79999995,
+      "borderIdle": [
+        0.280000001192093,
+        0.300000011920929,
+        0.340000003576279,
+        1
+      ],
+      "borderReady": [
+        1,
+        1,
+        1,
+        0.449999988079071
+      ],
+      "cdDisplay": 1,
+      "cdText": [
+        1,
+        0.920000016689301,
+        0.550000011920929,
+        1
+      ],
+      "cooldownAttention": 1,
+      "dimOnCd": false,
+      "dimOnNoResource": true,
+      "emptyFill": [
+        0.119999997317791,
+        0.129999995231628,
+        0.150000005960464,
+        1
+      ],
+      "gap": 0,
+      "glyphScale": 1.16999996,
+      "padding": 2,
+      "readyAttention": 1,
+      "readyCls": [
+        0.219999998807907,
+        0.479999989271164,
+        0.779999971389771,
+        1
+      ],
+      "readyDefault": [
+        0.349999994039536,
+        0.400000005960464,
+        0.479999989271164,
+        1
+      ],
+      "readySig": [
+        0.920000016689301,
+        0.720000028610229,
+        0.180000007152557,
+        1
+      ],
+      "readyWep": [
+        0.720000028610229,
+        0.479999989271164,
+        0.180000007152557,
+        1
+      ],
+      "rounding": 0,
+      "showCdText": true,
+      "showCharges": true,
+      "showGroupTags": true,
+      "showHotkeys": true,
+      "showLabels": false,
+      "showPinwheel": true,
+      "windowBg": [
+        0.0799999982118607,
+        0.0900000035762787,
+        0.109999999403954,
+        1
+      ]
+    },
+    "w": 162
+  },
+  "rifty": {
+    "chrome": {
+      "collapsed": false,
+      "lock": true,
+      "sun": true,
+      "trans": true,
+      "x": 730,
+      "y": 1099
+    },
+    "clockStyle": 0,
+    "hidden": false,
+    "size": 127,
+    "textU0": 0.280000001,
+    "textU1": 0.720000029,
+    "textV0": 0.379999995,
+    "textV1": 0.680000007
+  },
+  "combo": {
+    "chrome": {
+      "collapsed": false,
+      "lock": false,
+      "sun": true,
+      "trans": false,
+      "x": 40,
+      "y": 160
+    },
+    "h": 36,
+    "hidden": true,
+    "shape": 1,
+    "vertical": false,
+    "w": 220
+  },
+  "chaincast": {
+    "chrome": {
+      "collapsed": false,
+      "lock": false,
+      "sun": true,
+      "trans": false,
+      "x": 40,
+      "y": 210
+    },
+    "h": 200,
+    "hidden": true,
+    "rot": [],
+    "showStackBadge": true,
+    "spend": "",
+    "title": "Chaincast",
+    "w": 320
+  },
+  "conduit": {
+    "chrome": {
+      "collapsed": false,
+      "lock": false,
+      "sun": true,
+      "trans": false,
+      "x": 40,
+      "y": 250
+    },
+    "h": 36,
+    "hidden": true,
+    "shape": 1,
+    "vertical": false,
+    "w": 220
+  },
+  "attackCombo": {
+    "art": 0,
+    "bannerH": 56,
+    "chrome": {
+      "collapsed": false,
+      "lock": true,
+      "sun": true,
+      "trans": true,
+      "x": 1219,
+      "y": 1150
+    },
+    "customStyle": 0,
+    "h": 86,
+    "hidden": false,
+    "mode": 2,
+    "shape": 2,
+    "type": 1,
+    "vertical": false,
+    "w": 181
+  },
+  "resourceTracker": {},
+  "clog": {
+    "chrome": {
+      "collapsed": false,
+      "lock": false,
+      "sun": true,
+      "trans": false,
+      "x": 1833,
+      "y": 811
+    },
+    "enemy": true,
+    "heroes": true,
+    "hidden": true,
+    "player": false,
+    "playerRift": true,
+    "record": true,
+    "recordProx": false,
+    "recordWorld": false,
+    "tgt": false,
+    "you": true
+  },
+  "target": {
+    "always": true,
+    "badge": true,
+    "boss": false,
+    "chrome": {
+      "collapsed": false,
+      "lock": true,
+      "sun": true,
+      "trans": true,
+      "x": 1353,
+      "y": 190
+    },
+    "empty": false,
+    "emptyBar": true,
+    "h": 93,
+    "hidden": false,
+    "hp": true,
+    "low": 25,
+    "name": true,
+    "pct": true,
+    "portrait": true,
+    "pulse": true,
+    "round": 4,
+    "w": 257
+  },
+  "launchers": {
+    "f6": {
+      "chrome": {
+        "collapsed": false,
+        "lock": false,
+        "sun": true,
+        "trans": false,
+        "x": 80,
+        "y": 480
+      },
+      "hidden": true,
+      "size": 165
+    },
+    "f7": {
+      "chrome": {
+        "collapsed": false,
+        "lock": false,
+        "sun": true,
+        "trans": false,
+        "x": 260,
+        "y": 480
+      },
+      "hidden": true,
+      "size": 72
+    }
+  },
+  "saber": {
+    "chrome": {
+      "collapsed": false,
+      "lock": false,
+      "sun": true,
+      "trans": false,
+      "x": 1926,
+      "y": 1080
+    },
+    "expand": true,
+    "h": 312,
+    "hidden": false,
+    "log": false,
+    "rift": false,
+    "riftChrome": {
+      "collapsed": false,
+      "lock": false,
+      "sun": true,
+      "trans": false,
+      "x": 480,
+      "y": 280
+    },
+    "riftH": 280,
+    "riftW": 420,
+    "w": 614
+  },
+  "auras": {
+    "auraCounter": {
+      "aura_1": 0,
+      "aura_2": 0
+    },
+    "list": [
+      {
+        "plate": "AoEpuddle",
+        "keyText": "",
+        "showFuse": false,
+        "opacity": 1,
+        "dormant": false,
+        "showIcon": true,
+        "progressRing": false,
+        "visual": true,
+        "alwaysOn": false,
+        "showBanner": false,
+        "announce": "",
+        "showLabel": true,
+        "invert": false,
+        "h": 245,
+        "w": 214,
+        "id": "aura_1",
+        "op": "below",
+        "cue": "",
+        "pct": 35,
+        "region": "icon",
+        "fight": "",
+        "isCounter": false,
+        "followBuffDuration": true,
+        "requireAfford": true,
+        "iconId": "AoEpuddle",
+        "trigger": "resource",
+        "audio": false,
+        "name": "Tagged",
+        "effects": [
+          {
+            "alpha": 1,
+            "cue": "",
+            "enabled": true,
+            "fadeIn": 0,
+            "fadeOut": 0,
+            "glow": false,
+            "hold": 1.5,
+            "id": "win",
+            "kind": "window",
+            "text": "",
+            "when": "whileTrue"
+          }
+        ],
+        "stackCounter": false,
+        "bannerScale": 1.14999997615814,
+        "resource": "hp",
+        "skillId": "",
+        "duration": 3,
+        "scale": 1,
+        "bannerText": "",
+        "showCountdown": false,
+        "showKey": true,
+        "enabled": true,
+        "volume": 1,
+        "x": 1096,
+        "y": 214,
+        "lock": true,
+        "transparent": true,
+        "rule": {
+          "conditions": [
+            {
+              "boolValue": true,
+              "negate": false,
+              "numberValue": 1,
+              "op": "present",
+              "signal": "status.present",
+              "stringValue": "",
+              "subject": "SuperEliteDemon_Bomb_Status",
+              "subjectLabel": "SuperEliteDemon_Bomb_Status"
+            }
+          ],
+          "mode": "all",
+          "presentationSource": 0,
+          "version": 1
+        }
+      },
+      {
+        "plate": "Clones1",
+        "keyText": "",
+        "showFuse": false,
+        "opacity": 1,
+        "dormant": false,
+        "showIcon": true,
+        "progressRing": false,
+        "visual": true,
+        "alwaysOn": false,
+        "showBanner": true,
+        "announce": "",
+        "showLabel": true,
+        "invert": false,
+        "h": 308,
+        "w": 251,
+        "id": "aura_2",
+        "op": "below",
+        "cue": "",
+        "pct": 35,
+        "region": "icon",
+        "fight": "",
+        "isCounter": false,
+        "followBuffDuration": true,
+        "requireAfford": true,
+        "iconId": "Clones1",
+        "trigger": "resource",
+        "audio": false,
+        "name": "Clones",
+        "effects": [
+          {
+            "alpha": 1,
+            "cue": "",
+            "enabled": true,
+            "fadeIn": 0,
+            "fadeOut": 0,
+            "glow": false,
+            "hold": 1.5,
+            "id": "win",
+            "kind": "window",
+            "text": "",
+            "when": "whileTrue"
+          },
+          {
+            "alpha": 1,
+            "cue": "",
+            "enabled": true,
+            "fadeIn": 0,
+            "fadeOut": 0,
+            "glow": false,
+            "hold": 1.5,
+            "id": "boss_alert",
+            "kind": "alert",
+            "text": "",
+            "when": "onRiseHold"
+          }
+        ],
+        "stackCounter": false,
+        "bannerScale": 1.14999997615814,
+        "resource": "hp",
+        "skillId": "",
+        "duration": 3,
+        "scale": 1,
+        "bannerText": "Clones!",
+        "showCountdown": false,
+        "showKey": true,
+        "enabled": true,
+        "volume": 1,
+        "x": 1075,
+        "y": 240,
+        "lock": true,
+        "transparent": true,
+        "rule": {
+          "conditions": [
+            {
+              "boolValue": true,
+              "negate": false,
+              "numberValue": 1,
+              "op": "is",
+              "signal": "event.cast.active",
+              "stringValue": "",
+              "subject": "FairieSuperElite_Clones",
+              "subjectLabel": "Deceitful Illusions"
+            }
+          ],
+          "mode": "all",
+          "presentationSource": 0,
+          "version": 1
+        }
+      }
+    ],
+    "on": true,
+    "unlock": false
+  },
+  "universalProfiles": {
+    "active": "defaultpriest",
+    "profiles": {
+      "Default": {
+        "auras": {
+          "config": {
+            "list": [
+              {
+                "plate": "",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": true,
+                "visual": true,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 96,
+                "w": 96,
+                "id": "hp_low",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "bar",
+                "fight": "",
+                "isCounter": false,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "HP low",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 220,
+                "y": 160,
+                "lock": false,
+                "transparent": false
+              }
+            ],
+            "on": false,
+            "unlock": true
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1389,
+              "y": 594
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 124,
+            "hotkeys": [
+              "1",
+              "2",
+              "G",
+              "MB",
+              "3",
+              "Q"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "Axe_Boomerang_Skill1",
+              "Shield_Craft_Skill1",
+              "Warrior_IgnorePain",
+              "Warrior_Rage_Strike",
+              "GA_Craft_Skill1",
+              "Warrior_Charge"
+            ],
+            "style": {
+              "bgAlpha": 0.730000019,
+              "border": 1.5,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 0,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": true,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 1,
+              "glyphScale": 0.850000024,
+              "padding": 11,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 5,
+              "showCdText": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 164
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 0,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1397,
+              "y": 678
+            },
+            "customStyle": 0,
+            "h": 86,
+            "hidden": false,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 181
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 210
+            },
+            "h": 200,
+            "hidden": true,
+            "rot": [],
+            "spend": "",
+            "title": "Chaincast",
+            "w": 320
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 250
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": false,
+              "x": 1348,
+              "y": 91
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 95,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 304
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1194,
+              "y": 996
+            },
+            "hpH": 65,
+            "hpHidden": false,
+            "hpStyle": 0,
+            "hpVert": false,
+            "hpW": 180,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 270
+            },
+            "manaH": 44,
+            "manaHidden": true,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1368,
+              "y": 1004
+            },
+            "rageH": 56,
+            "rageHidden": false,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 80
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "enr": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 1
+            },
+            "list": [
+              {
+                "plate": "",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": true,
+                "visual": true,
+                "alwaysOn": true,
+                "showBanner": true,
+                "announce": "Ratsar Kill Counter",
+                "showLabel": true,
+                "invert": false,
+                "h": 158,
+                "w": 235,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": true,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 1",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "boss_alert",
+                    "kind": "alert",
+                    "text": "",
+                    "when": "onRiseHold"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": true,
+                    "hold": 4.90000009536743,
+                    "id": "fx3",
+                    "kind": "icon",
+                    "text": "",
+                    "when": "onRise"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "fx4",
+                    "kind": "alert",
+                    "text": "T E S T",
+                    "when": "onRise"
+                  }
+                ],
+                "stackCounter": true,
+                "bannerScale": 2.24000000953674,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 4.90000009536743,
+                "scale": 1,
+                "bannerText": "+1 TEST",
+                "showKey": false,
+                "enabled": true,
+                "volume": 1,
+                "x": 1636,
+                "y": 1080,
+                "lock": false,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "combat.killKindMatches",
+                      "stringValue": "",
+                      "subject": "Ratsar",
+                      "subjectLabel": "King Ratsar"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": false,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1414,
+              "y": 696
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 118,
+            "hotkeys": [
+              "1",
+              "2",
+              "G",
+              "MB",
+              "3",
+              "Q"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "GS_Nova_Skill1",
+              "GS_Nova_Skill2",
+              "Warrior_IgnorePain",
+              "Warrior_Rage_Strike",
+              "GA_Craft_Skill1",
+              "Warrior_Charge"
+            ],
+            "style": {
+              "bgAlpha": 1,
+              "border": 0,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 0,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": true,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.23000002,
+              "padding": 0,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 0,
+              "showCdText": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 127
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 1,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1249,
+              "y": 936
+            },
+            "customStyle": 1,
+            "h": 95,
+            "hidden": true,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 193
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 210
+            },
+            "h": 200,
+            "hidden": true,
+            "rot": [],
+            "spend": "",
+            "title": "Chaincast",
+            "w": 320
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 250
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1403,
+              "y": 951
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 95,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 304
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1160,
+              "y": 912
+            },
+            "hpH": 69,
+            "hpHidden": false,
+            "hpStyle": 3,
+            "hpVert": false,
+            "hpW": 252,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 270
+            },
+            "manaH": 44,
+            "manaHidden": true,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1127,
+              "y": 933
+            },
+            "rageH": 50,
+            "rageHidden": true,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 81
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "cm": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 0,
+              "aura_2": 0,
+              "aura_3": 0
+            },
+            "list": [
+              {
+                "plate": "AoEpuddle",
+                "keyText": "",
+                "showFuse": false,
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "Tagged!",
+                "showLabel": true,
+                "invert": false,
+                "h": 239,
+                "w": 288,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "followBuffDuration": true,
+                "requireAfford": true,
+                "iconId": "AoEpuddle",
+                "trigger": "resource",
+                "audio": false,
+                "name": "Bomb Tag",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 6,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 6,
+                    "id": "boss_alert",
+                    "kind": "alert",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": true,
+                    "hold": 6,
+                    "id": "fx3",
+                    "kind": "icon",
+                    "text": "",
+                    "when": "onRise"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 6,
+                "scale": 1,
+                "bannerText": "Tagged!",
+                "showCountdown": false,
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1068,
+                "y": 154,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "present",
+                      "signal": "status.present",
+                      "stringValue": "",
+                      "subject": "SuperEliteDemon_Bomb_Status",
+                      "subjectLabel": "SuperEliteDemon_Bomb_Status"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              },
+              {
+                "plate": "Clones1",
+                "keyText": "",
+                "showFuse": false,
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 239,
+                "w": 211,
+                "id": "aura_2",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "followBuffDuration": true,
+                "requireAfford": true,
+                "iconId": "Clones1",
+                "trigger": "resource",
+                "audio": false,
+                "name": "Clones",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 6,
+                    "id": "boss_alert",
+                    "kind": "alert",
+                    "text": "",
+                    "when": "whileFalse"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.20000004768372,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showCountdown": false,
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 969,
+                "y": 186,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "event.cast.active",
+                      "stringValue": "",
+                      "subject": "FairieSuperElite_Clones",
+                      "subjectLabel": "Deceitful Illusions"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              },
+              {
+                "plate": "",
+                "keyText": "",
+                "showFuse": false,
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": true,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 74,
+                "w": 96,
+                "id": "aura_3",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "followBuffDuration": true,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 3",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showCountdown": false,
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1384,
+                "y": 517,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "present",
+                      "signal": "status.present",
+                      "stringValue": "",
+                      "subject": "{bytes : ???, length : 27}",
+                      "subjectLabel": "Heartsteel"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": true,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1425,
+              "y": 598
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 167,
+            "hotkeys": [
+              "1",
+              "2",
+              "G",
+              "MB",
+              "3",
+              "Q"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "Axe_Boomerang_Skill1",
+              "Shield_Craft_Skill1",
+              "Warrior_IgnorePain",
+              "Warrior_Rage_Strike",
+              "GA_Craft_Skill1",
+              "Warrior_Charge"
+            ],
+            "style": {
+              "bgAlpha": 0.289999992,
+              "border": 2.20000005,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 1,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": false,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.19000006,
+              "padding": 0,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 1,
+              "showCdText": true,
+              "showCharges": true,
+              "showGroupTags": false,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 159
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 0,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1278,
+              "y": 952
+            },
+            "customStyle": 0,
+            "h": 77,
+            "hidden": true,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 142
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 210
+            },
+            "h": 200,
+            "hidden": true,
+            "rot": [],
+            "showStackBadge": true,
+            "spend": "",
+            "title": "Chaincast",
+            "w": 320
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 250
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1380,
+              "y": 263
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 98,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 266
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1026,
+              "y": 915
+            },
+            "hpH": 68,
+            "hpHidden": false,
+            "hpStyle": 0,
+            "hpVert": true,
+            "hpW": 175,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 270
+            },
+            "manaH": 44,
+            "manaHidden": true,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": true,
+              "x": 1157,
+              "y": 891
+            },
+            "rageH": 56,
+            "rageHidden": false,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 80
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "defaultpriest": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 0,
+              "aura_2": 0
+            },
+            "list": [
+              {
+                "plate": "AoEpuddle",
+                "keyText": "",
+                "showFuse": false,
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 245,
+                "w": 214,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "followBuffDuration": true,
+                "requireAfford": true,
+                "iconId": "AoEpuddle",
+                "trigger": "resource",
+                "audio": false,
+                "name": "Tagged",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showCountdown": false,
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1096,
+                "y": 214,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "present",
+                      "signal": "status.present",
+                      "stringValue": "",
+                      "subject": "SuperEliteDemon_Bomb_Status",
+                      "subjectLabel": "SuperEliteDemon_Bomb_Status"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              },
+              {
+                "plate": "Clones1",
+                "keyText": "",
+                "showFuse": false,
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": true,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 308,
+                "w": 251,
+                "id": "aura_2",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "followBuffDuration": true,
+                "requireAfford": true,
+                "iconId": "Clones1",
+                "trigger": "resource",
+                "audio": false,
+                "name": "Clones",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "boss_alert",
+                    "kind": "alert",
+                    "text": "",
+                    "when": "onRiseHold"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "Clones!",
+                "showCountdown": false,
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1075,
+                "y": 240,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "event.cast.active",
+                      "stringValue": "",
+                      "subject": "FairieSuperElite_Clones",
+                      "subjectLabel": "Deceitful Illusions"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": true,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1398,
+              "y": 613
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 122,
+            "hotkeys": [
+              "2",
+              "3",
+              "Q",
+              "MB",
+              "4",
+              "G"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "Shield_OrbitWater_S1",
+              "Spear_Eruption_Skill1",
+              "Priest_FaithfulWinds",
+              "Priest_Sig_DivineIntervention",
+              "Spear_Eruption_Skill2",
+              "Priest_Crusader"
+            ],
+            "style": {
+              "bgAlpha": 0.850000024,
+              "border": 1.79999995,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 1,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": false,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.16999996,
+              "padding": 2,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 0,
+              "showCdText": true,
+              "showCharges": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 162
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 0,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1219,
+              "y": 1150
+            },
+            "customStyle": 0,
+            "h": 86,
+            "hidden": false,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 181
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 210
+            },
+            "h": 200,
+            "hidden": true,
+            "rot": [],
+            "showStackBadge": true,
+            "spend": "",
+            "title": "Chaincast",
+            "w": 320
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 250
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1353,
+              "y": 190
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 93,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 257
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 938,
+              "y": 962
+            },
+            "hpH": 71,
+            "hpHidden": false,
+            "hpStyle": 0,
+            "hpVert": true,
+            "hpW": 195,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 270
+            },
+            "manaH": 44,
+            "manaHidden": true,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 994,
+              "y": 917
+            },
+            "prayersH": 86,
+            "prayersHidden": false,
+            "prayersW": 142,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1368,
+              "y": 1004
+            },
+            "rageH": 56,
+            "rageHidden": true,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 80
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "pockethive": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 1,
+              "aura_2": 0
+            },
+            "list": [
+              {
+                "plate": "",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": true,
+                "visual": true,
+                "alwaysOn": true,
+                "showBanner": true,
+                "announce": "Ratsar Kill Counter",
+                "showLabel": true,
+                "invert": false,
+                "h": 158,
+                "w": 235,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": true,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 1",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "boss_alert",
+                    "kind": "alert",
+                    "text": "",
+                    "when": "onRiseHold"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": true,
+                    "hold": 4.90000009536743,
+                    "id": "fx3",
+                    "kind": "icon",
+                    "text": "",
+                    "when": "onRise"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "fx4",
+                    "kind": "alert",
+                    "text": "T E S T",
+                    "when": "onRise"
+                  }
+                ],
+                "stackCounter": true,
+                "bannerScale": 2.24000000953674,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 4.90000009536743,
+                "scale": 1,
+                "bannerText": "+1 TEST",
+                "showKey": false,
+                "enabled": false,
+                "volume": 1,
+                "x": 1636,
+                "y": 1080,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "combat.killKindMatches",
+                      "stringValue": "",
+                      "subject": "Ratsar",
+                      "subjectLabel": "King Ratsar"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              },
+              {
+                "plate": "AoEpuddle",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 161,
+                "w": 159,
+                "id": "aura_2",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "requireAfford": true,
+                "iconId": "AoEpuddle",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 2",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 6.40000009536743,
+                    "id": "fx2",
+                    "kind": "alert",
+                    "text": "Despawned",
+                    "when": "onFall"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 775,
+                "y": 75,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "target.kindMatches",
+                      "stringValue": "",
+                      "subject": "Summon_Bee",
+                      "subjectLabel": "Angry Bee"
+                    }
+                  ],
+                  "mode": "any",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": true,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": true,
+              "x": 1427,
+              "y": 848
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 110,
+            "hotkeys": [
+              "2",
+              "1",
+              "G",
+              "MB",
+              "3",
+              "Q"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "GM_MassGrab_Skill2",
+              "GM_MassGrab_Skill1",
+              "Warrior_IgnorePain",
+              "Warrior_Rage_Strike",
+              "GA_Craft_Skill1",
+              "Warrior_Charge"
+            ],
+            "style": {
+              "bgAlpha": 1,
+              "border": 0,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 0,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": true,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.23000002,
+              "padding": 0,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 0,
+              "showCdText": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 146
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 1,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1249,
+              "y": 936
+            },
+            "customStyle": 1,
+            "h": 95,
+            "hidden": true,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 193
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 210
+            },
+            "h": 200,
+            "hidden": true,
+            "rot": [],
+            "spend": "",
+            "title": "Chaincast",
+            "w": 320
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 250
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1403,
+              "y": 951
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 95,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 304
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1160,
+              "y": 912
+            },
+            "hpH": 69,
+            "hpHidden": false,
+            "hpStyle": 3,
+            "hpVert": false,
+            "hpW": 252,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 270
+            },
+            "manaH": 44,
+            "manaHidden": true,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1127,
+              "y": 933
+            },
+            "rageH": 50,
+            "rageHidden": true,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 81
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "mage": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 0
+            },
+            "list": [
+              {
+                "plate": "",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 96,
+                "w": 96,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 1",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  }
+                ],
+                "stackCounter": true,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1356,
+                "y": 537,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "skill.instantReady",
+                      "stringValue": "",
+                      "subject": "Staff_Craft_S1",
+                      "subjectLabel": "Pyroclasm"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": true,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1601,
+              "y": 705
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 110,
+            "hotkeys": [
+              "2",
+              "1",
+              "3",
+              "E",
+              "Q",
+              "MB"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "Staff_Craft_S1",
+              "Staff_Craft_S2",
+              "Book_WaterOrbs_Skill1",
+              "Mage_ShieldOfSpark",
+              "Mage_Blink",
+              "Mage_RayOfSpark"
+            ],
+            "style": {
+              "bgAlpha": 1,
+              "border": 0,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 0,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": true,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.23000002,
+              "padding": 0,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 0,
+              "showCdText": true,
+              "showCharges": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 146
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 1,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1249,
+              "y": 936
+            },
+            "customStyle": 1,
+            "h": 95,
+            "hidden": true,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 193
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 1722,
+              "y": 943
+            },
+            "h": 96,
+            "hidden": false,
+            "rot": [],
+            "showStackBadge": true,
+            "spend": "",
+            "title": "Chaincast",
+            "w": 220
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 1705,
+              "y": 491
+            },
+            "h": 135,
+            "hidden": false,
+            "shape": 1,
+            "vertical": false,
+            "w": 186
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1353,
+              "y": 190
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 95,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 304
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1080,
+              "y": 920
+            },
+            "hpH": 64,
+            "hpHidden": false,
+            "hpStyle": 3,
+            "hpVert": false,
+            "hpW": 204,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1075,
+              "y": 953
+            },
+            "manaH": 65,
+            "manaHidden": false,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1127,
+              "y": 933
+            },
+            "rageH": 50,
+            "rageHidden": true,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 81
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "Rogue": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 0
+            },
+            "list": [
+              {
+                "plate": "",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 96,
+                "w": 96,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 1",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  }
+                ],
+                "stackCounter": true,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1356,
+                "y": 537,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "skill.instantReady",
+                      "stringValue": "",
+                      "subject": "Staff_Craft_S1",
+                      "subjectLabel": "Pyroclasm"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": true,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1601,
+              "y": 705
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 110,
+            "hotkeys": [
+              "2",
+              "1",
+              "3",
+              "E",
+              "Q",
+              "MB"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "Staff_Craft_S1",
+              "Staff_Craft_S2",
+              "Book_WaterOrbs_Skill1",
+              "Mage_ShieldOfSpark",
+              "Mage_Blink",
+              "Mage_RayOfSpark"
+            ],
+            "style": {
+              "bgAlpha": 1,
+              "border": 0,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 0,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": true,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.23000002,
+              "padding": 0,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 0,
+              "showCdText": true,
+              "showCharges": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 146
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 1,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1249,
+              "y": 936
+            },
+            "customStyle": 1,
+            "h": 95,
+            "hidden": true,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 193
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 1634,
+              "y": 367
+            },
+            "h": 103,
+            "hidden": true,
+            "rot": [],
+            "showStackBadge": true,
+            "spend": "",
+            "title": "Chaincast",
+            "w": 220
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1366,
+              "y": 667
+            },
+            "h": 70,
+            "hidden": false,
+            "shape": 4,
+            "vertical": false,
+            "w": 175
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 1658,
+              "y": 551
+            },
+            "h": 100,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 139
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1353,
+              "y": 190
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 95,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 304
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1080,
+              "y": 920
+            },
+            "hpH": 64,
+            "hpHidden": false,
+            "hpStyle": 3,
+            "hpVert": false,
+            "hpW": 204,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1075,
+              "y": 953
+            },
+            "manaH": 65,
+            "manaHidden": false,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1127,
+              "y": 933
+            },
+            "rageH": 50,
+            "rageHidden": true,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 81
+          }
+        },
+        "theme": "purple_gold"
+      }
+    }
+  },
+  "hub": {
+    "chrome": {
+      "collapsed": false,
+      "lock": false,
+      "sun": true,
+      "trans": false,
+      "x": 40,
+      "y": 80
+    },
+    "h": 802,
+    "w": 550
+  },
+  "featureProfiles": {
+    "active": "defaultpriest",
+    "profiles": {
+      "Default": {
+        "auras": {
+          "config": {
+            "list": [
+              {
+                "plate": "",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": true,
+                "visual": true,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 96,
+                "w": 96,
+                "id": "hp_low",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "bar",
+                "fight": "",
+                "isCounter": false,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "HP low",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 220,
+                "y": 160,
+                "lock": false,
+                "transparent": false
+              }
+            ],
+            "on": false,
+            "unlock": true
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1389,
+              "y": 594
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 124,
+            "hotkeys": [
+              "1",
+              "2",
+              "G",
+              "MB",
+              "3",
+              "Q"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "Axe_Boomerang_Skill1",
+              "Shield_Craft_Skill1",
+              "Warrior_IgnorePain",
+              "Warrior_Rage_Strike",
+              "GA_Craft_Skill1",
+              "Warrior_Charge"
+            ],
+            "style": {
+              "bgAlpha": 0.730000019,
+              "border": 1.5,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 0,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": true,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 1,
+              "glyphScale": 0.850000024,
+              "padding": 11,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 5,
+              "showCdText": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 164
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 0,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1397,
+              "y": 678
+            },
+            "customStyle": 0,
+            "h": 86,
+            "hidden": false,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 181
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 210
+            },
+            "h": 200,
+            "hidden": true,
+            "rot": [],
+            "spend": "",
+            "title": "Chaincast",
+            "w": 320
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 250
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": false,
+              "x": 1348,
+              "y": 91
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 95,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 304
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1194,
+              "y": 996
+            },
+            "hpH": 65,
+            "hpHidden": false,
+            "hpStyle": 0,
+            "hpVert": false,
+            "hpW": 180,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 270
+            },
+            "manaH": 44,
+            "manaHidden": true,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1368,
+              "y": 1004
+            },
+            "rageH": 56,
+            "rageHidden": false,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 80
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "enr": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 1
+            },
+            "list": [
+              {
+                "plate": "",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": true,
+                "visual": true,
+                "alwaysOn": true,
+                "showBanner": true,
+                "announce": "Ratsar Kill Counter",
+                "showLabel": true,
+                "invert": false,
+                "h": 158,
+                "w": 235,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": true,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 1",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "boss_alert",
+                    "kind": "alert",
+                    "text": "",
+                    "when": "onRiseHold"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": true,
+                    "hold": 4.90000009536743,
+                    "id": "fx3",
+                    "kind": "icon",
+                    "text": "",
+                    "when": "onRise"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "fx4",
+                    "kind": "alert",
+                    "text": "T E S T",
+                    "when": "onRise"
+                  }
+                ],
+                "stackCounter": true,
+                "bannerScale": 2.24000000953674,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 4.90000009536743,
+                "scale": 1,
+                "bannerText": "+1 TEST",
+                "showKey": false,
+                "enabled": true,
+                "volume": 1,
+                "x": 1636,
+                "y": 1080,
+                "lock": false,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "combat.killKindMatches",
+                      "stringValue": "",
+                      "subject": "Ratsar",
+                      "subjectLabel": "King Ratsar"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": false,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1414,
+              "y": 696
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 118,
+            "hotkeys": [
+              "1",
+              "2",
+              "G",
+              "MB",
+              "3",
+              "Q"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "GS_Nova_Skill1",
+              "GS_Nova_Skill2",
+              "Warrior_IgnorePain",
+              "Warrior_Rage_Strike",
+              "GA_Craft_Skill1",
+              "Warrior_Charge"
+            ],
+            "style": {
+              "bgAlpha": 1,
+              "border": 0,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 0,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": true,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.23000002,
+              "padding": 0,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 0,
+              "showCdText": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 127
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 1,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1249,
+              "y": 936
+            },
+            "customStyle": 1,
+            "h": 95,
+            "hidden": true,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 193
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 210
+            },
+            "h": 200,
+            "hidden": true,
+            "rot": [],
+            "spend": "",
+            "title": "Chaincast",
+            "w": 320
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 250
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1403,
+              "y": 951
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 95,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 304
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1160,
+              "y": 912
+            },
+            "hpH": 69,
+            "hpHidden": false,
+            "hpStyle": 3,
+            "hpVert": false,
+            "hpW": 252,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 270
+            },
+            "manaH": 44,
+            "manaHidden": true,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1127,
+              "y": 933
+            },
+            "rageH": 50,
+            "rageHidden": true,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 81
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "cm": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 0,
+              "aura_2": 0,
+              "aura_3": 0
+            },
+            "list": [
+              {
+                "plate": "AoEpuddle",
+                "keyText": "",
+                "showFuse": false,
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "Tagged!",
+                "showLabel": true,
+                "invert": false,
+                "h": 239,
+                "w": 288,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "followBuffDuration": true,
+                "requireAfford": true,
+                "iconId": "AoEpuddle",
+                "trigger": "resource",
+                "audio": false,
+                "name": "Bomb Tag",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 6,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 6,
+                    "id": "boss_alert",
+                    "kind": "alert",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": true,
+                    "hold": 6,
+                    "id": "fx3",
+                    "kind": "icon",
+                    "text": "",
+                    "when": "onRise"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 6,
+                "scale": 1,
+                "bannerText": "Tagged!",
+                "showCountdown": false,
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1068,
+                "y": 154,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "present",
+                      "signal": "status.present",
+                      "stringValue": "",
+                      "subject": "SuperEliteDemon_Bomb_Status",
+                      "subjectLabel": "SuperEliteDemon_Bomb_Status"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              },
+              {
+                "plate": "Clones1",
+                "keyText": "",
+                "showFuse": false,
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 239,
+                "w": 211,
+                "id": "aura_2",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "followBuffDuration": true,
+                "requireAfford": true,
+                "iconId": "Clones1",
+                "trigger": "resource",
+                "audio": false,
+                "name": "Clones",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 6,
+                    "id": "boss_alert",
+                    "kind": "alert",
+                    "text": "",
+                    "when": "whileFalse"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.20000004768372,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showCountdown": false,
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 969,
+                "y": 186,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "event.cast.active",
+                      "stringValue": "",
+                      "subject": "FairieSuperElite_Clones",
+                      "subjectLabel": "Deceitful Illusions"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              },
+              {
+                "plate": "",
+                "keyText": "",
+                "showFuse": false,
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": true,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 74,
+                "w": 96,
+                "id": "aura_3",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "followBuffDuration": true,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 3",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showCountdown": false,
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1384,
+                "y": 517,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "present",
+                      "signal": "status.present",
+                      "stringValue": "",
+                      "subject": "{bytes : ???, length : 27}",
+                      "subjectLabel": "Heartsteel"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": true,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1425,
+              "y": 598
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 167,
+            "hotkeys": [
+              "1",
+              "2",
+              "G",
+              "MB",
+              "3",
+              "Q"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "Axe_Boomerang_Skill1",
+              "Shield_Craft_Skill1",
+              "Warrior_IgnorePain",
+              "Warrior_Rage_Strike",
+              "GA_Craft_Skill1",
+              "Warrior_Charge"
+            ],
+            "style": {
+              "bgAlpha": 0.289999992,
+              "border": 2.20000005,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 1,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": false,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.19000006,
+              "padding": 0,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 1,
+              "showCdText": true,
+              "showCharges": true,
+              "showGroupTags": false,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 159
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 0,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1278,
+              "y": 952
+            },
+            "customStyle": 0,
+            "h": 77,
+            "hidden": true,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 142
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 210
+            },
+            "h": 200,
+            "hidden": true,
+            "rot": [],
+            "showStackBadge": true,
+            "spend": "",
+            "title": "Chaincast",
+            "w": 320
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 250
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1380,
+              "y": 263
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 98,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 266
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1026,
+              "y": 915
+            },
+            "hpH": 68,
+            "hpHidden": false,
+            "hpStyle": 0,
+            "hpVert": true,
+            "hpW": 175,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 270
+            },
+            "manaH": 44,
+            "manaHidden": true,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": true,
+              "x": 1157,
+              "y": 891
+            },
+            "rageH": 56,
+            "rageHidden": false,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 80
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "defaultpriest": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 0,
+              "aura_2": 0
+            },
+            "list": [
+              {
+                "plate": "AoEpuddle",
+                "keyText": "",
+                "showFuse": false,
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 245,
+                "w": 214,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "followBuffDuration": true,
+                "requireAfford": true,
+                "iconId": "AoEpuddle",
+                "trigger": "resource",
+                "audio": false,
+                "name": "Tagged",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showCountdown": false,
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1096,
+                "y": 214,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "present",
+                      "signal": "status.present",
+                      "stringValue": "",
+                      "subject": "SuperEliteDemon_Bomb_Status",
+                      "subjectLabel": "SuperEliteDemon_Bomb_Status"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              },
+              {
+                "plate": "Clones1",
+                "keyText": "",
+                "showFuse": false,
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": true,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 308,
+                "w": 251,
+                "id": "aura_2",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "followBuffDuration": true,
+                "requireAfford": true,
+                "iconId": "Clones1",
+                "trigger": "resource",
+                "audio": false,
+                "name": "Clones",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "boss_alert",
+                    "kind": "alert",
+                    "text": "",
+                    "when": "onRiseHold"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "Clones!",
+                "showCountdown": false,
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1075,
+                "y": 240,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "event.cast.active",
+                      "stringValue": "",
+                      "subject": "FairieSuperElite_Clones",
+                      "subjectLabel": "Deceitful Illusions"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": true,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1398,
+              "y": 613
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 122,
+            "hotkeys": [
+              "2",
+              "3",
+              "Q",
+              "MB",
+              "4",
+              "G"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "Shield_OrbitWater_S1",
+              "Spear_Eruption_Skill1",
+              "Priest_FaithfulWinds",
+              "Priest_Sig_DivineIntervention",
+              "Spear_Eruption_Skill2",
+              "Priest_Crusader"
+            ],
+            "style": {
+              "bgAlpha": 0.850000024,
+              "border": 1.79999995,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 1,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": false,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.16999996,
+              "padding": 2,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 0,
+              "showCdText": true,
+              "showCharges": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 162
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 0,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1219,
+              "y": 1150
+            },
+            "customStyle": 0,
+            "h": 86,
+            "hidden": false,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 181
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 210
+            },
+            "h": 200,
+            "hidden": true,
+            "rot": [],
+            "showStackBadge": true,
+            "spend": "",
+            "title": "Chaincast",
+            "w": 320
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 250
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1353,
+              "y": 190
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 93,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 257
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 938,
+              "y": 962
+            },
+            "hpH": 71,
+            "hpHidden": false,
+            "hpStyle": 0,
+            "hpVert": true,
+            "hpW": 195,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 270
+            },
+            "manaH": 44,
+            "manaHidden": true,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 994,
+              "y": 917
+            },
+            "prayersH": 86,
+            "prayersHidden": false,
+            "prayersW": 142,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1368,
+              "y": 1004
+            },
+            "rageH": 56,
+            "rageHidden": true,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 80
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "pockethive": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 1,
+              "aura_2": 0
+            },
+            "list": [
+              {
+                "plate": "",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": true,
+                "visual": true,
+                "alwaysOn": true,
+                "showBanner": true,
+                "announce": "Ratsar Kill Counter",
+                "showLabel": true,
+                "invert": false,
+                "h": 158,
+                "w": 235,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": true,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 1",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "boss_alert",
+                    "kind": "alert",
+                    "text": "",
+                    "when": "onRiseHold"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": true,
+                    "hold": 4.90000009536743,
+                    "id": "fx3",
+                    "kind": "icon",
+                    "text": "",
+                    "when": "onRise"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 4.90000009536743,
+                    "id": "fx4",
+                    "kind": "alert",
+                    "text": "T E S T",
+                    "when": "onRise"
+                  }
+                ],
+                "stackCounter": true,
+                "bannerScale": 2.24000000953674,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 4.90000009536743,
+                "scale": 1,
+                "bannerText": "+1 TEST",
+                "showKey": false,
+                "enabled": false,
+                "volume": 1,
+                "x": 1636,
+                "y": 1080,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "combat.killKindMatches",
+                      "stringValue": "",
+                      "subject": "Ratsar",
+                      "subjectLabel": "King Ratsar"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              },
+              {
+                "plate": "AoEpuddle",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 161,
+                "w": 159,
+                "id": "aura_2",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "requireAfford": true,
+                "iconId": "AoEpuddle",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 2",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  },
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 6.40000009536743,
+                    "id": "fx2",
+                    "kind": "alert",
+                    "text": "Despawned",
+                    "when": "onFall"
+                  }
+                ],
+                "stackCounter": false,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 775,
+                "y": 75,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "target.kindMatches",
+                      "stringValue": "",
+                      "subject": "Summon_Bee",
+                      "subjectLabel": "Angry Bee"
+                    }
+                  ],
+                  "mode": "any",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": true,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": true,
+              "x": 1427,
+              "y": 848
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 110,
+            "hotkeys": [
+              "2",
+              "1",
+              "G",
+              "MB",
+              "3",
+              "Q"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "GM_MassGrab_Skill2",
+              "GM_MassGrab_Skill1",
+              "Warrior_IgnorePain",
+              "Warrior_Rage_Strike",
+              "GA_Craft_Skill1",
+              "Warrior_Charge"
+            ],
+            "style": {
+              "bgAlpha": 1,
+              "border": 0,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 0,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": true,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.23000002,
+              "padding": 0,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 0,
+              "showCdText": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 146
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 1,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1249,
+              "y": 936
+            },
+            "customStyle": 1,
+            "h": 95,
+            "hidden": true,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 193
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 210
+            },
+            "h": 200,
+            "hidden": true,
+            "rot": [],
+            "spend": "",
+            "title": "Chaincast",
+            "w": 320
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 250
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1403,
+              "y": 951
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 95,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 304
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1160,
+              "y": 912
+            },
+            "hpH": 69,
+            "hpHidden": false,
+            "hpStyle": 3,
+            "hpVert": false,
+            "hpW": 252,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 270
+            },
+            "manaH": 44,
+            "manaHidden": true,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1127,
+              "y": 933
+            },
+            "rageH": 50,
+            "rageHidden": true,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 81
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "mage": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 0
+            },
+            "list": [
+              {
+                "plate": "",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 96,
+                "w": 96,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 1",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  }
+                ],
+                "stackCounter": true,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1356,
+                "y": 537,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "skill.instantReady",
+                      "stringValue": "",
+                      "subject": "Staff_Craft_S1",
+                      "subjectLabel": "Pyroclasm"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": true,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1601,
+              "y": 705
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 110,
+            "hotkeys": [
+              "2",
+              "1",
+              "3",
+              "E",
+              "Q",
+              "MB"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "Staff_Craft_S1",
+              "Staff_Craft_S2",
+              "Book_WaterOrbs_Skill1",
+              "Mage_ShieldOfSpark",
+              "Mage_Blink",
+              "Mage_RayOfSpark"
+            ],
+            "style": {
+              "bgAlpha": 1,
+              "border": 0,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 0,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": true,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.23000002,
+              "padding": 0,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 0,
+              "showCdText": true,
+              "showCharges": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 146
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 1,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1249,
+              "y": 936
+            },
+            "customStyle": 1,
+            "h": 95,
+            "hidden": true,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 193
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 1722,
+              "y": 943
+            },
+            "h": 96,
+            "hidden": false,
+            "rot": [],
+            "showStackBadge": true,
+            "spend": "",
+            "title": "Chaincast",
+            "w": 220
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 160
+            },
+            "h": 36,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 220
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 1705,
+              "y": 491
+            },
+            "h": 135,
+            "hidden": false,
+            "shape": 1,
+            "vertical": false,
+            "w": 186
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1353,
+              "y": 190
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 95,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 304
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1080,
+              "y": 920
+            },
+            "hpH": 64,
+            "hpHidden": false,
+            "hpStyle": 3,
+            "hpVert": false,
+            "hpW": 204,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1075,
+              "y": 953
+            },
+            "manaH": 65,
+            "manaHidden": false,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1127,
+              "y": 933
+            },
+            "rageH": 50,
+            "rageHidden": true,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 81
+          }
+        },
+        "theme": "purple_gold"
+      },
+      "Rogue": {
+        "auras": {
+          "config": {
+            "auraCounter": {
+              "aura_1": 0
+            },
+            "list": [
+              {
+                "plate": "",
+                "keyText": "",
+                "opacity": 1,
+                "dormant": false,
+                "showIcon": true,
+                "progressRing": false,
+                "visual": true,
+                "alwaysOn": false,
+                "showBanner": false,
+                "announce": "",
+                "showLabel": true,
+                "invert": false,
+                "h": 96,
+                "w": 96,
+                "id": "aura_1",
+                "op": "below",
+                "cue": "",
+                "pct": 35,
+                "region": "icon",
+                "fight": "",
+                "isCounter": false,
+                "requireAfford": true,
+                "iconId": "",
+                "trigger": "resource",
+                "audio": false,
+                "name": "New Aura 1",
+                "effects": [
+                  {
+                    "alpha": 1,
+                    "cue": "",
+                    "enabled": true,
+                    "fadeIn": 0,
+                    "fadeOut": 0,
+                    "glow": false,
+                    "hold": 1.5,
+                    "id": "win",
+                    "kind": "window",
+                    "text": "",
+                    "when": "whileTrue"
+                  }
+                ],
+                "stackCounter": true,
+                "bannerScale": 1.14999997615814,
+                "resource": "hp",
+                "skillId": "",
+                "duration": 3,
+                "scale": 1,
+                "bannerText": "",
+                "showKey": true,
+                "enabled": true,
+                "volume": 1,
+                "x": 1356,
+                "y": 537,
+                "lock": true,
+                "transparent": true,
+                "rule": {
+                  "conditions": [
+                    {
+                      "boolValue": true,
+                      "negate": false,
+                      "numberValue": 1,
+                      "op": "is",
+                      "signal": "skill.instantReady",
+                      "stringValue": "",
+                      "subject": "Staff_Craft_S1",
+                      "subjectLabel": "Pyroclasm"
+                    }
+                  ],
+                  "mode": "all",
+                  "presentationSource": 0,
+                  "version": 1
+                }
+              }
+            ],
+            "on": true,
+            "unlock": false
+          }
+        },
+        "geaux": {
+          "layout": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1601,
+              "y": 705
+            },
+            "cols": 3,
+            "glyphs": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "h": 110,
+            "hotkeys": [
+              "2",
+              "1",
+              "3",
+              "E",
+              "Q",
+              "MB"
+            ],
+            "on": true,
+            "rows": 2,
+            "slots": [
+              "Staff_Craft_S1",
+              "Staff_Craft_S2",
+              "Book_WaterOrbs_Skill1",
+              "Mage_ShieldOfSpark",
+              "Mage_Blink",
+              "Mage_RayOfSpark"
+            ],
+            "style": {
+              "bgAlpha": 1,
+              "border": 0,
+              "borderIdle": [
+                0.280000001192093,
+                0.300000011920929,
+                0.340000003576279,
+                1
+              ],
+              "borderReady": [
+                1,
+                1,
+                1,
+                0.449999988079071
+              ],
+              "cdDisplay": 0,
+              "cdText": [
+                1,
+                0.920000016689301,
+                0.550000011920929,
+                1
+              ],
+              "cooldownAttention": 1,
+              "dimOnCd": true,
+              "dimOnNoResource": true,
+              "emptyFill": [
+                0.119999997317791,
+                0.129999995231628,
+                0.150000005960464,
+                1
+              ],
+              "gap": 0,
+              "glyphScale": 1.23000002,
+              "padding": 0,
+              "readyAttention": 1,
+              "readyCls": [
+                0.219999998807907,
+                0.479999989271164,
+                0.779999971389771,
+                1
+              ],
+              "readyDefault": [
+                0.349999994039536,
+                0.400000005960464,
+                0.479999989271164,
+                1
+              ],
+              "readySig": [
+                0.920000016689301,
+                0.720000028610229,
+                0.180000007152557,
+                1
+              ],
+              "readyWep": [
+                0.720000028610229,
+                0.479999989271164,
+                0.180000007152557,
+                1
+              ],
+              "rounding": 0,
+              "showCdText": true,
+              "showCharges": true,
+              "showGroupTags": true,
+              "showHotkeys": true,
+              "showLabels": false,
+              "showPinwheel": true,
+              "windowBg": [
+                0.0799999982118607,
+                0.0900000035762787,
+                0.109999999403954,
+                1
+              ]
+            },
+            "w": 146
+          }
+        },
+        "resources": {
+          "attackCombo": {
+            "art": 1,
+            "bannerH": 56,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1249,
+              "y": 936
+            },
+            "customStyle": 1,
+            "h": 95,
+            "hidden": true,
+            "mode": 2,
+            "shape": 2,
+            "type": 1,
+            "vertical": false,
+            "w": 193
+          },
+          "chaincast": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 1634,
+              "y": 367
+            },
+            "h": 103,
+            "hidden": true,
+            "rot": [],
+            "showStackBadge": true,
+            "spend": "",
+            "title": "Chaincast",
+            "w": 220
+          },
+          "combo": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1366,
+              "y": 667
+            },
+            "h": 70,
+            "hidden": false,
+            "shape": 4,
+            "vertical": false,
+            "w": 175
+          },
+          "conduit": {
+            "chrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 1658,
+              "y": 551
+            },
+            "h": 100,
+            "hidden": true,
+            "shape": 1,
+            "vertical": false,
+            "w": 139
+          },
+          "target": {
+            "always": true,
+            "badge": true,
+            "boss": false,
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1353,
+              "y": 190
+            },
+            "empty": false,
+            "emptyBar": true,
+            "h": 95,
+            "hidden": false,
+            "hp": true,
+            "low": 25,
+            "name": true,
+            "pct": true,
+            "portrait": true,
+            "pulse": true,
+            "round": 4,
+            "w": 304
+          },
+          "vitals": {
+            "chrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1080,
+              "y": 920
+            },
+            "hpH": 64,
+            "hpHidden": false,
+            "hpStyle": 3,
+            "hpVert": false,
+            "hpW": 204,
+            "layout": 0,
+            "manaChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1075,
+              "y": 953
+            },
+            "manaH": 65,
+            "manaHidden": false,
+            "manaStyle": 0,
+            "manaVert": false,
+            "manaW": 220,
+            "prayersChrome": {
+              "collapsed": false,
+              "lock": false,
+              "sun": true,
+              "trans": false,
+              "x": 40,
+              "y": 330
+            },
+            "prayersH": 56,
+            "prayersHidden": true,
+            "prayersW": 180,
+            "rageChrome": {
+              "collapsed": false,
+              "lock": true,
+              "sun": true,
+              "trans": true,
+              "x": 1127,
+              "y": 933
+            },
+            "rageH": 50,
+            "rageHidden": true,
+            "rageStyle": 11,
+            "rageVert": false,
+            "rageW": 81
+          }
+        },
+        "theme": "purple_gold"
+      }
+    }
+  },
+  "uiState": {
+    "hubOpen": false,
+    "hubTab": 0,
+    "rememberHubLayout": true
+  }
+}

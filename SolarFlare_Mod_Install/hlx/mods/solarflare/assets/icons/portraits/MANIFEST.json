@@ -1,0 +1,8 @@
+{
+  "kind_portraits": 492,
+  "missing_kind_sources": 0,
+  "unique_stems": 346,
+  "raw_dir": "E:\\Solar_Flare_2_Mod\\tools\\_pak_portraits_raw",
+  "curated_dir": "E:\\Solar_Flare_2_Mod\\assets\\icons\\portraits",
+  "note": "GameIcons key = unit kind id (basename). Atlas frames should use the same keys."
+}

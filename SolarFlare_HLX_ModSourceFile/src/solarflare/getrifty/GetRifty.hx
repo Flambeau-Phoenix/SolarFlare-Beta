@@ -265,9 +265,10 @@ class GetRiftyConfig {
 			return;
 		ImGui.setNextWindowSize(ImGui.vec2(360, 0), ImGuiCond.FirstUseEver);
 		if (HudChrome.beginPanel("GetRifty##solarflare_cfg", open, "GetRifty")) {
-			ImGui.text("Rift timer. Portal at :45, rift at :00.");
+			ImGui.text("Rift timer. Portal at :45, rift at :00. Off until you uncheck Hide.");
 			if (ImGui.checkbox("Hide GetRifty##rifty_hidden", hidden))
 				SettingsStore.markDirty();
+			ImGui.textDisabled("Hidden by default. Uncheck Hide to show the on-screen clock.");
 			chrome.drawToggles("rifty");
 			if (ImGui.sliderFloat("Size", size, MIN_SIZE, MAX_SIZE, "%.0f px")) {
 				sizeDirty = true;
@@ -423,7 +424,7 @@ class GetRiftyConfig {
 class GetRiftyOverlay {
 	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
 		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
-		| ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoResize;
+		| ImGuiWindowFlags.NoBackground;
 	static inline var RAYS:Int = 16;
 
 	var theme:Theme;
@@ -474,12 +475,35 @@ class GetRiftyOverlay {
 		if (began) {
 			if (cfg.chrome != null)
 				cfg.chrome.capturePos();
+			if (cfg.chrome == null || !cfg.chrome.isLocked()) {
+				var win = ImGui.getWindowSize();
+				var next:Single = win.x;
+				if (bannerH > 0) {
+					var fromH:Single = win.y - bannerH;
+					if (fromH > 0 && fromH < next)
+						next = fromH;
+				} else if (win.y > 0 && win.y < next)
+					next = win.y;
+				if (next < GetRiftyConfig.MIN_SIZE)
+					next = GetRiftyConfig.MIN_SIZE;
+				if (next > GetRiftyConfig.MAX_SIZE)
+					next = GetRiftyConfig.MAX_SIZE;
+				if (Math.abs(next - cfg.size.get()) >= 0.5) {
+					cfg.size.set(next);
+					SettingsStore.markDirty();
+				}
+				size = next;
+				winW = size;
+				winH = size + bannerH;
+			}
 			if (cfg.chrome == null || cfg.chrome.beginBody(function() {
 				cfg.hidden.set(true);
 				SettingsStore.markDirty();
 			}, null, "GetRifty")) {
 			var origin = ImGui.getCursorScreenPos();
+			// Reserve body size with a real item first — GameIcons.draw uses SetCursorScreenPos.
 			ImGui.dummy(ImGui.vec2(winW, winH));
+			var settle = ImGui.getCursorScreenPos();
 			var dl = ImGui.getWindowDrawList();
 			var sunY:Single = origin.y + bannerH;
 			if (GetRiftyCache.alertKind != GetRiftyCache.ALERT_NONE)
@@ -504,6 +528,9 @@ class GetRiftyOverlay {
 				drawTemplateText(dl, origin.x, sunY, size, style);
 			else
 				drawHoleText(dl, origin.x, sunY, size, cfg, light);
+			// Settle cursor with an item so EndChild does not see a bare SetCursorScreenPos extend.
+			ImGui.setCursorScreenPos(settle);
+			ImGui.dummy(ImGui.vec2(1, 1));
 			}
 		}
 		solarflare.ui.HudChrome.endOverlayWindow(began, cfg.chrome);

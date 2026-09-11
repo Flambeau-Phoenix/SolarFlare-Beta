@@ -69,6 +69,10 @@ class AuraVisualRenderer {
 			RingGauge.draw(dl, ImGui.vec2(ix + side * 0.5, iy + side * 0.5), rad, progress,
 				ImGui.vec4(0.95, 0.82, 0.28, 0.9 * alpha), "");
 		}
+		if (!ghost && a.showFuse != null && a.showFuse.get())
+			drawFuse(dl, ix, iy, side, progress, alpha);
+		if (!ghost && a.showCountdown != null && a.showCountdown.get())
+			drawCountdown(dl, ix, iy, side, a, alpha);
 		if (showCount) {
 			var st = Std.string(count);
 			var ts = ImGui.calcTextSize(st);
@@ -85,6 +89,52 @@ class AuraVisualRenderer {
 			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + (w - ts.x) * 0.5, y + h - labelH + 2),
 				ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, alpha)), label);
 		}
+	}
+
+	/** Vertical fuse on the right edge: filled height = remaining ratio, drains top→bottom. */
+	static function drawFuse(dl:Dynamic, ix:Single, iy:Single, side:Single, progress:Float, alpha:Float):Void {
+		var p = clamp01(progress);
+		var fw:Single = Math.max(3, side * 0.08);
+		var pad:Single = 2;
+		var x0 = ix + side - fw - pad;
+		var y0 = iy + pad;
+		var y1 = iy + side - pad;
+		var fullH = y1 - y0;
+		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x0, y0), ImGui.vec2(x0 + fw, y1),
+			ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.05, 0.06, 0.08, 0.75 * alpha)), 2);
+		if (p > 0.001) {
+			var fillH = fullH * p;
+			var fy0 = y1 - fillH;
+			var hot = p < 0.25;
+			var col = hot
+				? ImGui.vec4(0.95, 0.35, 0.2, 0.95 * alpha)
+				: ImGui.vec4(0.95, 0.78, 0.28, 0.92 * alpha);
+			ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x0, fy0), ImGui.vec2(x0 + fw, y1),
+				ImGui.colorConvertFloat4ToU32(col), 2);
+		}
+	}
+
+	static function drawCountdown(dl:Dynamic, ix:Single, iy:Single, side:Single, a:AuraDef, alpha:Float):Void {
+		var text = "";
+		if (a.timerInfinite)
+			text = "∞";
+		else if (Math.isFinite(a.timeLeft) && a.timeLeft >= 0) {
+			var sec = Math.ceil(a.timeLeft - 0.001);
+			if (sec < 0)
+				sec = 0;
+			text = Std.string(sec);
+		} else
+			return;
+		var ts = ImGui.calcTextSize(text);
+		var tx = ix + (side - ts.x) * 0.5;
+		var ty = iy + (side - ts.y) * 0.5;
+		var pad:Single = 4;
+		ImGui.ImDrawList_AddRectFilled(dl,
+			ImGui.vec2(tx - pad, ty - 2),
+			ImGui.vec2(tx + ts.x + pad, ty + ts.y + 2),
+			ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.03, 0.05, 0.72 * alpha)), 6);
+		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty),
+			ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 0.95, 0.75, alpha)), text);
 	}
 
 	static inline function clamp01(v:Float):Float {

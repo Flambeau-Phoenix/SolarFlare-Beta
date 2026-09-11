@@ -134,7 +134,7 @@ class FieldWalk {
 				var s:String = val;
 				if (s == null)
 					return fallback;
-				s = StringTools.trim(s);
+				s = solarflare.ui.ByteUtil.materialize(StringTools.trim(s));
 				if (s.length == 0)
 					return fallback;
 				return s;

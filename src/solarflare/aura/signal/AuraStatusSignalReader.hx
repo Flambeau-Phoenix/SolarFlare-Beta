@@ -32,6 +32,11 @@ class AuraStatusSignalReader {
 		}
 		if (!present) { out.code = MISSING_SUBJECT; return; }
 		if (!s.durationKnown) { out.code = UNKNOWN_DOMAIN; return; }
+		if (s.infinite) {
+			out.numberValue = signal == "status.durationLeft" ? solarflare.SkillRemain.INFINITE_LEFT : 1;
+			out.timeLeft = solarflare.SkillRemain.INFINITE_LEFT; out.progress = 1;
+			out.known = true; out.code = OK; return;
+		}
 		out.numberValue = signal == "status.durationLeft" ? s.durationLeft : s.durationProgress;
 		out.timeLeft = s.durationLeft; out.progress = s.durationProgress;
 		out.known = Math.isFinite(out.numberValue);

@@ -25,6 +25,8 @@ class CombatLogLine {
 	public var affinity:String = "";
 	public var involvesCurrentTarget:Bool = false;
 	public var heroInvolved:Bool = false;
+	/** Source or target within CombatLogConfig.PROXIMITY of local hero (pos2D). */
+	public var inProximity:Bool = false;
 	public var t:Float = 0;
 	public var wallMs:Float = 0;
 	public var targetHp:Float = 0;

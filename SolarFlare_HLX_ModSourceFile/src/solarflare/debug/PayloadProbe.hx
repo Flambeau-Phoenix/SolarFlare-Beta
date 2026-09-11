@@ -98,6 +98,7 @@ class PayloadProbe {
 
 	public static function startRecording():Void {
 		recording.set(true);
+		FieldWalkLog.clearSession();
 		lastLabel = "payload-probe recording";
 	}
 
@@ -119,6 +120,7 @@ class PayloadProbe {
 		lastInstantSkillId = "";
 		lastInstantKnown = false;
 		lastInstantReady = false;
+		FieldWalkLog.clearSession();
 		lastLabel = armed() ? "payload-probe recording (cleared)" : "payload-probe idle";
 	}
 
@@ -126,7 +128,8 @@ class PayloadProbe {
 		if (!armed())
 			return;
 		var now = stamp();
-		if (now - lastCombat < MIN_GAP)
+		// Combat hits/casts bypass idle throttle so multi-hit skills are not dropped.
+		if (src != "damage" && src != "cast" && now - lastCombat < MIN_GAP)
 			return;
 		lastCombat = now;
 		var pack = src == "cast" ? "Skill" : "DamageResult";
@@ -383,8 +386,24 @@ class PayloadProbe {
 			if (Std.isOfType(v, String)) {
 				var s:String = v;
 				row.kind = "string";
-				row.preview = clip(s != null ? StringTools.trim(s) : "", 48);
+				row.preview = clip(solarflare.ui.ByteUtil.materialize(s != null ? StringTools.trim(s) : ""), 48);
 				return;
+			}
+		} catch (_:Dynamic) {}
+		// Bare {bytes,length} / hl.Bytes UCS-2 without String wrapper.
+		try {
+			var b:Dynamic = Reflect.field(v, "bytes");
+			var L:Dynamic = Reflect.field(v, "length");
+			if (b != null && L != null) {
+				var n = Std.int(L);
+				if (n > 0 && n < 4096) {
+					var decoded = solarflare.ui.ByteUtil.readUCS2(cast b, n);
+					if (decoded != null && decoded.length > 0) {
+						row.kind = "string";
+						row.preview = clip(decoded, 48);
+						return;
+					}
+				}
 			}
 		} catch (_:Dynamic) {}
 		try {
@@ -515,6 +534,7 @@ class PayloadProbe {
 	static function clip(s:String, n:Int):String {
 		if (s == null)
 			return "";
+		s = solarflare.ui.ByteUtil.materialize(s);
 		if (s.length <= n)
 			return s;
 		return s.substr(0, n);

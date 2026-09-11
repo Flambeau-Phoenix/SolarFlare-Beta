@@ -285,10 +285,20 @@ class AsciiArt {
 		searchDirs = [];
 		var candidates = new Array<String>();
 		try {
+			var mod = solarflare.ui.ModPaths.modDir();
+			candidates.push(Path.join([mod, "assets", "ascii"]));
+			candidates.push(Path.join([mod, "getrifty", "ascii"]));
+			candidates.push(Path.join([mod, "getrifty"]));
+		} catch (_:Dynamic) {}
+		try {
 			var exeDir = Path.directory(Sys.programPath());
+			candidates.push(Path.join([exeDir, "hlx", "mods", "solarflare", "assets", "ascii"]));
 			candidates.push(Path.join([exeDir, "hlx", "mods", "solarflare", "getrifty", "ascii"]));
 			candidates.push(Path.join([exeDir, "hlx", "mods", "solarflare", "getrifty"]));
 		} catch (_:Dynamic) {}
+		try
+			candidates.push(Path.join([Sys.getCwd(), "assets", "ascii"]))
+		catch (_:Dynamic) {}
 		try
 			candidates.push(Path.join([Sys.getCwd(), "assets", "getrifty", "ascii"]))
 		catch (_:Dynamic) {}

@@ -23,7 +23,7 @@ class AuraEffects {
 		}
 	}
 
-	public static function apply(a:AuraDef, hit:Bool, known:Bool, now:Float, prog:Float):Void {
+	public static function apply(a:AuraDef, hit:Bool, known:Bool, now:Float, prog:Float, buffLeft:Float, buffInfinite:Bool):Void {
 		if (a == null)
 			return;
 		ensure(a);
@@ -38,6 +38,8 @@ class AuraEffects {
 		var iconGlow = false;
 		var fxAlpha:Float = 1;
 		var anyWin = false;
+		var holdUntil:Float = 0;
+		var holdLen:Float = 0;
 
 		var i = 0;
 		while (i < a.effects.length) {
@@ -70,6 +72,13 @@ class AuraEffects {
 			} else if (kind == AuraEffect.KIND_AUDIO) {
 				// Stored for DRM export; HudMod does not play cues.
 			}
+			if (e.until > now) {
+				var h = e.hold > 0.05 ? e.hold : catalogHold(a, 1.5);
+				if (e.until > holdUntil) {
+					holdUntil = e.until;
+					holdLen = h;
+				}
+			}
 		}
 
 		// Legacy visual gate: if there is a window/icon effect, still honor visual=false.
@@ -81,7 +90,32 @@ class AuraEffects {
 		a.alertText = alertText;
 		a.iconGlow = iconGlow;
 		a.fxAlpha = fxAlpha;
-		a.progress = prog;
+
+		var follow = a.followBuffDuration == null || a.followBuffDuration.get();
+		var drawProg = prog;
+		var drawLeft = Math.NaN;
+		var drawInf = false;
+		if (follow && buffInfinite) {
+			drawProg = 1;
+			drawLeft = solarflare.SkillRemain.INFINITE_LEFT;
+			drawInf = true;
+		} else if (follow && Math.isFinite(buffLeft) && buffLeft > 0.02) {
+			drawLeft = buffLeft;
+			if (Math.isFinite(prog) && prog > 0.001 && prog < 0.999)
+				drawProg = prog;
+			else if (holdLen > 0.05)
+				drawProg = clamp01(buffLeft / holdLen);
+			else
+				drawProg = clamp01(prog);
+		} else if (holdUntil > now && holdLen > 0.05) {
+			var rem = holdUntil - now;
+			drawLeft = rem;
+			drawProg = clamp01(rem / holdLen);
+		}
+
+		a.progress = drawProg;
+		a.timeLeft = drawLeft;
+		a.timerInfinite = drawInf;
 		var rise = hit && !a.condWas;
 		if (rise && a.isCounter != null && a.isCounter.get()) {
 			if (a.counterValue < 2147483647) {
@@ -94,6 +128,10 @@ class AuraEffects {
 		if (hit)
 			a.lastHitAt = now;
 		a.condWas = hit;
+	}
+
+	static inline function clamp01(v:Float):Float {
+		return v < 0 ? 0 : (v > 1 ? 1 : v);
 	}
 
 	/** Drop live alert presentation + hold timers (disable / Large typed off). */

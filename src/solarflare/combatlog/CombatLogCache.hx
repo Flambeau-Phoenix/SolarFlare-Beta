@@ -22,7 +22,7 @@ class CombatLogCache {
 	public static inline var ROLE_ENEMY:Int = 3;
 
 	static inline var CAP:Int = 200;
-	static inline var DEDUPE_S:Float = 0.05;
+	static inline var DEDUPE_S:Float = 0.08;
 
 	static var lines:Array<CombatLogLine> = [];
 	static var writeAt:Int = 0;
@@ -32,6 +32,7 @@ class CombatLogCache {
 	static var lastTargetRef:Dynamic = null;
 	static var targetSnap:TargetSnap = new TargetSnap();
 	static var targetSnapOut:TargetSnap = new TargetSnap();
+	static var drawLinesBuf:Array<CombatLogLine> = [];
 	/** One-shot kill victim kind for aura frame (cleared on consume). */
 	static var pendingKillKind:String = "";
 
@@ -110,6 +111,8 @@ class CombatLogCache {
 			&& !solarflare.ObserveDemand.auraBuilderOpen) {
 			if (currentTarget != lastTargetRef)
 				lastTargetRef = currentTarget;
+			if (currentTarget == null)
+				targetSnap.clear();
 			return;
 		}
 
@@ -117,6 +120,7 @@ class CombatLogCache {
 		solarflare.ObserveDemand.targetPtrDirty = false;
 		lastTargetRef = currentTarget;
 		if (currentTarget == null) {
+			lastTargetRef = null;
 			targetSnap.clear();
 			return;
 		}
@@ -246,7 +250,7 @@ class CombatLogCache {
 				.emit();
 	}
 
-	public static function noteHit(victim:Dynamic, dmg:Dynamic):Void {
+	public static function noteHit(victim:Dynamic, dmg:Dynamic, hook:String = ""):Void {
 		if (dmg == null)
 			return;
 		try
@@ -259,7 +263,7 @@ class CombatLogCache {
 		if (!shouldCapture(source, target) && !shouldCapture(rawSource, target))
 			return;
 		var skill = skillOfDamage(dmg);
-		pushHit(skill, source, minion, target, dmg);
+		pushHit(skill, source, minion, target, dmg, hook);
 	}
 
 	/**
@@ -280,13 +284,13 @@ class CombatLogCache {
 		if (!shouldCapture(source, target) && !shouldCapture(attacker, target))
 			return;
 		var skill = skillOfDamage(dmg);
-		pushHit(skill, source, minion, target, dmg);
+		pushHit(skill, source, minion, target, dmg, "ent.Unit.onInflictDamage");
 	}
 
 	public static function linesForDraw(cfg:CombatLogConfig):Array<CombatLogLine> {
-		var out:Array<CombatLogLine> = [];
+		drawLinesBuf.resize(0);
 		if (cfg == null || cfg.hidden.get())
-			return out;
+			return drawLinesBuf;
 		var n = count < CAP ? count : CAP;
 		var start = count < CAP ? 0 : writeAt;
 		var i = 0;
@@ -294,10 +298,10 @@ class CombatLogCache {
 			var idx = (start + i) % CAP;
 			var line = lines[idx];
 			if (line != null && cfg.passes(line))
-				out.push(line);
+				drawLinesBuf.push(line);
 			i++;
 		}
-		return out;
+		return drawLinesBuf;
 	}
 
 	public static function recentAll():Array<CombatLogLine> {
@@ -322,11 +326,14 @@ class CombatLogCache {
 		commit(line);
 	}
 
-	static function pushHit(skillId:String, source:Dynamic, minion:String, target:Dynamic, dmg:Dynamic):Void {
+	static function pushHit(skillId:String, source:Dynamic, minion:String, target:Dynamic, dmg:Dynamic, hook:String = ""):Void {
 		var amount = extractNumber(dmg, "amount", 0);
 		var line = beginLine(KIND_HIT, skillId, source, target, amount);
 		line.minionName = minion;
-		fillDamage(line, dmg);
+		fillDamage(line, dmg, hook);
+		// Dedupe inflict vs receive paths within DEDUPE_S (same skill/src/tgt/amount).
+		if (isDupe(line.kind, line.skillId, line.sourceName, line.targetName, line.amount, line.t))
+			return;
 		if (line.kill)
 			noteKillOf(target);
 		commit(line);
@@ -359,6 +366,8 @@ class CombatLogCache {
 		line.involvesCurrentTarget = sameUnit(source, currentTarget) || sameUnit(target, currentTarget);
 		line.heroInvolved = line.sourceRole == ROLE_YOU || line.sourceRole == ROLE_PLAYER
 			|| line.targetRole == ROLE_YOU || line.targetRole == ROLE_PLAYER;
+		line.inProximity = line.sourceRole == ROLE_YOU || line.targetRole == ROLE_YOU
+			|| nearLocal(source) || nearLocal(target);
 		line.t = now;
 		try
 			line.wallMs = Date.now().getTime()
@@ -370,7 +379,7 @@ class CombatLogCache {
 		return line;
 	}
 
-	static function fillDamage(line:CombatLogLine, dmg:Dynamic):Void {
+	static function fillDamage(line:CombatLogLine, dmg:Dynamic, hook:String = ""):Void {
 		try {
 			var dr:st.skill.DamageResult = dmg;
 			if (dr != null) {
@@ -385,17 +394,17 @@ class CombatLogCache {
 				if (aff != null && isPlainName(aff))
 					line.affinity = aff;
 				if (solarflare.debug.ResolutionLedger.armed()) {
-					solarflare.debug.ResolutionLedger.note("combat.hit.amount")
+					var note = solarflare.debug.ResolutionLedger.note("combat.hit.amount")
 						.withMethod("typed")
 						.withSrc("CombatLogCache.fillDamage")
 						.withName("get_amount")
-						.withHook("ent.Hero.onReceiveDamage")
 						.withPayload("st.skill.DamageResult", "hook.dmgObj")
 						.withArgs(["self", "dmgObj", "result"])
 						.tryRoute("typed", "get_amount")
-						.tryRoute("fieldwalk", "amount")
-						.num(line.amount)
-						.emit();
+						.tryRoute("fieldwalk", "amount");
+					if (hook != null && hook.length > 0)
+						note.withHook(hook);
+					note.num(line.amount).emit();
 					solarflare.debug.ResolutionLedger.note("combat.hit.crit")
 						.withMethod("typed")
 						.withSrc("CombatLogCache.fillDamage")
@@ -449,9 +458,11 @@ class CombatLogCache {
 			if (count < CAP)
 				count++;
 		}
-		try
-			CombatLogRecorder.queue(line)
-		catch (_:Dynamic) {}
+		try {
+			var cfg = CombatLogConfig.live;
+			if (cfg == null || cfg.shouldRecord(line))
+				CombatLogRecorder.queue(line);
+		} catch (_:Dynamic) {}
 	}
 
 	static function isDupe(kind:Int, skillId:String, src:String, tgt:String, amount:Float, now:Float):Bool {
@@ -502,6 +513,26 @@ class CombatLogCache {
 		}
 	}
 
+	/** Typed Entity.get_pos2D distance vs local hero — no new hooks. */
+	static function nearLocal(unit:Dynamic):Bool {
+		if (unit == null)
+			return false;
+		var me = HealthCache.localHero;
+		if (me == null)
+			return false;
+		try {
+			var a:ent.Entity = cast me;
+			var b:ent.Entity = cast unit;
+			var pa = a.get_pos2D();
+			var pb = b.get_pos2D();
+			if (pa == null || pb == null)
+				return false;
+			return pa.distance(pb) <= CombatLogConfig.PROXIMITY;
+		} catch (_:Dynamic) {
+			return false;
+		}
+	}
+
 	static function classify(unit:Dynamic):Int {
 		if (unit == null)
 			return ROLE_UNKNOWN;
@@ -547,8 +578,10 @@ class CombatLogCache {
 	static function isPlainName(s:String):Bool {
 		if (s == null || s.length == 0)
 			return false;
-		var low = s.toLowerCase();
-		return low.indexOf("bytes") < 0 && low.indexOf("{") < 0;
+		// Avoid toLowerCase alloc on hot hit path; reject dumps / object traces.
+		if (s.charCodeAt(0) == "{".code)
+			return false;
+		return s.indexOf("bytes") < 0 && s.indexOf("Bytes") < 0;
 	}
 
 	static function cleanString(v:Dynamic):String {
@@ -569,22 +602,47 @@ class CombatLogCache {
 	}
 
 	static function skillIdOf(skill:Dynamic):String {
+		if (skill == null)
+			return "";
+		var shown = solarflare.EngineSkillId.ofSkill(skill);
+		if (shown.length > 0)
+			return shown;
 		var id = GeauxCache.getSkillId(skill);
 		if (id.length > 0)
 			return id;
 		return GeauxCache.sanitizeSkillId(cleanString(extractObject(skill, "kind")));
 	}
 
+	/**
+	 * Authoritative skill id for a hit: DamageResult.get_skillId() → BaseSkill.kind
+	 * (physical ordinal 28). serverSource is actor attribution (GameObject), not a skill string.
+	 */
 	static function skillOfDamage(dmg:Dynamic):String {
+		if (dmg == null)
+			return "";
+		try {
+			var dr:st.skill.DamageResult = dmg;
+			if (dr != null) {
+				var typed = solarflare.EngineSkillId.display(dr.get_skillId());
+				if (typed.length > 0)
+					return typed;
+				var viaSkill = skillIdOf(dr.skill);
+				if (viaSkill.length > 0)
+					return viaSkill;
+				viaSkill = skillIdOf(dr.get_activeSkill());
+				if (viaSkill.length > 0)
+					return viaSkill;
+			}
+		} catch (_:Dynamic) {}
 		var base = extractObject(dmg, "baseSkill");
 		var id = skillIdOf(base);
 		if (id.length > 0)
 			return id;
-		id = skillIdOf(dmg);
-		if (id.length > 0)
-			return id;
 		var ctx = extractObject(dmg, "ctx");
 		id = skillIdOf(extractObject(ctx, "baseSkill"));
+		if (id.length > 0)
+			return id;
+		id = skillIdOf(extractObject(ctx, "skill"));
 		if (id.length > 0)
 			return id;
 		return "";

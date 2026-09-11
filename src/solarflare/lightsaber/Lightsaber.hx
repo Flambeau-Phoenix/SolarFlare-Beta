@@ -233,10 +233,8 @@ class LightsaberMeter {
 		if (confirmed.length == 0)
 			confirmed = solarflare.EngineSkillId.display(skillLabel);
 		if (confirmed.length == 0) {
+			confirmed = "Unknown";
 			unattribDamage += amount;
-			if (writeLog)
-				LightsaberLog.push(nowSec, "", who, minion, target, amount, crit, targetHp, targetMaxHp);
-			return;
 		}
 
 		var key = (groupByCaster ? LightsaberCache.skillKey(who, confirmed) : confirmed) + "\u001f" + minion;
@@ -257,7 +255,8 @@ class LightsaberMeter {
 			row.maxHit = amount;
 		sortSkills();
 		if (writeLog)
-			LightsaberLog.push(nowSec, confirmed, who, minion, target, amount, crit, targetHp, targetMaxHp);
+			LightsaberLog.push(nowSec, confirmed == "Unknown" ? "" : confirmed, who, minion, target, amount, crit, targetHp,
+				targetMaxHp);
 	}
 
 	public function tick(nowSec:Float):Void {
@@ -600,6 +599,7 @@ class LightsaberConfig {
 		ImGui.setNextWindowSize(ImGui.vec2(380, 0), ImGuiCond.FirstUseEver);
 		if (HudChrome.beginPanel("Lightsaber", open, "Lightsaber options")) {
 			ImGui.text("Local meter is always You. GetRifty clock is independent.");
+			ImGui.text("Encounter ends after 6s without your hit; totals stay until next hit.");
 			ImGui.text("In that rift tracks hero players in the instance only.");
 			if (ImGui.checkbox("In that rift meter", showRiftMeter))
 				SettingsStore.markDirty();
@@ -765,8 +765,10 @@ class LightsaberOverlay {
 			ImGui.setNextWindowSize(ImGui.vec2(w, h), ImGuiCond.FirstUseEver);
 			ImGui.setNextWindowPos(ImGui.vec2(40, 280), ImGuiCond.FirstUseEver);
 		}
-		if (cfg.chrome != null)
+		if (cfg.chrome != null) {
+			cfg.chrome.clampToViewport();
 			cfg.chrome.applyPos();
+		}
 
 		var flags = cfg.chrome != null ? cfg.chrome.windowFlagsKeepClicks(FLAGS) : FLAGS;
 		flags |= ImGuiWindowFlags.NoSavedSettings;

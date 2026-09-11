@@ -102,6 +102,7 @@ class ScriptEngine {
 			interp.variables.set("conduit", 0);
 			interp.variables.set("step", 0);
 			interp.variables.set("inRift", false);
+			interp.variables.set("damageTaken", 0.0);
 			return;
 		}
 
@@ -126,6 +127,8 @@ class ScriptEngine {
 		interp.variables.set("comboWithin", frame.attackComboWithin);
 		interp.variables.set("comboFinal", frame.attackComboFinal);
 		interp.variables.set("inRift", frame.inRift);
+		// Frozen CombatLog max YOU-target hit in recent window — not threat (cut).
+		interp.variables.set("damageTaken", frame.damageTakenRecent);
 
 		// Helpers for skill and status queries
 		interp.variables.set("hasSkill", function(id:String):Bool {

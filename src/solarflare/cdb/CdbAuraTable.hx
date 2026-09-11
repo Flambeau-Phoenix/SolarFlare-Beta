@@ -137,8 +137,12 @@ class CdbAuraTable {
 		try candidates.push(Path.join([ModPaths.modDir(), "cdb", "aura-catalog.json"])) catch (_:Dynamic) {}
 		try {
 			var exeDir = Path.directory(Sys.programPath());
+			candidates.push(Path.join([exeDir, "hlx", "mods", "solarflare", "assets", "cdb", "aura-catalog.json"]));
 			candidates.push(Path.join([exeDir, "hlx", "mods", "solarflare", "cdb", "aura-catalog.json"]));
 		} catch (_:Dynamic) {}
+		try
+			candidates.push(Path.join([Sys.getCwd(), "hlx", "mods", "solarflare", "assets", "cdb", "aura-catalog.json"]))
+		catch (_:Dynamic) {}
 		try
 			candidates.push(Path.join([Sys.getCwd(), "hlx", "mods", "solarflare", "cdb", "aura-catalog.json"]))
 		catch (_:Dynamic) {}

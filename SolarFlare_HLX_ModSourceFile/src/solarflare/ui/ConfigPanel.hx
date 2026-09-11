@@ -25,9 +25,9 @@ import imgui.ref.BoolRef;
 import imgui.ref.FloatRef;
 
 /**
- * F6 hub for SolarFlare: Auras, Geaux, Resource Tracker, Notebook, Lightsaber.
- * GetRifty / Local Time / Combat Log remain as hidden settings fields for persistence
- * and Lightsaber observation; they are not hub entries.
+ * F6 hub for SolarFlare: Auras, Geaux, Resource Tracker, Notebook, Lightsaber, Combat Log, Theme.
+ * GetRifty is opt-in via the hub sun button (opens settings; overlay stays hidden until enabled).
+ * Local Time remains a hidden settings field for persistence.
  */
 class ConfigPanel {
 	static inline var HUB_LOGO:String = GameIcons.HUB_LOGO;
@@ -75,6 +75,7 @@ class ConfigPanel {
 	public var dbgLog:BoolRef;
 
 	var showSaber:BoolRef;
+	var showGetRifty:BoolRef;
 	var showHp:BoolRef;
 	var showRage:BoolRef;
 	var showMana:BoolRef;
@@ -102,6 +103,7 @@ class ConfigPanel {
 		dbgMetrics = new BoolRef(false);
 		dbgLog = new BoolRef(false);
 		showSaber = new BoolRef(false);
+		showGetRifty = new BoolRef(false);
 		showHp = new BoolRef(false);
 		showRage = new BoolRef(false);
 		showMana = new BoolRef(false);
@@ -312,6 +314,8 @@ class ConfigPanel {
 					}
 					if (lightsaber != null)
 						visCheck("Show Lightsaber##hub_saber_show", lightsaber.hidden, showSaber);
+					if (getRifty != null)
+						visCheck("Show GetRifty##hub_rifty_show", getRifty.hidden, showGetRifty);
 					if (auras != null && ImGui.checkbox("Show Auras##hub_aura_show", auras.enabled))
 						SettingsStore.markDirty();
 					if (launchers != null) {
@@ -347,9 +351,8 @@ class ConfigPanel {
 					ImGui.checkbox("Debug log window##sf_dbglog", dbgLog);
 					ImGui.checkbox("Payload probe panel##sf_payload", solarflare.debug.PayloadProbe.enabled);
 					ImGui.textWrapped("Opens panel only. Start/Stop recording inside the panel — session-only, not saved.");
-					if (ImGui.checkbox("Resolution ledger panel##sf_ledger", solarflare.debug.ResolutionLedger.enabled))
-						SettingsStore.markDirty();
-					ImGui.textWrapped("Panel open can be saved. Recording never auto-starts. JSONL: hlx/mods/solarflare/logs/");
+					ImGui.checkbox("Resolution ledger panel##sf_ledger", solarflare.debug.ResolutionLedger.enabled);
+					ImGui.textWrapped("Panel open is session-only (not saved). Recording never auto-starts. JSONL: hlx/mods/solarflare/logs/");
 					if (solarflare.debug.FieldWalkLog.lastPath.length > 0)
 						ImGui.text(solarflare.debug.FieldWalkLog.lastPath);
 					if (ImGui.smallButton("Copy FieldWalk log path##sf_fwlog"))
@@ -381,6 +384,11 @@ class ConfigPanel {
 				lightsaber.draw()
 			catch (_:Dynamic) {}
 		}
+		if (getRifty != null) {
+			try
+				getRifty.draw()
+			catch (_:Dynamic) {}
+		}
 	}
 
 	function drawHubMenuBar():Void {
@@ -397,6 +405,8 @@ class ConfigPanel {
 				notebook.open.set(true);
 			if (ImGui.menuItem("Lightsaber"))
 				lightsaber.open.set(true);
+			if (ImGui.menuItem("GetRifty"))
+				getRifty.open.set(true);
 			ImGui.endMenu();
 		}
 		if (ImGui.beginMenu("File")) {
@@ -467,6 +477,30 @@ class ConfigPanel {
 			if (moduleTab(labels[i], ids[i]) && ids[i] == TAB_NOTEBOOK) notebook.open.set(true);
 			used += width;
 		}
+		drawGetRiftySunButton(used, available);
+	}
+
+	/** Sun icon after Theme — opens GetRifty settings only; does not unhide the overlay. */
+	function drawGetRiftySunButton(used:Float, available:Float):Void {
+		var side:Single = 38;
+		if (used > 0 && used + 10 + side <= available)
+			ImGui.sameLine(0, 10);
+		var p = ImGui.getCursorScreenPos();
+		var clicked = ImGui.invisibleButton("##hub_getrifty_sun", ImGui.vec2(side, side));
+		var dl = ImGui.getWindowDrawList();
+		var tex = GameIcons.get(GameIcons.RIFT_SUN);
+		if (tex == 0)
+			tex = GameIcons.get(GameIcons.CHROME_SUN);
+		var tint = ImGui.isItemHovered()
+			? ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 0.92, 0.55, 1))
+			: ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.95, 0.82, 0.35, 1));
+		if (tex == 0 || !GameIcons.draw(dl, tex, p.x + 3, p.y + 3, side - 6, tint)) {
+			ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(p.x + side * 0.5, p.y + side * 0.5), side * 0.32, tint, 16);
+		}
+		if (ImGui.isItemHovered())
+			ImGui.setTooltip("GetRifty settings (off until you enable Show)");
+		if (clicked && getRifty != null)
+			getRifty.open.set(true);
 	}
 
 	function moduleTab(label:String, id:Int):Bool {
@@ -533,7 +567,8 @@ class ConfigPanel {
 
 	public function profileUiTab():Int return activeHubTab;
 	public function applyProfileUiTab(value:Int):Void {
-		if (value >= TAB_RESOURCES && value <= TAB_THEME) activeHubTab = value;
+		if (value >= TAB_RESOURCES && value <= TAB_THEME)
+			activeHubTab = value;
 	}
 
 	function trackProfileWindowState():Void {

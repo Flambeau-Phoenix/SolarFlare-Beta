@@ -196,7 +196,18 @@ class AuraEngine {
 			hit = false;
 		if (a.invert.get())
 			hit = known && !hit;
-		AuraEffects.apply(a, hit, known, now, prog);
+		var buffLeft = Math.NaN;
+		var buffInf = false;
+		if (t == "status") {
+			var stBuff = AuraStatusCache.find(a.skillId);
+			if (stBuff != null && stBuff.durationKnown) {
+				buffLeft = stBuff.left;
+				buffInf = stBuff.infinite;
+				if (!Math.isFinite(prog) || prog <= 0)
+					prog = stBuff.progress;
+			}
+		}
+		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf);
 		a.stacks = stacks < 1 ? 1 : stacks;
 		if (a.resolvedIcon.length == 0) {
 			if (a.iconId != null && a.iconId.length > 0)
@@ -216,7 +227,9 @@ class AuraEngine {
 		if (!Math.isFinite(prog)) prog = hit ? 1 : 0;
 		var stacks = a.ruleResult.stacks;
 		if (stacks < 1) stacks = 1;
-		AuraEffects.apply(a, hit, known, now, prog);
+		var buffLeft = a.ruleResult.timeLeft;
+		var buffInf = Math.isFinite(buffLeft) && buffLeft < 0;
+		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf);
 		a.stacks = stacks;
 		if (a.iconId != null && a.iconId.length > 0) {
 			a.resolvedIcon = a.iconId;
@@ -241,7 +254,7 @@ class AuraEngine {
 	 * only for reference during migration — call site uses AuraEffects.apply).
 	 */
 	static function applyVisibility(a:AuraDef, hit:Bool, known:Bool, now:Float, prog:Float):Void {
-		AuraEffects.apply(a, hit, known, now, prog);
+		AuraEffects.apply(a, hit, known, now, prog, Math.NaN, false);
 	}
 
 	static function resourceRatio(which:String):{ok:Bool, r:Float} {
@@ -473,6 +486,9 @@ class AuraEngine {
 			scale: floatRef(a.scale, 1),
 			showIcon: boolRef(a.showIcon, true),
 			progressRing: boolRef(a.progressRing, true),
+			showCountdown: boolRef(a.showCountdown, false),
+			showFuse: boolRef(a.showFuse, false),
+			followBuffDuration: boolRef(a.followBuffDuration, true),
 			stackCounter: boolRef(a.stackCounter, false),
 			showLabel: boolRef(a.showLabel, true),
 			isCounter: boolRef(a.isCounter, false),

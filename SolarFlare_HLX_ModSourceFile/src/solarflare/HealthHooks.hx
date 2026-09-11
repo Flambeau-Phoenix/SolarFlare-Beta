@@ -307,8 +307,9 @@ class HealthHooks {
 		}
 	}
 
-	@:hlx.postfix(script.SkillScript.onPrayerTrigger)
+	@:hlx.postfix(script._SkillScript.DynSkillScript.onPrayerTrigger)
 	static function onPrayerTrigger(self:Dynamic, skill:Dynamic, result:Void):Void {
+		// Live dispatcher (proto 82 / findex 45208). Base script.SkillScript.onPrayerTrigger is empty Ret.
 		if (!scriptOwnerIsLocalPriest(self))
 			return;
 		PrayerCache.spendAll();
@@ -648,7 +649,7 @@ class HealthHooks {
 
 	@:hlx.postfix(ent.Hero.onReceiveDamage)
 	static function onHeroReceiveDamage(self:Dynamic, dmgObj:Dynamic, result:Void):Void {
-		solarflare.combatlog.CombatLogHooks.endDamage(self, dmgObj);
+		solarflare.combatlog.CombatLogHooks.endDamage(self, dmgObj, "ent.Hero.onReceiveDamage");
 		if (!HealthCache.isLocalHero(self))
 			return;
 		try {

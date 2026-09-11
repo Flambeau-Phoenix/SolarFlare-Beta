@@ -2,7 +2,7 @@ package solarflare.cdb;
 
 /** Immutable build-time CastleDB catalog, initialized by ModEntry before drawing. */
 class AuraCatalog {
-	public static var entries(default, null):Array<{id:String, name:String, kind:String}> = [];
+	public static var entries(default, null):Array<{id:String, name:String, kind:String, searchKey:String}> = [];
 	static var names = new Map<String, String>();
 	static var ready = false;
 	public static function keep():Void {
@@ -15,7 +15,8 @@ class AuraCatalog {
 			var name:String = row.name;
 			var kind:String = row.kind;
 			if (!validName(name)) name = id;
-			entries.push({id:id, name:name, kind:kind});
+			var key = normalizeKey(id) + "\n" + normalizeKey(name);
+			entries.push({id:id, name:name, kind:kind, searchKey:key});
 			names.set(id, name);
 		}
 	}
@@ -46,10 +47,21 @@ class AuraCatalog {
 	}
 
 	public static function matchesSearch(id:String, name:String, query:String):Bool {
-		var needle = searchKey(query);
-		return needle.length == 0 || searchKey(id).indexOf(needle) >= 0 || searchKey(name).indexOf(needle) >= 0;
+		var needle = normalizeKey(query);
+		if (needle.length == 0)
+			return true;
+		return normalizeKey(id).indexOf(needle) >= 0 || normalizeKey(name).indexOf(needle) >= 0;
 	}
-	static function searchKey(value:String):String {
+
+	/** Fast path when caller already has a catalog entry. */
+	public static function entryMatchesSearch(e:{id:String, name:String, kind:String, searchKey:String}, query:String):Bool {
+		if (e == null)
+			return false;
+		var needle = normalizeKey(query);
+		return needle.length == 0 || e.searchKey.indexOf(needle) >= 0;
+	}
+
+	static function normalizeKey(value:String):String {
 		if (value == null) return "";
 		return StringTools.replace(StringTools.replace(StringTools.replace(value.toLowerCase(), "_", ""), "-", ""), " ", "");
 	}

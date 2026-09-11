@@ -4,11 +4,14 @@ import haxe.io.Bytes;
 import hl.Bytes as HLBytes;
 
 /**
- * Shared byte-buffer utilities for ImGui text fields.
+ * Shared byte-buffer utilities for ImGui text fields and HashLink native strings.
  * Uses HashLink's native byte operations with hl.Bytes required by ImGui.
- * 
+ *
  * IMPORTANT: hl.Bytes is a raw unmanaged pointer with no .length property.
  * The buffer capacity MUST always be passed explicitly.
+ *
+ * ImGui buffers = null-terminated UTF-8 (readString/readBytes).
+ * Engine String / FieldWalk bytes = UCS-2/UTF-16LE (readUCS2 / materialize).
  */
 class ByteUtil {
 	/** Maximum buffer size to prevent runaway iteration (64 KB) */
@@ -60,6 +63,64 @@ class ByteUtil {
 			#if debug
 			trace('ByteUtil.readString error: $e');
 			#end
+			return "";
+		}
+	}
+
+	/**
+	 * Read a HashLink native UCS-2 / UTF-16LE string buffer.
+	 * Fixes opaque `???` when UTF-8 scanners stop on the 0x00 high byte of ASCII.
+	 *
+	 * @param buf Raw character bytes (vbyte* / hl.Bytes)
+	 * @param charCount Explicit character count (e.g. String.length). If <= 0, scans for 16-bit NUL.
+	 */
+	public static function readUCS2(buf:HLBytes, charCount:Int = -1):String {
+		if (buf == null)
+			return "";
+		try {
+			if (charCount > 0)
+				return @:privateAccess String.__alloc__(buf, charCount);
+			return @:privateAccess String.fromUCS2(buf);
+		} catch (e:Dynamic) {
+			#if debug
+			trace('ByteUtil.readUCS2 error: $e');
+			#end
+			return "";
+		}
+	}
+
+	/**
+	 * Auto-detect UTF-8 (ImGui) vs UCS-2 (engine String bytes).
+	 * Heuristic: printable first byte + 0x00 second byte => UCS-2.
+	 */
+	public static function readAuto(buf:HLBytes, cap:Int = DEFAULT_CAPACITY):String {
+		if (buf == null || cap <= 0)
+			return "";
+		try {
+			if (cap >= 2 && buf.getUI8(0) != 0 && buf.getUI8(1) == 0)
+				return readUCS2(buf, -1);
+		} catch (_:Dynamic) {}
+		return readString(buf, cap, true);
+	}
+
+	/**
+	 * Copy a HashLink String into a fresh UTF-16-backed Haxe String via char codes.
+	 * Prevents haxe.Json.stringify from emitting `{bytes:"???",length:N}` for engine strings.
+	 */
+	public static function materialize(s:String):String {
+		if (s == null || s.length == 0)
+			return "";
+		try {
+			var out = new StringBuf();
+			var i = 0;
+			while (i < s.length) {
+				var c = s.charCodeAt(i);
+				if (c != null)
+					out.addChar(c);
+				i++;
+			}
+			return out.toString();
+		} catch (_:Dynamic) {
 			return "";
 		}
 	}

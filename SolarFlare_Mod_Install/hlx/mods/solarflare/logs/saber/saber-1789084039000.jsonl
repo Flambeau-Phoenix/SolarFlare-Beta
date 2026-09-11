@@ -1,0 +1,45 @@
+{"amt":25,"crit":false,"hp":737.47,"max":762,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084024.15,"tgt":"Crimson Market Gardener"}
+{"amt":88,"crit":false,"hp":887.38,"max":975,"minion":"","skill":"Shield_OrbitWater_S1_OrbStatus","src":"Flam","t":1789084024.18,"tgt":"Crimson Executioner"}
+{"amt":89,"crit":false,"hp":649.07,"max":762,"minion":"","skill":"Shield_OrbitWater_S1_OrbStatus","src":"Flam","t":1789084024.18,"tgt":"Crimson Market Gardener"}
+{"amt":18,"crit":false,"hp":957.68,"max":975,"minion":"","skill":"Sword_Base_Attack","src":"Flam","t":1789084024.39,"tgt":"Crimson Executioner"}
+{"amt":19,"crit":false,"hp":868.69,"max":975,"minion":"","skill":"Sword_Base_Attack2","src":"Flam","t":1789084024.66,"tgt":"Crimson Executioner"}
+{"amt":17,"crit":false,"hp":632.1,"max":762,"minion":"","skill":"Sword_Base_Attack2","src":"Flam","t":1789084024.66,"tgt":"Crimson Market Gardener"}
+{"amt":88,"crit":false,"hp":781.07,"max":975,"minion":"","skill":"Shield_OrbitWater_S1_OrbStatus","src":"Flam","t":1789084024.66,"tgt":"Crimson Executioner"}
+{"amt":89,"crit":false,"hp":543.7,"max":762,"minion":"","skill":"Shield_OrbitWater_S1_OrbStatus","src":"Flam","t":1789084024.66,"tgt":"Crimson Market Gardener"}
+{"amt":26,"crit":false,"hp":755.94,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084025.13,"tgt":"Crimson Executioner"}
+{"amt":26,"crit":false,"hp":518.34,"max":762,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084025.13,"tgt":"Crimson Market Gardener"}
+{"amt":88,"crit":false,"hp":668.33,"max":975,"minion":"","skill":"Shield_OrbitWater_S1_OrbStatus","src":"Flam","t":1789084025.19,"tgt":"Crimson Executioner"}
+{"amt":133,"crit":true,"hp":712.25,"max":975,"minion":"","skill":"Shield_OrbitWater_S1_OrbStatus","src":"Flam","t":1789084025.19,"tgt":"Crimson Executioner"}
+{"amt":89,"crit":false,"hp":429.94,"max":762,"minion":"","skill":"Shield_OrbitWater_S1_OrbStatus","src":"Flam","t":1789084025.19,"tgt":"Crimson Market Gardener"}
+{"amt":20,"crit":false,"hp":649.03,"max":975,"minion":"","skill":"Sword_Base_Attack3","src":"Flam","t":1789084025.21,"tgt":"Crimson Executioner"}
+{"amt":27,"crit":true,"hp":403.9,"max":762,"minion":"","skill":"Sword_Base_Attack3","src":"Flam","t":1789084025.21,"tgt":"Crimson Market Gardener"}
+{"amt":78,"crit":false,"hp":635.11,"max":975,"minion":"","skill":"Sword_Swarm_Combo","src":"Flam","t":1789084025.68,"tgt":"Crimson Executioner"}
+{"amt":158,"crit":false,"hp":491.32,"max":975,"minion":"","skill":"Shield_OrbitWater_S1_OrbStatus","src":"Flam","t":1789084025.68,"tgt":"Crimson Executioner"}
+{"amt":158,"crit":false,"hp":477.4,"max":975,"minion":"","skill":"Shield_OrbitWater_S1_OrbStatus","src":"Flam","t":1789084025.68,"tgt":"Crimson Executioner"}
+{"amt":160,"crit":false,"hp":244.77,"max":762,"minion":"","skill":"Shield_OrbitWater_S1_OrbStatus","src":"Flam","t":1789084025.68,"tgt":"Crimson Market Gardener"}
+{"amt":26,"crit":false,"hp":466.19,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084026.12,"tgt":"Crimson Executioner"}
+{"amt":26,"crit":false,"hp":219.41,"max":762,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084026.12,"tgt":"Crimson Market Gardener"}
+{"amt":19,"crit":false,"hp":200.64,"max":762,"minion":"","skill":"Sword_Swarm_Passive_Poison","src":"Flam","t":1789084026.12,"tgt":"Crimson Market Gardener"}
+{"amt":19,"crit":false,"hp":447.8,"max":975,"minion":"","skill":"Sword_Base_Attack","src":"Flam","t":1789084026.35,"tgt":"Crimson Executioner"}
+{"amt":19,"crit":false,"hp":182.01,"max":762,"minion":"","skill":"Sword_Base_Attack","src":"Flam","t":1789084026.35,"tgt":"Crimson Market Gardener"}
+{"amt":19,"crit":false,"hp":429.74,"max":975,"minion":"","skill":"Sword_Base_Attack2","src":"Flam","t":1789084026.62,"tgt":"Crimson Executioner"}
+{"amt":19,"crit":false,"hp":411.13,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Poison","src":"Flam","t":1789084027.02,"tgt":"Crimson Executioner"}
+{"amt":26,"crit":false,"hp":386.01,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084027.19,"tgt":"Crimson Executioner"}
+{"amt":26,"crit":false,"hp":156.66,"max":762,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084027.19,"tgt":"Crimson Market Gardener"}
+{"amt":19,"crit":false,"hp":367.88,"max":975,"minion":"","skill":"Sword_Base_Attack3","src":"Flam","t":1789084027.19,"tgt":"Crimson Executioner"}
+{"amt":231,"crit":false,"hp":137.87,"max":975,"minion":"","skill":"Priest_Prayer_Smite","src":"Flam","t":1789084027.71,"tgt":"Crimson Executioner"}
+{"amt":233,"crit":false,"hp":0,"max":762,"minion":"","skill":"Priest_Prayer_Smite","src":"Flam","t":1789084027.71,"tgt":"Crimson Market Gardener"}
+{"amt":19,"crit":false,"hp":119.26,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Poison","src":"Flam","t":1789084029.03,"tgt":"Crimson Executioner"}
+{"amt":26,"crit":false,"hp":172.01,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084029.11,"tgt":"Crimson Executioner"}
+{"amt":20,"crit":false,"hp":100.15,"max":975,"minion":"","skill":"Sword_Base_Attack2","src":"Flam","t":1789084030.09,"tgt":"Crimson Executioner"}
+{"amt":39,"crit":true,"hp":62.1,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084030.13,"tgt":"Crimson Executioner"}
+{"amt":26,"crit":false,"hp":146.89,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084030.13,"tgt":"Crimson Executioner"}
+{"amt":18,"crit":false,"hp":44.79,"max":975,"minion":"","skill":"Sword_Base_Attack3","src":"Flam","t":1789084030.59,"tgt":"Crimson Executioner"}
+{"amt":78,"crit":false,"hp":0,"max":975,"minion":"","skill":"Sword_Swarm_Combo","src":"Flam","t":1789084031.02,"tgt":"Crimson Executioner"}
+{"amt":26,"crit":false,"hp":121.76,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084031.09,"tgt":"Crimson Executioner"}
+{"amt":18,"crit":false,"hp":104.41,"max":975,"minion":"","skill":"Sword_Base_Attack","src":"Flam","t":1789084031.68,"tgt":"Crimson Executioner"}
+{"amt":19,"crit":false,"hp":85.79,"max":975,"minion":"","skill":"Sword_Base_Attack2","src":"Flam","t":1789084031.94,"tgt":"Crimson Executioner"}
+{"amt":19,"crit":false,"hp":67.19,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Poison","src":"Flam","t":1789084032.02,"tgt":"Crimson Executioner"}
+{"amt":26,"crit":false,"hp":42.06,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084032.11,"tgt":"Crimson Executioner"}
+{"amt":21,"crit":false,"hp":21.81,"max":975,"minion":"","skill":"Sword_Base_Attack3","src":"Flam","t":1789084032.53,"tgt":"Crimson Executioner"}
+{"amt":39,"crit":true,"hp":0,"max":975,"minion":"","skill":"Sword_Swarm_Passive_Swarm","src":"Flam","t":1789084033.14,"tgt":"Crimson Executioner"}

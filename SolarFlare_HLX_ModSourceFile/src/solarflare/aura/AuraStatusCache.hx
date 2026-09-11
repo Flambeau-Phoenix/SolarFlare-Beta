@@ -17,7 +17,9 @@ class AuraStatusCache {
 	static var sampledHero:Dynamic;
 
 	public static function reset():Void {
-		snaps = []; count = 0; domainKnown = false; sampledHero = null;
+		count = 0;
+		domainKnown = false;
+		sampledHero = null;
 		containerLength = -1;
 	}
 
@@ -68,10 +70,21 @@ class AuraStatusCache {
 		domainKnown = domainKnown || complete;
 	}
 
+	static function allocSnap():AuraStatusSnap {
+		if (count < snaps.length) {
+			var reuse = snaps[count];
+			reuse.clear();
+			return reuse;
+		}
+		var snap = new AuraStatusSnap();
+		snaps.push(snap);
+		return snap;
+	}
+
 	static function ingest(item:Dynamic):AuraStatusSnap {
 		if (item == null || count >= MAX)
 			return null;
-		var snap = new AuraStatusSnap();
+		var snap = allocSnap();
 		pushId(snap, EngineSkillId.ofSkill(item));
 		pushId(snap, skillIdOf(item));
 		var inf = FieldWalk.extractObject(item, "inf");
@@ -81,20 +94,43 @@ class AuraStatusCache {
 		if (snap.ids.length == 0)
 			return null;
 		snap.id = snap.ids[0];
-		var replace:AuraStatusSnap = null;
-		for (existing in snaps) {
-			if (!matches(existing, snap.id)) continue;
-			if (existing.known) return existing;
-			replace = existing; break;
-		}
 		snap.stacks = readStacks(item);
 		var rp = solarflare.SkillRemain.read(item);
 		snap.progress = rp.valid ? rp.progress : 1;
 		snap.left = rp.left;
+		snap.infinite = rp.infinite;
 		snap.durationKnown = rp.valid;
-		if (replace != null) snaps[snaps.indexOf(replace)] = snap;
-		else { snaps.push(snap); count++; }
+		var i = 0;
+		while (i < count) {
+			var existing = snaps[i];
+			if (matches(existing, snap.id)) {
+				if (existing.known)
+					return existing;
+				existing.clear();
+				copySnap(existing, snap);
+				return existing;
+			}
+			i++;
+		}
+		count++;
 		return snap;
+	}
+
+	static function copySnap(dst:AuraStatusSnap, src:AuraStatusSnap):Void {
+		dst.id = src.id;
+		var j = 0;
+		while (j < src.ids.length) {
+			dst.ids.push(src.ids[j]);
+			dst.idsLower.push(src.idsLower[j]);
+			j++;
+		}
+		dst.stacks = src.stacks;
+		dst.known = src.known;
+		dst.present = src.present;
+		dst.durationKnown = src.durationKnown;
+		dst.progress = src.progress;
+		dst.left = src.left;
+		dst.infinite = src.infinite;
 	}
 
 	static function lookupTyped(want:String):AuraStatusSnap {
@@ -108,15 +144,20 @@ class AuraStatusCache {
 			var n = h.getStatusCount(want, null);
 			if (n > 0) snap = ingest(h.getStatus(want, null));
 			if (snap == null) {
-				snap = new AuraStatusSnap();
-				snap.id = want; snap.ids = [want];
-				snap.present = n > 0; snap.stacks = n;
-				snaps.push(snap); count++;
+				snap = allocSnap();
+				snap.id = want;
+				pushId(snap, want);
+				snap.present = n > 0;
+				snap.stacks = n;
+				count++;
 			} else pushId(snap, want);
 		} catch (_:Dynamic) {
-			snap = new AuraStatusSnap();
-			snap.id = want; snap.ids = [want]; snap.known = false; snap.present = false;
-			snaps.push(snap); count++;
+			snap = allocSnap();
+			snap.id = want;
+			pushId(snap, want);
+			snap.known = false;
+			snap.present = false;
+			count++;
 		}
 		if (solarflare.debug.ResolutionLedger.armed() && snap != null)
 			solarflare.debug.ResolutionLedger.touch(
@@ -180,6 +221,7 @@ class AuraStatusCache {
 		var shown = EngineSkillId.display(s);
 		if (shown.length > 0)
 			s = shown;
+		var low = s.toLowerCase();
 		var i = 0;
 		while (i < snap.ids.length) {
 			if (snap.ids[i] == s)
@@ -187,6 +229,7 @@ class AuraStatusCache {
 			i++;
 		}
 		snap.ids.push(s);
+		snap.idsLower.push(low);
 	}
 
 	static function matches(snap:AuraStatusSnap, want:String):Bool {
@@ -198,12 +241,8 @@ class AuraStatusCache {
 			w = shown;
 		var wl = w.toLowerCase();
 		var i = 0;
-		while (i < snap.ids.length) {
-			var have = snap.ids[i];
-			if (have == null)
-				continue;
-			var hl = have.toLowerCase();
-			if (hl == wl)
+		while (i < snap.idsLower.length) {
+			if (snap.idsLower[i] == wl)
 				return true;
 			i++;
 		}

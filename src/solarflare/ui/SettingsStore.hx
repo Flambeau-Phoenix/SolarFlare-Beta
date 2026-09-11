@@ -16,7 +16,7 @@ import imgui.ImGui;
  * Persist SolarFlare layout + toggles next to the installed mod.
  */
 class SettingsStore {
-	static inline var VERSION:Int = 19;
+	static inline var VERSION:Int = 20;
 	static var dirty = false;
 	static var lastCfg:ConfigPanel = null;
 	static var lastSaveMs:Float = 0;
@@ -162,8 +162,7 @@ class SettingsStore {
 		assignDump(data, "hub", function() return {
 			w: cfg.hubW != null ? cfg.hubW.get() : 360,
 			h: cfg.hubH != null ? cfg.hubH.get() : 480,
-			chrome: chromeDump(cfg.hubChrome),
-			ledger: solarflare.debug.ResolutionLedger.enabled.get()
+			chrome: chromeDump(cfg.hubChrome)
 		});
 		return data;
 	}
@@ -428,10 +427,13 @@ class SettingsStore {
 			hidden: c.hidden.get(),
 			you: c.showYou.get(),
 			player: c.showPlayer.get(),
+			playerRift: c.showPlayersInRift.get(),
 			enemy: c.showEnemy.get(),
 			heroes: c.showHeroes.get(),
 			tgt: c.currentTargetOnly.get(),
 			record: solarflare.combatlog.CombatLogRecorder.enabled.get(),
+			recordWorld: c.recordWorld.get(),
+			recordProx: c.recordInProximity.get(),
 			chrome: chromeDump(c.chrome)
 		};
 	}
@@ -772,10 +774,15 @@ class SettingsStore {
 		setBool(c.hidden, data.hidden);
 		setBool(c.showYou, data.you);
 		setBool(c.showPlayer, data.player);
+		setBool(c.showPlayersInRift, data.playerRift);
 		setBool(c.showEnemy, data.enemy);
 		setBool(c.showHeroes, data.heroes);
 		setBool(c.currentTargetOnly, data.tgt);
 		setBool(solarflare.combatlog.CombatLogRecorder.enabled, data.record);
+		setBool(c.recordWorld, data.recordWorld);
+		setBool(c.recordInProximity, data.recordProx);
+		if (!c.recordWorld.get())
+			c.recordInProximity.set(false);
 		applyChrome(c.chrome, data.chrome);
 	}
 
@@ -816,7 +823,9 @@ class SettingsStore {
 		setFloat(cfg.hubH, data.h);
 		cfg.hubSizeDirty = true;
 		applyChrome(cfg.hubChrome, data.chrome);
-		setBool(solarflare.debug.ResolutionLedger.enabled, data.ledger);
+		// Resolution ledger panel is session-only (like PayloadProbe). Ignore legacy hub.ledger.
+		if (solarflare.debug.ResolutionLedger.enabled != null)
+			solarflare.debug.ResolutionLedger.enabled.set(false);
 	}
 
 	static function applySaber(s:LightsaberConfig, data:Dynamic):Void {

@@ -34,7 +34,8 @@ class ObserveDemand {
 	public static var castSkillIds:Array<String> = [];
 	public static var auraBuilderOpen:Bool = false;
 	public static var getRifty:Bool = false;
-
+	/** Sample GetRiftyCache.inInstance even when clock overlay hidden (combat log / saber). */
+	public static var riftFlag:Bool = false;
 	/** Dirty wakeups from hooks (consume on reconcile). */
 	public static var overlayDirty:Bool = true;
 	public static var geauxDirty:Bool = true;
@@ -96,6 +97,8 @@ class ObserveDemand {
 			aurasNeedTarget = true;
 		}
 		getRifty = cfg.getRifty != null && !cfg.getRifty.hidden.get();
+		var saberRift = cfg.lightsaber != null && !cfg.lightsaber.hidden.get() && cfg.lightsaber.showRiftMeter.get();
+		riftFlag = getRifty || combatLog || saberRift;
 	}
 
 	static function auraRulesNeedStatus(cfg:ConfigPanel):Bool {
@@ -310,7 +313,7 @@ class ObserveDemand {
 	}
 
 	public static function dueGetRifty(now:Float, inRift:Bool):Bool {
-		if (!getRifty)
+		if (!riftFlag)
 			return false;
 		var need = inRift ? GETRIFTY_IN_S : GETRIFTY_OUT_S;
 		if (now - lastGetRifty < need)

@@ -35,7 +35,7 @@ import solarflare.HealthCache;
 /**
  * SolarFlare panel: Resource Tracker vitals, Geaux, Auras, Notebook, Lightsaber.
  * observe() = Layer 1 cache tick; draw() = Layer 2 ImGui from snaps only.
- * GetRifty is observed for Lightsaber rift meters; its overlay is omitted.
+ * GetRifty overlay draws only when the user unhides it (opt-in).
  */
 class SolarFlarePanel {
 	static inline var VITALS_FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
@@ -55,6 +55,7 @@ class SolarFlarePanel {
 	var launchers:solarflare.ui.HudLaunchers;
 	var auraOverlay:solarflare.aura.AuraOverlay;
 	var lightsaber:LightsaberOverlay;
+	var getRiftyOverlay:GetRiftyOverlay;
 	var payloadProbe:PayloadProbeOverlay;
 	var resolutionLedger:ResolutionLedgerOverlay;
 	var vitalsTheme:Theme;
@@ -80,6 +81,7 @@ class SolarFlarePanel {
 		launchers = config.launchers;
 		auraOverlay = new solarflare.aura.AuraOverlay(config.auras);
 		lightsaber = new LightsaberOverlay();
+		getRiftyOverlay = new GetRiftyOverlay();
 		payloadProbe = new PayloadProbeOverlay();
 		resolutionLedger = new ResolutionLedgerOverlay();
 		vitalsTheme = new Theme()
@@ -110,6 +112,7 @@ class SolarFlarePanel {
 		if (!brandingRequested) {
 			brandingRequested = true;
 			GameIcons.get(GameIcons.CHROME_SUN);
+			GameIcons.get(GameIcons.RIFT_SUN);
 			GameIcons.get(GameIcons.HUB_LOGO);
 		}
 		if (GameIcons.hasPending())
@@ -188,6 +191,7 @@ class SolarFlarePanel {
 						SaberJsonlArchive.tick();
 				}
 			} catch (_:Dynamic) {}
+
 		}
 
 		// Background cadence (10 Hz outer) — GetRifty further gated inside ObserveDemand:
@@ -202,14 +206,15 @@ class SolarFlarePanel {
 					solarflare.combatlog.CombatLogRecorder.tick();
 			} catch (_:Dynamic) {}
 			try {
-				if (ObserveDemand.getRifty) {
+				if (ObserveDemand.riftFlag) {
 					var inRift = false;
 					try
 						inRift = GetRiftyCache.inInstance
 					catch (_:Dynamic) {}
 					if (ObserveDemand.dueGetRifty(now, inRift)) {
 						GetRiftyCache.observeApp(app);
-						GetRiftyCache.tick();
+						if (ObserveDemand.getRifty)
+							GetRiftyCache.tick();
 					}
 				}
 			} catch (_:Dynamic) {}
@@ -299,6 +304,10 @@ class SolarFlarePanel {
 		try
 			lightsaber.draw(config.lightsaber)
 		catch (_:Dynamic) {}
+		try {
+			if (getRiftyOverlay != null)
+				getRiftyOverlay.draw(config.getRifty);
+		} catch (_:Dynamic) {}
 		try {
 			if (payloadProbe != null)
 				payloadProbe.draw(CursorCaptureFix.cursorFree);

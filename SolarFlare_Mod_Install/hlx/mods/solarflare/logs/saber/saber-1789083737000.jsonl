@@ -1,0 +1,107 @@
+{"amt":129,"crit":false,"hp":990.68,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1","src":"Flambeau","t":1789083702.55,"tgt":"Blessed Crimson Executioner"}
+{"amt":249,"crit":true,"hp":870.87,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1","src":"Flambeau","t":1789083702.66,"tgt":"Blessed Crimson Executioner"}
+{"amt":267,"crit":true,"hp":477.72,"max":744,"minion":"","skill":"Axe_Boomerang_Skill1","src":"Flambeau","t":1789083702.79,"tgt":"Scholar Crimson Preacher"}
+{"amt":195,"crit":false,"hp":796.53,"max":1119,"minion":"","skill":"Warrior_Charge","src":"Flambeau","t":1789083702.91,"tgt":"Blessed Crimson Executioner"}
+{"amt":201,"crit":false,"hp":670.51,"max":1119,"minion":"","skill":"Warrior_Charge","src":"Flambeau","t":1789083702.91,"tgt":"Blessed Crimson Executioner"}
+{"amt":134,"crit":false,"hp":562.2,"max":696,"minion":"","skill":"Axe_Boomerang_Skill1","src":"Flambeau","t":1789083702.91,"tgt":"Brother Tuk"}
+{"amt":14,"crit":false,"hp":783.48,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083704.47,"tgt":"Blessed Crimson Executioner"}
+{"amt":26,"crit":false,"hp":644.58,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083704.58,"tgt":"Blessed Crimson Executioner"}
+{"amt":27,"crit":false,"hp":618.48,"max":1119,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083704.58,"tgt":"Blessed Crimson Executioner"}
+{"amt":30,"crit":false,"hp":447.94,"max":744,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083704.68,"tgt":"Scholar Crimson Preacher"}
+{"amt":28,"crit":false,"hp":420.04,"max":744,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083704.68,"tgt":"Scholar Crimson Preacher"}
+{"amt":15,"crit":false,"hp":548.07,"max":696,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083704.81,"tgt":"Brother Tuk"}
+{"amt":185,"crit":false,"hp":685.76,"max":870,"minion":"","skill":"Warrior_Charge","src":"Flambeau","t":1789083706.27,"tgt":"Crimson Priest"}
+{"amt":14,"crit":false,"hp":770.43,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083706.5,"tgt":"Blessed Crimson Executioner"}
+{"amt":26,"crit":false,"hp":592.55,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083706.61,"tgt":"Blessed Crimson Executioner"}
+{"amt":27,"crit":false,"hp":566.45,"max":1119,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083706.61,"tgt":"Blessed Crimson Executioner"}
+{"amt":30,"crit":false,"hp":390.26,"max":744,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083706.7,"tgt":"Scholar Crimson Preacher"}
+{"amt":28,"crit":false,"hp":362.36,"max":744,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083706.7,"tgt":"Scholar Crimson Preacher"}
+{"amt":35,"crit":true,"hp":513.84,"max":696,"minion":"","skill":"Axe_Base_Attack","src":"Flambeau","t":1789083706.79,"tgt":"Brother Tuk"}
+{"amt":25,"crit":false,"hp":1019.73,"max":1044,"minion":"","skill":"Axe_Base_Attack","src":"Flambeau","t":1789083706.79,"tgt":"Blessed Crimson Executioner"}
+{"amt":15,"crit":false,"hp":499.24,"max":696,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083706.85,"tgt":"Brother Tuk"}
+{"amt":232,"crit":false,"hp":131.23,"max":744,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083707.13,"tgt":"Scholar Crimson Preacher"}
+{"amt":331,"crit":true,"hp":236.15,"max":1119,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083707.13,"tgt":"Blessed Crimson Executioner"}
+{"amt":261,"crit":false,"hp":425.36,"max":870,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083707.13,"tgt":"Crimson Priest"}
+{"amt":225,"crit":false,"hp":274.67,"max":696,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083707.13,"tgt":"Brother Tuk"}
+{"amt":320,"crit":true,"hp":700.25,"max":1044,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083707.13,"tgt":"Blessed Crimson Executioner"}
+{"amt":341,"crit":true,"hp":403.16,"max":744,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083707.13,"tgt":"Scholar Crimson Preacher"}
+{"amt":27,"crit":false,"hp":247.83,"max":696,"minion":"","skill":"Axe_Base_Attack2","src":"Flambeau","t":1789083707.49,"tgt":"Brother Tuk"}
+{"amt":14,"crit":false,"hp":757.38,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083708.43,"tgt":"Blessed Crimson Executioner"}
+{"amt":26,"crit":false,"hp":210.22,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083708.54,"tgt":"Blessed Crimson Executioner"}
+{"amt":47,"crit":false,"hp":163.72,"max":1119,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083708.55,"tgt":"Blessed Crimson Executioner"}
+{"amt":30,"crit":false,"hp":101.45,"max":744,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083708.65,"tgt":"Scholar Crimson Preacher"}
+{"amt":42,"crit":true,"hp":59.6,"max":744,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083708.65,"tgt":"Scholar Crimson Preacher"}
+{"amt":4,"crit":false,"hp":244.23,"max":696,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083708.65,"tgt":"Brother Tuk"}
+{"amt":15,"crit":false,"hp":229.63,"max":696,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083708.82,"tgt":"Brother Tuk"}
+{"amt":34,"crit":false,"hp":666.65,"max":1044,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083709.06,"tgt":"Blessed Crimson Executioner"}
+{"amt":36,"crit":false,"hp":367.46,"max":744,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083709.06,"tgt":"Scholar Crimson Preacher"}
+{"amt":14,"crit":false,"hp":898.83,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083710.51,"tgt":"Blessed Crimson Executioner"}
+{"amt":26,"crit":false,"hp":292.28,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083710.61,"tgt":"Blessed Crimson Executioner"}
+{"amt":47,"crit":false,"hp":245.78,"max":1119,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083710.61,"tgt":"Blessed Crimson Executioner"}
+{"amt":30,"crit":false,"hp":184.32,"max":744,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083710.71,"tgt":"Scholar Crimson Preacher"}
+{"amt":28,"crit":false,"hp":156.42,"max":744,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083710.71,"tgt":"Scholar Crimson Preacher"}
+{"amt":4,"crit":false,"hp":380.53,"max":696,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083710.71,"tgt":"Brother Tuk"}
+{"amt":15,"crit":false,"hp":365.93,"max":696,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083710.83,"tgt":"Brother Tuk"}
+{"amt":34,"crit":false,"hp":787.55,"max":1044,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083711.06,"tgt":"Blessed Crimson Executioner"}
+{"amt":54,"crit":true,"hp":468.41,"max":744,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083711.06,"tgt":"Scholar Crimson Preacher"}
+{"amt":24,"crit":false,"hp":875.61,"max":1119,"minion":"","skill":"Axe_Base_Attack","src":"Flambeau","t":1789083712.46,"tgt":"Blessed Crimson Executioner"}
+{"amt":27,"crit":false,"hp":219.37,"max":1119,"minion":"","skill":"Axe_Base_Attack","src":"Flambeau","t":1789083712.46,"tgt":"Blessed Crimson Executioner"}
+{"amt":38,"crit":true,"hp":750.17,"max":1044,"minion":"","skill":"Axe_Base_Attack","src":"Flambeau","t":1789083712.46,"tgt":"Blessed Crimson Executioner"}
+{"amt":47,"crit":false,"hp":172.87,"max":1119,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083712.59,"tgt":"Blessed Crimson Executioner"}
+{"amt":4,"crit":false,"hp":362.33,"max":696,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083712.7,"tgt":"Brother Tuk"}
+{"amt":287,"crit":false,"hp":0,"max":744,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083712.88,"tgt":"Scholar Crimson Preacher"}
+{"amt":208,"crit":false,"hp":668.51,"max":1119,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083712.88,"tgt":"Blessed Crimson Executioner"}
+{"amt":268,"crit":false,"hp":0,"max":1119,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083712.89,"tgt":"Blessed Crimson Executioner"}
+{"amt":320,"crit":true,"hp":550.52,"max":870,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083712.89,"tgt":"Crimson Priest"}
+{"amt":225,"crit":false,"hp":137.76,"max":696,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083712.89,"tgt":"Brother Tuk"}
+{"amt":333,"crit":true,"hp":417.91,"max":1044,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083712.89,"tgt":"Blessed Crimson Executioner"}
+{"amt":343,"crit":true,"hp":353.91,"max":696,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083712.89,"tgt":"Scholar Crimson Preacher"}
+{"amt":50,"crit":false,"hp":368.11,"max":1044,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083713.04,"tgt":"Blessed Crimson Executioner"}
+{"amt":36,"crit":false,"hp":432.71,"max":744,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083713.04,"tgt":"Scholar Crimson Preacher"}
+{"amt":27,"crit":false,"hp":641.57,"max":1119,"minion":"","skill":"Axe_Base_Attack","src":"Flambeau","t":1789083714.13,"tgt":"Blessed Crimson Executioner"}
+{"amt":4,"crit":false,"hp":134.16,"max":696,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083714.69,"tgt":"Brother Tuk"}
+{"amt":34,"crit":false,"hp":516.92,"max":870,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083714.77,"tgt":"Crimson Priest"}
+{"amt":36,"crit":false,"hp":317.91,"max":696,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083714.77,"tgt":"Scholar Crimson Preacher"}
+{"amt":50,"crit":false,"hp":318.31,"max":1044,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083715.17,"tgt":"Blessed Crimson Executioner"}
+{"amt":36,"crit":false,"hp":397.01,"max":744,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083715.17,"tgt":"Scholar Crimson Preacher"}
+{"amt":26,"crit":false,"hp":616.23,"max":1119,"minion":"","skill":"Axe_Base_Attack","src":"Flambeau","t":1789083716.16,"tgt":"Blessed Crimson Executioner"}
+{"amt":24,"crit":false,"hp":592.35,"max":1119,"minion":"","skill":"Axe_Base_Attack2","src":"Flambeau","t":1789083716.43,"tgt":"Blessed Crimson Executioner"}
+{"amt":23,"crit":false,"hp":295.96,"max":1044,"minion":"","skill":"Axe_Base_Attack2","src":"Flambeau","t":1789083716.43,"tgt":"Blessed Crimson Executioner"}
+{"amt":34,"crit":false,"hp":483.32,"max":870,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083716.76,"tgt":"Crimson Priest"}
+{"amt":36,"crit":false,"hp":281.91,"max":696,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083716.76,"tgt":"Scholar Crimson Preacher"}
+{"amt":196,"crit":false,"hp":396.98,"max":1119,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083716.89,"tgt":"Blessed Crimson Executioner"}
+{"amt":254,"crit":false,"hp":42.45,"max":1044,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083716.89,"tgt":"Blessed Crimson Executioner"}
+{"amt":75,"crit":true,"hp":0,"max":1044,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083717.05,"tgt":"Blessed Crimson Executioner"}
+{"amt":34,"crit":false,"hp":449.72,"max":870,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083718.78,"tgt":"Crimson Priest"}
+{"amt":36,"crit":false,"hp":245.91,"max":696,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083718.78,"tgt":"Scholar Crimson Preacher"}
+{"amt":140,"crit":false,"hp":0,"max":696,"minion":"","skill":"Axe_Boomerang_Skill1","src":"Flambeau","t":1789083720.09,"tgt":"Brother Tuk"}
+{"amt":135,"crit":false,"hp":315.48,"max":870,"minion":"","skill":"Axe_Boomerang_Skill1","src":"Flambeau","t":1789083720.13,"tgt":"Crimson Priest"}
+{"amt":191,"crit":false,"hp":125.34,"max":870,"minion":"","skill":"Warrior_Charge","src":"Flambeau","t":1789083720.2,"tgt":"Crimson Priest"}
+{"amt":129,"crit":false,"hp":268.66,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1","src":"Flambeau","t":1789083720.25,"tgt":"Blessed Crimson Executioner"}
+{"amt":144,"crit":false,"hp":102.16,"max":696,"minion":"","skill":"Axe_Boomerang_Skill1","src":"Flambeau","t":1789083720.5,"tgt":"Scholar Crimson Preacher"}
+{"amt":41,"crit":false,"hp":84.74,"max":870,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083720.79,"tgt":"Crimson Priest"}
+{"amt":36,"crit":false,"hp":66.16,"max":696,"minion":"","skill":"Warrior_Hemorrhage_Status","src":"Flambeau","t":1789083720.79,"tgt":"Scholar Crimson Preacher"}
+{"amt":15,"crit":false,"hp":70.65,"max":870,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083722.1,"tgt":"Crimson Priest"}
+{"amt":14,"crit":false,"hp":255.61,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083722.21,"tgt":"Blessed Crimson Executioner"}
+{"amt":17,"crit":false,"hp":49.96,"max":696,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083722.44,"tgt":"Scholar Crimson Preacher"}
+{"amt":15,"crit":false,"hp":56.56,"max":870,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083724.1,"tgt":"Crimson Priest"}
+{"amt":14,"crit":false,"hp":242.56,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083724.18,"tgt":"Blessed Crimson Executioner"}
+{"amt":17,"crit":false,"hp":33.76,"max":696,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083724.47,"tgt":"Scholar Crimson Preacher"}
+{"amt":15,"crit":false,"hp":42.48,"max":870,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083726.1,"tgt":"Crimson Priest"}
+{"amt":14,"crit":false,"hp":229.51,"max":1119,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083726.18,"tgt":"Blessed Crimson Executioner"}
+{"amt":39,"crit":true,"hp":4.2,"max":870,"minion":"","skill":"Axe_Base_Attack","src":"Flambeau","t":1789083726.36,"tgt":"Crimson Priest"}
+{"amt":25,"crit":false,"hp":555.76,"max":870,"minion":"","skill":"Axe_Base_Attack","src":"Flambeau","t":1789083726.36,"tgt":"Crimson Priest"}
+{"amt":17,"crit":false,"hp":17.56,"max":696,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083726.47,"tgt":"Scholar Crimson Preacher"}
+{"amt":25,"crit":false,"hp":0,"max":870,"minion":"","skill":"Axe_Base_Attack2","src":"Flambeau","t":1789083726.63,"tgt":"Crimson Priest"}
+{"amt":39,"crit":true,"hp":517.33,"max":870,"minion":"","skill":"Axe_Base_Attack2","src":"Flambeau","t":1789083726.64,"tgt":"Crimson Priest"}
+{"amt":39,"crit":true,"hp":190.75,"max":1119,"minion":"","skill":"Axe_Base_Attack3","src":"Flambeau","t":1789083727.2,"tgt":"Blessed Crimson Executioner"}
+{"amt":28,"crit":false,"hp":489.57,"max":870,"minion":"","skill":"Axe_Base_Attack3","src":"Flambeau","t":1789083727.2,"tgt":"Crimson Priest"}
+{"amt":268,"crit":false,"hp":0,"max":1119,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083727.63,"tgt":"Blessed Crimson Executioner"}
+{"amt":333,"crit":true,"hp":157.31,"max":870,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083727.63,"tgt":"Crimson Priest"}
+{"amt":118,"crit":false,"hp":39.85,"max":870,"minion":"","skill":"Axe_Boomerang_Combo","src":"Flambeau","t":1789083728.01,"tgt":"Crimson Priest"}
+{"amt":380,"crit":true,"hp":0,"max":870,"minion":"","skill":"Shield_Craft_Passive","src":"Flambeau","t":1789083728.02,"tgt":"Crimson Priest"}
+{"amt":16,"crit":false,"hp":1.88,"max":696,"minion":"","skill":"Axe_Boomerang_Skill1_Status","src":"Flambeau","t":1789083728.48,"tgt":"Scholar Crimson Preacher"}
+{"amt":29,"crit":false,"hp":368.37,"max":744,"minion":"","skill":"Axe_Base_Attack2","src":"Flambeau","t":1789083730.73,"tgt":"Scholar Crimson Preacher"}
+{"amt":40,"crit":true,"hp":0,"max":696,"minion":"","skill":"Axe_Base_Attack2","src":"Flambeau","t":1789083730.73,"tgt":"Scholar Crimson Preacher"}
+{"amt":29,"crit":false,"hp":339.56,"max":744,"minion":"","skill":"Axe_Base_Attack3","src":"Flambeau","t":1789083731.29,"tgt":"Scholar Crimson Preacher"}
+{"amt":341,"crit":true,"hp":0,"max":744,"minion":"","skill":"Warrior_Rage_Strike","src":"Flambeau","t":1789083731.7,"tgt":"Scholar Crimson Preacher"}

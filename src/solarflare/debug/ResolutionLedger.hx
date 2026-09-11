@@ -46,6 +46,7 @@ class ResolutionLedger {
 
 	public static function startRecording():Void {
 		recording.set(true);
+		FieldWalkLog.clearSession();
 		lastLabel = "resolution-ledger recording";
 	}
 
@@ -65,6 +66,7 @@ class ResolutionLedger {
 		buf = [];
 		dirty = false;
 		lastJson = "{}";
+		FieldWalkLog.clearSession();
 		lastLabel = armed() ? "resolution-ledger recording (cleared)" : "resolution-ledger idle";
 	}
 
@@ -207,6 +209,7 @@ class ResolutionLedger {
 	public static function clip(s:String, n:Int):String {
 		if (s == null)
 			return "";
+		s = solarflare.ui.ByteUtil.materialize(s);
 		if (s.length <= n)
 			return s;
 		return s.substr(0, n);
@@ -259,18 +262,55 @@ class ResolutionLedger {
 			importance: agg.importance,
 			method: agg.method,
 			step: agg.step,
-			nameWon: agg.nameWon,
-			namesTried: agg.namesTried,
-			tried: agg.tried,
-			hook: agg.hook,
-			payload: {type: agg.payloadType, role: agg.payloadRole},
-			args: agg.args,
+			nameWon: safeStr(agg.nameWon),
+			namesTried: safeStrArr(agg.namesTried),
+			tried: safeTried(agg.tried),
+			hook: safeStr(agg.hook),
+			payload: {type: safeStr(agg.payloadType), role: safeStr(agg.payloadRole)},
+			args: safeStrArr(agg.args),
 			kind: agg.kind,
-			preview: agg.preview,
-			src: agg.src,
+			preview: safeStr(agg.preview),
+			src: safeStr(agg.src),
 			t: Math.round(agg.t * 100) / 100,
 			hits: hitCount
 		});
+	}
+
+	static function safeStr(s:String):String {
+		return solarflare.ui.ByteUtil.materialize(s);
+	}
+
+	static function safeStrArr(arr:Array<String>):Array<String> {
+		if (arr == null || arr.length == 0)
+			return [];
+		var out:Array<String> = [];
+		var i = 0;
+		while (i < arr.length) {
+			out.push(safeStr(arr[i]));
+			i++;
+		}
+		return out;
+	}
+
+	static function safeTried(tried:Array<Dynamic>):Array<Dynamic> {
+		if (tried == null || tried.length == 0)
+			return [];
+		var out:Array<Dynamic> = [];
+		var i = 0;
+		while (i < tried.length) {
+			var t:Dynamic = tried[i];
+			var m = "";
+			var nm = "";
+			try
+				m = safeStr(Std.string(t.method))
+			catch (_:Dynamic) {}
+			try
+				nm = safeStr(Std.string(t.name))
+			catch (_:Dynamic) {}
+			out.push({method: m, name: nm});
+			i++;
+		}
+		return out;
 	}
 
 	static function flush():Void {

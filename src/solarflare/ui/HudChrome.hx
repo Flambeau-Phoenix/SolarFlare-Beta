@@ -340,6 +340,8 @@ class HudChrome {
 		ImGui.setCursorPos(start);
 		ImGui.dummy(ImGui.vec2(0, STRIP));
 		ImGui.setCursorPos(ImGui.vec2(start.x, start.y + STRIP + 2));
+		// Item after SetCursorPos so body open does not trip ImGui boundary assert.
+		ImGui.dummy(ImGui.vec2(0.01, 0.01));
 		return true;
 	}
 
