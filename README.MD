@@ -4,12 +4,24 @@
 ![Minions in Combat Log](https://i.postimg.cc/Gp2y6gpY/Minion-Crit-and-Kill.png)
 
 
-# SolarFlare — v1.2 Beta - Current Changelog -
+# SolarFlare — v1.3b Beta - Current Changelog -
 
 ---
 This is the PTR working version of Solar Flare - Confirmed to work on Call to Glory update.
 ---
 
+### SolarFlare - v1.3b - Changelog
+
+### What's new
+
+* **Timers and countdowns on aura windows.
+* **GetRifty rift clock.
+* **Glow around icon in aura (geaux coming soon)
+* **Added a prominent, theme-aware Create New Aura panel. Choose from a type, then select a condition from the list. Or go freemode and just make whatever.
+* **Added searchable data.cdb catalogs for skills and statuses.
+* **Added boss selection and boss-specific ability suggestions to Quick Start.
+* **Added an embedded quick-start catalog containing 14 bosses and their abilities.
+* **Redesigned the Aura builder with better visibility between options sets. A lot of templates and user-friendly additions. 
 
 ### SolarFlare - v1.2b - Changelog
 
