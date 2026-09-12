@@ -89,7 +89,8 @@ class AuraTemplates {
 		a.region = "text";
 		a.showIcon.set(true);
 		a.showLabel.set(true);
-		a.stackCounter.set(true);
+		a.stackCounter.set(false);
+		a.enabled.set(false);
 
 		var r = new AuraRuleDef();
 		r.mode = "all";
@@ -101,6 +102,11 @@ class AuraTemplates {
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_ALERT, AuraEffect.WHEN_WHILE_TRUE)];
+		if (a.chrome != null) {
+			a.chrome.x.set(80);
+			a.chrome.y.set(200);
+			a.chrome.locked.set(true);
+		}
 		return a;
 	}
 
@@ -140,6 +146,10 @@ class AuraTemplates {
 		a.showBanner.set(true);
 		a.bannerText = "Status on me";
 		a.syncBannerBuf();
+		a.progressRing.set(true);
+		a.showCountdown.set(true);
+		a.showFuse.set(true);
+		a.followBuffDuration.set(true);
 
 		var r = new AuraRuleDef();
 		r.mode = "all";
@@ -158,6 +168,56 @@ class AuraTemplates {
 		alert.hold = 1.5;
 		alert.holdRef.set(1.5);
 		a.effects = [win, alert];
+		return a;
+	}
+
+	/**
+	 * Pre-rift canvas test: Warrior Ignore Pain.
+	 * Freeform icon + scaled text, amber glow, bottom fuse, numeric countdown.
+	 */
+	public static function createIgnorePainAlert():AuraDef {
+		var a = new AuraDef("warn_ignore_pain", "Ignore Pain");
+		a.announce = "PAIN ACTIVE";
+		a.syncAnnounceBuf();
+		a.skillId = "Warrior_IgnorePainStatus";
+		a.syncSkillBuf();
+		a.iconId = "Warrior_IgnorePainStatus";
+		a.syncIconBuf();
+		a.region = "canvas";
+		a.w.set(96);
+		a.h.set(96);
+		a.sizeDirty = true;
+		a.showIcon.set(true);
+		a.showLabel.set(false);
+		a.showBanner.set(false);
+		a.progressRing.set(false);
+		a.showCountdown.set(true);
+		a.showFuse.set(true);
+		a.fuseBottom.set(true);
+		a.followBuffDuration.set(true);
+		a.glowColor = 0xFFFF8800;
+		if (a.chrome != null)
+			a.chrome.transparent.set(true);
+
+		a.canvasElements = [
+			AuraCanvasElement.icon("Warrior_IgnorePainStatus", 0, 0, 96, 96),
+			AuraCanvasElement.text("PAIN ACTIVE", 8, -22, 18, 0xFFFFFFFF)
+		];
+
+		var r = new AuraRuleDef();
+		r.mode = "all";
+		var c = new AuraConditionDef();
+		c.signal = "status.present";
+		c.op = "present";
+		c.subject = "Warrior_IgnorePainStatus";
+		c.subjectLabel = "Ignore Pain";
+		r.conditions.push(c);
+		a.rule = r;
+
+		var win = new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE);
+		var icon = new AuraEffect("glow", AuraEffect.KIND_ICON, AuraEffect.WHEN_WHILE_TRUE);
+		icon.glow.set(true);
+		a.effects = [win, icon];
 		return a;
 	}
 

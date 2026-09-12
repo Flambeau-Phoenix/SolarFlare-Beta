@@ -156,10 +156,10 @@ class GeauxBuilder {
 			UiActionQueue.save();
 		}
 		ImGui.sameLine();
-		if (UiChrome.ghostButton("Copy JSON##gb_export"))
+		if (UiChrome.ghostButton("Copy Share Key##gb_export"))
 			UiActionQueue.enqueue(UiActionKind.ExportGeauxClipboard);
 		ImGui.sameLine();
-		if (UiChrome.ghostButton("Import JSON##gb_import"))
+		if (UiChrome.ghostButton("Import Share Key##gb_import"))
 			UiActionQueue.enqueue(UiActionKind.ImportGeauxClipboard);
 		ImGui.sameLine();
 		if (ImGui.smallButton(showDiag ? "Hide JSON##gb_diag_tog" : "Diagnostics##gb_diag_tog"))

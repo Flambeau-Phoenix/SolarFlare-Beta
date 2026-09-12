@@ -20,7 +20,7 @@ class ResolutionLedgerOverlay {
 		if (ResolutionLedger.enabled == null || !ResolutionLedger.enabled.get())
 			return;
 		ImGui.setNextWindowSize(ImGui.vec2(720, 380), ImGuiCond.FirstUseEver);
-		var extraFlags = cursorFree ? 0 : ImGuiWindowFlags.NoInputs;
+		var extraFlags = cursorFree ? 0 : ImGuiWindowFlags.NoMouseInputs;
 		if (HudChrome.beginPanel("Resolution ledger##hm_rl", ResolutionLedger.enabled, "Resolution ledger", extraFlags)) {
 			ImGui.textWrapped("Production winners (engine / typed / FieldWalk). Recording is session-only and does not auto-start.");
 			if (ResolutionLedger.armed()) {
@@ -75,9 +75,9 @@ class ResolutionLedgerOverlay {
 			ImGui.tableSetColumnIndex(3);
 			ImGui.text(Std.string(r.hits));
 			ImGui.tableSetColumnIndex(4);
-			ImGui.text(r.nameWon);
+			ImGui.text(ResolutionLedger.cleanId(r.nameWon));
 			ImGui.tableSetColumnIndex(5);
-			ImGui.text(r.preview);
+			ImGui.text(ResolutionLedger.cleanId(r.preview));
 			i++;
 		}
 		ImGui.endTable();

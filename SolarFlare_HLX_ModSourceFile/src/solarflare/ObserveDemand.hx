@@ -61,11 +61,11 @@ class ObserveDemand {
 	public static inline var OVERLAY_ACTIVE_S:Float = 0.12; // ~8 Hz when dirty/active
 	public static inline var IDENTITY_S:Float = 1.0;
 	public static inline var TARGET_HP_S:Float = 0.10; // 10 Hz
-	/** Slow safety poll; StatusObserveHooks dirty-wake owns edges. */
-	public static inline var AURA_STATUS_IDLE_S:Float = 1.0;
-	public static inline var AURA_STATUS_HOT_S:Float = 0.35;
-	/** Coalesce bursty Status mutators (init+stacks+refresh). */
-	public static inline var AURA_STATUS_DIRTY_S:Float = 0.02;
+	/** 20 Hz safety poll; StatusObserveHooks dirty-wake owns edges. */
+	public static inline var AURA_STATUS_IDLE_S:Float = 0.05;
+	public static inline var AURA_STATUS_HOT_S:Float = 0.05;
+	/** Dirty wake — AuraStatusCache.sample also self-gates at 20 Hz. */
+	public static inline var AURA_STATUS_DIRTY_S:Float = 0.0;
 	public static inline var GETRIFTY_OUT_S:Float = 0.75;
 	public static inline var GETRIFTY_IN_S:Float = 0.25;
 	public static inline var ATTACK_IDLE_S:Float = 0.25;
@@ -127,7 +127,8 @@ class ObserveDemand {
 			for (a in cfg.auras.auras) {
 				if (a == null || !a.enabled.get())
 					continue;
-				if (a.trigger == "status") addStatusId(a.skillId);
+				if (a.trigger == "status")
+					addStatusId(a.skillId);
 				if (a.rule != null && a.rule.conditions != null) {
 					for (c in a.rule.conditions) {
 						if (c == null || c.signal == null)
@@ -143,7 +144,8 @@ class ObserveDemand {
 
 	static function addStatusId(id:String):Void {
 		if (id == null) return;
-		id = StringTools.trim(id);
+		// HL String subjects can look like String but Json/ImGui show {bytes:???}.
+		id = solarflare.debug.ResolutionLedger.cleanId(id);
 		if (id.length == 0) return;
 		pushStatusId(id);
 		// Status alerts: plain skill ids expand to common companions on the hero.

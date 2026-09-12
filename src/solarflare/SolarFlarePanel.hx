@@ -131,10 +131,20 @@ class SolarFlarePanel {
 		catch (_:Dynamic) {}
 
 		CursorCaptureFix.apply(app);
+		// Look-lock closes hub/builders only when no interactive editor is open.
+		// Cursor lock must not tear down an active Aura/profile editor (keyboard
+		// ownership is independent of cursorFree — leaked inventory hotkeys used
+		// to flip cursor and cascade into suspendForCamera).
 		if (prevCursorFree && !CursorCaptureFix.cursorFree) {
+			var keepEditors = false;
 			try
-				config.suspendForCamera()
+				keepEditors = config.anyInteractiveOpen()
 			catch (_:Dynamic) {}
+			if (!keepEditors) {
+				try
+					config.suspendForCamera()
+				catch (_:Dynamic) {}
+			}
 		}
 		prevCursorFree = CursorCaptureFix.cursorFree;
 
@@ -153,14 +163,16 @@ class SolarFlarePanel {
 					|| ObserveDemand.comboPoints || ObserveDemand.chaincast || ObserveDemand.conduit)
 					HealthHooks.observeLocal();
 			} catch (_:Dynamic) {}
-			try
-				HealthHooks.reconcileOverlays()
-			catch (_:Dynamic) {}
-			try {
-				if (ObserveDemand.dueAttackCombo(now, AttackComboCache.withinCombo || AttackComboCache.flashFinal))
-					AttackComboCache.observe();
-			} catch (_:Dynamic) {}
+		try
+			HealthHooks.reconcileOverlays()
+		catch (_:Dynamic) {}
+		try {
+			if (ObserveDemand.dueAttackCombo(now, AttackComboCache.withinCombo || AttackComboCache.flashFinal))
+				AttackComboCache.observe();
+		} catch (_:Dynamic) {}
 		}
+
+
 
 		// Heavy cadence (~25 Hz outer) — feature visibility + inner adaptive rates:
 		if (now - lastHeavyPollSec >= 0.040) {
@@ -373,6 +385,8 @@ class SolarFlarePanel {
 		var v = config.vitals;
 		if (v == null)
 			return;
+		// HP position is set once at startup (fresh-install default via ConfigPanel.new)
+		// or restored from save. Never re-anchor per-frame — that would overwrite user drags.
 		if (!v.hpHidden.get())
 			drawResourceWindow(v, 0, "HP", v.hpHidden, v.chrome, v.hpWidth, v.hpHeight);
 		if (!v.rageHidden.get())

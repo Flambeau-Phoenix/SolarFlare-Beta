@@ -1,6 +1,7 @@
 package solarflare.ui;
 
 import imgui.ImGui;
+import solarflare.util.ShareCodec;
 
 /**
  * External work enqueued from tool draw (save / clipboard / JSON IO).
@@ -113,14 +114,19 @@ class UiActionQueue {
 			var clipBytes = ImGui.getClipboardText();
 			var clip = clipBytes != null ? ByteUtil.readString(clipBytes, 8192, true) : null;
 			if (clip == null || clip.length < 5) {
-				ToastManager.error("Clipboard does not contain valid JSON.");
+				ToastManager.error("Clipboard does not contain a valid share key or JSON.");
 				return;
 			}
-			var parsed:Dynamic = haxe.Json.parse(clip);
+			var json = ShareCodec.unwrapToJson(clip);
+			if (json == null) {
+				ToastManager.error("Clipboard does not contain a valid share key or JSON.");
+				return;
+			}
+			var parsed:Dynamic = haxe.Json.parse(json);
 			host.geauxBuilder.applyExternalLayout(parsed, "Import Layout");
 			ToastManager.success("Imported Geaux layout from clipboard!");
 		} catch (e:Dynamic) {
-			ToastManager.error("Failed to import JSON: " + e);
+			ToastManager.error("Failed to import share key: " + e);
 		}
 	}
 
@@ -131,8 +137,8 @@ class UiActionQueue {
 		}
 		try {
 			var json = haxe.Json.stringify(host.geaux.dumpLayout(), null, "  ");
-			ImGui.setClipboardText(json);
-			ToastManager.success("Geaux layout copied to clipboard!");
+			ImGui.setClipboardText(ShareCodec.wrapJson(json));
+			ToastManager.success("Geaux layout share key copied!");
 		} catch (e:Dynamic) {
 			ToastManager.error("Export failed: " + e);
 		}

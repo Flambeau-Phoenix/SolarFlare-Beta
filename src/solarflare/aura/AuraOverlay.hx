@@ -150,6 +150,9 @@ class AuraOverlay {
 				}
 
 				var dl = ImGui.getWindowDrawList();
+				if (layout) {
+					solarflare.ui.VectorGlow.rect(dl, rmin.x - 2, rmin.y - 2, rw + 4, rh + 4, 0x8844CCFF, 4.0, 1.5);
+				}
 				drawRegion(dl, a, rmin.x, rmin.y, rw, rh, !a.show && layout);
 				drawKeyChip(dl, rmin.x, rmin.y, rw, rh, a, !a.show && layout);
 				// Keep layout cursor at the end of reserved content (no stray SetCursor beyond).

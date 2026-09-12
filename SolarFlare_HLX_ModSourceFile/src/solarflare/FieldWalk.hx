@@ -137,10 +137,14 @@ class FieldWalk {
 				if (s == null)
 					return fallback;
 				s = solarflare.ui.ByteUtil.materialize(StringTools.trim(s));
-				if (s.length == 0)
+				if (s.length == 0 || solarflare.ui.ByteUtil.isDumpShape(s))
 					return fallback;
 				return s;
 			}
+			// Unboxed hl.Bytes / opaque engine pointers.
+			var coerced = solarflare.ui.ByteUtil.coerceString(val);
+			if (coerced.length > 0)
+				return coerced;
 		} catch (_:Dynamic) {}
 		return fallback;
 	}

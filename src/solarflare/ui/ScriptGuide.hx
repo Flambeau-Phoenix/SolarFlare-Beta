@@ -32,7 +32,7 @@ class ScriptGuide {
 				"Unlock ghosts hidden auras so you can place them. Lock for combat.",
 				"Status: op + pct = stack compare (pct 1 or leftover 35 = any stacks).",
 				"duration 0 uses CastleDB length from hlx/mods/solarflare/cdb/aura-catalog.json.",
-				"skillId is the engine id (Fairie spelling for clones). Export string is JSON Base64, not Lua.",
+				"skillId is the engine id (Fairie spelling for clones). Clipboard share key is Base64 JSON; settings file stays plain JSON.",
 				"Out-of-game builder is in the SolarFlare repo: tools/custom_script_builder.html (not under Farever).",
 			], [aurasDir()]);
 			section("drm", "Deadly Rift Mods", [

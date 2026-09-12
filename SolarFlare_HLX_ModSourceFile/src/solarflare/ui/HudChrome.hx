@@ -268,7 +268,8 @@ class HudChrome {
 
 	/**
 	 * Thin title: ico (collapse / drag) + optional leading + caption + X.
-	 * Hidden while locked (unless collapsed, so the ico can expand).
+	 * Locked or transparent: hide chrome X (interaction already disabled when locked).
+	 * Collapsed strip still reserves space; expand via sun when unlocked, or context menu.
 	 * Returns false when collapsed — caller should skip body widgets.
 	 */
 	public function drawTitleTools(?onClose:Void->Void, ?drawLeading:Void->Void, ?caption:String):Bool {
@@ -305,12 +306,12 @@ class HudChrome {
 				ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(sunX + 3 + i * 4, sunY + SUN * 0.5), 1, gripCol, 8);
 		}
 
+		// Lock / transparent: hide X (match title chrome). Close via context menu.
 		var closeHit = false;
-		if (onClose != null) {
+		if (onClose != null && !isLocked() && !isTransparent()) {
 			var closeX:Single = wp.x + ws.x - CLOSE - 4;
 			var closeY:Single = wp.y + ((STRIP + 2) - CLOSE) * 0.5;
-			if (!isLocked())
-				closeHit = pollCloseButton(closeX, closeY);
+			closeHit = pollCloseButton(closeX, closeY);
 			drawCloseGlyph(closeX, closeY);
 		}
 

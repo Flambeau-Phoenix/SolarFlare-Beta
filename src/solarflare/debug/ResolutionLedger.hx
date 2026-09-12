@@ -100,8 +100,9 @@ class ResolutionLedger {
 		var def = ResolutionCatalog.get(n.key);
 		var method = n.method != null ? n.method : "";
 		var step = n.step != null ? n.step : "";
-		var nameWon = n.nameWon != null ? n.nameWon : "";
+		var nameWon = cleanId(n.nameWon);
 		var hook = n.hook != null ? n.hook : "";
+		// Keep full identity so no status/phase row is dropped. Long lists OK.
 		var aggKey = n.key + "|" + method + "|" + step + "|" + nameWon + "|" + hook;
 		var agg = aggs.get(aggKey);
 		if (agg == null) {
@@ -127,6 +128,10 @@ class ResolutionLedger {
 		}
 		agg.hits++;
 		agg.src = n.src != null ? n.src : agg.src;
+		if (step.length > 0)
+			agg.step = step;
+		if (hook.length > 0)
+			agg.hook = hook;
 		agg.payloadType = n.payloadType != null && n.payloadType.length > 0 ? n.payloadType : agg.payloadType;
 		agg.payloadRole = n.payloadRole != null && n.payloadRole.length > 0 ? n.payloadRole : agg.payloadRole;
 		if (n.args != null && n.args.length > 0)
@@ -134,7 +139,7 @@ class ResolutionLedger {
 		if (n.kind != null && n.kind.length > 0)
 			agg.kind = n.kind;
 		if (n.preview != null && n.preview.length > 0)
-			agg.preview = n.preview;
+			agg.preview = cleanId(n.preview);
 		mergeTried(agg, n.tried);
 		mergeNames(agg, n.namesTried);
 		agg.t = stamp();
@@ -155,16 +160,22 @@ class ResolutionLedger {
 		ensure();
 		var st = step != null ? step : "";
 		var hk = hook != null ? hook : "";
-		var nm = nameWon != null ? nameWon : "";
-		var aggKey = key + "|" + method + "|" + st + "|" + nm + "|" + hk;
+		var nm = cleanId(nameWon);
+		var meth = method != null ? method : "";
+		var prev = cleanId(preview);
+		var aggKey = key + "|" + meth + "|" + st + "|" + nm + "|" + hk;
 		var agg = aggs.get(aggKey);
 		if (agg != null) {
 			agg.hits++;
 			agg.pending++;
-			if (preview != null && preview.length > 0)
-				agg.preview = preview;
+			if (prev != null && prev.length > 0)
+				agg.preview = prev;
 			if (src != null && src.length > 0)
 				agg.src = src;
+			if (st.length > 0)
+				agg.step = st;
+			if (hk.length > 0)
+				agg.hook = hk;
 			agg.t = stamp();
 			dirty = true;
 			return;
@@ -177,8 +188,70 @@ class ResolutionLedger {
 		n.step = st;
 		n.hook = hk;
 		n.kind = kind != null ? kind : "";
-		n.preview = preview != null ? preview : "";
+		n.preview = prev;
 		commit(n);
+	}
+
+	/**
+	 * Status lifecycle trampoline: one row per (status.hook, phase, statusId).
+	 * Hits increment and preview updates in place.
+	 */
+	public static function recordStatusHook(phase:String, statusId:String, previewValue:Dynamic, stepTag:String = "", hookPath:String = ""):Void {
+		if (!armed())
+			return;
+		var id = cleanId(statusId);
+		if (id.length == 0)
+			id = "unknownStatus";
+		var meth = phase != null && phase.length > 0 ? phase : "postfix:unknown";
+		var preview = previewOf(previewValue, id);
+		touch("status.hook", meth, "StatusObserveHooks", id, "string", preview, stepTag != null ? stepTag : "", hookPath != null ? hookPath : "");
+	}
+
+	/** Preview without Std.string-first (Bytes → {bytes…} dumps). */
+	static function previewOf(previewValue:Dynamic, fallback:String):String {
+		if (previewValue == null)
+			return fallback;
+		var cleaned = cleanId(previewValue);
+		if (cleaned.length > 0)
+			return cleaned;
+		if (Std.isOfType(previewValue, Int) || Std.isOfType(previewValue, Float) || Std.isOfType(previewValue, Bool))
+			return Std.string(previewValue);
+		return fallback;
+	}
+
+	/** Decode HL String / Bytes dumps into a stable Haxe id for keys + ImGui. Never returns {bytes…}. */
+	public static function cleanId(raw:Dynamic):String {
+		if (raw == null)
+			return "";
+		// Opaque HL String: UCS-2 char-code copy (not fromUTF8).
+		if (Std.isOfType(raw, String)) {
+			var s:String = cast raw;
+			if (s.length == 0)
+				return "";
+			var mat = "";
+			try
+				mat = solarflare.ui.ByteUtil.materialize(s)
+			catch (_:Dynamic)
+				mat = "";
+			mat = StringTools.trim(mat);
+			if (mat.length > 0 && !isDumpId(mat))
+				return mat;
+		}
+		// Raw hl.Bytes / dump objects via Geaux coerce.
+		var coerced = solarflare.geaux.GeauxCache.coerceSkillId(raw);
+		coerced = StringTools.trim(coerced);
+		if (coerced.length > 0 && !isDumpId(coerced))
+			return coerced;
+		return "";
+	}
+
+	static function isDumpId(s:String):Bool {
+		if (s == null || s.length == 0)
+			return true;
+		if (s.indexOf("{") >= 0 || s.indexOf("}") >= 0)
+			return true;
+		var low = s.toLowerCase();
+		return low.indexOf("bytes") >= 0;
 	}
 
 	public static function rowsForDraw():Array<LedgerAgg> {

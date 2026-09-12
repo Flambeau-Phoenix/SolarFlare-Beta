@@ -9,8 +9,7 @@ import solarflare.ui.UiChrome;
 import imgui.ImGui;
 import imgui.Enums.ImGuiCond;
 import imgui.ref.BoolRef;
-import haxe.crypto.Base64;
-import haxe.io.Bytes;
+import solarflare.util.ShareCodec;
 import solarflare.aura.signal.AuraRuleCodec;
 import solarflare.aura.signal.AuraConditionEditor;
 
@@ -50,6 +49,32 @@ class AuraConfig {
 			if (a.id == id)
 				return a;
 		return null;
+	}
+
+	/** Disable default max_combo / resource.combo trackers that spawn unanchored pips. */
+	public function disableUnanchoredComboTrackers():Void {
+		if (auras == null)
+			return;
+		for (a in auras) {
+			if (a == null)
+				continue;
+			var isCombo = a.id == "max_combo_finisher";
+			if (!isCombo && a.rule != null && a.rule.conditions != null) {
+				for (c in a.rule.conditions) {
+					if (c != null && c.signal != null
+						&& (c.signal == "resource.combo.count" || c.signal == "resource.combo.atMax")) {
+						isCombo = true;
+						break;
+					}
+				}
+			}
+			if (!isCombo && a.trigger == "combo")
+				isCombo = true;
+			if (isCombo) {
+				a.enabled.set(false);
+				a.show = false;
+			}
+		}
 	}
 
 	public static function fromDyn(d:Dynamic):AuraDef {
@@ -122,8 +147,12 @@ class AuraConfig {
 			a.showCountdown.set(true);
 		if (d.showFuse == true)
 			a.showFuse.set(true);
+		if (d.fuseBottom == true)
+			a.fuseBottom.set(true);
 		if (d.followBuffDuration == false)
 			a.followBuffDuration.set(false);
+		if (d.glowColor != null)
+			a.glowColor = Std.int(d.glowColor);
 		if (d.stackCounter == true)
 			a.stackCounter.set(true);
 		if (d.showLabel == false)
@@ -159,6 +188,19 @@ class AuraConfig {
 		} catch (_:Dynamic) {}
 		AuraEffects.ensure(a);
 		AuraEffects.syncDormantFlag(a);
+		a.canvasElements = [];
+		try {
+			var rawCanvas:Dynamic = d.canvasElements;
+			if (rawCanvas != null) {
+				var carr:Array<Dynamic> = cast rawCanvas;
+				var ci = 0;
+				while (ci < carr.length) {
+					if (carr[ci] != null)
+						a.canvasElements.push(AuraCanvasElement.fromDyn(carr[ci]));
+					ci++;
+				}
+			}
+		} catch (_:Dynamic) {}
 		a.pctRef.set(a.pct);
 		a.durRef.set(a.duration);
 		a.syncSkillBuf();
@@ -689,7 +731,7 @@ class AuraConfig {
 
 	function drawRegion(a:AuraDef):Void {
 		if (ImGui.beginCombo("Region##rg" + a.id, a.region)) {
-			for (t in ["bar", "icon", "text", "ring"]) {
+			for (t in ["bar", "icon", "text", "ring", "canvas"]) {
 				if (ImGui.selectable(t, a.region == t)) {
 					a.region = t;
 					SettingsStore.markDirty();
@@ -697,7 +739,7 @@ class AuraConfig {
 			}
 			ImGui.endCombo();
 		}
-		if (a.region == "icon") {
+		if (a.region == "icon" || a.region == "canvas") {
 			if (ImGui.inputText("Icon id##ic" + a.id, a.iconBuf, AuraDef.ICON_BUF)) {
 				a.iconId = bytesToString(a.iconBuf, AuraDef.ICON_BUF);
 				SettingsStore.markDirty();
@@ -715,8 +757,7 @@ class AuraConfig {
 	}
 
 	function exportOne(a:AuraDef):String {
-		var json = haxe.Json.stringify(AuraEngine.toObj(a));
-		return Base64.encode(Bytes.ofString(json));
+		return ShareCodec.wrapJson(haxe.Json.stringify(AuraEngine.toObj(a)));
 	}
 
 	function importOne():Void {

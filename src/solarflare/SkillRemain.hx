@@ -100,9 +100,11 @@ class SkillRemain {
 					return lastResult.set(1, INFINITE_LEFT, true, true);
 			} catch (_:Dynamic) {}
 			var left = 0.0;
-			try
-				left = st.getDurationLeft()
-			catch (_:Dynamic)
+			var gotLeft = false;
+			try {
+				left = st.getDurationLeft();
+				gotLeft = true;
+			} catch (_:Dynamic)
 				left = 0;
 			var prog = Math.NaN;
 			try
@@ -118,6 +120,12 @@ class SkillRemain {
 						max = d;
 				}
 			} catch (_:Dynamic) {}
+			// Known finite expiry only when a duration domain exists (max/progress), not bare 0.
+			if (gotLeft && left <= 0.02) {
+				var hadTimer = max > 0.05 || (!Math.isNaN(prog) && prog >= 0 && prog < 0.999);
+				if (hadTimer)
+					return lastResult.set(0, left < 0 ? 0 : left, true, false);
+			}
 			return finish(left, prog, max, false);
 		} catch (_:Dynamic) {}
 		return miss();
@@ -127,15 +135,19 @@ class SkillRemain {
 		try {
 			var bs:st.skill.BaseSkill = item;
 			var left = 0.0;
-			try
-				left = bs.getDurationLeft()
-			catch (_:Dynamic)
+			var gotLeft = false;
+			try {
+				left = bs.getDurationLeft();
+				gotLeft = true;
+			} catch (_:Dynamic)
 				left = 0;
 			var prog = Math.NaN;
 			try
 				prog = bs.getDurationProgress()
 			catch (_:Dynamic)
 				prog = Math.NaN;
+			if (gotLeft && left <= 0.02 && !Math.isNaN(prog) && prog >= 0 && prog < 0.999)
+				return lastResult.set(0, left < 0 ? 0 : left, true, false);
 			return finish(left, prog, 0, false);
 		} catch (_:Dynamic) {}
 		return miss();

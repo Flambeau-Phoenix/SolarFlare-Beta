@@ -1,7 +1,6 @@
 package solarflare.aura;
 
-import haxe.crypto.Base64;
-import haxe.io.Bytes;
+import solarflare.util.ShareCodec;
 
 /**
  * Combine many single auras into one shareable export key, and map them to
@@ -21,8 +20,7 @@ class AuraPack {
 	public static var FIGHTS:Array<String> = ["maat", "nightqueen", "shared"];
 
 	public static function encode(fight:String, packId:String, packName:String, auras:Array<AuraDef>):String {
-		var json = haxe.Json.stringify(toObj(fight, packId, packName, auras));
-		return Base64.encode(Bytes.ofString(json));
+		return ShareCodec.encodeObj(toObj(fight, packId, packName, auras));
 	}
 
 	public static function toObj(fight:String, packId:String, packName:String, auras:Array<AuraDef>):Dynamic {
@@ -141,10 +139,10 @@ class AuraPack {
 		var t = StringTools.trim(s);
 		if (t.length < 4)
 			return null;
-		var json = t;
-		if (t.charAt(0) != "{" && t.charAt(0) != "[")
-			json = Base64.decode(t).toString();
-		return haxe.Json.parse(json);
+		try
+			return ShareCodec.parseDyn(t)
+		catch (_:Dynamic)
+			return null;
 	}
 
 	/** Import auras from a pack export (kind solarflare.aura_pack or bare aura array). */

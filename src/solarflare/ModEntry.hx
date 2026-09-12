@@ -41,6 +41,7 @@ class ModEntry {
 		solarflare.cdb.CdbNames.keep();
 		solarflare.cdb.CdbUnitNames.keep();
 		solarflare.cdb.AuraCatalog.keep();
+		solarflare.cdb.AuraQuickStartCatalog.keep();
 		solarflare.cdb.CdbAuraTable.keep();
 		solarflare.geaux.GeauxCdTable.keep();
 		solarflare.geaux.GeauxTalentTable.keep();

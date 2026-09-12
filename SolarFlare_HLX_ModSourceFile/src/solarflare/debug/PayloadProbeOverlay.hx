@@ -19,7 +19,7 @@ class PayloadProbeOverlay {
 		if (PayloadProbe.enabled == null || !PayloadProbe.enabled.get())
 			return;
 		ImGui.setNextWindowSize(ImGui.vec2(560, 360), ImGuiCond.FirstUseEver);
-		var extraFlags = cursorFree ? 0 : ImGuiWindowFlags.NoInputs;
+		var extraFlags = cursorFree ? 0 : ImGuiWindowFlags.NoMouseInputs;
 		if (HudChrome.beginPanel("Payload probe##hm_pp", PayloadProbe.enabled, "Payload probe", extraFlags)) {
 			ImGui.textWrapped("Session only. Recording does not auto-start and is not saved.");
 			if (PayloadProbe.armed()) {

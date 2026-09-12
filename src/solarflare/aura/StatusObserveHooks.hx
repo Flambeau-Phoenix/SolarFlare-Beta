@@ -3,10 +3,12 @@ package solarflare.aura;
 import solarflare.FieldWalk;
 import solarflare.HealthCache;
 import solarflare.ObserveDemand;
+import solarflare.debug.ResolutionLedger;
 
 /**
  * Status lifecycle dirty-wake for AuraStatusCache.
  * Present poll remains duration/list authority; hooks only mark local edges.
+ * Ledger: one row per (status.hook, postfix:<phase>, statusId); hits/preview update in place.
  * ABI from Farever gamelib_metadata (Ubuntu data dir).
  */
 class StatusObserveHooks {
@@ -15,75 +17,95 @@ class StatusObserveHooks {
 	@:hlx.postfix(st.skill.Status.init)
 	static function onInit(self:Dynamic, result:Void):Void {
 		if (isLocalStatus(self))
-			wake("st.skill.Status.init", self);
+			wake("st.skill.Status.init", "postfix:init", self, "init");
 	}
 
 	@:hlx.postfix(st.skill.Status.set_stacks)
 	static function onSetStacks(self:Dynamic, value:Int, result:Int):Int {
 		if (isLocalStatus(self))
-			wake("st.skill.Status.set_stacks", self);
+			wake("st.skill.Status.set_stacks", "postfix:set_stacks", self, value);
 		return result;
 	}
 
 	@:hlx.postfix(st.skill.Status.set_refreshDuration)
 	static function onRefresh(self:Dynamic, value:Float, result:Float):Float {
 		if (isLocalStatus(self))
-			wake("st.skill.Status.set_refreshDuration", self);
+			wake("st.skill.Status.set_refreshDuration", "postfix:set_refreshDuration", self, value);
 		return result;
 	}
 
 	@:hlx.postfix(st.skill.Status.extendDuration)
 	static function onExtend(self:Dynamic, value:Float, result:Void):Void {
 		if (isLocalStatus(self))
-			wake("st.skill.Status.extendDuration", self);
+			wake("st.skill.Status.extendDuration", "postfix:extendDuration", self, value);
 	}
 
-	/** Pending live for expiry authority; still useful as cancel wake. */
+	/** Immediate expiry authority: clear cached present before next 20 Hz poll. */
 	@:hlx.postfix(st.skill.Status.onRemove)
 	static function onRemove(self:Dynamic, result:Void):Void {
-		if (isLocalStatus(self))
-			wake("st.skill.Status.onRemove", self);
+		if (!isLocalStatus(self))
+			return;
+		try {
+			var id = statusIdOf(self);
+			if (id != null && id.length > 0)
+				AuraStatusCache.markAbsent(id);
+		} catch (_:Dynamic) {}
+		wake("st.skill.Status.onRemove", "postfix:onRemove", self, "removed");
 	}
 
 	@:hlx.postfix(ent.GameObject.__net_mark_statuses)
 	static function onNetStatuses(self:Dynamic, incoming:Dynamic, result:Dynamic):Dynamic {
 		if (HealthCache.isLocalHero(self)) {
 			ObserveDemand.markAuraStatusDirty();
-			if (solarflare.debug.ResolutionLedger.armed())
-				solarflare.debug.ResolutionLedger.touch(
-					"status.hook",
-					"postfix",
-					"StatusObserveHooks.onNetStatuses",
+			if (ResolutionLedger.armed())
+				ResolutionLedger.recordStatusHook(
+					"postfix:__net_mark_statuses",
 					"localHero",
-					"bool",
 					"true",
-					"",
+					"__net_mark_statuses",
 					"ent.GameObject.__net_mark_statuses"
 				);
 		}
 		return result;
 	}
 
-	static function wake(hook:String, statusDyn:Dynamic):Void {
+	static function wake(hookPath:String, phase:String, statusDyn:Dynamic, previewValue:Dynamic):Void {
 		ObserveDemand.markAuraStatusDirty();
-		if (!solarflare.debug.ResolutionLedger.armed())
+		if (!ResolutionLedger.armed())
 			return;
-		var id = "";
+		ResolutionLedger.recordStatusHook(phase, statusIdOf(statusDyn), previewValue, hookPhase(phase), hookPath);
+	}
+
+	static function statusIdOf(statusDyn:Dynamic):String {
+		if (statusDyn == null)
+			return "";
 		try {
 			var bs:st.skill.BaseSkill = statusDyn;
 			if (bs != null && bs.kind != null)
-				id = bs.kind;
+				return ResolutionLedger.cleanId(bs.kind);
 		} catch (_:Dynamic) {}
-		solarflare.debug.ResolutionLedger.touch(
-			"status.hook",
-			"postfix",
-			"StatusObserveHooks",
-			id.length > 0 ? id : "localStatus",
-			"string",
-			id,
-			"",
-			hook
-		);
+		try {
+			var s = FieldWalk.extractString(statusDyn, "kind");
+			if (s != null && s.length > 0)
+				return ResolutionLedger.cleanId(s);
+		} catch (_:Dynamic) {}
+		try {
+			var s = FieldWalk.extractString(statusDyn, "id");
+			if (s != null && s.length > 0)
+				return ResolutionLedger.cleanId(s);
+		} catch (_:Dynamic) {}
+		return "";
+	}
+
+	static function hookPhase(phase:String):String {
+		if (phase == null || phase.length == 0)
+			return "unknown";
+		if (StringTools.startsWith(phase, "postfix:"))
+			return phase.substr(8);
+		var i = phase.lastIndexOf(".");
+		if (i >= 0 && i + 1 < phase.length)
+			return phase.substr(i + 1);
+		return phase;
 	}
 
 	/** Carrier on local hero — not instigator (who applied). */

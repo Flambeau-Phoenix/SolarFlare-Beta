@@ -22,6 +22,8 @@ class GeauxSlotSnap {
 	public var ready:Bool = false;
 	/** False when off cooldown but missing cast resources (rage/spark/etc.). */
 	public var affordable:Bool = true;
+	/** SkillScript.shouldPlayInstantly — frozen observe; draw must not query scripts. */
+	public var procReady:Bool = false;
 	public var cdLeft:Float = 0;
 	public var cdMax:Float = 0;
 	public var remaining:Float = 0;
@@ -1889,6 +1891,7 @@ class GeauxCache {
 		dest.present = src.present;
 		dest.ready = src.ready;
 		dest.affordable = src.affordable;
+		dest.procReady = src.procReady;
 		dest.cdLeft = src.cdLeft;
 		dest.cdMax = src.cdMax;
 		dest.remaining = src.remaining;
@@ -2985,12 +2988,14 @@ class GeauxCache {
 			return;
 		if (!snap.present || snap.id == null || snap.id.length == 0) {
 			snap.affordable = true;
+			snap.procReady = false;
 			snap.charges = 0;
 			snap.chargesMax = 0;
 			return;
 		}
 		if (solarflare.PrayerCache.isPrayerId(snap.id)) {
 			snap.affordable = snap.ready;
+			snap.procReady = false;
 			snap.charges = 0;
 			snap.chargesMax = 0;
 			return;
@@ -3007,6 +3012,19 @@ class GeauxCache {
 		if (snap.chargesMax > 0)
 			snap.ready = snap.charges > 0;
 		applyAffordSnap(hero, snap, skill);
+		applyProcReady(snap, skill);
+	}
+
+	/** Observe-only: freeze Spell Activation Overlay flag from typed SkillScript. */
+	static function applyProcReady(snap:GeauxSlotSnap, skill:Dynamic):Void {
+		snap.procReady = false;
+		if (skill == null || snap == null)
+			return;
+		try {
+			var sc:script.SkillScript = skill;
+			if (sc != null)
+				snap.procReady = sc.shouldPlayInstantly();
+		} catch (_:Dynamic) {}
 	}
 
 	static function bindSlotSkill(hero:ent.Hero, snap:GeauxSlotSnap):Dynamic {

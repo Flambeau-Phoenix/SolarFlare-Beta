@@ -10,8 +10,9 @@ import hl.Bytes as HLBytes;
  * IMPORTANT: hl.Bytes is a raw unmanaged pointer with no .length property.
  * The buffer capacity MUST always be passed explicitly.
  *
- * ImGui buffers = null-terminated UTF-8 (readString/readBytes).
- * Engine String / FieldWalk bytes = UCS-2/UTF-16LE (readUCS2 / materialize).
+ * ImGui buffers = null-terminated UTF-8 (readString/readBytes/fillBuf).
+ * Engine String / FieldWalk bytes = UCS-2/UTF-16LE (readUCS2 / materialize / coerceString).
+ * Prefer coerceString or readUCS2 at engine sites; readAuto is ImGui/unknown only.
  */
 class ByteUtil {
 	/** Maximum buffer size to prevent runaway iteration (64 KB) */
@@ -91,14 +92,22 @@ class ByteUtil {
 
 	/**
 	 * Auto-detect UTF-8 (ImGui) vs UCS-2 (engine String bytes).
-	 * Heuristic: printable first byte + 0x00 second byte => UCS-2.
+	 * Prefer readUCS2 / coerceString at engine/FieldWalk sites — do not guess with readAuto.
+	 * Heuristic: empty UCS-2 (0x00 0x00); ASCII LE (b0!=0 && b1==0) => UCS-2; else UTF-8.
 	 */
 	public static function readAuto(buf:HLBytes, cap:Int = DEFAULT_CAPACITY):String {
 		if (buf == null || cap <= 0)
 			return "";
 		try {
-			if (cap >= 2 && buf.getUI8(0) != 0 && buf.getUI8(1) == 0)
-				return readUCS2(buf, -1);
+			if (cap >= 2) {
+				var b0 = buf.getUI8(0);
+				var b1 = buf.getUI8(1);
+				// Empty UCS-2 / UTF-16LE null string — do not UTF-8-scan.
+				if (b0 == 0 && b1 == 0)
+					return "";
+				if (b0 != 0 && b1 == 0)
+					return readUCS2(buf, -1);
+			}
 		} catch (_:Dynamic) {}
 		return readString(buf, cap, true);
 	}
@@ -125,6 +134,40 @@ class ByteUtil {
 		}
 	}
 
+	/** True for Json/Std.string dump shapes like `{bytes : ???, length : N}`. */
+	public static function isDumpShape(s:String):Bool {
+		if (s == null || s.length == 0)
+			return true;
+		if (s.indexOf("{") >= 0 || s.indexOf("}") >= 0)
+			return true;
+		var low = s.toLowerCase();
+		return low.indexOf("bytes") >= 0;
+	}
+
+	/**
+	 * Dynamic → managed Haxe String for hooks / FieldWalk.
+	 * String → materialize; raw vbyte* → try readUCS2 (no isBytes); never Std.string.
+	 */
+	public static function coerceString(val:Dynamic, cap:Int = DEFAULT_CAPACITY):String {
+		if (val == null)
+			return "";
+		// 1. Boxed Haxe String path
+		if (Std.isOfType(val, String)) {
+			var s = materialize(cast val);
+			return isDumpShape(s) ? "" : s;
+		}
+		#if hl
+		// 2. Raw HashLink Bytes pointer (vbyte*) — guarded; no isBytes on this HL.
+		try {
+			var decoded = readUCS2(cast val, -1);
+			if (decoded != null && decoded.length > 0 && !isDumpShape(decoded))
+				return decoded;
+		} catch (_:Dynamic) {}
+		#end
+		// 3. Fallback: drop safely without Std.string dumps
+		return "";
+	}
+
 	/**
 	 * Zero-fill a byte buffer with bounds checking.
 	 *
@@ -145,6 +188,7 @@ class ByteUtil {
 
 	/**
 	 * Fill a byte buffer from a String, guaranteeing null-termination.
+	 * Writes payload + single NUL only — does not zero the remainder of the buffer.
 	 *
 	 * @param buf Destination buffer
 	 * @param cap Capacity of the buffer (MUST be > 0)
@@ -168,16 +212,8 @@ class ByteUtil {
 			return 0;
 		}
 		
-		// Clear the buffer
-		clearBytes(buf, effectiveCap);
-		
 		// Handle null or empty string
-		if (s == null) {
-			buf.setUI8(0, 0);
-			return 0;
-		}
-		
-		if (s.length == 0) {
+		if (s == null || s.length == 0) {
 			buf.setUI8(0, 0);
 			return 0;
 		}
@@ -194,7 +230,7 @@ class ByteUtil {
 			buf.blit(0, source.getData(), 0, copyLen);
 		}
 		
-		// Null-terminate
+		// Null-terminate immediately after payload
 		buf.setUI8(copyLen, 0);
 		
 		// Warn about truncation in debug builds

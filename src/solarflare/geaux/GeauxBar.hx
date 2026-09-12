@@ -352,9 +352,8 @@ class GeauxBar {
 		var fill = !present ? style.readEmpty() : style.readyFill(group, lit, snapId);
 		var border = style.borderCol(lit);
 
-		if (present && lit && affordable) {
-			solarflare.ui.VectorGlow.radial(dl, x + size * 0.5, y + size * 0.5, size * 0.55, 0x33FFB833, 0.45, 5);
-		} else if (present && onCd && !hasCharges && snap.cdLeft <= 1.2 && snap.cdLeft > 0.05) {
+		// Near-ready CD pulse only (usable/proc SAO draws after icon).
+		if (present && onCd && !hasCharges && snap.cdLeft <= 1.2 && snap.cdLeft > 0.05) {
 			var pulseAlpha = 0.25 + 0.25 * Math.sin(ImGui.getTime() * 8.0);
 			var pulseCol = 0x00FFFF | (Std.int(pulseAlpha * 255) << 24);
 			solarflare.ui.VectorGlow.radial(dl, x + size * 0.5, y + size * 0.5, size * 0.5, pulseCol, 0.4, 4);
@@ -363,6 +362,9 @@ class GeauxBar {
 		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + size, y + size), ImGui.colorConvertFloat4ToU32(fill), rounding);
 		if (pickable && hovered) {
 			solarflare.ui.VectorGlow.rect(dl, x, y, size, size, UiCol.rgb(0xFFAA22), rounding, 2.0);
+		} else if (present && lit) {
+			var bU32 = ImGui.colorConvertFloat4ToU32(border);
+			solarflare.ui.VectorGlow.rect(dl, x, y, size, size, bU32, rounding, borderW > 0 ? borderW : 1.5);
 		} else if (borderW > 0) {
 			ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + size, y + size), ImGui.colorConvertFloat4ToU32(border), rounding, borderW);
 		}
@@ -437,6 +439,21 @@ class GeauxBar {
 				ImGui.ImDrawList_AddText_Vec2(dl,
 					ImGui.vec2(x + (size - ms.x) * 0.5, y + (size - ms.y) * 0.5),
 					ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.45, 0.48, 0.52, 0.85)), mark);
+			}
+		}
+
+		// SAO / usable attention after icon, before CD text & hotkeys.
+		if (present) {
+			var procReady = false;
+			try
+				procReady = snap.procReady == true
+			catch (_:Dynamic) {}
+			if (procReady) {
+				solarflare.ui.VectorGlow.procOverlay(dl, x, y, size, size, ImGui.getTime());
+			} else if (lit && affordable && style.readyAttention.get() == GeauxStyle.ATTN_PULSE) {
+				solarflare.ui.VectorGlow.radial(dl, x + size * 0.5, y + size * 0.5, size * 0.55, 0x33FFB833, 0.45, 5);
+			} else if (lit && affordable && style.readyAttention.get() == GeauxStyle.ATTN_BRIGHT) {
+				solarflare.ui.VectorGlow.rect(dl, x - 1, y - 1, size + 2, size + 2, 0xAAFFF6A0, rounding, 2.0);
 			}
 		}
 

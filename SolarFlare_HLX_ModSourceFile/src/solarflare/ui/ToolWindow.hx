@@ -18,6 +18,8 @@ class ToolWindow {
 	static var forceLayoutIds:Map<String, Bool> = new Map();
 	static inline var STRIP:Single = 22;
 	static inline var CLOSE:Single = 14;
+	/** Keep close X left of the vertical scrollbar lane (ImGui default ~14–16px). */
+	static inline var SCROLL_GUTTER:Single = 18;
 
 	/**
 	 * Begin a floating tool window. Always pair with ToolWindow.end() when open was true
@@ -149,9 +151,10 @@ class ToolWindow {
 		var accentCol = ImGui.colorConvertFloat4ToU32(theme.accent);
 		ImGui.ImDrawList_AddLine(dl, ImGui.vec2(wp.x, wp.y + STRIP), ImGui.vec2(wp.x + ws.x, wp.y + STRIP), accentCol, 1);
 
-		// Drag grip on the whole title strip.
+		// Drag grip leaves close + scrollbar gutter free on the right.
+		var rightReserve:Single = CLOSE + 10 + SCROLL_GUTTER;
 		ImGui.setCursorScreenPos(ImGui.vec2(wp.x, wp.y));
-		ImGui.invisibleButton("##tw_title_drag", ImGui.vec2(ws.x - CLOSE - 10, STRIP));
+		ImGui.invisibleButton("##tw_title_drag", ImGui.vec2(ws.x - rightReserve, STRIP));
 		if (ImGui.isItemActive() && ImGui.isMouseDragging(ImGuiMouseButton.Left)) {
 			var delta = ImGui.getMouseDragDelta(ImGuiMouseButton.Left, 0);
 			if (delta != null && (delta.x != 0 || delta.y != 0)) {
@@ -168,7 +171,8 @@ class ToolWindow {
 		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(titleX, titleY), textCol, caption);
 
 		if (open != null) {
-			var closeX:Single = wp.x + ws.x - CLOSE - 6;
+			// Place X left of scrollbar lane so root vertical scroll never covers hitbox.
+			var closeX:Single = wp.x + ws.x - CLOSE - 6 - SCROLL_GUTTER;
 			var closeY:Single = wp.y + (STRIP - CLOSE) * 0.5;
 			ImGui.setCursorScreenPos(ImGui.vec2(closeX, closeY));
 			if (ImGui.invisibleButton("##tw_close", ImGui.vec2(CLOSE, CLOSE)))

@@ -10,6 +10,7 @@ import solarflare.ui.CursorCaptureFix;
 import solarflare.ui.HudChrome;
 import solarflare.ui.ImGuiLists;
 import solarflare.ui.SettingsStore;
+import solarflare.ui.ToastManager;
 import imgui.ImGui;
 import imgui.Enums.ImGuiChildFlags;
 import imgui.Enums.ImGuiCol;
@@ -854,10 +855,32 @@ class LightsaberOverlay {
 				}, function() {
 					ImGui.text("In that rift  heroes [" + meterStatus(LightsaberCache.rift) + "]");
 					ImGui.sameLine();
+					ImGui.pushStyleColor(ImGuiCol.Button, ImGui.vec4(0.52, 0.20, 0.20, 0.9));
+					ImGui.pushStyleColor(ImGuiCol.ButtonHovered, ImGui.vec4(0.68, 0.26, 0.26, 1));
+					ImGui.pushStyleColor(ImGuiCol.ButtonActive, ImGui.vec4(0.40, 0.15, 0.15, 1));
+					if (ImGui.button("Reset##saber_reset_rift")) {
+						LightsaberCache.rift.reset();
+						ToastManager.info("In-rift DPS meter reset");
+					}
+					if (ImGui.isItemHovered())
+						ImGui.setTooltip("Reset in-rift hero encounter metrics");
+					ImGui.popStyleColor(3);
+					ImGui.sameLine();
 					drawRiftTimerBox("saber_rift_grp");
 				}, "");
 			} else {
 				ImGui.text("In that rift  heroes [" + meterStatus(LightsaberCache.rift) + "]");
+				ImGui.sameLine();
+				ImGui.pushStyleColor(ImGuiCol.Button, ImGui.vec4(0.52, 0.20, 0.20, 0.9));
+				ImGui.pushStyleColor(ImGuiCol.ButtonHovered, ImGui.vec4(0.68, 0.26, 0.26, 1));
+				ImGui.pushStyleColor(ImGuiCol.ButtonActive, ImGui.vec4(0.40, 0.15, 0.15, 1));
+				if (ImGui.button("Reset##saber_reset_rift")) {
+					LightsaberCache.rift.reset();
+					ToastManager.info("In-rift DPS meter reset");
+				}
+				if (ImGui.isItemHovered())
+					ImGui.setTooltip("Reset in-rift hero encounter metrics");
+				ImGui.popStyleColor(3);
 				ImGui.sameLine();
 				drawRiftTimerBox("saber_rift_grp");
 			}
@@ -883,10 +906,21 @@ class LightsaberOverlay {
 		ImGui.pushStyleColor(ImGuiCol.Button, ImGui.vec4(0.22, 0.42, 0.78, 1));
 		ImGui.pushStyleColor(ImGuiCol.ButtonHovered, ImGui.vec4(0.30, 0.52, 0.90, 1));
 		ImGui.pushStyleColor(ImGuiCol.ButtonActive, ImGui.vec4(0.16, 0.32, 0.62, 1));
-		if (ImGui.button("Logs")) {
+		if (ImGui.button("Logs##saber_logs")) {
 			cfg.showLog.set(true);
 			SettingsStore.markDirty();
 		}
+		ImGui.popStyleColor(3);
+		ImGui.sameLine();
+		ImGui.pushStyleColor(ImGuiCol.Button, ImGui.vec4(0.52, 0.20, 0.20, 0.9));
+		ImGui.pushStyleColor(ImGuiCol.ButtonHovered, ImGui.vec4(0.68, 0.26, 0.26, 1));
+		ImGui.pushStyleColor(ImGuiCol.ButtonActive, ImGui.vec4(0.40, 0.15, 0.15, 1));
+		if (ImGui.button("Reset##saber_reset_you")) {
+			LightsaberCache.reset();
+			ToastManager.info("Lightsaber DPS meter reset");
+		}
+		if (ImGui.isItemHovered())
+			ImGui.setTooltip("Reset current DPS encounter metrics");
 		ImGui.popStyleColor(3);
 		ImGui.sameLine();
 		drawRiftTimerBox("saber_rift");

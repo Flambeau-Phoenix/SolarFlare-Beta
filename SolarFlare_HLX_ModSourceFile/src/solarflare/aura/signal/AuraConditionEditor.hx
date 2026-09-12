@@ -18,14 +18,15 @@ import imgui.Enums.ImGuiStyleVar;
  */
 class AuraConditionEditor {
 
-	public static function draw(a:AuraDef):Void {
+	public static function draw(a:AuraDef, prominent:Bool = false):Void {
 		if (a == null)
 			return;
 		if (a.rule == null)
 			a.rule = new AuraRuleDef();
 		var r = a.rule;
 
-		UiChrome.subHeader("Require");
+		UiChrome.heading("Require", prominent ? 1.24 : 1.15);
+		if (prominent) ImGui.spacing();
 		var allMode = r.mode == "all";
 		if (ImGui.radioButton("ALL conditions (AND)##rule_all_" + a.id, allMode)) {
 			r.mode = "all";
@@ -63,13 +64,13 @@ class AuraConditionEditor {
 				? ImGui.vec4(0.85, 0.35, 0.35, 0.9)
 				: ImGui.vec4(0.35, 0.75, 0.45, 0.9);
 			ImGui.pushStyleColor(ImGuiCol.Border, border);
-			ImGui.pushStyleVar(ImGuiStyleVar.ChildBorderSize, 2.0);
-			ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, ImGui.vec2(8, 6));
-			ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, ImGui.vec2(6, 4));
+			ImGui.pushStyleVar(ImGuiStyleVar.ChildBorderSize, prominent ? 2.25 : 2.0);
+			ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, prominent ? ImGui.vec2(12, 9) : ImGui.vec2(8, 6));
+			ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, prominent ? ImGui.vec2(8, 6) : ImGui.vec2(6, 4));
 			ImGui.beginChild("##condition_card_" + c.uiKey, ImGui.vec2(0, 0),
 				ImGuiChildFlags.Borders | ImGuiChildFlags.AutoResizeY | ImGuiChildFlags.AlwaysUseWindowPadding, 0);
 			try {
-				removed = drawConditionCard(a, r, c, ci);
+				removed = drawConditionCard(a, r, c, ci, prominent);
 			} catch (_:Dynamic) {}
 			ImGui.endChild();
 			ImGui.popStyleVar(3);
@@ -93,7 +94,7 @@ class AuraConditionEditor {
 		}
 
 		if (r.conditions.length < AuraRuleDef.MAX_CONDITIONS) {
-			if (ImGui.button("+ Add condition##add_cond_" + a.id, ImGui.vec2(-1, 30))) {
+			if (ImGui.button("+ Add Condition##add_cond_" + a.id, ImGui.vec2(-1, prominent ? 36 : 30))) {
 				var newCond = new AuraConditionDef();
 				newCond.signal = "resource.health.ratio";
 				newCond.op = "lte";
@@ -148,7 +149,7 @@ class AuraConditionEditor {
 		};
 	}
 
-	static function drawConditionCard(a:AuraDef, r:AuraRuleDef, c:AuraConditionDef, index:Int):Bool {
+	static function drawConditionCard(a:AuraDef, r:AuraRuleDef, c:AuraConditionDef, index:Int, prominent:Bool):Bool {
 		var tag = a.id + "_" + c.uiKey;
 		while (a.conditionUi.length <= index)
 			a.conditionUi.push(new AuraConditionUiState());
@@ -159,7 +160,11 @@ class AuraConditionEditor {
 		}
 		ui.bind(c);
 
-		ImGui.textDisabled("Condition " + (index + 1));
+		var cardFont = ImGui.getFont();
+		if (prominent && cardFont != null) ImGui.pushFont(cardFont, ImGui.getFontSize() * 1.10);
+		if (prominent) ImGui.text("Condition " + (index + 1));
+		else ImGui.textDisabled("Condition " + (index + 1));
+		if (prominent && cardFont != null) ImGui.popFont();
 		ImGui.sameLine();
 		if (index > 0 && ImGui.smallButton("^##cond_up_" + tag)) {
 			var p = r.conditions[index - 1];
@@ -177,7 +182,7 @@ class AuraConditionEditor {
 			SettingsStore.markDirty();
 		}
 		ImGui.sameLine();
-		var remove = ImGui.smallButton("Remove##cond_rm_" + tag);
+		var remove = ImGui.smallButton("Remove##cond_rm_" + tag); // [Remove]
 		ImGui.sameLine();
 		if (ImGui.checkbox("Invert##cond_neg_" + tag, ui.negateRef)) {
 			ui.pull(c);

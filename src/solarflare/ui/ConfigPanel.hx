@@ -156,6 +156,16 @@ class ConfigPanel {
 		rebuildInteractiveRegistry();
 		SettingsStore.bind(this);
 		SettingsStore.load(this);
+		// Stray HUD: never leave combo pips enabled from legacy profiles / max_combo auras.
+		if (combo != null)
+			combo.hidden.set(true);
+		if (showCombo != null)
+			showCombo.set(false);
+		if (auras != null)
+			auras.disableUnanchoredComboTrackers();
+		// Personal HP: fixed screen coords above Geaux (not world-projected).
+		if (vitals != null && geaux != null)
+			vitals.anchorHpAboveGeaux(geaux);
 		FeatureProfiles.init(this);
 		UiActionQueue.bind(this);
 	}
@@ -257,10 +267,22 @@ class ConfigPanel {
 		}
 	}
 
-	/** Hub, builders, or other editors that must block Farever menu shortcuts. */
+	/** Hub, builders, debug panels, or other editors that must block Farever menu shortcuts. */
 	public function anyInteractiveOpen():Bool {
 		if (solarflare.debug.DebugSystem.open.get())
 			return true;
+		// Session debug overlays: capture keys, but never register in interactiveOpenRefs
+		// so suspendForCamera / inventory cursor flips do not clear them.
+		try {
+			if (solarflare.debug.ResolutionLedger.enabled != null
+				&& solarflare.debug.ResolutionLedger.enabled.get())
+				return true;
+		} catch (_:Dynamic) {}
+		try {
+			if (solarflare.debug.PayloadProbe.enabled != null
+				&& solarflare.debug.PayloadProbe.enabled.get())
+				return true;
+		} catch (_:Dynamic) {}
 		for (ref in interactiveOpenRefs)
 			if (ref != null && ref.get())
 				return true;
@@ -420,7 +442,8 @@ class ConfigPanel {
 	}
 
 	function pollToolShortcuts():Void {
-		if (!CursorCaptureFix.cursorFree || !anyInteractiveOpen())
+		// Keyboard ownership follows interactive tools, not cursorFree.
+		if (!anyInteractiveOpen())
 			return;
 		try {
 			var ctrl = ImGui.isKeyDown(ImGuiKey.LeftCtrl) || ImGui.isKeyDown(ImGuiKey.RightCtrl);
@@ -431,7 +454,7 @@ class ConfigPanel {
 
 	/** Close hub on Escape only — never letter keys (typing must not dismiss). */
 	function pollHubDismissKeys():Void {
-		if (!open.get() || !CursorCaptureFix.cursorFree)
+		if (!open.get())
 			return;
 		try {
 			var typing = false;

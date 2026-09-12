@@ -6,26 +6,51 @@ import solarflare.FieldWalk;
 /**
  * Frozen local-hero status snaps for AuraEngine. Observe-only: typed getStatus /
  * BaseSkill duration getters, then FieldWalk list walk. Draw never reads this.
+ *
+ * Poll authority: 20 Hz accumulator, dirty-wake via ObserveDemand.auraStatusDirty.
+ * Expiry authority: SkillRemain left <= 0.02 clears present (recycled snaps start absent).
  */
 class AuraStatusCache {
 	public static inline var MAX:Int = solarflare.aura.signal.AuraSignalFrame.MAX_STATUSES;
+	/** 20 Hz sample ceiling unless ObserveDemand.auraStatusDirty wakes early. */
+	public static inline var SAMPLE_INTERVAL_S:Float = 0.05;
 	public static var snaps:Array<AuraStatusSnap> = [];
 	public static var count:Int = 0;
 	public static var domainKnown:Bool = false;
 	/** Full container length before scan cap; -1 when unavailable. */
 	public static var containerLength:Int = -1;
 	static var sampledHero:Dynamic;
+	static var lastSampleAt:Float = 0;
 
 	public static function reset():Void {
 		count = 0;
 		domainKnown = false;
 		sampledHero = null;
 		containerLength = -1;
+		var i = 0;
+		while (i < snaps.length) {
+			var s = snaps[i];
+			if (s != null)
+				s.clear();
+			i++;
+		}
 	}
 
 	public static function isCurrent(hero:Dynamic):Bool return hero != null && sampledHero == hero;
 
+	/**
+	 * Gate: skip unless dirty wake, hero change, or 50 ms elapsed.
+	 * Consumes ObserveDemand.auraStatusDirty on entry.
+	 */
 	public static function sample(hero:Dynamic):Void {
+		var now = stamp();
+		var dirty = solarflare.ObserveDemand.auraStatusDirty;
+		var heroChanged = hero != null && hero != sampledHero;
+		if (!dirty && !heroChanged && (now - lastSampleAt) < SAMPLE_INTERVAL_S)
+			return;
+		lastSampleAt = now;
+		solarflare.ObserveDemand.auraStatusDirty = false;
+
 		reset();
 		if (hero == null)
 			return;
@@ -50,6 +75,23 @@ class AuraStatusCache {
 			i++;
 		}
 		return null;
+	}
+
+	/** Immediate expiry from Status.onRemove — includes already-absent snaps. */
+	public static function markAbsent(want:String):Void {
+		if (want == null || want.length < 2)
+			return;
+		var i = 0;
+		while (i < count) {
+			var s = snaps[i];
+			if (s != null && matches(s, want)) {
+				s.present = false;
+				s.stacks = 0;
+				s.left = 0;
+				s.progress = 0;
+			}
+			i++;
+		}
 	}
 
 	static function walkList(owner:Dynamic, name:String):Void {
@@ -77,10 +119,15 @@ class AuraStatusCache {
 			return reuse;
 		}
 		var snap = new AuraStatusSnap();
+		snap.clear();
 		snaps.push(snap);
 		return snap;
 	}
 
+	/**
+	 * Ingest one status object. Expired finite timers (SkillRemain) are stored as
+	 * present=false and are not treated as active by find().
+	 */
 	static function ingest(item:Dynamic):AuraStatusSnap {
 		if (item == null || count >= MAX)
 			return null;
@@ -95,17 +142,19 @@ class AuraStatusCache {
 			return null;
 		snap.id = snap.ids[0];
 		snap.stacks = readStacks(item);
-		var rp = solarflare.SkillRemain.read(item);
-		snap.progress = rp.valid ? rp.progress : 1;
-		snap.left = rp.left;
-		snap.infinite = rp.infinite;
-		snap.durationKnown = rp.valid;
+		applyRemain(snap, item);
+		if (!snap.present) {
+			// Keep known-absent row for typed ids; do not count as active.
+			snap.stacks = 0;
+		}
 		var i = 0;
 		while (i < count) {
 			var existing = snaps[i];
 			if (matches(existing, snap.id)) {
-				if (existing.known)
+				if (existing.known) {
+					copySnap(existing, snap);
 					return existing;
+				}
 				existing.clear();
 				copySnap(existing, snap);
 				return existing;
@@ -116,8 +165,26 @@ class AuraStatusCache {
 		return snap;
 	}
 
+	static function applyRemain(snap:AuraStatusSnap, item:Dynamic):Void {
+		var rp = solarflare.SkillRemain.read(item);
+		snap.progress = rp.valid ? rp.progress : 1;
+		snap.left = rp.left;
+		snap.infinite = rp.infinite;
+		snap.durationKnown = rp.valid;
+		if (rp.valid && !rp.infinite && rp.left <= 0.02) {
+			snap.present = false;
+			snap.progress = 0;
+			snap.left = rp.left < 0 ? 0 : rp.left;
+			snap.stacks = 0;
+			return;
+		}
+		snap.present = true;
+	}
+
 	static function copySnap(dst:AuraStatusSnap, src:AuraStatusSnap):Void {
 		dst.id = src.id;
+		dst.ids.resize(0);
+		dst.idsLower.resize(0);
 		var j = 0;
 		while (j < src.ids.length) {
 			dst.ids.push(src.ids[j]);
@@ -142,33 +209,47 @@ class AuraStatusCache {
 		try {
 			var h:ent.GameObject = cast hero;
 			var n = h.getStatusCount(want, null);
-			if (n > 0) snap = ingest(h.getStatus(want, null));
+			if (n > 0) {
+				snap = ingest(h.getStatus(want, null));
+				if (snap != null)
+					pushId(snap, want);
+			}
 			if (snap == null) {
 				snap = allocSnap();
 				snap.id = want;
 				pushId(snap, want);
-				snap.present = n > 0;
-				snap.stacks = n;
+				snap.present = false;
+				snap.stacks = 0;
 				count++;
-			} else pushId(snap, want);
+			} else if (snap.present) {
+				// Re-check duration on typed hit (ingest already applied; reinforce).
+				var item = h.getStatus(want, null);
+				if (item != null)
+					applyRemain(snap, item);
+			}
 		} catch (_:Dynamic) {
 			snap = allocSnap();
 			snap.id = want;
 			pushId(snap, want);
 			snap.known = false;
 			snap.present = false;
+			snap.stacks = 0;
 			count++;
 		}
-		if (solarflare.debug.ResolutionLedger.armed() && snap != null)
+		if (solarflare.debug.ResolutionLedger.armed() && snap != null) {
+			var id = solarflare.debug.ResolutionLedger.cleanId(want);
+			if (id.length == 0)
+				id = "unknown";
 			solarflare.debug.ResolutionLedger.touch(
 				"status.present",
 				"typed",
 				"AuraStatusCache.lookupTyped",
-				want,
+				id,
 				"bool",
 				snap.present ? "true" : "false",
 				snap.known ? "known" : "unknown"
 			);
+		}
 		return snap;
 	}
 
@@ -247,5 +328,12 @@ class AuraStatusCache {
 			i++;
 		}
 		return false;
+	}
+
+	static function stamp():Float {
+		try
+			return haxe.Timer.stamp()
+		catch (_:Dynamic)
+			return Date.now().getTime() / 1000.0;
 	}
 }

@@ -488,7 +488,9 @@ class AuraEngine {
 			progressRing: boolRef(a.progressRing, true),
 			showCountdown: boolRef(a.showCountdown, false),
 			showFuse: boolRef(a.showFuse, false),
+			fuseBottom: boolRef(a.fuseBottom, false),
 			followBuffDuration: boolRef(a.followBuffDuration, true),
+			glowColor: a.glowColor,
 			stackCounter: boolRef(a.stackCounter, false),
 			showLabel: boolRef(a.showLabel, true),
 			isCounter: boolRef(a.isCounter, false),
@@ -501,6 +503,17 @@ class AuraEngine {
 			w: floatRef(a.w, 96),
 			h: floatRef(a.h, 96)
 		};
+		if (a.canvasElements != null && a.canvasElements.length > 0) {
+			var canvas:Array<Dynamic> = [];
+			var ci = 0;
+			while (ci < a.canvasElements.length) {
+				var el = a.canvasElements[ci];
+				if (el != null)
+					canvas.push(el.toObj());
+				ci++;
+			}
+			Reflect.setField(obj, "canvasElements", canvas);
+		}
 		if (a.chrome != null) {
 			Reflect.setField(obj, "x", floatRef(a.chrome.x, 0));
 			Reflect.setField(obj, "y", floatRef(a.chrome.y, 0));

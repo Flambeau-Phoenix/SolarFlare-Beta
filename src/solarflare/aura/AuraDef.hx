@@ -48,8 +48,14 @@ class AuraDef {
 	public var showCountdown:BoolRef;
 	/** Vertical fuse bar that drains with remaining time. */
 	public var showFuse:BoolRef;
+	/** Draw fuse as a bottom strip instead of the right-edge bar (canvas / icon). */
+	public var fuseBottom:BoolRef;
 	/** Prefer live status duration when known; else fixed Display Duration hold. */
 	public var followBuffDuration:BoolRef;
+	/** Freeform canvas placements when region == "canvas". */
+	public var canvasElements:Array<AuraCanvasElement>;
+	/** Packed 0xAARRGGBB glow accent (used when iconGlow is active). */
+	public var glowColor:Int;
 	public var stackCounter:BoolRef;
 	public var showLabel:BoolRef;
 	public var isCounter:BoolRef;
@@ -145,7 +151,10 @@ class AuraDef {
 		progressRing = new BoolRef(true);
 		showCountdown = new BoolRef(false);
 		showFuse = new BoolRef(false);
+		fuseBottom = new BoolRef(false);
 		followBuffDuration = new BoolRef(true);
+		canvasElements = [];
+		glowColor = 0xFFFF8800;
 		stackCounter = new BoolRef(false);
 		showLabel = new BoolRef(true);
 		isCounter = new BoolRef(false);

@@ -1,4 +1,4 @@
-﻿package solarflare.combatlog;
+package solarflare.combatlog;
 
 import solarflare.HealthCache;
 import solarflare.FieldWalk;

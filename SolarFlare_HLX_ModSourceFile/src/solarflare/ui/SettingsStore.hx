@@ -612,6 +612,8 @@ class SettingsStore {
 		setInt(v.layout, data.layout);
 		v.hpSizeDirty = true;
 		applyChrome(v.chrome, data.chrome != null ? data.chrome : data);
+		// Position was loaded from save — mark as saved so anchorHpAboveGeaux is a no-op.
+		v.hpPositionSaved = true;
 		v.rageSizeDirty = true;
 		v.manaSizeDirty = true;
 		v.prayersSizeDirty = true;

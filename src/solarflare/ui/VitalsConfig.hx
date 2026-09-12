@@ -1,4 +1,4 @@
-﻿package solarflare.ui;
+package solarflare.ui;
 
 import solarflare.HealthCache;
 import imgui.ImGui;
@@ -42,6 +42,10 @@ class VitalsConfig {
 	public var rageHidden = new BoolRef(false);
 	public var manaHidden = new BoolRef(false);
 	public var prayersHidden = new BoolRef(false);
+	/** True once a saved position has been loaded or a user drag has been committed.
+	 *  anchorHpAboveGeaux is a one-time fresh-install default; it must not fire every frame
+	 *  or overwrite a saved position on reload. */
+	public var hpPositionSaved:Bool = false;
 	public var hpWidth = new FloatRef(320);
 	public var hpHeight = new FloatRef(120);
 	public var hpSizeDirty = true;
@@ -67,10 +71,33 @@ class VitalsConfig {
 	public var prayersChrome:HudChrome;
 
 	public function new() {
-		chrome = new HudChrome(40, 80);
+		chrome = new HudChrome(80, 232);
 		rageChrome = new HudChrome(40, 210);
 		manaChrome = new HudChrome(40, 270);
 		prayersChrome = new HudChrome(40, 330);
+	}
+
+	/**
+	 * Place personal HP to fixed screen coords above the Geaux action bar.
+	 * This is a ONE-TIME fresh-install default — never called per-frame, never locks.
+	 * If a saved position was loaded (hpPositionSaved == true) this is a no-op.
+	 */
+	public function anchorHpAboveGeaux(geaux:solarflare.geaux.GeauxConfig):Void {
+		// Skip if user already has a saved position — don't overwrite it.
+		if (hpPositionSaved)
+			return;
+		if (chrome == null || geaux == null || geaux.chrome == null)
+			return;
+		var gx:Single = geaux.chrome.x.get();
+		var gy:Single = geaux.chrome.y.get();
+		var hpH:Single = hpHeight != null ? hpHeight.get() : 28;
+		if (hpH < 20) hpH = 20;
+		chrome.x.set(gx);
+		chrome.y.set(gy - hpH - 12);
+		chrome.posDirty = true;
+		// Mark as placed so this default is applied at most once.
+		hpPositionSaved = true;
+		// NOTE: Do NOT lock here. Lock state is user-owned only.
 	}
 
 	public function anyBarVisible():Bool {

@@ -20,9 +20,9 @@ class AuraStatusSnap {
 		id = "";
 		ids.resize(0);
 		idsLower.resize(0);
-		stacks = 1;
+		stacks = 0;
 		known = true;
-		present = true;
+		present = false;
 		durationKnown = false;
 		progress = 1;
 		left = 0;
