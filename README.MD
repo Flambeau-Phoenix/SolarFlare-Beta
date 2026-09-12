@@ -12,7 +12,7 @@ This is the PTR working version of Solar Flare - Confirmed to work on Call to Gl
 
 ### SolarFlare - v1.3b - Changelog
 
-### What's new
+## What's new
 
 * **Timers and countdowns on aura windows.
 * **GetRifty rift clock.
