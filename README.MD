@@ -1,11 +1,11 @@
 
 ![Aura instant cast proc](ghub.gif)
 
-![Imp+Bee in Combat Log](TrinketBee_Imp.png)
-
 # SolarFlare — v1.4 Beta - Current Changelog -
 
-https://youtu.be/DJ7OQBE_sT4
+[![Bee + Imp DPS]
+(TrinketBee_Imp.png)]
+(https://youtu.be/DJ7OQBE_sT4)
 
 ## SolarFlare - v1.4b - Changelog
 
