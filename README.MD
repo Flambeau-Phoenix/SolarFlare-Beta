@@ -1,7 +1,7 @@
 
 ![Aura instant cast proc](ghub.gif)
 
-![Minions in Combat Log](https://i.postimg.cc/FzhM9xz0/Minion-Crit-and-Kill.png)
+![Imp+Bee in Combat Log](Minion_Crit_and_Kill.png)
 
 # SolarFlare — v1.4 Beta - Current Changelog -
 
