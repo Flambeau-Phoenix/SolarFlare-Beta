@@ -3,7 +3,7 @@
 
 # SolarFlare — v1.4 Beta - Current Changelog -
 
-[![Bee + Imp DPS](TrinketBee_Imp.png)
+![Bee + Imp DPS](TrinketBee_Imp.png)
 
 ## SolarFlare - v1.4b - Changelog
 
