@@ -1,0 +1,886 @@
+{
+  "source": "D:/FareverDevSpace/Farever/res.light.pak#data.cdb",
+  "notes": [
+    "Player skills only (weapon / class / signature / dash / prayer / poison / conduit / passive).",
+    "charges = props.charges (how many uses before the skill is empty). chargedCd is a separate flag.",
+    "Rank CD lives on props.rankOverride[].props.cooldown (minRank).",
+    "Live getEffectiveCooldown already includes haste when the metric works; this table is the CDB fallback."
+  ],
+  "skills": [
+    {
+      "id": "Axe_Boomerang_Skill1",
+      "name": "Bonethrow",
+      "type": 7,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Book_Start_Skill1",
+      "name": "Pyroball",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Book_Start_Skill2",
+      "name": "Fire Blast",
+      "type": 7,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Book_WaterOrbs_Skill1",
+      "name": "Abyssal Rise",
+      "type": 7,
+      "cooldown": 10.0,
+      "rankCooldown": [
+        {
+          "cooldown": 8.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Book_WaterOrbs_Skill2",
+      "name": "Expulse",
+      "type": 7,
+      "cooldown": 15.0,
+      "reducesCooldown": true,
+      "reduceSeconds": 6.0
+    },
+    {
+      "id": "Bow_BigGame_Skill1",
+      "name": "Hunter Net",
+      "type": 7,
+      "cooldown": 16.0,
+      "rankCooldown": [
+        {
+          "cooldown": 12.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Bow_BigGame_Skill2",
+      "name": "Ram Trap",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Bow_Craft_Skill1",
+      "name": "Aimed Shot",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Bow_Craft_Skill2",
+      "name": "Bouncing Shot",
+      "type": 7,
+      "cooldown": 10.0,
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "Bow_Craft_Skill2"
+      ],
+      "reduceSeconds": 2.0
+    },
+    {
+      "id": "Crescent_FlowerSpiral_Passive",
+      "name": "Nectar-infused Blade",
+      "type": 24,
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "Crescent_FlowerSpiral_Skill_1"
+      ],
+      "reduceSeconds": 1.0
+    },
+    {
+      "id": "Crescent_FlowerSpiral_Skill_1",
+      "name": "Flower Spiral",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Crescent_FlowerSpiral_Skill_2",
+      "name": "Bloom",
+      "type": 7,
+      "cooldown": 16.0
+    },
+    {
+      "id": "Crimson_Fists_Skill",
+      "name": "Ram's Expulsion",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Crimson_GA_Skill",
+      "name": "",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Crimson_GA_Skill_E",
+      "name": "",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "DA_Water_Skill1",
+      "name": "Abyssal Fury",
+      "type": 7,
+      "cooldown": 20.0
+    },
+    {
+      "id": "DA_Water_Skill2",
+      "name": "Groundswell Strike",
+      "type": 7,
+      "cooldown": 10.0,
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "DA_Water_Skill2"
+      ],
+      "reduceSeconds": 1.5
+    },
+    {
+      "id": "DM_Multispin_Skill1",
+      "name": "Zealous Spins",
+      "type": 7,
+      "cooldown": 10.0
+    },
+    {
+      "id": "DM_Multispin_Skill2",
+      "name": "Iron Cyclone",
+      "type": 7,
+      "cooldown": 10.0
+    },
+    {
+      "id": "DS_Bladeleaf_Passive",
+      "name": "Queen's Decree",
+      "type": 24,
+      "cooldown": 30.0,
+      "rankCooldown": [
+        {
+          "cooldown": 20.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "DS_Bladeleaf_Skill1",
+      "name": "Hiveborn Blossom",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "DS_Bladeleaf_Skill2",
+      "name": "Swarmstrike Accord",
+      "type": 7,
+      "cooldown": 45.0,
+      "rankCooldown": [
+        {
+          "cooldown": 30.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Daggers_Demondash_Skill1",
+      "name": "Infernal Plunge",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Daggers_Demondash_Skill2",
+      "name": "Void Fangs",
+      "type": 7,
+      "cooldown": 20.0
+    },
+    {
+      "id": "Daggers_Demondash_Skill2_Shoot",
+      "name": "Void Fangs",
+      "type": 8,
+      "cooldown": 0.5
+    },
+    {
+      "id": "Daggers_DuplicatePoison_ComboAttack",
+      "name": "Cheesebane",
+      "type": 4,
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "s"
+      ],
+      "reduceSeconds": 3.0
+    },
+    {
+      "id": "Daggers_DuplicatePoison_Skill1",
+      "name": "Gaping Wound",
+      "type": 7,
+      "cooldown": 24.0,
+      "rankCooldown": [
+        {
+          "cooldown": 18.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Daggers_DuplicatePoison_Skill2",
+      "name": "Shiv",
+      "type": 7,
+      "cooldown": 4.0
+    },
+    {
+      "id": "Daggers_Start_Skill1",
+      "name": "Shiv",
+      "type": 7,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Daggers_Start_Skill2",
+      "name": "Shadow Jump",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Dash_Base",
+      "name": "Dash",
+      "type": 12,
+      "cooldown": 10.0,
+      "charges": 2
+    },
+    {
+      "id": "Fists_LightMonk_Skill1",
+      "name": "Blind Breakthrough",
+      "type": 7,
+      "cooldown": 16.0,
+      "rankCooldown": [
+        {
+          "cooldown": 12.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Fists_LightMonk_Skill2",
+      "name": "Ram's Expulsion",
+      "type": 7,
+      "cooldown": 24.0
+    },
+    {
+      "id": "Fists_WaterUppercut_C",
+      "name": "Sink to the Bottom",
+      "type": 4,
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "vars"
+      ],
+      "reduceSeconds": 0.5
+    },
+    {
+      "id": "Fists_WaterUppercut_S1",
+      "name": "Tide Rising Uppercut",
+      "type": 7,
+      "cooldown": 22.0,
+      "rankCooldown": [
+        {
+          "cooldown": 18.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Fists_WaterUppercut_S2",
+      "name": "Twin Claws",
+      "type": 7,
+      "cooldown": 6.0,
+      "charges": 1
+    },
+    {
+      "id": "GA_Craft_Skill1",
+      "name": "Rampage",
+      "type": 7,
+      "cooldown": 16.0,
+      "rankCooldown": [
+        {
+          "cooldown": 12.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "GA_Craft_Skill2",
+      "name": "Shockwave",
+      "type": 7,
+      "cooldown": 25.0
+    },
+    {
+      "id": "GA_Demon_Passive",
+      "name": "Resilience of the Unkillable Demon King",
+      "type": 24,
+      "cooldown": 30.0,
+      "reducesCooldown": true,
+      "reduceSeconds": 2.0
+    },
+    {
+      "id": "GA_Demon_Skill1",
+      "name": "Tear Reality",
+      "type": 7,
+      "cooldown": 25.0,
+      "rankCooldown": [
+        {
+          "cooldown": 20.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "GA_Demon_Skill2",
+      "name": "Dark Gift",
+      "type": 7,
+      "cooldown": 40.0
+    },
+    {
+      "id": "GM_MassGrab_Skill1",
+      "name": "Reverse Honey Spin",
+      "type": 7,
+      "cooldown": 16.0
+    },
+    {
+      "id": "GM_MassGrab_Skill2",
+      "name": "Brood Leap",
+      "type": 7,
+      "cooldown": 24.0
+    },
+    {
+      "id": "GS_Nova_Skill1",
+      "name": "Wild Whirlwind",
+      "type": 7,
+      "cooldown": 15.0,
+      "reducesCooldown": true,
+      "reduceSeconds": 3.0
+    },
+    {
+      "id": "GS_Nova_Skill2",
+      "name": "Outburst",
+      "type": 7,
+      "cooldown": 30.0
+    },
+    {
+      "id": "Halos_Demon_Skill1",
+      "name": "Chaotic Distorsion",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Halos_Demon_Skill2",
+      "name": "Deceiver Trick",
+      "type": 7,
+      "cooldown": 20.0,
+      "rankCooldown": [
+        {
+          "cooldown": 15.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Halos_Totem_Skill",
+      "name": "Tidal Totem",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Halos_Totem_Skill2",
+      "name": "Riptide",
+      "type": 7,
+      "cooldown": 18.0,
+      "reducesCooldown": true,
+      "reduceSeconds": 1.5
+    },
+    {
+      "id": "Mace_Benediction_Skill1",
+      "name": "Ram Veil",
+      "type": 7,
+      "cooldown": 8.0
+    },
+    {
+      "id": "Mage_Blink",
+      "name": "Blink",
+      "type": 9,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Mage_ChronoReset",
+      "name": "Chrono Reset",
+      "type": 9,
+      "cooldown": 180.0,
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "s"
+      ],
+      "reduceSeconds": 1.0
+    },
+    {
+      "id": "Mage_MysticEmpowerment",
+      "name": "Mystic Empowerment",
+      "type": 9,
+      "cooldown": 120.0
+    },
+    {
+      "id": "Mage_MysticEmpowerment_Status_Physical",
+      "name": "Mystic Empowerment",
+      "type": null,
+      "cooldown": 25.0,
+      "cdrAffixes": [
+        {
+          "attribute": "CooldownReduction",
+          "val": 30.0,
+          "ref": "TAttribute_Flat"
+        }
+      ]
+    },
+    {
+      "id": "Mage_Overload",
+      "name": "Overload",
+      "type": 9,
+      "cooldown": 120.0
+    },
+    {
+      "id": "Mage_RayOfSpark",
+      "name": "Spark Beam",
+      "type": 17,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Mage_ShieldOfSpark",
+      "name": "Spark Shield",
+      "type": 9,
+      "cooldown": 30.0
+    },
+    {
+      "id": "Mage_StaticNova",
+      "name": "Static Nova",
+      "type": 9,
+      "cooldown": 25.0
+    },
+    {
+      "id": "MagicBlock",
+      "name": "Withstand",
+      "type": 6,
+      "cooldown": 0.5
+    },
+    {
+      "id": "PhysicalBlock",
+      "name": "Parry",
+      "type": 6,
+      "cooldown": 0.5
+    },
+    {
+      "id": "Priest_BeaconOfHope",
+      "name": "Beacon of Hope",
+      "type": 9,
+      "cooldown": 180.0,
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "Priest_BeaconOfHope",
+        "Priest_BeaconOfHope"
+      ]
+    },
+    {
+      "id": "Priest_BlessingOfFervor",
+      "name": "Blessing of Fervor",
+      "type": 9,
+      "cooldown": 120.0,
+      "reducesCooldown": true
+    },
+    {
+      "id": "Priest_Crusader",
+      "name": "Crusader",
+      "type": 9,
+      "cooldown": 120.0,
+      "reducesCooldown": true
+    },
+    {
+      "id": "Priest_FaithfulWinds",
+      "name": "Faithful Winds",
+      "type": 9,
+      "cooldown": 25.0
+    },
+    {
+      "id": "Priest_Prayer_Life",
+      "name": "Prayer: Life",
+      "type": 19,
+      "cooldown": 1.0,
+      "chargedCd": true
+    },
+    {
+      "id": "Priest_Prayer_Shield",
+      "name": "Prayer: Virtue",
+      "type": 19,
+      "cooldown": 1.0,
+      "chargedCd": true
+    },
+    {
+      "id": "Priest_Prayer_Smite",
+      "name": "Prayer: Smite",
+      "type": 19,
+      "cooldown": 1.0,
+      "chargedCd": true
+    },
+    {
+      "id": "Priest_RadiantVerdict",
+      "name": "Radiant Verdict",
+      "type": 9,
+      "cooldown": 45.0,
+      "reducesCooldown": true,
+      "reduceSeconds": 3.0
+    },
+    {
+      "id": "Priest_Sig_DivineIntervention",
+      "name": "Judgment",
+      "type": 17,
+      "cooldown": 12.0,
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "Priest_Sig_DivineIntervention"
+      ]
+    },
+    {
+      "id": "ProjTest",
+      "name": "",
+      "type": 7,
+      "cooldown": 1.0
+    },
+    {
+      "id": "Rogue_Darkness",
+      "name": "Darkness Shadows",
+      "type": 9,
+      "cooldown": 120.0
+    },
+    {
+      "id": "Rogue_DeathMark",
+      "name": "Death Mark",
+      "type": 9,
+      "cooldown": 90.0
+    },
+    {
+      "id": "Rogue_KnivesTempest",
+      "name": "Knives Tempest",
+      "type": 9,
+      "cooldown": 30.0,
+      "charges": 2
+    },
+    {
+      "id": "Rogue_Shadowstep",
+      "name": "Shadowstep",
+      "type": 9,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Rogue_Sig_Finisher",
+      "name": "Finisher",
+      "type": 17,
+      "cooldown": 8.0
+    },
+    {
+      "id": "Rogue_SmokeBomb",
+      "name": "Smoke Bomb",
+      "type": 9,
+      "cooldown": 60.0
+    },
+    {
+      "id": "Rogue_UrgeToKill",
+      "name": "Urge to Kill",
+      "type": 9,
+      "cooldown": 120.0
+    },
+    {
+      "id": "Scepter_Flamie_S2",
+      "name": "Hot, hot, hot!",
+      "type": 7,
+      "cooldown": 20.0
+    },
+    {
+      "id": "Scepter_Flamie_Skill1",
+      "name": "Heat Emission",
+      "type": 7,
+      "cooldown": 8.0,
+      "rankCooldown": [
+        {
+          "cooldown": 6.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Scepter_Start_Skill1",
+      "name": "Luon flame",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Scepter_Start_Skill2",
+      "name": "Radiance",
+      "type": 7,
+      "cooldown": 10.0,
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "vars"
+      ],
+      "reduceSeconds": 1.0
+    },
+    {
+      "id": "ShieldBlock",
+      "name": "Block",
+      "type": 6,
+      "cooldown": 0.1
+    },
+    {
+      "id": "Shield_Craft_Passive",
+      "name": "Heartsteel",
+      "type": 24,
+      "cooldown": 20.0,
+      "rankCooldown": [
+        {
+          "cooldown": 15.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Shield_Craft_Skill1",
+      "name": "Fortifying Cry",
+      "type": 7,
+      "cooldown": 40.0,
+      "rankCooldown": [
+        {
+          "cooldown": 35.0,
+          "minRank": 2
+        }
+      ],
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "Shield_Craft_Skill1"
+      ],
+      "reduceSeconds": 2.0
+    },
+    {
+      "id": "Shield_Firebreath_Passive",
+      "name": "Cinder Coat",
+      "type": 24,
+      "rankCooldown": [
+        {
+          "cooldown": 15.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Shield_Firebreath_Skill1",
+      "name": "Furnace Roar",
+      "type": 7,
+      "cooldown": 18.0,
+      "rankCooldown": [
+        {
+          "cooldown": 12.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Shield_OrbitWater_P",
+      "name": "Shell of the Devourer",
+      "type": 24,
+      "rankCooldown": [
+        {
+          "cooldown": 35.0,
+          "minRank": 2
+        }
+      ],
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "Shield_OrbitWater_S1"
+      ],
+      "reduceSeconds": 5.0
+    },
+    {
+      "id": "Shield_OrbitWater_S1",
+      "name": "Depth Shield",
+      "type": 7,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Shield_Start_Skill1",
+      "name": "Shield Bash",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Spear_Eruption_Skill1",
+      "name": "Swirling Embers",
+      "type": 7,
+      "cooldown": 18.0
+    },
+    {
+      "id": "Spear_Eruption_Skill2",
+      "name": "Eruption",
+      "type": 7,
+      "cooldown": 20.0,
+      "rankCooldown": [
+        {
+          "cooldown": 15.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Spear_Goo_Skill1",
+      "name": "Stingerang",
+      "type": 7,
+      "cooldown": 8.0
+    },
+    {
+      "id": "Spear_Goo_Skill2",
+      "name": "Apix Dash",
+      "type": 7,
+      "cooldown": 12.0,
+      "charges": 1,
+      "reducesCooldown": true,
+      "reduceSeconds": 1.0
+    },
+    {
+      "id": "Staff_Censer_Skill1",
+      "name": "Luon Shackles",
+      "type": 7,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Staff_Censer_Skill2",
+      "name": "Blinding Light",
+      "type": 7,
+      "cooldown": 20.0,
+      "reducesCooldown": true,
+      "reduceSeconds": 10.0
+    },
+    {
+      "id": "Staff_Craft_S1",
+      "name": "Pyroclasm",
+      "type": 7,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Staff_Craft_S2",
+      "name": "Blazing Beam",
+      "type": 7,
+      "cooldown": 18.0
+    },
+    {
+      "id": "Staff_SummonDemon_Passive",
+      "name": "Inner Demon",
+      "type": 24,
+      "cooldown": 30.0,
+      "rankCooldown": [
+        {
+          "cooldown": 20.0,
+          "minRank": 2
+        }
+      ]
+    },
+    {
+      "id": "Staff_SummonDemon_Skill1",
+      "name": "Demonic Discharge",
+      "type": 7,
+      "cooldown": 6.0
+    },
+    {
+      "id": "Staff_SummonDemon_Skill2",
+      "name": "Summon: Vile Imps",
+      "type": 7,
+      "cooldown": 20.0
+    },
+    {
+      "id": "Sword_Craft_Combo",
+      "name": "Tactician Assault",
+      "type": 4,
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "vars"
+      ],
+      "reduceSeconds": 3.0
+    },
+    {
+      "id": "Sword_Craft_Skill1",
+      "name": "Conquer",
+      "type": 7,
+      "cooldown": 9.0
+    },
+    {
+      "id": "Sword_Start_Skill1",
+      "name": "Cleave",
+      "type": 7,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Sword_Swarm_Skill1",
+      "name": "Hive's Sunder",
+      "type": 7,
+      "cooldown": 18.0
+    },
+    {
+      "id": "Thrown_Seeds_Skill1",
+      "name": "Harvesting Scythe",
+      "type": 7,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Thrown_Seeds_Skill2",
+      "name": "Verdant Impetus",
+      "type": 7,
+      "cooldown": 24.0
+    },
+    {
+      "id": "Warrior_BattleShout",
+      "name": "Battle Shout",
+      "type": 9,
+      "cooldown": 120.0,
+      "reducesCooldown": true
+    },
+    {
+      "id": "Warrior_Berserk",
+      "name": "Berserk",
+      "type": 9,
+      "cooldown": 120.0
+    },
+    {
+      "id": "Warrior_Charge",
+      "name": "Charge",
+      "type": 9,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Warrior_IgnorePain",
+      "name": "Ignore Pain",
+      "type": 9,
+      "cooldown": 60.0,
+      "reducesCooldown": true,
+      "reduceTargets": [
+        "Warrior_IgnorePain"
+      ]
+    },
+    {
+      "id": "Warrior_Rage_Strike",
+      "name": "Raging Smash",
+      "type": 17,
+      "costs": [
+        {
+          "atb": "Rage",
+          "amount": 10.0
+        }
+      ]
+    },
+    {
+      "id": "Warrior_SurgingForce",
+      "name": "Surging Force",
+      "type": 9,
+      "cooldown": 45.0,
+      "reducesCooldown": true,
+      "reduceSeconds": 2.0
+    }
+  ]
+}

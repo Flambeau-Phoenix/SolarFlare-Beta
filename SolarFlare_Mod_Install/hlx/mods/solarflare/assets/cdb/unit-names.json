@@ -1,0 +1,2068 @@
+{
+  "units": [
+    {
+      "id": "Abigail",
+      "name": "Abigail"
+    },
+    {
+      "id": "Crab_Z2D_2",
+      "name": "Abyssal Crab"
+    },
+    {
+      "id": "Manfish_Z2W_Spear",
+      "name": "Acrobatic Nepsid Runner"
+    },
+    {
+      "id": "Manfish_Z1W_Claws_2",
+      "name": "Adept Nepsid Fighter"
+    },
+    {
+      "id": "Manfish_Z1W_Spear_3",
+      "name": "Agile Nepsid Runner"
+    },
+    {
+      "id": "Dummy_Support",
+      "name": "Ally dummy"
+    },
+    {
+      "id": "Wolf_Z1W_Alpha",
+      "name": "Alpha Wolf"
+    },
+    {
+      "id": "Summon_Bee",
+      "name": "Angry Bee"
+    },
+    {
+      "id": "Golem_Z2W_Wind1",
+      "name": "Aoyl Golem"
+    },
+    {
+      "id": "Elemental_Z2W",
+      "name": "Aoyl Sparkle"
+    },
+    {
+      "id": "FaerieBee_Z1W_Spear",
+      "name": "Apix Builder"
+    },
+    {
+      "id": "FaerieBee_Z1W_Tank",
+      "name": "Apix Defender"
+    },
+    {
+      "id": "Bee_Z1W",
+      "name": "Apix Harvester"
+    },
+    {
+      "id": "Bee_Prisoner",
+      "name": "Apix Prisoner"
+    },
+    {
+      "id": "FaerieBee_Z1W_GreatMace",
+      "name": "Apix Royal Guard"
+    },
+    {
+      "id": "FaerieBee_Z1W_Claws",
+      "name": "Apix Watcher"
+    },
+    {
+      "id": "StinkBug_Blue",
+      "name": "Aqua Aromabug"
+    },
+    {
+      "id": "Frog_Blue",
+      "name": "Aqua Grassflopper"
+    },
+    {
+      "id": "Turtle_Blue",
+      "name": "Aqua Tortrock"
+    },
+    {
+      "id": "FaerieDemon_Z1_Soulstone_Leg",
+      "name": "Ariana Grandemon"
+    },
+    {
+      "id": "PunchingBagArmor",
+      "name": "Armor"
+    },
+    {
+      "id": "StinkBug_Green",
+      "name": "Aromabug"
+    },
+    {
+      "id": "ImpDemon_Z2_Soulstone",
+      "name": "Asmodeaf"
+    },
+    {
+      "id": "Squirrel_Green",
+      "name": "Autumnal Leafcutter"
+    },
+    {
+      "id": "Demon_Z1_Claws_Soulstone",
+      "name": "Baphometal"
+    },
+    {
+      "id": "Slime_Z1W_FS_2",
+      "name": "Barrel-aged Invoked Slime"
+    },
+    {
+      "id": "Slime_Z1W_4",
+      "name": "Barrel-aged Sap Slime"
+    },
+    {
+      "id": "FaerieBee_Z2W_GreatMace_E",
+      "name": "Bartlebee"
+    },
+    {
+      "id": "Base_Critter",
+      "name": "Base_Critter"
+    },
+    {
+      "id": "BaseHero",
+      "name": "BaseHero"
+    },
+    {
+      "id": "BaseMob",
+      "name": "BaseMob"
+    },
+    {
+      "id": "BaseMount",
+      "name": "BaseMount"
+    },
+    {
+      "id": "BaseSummon",
+      "name": "BaseSummon"
+    },
+    {
+      "id": "Crimson_Z2W_Beekeeper2",
+      "name": "Beekept Crimson"
+    },
+    {
+      "id": "Bee_Z1W_E",
+      "name": "Beelial"
+    },
+    {
+      "id": "Sprout_Rice_Z2W_E",
+      "name": "Beet the Maul"
+    },
+    {
+      "id": "ImpDemon_Z1_Soulstone",
+      "name": "Belzebeat"
+    },
+    {
+      "id": "Crab_Z1W_E",
+      "name": "Belzebubbles"
+    },
+    {
+      "id": "Bee_Z1W_2",
+      "name": "Bibulous Apix Harvester"
+    },
+    {
+      "id": "Bee_Z1_FS",
+      "name": "Bibulous Invoked Harvester"
+    },
+    {
+      "id": "DemonDog_Orange",
+      "name": "Black Demodoggo"
+    },
+    {
+      "id": "Goat_Black",
+      "name": "Black Raminiature"
+    },
+    {
+      "id": "Sprout_DarkRice_Z2W",
+      "name": "Black Rice Seedling"
+    },
+    {
+      "id": "Sheep_Black",
+      "name": "Black Woolybell"
+    },
+    {
+      "id": "TODO_FaerieSwarowl_Z3W_Claws",
+      "name": "Blackbird Harpy"
+    },
+    {
+      "id": "Swarowl_Bat",
+      "name": "Blackbird Volture"
+    },
+    {
+      "id": "Golem_Z2W_FireExplosive_E",
+      "name": "Blaze Rascal"
+    },
+    {
+      "id": "Crimson_Z3W_GA_2",
+      "name": "Blessed Crimson Executioner"
+    },
+    {
+      "id": "Slime_Z1W_E",
+      "name": "Blob Dylan"
+    },
+    {
+      "id": "Dog_Z3W",
+      "name": "Bloodred Hound"
+    },
+    {
+      "id": "DemonDog_Blue02",
+      "name": "Blue Demodoggo"
+    },
+    {
+      "id": "Ladybug_Blue",
+      "name": "Blue Leggybug"
+    },
+    {
+      "id": "Lizard_Blue",
+      "name": "Blue Saladmander"
+    },
+    {
+      "id": "Boar_Z1W",
+      "name": "Boar"
+    },
+    {
+      "id": "Boar_Z4W_E",
+      "name": "Boar Burnham"
+    },
+    {
+      "id": "Crimson_Z3_Fist_U2",
+      "name": "Brawler Benoit"
+    },
+    {
+      "id": "Crimson_Z3_Fist_U",
+      "name": "Brawler Brahim"
+    },
+    {
+      "id": "Crimson_Z3_Fist_U1",
+      "name": "Brawler Mike"
+    },
+    {
+      "id": "Manfish_Z2D_Tank",
+      "name": "Breakwater of New Atlaan"
+    },
+    {
+      "id": "Golem_Z2W_Wind2",
+      "name": "Breezy Aoyl Golem"
+    },
+    {
+      "id": "Crimson_Z3W_Monk_U2",
+      "name": "Brother Ezekiel"
+    },
+    {
+      "id": "Crimson_Z3W_Monk_U1",
+      "name": "Brother Jacques"
+    },
+    {
+      "id": "Crimson_Z3W_Monk_U",
+      "name": "Brother Tuk"
+    },
+    {
+      "id": "Rabbit_Brown",
+      "name": "Brown Buttontail"
+    },
+    {
+      "id": "Frog_Brown",
+      "name": "Brown Grassflopper"
+    },
+    {
+      "id": "Squirrel_Brown",
+      "name": "Brown Leafcutter"
+    },
+    {
+      "id": "Goat_Brown",
+      "name": "Brown Raminiature"
+    },
+    {
+      "id": "Sheep_Brown",
+      "name": "Brown Woolybell"
+    },
+    {
+      "id": "Crimson_Z2W_Peasant_2",
+      "name": "Bucolic Crimson Farmhand"
+    },
+    {
+      "id": "Rabbit_Yellow",
+      "name": "Buttontail"
+    },
+    {
+      "id": "DemonDog_Beige",
+      "name": "Camel Demodoggo"
+    },
+    {
+      "id": "Goat_Beige01",
+      "name": "Camel Raminiature"
+    },
+    {
+      "id": "CannonPlant",
+      "name": "Cannon Plant"
+    },
+    {
+      "id": "Crimson_Z3W_GA_E",
+      "name": "Captain Druss"
+    },
+    {
+      "id": "Crimson_Z2W_Captain_E",
+      "name": "Captain Ramshackle"
+    },
+    {
+      "id": "Crimson_Z2W_Captain_E_2",
+      "name": "Captain Wolfram"
+    },
+    {
+      "id": "Crab_Z2W_E",
+      "name": "Carcinos the Proud"
+    },
+    {
+      "id": "Dog_Z2W_Azuram",
+      "name": "Carmine Hound"
+    },
+    {
+      "id": "TODO_SnowPanther_Black",
+      "name": "Cave Leopard"
+    },
+    {
+      "id": "Crimson_Z2W_Peasant_E",
+      "name": "Celeryman Pumpkintaro"
+    },
+    {
+      "id": "Bees_Mokshi",
+      "name": "Chamber Guardian"
+    },
+    {
+      "id": "Cleodora_ChampionEgg",
+      "name": "Champion's Chrysalid"
+    },
+    {
+      "id": "ChaoticPortal",
+      "name": "Chaotic Portal"
+    },
+    {
+      "id": "Sprout_Rice_Z2W_Plantivore_5",
+      "name": "Charles Cabbage"
+    },
+    {
+      "id": "Dog_Z3W_RamPatrol01",
+      "name": "Chase"
+    },
+    {
+      "id": "Kobold_Z2W_Daggers",
+      "name": "Cleanhanded Kobold Thief"
+    },
+    {
+      "id": "TODO_SnowPanther_DarkBrown",
+      "name": "Cliff Leopard"
+    },
+    {
+      "id": "Frog_BluePurple",
+      "name": "Cloudy Grassflopper"
+    },
+    {
+      "id": "Lizard_BlueOrange",
+      "name": "Clown Saladmander"
+    },
+    {
+      "id": "Manfish_Z2W_FS_Tank",
+      "name": "Confident Invoked Breakwater"
+    },
+    {
+      "id": "Sprout_Onion_Z2W_2",
+      "name": "Controversial  Onion Seedling"
+    },
+    {
+      "id": "TODO_Sprout_Onion_Spark",
+      "name": "Controversial  Onion Seedling"
+    },
+    {
+      "id": "Wolf_Z2W",
+      "name": "Coyote"
+    },
+    {
+      "id": "Crab_Z1W",
+      "name": "Crab"
+    },
+    {
+      "id": "Crab_Z1D",
+      "name": "Crab of the Lost City"
+    },
+    {
+      "id": "Crab_Crabgantua",
+      "name": "Crab of the Lost City"
+    },
+    {
+      "id": "Crabgantua",
+      "name": "Crabgantua"
+    },
+    {
+      "id": "Crimson_Z1W_Bow",
+      "name": "Crimson Archer"
+    },
+    {
+      "id": "StinkBug_RedOrange",
+      "name": "Crimson Aromabug"
+    },
+    {
+      "id": "Crimson_Z2W_Beekeeper",
+      "name": "Crimson Beekeeper"
+    },
+    {
+      "id": "Crimson_Z3_Fist",
+      "name": "Crimson Brawler"
+    },
+    {
+      "id": "Crimson_Z1W_Captain_U",
+      "name": "Crimson Captain Agamemnon"
+    },
+    {
+      "id": "Crimson_Z3D_Captain",
+      "name": "Crimson Captain Alex"
+    },
+    {
+      "id": "Crimson_Z3W_Captain_U_1",
+      "name": "Crimson Captain Arthur"
+    },
+    {
+      "id": "Crimson_Z2W_Captain_U_6",
+      "name": "Crimson Captain Ben"
+    },
+    {
+      "id": "Crimson_Z2W_Captain_U_4",
+      "name": "Crimson Captain Carmine"
+    },
+    {
+      "id": "Crimson_Z2W_Captain_U_3",
+      "name": "Crimson Captain Clover"
+    },
+    {
+      "id": "Crimson_Z3D_Captain1",
+      "name": "Crimson Captain Cynthia"
+    },
+    {
+      "id": "Crimson_Z2W_Captain_U_5",
+      "name": "Crimson Captain Hector"
+    },
+    {
+      "id": "Crimson_Z3W_Captain_U_2",
+      "name": "Crimson Captain Joseph"
+    },
+    {
+      "id": "Crimson_Z3D_Captain2",
+      "name": "Crimson Captain Katy"
+    },
+    {
+      "id": "Crimson_Z2W_Captain_U",
+      "name": "Crimson Captain Miranda"
+    },
+    {
+      "id": "Crimson_Z3W_Captain_U",
+      "name": "Crimson Captain Roger"
+    },
+    {
+      "id": "Crimson_Z2W_Captain_U_2",
+      "name": "Crimson Captain Sensabille"
+    },
+    {
+      "id": "OgreHuman_Z3W_GM",
+      "name": "Crimson Colossus"
+    },
+    {
+      "id": "OgreHuman_Z3W_GM_FS",
+      "name": "Crimson Colossus"
+    },
+    {
+      "id": "Crimson_Z3W_Daggers",
+      "name": "Crimson Cutpurse"
+    },
+    {
+      "id": "Crimson_Z3W_Daggers_FS",
+      "name": "Crimson Cutpurse"
+    },
+    {
+      "id": "Crimson_Z3W_GA",
+      "name": "Crimson Executioner"
+    },
+    {
+      "id": "Crimson_Z3W_Peasant_U",
+      "name": "Crimson Farmer Syndicate chief José"
+    },
+    {
+      "id": "Crimson_Z2W_Peasant",
+      "name": "Crimson Farmhand"
+    },
+    {
+      "id": "Dog_Z3D",
+      "name": "Crimson Hound"
+    },
+    {
+      "id": "RobinHoofDog01",
+      "name": "Crimson Hunting Dog"
+    },
+    {
+      "id": "Crimson_Z3W_Peasant",
+      "name": "Crimson Market Gardener"
+    },
+    {
+      "id": "OgreHuman_Z3W_Peasant",
+      "name": "Crimson Market Gardener Assistant"
+    },
+    {
+      "id": "OgreHuman_Z2W_Peasant",
+      "name": "Crimson Plow Hauler"
+    },
+    {
+      "id": "Crimson_Z2W_Monk",
+      "name": "Crimson Preacher"
+    },
+    {
+      "id": "Crimson_Z3W_Caster",
+      "name": "Crimson Priest"
+    },
+    {
+      "id": "Lizard_RedOrange",
+      "name": "Crimson Saladmander"
+    },
+    {
+      "id": "Crimson_Z3D_Bow",
+      "name": "Crimson Sniper"
+    },
+    {
+      "id": "Crimson_Z1W_Sword",
+      "name": "Crimson Soldier"
+    },
+    {
+      "id": "Wolf_Z3W",
+      "name": "Crimson Wolf"
+    },
+    {
+      "id": "Crimson_Base",
+      "name": "Crimson_Base"
+    },
+    {
+      "id": "Crocopork_Z1W",
+      "name": "Crocoboar"
+    },
+    {
+      "id": "TODO_Crocopork_Spark",
+      "name": "Crocoboar"
+    },
+    {
+      "id": "D_Assassin",
+      "name": "D_Assassin"
+    },
+    {
+      "id": "D_Base",
+      "name": "D_Base"
+    },
+    {
+      "id": "D_Base_Big",
+      "name": "D_Base_Big"
+    },
+    {
+      "id": "D_Base_Elite",
+      "name": "D_Base_Elite"
+    },
+    {
+      "id": "D_Base_Small",
+      "name": "D_Base_Small"
+    },
+    {
+      "id": "Spirit_Z2W_Claws_E",
+      "name": "da'Lida"
+    },
+    {
+      "id": "Spirit_Z2W_Claws_E2",
+      "name": "da'Mascus"
+    },
+    {
+      "id": "Spirit_Z3W_Claws_E",
+      "name": "da'Rius"
+    },
+    {
+      "id": "DemonDog_Blue",
+      "name": "Dark Demodoggo"
+    },
+    {
+      "id": "FaerieDemon_Rift_Caster_Major",
+      "name": "Deathbringer Invader"
+    },
+    {
+      "id": "Squirrel_Demon",
+      "name": "Demonic Leafcutter"
+    },
+    {
+      "id": "Goat_Demon",
+      "name": "Demonic Raminiature"
+    },
+    {
+      "id": "Crimson_Z2W_Sword",
+      "name": "Devout Crimson Soldier"
+    },
+    {
+      "id": "Kobold_Ogre_Prisoner",
+      "name": "Docker Prisoner"
+    },
+    {
+      "id": "Dog_Z3W_E",
+      "name": "Dogma"
+    },
+    {
+      "id": "OgreHuman_Z3D_GM",
+      "name": "Doped Crimson Colossus"
+    },
+    {
+      "id": "ImpDemon_Elite_Red",
+      "name": "Draculag, aspiring Nightgod"
+    },
+    {
+      "id": "Dummy",
+      "name": "Dummy"
+    },
+    {
+      "id": "Crimson_Z3W_Bow",
+      "name": "Eagle-eyed Crimson Archer"
+    },
+    {
+      "id": "Crimson_Z3W_Bow_FS",
+      "name": "Eagle-eyed Crimson Archer"
+    },
+    {
+      "id": "Manfish_Z1W_Caster_3",
+      "name": "Educated Nepsid Wavemonger"
+    },
+    {
+      "id": "Egglektra",
+      "name": "Egglektra"
+    },
+    {
+      "id": "World",
+      "name": "Environment"
+    },
+    {
+      "id": "Manfish_Z2W_Caster",
+      "name": "Erudite Nepsid Wavemonger"
+    },
+    {
+      "id": "Dog_Z3W_RamPatrol07",
+      "name": "Everest"
+    },
+    {
+      "id": "Manfish_Z2W_Claws",
+      "name": "Expert Nepsid Fighter"
+    },
+    {
+      "id": "FaerieBee_Base",
+      "name": "FaerieBee_Base"
+    },
+    {
+      "id": "Wolf_Z1W_E",
+      "name": "Fangandog"
+    },
+    {
+      "id": "Cleodora_Feeder",
+      "name": "Feeder Bee"
+    },
+    {
+      "id": "Crimson_Z2W_Sword_2",
+      "name": "Fervent Crimson Soldier"
+    },
+    {
+      "id": "Crab_Z1W_E_3",
+      "name": "Fiddle Crabstro"
+    },
+    {
+      "id": "Crab_Z1W_2",
+      "name": "Fiddler Crab"
+    },
+    {
+      "id": "Sheep_Brown02",
+      "name": "Fields Woolybell"
+    },
+    {
+      "id": "Manfish_Z1D_Claws",
+      "name": "Fighter of the Lost City"
+    },
+    {
+      "id": "Dummy_Runner",
+      "name": "Fleeing Bag"
+    },
+    {
+      "id": "Sprout_Garlic_Z2W_2",
+      "name": "Fragrant Garlic Seedling"
+    },
+    {
+      "id": "TODO_Sprout_Garlic_Spark",
+      "name": "Fragrant Garlic Seedling"
+    },
+    {
+      "id": "Kobold_Z1W_Mace_2",
+      "name": "Freelance Kobold Miner"
+    },
+    {
+      "id": "Dummy_FX",
+      "name": "FXTest"
+    },
+    {
+      "id": "Sprout_Rice_Z2W_Plantivore_4",
+      "name": "Garlic Hooper"
+    },
+    {
+      "id": "Sprout_Garlic_Z2W",
+      "name": "Garlic Seedling"
+    },
+    {
+      "id": "ChaoticPortalPhrixes",
+      "name": "Gate to Niflel"
+    },
+    {
+      "id": "Gatsbee",
+      "name": "Gatsbee"
+    },
+    {
+      "id": "OgreManfish_Z2W_Claws_E",
+      "name": "Gilliver"
+    },
+    {
+      "id": "Golem_Z2W_E",
+      "name": "Golatea"
+    },
+    {
+      "id": "Golcano_Minion",
+      "name": "Golcanito"
+    },
+    {
+      "id": "Golcano",
+      "name": "Golcano"
+    },
+    {
+      "id": "Golem_Z1W_Earth_E_2",
+      "name": "Goledeneye"
+    },
+    {
+      "id": "Golem_Z1W_Earth1",
+      "name": "Golem"
+    },
+    {
+      "id": "Golem_Base",
+      "name": "Golem_Base"
+    },
+    {
+      "id": "Golem_Z2D_FireExplosive",
+      "name": "Gorgon's Hollow Golem"
+    },
+    {
+      "id": "Kobold_Z2D_Mace_2",
+      "name": "Gorgon's Hollow Miner"
+    },
+    {
+      "id": "Kobold_Z2D_Caster",
+      "name": "Gorgon's Hollow Overseer"
+    },
+    {
+      "id": "Golem_Z2D_FireExplosive_2",
+      "name": "Gorgon's Hollow Pyrh Golem"
+    },
+    {
+      "id": "Elemental_Z1D_Lava",
+      "name": "Gorgon's Hollow Sparkle"
+    },
+    {
+      "id": "Ladybug_Green",
+      "name": "Grass Leggybug"
+    },
+    {
+      "id": "Frog_BlueGreen",
+      "name": "Grassflopper"
+    },
+    {
+      "id": "Crimson_Z3W_GA_U",
+      "name": "Great Executioner Léon"
+    },
+    {
+      "id": "Squirrel_Blue",
+      "name": "Green Leafcutter"
+    },
+    {
+      "id": "Slime_Z1W",
+      "name": "Green Slime"
+    },
+    {
+      "id": "Turtle_Green",
+      "name": "Green Tortrock"
+    },
+    {
+      "id": "Squirrel_Grey",
+      "name": "Grey Leafcutter"
+    },
+    {
+      "id": "Goat_Grey",
+      "name": "Grey Raminiature"
+    },
+    {
+      "id": "Golem_Z2W_FireExplosive_E_2",
+      "name": "Grill Arson"
+    },
+    {
+      "id": "OgreHuman_Z2W_Peasant_E",
+      "name": "Gruffy"
+    },
+    {
+      "id": "TODO_WanderingMerchant",
+      "name": "Guild Merchant"
+    },
+    {
+      "id": "TODO_StableMaster",
+      "name": "Guild Merchant"
+    },
+    {
+      "id": "OgreKobold_Z1W_E_Claws",
+      "name": "Heraclette"
+    },
+    {
+      "id": "Boar_Z2W_2",
+      "name": "Hermitic Boar"
+    },
+    {
+      "id": "Phrixes",
+      "name": "High Inquisitor Chakram"
+    },
+    {
+      "id": "HildaLambert",
+      "name": "Hilda Lambert"
+    },
+    {
+      "id": "TODO_SnowPanther_Yellow",
+      "name": "Hill Leopard"
+    },
+    {
+      "id": "TODO_SnowPanther_Spark",
+      "name": "Hill Leopard"
+    },
+    {
+      "id": "FaerieBee_Z1D_Spear",
+      "name": "Hivetree Builder"
+    },
+    {
+      "id": "Bee_Z1D",
+      "name": "Hivetree Harvester"
+    },
+    {
+      "id": "FaerieBee_Z1D_Claws",
+      "name": "Hivetree Watcher"
+    },
+    {
+      "id": "CannonHoney",
+      "name": "Honey Cannon"
+    },
+    {
+      "id": "Cannon_Mokshi",
+      "name": "Honey Cannon"
+    },
+    {
+      "id": "FaerieBee_Z1W_Claws_E",
+      "name": "Honey Mucha"
+    },
+    {
+      "id": "Slime_Z1W_Honey",
+      "name": "Honey Slime"
+    },
+    {
+      "id": "Slime_Z1D_Honey",
+      "name": "Honey Slime of the Hivetree"
+    },
+    {
+      "id": "Slime_Z1D_Honey_NoXP",
+      "name": "Honey Slime of the Hivetree"
+    },
+    {
+      "id": "FaerieBee_Z1W_GreatMace_E",
+      "name": "Honey Zucca"
+    },
+    {
+      "id": "HunterShepherd",
+      "name": "Hunter Shepherd"
+    },
+    {
+      "id": "Golem_Z2_FS_FireExplosive_2",
+      "name": "Incandescent Invoked Pyrh Golem"
+    },
+    {
+      "id": "Golem_Z2W_FireExplosive_2",
+      "name": "Incandescent Pyrh Golem"
+    },
+    {
+      "id": "Bee_Z2W",
+      "name": "Intoxicated Apix Harvester"
+    },
+    {
+      "id": "Golem_Z2_FS",
+      "name": "Invoked Aoyl Golem"
+    },
+    {
+      "id": "Golem_Z2_FS_2",
+      "name": "Invoked Aoyl Golem"
+    },
+    {
+      "id": "Elemental_Z2_FS",
+      "name": "Invoked Aoyl Sparkle"
+    },
+    {
+      "id": "Crimson_Z2W_Peasant_FS",
+      "name": "Invoked Crimson Farmhand"
+    },
+    {
+      "id": "FaerieBee_Z2W_FS_Tank",
+      "name": "Invoked Defender"
+    },
+    {
+      "id": "TODO_FaerieBee",
+      "name": "Invoked Defender"
+    },
+    {
+      "id": "OgreKobold_Z1D_FS_Claws",
+      "name": "Invoked Docker"
+    },
+    {
+      "id": "Golem_Z1_FS",
+      "name": "Invoked Golem"
+    },
+    {
+      "id": "Elemental_Z1_FS_Underwater",
+      "name": "Invoked Naya Sparkle"
+    },
+    {
+      "id": "Demon_Z3W_Claws_FS",
+      "name": "Invoked Nightling Slayer"
+    },
+    {
+      "id": "ImpDemon_Z3W_FS",
+      "name": "Invoked Nightspawn"
+    },
+    {
+      "id": "Sprout_Onion_Z2_FS",
+      "name": "Invoked Onion Seedling"
+    },
+    {
+      "id": "Manfish_Z1D_FS_Healer",
+      "name": "Invoked Oracle"
+    },
+    {
+      "id": "Kobold_Z1D_FS_Caster",
+      "name": "Invoked Overseer"
+    },
+    {
+      "id": "Golem_Z2_FS_FireExplosive",
+      "name": "Invoked Pyrh Golem"
+    },
+    {
+      "id": "Sprout_Rice_Z2_FS",
+      "name": "Invoked Rice Seedling"
+    },
+    {
+      "id": "FaerieBee_Z1_FS",
+      "name": "Invoked Royal Guard"
+    },
+    {
+      "id": "Skunk_Z1W_FS",
+      "name": "Invoked Skunk"
+    },
+    {
+      "id": "Slime_Z1W_FS",
+      "name": "Invoked Slime"
+    },
+    {
+      "id": "Elemental_Z1_FS_Earth",
+      "name": "Invoked Sparkle"
+    },
+    {
+      "id": "Spirit_Z2W_FS_Claws",
+      "name": "Invoked Spirit of Tiocha"
+    },
+    {
+      "id": "Manfish_Z1W_FS",
+      "name": "Invoked Wavemonger"
+    },
+    {
+      "id": "PunchingBagInvulnerable",
+      "name": "Invu"
+    },
+    {
+      "id": "Sprout_Rice_Z2W_Plantivore_6",
+      "name": "Jared Lettuce"
+    },
+    {
+      "id": "Slime_Z1W_E_2",
+      "name": "Jelly Lewis"
+    },
+    {
+      "id": "Golem_Z2W_E_2",
+      "name": "Jimmy Crater"
+    },
+    {
+      "id": "TODO_ProfessionTrainer",
+      "name": "Job Welldon"
+    },
+    {
+      "id": "Ratsar",
+      "name": "King Ratsar"
+    },
+    {
+      "id": "Slime_Demonic_Z3W_E",
+      "name": "Knight Slime"
+    },
+    {
+      "id": "OgreKobold_Z2W_GM",
+      "name": "Kobold Crusher"
+    },
+    {
+      "id": "OgreKobold_Z1W_Claws",
+      "name": "Kobold Docker"
+    },
+    {
+      "id": "OgreKobold_Z1D_Claws",
+      "name": "Kobold Docker of Estrone"
+    },
+    {
+      "id": "Kobold_Z1W_Mace",
+      "name": "Kobold Miner"
+    },
+    {
+      "id": "Kobold_Z1D_Mace",
+      "name": "Kobold Miner of Estrone"
+    },
+    {
+      "id": "Kobold_Z1W_Caster",
+      "name": "Kobold Overseer"
+    },
+    {
+      "id": "Kobold_Prisoner",
+      "name": "Kobold Prisoner"
+    },
+    {
+      "id": "TODO_Kobold_Tank",
+      "name": "Kobold Raider"
+    },
+    {
+      "id": "Kobold_Z1W_Daggers",
+      "name": "Kobold Thief"
+    },
+    {
+      "id": "Kobold_Z1D_Daggers",
+      "name": "Kobold Thief of Estrone"
+    },
+    {
+      "id": "Crab_Z1W_E_2",
+      "name": "Kraba the Sorceress"
+    },
+    {
+      "id": "Crawler_Z1W_E",
+      "name": "Krabby Jacob"
+    },
+    {
+      "id": "Demon_Z2_Spear_Soulstone_Leg",
+      "name": "Kristian Belial"
+    },
+    {
+      "id": "Mokshi",
+      "name": "Lady Bee"
+    },
+    {
+      "id": "FaerieDemon_Z3W_Caster_E1",
+      "name": "Lady Borgild"
+    },
+    {
+      "id": "FaerieDemon_Z3W_Caster_E",
+      "name": "Lady Zaster"
+    },
+    {
+      "id": "FaerieBee_Z2W_GreatMace_U",
+      "name": "Left Wing"
+    },
+    {
+      "id": "Elemental_Z2W_2",
+      "name": "Lightweight Aoyl Sparkle"
+    },
+    {
+      "id": "FaerieDemon_Z2_Soulstone",
+      "name": "Lilithium"
+    },
+    {
+      "id": "Elemental_Z1_FS_Earth_2",
+      "name": "Loamy Invoked Sparkle"
+    },
+    {
+      "id": "Elemental_Z1W_Earth_2",
+      "name": "Loamy Sparkle"
+    },
+    {
+      "id": "Demon_Z1_Spear_Soulstone",
+      "name": "Luciferrari"
+    },
+    {
+      "id": "Sprout_Turnip_Z2W_2",
+      "name": "Lucrative Turnip Seedling"
+    },
+    {
+      "id": "TODO_Sprout_Turnip_Spark",
+      "name": "Lucrative Turnip Seedling"
+    },
+    {
+      "id": "Kobold_Z2W_Caster",
+      "name": "Lunatic Kobold Overseer"
+    },
+    {
+      "id": "Mage",
+      "name": "Mage"
+    },
+    {
+      "id": "PunchingBagMagicRes",
+      "name": "MagicRes"
+    },
+    {
+      "id": "Dog_Z3W_RamPatrol02",
+      "name": "Marshall"
+    },
+    {
+      "id": "Rabbit_Grey",
+      "name": "Misty Buttontail"
+    },
+    {
+      "id": "Elemental_Z2_FS_Lava_2",
+      "name": "Molten Invoked Pyrh Sparkle"
+    },
+    {
+      "id": "Elemental_Z2W_Lava_2",
+      "name": "Molten Pyrh Sparkle"
+    },
+    {
+      "id": "Demon_Z2_Claws_Soulstone",
+      "name": "Mortalkombaal"
+    },
+    {
+      "id": "MountGoat_01",
+      "name": "MountGoat_01"
+    },
+    {
+      "id": "MountGoat_02",
+      "name": "MountGoat_02"
+    },
+    {
+      "id": "MountGoat_03",
+      "name": "MountGoat_03"
+    },
+    {
+      "id": "MountGoat_04",
+      "name": "MountGoat_04"
+    },
+    {
+      "id": "MountWolf_01",
+      "name": "MountWolf_01"
+    },
+    {
+      "id": "MountWolf_04",
+      "name": "MountWolf_04"
+    },
+    {
+      "id": "MountWolf_06",
+      "name": "MountWolf_06"
+    },
+    {
+      "id": "MunsterChuck",
+      "name": "Munster Chuck"
+    },
+    {
+      "id": "Elemental_Z1W_Underwater",
+      "name": "Naya Sparkle"
+    },
+    {
+      "id": "Elemental_Z2W_Underwater",
+      "name": "Naya Sparkle"
+    },
+    {
+      "id": "Manfish_Z2W_Sword",
+      "name": "Nepsid Breakwater"
+    },
+    {
+      "id": "Manfish_Z1W_Claws",
+      "name": "Nepsid Fighter"
+    },
+    {
+      "id": "Manfish_Z2W_Healer",
+      "name": "Nepsid Oracle"
+    },
+    {
+      "id": "Manfish_Prisonner",
+      "name": "Nepsid Prisoner"
+    },
+    {
+      "id": "Manfish_Z1W_Spear",
+      "name": "Nepsid Runner"
+    },
+    {
+      "id": "Manfish_Z1W_Caster",
+      "name": "Nepsid Wavemonger"
+    },
+    {
+      "id": "OgreManfish_Z1W_Claws",
+      "name": "Nepsid Whale"
+    },
+    {
+      "id": "OgreManfish_Z1D_Claws",
+      "name": "Nepsid Whale of the Lost City"
+    },
+    {
+      "id": "Manfish_Ogre_Prisoner",
+      "name": "Nepsid Whale Prisoner"
+    },
+    {
+      "id": "Nepsilon",
+      "name": "Nepsilon"
+    },
+    {
+      "id": "TODO_Kobold_Z2W_Tank",
+      "name": "Nervous Kobold Raider"
+    },
+    {
+      "id": "Elemental_Z2D_Underwater",
+      "name": "New Atlaan Sparkle"
+    },
+    {
+      "id": "Boar_Z1W_E",
+      "name": "Niels Boar"
+    },
+    {
+      "id": "StinkBug_Demon",
+      "name": "Night Aromabug"
+    },
+    {
+      "id": "Rabbit_Demon",
+      "name": "Night Buttontail"
+    },
+    {
+      "id": "Frog_Demon",
+      "name": "Night Grassflopper"
+    },
+    {
+      "id": "Ladybug_Demon",
+      "name": "Night Leggybug"
+    },
+    {
+      "id": "Lizard_Demon",
+      "name": "Night Saladmander"
+    },
+    {
+      "id": "Slime_Demonic_Z3W",
+      "name": "Night Slime"
+    },
+    {
+      "id": "Turtle_Demon",
+      "name": "Night Tortrock"
+    },
+    {
+      "id": "Sheep_Demon",
+      "name": "Night Woolybell"
+    },
+    {
+      "id": "ImpDemon_Rift_Major",
+      "name": "Nightbringer Invader"
+    },
+    {
+      "id": "DemonSuperElite",
+      "name": "Nightking Maat Demon"
+    },
+    {
+      "id": "Demon_Z3W_Spear",
+      "name": "Nightling Blade"
+    },
+    {
+      "id": "FaerieDemon_Z3W_Caster_Big",
+      "name": "Nightling Deathbringer"
+    },
+    {
+      "id": "Demon_Rift_Claws",
+      "name": "Nightling Invader"
+    },
+    {
+      "id": "Fly_Demon_Z3W",
+      "name": "Nightling Patrolfly"
+    },
+    {
+      "id": "TODO_Fly_Demon_Elite",
+      "name": "Nightling Patrolfly"
+    },
+    {
+      "id": "Demon_Z3W_Claws_Big",
+      "name": "Nightling Ruinbringer"
+    },
+    {
+      "id": "Demon_Z3W_Claws",
+      "name": "Nightling Slayer"
+    },
+    {
+      "id": "FaerieDemon_Z3W_Caster",
+      "name": "Nightling Subjugator"
+    },
+    {
+      "id": "Summon_Imp",
+      "name": "Nightling Terror"
+    },
+    {
+      "id": "Demon_Z3W_Spear_Big",
+      "name": "Nightling Warbringer"
+    },
+    {
+      "id": "Demon_Z3W_Claws_E",
+      "name": "Nightlord Asmoderator"
+    },
+    {
+      "id": "Demon_Z3W_Spear_E",
+      "name": "Nightlord Diabloot"
+    },
+    {
+      "id": "Demon_Z3W_Claws_E_1",
+      "name": "Nightlord Naamahs'tea"
+    },
+    {
+      "id": "DemonSuperElite_Fairy",
+      "name": "Nightqueen Shaarlize Te'ror"
+    },
+    {
+      "id": "DemonSuperElite_Fairy_FalseClone",
+      "name": "Nightqueen Shaarlize Te'ror"
+    },
+    {
+      "id": "DemonSuperElite_Fairy_TrueClone",
+      "name": "Nightqueen Shaarlize Te'ror"
+    },
+    {
+      "id": "ImpDemon_Red",
+      "name": "Nightspawn"
+    },
+    {
+      "id": "ImpDemon_GreyBlue",
+      "name": "Nightspawn"
+    },
+    {
+      "id": "ImpDemon_Z3W",
+      "name": "Nightspawn"
+    },
+    {
+      "id": "ImpDemon_Rift",
+      "name": "Nightspawn Invader"
+    },
+    {
+      "id": "FaerieBee_Z2W_Champ_E",
+      "name": "Notorious Bee"
+    },
+    {
+      "id": "Crimson_Z2W_Bow",
+      "name": "Observant Crimson Archer"
+    },
+    {
+      "id": "Crimson_Z3W_Sword",
+      "name": "Obsessive Crimson Soldier"
+    },
+    {
+      "id": "Crimson_Z3W_Sword_E",
+      "name": "Obsessive Crimson Soldier"
+    },
+    {
+      "id": "Sprout_Onion_Z2W",
+      "name": "Onion Seedling"
+    },
+    {
+      "id": "Manfish_Z2D_Healer",
+      "name": "Oracle of New Atlaan"
+    },
+    {
+      "id": "Frog_RedOrange",
+      "name": "Orange Grassflopper"
+    },
+    {
+      "id": "FaerieBee_Z2W_Tank",
+      "name": "Overprotective Apix Defender"
+    },
+    {
+      "id": "FaerieBee_Z2W_GreatMace",
+      "name": "Overqualified Apix Royal Guard"
+    },
+    {
+      "id": "FaerieBee_Z2W_Spear",
+      "name": "Overworked Apix Builder"
+    },
+    {
+      "id": "FaerieBee_Z2_FS_Tank_2",
+      "name": "Overworked Invoked Builder"
+    },
+    {
+      "id": "FaerieBee_Z2W_Claws",
+      "name": "Overzealous Apix Watcher"
+    },
+    {
+      "id": "Crimson_Z3W_Caster_E",
+      "name": "Pastor Ramen"
+    },
+    {
+      "id": "Fly_Demon_Rift",
+      "name": "Patrolfly Invader"
+    },
+    {
+      "id": "Rabbit_Pink",
+      "name": "Pink Buttontail"
+    },
+    {
+      "id": "Turtle_Pink",
+      "name": "Pink Tortrock"
+    },
+    {
+      "id": "Priest",
+      "name": "Priest"
+    },
+    {
+      "id": "Cleodora_Champion",
+      "name": "Prince Beelliams"
+    },
+    {
+      "id": "Cleodora_Champion2",
+      "name": "Prince Beeter"
+    },
+    {
+      "id": "Cleodora_Champion3",
+      "name": "Princess Beeatrice"
+    },
+    {
+      "id": "PunchingBag",
+      "name": "Punching Bag"
+    },
+    {
+      "id": "StinkBug_Purple",
+      "name": "Purple Aromabug"
+    },
+    {
+      "id": "DemonDog_Purple",
+      "name": "Purple Demodoggo"
+    },
+    {
+      "id": "Ladybug_Purple",
+      "name": "Purple Leggybug"
+    },
+    {
+      "id": "Golem_Z2W_FireExplosive",
+      "name": "Pyrh Golem"
+    },
+    {
+      "id": "Elemental_Z2W_Lava",
+      "name": "Pyrh Sparkle"
+    },
+    {
+      "id": "Elemental_Z2_FS_Lava",
+      "name": "Pyrh Sparkle"
+    },
+    {
+      "id": "Cleodora",
+      "name": "Queen Honeyzabeth"
+    },
+    {
+      "id": "Sheep_Black02",
+      "name": "Radiated Woolybell"
+    },
+    {
+      "id": "Crimson_Z1W_Captain_E",
+      "name": "Ram Page"
+    },
+    {
+      "id": "OgreHuman_Z3W_GM_E",
+      "name": "Ram Stein, the Janitor"
+    },
+    {
+      "id": "Crimson_Z3W_Daggers_E",
+      "name": "Ramface"
+    },
+    {
+      "id": "Kobold_Ratsar_Caster",
+      "name": "Ratsar Lighter"
+    },
+    {
+      "id": "Reblochonk",
+      "name": "Reblochonk"
+    },
+    {
+      "id": "Boar_Z2W",
+      "name": "Reclusive Boar"
+    },
+    {
+      "id": "DemonDog_Red",
+      "name": "Red Demodoggo"
+    },
+    {
+      "id": "Squirrel_Red",
+      "name": "Red Leafcutter"
+    },
+    {
+      "id": "Ladybug_Red",
+      "name": "Red Leggybug"
+    },
+    {
+      "id": "Turtle_Red",
+      "name": "Red Tortrock"
+    },
+    {
+      "id": "OgreKobold_Z2W_Claws",
+      "name": "Reliable Kobold Docker"
+    },
+    {
+      "id": "Sprout_Rice_Z2W",
+      "name": "Rice Seedling"
+    },
+    {
+      "id": "FaerieBee_Z2W_GreatMace_U_2",
+      "name": "Right Wing"
+    },
+    {
+      "id": "Slime_Z2W_FS",
+      "name": "Ripe Invoked Slime"
+    },
+    {
+      "id": "DemonHunterZoey",
+      "name": "Rita"
+    },
+    {
+      "id": "DemonHunterMira",
+      "name": "Rita"
+    },
+    {
+      "id": "RobinHoof",
+      "name": "Robin Hoof"
+    },
+    {
+      "id": "TODO_SnowPanther_Grey",
+      "name": "Rock Leopard"
+    },
+    {
+      "id": "Dog_Z3W_RamPatrol04",
+      "name": "Rocky"
+    },
+    {
+      "id": "Rogue",
+      "name": "Rogue"
+    },
+    {
+      "id": "FaerieBee_Z1D_GreatMace",
+      "name": "Royal Guard of the Hivetree"
+    },
+    {
+      "id": "Bee_Prisoner1",
+      "name": "Royal Guard Prisoner"
+    },
+    {
+      "id": "Slime_Z1D_U",
+      "name": "Royal Jelly Slime"
+    },
+    {
+      "id": "Dog_Z3W_RamPatrol03",
+      "name": "Rubble"
+    },
+    {
+      "id": "Demon_Rift_Claws_Major",
+      "name": "Ruinbringer Invader"
+    },
+    {
+      "id": "Crab_Z2W",
+      "name": "Ruins Crab"
+    },
+    {
+      "id": "DemonHunterRumi",
+      "name": "Rumi, Demon Huntress"
+    },
+    {
+      "id": "Manfish_Z2D_Spear",
+      "name": "Runner of New Atlaan"
+    },
+    {
+      "id": "Manfish_Z1D_Spear",
+      "name": "Runner of the Lost City"
+    },
+    {
+      "id": "Lizard_Green",
+      "name": "Saladmander"
+    },
+    {
+      "id": "Slime_Z1W_2",
+      "name": "Sap Slime"
+    },
+    {
+      "id": "Crimson_Z3W_Monk",
+      "name": "Scholar Crimson Preacher"
+    },
+    {
+      "id": "Manfish_Z2W_E_Spear_2",
+      "name": "Scummy BlackGill"
+    },
+    {
+      "id": "Sprout_Rice_Z2W_Plantivore",
+      "name": "Seed Barrett"
+    },
+    {
+      "id": "Sprout_Rice_Z2W_Plantivore_2",
+      "name": "Seed Vicious"
+    },
+    {
+      "id": "Kobold_Z2W_Mace",
+      "name": "Senior Kobold Miner"
+    },
+    {
+      "id": "Slime_Z3W",
+      "name": "Sewer Drop"
+    },
+    {
+      "id": "DemonSuperElite_Fairy_Guardian",
+      "name": "Shaarlize's Guardian"
+    },
+    {
+      "id": "PunchingBagShield",
+      "name": "Shielded"
+    },
+    {
+      "id": "ShiroNext_Pirate",
+      "name": "ShiroNext_Pirate"
+    },
+    {
+      "id": "ShiroNext_Pirate1",
+      "name": "ShiroNext_Pirate1"
+    },
+    {
+      "id": "Crimson_Z2W_Bow_2",
+      "name": "Sighted Crimson Archer"
+    },
+    {
+      "id": "Skunk_Z1W",
+      "name": "Skunk"
+    },
+    {
+      "id": "Manfish_Z1W_E_Spear",
+      "name": "Skuttle Goldengill"
+    },
+    {
+      "id": "Dog_Z3W_RamPatrol06",
+      "name": "Skye"
+    },
+    {
+      "id": "OgreManfish_Z2D_Claws",
+      "name": "Slick Nepsid Whale"
+    },
+    {
+      "id": "OgreManfish_Z2W_Claws",
+      "name": "Slick Nepsid Whale"
+    },
+    {
+      "id": "OgreManfish_Z2W_FS_Claws",
+      "name": "Slick Nepsid Whale"
+    },
+    {
+      "id": "TODO_OgreBagon_Grey",
+      "name": "Slick Nepsid Whale"
+    },
+    {
+      "id": "TODO_OgreBagon_Brown",
+      "name": "Slick Nepsid Whale"
+    },
+    {
+      "id": "TODO_OgreBagon_Brown02",
+      "name": "Slick Nepsid Whale"
+    },
+    {
+      "id": "TODO_OgreBagon_DarkBlue",
+      "name": "Slick Nepsid Whale"
+    },
+    {
+      "id": "TODO_OgreBagon_BlueGrey",
+      "name": "Slick Nepsid Whale"
+    },
+    {
+      "id": "TODO_OgreBagon_Beige",
+      "name": "Slick Nepsid Whale"
+    },
+    {
+      "id": "TODO_OgreBagon_Spark",
+      "name": "Slick Nepsid Whale"
+    },
+    {
+      "id": "TODO_Slime_King",
+      "name": "Slime King"
+    },
+    {
+      "id": "OgreManfish_Z1W_FS_Claws",
+      "name": "Slippery Invoked Whale"
+    },
+    {
+      "id": "Golem_Z1W_Earth_E",
+      "name": "Smeagolem"
+    },
+    {
+      "id": "R1KoboldBoss_Sparkling",
+      "name": "Snack of Ratsar"
+    },
+    {
+      "id": "Crab_Z1W_3",
+      "name": "Snapping Crab"
+    },
+    {
+      "id": "Crab_Z1W_FS",
+      "name": "Snapping Invoked Crab"
+    },
+    {
+      "id": "TODO_SnowPanther_White",
+      "name": "Snow Leopard"
+    },
+    {
+      "id": "Golem_Z1W_Earth_2",
+      "name": "Solid  Golem"
+    },
+    {
+      "id": "Golem_Z1_FS_2",
+      "name": "Solid Invoked Golem"
+    },
+    {
+      "id": "Crab_Z1W_5",
+      "name": "Solist Crab"
+    },
+    {
+      "id": "Elemental_Z1W_Earth",
+      "name": "Sparkle"
+    },
+    {
+      "id": "Elemental_Z1D_Earth",
+      "name": "Sparkle of Estrone"
+    },
+    {
+      "id": "Golem_Z2W_U",
+      "name": "Sparkling Amethyst Golem"
+    },
+    {
+      "id": "StinkBug_Spark",
+      "name": "Sparkling Aromabug"
+    },
+    {
+      "id": "Boar_Z2W_U",
+      "name": "Sparkling Boar"
+    },
+    {
+      "id": "FaerieBee_Z1W_Spear_U",
+      "name": "Sparkling Builder"
+    },
+    {
+      "id": "FaerieBee_Z2W_Spear_U",
+      "name": "Sparkling Builder"
+    },
+    {
+      "id": "Rabbit_Spark",
+      "name": "Sparkling Buttontail"
+    },
+    {
+      "id": "Wolf_Z2W_U",
+      "name": "Sparkling Coyote"
+    },
+    {
+      "id": "Crab_Z1W_U",
+      "name": "Sparkling Crab"
+    },
+    {
+      "id": "GiantCrab_Z1W_U",
+      "name": "Sparkling Crustacean"
+    },
+    {
+      "id": "OgreKobold_Z1W_Claws_U",
+      "name": "Sparkling Docker"
+    },
+    {
+      "id": "Frog_Spark",
+      "name": "Sparkling Grassflopper"
+    },
+    {
+      "id": "Bee_Z1W_U",
+      "name": "Sparkling Harvester"
+    },
+    {
+      "id": "Bee_Z2W_U",
+      "name": "Sparkling Harvester"
+    },
+    {
+      "id": "Squirrel_Spark",
+      "name": "Sparkling Leafcutter"
+    },
+    {
+      "id": "Ladybug_Spark",
+      "name": "Sparkling Leggybug"
+    },
+    {
+      "id": "Kobold_Z1W_Mace_U",
+      "name": "Sparkling Miner"
+    },
+    {
+      "id": "Elemental_Z2W_Underwater_U",
+      "name": "Sparkling Naya Sparkle"
+    },
+    {
+      "id": "Goat_Spark",
+      "name": "Sparkling Raminiature"
+    },
+    {
+      "id": "Sprout_Rice_Z2W_U",
+      "name": "Sparkling Rice Seedling"
+    },
+    {
+      "id": "Lizard_Spark",
+      "name": "Sparkling Saladmander"
+    },
+    {
+      "id": "Skunk_Z1W_U",
+      "name": "Sparkling Skunk"
+    },
+    {
+      "id": "Slime_Z1W_U",
+      "name": "Sparkling Slime"
+    },
+    {
+      "id": "Elemental_Z1W_Earth_U",
+      "name": "Sparkling Sparkle"
+    },
+    {
+      "id": "Elemental_Z3W_Earth_U",
+      "name": "Sparkling Sparkle"
+    },
+    {
+      "id": "Turtle_Spark",
+      "name": "Sparkling Tortrock"
+    },
+    {
+      "id": "Manfish_Z1W_U_Caster",
+      "name": "Sparkling Wavemonger"
+    },
+    {
+      "id": "OgreManfish_Z1W_Claws_U",
+      "name": "Sparkling Whale"
+    },
+    {
+      "id": "Sheep_Spark",
+      "name": "Sparkling Woolybell"
+    },
+    {
+      "id": "Rabbit_EarlyAccess_Spark",
+      "name": "Sparktail"
+    },
+    {
+      "id": "Spirit_Z2W_Claws2",
+      "name": "Spirit of Night"
+    },
+    {
+      "id": "Spirit_Z3W_Claws",
+      "name": "Spirit of Night"
+    },
+    {
+      "id": "Spirit_Z2W_Claws",
+      "name": "Spirit of Tiocha"
+    },
+    {
+      "id": "SpongeBlob",
+      "name": "Sponge Blob"
+    },
+    {
+      "id": "Wolf_Z2W_2",
+      "name": "Starving Coyote"
+    },
+    {
+      "id": "OgreKobold_Z2D_Docker",
+      "name": "Stationmaster"
+    },
+    {
+      "id": "OgreKobold_Z1W_Claws_3",
+      "name": "Steady Kobold Docker"
+    },
+    {
+      "id": "FaerieDemon_Rift_Caster",
+      "name": "Subjugator Invader"
+    },
+    {
+      "id": "ImpDemon_Summoned",
+      "name": "Summoned Nightspawn"
+    },
+    {
+      "id": "Frog_Green",
+      "name": "Swamp Grassflopper"
+    },
+    {
+      "id": "Totem_Tidal",
+      "name": "Tidal Totem"
+    },
+    {
+      "id": "Totem_BeaconOfHope",
+      "name": "Tidal Totem"
+    },
+    {
+      "id": "Bee_Z1W_3",
+      "name": "Tipsy Apix Harvester"
+    },
+    {
+      "id": "TODO_Toad",
+      "name": "Toad"
+    },
+    {
+      "id": "Turtle_Grey",
+      "name": "Tortrock"
+    },
+    {
+      "id": "Dog_Z3W_RamPatrol08",
+      "name": "Tracker"
+    },
+    {
+      "id": "Crimson_Z3D_GA",
+      "name": "Trained Crimson Executioner"
+    },
+    {
+      "id": "Crimson_Z2W_Monk_2",
+      "name": "Trained Crimson Preacher"
+    },
+    {
+      "id": "Crimson_Z3D_Sword",
+      "name": "Trained Crimson Soldier"
+    },
+    {
+      "id": "Kobold_Z1W_Daggers_2",
+      "name": "Trustworthy Kobold Thief"
+    },
+    {
+      "id": "Sprout_Rice_Z2W_Plantivore_3",
+      "name": "Turnip Arker"
+    },
+    {
+      "id": "Sprout_Turnip_Z2W",
+      "name": "Turnip Seedling"
+    },
+    {
+      "id": "TODO_BaseNPC_01",
+      "name": "Tyra Firma"
+    },
+    {
+      "id": "OgreHuman_Z3W_Claws_U",
+      "name": "Ugly Naked Guy"
+    },
+    {
+      "id": "Ulserous",
+      "name": "ul'Serous, Herald Avatar"
+    },
+    {
+      "id": "Skunk_Z1W_FS_2",
+      "name": "Unpopular Invoked Skunk"
+    },
+    {
+      "id": "Skunk_Z1W_2",
+      "name": "Unpopular Skunk"
+    },
+    {
+      "id": "Kobold_Z1W_Caster_2",
+      "name": "Unpredictable Kobold Overseer"
+    },
+    {
+      "id": "Boar_Z2W_E",
+      "name": "Venerer's Hog"
+    },
+    {
+      "id": "Crimson_Z3W_Daggers_2",
+      "name": "Vicious Crimson Cutpurse"
+    },
+    {
+      "id": "Staff_SummonDemon_Imp",
+      "name": "Vile Imp"
+    },
+    {
+      "id": "Crab_Z1W_FS_1",
+      "name": "Virtuoso Invoked Crab"
+    },
+    {
+      "id": "TODO_SnowPanther_LightBrown",
+      "name": "Volcano Leopard"
+    },
+    {
+      "id": "W_Assassin",
+      "name": "W_Assassin"
+    },
+    {
+      "id": "W_Assassin_U",
+      "name": "W_Assassin_U"
+    },
+    {
+      "id": "W_Base",
+      "name": "W_Base"
+    },
+    {
+      "id": "W_Base_Big",
+      "name": "W_Base_Big"
+    },
+    {
+      "id": "W_Base_Elite",
+      "name": "W_Base_Elite"
+    },
+    {
+      "id": "W_Base_Small",
+      "name": "W_Base_Small"
+    },
+    {
+      "id": "W_Base_Unique",
+      "name": "W_Base_Unique"
+    },
+    {
+      "id": "Demon_Rift_Spear_Major",
+      "name": "Warbringer Invader"
+    },
+    {
+      "id": "Warrior",
+      "name": "Warrior"
+    },
+    {
+      "id": "Manfish_Z2D_Caster",
+      "name": "Wavemonger of New Atlaan"
+    },
+    {
+      "id": "Manfish_Z1D_Caster",
+      "name": "Wavemonger of the Lost City"
+    },
+    {
+      "id": "Goat_Beige02",
+      "name": "White Raminiature"
+    },
+    {
+      "id": "Wolf_Z1W",
+      "name": "Wolf"
+    },
+    {
+      "id": "Rabbit_Green",
+      "name": "Woods Buttontail"
+    },
+    {
+      "id": "Sheep_Beige",
+      "name": "Woolybell"
+    },
+    {
+      "id": "Rabbit_Yellow02",
+      "name": "Yellow Buttontail"
+    },
+    {
+      "id": "Frog_Yellow",
+      "name": "Yellow Grassflopper"
+    },
+    {
+      "id": "Ladybug_Yellow",
+      "name": "Yellow Leggybug"
+    },
+    {
+      "id": "Lizard_Yellow",
+      "name": "Yellow Saladmander"
+    },
+    {
+      "id": "Turtle_Yellow",
+      "name": "Yellow Tortrock"
+    },
+    {
+      "id": "YellowRabbits",
+      "name": "YellowRabbits"
+    },
+    {
+      "id": "Dog_Z3W_RamPatrol05",
+      "name": "Zuma"
+    }
+  ]
+}

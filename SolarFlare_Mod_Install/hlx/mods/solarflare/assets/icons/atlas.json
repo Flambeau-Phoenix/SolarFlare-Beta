@@ -1,0 +1,5857 @@
+{
+  "meta": {
+    "width": 8192,
+    "height": 4096,
+    "total_packed": 731
+  },
+  "frames": {
+    "swords.png": {
+      "x": 0,
+      "y": 0,
+      "w": 1536,
+      "h": 1024,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Clones1.png": {
+      "x": 1536,
+      "y": 0,
+      "w": 569,
+      "h": 856,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Anubis.png": {
+      "x": 2105,
+      "y": 0,
+      "w": 410,
+      "h": 746,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "SaberNoLabelBig.png": {
+      "x": 2515,
+      "y": 0,
+      "w": 743,
+      "h": 743,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "cfg_f7.png": {
+      "x": 3258,
+      "y": 0,
+      "w": 663,
+      "h": 663,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "RiftModsButtonNew_Test.png": {
+      "x": 3921,
+      "y": 0,
+      "w": 663,
+      "h": 663,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "LightningBolt.png": {
+      "x": 4584,
+      "y": 0,
+      "w": 602,
+      "h": 649,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "AoEpuddle.png": {
+      "x": 5186,
+      "y": 0,
+      "w": 624,
+      "h": 625,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "AoEpuddle2.png": {
+      "x": 5810,
+      "y": 0,
+      "w": 624,
+      "h": 625,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "skrunchycircle.png": {
+      "x": 6434,
+      "y": 0,
+      "w": 626,
+      "h": 624,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "fire.png": {
+      "x": 7060,
+      "y": 0,
+      "w": 584,
+      "h": 617,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fire2.png": {
+      "x": 7644,
+      "y": 0,
+      "w": 522,
+      "h": 608,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "rift-sun.png": {
+      "x": 0,
+      "y": 1024,
+      "w": 600,
+      "h": 600,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "rifttimerbg.png": {
+      "x": 600,
+      "y": 1024,
+      "w": 600,
+      "h": 600,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "ThumbsUp.png": {
+      "x": 1200,
+      "y": 1024,
+      "w": 548,
+      "h": 571,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "CheckMark2.png": {
+      "x": 1748,
+      "y": 1024,
+      "w": 560,
+      "h": 559,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "TextBubble2.png": {
+      "x": 2308,
+      "y": 1024,
+      "w": 571,
+      "h": 549,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "TextBubble.png": {
+      "x": 2879,
+      "y": 1024,
+      "w": 588,
+      "h": 538,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "FoodBuff2.png": {
+      "x": 3467,
+      "y": 1024,
+      "w": 544,
+      "h": 533,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crown1.png": {
+      "x": 4011,
+      "y": 1024,
+      "w": 565,
+      "h": 525,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "rogue.png": {
+      "x": 4576,
+      "y": 1024,
+      "w": 308,
+      "h": 511,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Arrow.png": {
+      "x": 4884,
+      "y": 1024,
+      "w": 585,
+      "h": 509,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Checkmark1.png": {
+      "x": 5469,
+      "y": 1024,
+      "w": 650,
+      "h": 501,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "mage.png": {
+      "x": 6119,
+      "y": 1024,
+      "w": 317,
+      "h": 496,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "cleric.png": {
+      "x": 6436,
+      "y": 1024,
+      "w": 325,
+      "h": 494,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "FoodBuff1.png": {
+      "x": 6761,
+      "y": 1024,
+      "w": 590,
+      "h": 494,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "warrior.png": {
+      "x": 7351,
+      "y": 1024,
+      "w": 321,
+      "h": 492,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "ComicBubbleWhite.png": {
+      "x": 0,
+      "y": 1624,
+      "w": 754,
+      "h": 481,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "ComicBubbleYellow.png": {
+      "x": 754,
+      "y": 1624,
+      "w": 754,
+      "h": 481,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Star.png": {
+      "x": 1508,
+      "y": 1624,
+      "w": 442,
+      "h": 418,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Arrow1.png": {
+      "x": 1950,
+      "y": 1624,
+      "w": 870,
+      "h": 397,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "dpstext.png": {
+      "x": 2820,
+      "y": 1624,
+      "w": 577,
+      "h": 383,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "notestext.png": {
+      "x": 3397,
+      "y": 1624,
+      "w": 784,
+      "h": 382,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "4FullCombo.png": {
+      "x": 4181,
+      "y": 1624,
+      "w": 613,
+      "h": 314,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Backdrop1.png": {
+      "x": 4794,
+      "y": 1624,
+      "w": 899,
+      "h": 307,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "RoundedBackDrop.png": {
+      "x": 5693,
+      "y": 1624,
+      "w": 1063,
+      "h": 306,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "lightsaber.png": {
+      "x": 6756,
+      "y": 1624,
+      "w": 242,
+      "h": 300,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "BlankButton.png": {
+      "x": 6998,
+      "y": 1624,
+      "w": 631,
+      "h": 287,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "ARiftAlert.png": {
+      "x": 7629,
+      "y": 1624,
+      "w": 313,
+      "h": 274,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Eyeball.png": {
+      "x": 0,
+      "y": 2105,
+      "w": 429,
+      "h": 265,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "ElixirOfAbundanceStatus.png": {
+      "x": 429,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Enchant_Devote_Status.png": {
+      "x": 685,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Enchant_Zealot_Status.png": {
+      "x": 941,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "FastSwimPotion.png": {
+      "x": 1197,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "InfusedTusk.png": {
+      "x": 1453,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "InfusedTusk_Cooldown.png": {
+      "x": 1709,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "InfusedTusk_Status.png": {
+      "x": 1965,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "LongBreathPotion.png": {
+      "x": 2221,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "MinorShieldPotion_Status.png": {
+      "x": 2477,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "MinorVelocityPotion_Status.png": {
+      "x": 2733,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "PrismaticPearl.png": {
+      "x": 2989,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "PrismaticPearl_Status.png": {
+      "x": 3245,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "PrismaticPearl_Status2.png": {
+      "x": 3501,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "PurifiedHeart.png": {
+      "x": 3757,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "PurifiedHeart_Proc.png": {
+      "x": 4013,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "PurifiedHeart_Status.png": {
+      "x": 4269,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "SacrificePotion_Status.png": {
+      "x": 4525,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "ShieldPotion_Status.png": {
+      "x": 4781,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "StoneOfCunning_Trinket.png": {
+      "x": 5037,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "StoneOfCunning_Trinket_Status.png": {
+      "x": 5293,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "StoneOfPower_Trinket.png": {
+      "x": 5549,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "StoneOfPower_Trinket_Status.png": {
+      "x": 5805,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "StoneOfRighteousness_Trinket.png": {
+      "x": 6061,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "StoneOfRighteousness_Trinket_Status.png": {
+      "x": 6317,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "StoneOfWisdom_Trinket.png": {
+      "x": 6573,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "StoneOfWisdom_Trinket_Status.png": {
+      "x": 6829,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Trinket_Bee.png": {
+      "x": 7085,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Trinket_Bee_Status.png": {
+      "x": 7341,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Trinket_Crimson.png": {
+      "x": 7597,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Trinket_Crimson_Status.png": {
+      "x": 7853,
+      "y": 2105,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Trinket_Demon.png": {
+      "x": 0,
+      "y": 2370,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Trinket_Demon_Status.png": {
+      "x": 256,
+      "y": 2370,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Trinket_Kobold.png": {
+      "x": 512,
+      "y": 2370,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Trinket_Kobold_Status.png": {
+      "x": 768,
+      "y": 2370,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Trinket_Manfish.png": {
+      "x": 1024,
+      "y": 2370,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Trinket_Manfish_Status.png": {
+      "x": 1280,
+      "y": 2370,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "VesselPotion_Status.png": {
+      "x": 1536,
+      "y": 2370,
+      "w": 256,
+      "h": 256,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "01ComboAttack.png": {
+      "x": 1792,
+      "y": 2370,
+      "w": 525,
+      "h": 250,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "02ComboAttack.png": {
+      "x": 2317,
+      "y": 2370,
+      "w": 525,
+      "h": 250,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "03ComboAttack.png": {
+      "x": 2842,
+      "y": 2370,
+      "w": 525,
+      "h": 250,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "04FullCombo.png": {
+      "x": 3367,
+      "y": 2370,
+      "w": 525,
+      "h": 250,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "0ComboAttack.png": {
+      "x": 3892,
+      "y": 2370,
+      "w": 525,
+      "h": 250,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Style_01ComboAttack.png": {
+      "x": 4417,
+      "y": 2370,
+      "w": 650,
+      "h": 250,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Style_02ComboAttack.png": {
+      "x": 5067,
+      "y": 2370,
+      "w": 650,
+      "h": 250,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Style_03AttackCombo.png": {
+      "x": 5717,
+      "y": 2370,
+      "w": 650,
+      "h": 250,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Style_04ComboAttack.png": {
+      "x": 6367,
+      "y": 2370,
+      "w": 650,
+      "h": 250,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Style_0ComboAttack.png": {
+      "x": 7017,
+      "y": 2370,
+      "w": 650,
+      "h": 250,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "resource-max.png": {
+      "x": 7667,
+      "y": 2370,
+      "w": 226,
+      "h": 247,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Style2_4FullCombo.png": {
+      "x": 0,
+      "y": 2626,
+      "w": 511,
+      "h": 205,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "2AttackCombo.png": {
+      "x": 511,
+      "y": 2626,
+      "w": 536,
+      "h": 169,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "3AttackCombo.png": {
+      "x": 1047,
+      "y": 2626,
+      "w": 536,
+      "h": 169,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "1AttackCombo.png": {
+      "x": 1583,
+      "y": 2626,
+      "w": 536,
+      "h": 168,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "0NoCombo.png": {
+      "x": 2119,
+      "y": 2626,
+      "w": 497,
+      "h": 166,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "0NoComboLabeled.png": {
+      "x": 2616,
+      "y": 2626,
+      "w": 497,
+      "h": 166,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Style2_0Combo.png": {
+      "x": 3113,
+      "y": 2626,
+      "w": 497,
+      "h": 166,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Style2_1Combo.png": {
+      "x": 3610,
+      "y": 2626,
+      "w": 497,
+      "h": 166,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Style2_2Combo.png": {
+      "x": 4107,
+      "y": 2626,
+      "w": 497,
+      "h": 166,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Style2_3Combo.png": {
+      "x": 4604,
+      "y": 2626,
+      "w": 497,
+      "h": 166,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "ThinBackDrop.png": {
+      "x": 5101,
+      "y": 2626,
+      "w": 1446,
+      "h": 162,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "notepad.png": {
+      "x": 6547,
+      "y": 2626,
+      "w": 94,
+      "h": 110,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Activity_BallonBouncing_StatusCounter.png": {
+      "x": 6641,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Axe_Base_Attack.png": {
+      "x": 6737,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Axe_Base_Attack2.png": {
+      "x": 6833,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Axe_Base_Attack3.png": {
+      "x": 6929,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Axe_Boomerang_Combo.png": {
+      "x": 7025,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Axe_Boomerang_Skill1.png": {
+      "x": 7121,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Axe_Boomerang_Skill1_Status.png": {
+      "x": 7217,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Axe_Boomerang_Skill_Passive.png": {
+      "x": 7313,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Axe_Boomerang_Skill_Passive_Status.png": {
+      "x": 7409,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bleed.png": {
+      "x": 7505,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_Base_Attack.png": {
+      "x": 7601,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_Base_Attack2.png": {
+      "x": 7697,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_Base_Attack3.png": {
+      "x": 7793,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_Start_Combo.png": {
+      "x": 7889,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_Start_Skill1.png": {
+      "x": 7985,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_Start_Skill1_Burn.png": {
+      "x": 8081,
+      "y": 2626,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_Start_Skill2.png": {
+      "x": 0,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_WaterOrbs_Combo.png": {
+      "x": 96,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_WaterOrbs_Orb_Charge.png": {
+      "x": 192,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_WaterOrbs_Passive.png": {
+      "x": 288,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_WaterOrbs_Passive_Status.png": {
+      "x": 384,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_WaterOrbs_Rise_Charge.png": {
+      "x": 480,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_WaterOrbs_Skill1.png": {
+      "x": 576,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_WaterOrbs_Skill1_Buff.png": {
+      "x": 672,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_WaterOrbs_Skill1_Shield.png": {
+      "x": 768,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_WaterOrbs_Skill2.png": {
+      "x": 864,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Book_WaterOrbs_Skill2_Recast.png": {
+      "x": 960,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_Base_Attack.png": {
+      "x": 1056,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_Base_Attack2.png": {
+      "x": 1152,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_Base_Attack3.png": {
+      "x": 1248,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_Base_Attack4.png": {
+      "x": 1344,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_BigGame_Combo.png": {
+      "x": 1440,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_BigGame_Passive.png": {
+      "x": 1536,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_BigGame_Passive_Status.png": {
+      "x": 1632,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_BigGame_Skill1.png": {
+      "x": 1728,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_BigGame_Skill1_Status.png": {
+      "x": 1824,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_BigGame_Skill2.png": {
+      "x": 1920,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_BigGame_Skill2_Status.png": {
+      "x": 2016,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_BigGame_Status.png": {
+      "x": 2112,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_Craft_AttackCombo.png": {
+      "x": 2208,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_Craft_AttackCombo_Status.png": {
+      "x": 2304,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_Craft_Passive.png": {
+      "x": 2400,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_Craft_Passive_Status.png": {
+      "x": 2496,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_Craft_Skill1.png": {
+      "x": 2592,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_Craft_Skill1_Rank3_Status.png": {
+      "x": 2688,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bow_Craft_Skill2.png": {
+      "x": 2784,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Bulwark.png": {
+      "x": 2880,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Burning.png": {
+      "x": 2976,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "CannonPlant_Load.png": {
+      "x": 3072,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "CannonPlant_Shoot.png": {
+      "x": 3168,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Cannon_HoneyShot_Liquid.png": {
+      "x": 3264,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Cannon_HoneyShot_Solid.png": {
+      "x": 3360,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Cannon_MokshiShot.png": {
+      "x": 3456,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "CleodoraEgg_Cast.png": {
+      "x": 3552,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "CleodoraFeeder_Beam.png": {
+      "x": 3648,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Cleodora_ChampionSummon.png": {
+      "x": 3744,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Cleodora_Devastation.png": {
+      "x": 3840,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Cleodora_MiniElite_Sleep.png": {
+      "x": 3936,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Cleodora_RoyalSmash.png": {
+      "x": 4032,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Cleodora_SparkRay.png": {
+      "x": 4128,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_Base_Attack.png": {
+      "x": 4224,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_Base_Attack2.png": {
+      "x": 4320,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_Base_Attack3.png": {
+      "x": 4416,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_Base_Attack4.png": {
+      "x": 4512,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_FlowerSpiral_FinalCombo.png": {
+      "x": 4608,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_FlowerSpiral_FinalCombo_Status.png": {
+      "x": 4704,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_FlowerSpiral_Passive.png": {
+      "x": 4800,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_FlowerSpiral_Passive_Slow.png": {
+      "x": 4896,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_FlowerSpiral_Skill_1.png": {
+      "x": 4992,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_FlowerSpiral_Skill_1_Charge.png": {
+      "x": 5088,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_FlowerSpiral_Skill_2.png": {
+      "x": 5184,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crescent_FlowerSpiral_Skill_2_Status.png": {
+      "x": 5280,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crimson_Book_Aura.png": {
+      "x": 5376,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crimson_Captain_FanaticalFuryStatus.png": {
+      "x": 5472,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crimson_Scepter_Auto_Status.png": {
+      "x": 5568,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Crimson_SwordShield_Consecration_Shield.png": {
+      "x": 5664,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Base_Attack.png": {
+      "x": 5760,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Base_Attack2.png": {
+      "x": 5856,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Base_Attack3.png": {
+      "x": 5952,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Base_Attack4.png": {
+      "x": 6048,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Combo.png": {
+      "x": 6144,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Combo_Status.png": {
+      "x": 6240,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Mark.png": {
+      "x": 6336,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Passive.png": {
+      "x": 6432,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Passive_Debuff.png": {
+      "x": 6528,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Passive_Status.png": {
+      "x": 6624,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Skill1.png": {
+      "x": 6720,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Skill1_Counter.png": {
+      "x": 6816,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Skill1_Status.png": {
+      "x": 6912,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Skill2.png": {
+      "x": 7008,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Skill2_Counter.png": {
+      "x": 7104,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Demondash_Skill2_Shoot.png": {
+      "x": 7200,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_DuplicatePoison_ComboAttack.png": {
+      "x": 7296,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_DuplicatePoison_ComboAttack_Status.png": {
+      "x": 7392,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_DuplicatePoison_Passive.png": {
+      "x": 7488,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_DuplicatePoison_PassiveStatus.png": {
+      "x": 7584,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_DuplicatePoison_Passive_Bonus.png": {
+      "x": 7680,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_DuplicatePoison_Skill1.png": {
+      "x": 7776,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_DuplicatePoison_Skill1_Status.png": {
+      "x": 7872,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_DuplicatePoison_Skill2.png": {
+      "x": 7968,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Start_Combo.png": {
+      "x": 8064,
+      "y": 2831,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Start_Combo_Status.png": {
+      "x": 0,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Start_Skill1.png": {
+      "x": 96,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Start_Skill2.png": {
+      "x": 192,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Daggers_Start_Skill2_Status.png": {
+      "x": 288,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Dash_Base.png": {
+      "x": 384,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Dash_Status.png": {
+      "x": 480,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Base_Attack1.png": {
+      "x": 576,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Base_Attack2.png": {
+      "x": 672,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Base_Attack3.png": {
+      "x": 768,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Base_Attack4.png": {
+      "x": 864,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Water_Combo.png": {
+      "x": 960,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Water_Combo_Status.png": {
+      "x": 1056,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Water_Passive.png": {
+      "x": 1152,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Water_Passive_Status.png": {
+      "x": 1248,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Water_Passive_Status_R3.png": {
+      "x": 1344,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Water_Skill1.png": {
+      "x": 1440,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Water_Skill1_Status.png": {
+      "x": 1536,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DA_Water_Skill2.png": {
+      "x": 1632,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Base_Attack1.png": {
+      "x": 1728,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Base_Attack2.png": {
+      "x": 1824,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Base_Attack3.png": {
+      "x": 1920,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Base_Attack4.png": {
+      "x": 2016,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Multispin_Combo.png": {
+      "x": 2112,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Multispin_Combo_Status.png": {
+      "x": 2208,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Multispin_Passive.png": {
+      "x": 2304,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Multispin_Passive_Status.png": {
+      "x": 2400,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Multispin_Passive_Status2.png": {
+      "x": 2496,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Multispin_Passive_Status_Max_Stacks.png": {
+      "x": 2592,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Multispin_Skill1.png": {
+      "x": 2688,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Multispin_Skill1_Recast.png": {
+      "x": 2784,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Multispin_Skill1_Status.png": {
+      "x": 2880,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DM_Multispin_Skill2.png": {
+      "x": 2976,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Drowning.png": {
+      "x": 3072,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Base_Attack.png": {
+      "x": 3168,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Base_Attack2.png": {
+      "x": 3264,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Base_Attack3.png": {
+      "x": 3360,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Base_Attack4.png": {
+      "x": 3456,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Bladeleaf_Combo.png": {
+      "x": 3552,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Bladeleaf_Combo_Status.png": {
+      "x": 3648,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Bladeleaf_Passive.png": {
+      "x": 3744,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Bladeleaf_Passive_Status.png": {
+      "x": 3840,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Bladeleaf_Skill1.png": {
+      "x": 3936,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Bladeleaf_Skill2.png": {
+      "x": 4032,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Bladeleaf_Skill2_Status.png": {
+      "x": 4128,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DS_Bladeleaf_Skill_1Recast.png": {
+      "x": 4224,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Dueling.png": {
+      "x": 4320,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Exit_Vehicle.png": {
+      "x": 4416,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "FaerieEliteDemon_NightRain_Status.png": {
+      "x": 4512,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "FairieSuperElite_Clones_Stealth.png": {
+      "x": 4608,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_Base_Attack.png": {
+      "x": 4704,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_Base_Attack2.png": {
+      "x": 4800,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_Base_Attack3.png": {
+      "x": 4896,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_Base_Attack4.png": {
+      "x": 4992,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_LightMonk_Combo.png": {
+      "x": 5088,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_LightMonk_Combo_Status.png": {
+      "x": 5184,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_LightMonk_Passive.png": {
+      "x": 5280,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_LightMonk_Passive_Shield.png": {
+      "x": 5376,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_LightMonk_Skill1.png": {
+      "x": 5472,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_LightMonk_Skill1_Recast.png": {
+      "x": 5568,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_LightMonk_Skill1_Status.png": {
+      "x": 5664,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_LightMonk_Skill2.png": {
+      "x": 5760,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_LightMonk_Skill2_Status.png": {
+      "x": 5856,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_WaterUppercut_C.png": {
+      "x": 5952,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_WaterUppercut_C_CritStatus.png": {
+      "x": 6048,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_WaterUppercut_P.png": {
+      "x": 6144,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_WaterUppercut_P_Status_Slow.png": {
+      "x": 6240,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_WaterUppercut_S1.png": {
+      "x": 6336,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_WaterUppercut_S2.png": {
+      "x": 6432,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fists_WaterUppercut_S3.png": {
+      "x": 6528,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "FoeStealth.png": {
+      "x": 6624,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "FoeStealthStatus.png": {
+      "x": 6720,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Fracture.png": {
+      "x": 6816,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Frailty.png": {
+      "x": 6912,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "FXTest.png": {
+      "x": 7008,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Base_Attack.png": {
+      "x": 7104,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Base_Attack2.png": {
+      "x": 7200,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Base_Attack3.png": {
+      "x": 7296,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Craft_FinalCombo.png": {
+      "x": 7392,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Craft_FinalCombo_Status.png": {
+      "x": 7488,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Craft_Passive.png": {
+      "x": 7584,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Craft_Skill1.png": {
+      "x": 7680,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Craft_Skill2.png": {
+      "x": 7776,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Demon_Combo.png": {
+      "x": 7872,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Demon_Combo_Status.png": {
+      "x": 7968,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Demon_Passive.png": {
+      "x": 8064,
+      "y": 2927,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Demon_Passive_Status.png": {
+      "x": 0,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Demon_Skill1.png": {
+      "x": 96,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Demon_Skill1_Status.png": {
+      "x": 192,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Demon_Skill2.png": {
+      "x": 288,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GA_Demon_Skill2_Status.png": {
+      "x": 384,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_Base_Attack.png": {
+      "x": 480,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_Base_Attack2.png": {
+      "x": 576,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_Base_Attack3.png": {
+      "x": 672,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_MassGrab_Combo.png": {
+      "x": 768,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_MassGrab_Combo_Proc.png": {
+      "x": 864,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_MassGrab_Passive.png": {
+      "x": 960,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_MassGrab_Passive_Status.png": {
+      "x": 1056,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_MassGrab_Skill1.png": {
+      "x": 1152,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_MassGrab_Skill1_Status.png": {
+      "x": 1248,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_MassGrab_Skill1_Status2.png": {
+      "x": 1344,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_MassGrab_Skill2.png": {
+      "x": 1440,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_MassGrab_Skill2_Area.png": {
+      "x": 1536,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GM_MassGrab_Skill2_Status.png": {
+      "x": 1632,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Base_Attack.png": {
+      "x": 1728,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Base_Attack2.png": {
+      "x": 1824,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Base_Attack3.png": {
+      "x": 1920,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Nova_Combo.png": {
+      "x": 2016,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Nova_Combo_Status.png": {
+      "x": 2112,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Nova_Passive.png": {
+      "x": 2208,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Nova_Passive_Stack.png": {
+      "x": 2304,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Nova_Skill1.png": {
+      "x": 2400,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Nova_Skill2.png": {
+      "x": 2496,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Nova_Skill2_Buff.png": {
+      "x": 2592,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Nova_Ultimate.png": {
+      "x": 2688,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Nova_Ultimate_Proc.png": {
+      "x": 2784,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "GS_Nova_Ultimate_Slow.png": {
+      "x": 2880,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Base_Attack.png": {
+      "x": 2976,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Base_Attack2.png": {
+      "x": 3072,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Base_Attack3.png": {
+      "x": 3168,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Demon_Combo.png": {
+      "x": 3264,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Demon_Combo_Status.png": {
+      "x": 3360,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Demon_Passive.png": {
+      "x": 3456,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Demon_Passive_Status.png": {
+      "x": 3552,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Demon_Skill1.png": {
+      "x": 3648,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Demon_Skill1_Recast.png": {
+      "x": 3744,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Demon_Skill1_Shield.png": {
+      "x": 3840,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Demon_Skill2.png": {
+      "x": 3936,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Demon_Skill2_Leash.png": {
+      "x": 4032,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Demon_Skill2_R3_Counter.png": {
+      "x": 4128,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Totem_Combo.png": {
+      "x": 4224,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Totem_Passive.png": {
+      "x": 4320,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Totem_Passive_Aoe.png": {
+      "x": 4416,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Totem_Passive_Slow.png": {
+      "x": 4512,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Totem_Passive_Status.png": {
+      "x": 4608,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Totem_Skill.png": {
+      "x": 4704,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Totem_Skill2.png": {
+      "x": 4800,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Halos_Totem_SummonPassive.png": {
+      "x": 4896,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "HoneyCovered.png": {
+      "x": 4992,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "HoneyCoveredDamage.png": {
+      "x": 5088,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Invisible.png": {
+      "x": 5184,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "KoboldThief_Auto_Status.png": {
+      "x": 5280,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mace_Base_Attack.png": {
+      "x": 5376,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mace_Base_Attack2.png": {
+      "x": 5472,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mace_Base_Attack3.png": {
+      "x": 5568,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mace_Benediction_Combo.png": {
+      "x": 5664,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mace_Benediction_Passive.png": {
+      "x": 5760,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mace_Benediction_Passive_Status.png": {
+      "x": 5856,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mace_Benediction_Skill1.png": {
+      "x": 5952,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mace_Benediction_Skill1_Proc.png": {
+      "x": 6048,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mace_Benediction_Skill1_Status.png": {
+      "x": 6144,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mace_Benediction_Status.png": {
+      "x": 6240,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Blink.png": {
+      "x": 6336,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Blink_Mastery2_Position.png": {
+      "x": 6432,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Blink_Mastery3.png": {
+      "x": 6528,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_ChronoReset.png": {
+      "x": 6624,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Conduit_Power.png": {
+      "x": 6720,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Conduit_Power_Status.png": {
+      "x": 6816,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Conduit_Projectile.png": {
+      "x": 6912,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Foresight.png": {
+      "x": 7008,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Foresight_Status.png": {
+      "x": 7104,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Infusion.png": {
+      "x": 7200,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_MysticEmpowerment.png": {
+      "x": 7296,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_MysticEmpowerment_Status.png": {
+      "x": 7392,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_MysticEmpowerment_Status_Physical.png": {
+      "x": 7488,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Overload.png": {
+      "x": 7584,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Overload_Status.png": {
+      "x": 7680,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_RayOfSpark.png": {
+      "x": 7776,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_RayOfSpark_Status.png": {
+      "x": 7872,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_ShieldOfSpark.png": {
+      "x": 7968,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_ShieldOfSpark_Status.png": {
+      "x": 8064,
+      "y": 3023,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_ShieldOfSpark_Status2.png": {
+      "x": 0,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_SparkMaster.png": {
+      "x": 96,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_StaticNova.png": {
+      "x": 192,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_StaticNova_Status_M1.png": {
+      "x": 288,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_StaticNova_Status_Root.png": {
+      "x": 384,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_Amplification.png": {
+      "x": 480,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_Chaincast.png": {
+      "x": 576,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_Chaincast_Accum_Status.png": {
+      "x": 672,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_Chaincast_Status.png": {
+      "x": 768,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_ChainStrike.png": {
+      "x": 864,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_ConcentratedPower.png": {
+      "x": 960,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_ConduitLifebolt.png": {
+      "x": 1056,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_ConduitLifebolt_Conduit.png": {
+      "x": 1152,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_ConduitResidues.png": {
+      "x": 1248,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_ConduitSparkExplosion.png": {
+      "x": 1344,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_ConduitSparkExplosion_Conduit.png": {
+      "x": 1440,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_Discipline.png": {
+      "x": 1536,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_EchoingLife.png": {
+      "x": 1632,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_ExpandedSpirit.png": {
+      "x": 1728,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_FerventWizard.png": {
+      "x": 1824,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_FlowingVitality.png": {
+      "x": 1920,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_HighVoltage.png": {
+      "x": 2016,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_HighVoltage_Status.png": {
+      "x": 2112,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_InfiniteResources.png": {
+      "x": 2208,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_KineticSurge.png": {
+      "x": 2304,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_LifeCurrent.png": {
+      "x": 2400,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_NimbleFingers.png": {
+      "x": 2496,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_PowerCircuit.png": {
+      "x": 2592,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_PowerCircuit_Status.png": {
+      "x": 2688,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_ProdigiousMind.png": {
+      "x": 2784,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_Reverberate.png": {
+      "x": 2880,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_SparkFlask.png": {
+      "x": 2976,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mage_Talent_TemporalCompression.png": {
+      "x": 3072,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "MagicBlock.png": {
+      "x": 3168,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "ManfishBoss_Aoe.png": {
+      "x": 3264,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "ManfishBoss_WaterBreath.png": {
+      "x": 3360,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "MChuck_SprayedFondueStatus.png": {
+      "x": 3456,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mokshi_Barrage.png": {
+      "x": 3552,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mokshi_ChrysalisLaser.png": {
+      "x": 3648,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mokshi_ChrysalisStatus.png": {
+      "x": 3744,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mokshi_DeadlyBlossom.png": {
+      "x": 3840,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Mokshi_Leaves.png": {
+      "x": 3936,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Net_Capture.png": {
+      "x": 4032,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "OreAffix_Air.png": {
+      "x": 4128,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "OreAffix_Air_Status.png": {
+      "x": 4224,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "OreAffix_Fire.png": {
+      "x": 4320,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "OreAffix_Fire_Status.png": {
+      "x": 4416,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "OreAffix_Ice.png": {
+      "x": 4512,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "OreAffix_Ice_Slow.png": {
+      "x": 4608,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "OreAffix_Ice_Status.png": {
+      "x": 4704,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "OreAffix_Nature.png": {
+      "x": 4800,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "OreAffix_Nature_Status.png": {
+      "x": 4896,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_ChaosOrbStatus.png": {
+      "x": 4992,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_Demon_Summon.png": {
+      "x": 5088,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_DimensionalInstability.png": {
+      "x": 5184,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_DimensionalInstabilityStatus.png": {
+      "x": 5280,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_EternalNight.png": {
+      "x": 5376,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_LightBolt.png": {
+      "x": 5472,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_NightBolt.png": {
+      "x": 5568,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_NightSalvo.png": {
+      "x": 5664,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_OpenRift.png": {
+      "x": 5760,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_OpenRiftStatus.png": {
+      "x": 5856,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_Phase2Entry.png": {
+      "x": 5952,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Phrixes_PowerExpulsion.png": {
+      "x": 6048,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "PhysicalBlock.png": {
+      "x": 6144,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "PhysicalBlock_Status_WellTimed.png": {
+      "x": 6240,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Poisoned.png": {
+      "x": 6336,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_BeaconOfHope.png": {
+      "x": 6432,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_BeaconOfHope_Status.png": {
+      "x": 6528,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_BeaconOfHope_Status_Buff.png": {
+      "x": 6624,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_BeaconOfHope_Status_Debuff.png": {
+      "x": 6720,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_BlessingOfFervor.png": {
+      "x": 6816,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_BlessingOfFervor_Status.png": {
+      "x": 6912,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Crusader.png": {
+      "x": 7008,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Crusader_Status.png": {
+      "x": 7104,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_FaithfulWinds.png": {
+      "x": 7200,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_FaithfulWindsStatus.png": {
+      "x": 7296,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Judgment_Status.png": {
+      "x": 7392,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Judgment_Status2.png": {
+      "x": 7488,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Miracle.png": {
+      "x": 7584,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Miracle_Status.png": {
+      "x": 7680,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Penance.png": {
+      "x": 7776,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_PenanceStatus.png": {
+      "x": 7872,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Prayer_Life.png": {
+      "x": 7968,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Prayer_Shield.png": {
+      "x": 8064,
+      "y": 3119,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Prayer_Shield_Status.png": {
+      "x": 0,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Prayer_Smite.png": {
+      "x": 96,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_RadiantVerdict.png": {
+      "x": 192,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Rosary.png": {
+      "x": 288,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Sig_DivineIntervention.png": {
+      "x": 384,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_Authority.png": {
+      "x": 480,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_BlessedSpirituality.png": {
+      "x": 576,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_BurningRays.png": {
+      "x": 672,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_BurningRays_Status.png": {
+      "x": 768,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_CrusadersResolve.png": {
+      "x": 864,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_FerventDefender.png": {
+      "x": 960,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_LuminousBastion.png": {
+      "x": 1056,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_MeltingFaith.png": {
+      "x": 1152,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_MeltingFaith_Status.png": {
+      "x": 1248,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_MightyExecutioner.png": {
+      "x": 1344,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_OppressiveRays.png": {
+      "x": 1440,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_PiercingLight.png": {
+      "x": 1536,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_PiousAdept.png": {
+      "x": 1632,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_PotentFortitude.png": {
+      "x": 1728,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_PotentFortitude_Status.png": {
+      "x": 1824,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_Prosecutor.png": {
+      "x": 1920,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_PurgingStrikes.png": {
+      "x": 2016,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_PurgingStrikes_Status.png": {
+      "x": 2112,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_Radiance.png": {
+      "x": 2208,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_SharpMind.png": {
+      "x": 2304,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_SolarDevotion.png": {
+      "x": 2400,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_SoothingRays.png": {
+      "x": 2496,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_SunHalo.png": {
+      "x": 2592,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_Sunlight.png": {
+      "x": 2688,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_Sunlight_Status.png": {
+      "x": 2784,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_SwiftJustice.png": {
+      "x": 2880,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Priest_Talent_ZealousFighter.png": {
+      "x": 2976,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "ProjTest.png": {
+      "x": 3072,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "R1CrabBoss_HuntDown.png": {
+      "x": 3168,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "R1CrabBoss_HuntDownStatus.png": {
+      "x": 3264,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "R1CrabBoss_NayasFury.png": {
+      "x": 3360,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "R1CrabBoss_TidalSlash.png": {
+      "x": 3456,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Ratsar_KingRage.png": {
+      "x": 3552,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Ratsar_SparkAbsorption.png": {
+      "x": 3648,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Reblochonk_CheeseShot.png": {
+      "x": 3744,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Reblochonk_Skill1.png": {
+      "x": 3840,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rested.png": {
+      "x": 3936,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_AssassinMark_Status.png": {
+      "x": 4032,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_ComboMax.png": {
+      "x": 4128,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_ComboPoints.png": {
+      "x": 4224,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Darkness.png": {
+      "x": 4320,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_DeathMark.png": {
+      "x": 4416,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Finality.png": {
+      "x": 4512,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Finisher_Combo_Point.png": {
+      "x": 4608,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_KnivesTempest.png": {
+      "x": 4704,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_KnivesTempest_Status.png": {
+      "x": 4800,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_KnivesTempest_Status2.png": {
+      "x": 4896,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_KnivesTempest_StatusBis.png": {
+      "x": 4992,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_MasterPoisoner.png": {
+      "x": 5088,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Poison_Blinding.png": {
+      "x": 5184,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Poison_Deadly.png": {
+      "x": 5280,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Poison_DeadlyStatus.png": {
+      "x": 5376,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Shadowstep.png": {
+      "x": 5472,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_ShadowstepStatus.png": {
+      "x": 5568,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Sig_Finisher.png": {
+      "x": 5664,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_SmokeBomb.png": {
+      "x": 5760,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_SmokeBomb_MoveSpeed.png": {
+      "x": 5856,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_SmokeBomb_Status.png": {
+      "x": 5952,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_AcidicSplatter.png": {
+      "x": 6048,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_AcidicSplatter_Status.png": {
+      "x": 6144,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_Adrenaline.png": {
+      "x": 6240,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_Adrenaline_Status.png": {
+      "x": 6336,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_AtrophicPoison.png": {
+      "x": 6432,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_AtrophicPoison_Status.png": {
+      "x": 6528,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_BullyingTheWeak.png": {
+      "x": 6624,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_CheatDeath.png": {
+      "x": 6720,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_CheatDeath_Cooldown.png": {
+      "x": 6816,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_CheatDeath_Status.png": {
+      "x": 6912,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_CripplingPoison.png": {
+      "x": 7008,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_CripplingPoison_Tracker.png": {
+      "x": 7104,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_DeadlyPoison.png": {
+      "x": 7200,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_Envenom.png": {
+      "x": 7296,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_FinishTheJob.png": {
+      "x": 7392,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_Footwork.png": {
+      "x": 7488,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_ImprovedMixture.png": {
+      "x": 7584,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_IntentToKill.png": {
+      "x": 7680,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_LeechingPoison.png": {
+      "x": 7776,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_LethalDose.png": {
+      "x": 7872,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_LethalPoison.png": {
+      "x": 7968,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_LethalPoison_Status.png": {
+      "x": 8064,
+      "y": 3215,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_NoxiousStrategem.png": {
+      "x": 0,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_OpportunityStrike.png": {
+      "x": 96,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_RegeneratingMiasmas.png": {
+      "x": 192,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_UpTheAnte.png": {
+      "x": 288,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_VenomInfusion.png": {
+      "x": 384,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_VenomousFinisher.png": {
+      "x": 480,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_Talent_VirulentMagic.png": {
+      "x": 576,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_UrgeToKill.png": {
+      "x": 672,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_UrgeToKill_Status.png": {
+      "x": 768,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Rogue_UrgeToKill_Status2.png": {
+      "x": 864,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Root.png": {
+      "x": 960,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Base_Attack.png": {
+      "x": 1056,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Base_Attack2.png": {
+      "x": 1152,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Base_Attack3.png": {
+      "x": 1248,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Flamie_Combo.png": {
+      "x": 1344,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Flamie_Combo_Status.png": {
+      "x": 1440,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Flamie_Flamie.png": {
+      "x": 1536,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Flamie_P.png": {
+      "x": 1632,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Flamie_S2.png": {
+      "x": 1728,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Flamie_S2_R2.png": {
+      "x": 1824,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Flamie_S2_R3.png": {
+      "x": 1920,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Flamie_Skill1.png": {
+      "x": 2016,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Flamie_Skill1_Area.png": {
+      "x": 2112,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Flamie_Skill1_Shield.png": {
+      "x": 2208,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Start_Combo.png": {
+      "x": 2304,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Start_Skill1.png": {
+      "x": 2400,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Start_Skill1_Burn.png": {
+      "x": 2496,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Start_Skill2.png": {
+      "x": 2592,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Scepter_Start_Skill2_Shield.png": {
+      "x": 2688,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "ShieldBlock.png": {
+      "x": 2784,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_Craft_Passive.png": {
+      "x": 2880,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_Craft_Passive_Status.png": {
+      "x": 2976,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_Craft_Skill1.png": {
+      "x": 3072,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_Craft_Status.png": {
+      "x": 3168,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_Firebreath_Passive.png": {
+      "x": 3264,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_Firebreath_Passive_Status.png": {
+      "x": 3360,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_Firebreath_Skill1.png": {
+      "x": 3456,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_OrbitWater_P.png": {
+      "x": 3552,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_OrbitWater_P_Status.png": {
+      "x": 3648,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_OrbitWater_P_StatusBlockBuffed.png": {
+      "x": 3744,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_OrbitWater_S1.png": {
+      "x": 3840,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_OrbitWater_S1_OrbStatus.png": {
+      "x": 3936,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_Start_Skill1.png": {
+      "x": 4032,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Shield_Start_Skill1_Status.png": {
+      "x": 4128,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Silence.png": {
+      "x": 4224,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Skunk_Auto_Status.png": {
+      "x": 4320,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Slow.png": {
+      "x": 4416,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "SparkSurge.png": {
+      "x": 4512,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "SparkSurge_Mark.png": {
+      "x": 4608,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "SparkSurge_Status.png": {
+      "x": 4704,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Base_Attack.png": {
+      "x": 4800,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Base_Attack2.png": {
+      "x": 4896,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Base_Attack3.png": {
+      "x": 4992,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Eruption_Combo.png": {
+      "x": 5088,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Eruption_Combo_Status.png": {
+      "x": 5184,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Eruption_Passive.png": {
+      "x": 5280,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Eruption_Passive_Shield.png": {
+      "x": 5376,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Eruption_Passive_Status.png": {
+      "x": 5472,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Eruption_Skill1.png": {
+      "x": 5568,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Eruption_Skill1_Status.png": {
+      "x": 5664,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Eruption_Skill2.png": {
+      "x": 5760,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Goo_Combo.png": {
+      "x": 5856,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Goo_Combo_Status.png": {
+      "x": 5952,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Goo_Passive.png": {
+      "x": 6048,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Goo_PassiveStatus.png": {
+      "x": 6144,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Goo_Passive_Dot.png": {
+      "x": 6240,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Goo_Skill1.png": {
+      "x": 6336,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Goo_Skill1_Status.png": {
+      "x": 6432,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Spear_Goo_Skill2.png": {
+      "x": 6528,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sprout_Burrowed.png": {
+      "x": 6624,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Base_Attack.png": {
+      "x": 6720,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Base_Attack2.png": {
+      "x": 6816,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Base_Attack3.png": {
+      "x": 6912,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Censer_Combo.png": {
+      "x": 7008,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Censer_Combo_Buff.png": {
+      "x": 7104,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Censer_Mark.png": {
+      "x": 7200,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Censer_Passive.png": {
+      "x": 7296,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Censer_Passive_Buff.png": {
+      "x": 7392,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Censer_Skill1.png": {
+      "x": 7488,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Censer_Skill2.png": {
+      "x": 7584,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Censer_Skill2_Slow.png": {
+      "x": 7680,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Censer_Ultimate.png": {
+      "x": 7776,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Censer_Ultimate_Proc.png": {
+      "x": 7872,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Craft_C.png": {
+      "x": 7968,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Craft_C_Status.png": {
+      "x": 8064,
+      "y": 3311,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Craft_Passive.png": {
+      "x": 0,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Craft_Passive_Status.png": {
+      "x": 96,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Craft_S1.png": {
+      "x": 192,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Craft_S1_Proc.png": {
+      "x": 288,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Craft_S1_Status.png": {
+      "x": 384,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Craft_S2.png": {
+      "x": 480,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_Craft_S2_Status.png": {
+      "x": 576,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_SummonDemon_Combo.png": {
+      "x": 672,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_SummonDemon_Combo_R3_Buff.png": {
+      "x": 768,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_SummonDemon_Passive.png": {
+      "x": 864,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_SummonDemon_Passive_Buff.png": {
+      "x": 960,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_SummonDemon_Passive_Shield.png": {
+      "x": 1056,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_SummonDemon_Skill1.png": {
+      "x": 1152,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_SummonDemon_Skill1_Status.png": {
+      "x": 1248,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Staff_SummonDemon_Skill2.png": {
+      "x": 1344,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Stun.png": {
+      "x": 1440,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "SuperEliteDemon_Bomb_Status.png": {
+      "x": 1536,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "SuperEliteDemon_Rage_Status.png": {
+      "x": 1632,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "SuperEliteDemon_Status_Stackable.png": {
+      "x": 1728,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Base_Attack.png": {
+      "x": 1824,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Base_Attack2.png": {
+      "x": 1920,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Base_Attack3.png": {
+      "x": 2016,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Craft_Combo.png": {
+      "x": 2112,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Craft_Passive.png": {
+      "x": 2208,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Craft_Passive_Status.png": {
+      "x": 2304,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Craft_Skill1.png": {
+      "x": 2400,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Craft_Skill1_Status.png": {
+      "x": 2496,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Start_Combo.png": {
+      "x": 2592,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Start_Skill1.png": {
+      "x": 2688,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Start_Skill1Status.png": {
+      "x": 2784,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Swarm_Combo.png": {
+      "x": 2880,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Swarm_Passive.png": {
+      "x": 2976,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Swarm_Passive_Poison.png": {
+      "x": 3072,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Swarm_Passive_Swarm.png": {
+      "x": 3168,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Swarm_Skill1.png": {
+      "x": 3264,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Swarm_Skill1_SelfBuff.png": {
+      "x": 3360,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Sword_Swarm_Skill1_Status.png": {
+      "x": 3456,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Teleport.png": {
+      "x": 3552,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Thrown_Base_Attack.png": {
+      "x": 3648,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Thrown_Base_Attack2.png": {
+      "x": 3744,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Thrown_Base_Attack3.png": {
+      "x": 3840,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Thrown_Seeds_AttackCombo.png": {
+      "x": 3936,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Thrown_Seeds_Dot.png": {
+      "x": 4032,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Thrown_Seeds_Passive.png": {
+      "x": 4128,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Thrown_Seeds_Skill1.png": {
+      "x": 4224,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Thrown_Seeds_Skill2.png": {
+      "x": 4320,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Thrown_Seeds_Skill2_Status.png": {
+      "x": 4416,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Thrown_Seeds_Sprout.png": {
+      "x": 4512,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Trap.png": {
+      "x": 4608,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "UnderWater.png": {
+      "x": 4704,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Ward.png": {
+      "x": 4800,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_BattleShout.png": {
+      "x": 4896,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_BattleShoutStatus.png": {
+      "x": 4992,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_BattleShout_Buff.png": {
+      "x": 5088,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Berserk.png": {
+      "x": 5184,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_BerserkStatus.png": {
+      "x": 5280,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_BurstOfAnger.png": {
+      "x": 5376,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_BurstOfAnger_Status.png": {
+      "x": 5472,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Charge.png": {
+      "x": 5568,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Charge_DestabilisationStatus.png": {
+      "x": 5664,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_ExposedEssence.png": {
+      "x": 5760,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Hemorrhage.png": {
+      "x": 5856,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Hemorrhage_Status.png": {
+      "x": 5952,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_IgnorePain.png": {
+      "x": 6048,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_IgnorePainStatus.png": {
+      "x": 6144,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_IgnorePainStatus_Allies.png": {
+      "x": 6240,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_InfiniteRage.png": {
+      "x": 6336,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Rage.png": {
+      "x": 6432,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Rage_Strike.png": {
+      "x": 6528,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_RashSoul.png": {
+      "x": 6624,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_RedTempo.png": {
+      "x": 6720,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_SecondWind.png": {
+      "x": 6816,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_SecondWind_Cooldown.png": {
+      "x": 6912,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_SurgingForce.png": {
+      "x": 7008,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_Bloodfeast.png": {
+      "x": 7104,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_Bloodletting.png": {
+      "x": 7200,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_Bruise.png": {
+      "x": 7296,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_Bruise_Status.png": {
+      "x": 7392,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_CrackingBlood.png": {
+      "x": 7488,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_CrippingBloodloss.png": {
+      "x": 7584,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_CrippingBloodloss_Status.png": {
+      "x": 7680,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_Exsanguination.png": {
+      "x": 7776,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_FightingSpirit.png": {
+      "x": 7872,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_HoldTheLine.png": {
+      "x": 7968,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_HoldTheLine_Status.png": {
+      "x": 8064,
+      "y": 3407,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_InfusedWound.png": {
+      "x": 0,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_InfusedWound_Status.png": {
+      "x": 96,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_MagicConduction.png": {
+      "x": 192,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_MasterAtArms.png": {
+      "x": 288,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_RageShield.png": {
+      "x": 384,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_RageShield_Status.png": {
+      "x": 480,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_SeasonedSoldier.png": {
+      "x": 576,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_Sever.png": {
+      "x": 672,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_ShatteredRage.png": {
+      "x": 768,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_SurgeOfViolence.png": {
+      "x": 864,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_SurgeOfViolence_Status.png": {
+      "x": 960,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Warrior_Talent_ZealousWarrior.png": {
+      "x": 1056,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Wolf_Auto_Status.png": {
+      "x": 1152,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Wolf_Skill1_Status.png": {
+      "x": 1248,
+      "y": 3503,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "cfg_f6.png": {
+      "x": 1344,
+      "y": 3503,
+      "w": 116,
+      "h": 48,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "chrome-sun.png": {
+      "x": 1460,
+      "y": 3503,
+      "w": 48,
+      "h": 48,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DebugShield.png": {
+      "x": 1508,
+      "y": 3503,
+      "w": 48,
+      "h": 48,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "DebugShieldStatus.png": {
+      "x": 1556,
+      "y": 3503,
+      "w": 48,
+      "h": 48,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "Golcano_ShieldApply_Status.png": {
+      "x": 1604,
+      "y": 3503,
+      "w": 48,
+      "h": 48,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    },
+    "menubutton.png": {
+      "x": 1652,
+      "y": 3503,
+      "w": 116,
+      "h": 48,
+      "atlas_w": 8192,
+      "atlas_h": 4096
+    }
+  }
+}
