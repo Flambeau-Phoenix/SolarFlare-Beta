@@ -1,271 +1,181 @@
-
 ![Aura instant cast proc](ghub.gif)
 
-# SolarFlare — v1.4 Beta - Current Changelog -
+# SolarFlare — v1.4 Beta
+> **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
 
 ![Bee + Imp DPS](TrinketBee_Imp.png)
 
-## SolarFlare - v1.4b - Changelog
+---
 
-# HLX Core Loader & Runtime Update — Patch Notes
+### Quick Controls
 
-### Compatibility Target: Farever 0.2.4+ (HashLink v6)
+* **F6** — Show or hide the SolarFlare Control Hub & Builders.
+* **Hide All Keybind** — Instantly toggle all SolarFlare HUD overlays on or off (Numpad by default, or Middle Mouse via Resource Tracker settings). The F6 hub remains accessible.
+* **Move & Resize** — Unlock any window in its settings. Drag the **sun icon** to reposition; drag the bottom-right corner to resize; click the sun icon to collapse or hide. Re-lock when finished.
 
 ---
 
-### Highlights
+## Overview
 
-* **Farever 0.2.4 Ready**: Full runtime support for HashLink Bytecode Version 6 (`HLB v6`).
-* **Upgraded Hook Engine (MinHook 1.3.4)**: Resolves hook installation failures (`no safe cut found` / `install_patch failed`) across game functions.
-* **Full Backward Compatibility**: Restored legacy reflection primitives so existing community mods load without crashes.
-* **Synchronized Loader ABI**: Aligned the native DLL and Haxe loader bytecode to prevent signature mismatch errors.
+**SolarFlare** is a fully customizable interface and combat awareness mod for **Farever**, built on the [HLX Modding Framework](https://hlx-framework.github.io/) by [laymain](https://github.com/laymain). It gives you complete control over your HUD with four flagship systems:
 
----
-
-### Patch Details
-
-#### 1. Engine & Bytecode Compatibility
-* **HashLink Bytecode v6 Support**: Upgraded the vendored bytecode reader to parse HashLink 2.0 / `HLB v6` layout (`max_version = 6`), including the 3rd debug assignment index.
-* **Startup Crash Fix**: Resolves the fatal error on launch:  
-  `Found version 6 while HL supports up to 5`
-
-#### 2. Hook Injection & JIT Safety (MinHook 1.3.4)
-* **Next-Gen Trampoline Engine**: Replaced the legacy hand-rolled x64 instruction whitelist in `patching.c` with **MinHook 1.3.4**.
-* **Relocatable Opcodes**: The patcher now relocates `CALL`, `JMP`, `Jcc`, and RIP-relative offsets rather than refusing to patch tight JIT loops.
-* **Reliable Hooks**: Resolves hook attachment failures on vital player and combat methods (e.g., `Player.update`, resource setters, cooldown timers).
-
-#### 3. Legacy & Community Mod Backward Compatibility
-* **Restored `hlx_construct_enum`**: Added `construct_enum_by_name` and exported `std@hlx_construct_enum` (`PBBD_D`) in `libhl64.dll`.
-* **Fixes Fatal Error**: Resolves the crash on boot when running older mods:  
-  `Failed to load function std@hlx_construct_enum in module.c(651)`  
-  *(Fixes mods like **Better Mod Settings**)*.
-
-#### 4. Cross-Mod Infrastructure
-* **Message Bus (`bus.c`)**: Native pub/sub support via `hlx_bus_publish`, `hlx_bus_subscribe`, and `hlx_bus_unsubscribe` *(required by **Minimap**)*.
-* **Retained KV Registry (`registry.c`)**: Cross-mod state sharing (`hlx_kv_*`) pinned in root GC memory across mod lifetimes.
-
-#### 5. Loader Synchronization
-* **Aligned ABI**: Recompiled [`hlx-loader.hl`](file:///G:/SteamLibrary/steamapps/common/Farever/hlx/loader/hlx-loader.hl) against the matching `PBBDB_i` native signature (with error-logging labels).
-* **Fixes Fatal Error**: Resolves the loader boot crash:  
-  `Invalid signature for function std@hlx_install_patch : PBBD_i required but PBBDB_i found in hdll`
+* **ResourceTracker** — Independent, movable widgets for Health, Shields, Rage, Mana/Spark, Prayers, Combo Points, Conduits, and Target Vitals.
+* **Auras** — Dynamic visual alerts, procedural glow rings, countdown timers, and kill/use counters for buffs, procs, cooldowns, and boss mechanics.
+* **Geaux Grid** — A dedicated, customizable skill-monitoring display featuring radial cooldown sweeps, charge indicators, and keybind labels.
+* **Combat Intelligence** — In-game **Lightsaber** DPS meter (featuring full pet/minion attribution), live **Combat Log**, and the **GetRifty** timer.
 
 ---
 
-### Included Files & Installation
+## Installation (Farever 0.2.4+ Ready)
 
-To run modern mods on Farever 0.2.4 alongside legacy mods, deploy these files into your game directory:
+> [!IMPORTANT]
+> **Farever 0.2.4** requires HashLink bytecode v6 and MinHook-capable loaders. The bundled `libhl64.dll` and `hlx-loader.hl` provide full compatibility for SolarFlare, Minimap, and legacy mods (e.g. *Better Mod Settings*).
+
+1. Download **`SolarFlare_Live_v1.4b.zip`**.
+2. Extract the contents directly into your **`Farever`** game root directory:
 
 ```text
 Farever/
-├── libhl64.dll                <- Updated native loader (v6 + MinHook + legacy exports)
+├── libhl64.dll                       <- Updated v6 + MinHook native loader
 └── hlx/
+    ├── config/
+    │   └── loader.conf
     ├── loader/
-    │   └── hlx-loader.hl      <- Synchronized loader bytecode (PBBDB_i ABI)
+    │   └── hlx-loader.hl             <- Synchronized loader bytecode (PBBDB_i ABI)
+    ├── plugins/
+    │   └── imgui/
+    │       ├── sfimgui.hdll          <- Isolated SolarFlare ImGui plugin
+    │       └── fonts/                <- Bundled UI fonts
     └── mods/
-        ├── SolarFlare/        <- Mod folder
-        ├── minimap/
-        └── better-mod-settings/
+        └── solarflare/
+            ├── solarflare.hl         <- Mod bytecode
+            └── assets/               <- Supplied CDB tables, icons, and atlases
 ```
-## What's new
 
-* **Hide All Hotkey:** Toggle all SolarFlare HUD overlays on and off with a single bind (numpad by default, or middle mouse via Resource Tracker settings). F6 hub and builders remain unaffected.
-* **Aura re-design featuring quick reference conditions that start a new aura build
-* **Auras now have an optional glow effect
-* **Auras now have countdowns/ups with quick reference button from cdb suggestion
-* **Isolated Input Handling:** Keystrokes typed into any SolarFlare text field (aura names, search boxes, ID entry) no longer leak into Farever or trigger keybinds. Handled at the window-message level for absolute reliability.
-* **Alt Key Isolation:** Alt no longer toggles look-lock while typing, preventing windows from closing out from under an open editor.
-* **Geaux Ready Glow Mode:** Added a new "Ready glow" option on the Geaux grid featuring a bright core and sparks travelling the border, tinted from your existing Ready glow color.
-* **Interactive CastleDB Spans:** The CastleDB span suggestion ("Listed: Xs") is now always a clickable button that switches the aura to a fixed span and applies the value.
-* **Resource Tracker Refresh:** Page completely rebuilt with a compact navigation column, consolidated settings, and removed redundant per-row Lock and Transparent toggles.
+3. Launch **Farever** and press **F6**.
 
-## Fixes
-
-* **Window Bounds:** HUD windows no longer walk off-screen when the game reclaims the cursor mid-drag.
-* **Stuck Keys:** Held keys can no longer stick when a text field takes focus mid-keypress.
-* **HudChrome Scaling:** Panels no longer clip or distort their contents at arbitrary sizes.
-* **Optimized HUD Path:** Reduced per-frame overhead by resolving hotkey codes once, eliminating per-frame toast sizing queries, and stripping out menu-detection polling latency.
-* **ImGui Plugin Independence:** SolarFlare now ships its own `sfimgui.hdll` plugin instead of relying on the shared `imgui64.hdll`, safely eliminating load-order conflicts with other mods.
-
-## Install notes
-
-* **Place `sfimgui.hdll` in `hlx/plugins/imgui/`, alongside its `fonts/` folder.
-* **SolarFlare no longer requires `imgui64.hdll`. If another mod installs one, leave it—the two coexist safely.
+> [!NOTE]
+> **Plugin Independence:** SolarFlare uses its own `sfimgui.hdll` rather than relying on a shared `imgui64.hdll`. If other installed mods require `imgui64.hdll`, you can leave it in place—both plugins coexist safely without load-order conflicts.
 
 ---
 
-### SolarFlare - v1.3b - Changelog
+## Flagship Features
 
-## What's new
+### 1. ResourceTracker
+Build your ideal layout with independently movable, stylable resource and combat displays:
 
-* **Timers and countdowns on aura windows.
-* **GetRifty rift clock.
-* **Glow around icon in aura (geaux coming soon).
-* **Added a prominent, theme-aware Create New Aura panel. Choose from a type, then select a condition from the list or go freemode.
-* **Added searchable data.cdb catalogs for skills and statuses.
-* **Added boss selection and boss-specific ability suggestions to Quick Start.
-* **Added an embedded quick-start catalog containing 14 bosses and their abilities.
-* **Redesigned the Aura builder with better visibility between option sets, templates, and user-friendly additions.
-
----
-
-### SolarFlare - v1.2b - Changelog
-
-## Added
-
-* **Minion Attribution System:** Summon damage now properly credits the parent hero via `ent.Foe.summonOwner` / `summonSourceSkill` (`CombatOwnership`). Fully covers summons including *Eternal Flower Heart* (`Trinket_Bee`), *Pocket Hive* (`GM_MassGrab_Passive` → `Summon_Bee`), and *Silhouette of Almar* (`Staff_SummonDemon_Skill2` → `Summon_Imp`).
-* **Minion Reporting & Logging:** Added a sortable **Minion** (`minionName`) table column to the overlay and exposed the `minion` field in JSON exports.
-* **Damage Observation & Hooks:** Added `noteInflict` on outgoing hits from `Unit.onInflictDamage` (handling bee/imp as self) to dedupe against receive-side hits, `DamageObservation` to suppress duplicate `Foe` → `Unit` `onReceiveDamage` events for identical payloads, and `maxDamageTakenRecent` windowed helper for aura evaluation.
-* **Enemy Cast Feed:** Added `noteCast` tracking for engaged foes, routing `BaseSkill.doStop` events into `EnemyCastCache` (`aura/event.cast`).
-* **Aura Templates & Signals:** Added a dedicated **Status on me** aura template and expanded the aura catalog (skills, statuses, fxset) for improved search and ranking.
-* **Shared Overlay Renderers:** Introduced `ChaincastRenderer` and unified the `ConduitOverlay.drawSlotRow` path to ensure builder previews identically mirror live HUD elements.
-* **Skill Charge HUD Elements:** Added support for Geaux skill charges on bar snaps, featuring an optional charge digit and lit/hide rules to display remaining charges during cooldown regen.
-* **Skill Hygiene:** Added automated skill ID coercion and JSON sanitization (`coerceSkillId`) across settings load, save, and rotation edits.
-
-## Changed
-
-* **Damage Source & Ownership Resolution:** Rebuilt source resolution order (`sourceUnit` → `serverSource` → `source` → `ctx.owner` → skill owner) and expanded event capture to trigger whenever an attacker or victim is owned by the local hero.
-* **Receive Hook Architecture:** Refactored receive hooks into a paired prefix/postfix model with a shared observation gate across `Hero`, `Unit`, and `Foe`.
-* **Lightsaber Ingestion:** Parser now accepts parent-credited `ROLE_YOU` and `ROLE_PLAYER` lines, preserving the minion label.
-* **Overlay & Editor Cleanup:** Added sortable Minion column and streamlined the editor contents draw path.
-* **Aura Builder UX:** Reorganized the signal catalog into dedicated groups (e.g., explicit "on me" status labels, isolated Instant Cast group), added clearer subject picker tooltips, and removed `skill.specialReady` from the picker (legacy configurations remain supported).
-* **Aura Lifecycle Observation:** Updated local hero status tracking to leverage lifecycle hooks (`init`, stacks, duration, remove, net mark) with dirty-wake sampling; `skill.instantReady` now queries `shouldPlayInstantly`, pre-warms only `*_Proc` IDs, and falls back to `getStatusCount(skillId_Proc)`.
-* **Resource Tracker Previews:** Chaincast previews now share the live badge, icon rail, and stack visibility settings (`N/4` or `READY`). Conduit previews reliably respect configured pip shapes with inset skill icons rather than generic dark diamond placeholders.
-* **Debug Tool Controls:** Decoupled panel visibility from capture state in Payload Probe and Resolution Ledger. Recording is strictly manual, session-only, and gated by `armed()` to prevent uncontrolled JSONL growth.
-
-## Fixed
-
-* Fixed minion damage credit where `Unit.onInflictDamage` previously dropped bee and imp hits by requiring `isLocalHero(self)`.
-* Fixed missing projectile damage sources (e.g., honey-bolts) by properly falling back to `ctx.owner`.
-* Fixed Chaincast skill labels displaying raw byte strings (e.g., `(bytes : ???, length : N)`) across the next-cast list, Add Skill menu, spend picker, and live hints.
-* Fixed Conduit overlay lighting to ensure equipped Sparkmaster conduit slots render at full brightness based on equipped counts or active Power stacks.
-
----
-
-## Technical & User Notes
-
-* **Minion Attribution:** Attribution relies strictly on runtime `summonOwner`; there are no per-summon skill hooks. `get_networkPropSummonOwner` returns a network Int and is not used for combat crediting.
-* **Pyroclasm Setup:** For free-cast windows, configure **Instant Cast** with subject `Staff_Craft_S1`, or **Status** targeting `Staff_Craft_S1_Proc`.
-* **Buff/Debuff Tracking:** Use **Statuses → Buff/debuff on me** (`status.present`) paired with active status IDs for encounters (e.g., bombs, elite affixes).
-* **Logging:** Restoring or opening the Resolution Ledger / Payload Probe panels no longer records automatically. Click **Start recording** when capturing session data.
-
----
-
-### SolarFlare - v1.1b - Changelog
-
-## Added
-
-* **Searchable Catalogs:** Added searchable catalogs for 516 units, 955 skills, and a complete icon list, with thumbnails displayed where available.
-* **Persistent Aura Counters:** Added profile-persistent Aura counters so your counters persist when logging in and out. You can reset them in the aura builder.
-* **Always On Option:** Added a radio button to enable "Always On" for auras like unit kill counts.
-* **Window Persistence:** Automatic window size and position saving for the F6 menu. You don't have to resize a tiny window each time you login.
-* **Aura Window Controls:** Added quick options atop the aura builder for window hide/transparent/always on.
-* **Visual Polish:** Added highlighted settings cog icons to the Resource Tracker. Removed the old vector suns everywhere. They were a proof of concept that stuck, same reason sliders were scuffed.
-
-## Changed
-
-* **F6 Menu Layout:** Reorganized menu structure; moved **Show/Hide** and **Lock** options higher up for quicker access.
-* **Panel Navigation:** Replaced appearance dropdowns with dedicated button-selected panels.
-* **Slider Formatting:** Fraction sliders now display and adjust using percentages.
-* **Aura Preview Behavior:** Aura previews now default to a paused state upon opening.
-* **UI Clean-up:** Simplified section headings, reduced visual clutter, and improved Resource Tracker spacing with centered previews.
-* **Data Isolation:** Saved IDs now operate independently from live units. This means your counters will not lose their configurations because their unit id was lost in the ledger.
-
-## Fixed
-
-* Fixed Geaux texture scaling and size preview rendering. The sliders work now.
-* Fixed Aura skill and unit name resolution, including support for unequipped skills.
-* Resolved ImGui child-window clipping and preview boundary errors.
-
----
-This mod uses the HLX Modding Framework by https://github.com/laymain found here: https://hlx-framework.github.io/  
-
-SolarFlare is a customizable HUD addon for Farever, built around three main features: **ResourceTracker, Auras, and Geaux**. Keep resources, skill readiness, and visual alerts where you want them on screen.
-
-**Press F6 to show or hide the SolarFlare control panel.** Individual HUD windows have their own visibility settings.
-
-## ResourceTracker
-
-Build your HUD with independently movable resource and combat windows:
-
-| Tracker | What it shows |
+| Tracker | What it displays |
 |---|---|
-| Health | Current and maximum health, plus shield information. |
-| Rage | Rage level, with a maximum-resource alert. |
-| Mana / Spark | Mana or Spark, according to your active class resource. |
-| Prayers | Smite, Life, and Shield prayer readiness. |
-| Combo Points | Rogue combo points, from 0 to 6. |
-| Attack Combo | Weapon attack-chain progress and final-step feedback. |
-| Chaincast | Chaincast stacks, readiness, and remaining time. |
-| Conduits | Sparkmaster conduit slots and Power stacks, from 0 to 20. |
-| Current Target | Target portrait, name, health, and optional boss/elite badges. |
+| **Health** | Current and max health, temporary shields, and dynamic alert thresholds. |
+| **Rage** | Current rage levels with an optional maximum-resource pulse. |
+| **Mana / Spark** | Automatically tracks Mana or Spark according to your active hero class. |
+| **Prayers** | Readiness monitors for Smite, Life, and Shield prayers. |
+| **Combo Points** | Rogue combo point tracking (0 to 6) with customized pip shapes. |
+| **Attack Combo** | Real-time weapon attack-chain tracking with final-hit feedback. |
+| **Chaincast** | Chaincast stack accumulation, readiness triggers, and remaining window timers. |
+| **Conduits** | Sparkmaster conduit slot monitors and Power stacks (0 to 20). |
+| **Current Target** | Target portrait, nameplate, health pool, and boss/elite difficulty badges. |
 
-Each window can be hidden, locked, resized, and made transparent. Appearance options vary by tracker, including bar styles, vertical layouts, and pip shapes. Preview empty, partial, full, and alert states while setting up your layout.
+* **Customization:** Customize bar orientations (horizontal/vertical), borders, transparency, and pip shapes. Test empty, partial, full, and alert states in real time using the built-in previewers.
+* **Getting Started:** Press **F6** → **Resources** → **Open Resource Tracker Builder**.
 
-**Start here:** F6 → Resources → Open Resource Tracker Builder. Select a tracker, turn off Hide, and adjust its settings.
+### 2. Auras
+Create bespoke visual alerts for any gameplay condition:
 
-## Auras
+* **Trigger Sources:** Health/shield/resource thresholds, skill cooldown readiness, resource affordability, status effects (buffs/debuffs on you or targets), prayers, combo stacks, rift states, and enemy casts.
+* **Counters:** Persistent boss, enemy, and skill use counters that survive logout sessions.
+* **Visual FX:** Procedural glow rings, custom icon styling, active timers (countdowns/countups), and sound/visual pulses.
+* **Quick Start Catalog:** Searchable CastleDB database covering skills, statuses, and 14 bosses with pre-configured ability triggers.
+* **Getting Started:** Press **F6** → **Auras** → Enable aura system → **Open Aura Builder**.
 
-Create visual alerts for information that matters to your build:
+### 3. Geaux Skill Grid
+A personal skill-monitoring grid designed to keep critical abilities in your field of view:
 
-- Health, shield, and class-resource thresholds.
-- Skill readiness, cooldowns, and resource affordability.
-- Status presence, stack counts, and remaining duration.
-- Prayers, Combo Points, Chaincast, Conduits, and attack combos.
-- Target conditions, target health, rift state, and specific enemy kills.
-- Boss/unit kill counters, skill use counters, etc.
+* **Layouts:** Configurable rows, columns, padding, and slot spacing presets.
+* **Visual States:** Radial cooldown sweeps, text countdowns, charge count digits, ready-flashes, and dimmed unavailable states.
+* **Ready Glow:** Border sparks and core pulses that highlight when priority abilities come off cooldown.
+* **Getting Started:** Press **F6** → **Geaux** → Show Geaux grid → **Open Geaux Builder**. Assign abilities via the searchable skill catalog. *(Note: Geaux is an observation HUD; clicking slots does not cast skills).*
 
-Start from a template or create your own aura. Choose **When It Shows**, then customize **How It Looks**. Use previews and the test tools to check your setup. Import and export auras to share them; advanced users can also use custom expressions.
+### 4. Combat Tracking & Utilities
+* **Lightsaber DPS Meter:** Local combat log parser providing real-time damage-per-second tracking, breakdown tables, and minion damage attribution.
+* **Pet & Minion Attribution:** Damage from summons (e.g. *Eternal Flower Heart* bees, *Pocket Hive*, and *Silhouette of Almar* imps) is credited to the parent hero.
+* **GetRifty:** Integrated in-game rift clock and timer.
+* **Notebook:** In-game scratchpad with full search, page duplication, and automatic persistence.
+* **Profiles & Themes:** Save, duplicate, and switch whole-HUD profiles across characters; choose curated color schemes or define your own.
 
-**Start here:** F6 → Auras → Enable aura system → Open Aura Builder. Enable each aura you want to display, then save.
+---
 
-## Geaux
+## SolarFlare v1.4b — Changelog
 
-Build a personal skill-monitoring grid with the icons you want to watch:
+### What's New in SolarFlare
+* **Hide All Hotkey:** Toggle all SolarFlare HUD overlays on and off with a single bind (Numpad by default, or Middle Mouse via Resource Tracker settings). The F6 hub and builder windows remain unaffected.
+* **Aura Builder Redesign:** Reorganized interface featuring quick-reference condition cards that launch directly into a new aura build.
+* **Aura Procedural Glows:** Auras now support optional custom-colored outer glow effects.
+* **Aura Countdowns & Countups:** Full timer display with quick-reference auto-configuration buttons populated from CastleDB suggestions.
+* **Isolated Input Handling:** Keystrokes typed into SolarFlare text fields (aura names, search bars, ID entry) no longer leak into the game or trigger character abilities.
+* **Alt Key Isolation:** Pressing Alt while typing in SolarFlare panels no longer triggers look-lock or closes open windows.
+* **Geaux Ready Glow Mode:** Added an animated "Ready glow" option to the Geaux grid featuring a bright core and border sparks tinted to your selected color.
+* **Interactive CastleDB Spans:** The CastleDB span recommendation (*"Listed: Xs"*) is now an interactive button that converts the aura to a fixed span and applies the duration immediately.
+* **Resource Tracker Refresh:** Modernized navigation sidebar, consolidated settings, and removed redundant per-row Lock/Transparent toggles.
 
-- Adjustable rows, columns, spacing, and quick layout presets.
-- Searchable skill catalog and drag-and-drop slot arrangement in the builder.
-- Cooldown countdowns and radial cooldown indicators.
-- Optional keybind labels and group tags.
-- Options to dim unavailable skills or hide icons during cooldowns.
-- Undo/redo and JSON layout import/export.
+### Bug Fixes
+* **Window Bounds:** HUD windows no longer walk off-screen if Farever reclaims cursor capture mid-drag.
+* **Held Keys:** Prevented held keyboard keys from sticking when an input text field acquires focus mid-stroke.
+* **HudChrome Scaling:** Window frames and borders now scale cleanly without clipping or visual distortion at non-standard resolutions.
+* **Performance Optimization:** Reduced per-frame HUD overhead by caching keycode resolutions and removing redundant toast sizing queries.
+* **Plugin Independence:** Bundled `sfimgui.hdll` eliminates plugin collisions and DLL load-order issues with other mods.
 
-**Start here:** F6 → Geaux → Show Geaux grid → Open Geaux Builder. Assign skills from the catalog and arrange your slots.
-You can also use Aura to make alerts for single spells if you want.
+---
 
-The gameplay grid is display-only: clicking it does not cast skills. Assignments and slot editing happen in Geaux Builder.
+## HLX Core & Runtime Update (v0.0.9)
 
-## More features
+SolarFlare v1.4b includes an upgraded, fully compatible HLX loader stack targeting **Farever 0.2.4**:
 
-- **Profiles:** Save, copy, and switch shared HUD setups covering resources, Geaux, Auras, and theme.
-- **Themes:** Choose a theme or customize colors.
-- **Notebook:** Create, search, copy, and delete in-game notes; pages auto-save.
-- **Lightsaber:** Local combat-log DPS meter. Include automatic logging and in-game log viewer.
-- **Combat Log:** View skill casts and combat events, with display filters and optional recording.
-- **Layout controls:** Save or reset the workspace layout, plus an optional on-screen F6 menu button.
-- **Diagnostics:** Optional performance monitor and debugging tools for troubleshooting.
+* **Farever 0.2.4 Ready (`HLB v6`):** Full HashLink 2.0 bytecode support (`max_version = 6` with 3rd debug-assignment index). Fixes `Found version 6 while HL supports up to 5`.
+* **MinHook 1.3.4 Engine:** Replaced the legacy hand-rolled assembly whitelist in `patching.c` with MinHook. Relocates `CALL`, `JMP`, `Jcc`, and RIP-relative memory offsets cleanly, eliminating `no safe cut found` / `install_patch failed` crashes on tight JIT function prologues (`Player.update`, combat hooks).
+* **Legacy Mod Compatibility:** Restored native `std@hlx_construct_enum` export (`PBBD_D`). Fixes the fatal error when loading older mods like **Better Mod Settings** (`module.c:651`).
+* **Cross-Mod Message Bus & Registry:** Full native implementation of `hlx_bus_*` and `hlx_kv_*` for inter-mod communication (enables **Minimap**).
+* **Synchronized Loader ABI:** Recompiled `hlx-loader.hl` to match `libhl64.dll`'s `PBBDB_i` labeled patch signature, preventing signature mismatch fatal errors.
 
-## Install
+---
 
-With HLX installed, copy the release files into your game's `hlx/mods/solarflare/` folder:
+<details>
+<summary><b>Previous Version Changelogs (v1.1b – v1.3b)</b></summary>
 
-```text
-hlx/mods/solarflare/
-├── solarflare.hl
-└── assets/
-    ├── cdb/
-    │   └── supplied JSON files
-    └── icons/
-        └── supplied atlases, logos, and icon files
-```
+<br>
 
-Just copy the HLX folder & libhl64.dll to your game folder and you're yet.
-Keep the supplied asset folders intact. `atlas.png/json` contains skill and UI artwork; `atlas2.png/json` contains target portraits. Start Farever and press **F6**.
+### SolarFlare - v1.3b
+* **Aura Timers:** Added countdowns and elapsed timers to aura windows.
+* **GetRifty:** Integrated Rift clock and event tracker.
+* **Icon Glows:** Added icon glow shaders for aura alerts.
+* **Create New Aura Hub:** Prominent, theme-aware panel to start auras by type, condition template, or freemode.
+* **Searchable Catalogs:** Live CastleDB catalogs for skills, statuses, and 14 boss encounters.
+* **Builder Overhaul:** Streamlined separation between templates, options, and live preview rendering.
 
-## Move and resize your HUD
+---
 
-Unlock the window in its settings and free your game cursor. Drag the sun icon to move the window; drag its corner to resize. Lock it again when finished. Use each feature's Show or Hide setting to choose which windows remain visible. Sun icon also collapses/hides windows on press.
-You can make the window transparent and leave it unlocked to get the best looking setup, then lock the windows. 
+### SolarFlare - v1.2b
+* **Minion Attribution System:** Summon damage now credits the parent hero via `ent.Foe.summonOwner` / `summonSourceSkill` (covering *Eternal Flower Heart* bees, *Pocket Hive*, and *Silhouette of Almar* imps).
+* **Combat Log Minion Column:** Added sortable **Minion** column in the overlay and exposed minion identities in JSON exports.
+* **Damage Deduplication:** Added `noteInflict` to deduplicate outgoing hits against receive-side events, and `DamageObservation` to suppress duplicate events.
+* **Enemy Cast Tracking:** Integrated `noteCast` tracking for engaged foes, routing `BaseSkill.doStop` into `EnemyCastCache`.
+* **Shared Renderers:** Unified `ChaincastRenderer` and `ConduitOverlay` draw paths to guarantee previews match live HUD rendering.
+* **Geaux Charges:** Added skill charge indicators displaying remaining charge counts during cooldown regeneration.
+* **Hygiene & Formatting:** Automated skill ID coercion (`coerceSkillId`) across load/save routines, preventing corrupted rotation saves.
 
-## Beta
+---
 
-Some features might be buggy. Some design might not be consistent, like the combat log area. Overall the mod is very usable. Source files are provided if you want to improve this one or make your own.
+### SolarFlare - v1.1b
+* **Searchable Database Catalogs:** Added catalogs covering 516 units, 955 skills, and all icon sets.
+* **Persistent Aura Counters:** Profile-persistent counters that retain values across login/logout cycles.
+* **Window Persistence:** Automatic window size and coordinate persistence for the F6 menu hub.
+* **Visual Polish:** Highlighted settings cogs in Resource Tracker; cleaned up legacy vector icons and standardized sliders to percentages.
+* **Data Isolation:** Saved IDs operate independently from live units, ensuring counters don't reset when unit IDs drift in memory.
+
+</details>
+
+---
+
+## Feedback & Community
+
+SolarFlare is in active Beta. While the core HUD, Auras, and Geaux systems are thoroughly tested, please report any unexpected behavior or layout quirks. Full source files and compile scripts are provided in this repository for modders and contributors.
