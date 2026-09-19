@@ -7,6 +7,65 @@
 
 ## SolarFlare - v1.4b - Changelog
 
+# HLX Core Loader & Runtime Update — Patch Notes
+
+### Compatibility Target: Farever 0.2.4+ (HashLink v6)
+
+---
+
+### Highlights
+
+* **Farever 0.2.4 Ready**: Full runtime support for HashLink Bytecode Version 6 (`HLB v6`).
+* **Upgraded Hook Engine (MinHook 1.3.4)**: Resolves hook installation failures (`no safe cut found` / `install_patch failed`) across game functions.
+* **Full Backward Compatibility**: Restored legacy reflection primitives so existing community mods load without crashes.
+* **Synchronized Loader ABI**: Aligned the native DLL and Haxe loader bytecode to prevent signature mismatch errors.
+
+---
+
+### Patch Details
+
+#### 1. Engine & Bytecode Compatibility
+* **HashLink Bytecode v6 Support**: Upgraded the vendored bytecode reader to parse HashLink 2.0 / `HLB v6` layout (`max_version = 6`), including the 3rd debug assignment index.
+* **Startup Crash Fix**: Resolves the fatal error on launch:  
+  `Found version 6 while HL supports up to 5`
+
+#### 2. Hook Injection & JIT Safety (MinHook 1.3.4)
+* **Next-Gen Trampoline Engine**: Replaced the legacy hand-rolled x64 instruction whitelist in `patching.c` with **MinHook 1.3.4**.
+* **Relocatable Opcodes**: The patcher now relocates `CALL`, `JMP`, `Jcc`, and RIP-relative offsets rather than refusing to patch tight JIT loops.
+* **Reliable Hooks**: Resolves hook attachment failures on vital player and combat methods (e.g., `Player.update`, resource setters, cooldown timers).
+
+#### 3. Legacy & Community Mod Backward Compatibility
+* **Restored `hlx_construct_enum`**: Added `construct_enum_by_name` and exported `std@hlx_construct_enum` (`PBBD_D`) in `libhl64.dll`.
+* **Fixes Fatal Error**: Resolves the crash on boot when running older mods:  
+  `Failed to load function std@hlx_construct_enum in module.c(651)`  
+  *(Fixes mods like **Better Mod Settings**)*.
+
+#### 4. Cross-Mod Infrastructure
+* **Message Bus (`bus.c`)**: Native pub/sub support via `hlx_bus_publish`, `hlx_bus_subscribe`, and `hlx_bus_unsubscribe` *(required by **Minimap**)*.
+* **Retained KV Registry (`registry.c`)**: Cross-mod state sharing (`hlx_kv_*`) pinned in root GC memory across mod lifetimes.
+
+#### 5. Loader Synchronization
+* **Aligned ABI**: Recompiled [`hlx-loader.hl`](file:///G:/SteamLibrary/steamapps/common/Farever/hlx/loader/hlx-loader.hl) against the matching `PBBDB_i` native signature (with error-logging labels).
+* **Fixes Fatal Error**: Resolves the loader boot crash:  
+  `Invalid signature for function std@hlx_install_patch : PBBD_i required but PBBDB_i found in hdll`
+
+---
+
+### Included Files & Installation
+
+To run modern mods on Farever 0.2.4 alongside legacy mods, deploy these files into your game directory:
+
+```text
+Farever/
+├── libhl64.dll                <- Updated native loader (v6 + MinHook + legacy exports)
+└── hlx/
+    ├── loader/
+    │   └── hlx-loader.hl      <- Synchronized loader bytecode (PBBDB_i ABI)
+    └── mods/
+        ├── SolarFlare/        <- Mod folder
+        ├── minimap/
+        └── better-mod-settings/
+```
 ## What's new
 
 * **Hide All Hotkey:** Toggle all SolarFlare HUD overlays on and off with a single bind (numpad by default, or middle mouse via Resource Tracker settings). F6 hub and builders remain unaffected.
