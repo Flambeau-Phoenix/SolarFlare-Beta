@@ -124,7 +124,7 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 
 ---
 
-## SolarFlare v1.4b — Changelog
+## SolarFlare v2b — Changelog
 
 ### Six-Hook Runtime Optimization
 * **44 → 6 Hooks:** Removed 38 redundant release hooks while retaining all required cast, prayer, damage, and UI-drag events.
