@@ -9,14 +9,13 @@ import solarflare.geaux.GeauxCache;
 import solarflare.geaux.GeauxConfig;
 import solarflare.getrifty.GetRifty;
 import solarflare.lightsaber.Lightsaber;
-import solarflare.localtime.LocalTime;
 import imgui.ImGui;
 
 /**
  * Persist SolarFlare layout + toggles next to the installed mod.
  */
 class SettingsStore {
-	static inline var VERSION:Int = 21;
+	static inline var VERSION:Int = 22;
 	static var dirty = false;
 	static var lastCfg:ConfigPanel = null;
 	static var lastSaveMs:Float = 0;
@@ -86,12 +85,36 @@ class SettingsStore {
 			if (raw == null || raw.length == 0)
 				return;
 			var data:Dynamic = haxe.Json.parse(raw);
+			var oldVersion = readVersion(data);
+			if (oldVersion < VERSION)
+				backupBeforeMigration(path, raw, oldVersion);
 			apply(cfg, data);
 			FeatureProfiles.load(cfg, data);
 			applyUiState(cfg, Reflect.field(data, "uiState"));
 			try
 				solarflare.ObserveDemand.markStatusDemandDirty()
 			catch (_:Dynamic) {}
+		} catch (_:Dynamic) {}
+	}
+
+	static function readVersion(data:Dynamic):Int {
+		try {
+			var raw = Reflect.field(data, "v");
+			var parsed = raw == null ? 0 : Std.parseInt(Std.string(raw));
+			return parsed == null ? 0 : parsed;
+		} catch (_:Dynamic) {
+			return 0;
+		}
+	}
+
+	/** One recoverable copy per source schema; legacy fields remain accepted on load. */
+	static function backupBeforeMigration(path:String, raw:String, oldVersion:Int):Void {
+		if (path == null || path.length == 0 || raw == null)
+			return;
+		try {
+			var backup = path + ".v" + oldVersion + ".bak";
+			if (!sys.FileSystem.exists(backup))
+				sys.io.File.saveContent(backup, raw);
 		} catch (_:Dynamic) {}
 	}
 
@@ -115,6 +138,8 @@ class SettingsStore {
 			ensureDir(haxe.io.Path.directory(path));
 			var jsonText = haxe.Json.stringify(dump(cfg), null, "  ");
 			sys.io.File.saveContent(path, jsonText);
+			// Do not clear dirty until the persisted replacement parses successfully.
+			haxe.Json.parse(sys.io.File.getContent(path));
 			dirty = false;
 			lastSaveMs = Date.now().getTime();
 			try {
@@ -151,7 +176,6 @@ class SettingsStore {
 		var data:Dynamic = {v: VERSION, activeTheme: activeTheme};
 		assignDump(data, "customTheme", function() return ThemePalette.dumpCustom());
 		assignDump(data, "vitals", function() return vitalsDump(cfg.vitals));
-		assignDump(data, "localTime", function() return localDump(cfg.localTime));
 		assignDump(data, "geaux", function() return geauxDump(cfg.geaux));
 		assignDump(data, "rifty", function() return riftyDump(cfg.getRifty));
 		assignDump(data, "combo", function() return comboDump(cfg.combo));
@@ -246,17 +270,6 @@ class SettingsStore {
 			mode: c.comboType.get() == 1 ? 2 : (c.shape.get() == PipShapes.BOX ? 1 : 0),
 			art: c.customStyle.get() == 0 ? 0 : 1,
 			chrome: chromeDump(c.chrome)
-		};
-	}
-
-	static function localDump(l:LocalTimeConfig):Dynamic {
-		if (l == null)
-			return {};
-		return {
-			on: l.enabled.get(),
-			w: l.width.get(),
-			h: l.height.get(),
-			chrome: chromeDump(l.chrome)
 		};
 	}
 
@@ -576,14 +589,6 @@ class SettingsStore {
 			cfg.vitals.hpSizeDirty = true;
 			applyChrome(cfg.vitals.chrome, data.hp);
 		}
-		applyLocal(cfg.localTime, data.localTime);
-		if (cfg.localTime != null && data.localTime != null && Std.isOfType(data.localTime, Bool)) {
-			setBool(cfg.localTime.enabled, data.localTime);
-			applyChrome(cfg.localTime.chrome, data.lt);
-		} else if (cfg.localTime != null && data.localTime == null && data.lt != null) {
-			// Legacy layout: only chrome under `lt` — leave enabled at ctor default.
-			applyChrome(cfg.localTime.chrome, data.lt);
-		}
 		applyGeauxProfile(cfg.geaux, data.geaux);
 		applyRifty(cfg.getRifty, data.rifty);
 		// v5: Geaux uses Show (enabled) instead of Hide; force visible once on upgrade.
@@ -601,12 +606,6 @@ class SettingsStore {
 				}
 				if (cfg.getRifty != null)
 					cfg.getRifty.hidden.set(false);
-				if (cfg.localTime != null) {
-					cfg.localTime.enabled.set(true);
-					if (cfg.localTime.chrome != null)
-						// Defer clampToViewport — ImGui viewport APIs AV during mod main().
-						cfg.localTime.chrome.posDirty = true;
-				}
 				dirty = true;
 			}
 		} catch (_:Dynamic) {}
@@ -681,20 +680,6 @@ class SettingsStore {
 		setFloat(c.bannerH, migrated.bannerH);
 		c.sizeDirty = true;
 		applyChrome(c.chrome, migrated.chrome);
-	}
-
-	static function applyLocal(l:LocalTimeConfig, data:Dynamic):Void {
-		if (l == null || data == null)
-			return;
-		if (Std.isOfType(data, Bool)) {
-			setBool(l.enabled, data);
-			return;
-		}
-		setBool(l.enabled, data.on);
-		setFloat(l.width, data.w);
-		setFloat(l.height, data.h);
-		l.sizeDirty = true;
-		applyChrome(l.chrome, data.chrome);
 	}
 
 	public static function applyGeauxProfile(g:GeauxConfig, data:Dynamic):Void {

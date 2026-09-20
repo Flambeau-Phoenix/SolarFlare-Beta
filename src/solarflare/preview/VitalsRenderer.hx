@@ -1,7 +1,6 @@
 package solarflare.preview;
 
 import imgui.ImGui;
-import imgui.Enums.ImGuiCol;
 import imgui.Structs.ImVec4;
 import solarflare.ui.PipShapes;
 import solarflare.ui.VitalsConfig;
@@ -145,31 +144,27 @@ class VitalsRenderer {
 		return ImGui.vec4(0.12, 0.14, 0.13, 0.95);
 	}
 
-	/** Classic horizontal bar (progressBar) with the per-resource theme colors. */
+	/**
+	 * Classic horizontal bar. Drawn via raw ImDrawList calls (VitalsConfig.HorizontalBarGauge),
+	 * same as every other vitals style here — not ImGui.progressBar's style-color-stack path,
+	 * which depends on the native ImGuiCol table lining up and was rendering the HP bar as
+	 * ImGui's default frame color (gray/slate) instead of the intended tint.
+	 */
 	static function drawBar(snap:VitalSnap, w:Single, h:Single):Void {
 		var overlay = snap.valid ? overlayValid(snap) : overlayInvalid(snap);
 		var fraction:Single = snap.valid ? snap.ratio : (0.0 : Single);
 		var main:ImVec4;
-		var hover:ImVec4;
-		var frame:ImVec4;
 		if (snap.kind == VitalSnap.HP) {
 			main = healthTint(snap, ImGui.vec4(0.22, 0.72, 0.38, 1));
-			hover = healthTint(snap, ImGui.vec4(0.30, 0.82, 0.46, 1));
-			frame = ImGui.vec4(0.10, 0.14, 0.12, 0.95);
 		} else if (snap.kind == VitalSnap.RAGE) {
 			main = ImGui.vec4(0.88, 0.38, 0.12, 1);
-			hover = ImGui.vec4(0.95, 0.48, 0.18, 1);
-			frame = ImGui.vec4(0.16, 0.10, 0.08, 0.95);
 		} else {
 			main = ImGui.vec4(0.28, 0.48, 0.92, 1);
-			hover = ImGui.vec4(0.38, 0.58, 0.98, 1);
-			frame = ImGui.vec4(0.08, 0.10, 0.18, 0.95);
 		}
-		ImGui.pushStyleColor(ImGuiCol.PlotHistogram, main);
-		ImGui.pushStyleColor(ImGuiCol.PlotHistogramHovered, hover);
-		ImGui.pushStyleColor(ImGuiCol.FrameBg, frame);
-		ImGui.progressBar(fraction, ImGui.vec2(w, h), overlay);
-		ImGui.popStyleColor(3);
+		var origin = ImGui.getCursorScreenPos();
+		var dl = ImGui.getWindowDrawList();
+		solarflare.ui.VitalsConfig.HorizontalBarGauge.draw(dl, origin.x, origin.y, w, h, fraction, main, overlay);
+		ImGui.dummy(ImGui.vec2(w, h));
 	}
 
 	/** Full-value segmented bars (2×50 / 2×10). */

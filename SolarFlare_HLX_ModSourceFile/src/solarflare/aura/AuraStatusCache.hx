@@ -1,4 +1,4 @@
-﻿package solarflare.aura;
+package solarflare.aura;
 
 import solarflare.EngineSkillId;
 import solarflare.FieldWalk;
@@ -87,11 +87,17 @@ class AuraStatusCache {
 		sampledHero = hero;
 		if (solarflare.debug.ResolutionLedger.armed())
 			solarflare.debug.ResolutionLedger.touch("status.sample", "observe", "AuraStatusCache.sample", "hero", "bool", "true");
-		// Query configured IDs first so list truncation cannot hide requested procs.
-		for (id in solarflare.ObserveDemand.statusIds) lookupTyped(id);
+		// Walk the hero's own container first: a status sitting in that list is a fact.
+		// Typed lookups run after, so a getStatus() miss can only add a demanded id that
+		// the walk never saw — it can no longer land an absent row ahead of the live one.
 		walkList(hero, "statuses");
 		if (containerLength < 0)
 			walkList(hero, "statusList");
+		// The container walk is the one-pass authority for active statuses. Only ask
+		// typed getStatus/getStatusCount for demanded ids not resolved by that pass.
+		for (id in solarflare.ObserveDemand.statusIds)
+			if (find(id) == null)
+				lookupTyped(id);
 	}
 
 	public static function find(want:String):AuraStatusSnap {
@@ -141,6 +147,39 @@ class AuraStatusCache {
 				s.progress = 0;
 			}
 			i++;
+		}
+	}
+
+	/** Immediate stack update from st.skill.Status.set_stacks or onStacksChange */
+	public static function updateStacks(want:String, newStacks:Int):Void {
+		if (want == null || want.length < 2)
+			return;
+		var found = false;
+		var i = 0;
+		while (i < count) {
+			var s = snaps[i];
+			if (s != null && matches(s, want)) {
+				s.stacks = newStacks;
+				if (newStacks <= 0) {
+					s.present = false;
+				} else {
+					s.present = true;
+				}
+				found = true;
+			}
+			i++;
+		}
+		if (!found && newStacks > 0) {
+			solarflare.ObserveDemand.markAuraStatusDirty();
+			if (count < MAX) {
+				var snap = allocSnap();
+				snap.id = want;
+				pushId(snap, want);
+				snap.present = true;
+				snap.known = true;
+				snap.stacks = newStacks;
+				count++;
+			}
 		}
 	}
 
@@ -197,22 +236,60 @@ class AuraStatusCache {
 			// Keep known-absent row for typed ids; do not count as active.
 			snap.stacks = 0;
 		}
-		var i = 0;
-		while (i < count) {
-			var existing = snaps[i];
-			if (matches(existing, snap.id)) {
-				if (existing.known) {
-					copySnap(existing, snap);
-					return existing;
-				}
-				existing.clear();
+		var existing = findExistingSnap(snap);
+		if (existing != null) {
+			var keepStacks = existing.stacks;
+			if (existing.known) {
 				copySnap(existing, snap);
+				// Don't let a weaker re-read clobber a typed getStatusCount win.
+				if (keepStacks > existing.stacks)
+					existing.stacks = keepStacks;
 				return existing;
 			}
-			i++;
+			existing.clear();
+			copySnap(existing, snap);
+			if (keepStacks > existing.stacks)
+				existing.stacks = keepStacks;
+			return existing;
 		}
 		count++;
 		return snap;
+	}
+
+	/** Prefer exact primary-id match so a typed miss placeholder merges with the walked row. */
+	static function findExistingSnap(incoming:AuraStatusSnap):AuraStatusSnap {
+		if (incoming == null)
+			return null;
+		var want = incoming.id;
+		var i = 0;
+		while (i < count) {
+			var existing = snaps[i];
+			if (existing != null && existing.id.length > 0 && existing.id == want)
+				return existing;
+			i++;
+		}
+		i = 0;
+		while (i < count) {
+			var existing = snaps[i];
+			if (existing != null && matches(existing, want))
+				return existing;
+			i++;
+		}
+		// Walked ids may use a different primary spelling than the demanded subject.
+		i = 0;
+		while (i < count) {
+			var existing = snaps[i];
+			if (existing == null)
+				{ i++; continue; }
+			var j = 0;
+			while (j < incoming.ids.length) {
+				if (matches(existing, incoming.ids[j]))
+					return existing;
+				j++;
+			}
+			i++;
+		}
+		return null;
 	}
 
 	/**
@@ -240,8 +317,9 @@ class AuraStatusCache {
 				stampInfinite(snap, key);
 				return;
 			}
-			if (rp.left <= 0.02) {
-				// Genuinely expired — do not stamp, the status is about to drop.
+			var cdb = resolveCdbDuration(snap);
+			if (rp.left <= 0.02 && (cdb > 0.05 || snap.totalDur > 0.05)) {
+				// Genuinely expired timed status — do not stamp, the status is about to drop.
 				snap.durationKnown = true;
 				snap.infinite = false;
 				snap.present = false;
@@ -250,8 +328,10 @@ class AuraStatusCache {
 				snap.stacks = 0;
 				return;
 			}
-			stampFinite(snap, key, rp.left, rp.progress, now, "live");
-			return;
+			if (rp.left > 0.02) {
+				stampFinite(snap, key, rp.left, rp.progress, now, "live");
+				return;
+			}
 		}
 
 		// No usable live timer: fall back to the baked CastleDB span, if the id has one.
@@ -374,19 +454,31 @@ class AuraStatusCache {
 		var snap:AuraStatusSnap = null;
 		try {
 			var h:ent.GameObject = cast hero;
+			// getStatusCount returns Status.stacks (proven via farever IL) — authoritative count.
 			var n = h.getStatusCount(want, null);
 			if (n > 0) {
 				snap = ingest(h.getStatus(want, null));
-				if (snap != null)
+				if (snap != null) {
 					pushId(snap, want);
+					snap.present = true;
+					// Prefer the typed count over re-read; ingest/readStacks can floor wrongly.
+					snap.stacks = n;
+				}
 			}
 			if (snap == null) {
-				snap = allocSnap();
-				snap.id = want;
-				pushId(snap, want);
-				snap.present = false;
-				snap.stacks = 0;
-				count++;
+				// Merge into any walked row that already aliases this demand id.
+				var existing = findByWant(want);
+				if (existing != null) {
+					pushId(existing, want);
+					snap = existing;
+				} else {
+					snap = allocSnap();
+					snap.id = want;
+					pushId(snap, want);
+					snap.present = false;
+					snap.stacks = 0;
+					count++;
+				}
 			}
 		} catch (_:Dynamic) {
 			snap = allocSnap();
@@ -410,28 +502,74 @@ class AuraStatusCache {
 				snap.present ? "true" : "false",
 				snap.known ? "known" : "unknown"
 			);
+			if (snap.present)
+				solarflare.debug.ResolutionLedger.touch(
+					"status.stacks",
+					"getStatusCount",
+					"AuraStatusCache.lookupTyped",
+					id,
+					"int",
+					Std.string(snap.stacks),
+					"typed"
+				);
 		}
 		return snap;
 	}
 
+	static function findByWant(want:String):AuraStatusSnap {
+		if (want == null || want.length < 2)
+			return null;
+		var i = 0;
+		while (i < count) {
+			var s = snaps[i];
+			if (s != null && matches(s, want))
+				return s;
+			i++;
+		}
+		return null;
+	}
+
+	/**
+	 * Prefer typed Status.stacks, then FieldWalk; floor to 1 so the existence of the status
+	 * counts as 1 stack even if the native object leaves stacks unset.
+	 */
 	static function readStacks(item:Dynamic):Int {
-		var n = 1;
+		var n = 0;
+		var method = "miss";
 		try {
 			var st:st.skill.Status = item;
-			if (st.stacks > 1)
-				n = st.stacks;
-			try {
-				var info = st.getStatusInfo();
-				if (info != null && info.stacks > 1)
-					n = info.stacks;
-			} catch (_:Dynamic) {}
+			var typed = st.stacks;
+			if (typed >= 1) {
+				n = typed;
+				method = "typed.stacks";
+			}
 		} catch (_:Dynamic) {
-			var s = Std.int(FieldWalk.extractNumber(item, "stacks", 1));
-			if (s > 1)
+			var s = Std.int(FieldWalk.extractNumber(item, "stacks", 0));
+			if (s >= 1) {
 				n = s;
+				method = "fieldwalk";
+			}
 		}
 		if (n < 1)
 			n = 1;
+		if (solarflare.debug.ResolutionLedger.armed()) {
+			var id = "";
+			try
+				id = solarflare.debug.ResolutionLedger.cleanId(skillIdOf(item))
+			catch (_:Dynamic)
+				id = "";
+			if (id.length == 0)
+				id = "unknown";
+			solarflare.debug.ResolutionLedger.touch(
+				"status.stacks",
+				method,
+				"AuraStatusCache.readStacks",
+				id,
+				"int",
+				Std.string(n),
+				method
+			);
+		}
 		return n;
 	}
 
@@ -487,6 +625,19 @@ class AuraStatusCache {
 			if (snap.idsLower[i] == wl)
 				return true;
 			i++;
+		}
+		if (!(StringTools.endsWith(wl, "_status") || StringTools.endsWith(wl, "_proc")
+			|| StringTools.endsWith(wl, "status") || wl.indexOf("_status_") >= 0
+			|| wl.indexOf("status_") >= 0 || wl.indexOf("_proc_") >= 0)) {
+			var proc = wl + "_proc";
+			var status = wl + "_status";
+			i = 0;
+			while (i < snap.idsLower.length) {
+				var idl = snap.idsLower[i];
+				if (idl == proc || idl == status)
+					return true;
+				i++;
+			}
 		}
 		return false;
 	}

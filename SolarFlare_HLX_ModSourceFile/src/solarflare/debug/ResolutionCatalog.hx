@@ -1,4 +1,4 @@
-﻿package solarflare.debug;
+package solarflare.debug;
 
 /**
  * Semantic keys the HUD actually uses. Live hits join these so analysis can
@@ -76,7 +76,7 @@ class ResolutionCatalog {
 		add("skill.id", "GeauxBar", "engineSkillId", "Confirmed script-style skill id", "P0");
 		add("health.rage", "Vitals", "rageFill", "Warrior rage bar / pips", "P1");
 		add("health.rageMax", "Vitals", "rageFill", "Rage cap (usually 20)", "P1");
-		add("health.mana", "Vitals", "manaFill", "Mana bar when the class exposes it", "P1");
+		add("health.specialEnergy", "Vitals", "manaFill", "Generic special-energy bar; v6 has no `mana` field (ent.UnitAttributes.specialEnergy)", "P1");
 		add("health.spark", "Vitals", "sparkFill", "Mage spark resource bar", "P1");
 		add("combo.points", "Combo", "comboPips", "Rogue combo point pips", "P1");
 		add("prayer.ready", "Prayer", "prayerPips", "Priest life/shield/smite ready flags", "P1");
@@ -91,11 +91,20 @@ class ResolutionCatalog {
 		add("chat.channel", "Chat", "channelLabel", "Incoming chat channel", "P2");
 		add("status.remain", "Aura", "statusRemain", "Status / BaseSkill remaining duration", "P2");
 		add("status.present", "Aura", "statusPresent", "Typed getStatusCount / list match for aura status.present", "P2");
+		add("status.stacks", "Aura", "statusStacks", "Typed getStatusCount / Status.stacks for aura status.stacks", "P2");
 		add("status.sample", "Aura", "statusSample", "AuraStatusCache sample / dirty-wake reconcile", "P2");
 		add("status.hook", "Aura", "statusHook", "Local Status lifecycle dirty-wake postfix", "P2");
 		add("skill.instantReady", "Aura", "instantReady", "SkillScript.shouldPlayInstantly / owner *_Proc status", "P2");
+		add("geaux.slot.charges", "Aura", "skillCharges", "Live getCurrentCharges for aura skill.charges", "P2");
+		add("geaux.slot.chargesMax", "Aura", "skillChargesMax", "Live getMaxCharges for aura skill.chargesMax", "P2");
+		add("target.live", "Aura", "targetPointer", "CombatLogCache current target pointer for aura target.*", "P2");
+		add("enemy.cast.skillId", "Aura", "enemyCastId", "EnemyCastCache skill id for event.cast.*", "P2");
+		add("enemy.cast.active", "Aura", "enemyCastActive", "EnemyCastCache active flag for event.cast.active", "P2");
+		add("enemy.cast.age", "Aura", "enemyCastAge", "EnemyCastCache age for event.cast.recent", "P2");
 		add("getrifty.inInstance", "GetRifty", "riftFlag", "Show instance remain vs portal schedule", "P2");
 		add("getrifty.remain", "GetRifty", "instanceRemain", "Instance time remaining text", "P2");
+		add("getrifty.targetBossId", "GetRifty", "targetBossId", "Rift boss ID string", "P2");
+		add("getrifty.inBossFight", "GetRifty", "inBossFight", "Rift boss encounter active flag", "P2");
 		add("identity.heroName", "Identity", "heroName", "Local hero display name / resource profiles", "P3");
 		add("identity.region", "Identity", "serverRegion", "Shard / region string when exposed", "P3");
 		add("identity.playerUid", "Identity", "playerUid", "st.Player.uid when exposed", "P3");

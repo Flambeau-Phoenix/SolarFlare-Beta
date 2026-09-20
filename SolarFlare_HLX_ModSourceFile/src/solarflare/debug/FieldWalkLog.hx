@@ -81,6 +81,7 @@ class FieldWalkLog {
 			var out = File.append(jsonlPath);
 			out.writeString(chunk);
 			out.close();
+			LogRotation.enforce(jsonlPath);
 		} catch (_:Dynamic) {}
 	}
 

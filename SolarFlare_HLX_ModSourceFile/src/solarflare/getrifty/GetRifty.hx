@@ -1,4 +1,4 @@
-﻿package solarflare.getrifty;
+package solarflare.getrifty;
 
 import solarflare.ui.GameIcons;
 import solarflare.ui.CursorCaptureFix;
@@ -35,6 +35,11 @@ class GetRiftyCache {
 	/** Layer 1: GameLayer.isRift / Activity.isRift — wall-clock still drives the countdown. */
 	public static var inInstance:Bool = false;
 	public static var instanceRemainText:String = "";
+	public static var targetBossId:String = "";
+	public static var inBossFight:Bool = false;
+	public static var remainingTime:Float = 0.0;
+	public static var inWaitPhase:Bool = false;
+	public static var nbPlayerDeaths:Int = 0;
 	/** Alert animation frame (observe). */
 	public static var animFrame:Int = 0;
 
@@ -75,18 +80,58 @@ class GetRiftyCache {
 		updateAlertCopy();
 	}
 
-	/** Poll rift instance flag from GameApp.layer — identity/metrics only, no widgets. */
+	/** Poll rift instance flag from GameApp / GameLayer — identity/metrics only, no widgets. */
 	public static function observeApp(app:Dynamic):Void {
 		inInstance = false;
 		instanceRemainText = "";
+		targetBossId = "";
+		inBossFight = false;
+		remainingTime = 0.0;
+		inWaitPhase = false;
+		nbPlayerDeaths = 0;
 		if (app == null)
 			return;
 		try {
-			var layer = FieldWalk.extractObject(app, "layer");
-			if (layer == null)
-				return;
-			var riftFlag = FieldWalk.extractBool(layer, "isRift", false);
-			var activity = FieldWalk.extractObject(layer, "mainActivity");
+			var gApp:GameApp = null;
+			try {
+				gApp = cast app;
+			} catch (_:Dynamic) {}
+
+			var layer:Dynamic = null;
+			if (gApp != null) {
+				try layer = gApp.layer catch (_:Dynamic) {}
+				if (layer == null && gApp.hero != null && gApp.hero.player != null) {
+					try layer = gApp.hero.player.layer catch (_:Dynamic) {}
+				}
+				if (layer == null && gApp.me != null) {
+					try layer = gApp.me.layer catch (_:Dynamic) {}
+				}
+			}
+			if (layer == null && HealthCache.localHero != null) {
+				try {
+					var h:ent.Hero = cast HealthCache.localHero;
+					if (h.player != null)
+						layer = h.player.layer;
+				} catch (_:Dynamic) {}
+			}
+			if (layer == null) {
+				layer = FieldWalk.extractObject(app, "layer");
+			}
+
+			var riftFlag = false;
+			var activity:Dynamic = null;
+			if (layer != null) {
+				try {
+					var gl:st.GameLayer = cast layer;
+					if (gl.isRift)
+						riftFlag = true;
+					activity = gl.mainActivity;
+				} catch (_:Dynamic) {
+					riftFlag = FieldWalk.extractBool(layer, "isRift", false);
+					activity = FieldWalk.extractObject(layer, "mainActivity");
+				}
+			}
+
 			if (!riftFlag && activity != null) {
 				try {
 					var a:st.Activity = cast activity;
@@ -94,16 +139,28 @@ class GetRiftyCache {
 						riftFlag = true;
 				} catch (_:Dynamic) {}
 			}
-			var cfg = FieldWalk.extractObject(layer, "config");
+
+			var cfg:Dynamic = null;
+			if (layer != null) {
+				cfg = FieldWalk.extractObject(layer, "config");
+			}
 			if (cfg == null) {
 				var inst = FieldWalk.extractPath(app, ["connectionInfo", "instanceInfo"]);
 				cfg = FieldWalk.extractObject(inst, "config");
 			}
-			var mapId = dynId(FieldWalk.extractObject(cfg, "mapId"));
-			var actId = dynId(FieldWalk.extractObject(cfg, "activityID"));
+
+			var mapId = FieldWalk.extractString(cfg, "mapId").toLowerCase();
+			var actId = FieldWalk.extractString(cfg, "activityID").toLowerCase();
+			if (mapId.length == 0)
+				mapId = dynId(FieldWalk.extractObject(cfg, "mapId"));
+			if (actId.length == 0)
+				actId = dynId(FieldWalk.extractObject(cfg, "activityID"));
+
 			if (!riftFlag && (looksLikeRiftPlace(mapId) || looksLikeRiftPlace(actId)))
 				riftFlag = true;
+
 			inInstance = riftFlag;
+
 			if (solarflare.debug.ResolutionLedger.armed()) {
 				var method = "typed";
 				var name = "isRift";
@@ -113,20 +170,54 @@ class GetRiftyCache {
 				}
 				solarflare.debug.ResolutionLedger.touch("getrifty.inInstance", method, "GetRiftyCache.observeApp", name, "bool", inInstance ? "true" : "false");
 			}
+
 			if (inInstance) {
-				// Typed encounter identity for the Aura evidence ledger.  This stays
-				// observation-only: no runtime discovery and no gameplay state changes.
-				try {
-					var rift:st.activity.Rift = cast activity;
-					var bossId:String = rift == null ? null : rift.targetBossId;
-					if (bossId != null && bossId.length > 0 && solarflare.debug.ResolutionLedger.armed())
+				var bossId:String = null;
+				var left:Float = -1;
+
+				if (activity != null) {
+					try {
+						var rift:st.activity.Rift = cast activity;
+						if (rift != null) {
+							bossId = rift.targetBossId;
+						}
+					} catch (_:Dynamic) {}
+
+					try {
+						var act:st.Activity = cast activity;
+						if (act != null && act.globalCtx != null) {
+							var riftCtx:st.activity.RiftContext = cast act.globalCtx;
+							if (riftCtx != null) {
+								try left = riftCtx.getRemainingTime() catch (_:Dynamic) {}
+								try inBossFight = riftCtx.inBossFight catch (_:Dynamic) {}
+								try inWaitPhase = riftCtx.isInWaitPhase() catch (_:Dynamic) {}
+								try nbPlayerDeaths = riftCtx.nbPlayerDeaths catch (_:Dynamic) {}
+							}
+						}
+					} catch (_:Dynamic) {}
+				}
+
+				if (bossId == null || bossId.length == 0) {
+					bossId = FieldWalk.extractString(activity, "targetBossId");
+				}
+				if (bossId != null && bossId.length > 0) {
+					targetBossId = bossId;
+					if (solarflare.debug.ResolutionLedger.armed())
 						solarflare.debug.ResolutionLedger.touch("getrifty.targetBossId", "typed", "st.activity.Rift", "targetBossId", "String", bossId);
-				} catch (_:Dynamic) {}
-				var left = FieldWalk.extractNumberAny(activity, ["remaining", "timeLeft", "durationLeft"], -1);
+				}
+
+				if (left < 0) {
+					left = FieldWalk.extractNumberAny(activity, ["remaining", "timeLeft", "durationLeft"], -1);
+				}
 				if (left > 0) {
+					remainingTime = left;
 					instanceRemainText = formatRemain(left);
 					if (solarflare.debug.ResolutionLedger.armed())
-						solarflare.debug.ResolutionLedger.touch("getrifty.remain", "fieldwalk", "GetRiftyCache.observeApp", "remaining", "number", Std.string(Math.round(left * 1000) / 1000));
+						solarflare.debug.ResolutionLedger.touch("getrifty.remain", "typed", "st.activity.RiftContext", "getRemainingTime", "number", Std.string(Math.round(left * 1000) / 1000));
+				}
+
+				if (solarflare.debug.ResolutionLedger.armed()) {
+					solarflare.debug.ResolutionLedger.touch("getrifty.inBossFight", "typed", "st.activity.RiftContext", "inBossFight", "bool", inBossFight ? "true" : "false");
 				}
 			}
 		} catch (_:Dynamic) {}
@@ -138,6 +229,9 @@ class GetRiftyCache {
 		try {
 			if (Std.isOfType(v, String))
 				return (cast v : String).toLowerCase();
+			var s = solarflare.ui.ByteUtil.coerceString(v);
+			if (s.length > 0)
+				return s.toLowerCase();
 		} catch (_:Dynamic) {}
 		return "";
 	}

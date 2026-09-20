@@ -109,7 +109,7 @@ class GeauxCache {
 	static var costsById:Map<String, Dynamic> = new Map();
 	static var costsKnown:Map<String, Bool> = new Map();
 	static var costSpecsById:Map<String, Array<{atb:String, amount:Float}>> = new Map();
-	static inline var LAYOUT_S:Float = 2.0; // rare fallback only; prefer dirty/hero/slot change
+	static inline var LAYOUT_RECOVERY_S:Float = 15.0; // missed-edge recovery only
 	static inline var TELEMETRY_IDLE_S:Float = 0.12; // ~8 Hz idle
 	static inline var TELEMETRY_HOT_S:Float = 0.05; // ~20 Hz while CD/drag/builder/dirty
 	static var layoutAt:Float = 0;
@@ -312,8 +312,12 @@ class GeauxCache {
 		}
 		var now = nowStamp();
 		// Layout only on dirty / identity / slot-count change; rare time fallback for missed dirty edges.
+		var recovery = layoutAt > 0 && now >= layoutAt + LAYOUT_RECOVERY_S;
 		if (layoutDirty || heroChanged || layoutCount != visibleCount || okey != layoutOverrideKey
-			|| (layoutAt > 0 && now >= layoutAt + LAYOUT_S)) {
+			|| recovery) {
+			if (recovery && !layoutDirty && !heroChanged && layoutCount == visibleCount
+					&& okey == layoutOverrideKey)
+				solarflare.runtime.RuntimeMetrics.layoutRecoveryPolls++;
 			layoutHero = heroDyn;
 			layoutCount = visibleCount;
 			layoutOverrideKey = okey;
@@ -2336,121 +2340,16 @@ class GeauxCache {
 			lastUseAt.set(id, now);
 	}
 
-	/** ENGINE_TELEMETRY_MAP: Skill.onTriggerCD — CD just started. */
-	public static function noteTriggerCd(skill:Dynamic):Void {
-		rememberSkill(skill);
+	/**
+	 * Constant-time cooldown hook ingress. Native callbacks do not expand aliases,
+	 * query cooldown getters, consult CDB, or walk equipment; the demanded sampler
+	 * reconciles the authoritative continuous values within its 50 ms ceiling.
+	 */
+	public static function noteCooldownEdge():Void {
 		equipDirty = true;
 		telemetryAt = 0;
 		telemetryDirty = true;
 		solarflare.ObserveDemand.markGeauxDirty();
-		var ids = skillIdAliases(skill);
-		if (ids.length == 0) {
-			ledgerEngineCd("noteTriggerCd", "st.skill.Skill.onTriggerCD", "", 0);
-			return;
-		}
-		var now = nowStamp();
-		var max = typedMaxCd(skill);
-		var left = typedLeftCd(skill, max);
-		if (Math.isNaN(left) || left < 0)
-			left = 0;
-		if (max <= 0.05) {
-			try
-				max = GeauxCdTable.resolveMax(getSkillId(skill), skillIdAliases(skill), skillRank(skill), max)
-			catch (_:Dynamic) {}
-		}
-		var dur = left > 0.05 ? left : (max > 0.05 ? max : 1);
-		var until = now + dur;
-		for (id in ids) {
-			cdUntil.set(id, until);
-			if (max > 0.05)
-				cdMaxById.set(id, max);
-			lastUseAt.set(id, now);
-			var script = classSignatureScriptId(id);
-			if (script.length > 0 && script != id) {
-				cdUntil.set(script, until);
-				if (max > 0.05)
-					cdMaxById.set(script, max);
-			}
-		}
-		ledgerEngineCd("noteTriggerCd", "st.skill.Skill.onTriggerCD", ids[0], dur);
-	}
-
-	/** ENGINE_TELEMETRY_MAP: Skill.reduceCooldown — CDR / early reset (Bonethrow). */
-	public static function noteReduceCd(skill:Dynamic, seconds:Float):Void {
-		rememberSkill(skill);
-		telemetryAt = 0;
-		telemetryDirty = true;
-		solarflare.ObserveDemand.markGeauxDirty();
-		var ids = skillIdAliases(skill);
-		if (ids.length == 0) {
-			ledgerEngineCd("noteReduceCd", "st.skill.Skill.reduceCooldown", "", 0);
-			return;
-		}
-		var now = nowStamp();
-		var max = typedMaxCd(skill);
-		var left = typedLeftCd(skill, max);
-		if (!Math.isNaN(left) && left >= 0) {
-			if (left <= 0.05) {
-				for (id in ids)
-					removeTracked(id);
-				ledgerEngineCd("noteReduceCd", "st.skill.Skill.reduceCooldown", ids[0], 0);
-				return;
-			}
-			var until = now + left;
-			for (id in ids) {
-				cdUntil.set(id, until);
-				if (max > 0.05)
-					cdMaxById.set(id, max);
-				// Prevent lastUse reconstruction from reinflating above reduced remaining.
-				clearLastUse(id);
-				var script = classSignatureScriptId(id);
-				if (script.length > 0 && script != id) {
-					cdUntil.set(script, until);
-					if (max > 0.05)
-						cdMaxById.set(script, max);
-					clearLastUse(script);
-				}
-			}
-			ledgerEngineCd("noteReduceCd", "st.skill.Skill.reduceCooldown", ids[0], left);
-			return;
-		}
-		if (Math.isNaN(seconds) || seconds == 0)
-			return;
-		var trackedLeft = Math.NaN;
-		for (id in ids) {
-			var untilKey = trackedUntil(id);
-			if (Math.isNaN(untilKey))
-				continue;
-			var until = untilKey - seconds;
-			if (until <= now + 0.05)
-				removeTracked(id);
-			else {
-				cdUntil.set(id, until);
-				clearLastUse(id);
-				var script = classSignatureScriptId(id);
-				if (script.length > 0) {
-					cdUntil.set(script, until);
-					clearLastUse(script);
-				}
-				if (Math.isNaN(trackedLeft))
-					trackedLeft = until - now;
-			}
-		}
-		ledgerEngineCd("noteReduceCd", "st.skill.Skill.reduceCooldown", ids[0],
-			Math.isNaN(trackedLeft) ? 0 : trackedLeft);
-	}
-
-	/** ENGINE_TELEMETRY_MAP: Skill.resetCooldown. */
-	public static function noteResetCd(skill:Dynamic):Void {
-		rememberSkill(skill);
-		telemetryAt = 0;
-		telemetryDirty = true;
-		solarflare.ObserveDemand.markGeauxDirty();
-		var ids = skillIdAliases(skill);
-		for (id in ids)
-			removeTracked(id);
-		var shown = ids.length > 0 ? ids[0] : "";
-		ledgerEngineCd("noteResetCd", "st.skill.Skill.resetCooldown", shown, 0);
 	}
 
 	/**
@@ -3414,17 +3313,6 @@ class GeauxCache {
 				return true;
 		}
 		return false;
-	}
-
-	/** Fires even when applyTrackedToSnap skips overlay (live getter already has left). */
-	static function ledgerEngineCd(src:String, hook:String, id:String, left:Float):Void {
-		if (!solarflare.debug.ResolutionLedger.armed())
-			return;
-		var L = solarflare.debug.ResolutionLedger;
-		L.touch("geaux.slot.cdLeft", "engine", "GeauxCache." + src, "cdUntil", "number",
-			Std.string(Math.round(left * 1000) / 1000), "", hook);
-		if (id != null && id.length > 0)
-			L.touch("geaux.slot.id", "engine", "GeauxCache." + src, "id", "string", L.clip(id, 48), "", hook);
 	}
 
 	/** Four bound ledger rows per emit site — this is the highest-rate caller in the mod. */

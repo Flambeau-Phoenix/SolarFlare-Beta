@@ -10,6 +10,5 @@
 -lib json2object
 -D hl-ver=1.17.0
 -dce full
--debug
 -main solarflare.ModEntry
 -hl solarflare.hl

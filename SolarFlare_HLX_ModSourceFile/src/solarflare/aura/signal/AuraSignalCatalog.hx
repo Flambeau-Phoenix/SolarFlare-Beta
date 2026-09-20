@@ -35,7 +35,8 @@ class AuraSignalCatalog {
 		// skill.specialReady (shouldHighlightSkill) kept in reader for legacy saves; not offered in picker.
 		add("skill.instantReady", "Instant cast ready (skill script)", "Instant cast", Boolean, "skill");
 		add("status.present", "Buff/debuff on me", "Statuses", Boolean, "status");
-		add("status.stacks", "Stacks on me", "Statuses", Count, "status");
+		// Parallel to present — not "Stacks on me" (that collided with aura names / home buttons).
+		add("status.stacks", "Buff/debuff stacks", "Statuses", Count, "status");
 		add("status.durationLeft", "Duration left on me", "Statuses", Duration, "status");
 		add("status.durationProgress", "Duration progress on me", "Statuses", Percent, "status");
 		add("status.count", "Status container count", "Statuses", Count);
@@ -55,6 +56,8 @@ class AuraSignalCatalog {
 		add("attackCombo.withinChain", "Within attack combo", "Class mechanics", Boolean);
 		add("attackCombo.finalFlash", "Attack combo final flash", "Class mechanics", Boolean);
 		add("encounter.inRift", "In rift", "Encounter", Boolean);
+		add("encounter.inBossFight", "In rift boss fight", "Encounter", Boolean);
+		add("encounter.riftRemain", "Rift time remaining", "Encounter", Duration);
 		add("target.valid", "Has current target", "Target", Boolean);
 		add("target.kindMatches", "Target kind matches", "Target", Boolean, "unit");
 		add("target.isBoss", "Target is boss", "Target", Boolean);

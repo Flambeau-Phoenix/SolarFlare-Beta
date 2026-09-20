@@ -48,6 +48,8 @@ class ResolutionLedger {
 	}
 
 	public static function startRecording():Void {
+		ensure();
+		LogRotation.enforce(jsonlPath);
 		recording.set(true);
 		FieldWalkLog.clearSession();
 		lastLabel = "resolution-ledger recording";
@@ -59,6 +61,7 @@ class ResolutionLedger {
 		recording.set(false);
 		flush();
 		writeSnapshot();
+		ResolutionCoverage.writeReport();
 		lastLabel = "resolution-ledger stopped";
 	}
 
@@ -226,7 +229,7 @@ class ResolutionLedger {
 				agg.step = st;
 			if (hk.length > 0)
 				agg.hook = hk;
-			agg.t = stamp();
+		agg.t = stamp();
 			dirty = true;
 			return;
 		}
@@ -394,7 +397,8 @@ class ResolutionLedger {
 			kind: agg.kind,
 			preview: safeStr(agg.preview),
 			src: safeStr(agg.src),
-			t: Math.round(agg.t * 100) / 100,
+			// Math.round returns Int on HL and overflowed long monotonic uptimes.
+			t: Math.floor(agg.t * 100.0 + 0.5) / 100.0,
 			hits: hitCount
 		});
 	}
@@ -456,6 +460,7 @@ class ResolutionLedger {
 			var out = File.append(jsonlPath);
 			out.writeString(chunk);
 			out.close();
+			LogRotation.enforce(jsonlPath);
 			lastFlush = stamp();
 			dirty = false;
 		} catch (_:Dynamic) {}

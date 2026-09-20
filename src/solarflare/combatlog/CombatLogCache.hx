@@ -13,6 +13,7 @@ import solarflare.ui.GameIcons;
  * Also freezes the local hero's current target into TargetSnap each tick.
  */
 class CombatLogCache {
+	public static inline var HOOK_EVENT_LINE:Int = 1;
 	public static inline var KIND_CAST:Int = 0;
 	public static inline var KIND_HIT:Int = 1;
 
@@ -90,21 +91,44 @@ class CombatLogCache {
 			return;
 		}
 		try {
-			var hero:ent.Hero = cast localHero;
-			var t = hero.getTarget();
+			var unit:ent.Unit = cast localHero;
+			var t = unit.getTarget();
 			if (t != null)
 				currentTarget = t;
 		} catch (_:Dynamic) {}
+		if (currentTarget == null) {
+			try {
+				var hero:ent.Hero = cast localHero;
+				var t = hero.getTarget();
+				if (t != null)
+					currentTarget = t;
+			} catch (_:Dynamic) {}
+		}
 		if (currentTarget == null) {
 			try {
 				var unit:ent.Unit = cast localHero;
 				currentTarget = unit.get_targetUnit();
 			} catch (_:Dynamic) {}
 		}
+		if (currentTarget == null) {
+			var rawTarget = extractObject(localHero, "target");
+			if (rawTarget != null) {
+				try {
+					var res = FieldWalk.extractObject(rawTarget, "resolveProxy");
+					if (res != null)
+						currentTarget = (rawTarget : Dynamic).resolveProxy();
+				} catch (_:Dynamic) {}
+				if (currentTarget == null)
+					currentTarget = rawTarget;
+			}
+		}
 		if (currentTarget == null)
 			currentTarget = extractObject(localHero, "targetUnit");
-		if (solarflare.debug.ResolutionLedger.armed() && currentTarget != null)
-			solarflare.debug.ResolutionLedger.touch("combat.target", "typed", "CombatLogCache.tick", "getTarget", "string", "obj");
+
+		if (solarflare.debug.ResolutionLedger.armed()) {
+			var tName = currentTarget != null ? unitName(currentTarget) : "none";
+			solarflare.debug.ResolutionLedger.touch("target.live", currentTarget != null ? "found" : "none", "CombatLogCache.tick", tName, "string", currentTarget != null ? "hasTarget" : "noTarget");
+		}
 
 		// Combat-log-only: keep pointer for involvesCurrentTarget; skip HUD snap unless auras need target.
 		if (!solarflare.ObserveDemand.targetHud && !solarflare.ObserveDemand.aurasNeedTarget
@@ -469,6 +493,22 @@ class CombatLogCache {
 	}
 
 	static function commit(line:CombatLogLine):Void {
+		if (line == null)
+			return;
+		solarflare.runtime.HookIngress.frozenEvent(HOOK_EVENT_LINE, line);
+	}
+
+	/** Scheduler-side commit. Payload is already a frozen primitive/string DTO. */
+	public static function consumeHookEvent(event:solarflare.runtime.HookEvent):Void {
+		if (event == null || event.kind != HOOK_EVENT_LINE || event.payload == null)
+			return;
+		try {
+			var line:CombatLogLine = cast event.payload;
+			commitNow(line);
+		} catch (_:Dynamic) {}
+	}
+
+	static function commitNow(line:CombatLogLine):Void {
 		line.sequence = ++latestSequence;
 		if (lines.length < CAP) {
 			lines.push(line);

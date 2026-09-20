@@ -73,6 +73,7 @@ class PayloadProbe {
 		ensure();
 	}
 
+	#if solarflare_telemetry
 	@:hlx.postfix(ui.hud.ChatBox.receiveMessage)
 	static function onChatBoxReceive(
 		self:ui.hud.ChatBox,
@@ -91,12 +92,15 @@ class PayloadProbe {
 			captureChat(a0)
 		catch (_:Dynamic) {}
 	}
+	#end
 
 	public static function armed():Bool {
 		return recording != null && recording.get();
 	}
 
 	public static function startRecording():Void {
+		ensure();
+		LogRotation.enforce(jsonlPath);
 		recording.set(true);
 		FieldWalkLog.clearSession();
 		lastLabel = "payload-probe recording";
@@ -487,7 +491,7 @@ class PayloadProbe {
 			v: 1,
 			src: snap.src,
 			pack: snap.pack,
-			t: Math.round(snap.t * 100) / 100,
+			t: Math.floor(snap.t * 100.0 + 0.5) / 100.0,
 			rows: rows
 		});
 	}
@@ -501,6 +505,7 @@ class PayloadProbe {
 			var out = File.append(jsonlPath);
 			out.writeString(chunk);
 			out.close();
+			LogRotation.enforce(jsonlPath);
 			lastFlush = stamp();
 		} catch (_:Dynamic) {}
 	}

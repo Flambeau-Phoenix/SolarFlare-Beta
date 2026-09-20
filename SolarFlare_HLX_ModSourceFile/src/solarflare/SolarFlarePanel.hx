@@ -103,31 +103,11 @@ class SolarFlarePanel {
 		CursorCaptureFix.ensureHardwareCursor();
 	}
 
-	var lastFastPollSec:Float = 0.0;
-	var lastHeavyPollSec:Float = 0.0;
-	var lastSlowPollSec:Float = 0.0;
-
 	var prevCursorFree:Bool = true;
-
-	var lastAssetPollSec:Float = -1;
-	var brandingRequested:Bool = false;
 
 	/** UI assets also load at the title screen, before GameApp exists. */
 	public function observeAssets():Void {
-		var now = nowSec();
-		if (now - lastAssetPollSec < 0.100)
-			return;
-		lastAssetPollSec = now;
-		if (!brandingRequested) {
-			brandingRequested = true;
-			GameIcons.get(GameIcons.CHROME_SUN);
-			GameIcons.get(GameIcons.RIFT_SUN);
-			GameIcons.get(GameIcons.HUB_LOGO);
-		}
-		if (GameIcons.hasPending())
-			GameIcons.tickPreload();
-		if (AttackComboArt.hasPending())
-			AttackComboArt.tickPreload();
+		solarflare.runtime.TelemetryKernel.observeAssets();
 	}
 
 	/** Layer 1: cursor + caches. Reactionary polling driven by state change & visibility. */
@@ -161,117 +141,7 @@ class SolarFlarePanel {
 			solarflare.ui.UiActionQueue.drain()
 		catch (_:Dynamic) {}
 
-		var now = nowSec();
-		ObserveDemand.publish(config);
-
-		// Hotkey codes come off the live engine module, so they are resolved here in
-		// observe rather than from the settings draw. First call does the work.
-		try
-			solarflare.ui.HideAllBind.ensureCodes()
-		catch (_:Dynamic) {}
-
-		// Fast cadence (~30 Hz): HP/resources; overlay reconcile is demand+dirty gated inside.
-		if (now - lastFastPollSec >= 0.033) {
-			lastFastPollSec = now;
-			// Identity must be acquired even when all resource bars are hidden.
-			// A rejected Player.update trampoline must not suppress every runtime HUD.
-			try
-				HealthHooks.observeLocalPlayer(app)
-			catch (_:Dynamic) {}
-			try {
-				if (ObserveDemand.resourceBars || ObserveDemand.auras || ObserveDemand.auraBuilderOpen || ObserveDemand.prayers
-					|| ObserveDemand.comboPoints || ObserveDemand.chaincast || ObserveDemand.conduit)
-					HealthHooks.observeLocal();
-			} catch (_:Dynamic) {}
-		try
-			HealthHooks.reconcileOverlays()
-		catch (_:Dynamic) {}
-		try {
-			if (ObserveDemand.dueAttackCombo(now, AttackComboCache.withinCombo || AttackComboCache.flashFinal))
-				AttackComboCache.observe();
-		} catch (_:Dynamic) {}
-		}
-
-
-
-		// Heavy cadence (~25 Hz outer) — feature visibility + inner adaptive rates:
-		if (now - lastHeavyPollSec >= 0.040) {
-			lastHeavyPollSec = now;
-
-			try {
-				// Warm liveById when script-ready Auras or Aura builder need Geaux.
-				if (ObserveDemand.geaux || ObserveDemand.geauxBuilder || ObserveDemand.auras || ObserveDemand.aurasNeedInstant
-					|| ObserveDemand.aurasNeedSpecial || ObserveDemand.auraBuilderOpen) {
-					config.geaux.ensureSlots();
-					GeauxCache.sample(HealthCache.localHero, config.geaux.visibleCount(), config.geaux.slotIds);
-				}
-			} catch (_:Dynamic) {}
-
-			try {
-				if (ObserveDemand.targetHud || ObserveDemand.combatLog || ObserveDemand.aurasNeedTarget
-					|| ObserveDemand.auraBuilderOpen)
-					CombatLogCache.tick(HealthCache.localHero);
-			} catch (_:Dynamic) {}
-
-			try {
-				if (ObserveDemand.auras || ObserveDemand.auraBuilderOpen)
-					solarflare.aura.AuraEngine.tick(config.auras);
-			} catch (_:Dynamic) {}
-
-			try {
-				if (config.lightsaber != null && !config.lightsaber.hidden.get()) {
-					LightsaberCache.enabled = true;
-					LightsaberCache.ingestForConfig(config.lightsaber);
-					LightsaberCache.tick(now);
-					if (config.lightsaber.showLog.get())
-						SaberJsonlArchive.tick();
-				}
-			} catch (_:Dynamic) {}
-
-		}
-
-		// Background cadence (10 Hz outer) — GetRifty further gated inside ObserveDemand:
-		if (now - lastSlowPollSec >= 0.100) {
-			lastSlowPollSec = now;
-
-			try
-				restoreNativeChat()
-			catch (_:Dynamic) {}
-			try {
-				if (ObserveDemand.combatLog)
-					solarflare.combatlog.CombatLogRecorder.tick();
-			} catch (_:Dynamic) {}
-			try {
-				if (ObserveDemand.riftFlag) {
-					var inRift = false;
-					try
-						inRift = GetRiftyCache.inInstance
-					catch (_:Dynamic) {}
-					if (ObserveDemand.dueGetRifty(now, inRift)) {
-						GetRiftyCache.observeApp(app);
-						if (ObserveDemand.getRifty)
-							GetRiftyCache.tick();
-					}
-				}
-			} catch (_:Dynamic) {}
-			try
-				solarflare.ui.SettingsStore.tick(config)
-			catch (_:Dynamic) {}
-			try {
-				if (PayloadProbe.armed()) {
-					PayloadProbe.sampleApp(app);
-					PayloadProbe.tick();
-				}
-			} catch (_:Dynamic) {}
-			try {
-				if (ResolutionLedger.armed())
-					ResolutionLedger.tick();
-			} catch (_:Dynamic) {}
-			try {
-				if (solarflare.debug.FieldWalkLog.armed())
-					solarflare.debug.FieldWalkLog.tick();
-			} catch (_:Dynamic) {}
-		}
+		solarflare.runtime.TelemetryKernel.observe(app, config, restoreNativeChat);
 	}
 
 	/** Layer 2: ImGui presentation from caches only. */
@@ -297,9 +167,6 @@ class SolarFlarePanel {
 
 		// Only draw in-game HUD elements when the hero/world is active:
 		if (!HealthCache.valid && HealthCache.localHero == null) {
-			try {
-				solarflare.ui.SettingsStore.tick(config);
-			} catch (_:Dynamic) {}
 			return;
 		}
 
@@ -383,22 +250,12 @@ class SolarFlarePanel {
 		try {
 			solarflare.ui.ToastManager.draw();
 		} catch (_:Dynamic) {}
-		try {
-			solarflare.ui.SettingsStore.tick(config);
-		} catch (_:Dynamic) {}
 	}
 
 	/** Flush pending layout/toggles when GameApp is gone (logout / shutdown). */
 	public function flushPendingSettings():Void {
 		if (solarflare.ui.SettingsStore.isDirty())
 			solarflare.ui.SettingsStore.save(config);
-	}
-
-	static function nowSec():Float {
-		try
-			return haxe.Timer.stamp()
-		catch (_:Dynamic)
-			return Date.now().getTime() / 1000.0;
 	}
 
 	/** Typed GameLib `ui.Hud.chat` — not FieldWalk. FieldWalk stays on the probe/ledger path. */

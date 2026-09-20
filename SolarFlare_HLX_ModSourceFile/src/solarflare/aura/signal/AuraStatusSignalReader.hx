@@ -24,13 +24,15 @@ class AuraStatusSignalReader {
 		out.present = present;
 		if (signal == "status.present") {
 			out.boolValue = present; out.known = true; out.code = OK;
+			out.intValue = present && s != null ? s.stacks : 0;
 			attachDurationMeta(present, s, out);
 			return;
 		}
 		if (signal == "status.stacks") {
 			out.intValue = present ? s.stacks : 0;
 			attachDurationMeta(present, s, out);
-			out.numberValue = out.intValue; out.known = true; out.code = OK; return;
+			out.numberValue = out.intValue; out.known = true; out.code = OK;
+			return;
 		}
 		if (!present) { out.code = MISSING_SUBJECT; return; }
 		if (!s.durationKnown) { out.code = UNKNOWN_DOMAIN; return; }
@@ -47,7 +49,9 @@ class AuraStatusSignalReader {
 
 	/** Present/stacks stay boolean/count; attach live SkillRemain so countdown/fuse can follow. */
 	static inline function attachDurationMeta(present:Bool, s:StatusSignalSnap, out:AuraResolvedValue):Void {
-		if (!present || s == null || !s.durationKnown) return;
+		if (!present || s == null) return;
+		if (s.stacks > 0) out.intValue = s.stacks;
+		if (!s.durationKnown) return;
 		if (s.infinite) {
 			out.timeLeft = solarflare.SkillRemain.INFINITE_LEFT;
 			out.progress = 1;

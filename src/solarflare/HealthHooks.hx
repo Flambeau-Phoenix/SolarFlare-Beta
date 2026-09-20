@@ -16,7 +16,7 @@ class HpBinds {
 
 /**
  * Ring-1 postfix + Layer 1 resource poll. ImGui draws from HealthCache only.
- * Present: HP / shield / rage / mana / spark. Player.update: those plus overlay subsystems.
+	 * Present sampling owns identity, vitals, status-derived class state, and cooldown state.
  */
 class HealthHooks {
 	/** Keep this class reachable under `-dce full` so the postfixes are retained. */
@@ -38,7 +38,7 @@ class HealthHooks {
 		sampleResources(heroDyn, "HealthHooks.observeLocal", "", "localHero");
 	}
 
-	/** Bootstrap without st.Player.update: HLX may refuse that native patch. */
+	/** Present-loop identity authority; no per-frame player trampoline is installed. */
 	public static function observeLocalPlayer(app:GameApp):Void {
 		var heroDyn:Dynamic = app == null ? null : app.hero;
 		if (heroDyn == null) {
@@ -61,8 +61,7 @@ class HealthHooks {
 	 * Recovery from a stale pin is owned by releaseStaleLocalHero / observeLocalPlayer,
 	 * not by this hook, so skipping the ladder here cannot strand identity.
 	 */
-	@:hlx.postfix(st.Player.update)
-	static function onPlayerUpdate(self:Dynamic, dt:Float, result:Void):Void {
+	static function onPlayerUpdate(self:Dynamic, dt:Float):Void {
 		var heroDyn = FieldWalk.extractObject(self, "hero");
 		if (heroDyn == null) {
 			// Local player with cleared hero (zone unload) — drop GC pin.
@@ -334,20 +333,15 @@ class HealthHooks {
 		}
 	}
 
-	@:hlx.postfix(ent.Hero.onSkillUse)
-	static function onHeroSkillUse(self:Dynamic, skill:Dynamic, result:Void):Void {
+	static function onHeroSkillUse(self:Dynamic, skill:Dynamic):Void {
 		if (!HealthCache.isLocalHero(self))
 			return;
-		solarflare.geaux.GeauxCache.noteUse(self, skill);
-		if (ComboPointsCache.isFinisherSkill(skill) || ComboPointsCache.isRogueSkillId(skillIdOf(skill)))
-			ComboPointsCache.noteRogue();
 		if (!ensureLocalPriest(self))
 			return;
 		PrayerCache.applySkill(skill);
 	}
 
-	@:hlx.postfix(script.SkillScript.chargePrayer)
-	static function onScriptChargePrayer(self:Dynamic, result:Void):Void {
+	static function onScriptChargePrayer(self:Dynamic):Void {
 		try {
 			var script:script.SkillScript = self;
 			var hero = script.get_ownerHero();
@@ -376,23 +370,20 @@ class HealthHooks {
 		}
 	}
 
-	@:hlx.postfix(script._SkillScript.DynSkillScript.onPrayerTrigger)
-	static function onPrayerTrigger(self:Dynamic, skill:Dynamic, result:Void):Void {
+	static function onPrayerTrigger(self:Dynamic, skill:Dynamic):Void {
 		// Live dispatcher (proto 82 / findex 45208). Base script.SkillScript.onPrayerTrigger is empty Ret.
 		if (!scriptOwnerIsLocalPriest(self))
 			return;
 		PrayerCache.spendAll();
 	}
 
-	@:hlx.postfix(script.skills.Priest_Sig_DivineIntervention.onSkillProc)
-	static function onJudgmentProc(self:Dynamic, ctx:Dynamic, result:Void):Void {
+	static function onJudgmentProc(self:Dynamic, ctx:Dynamic):Void {
 		if (!scriptOwnerIsLocalPriest(self))
 			return;
 		PrayerCache.spendAll();
 	}
 
-	@:hlx.postfix(script.skills.Priest_Sig_DivineIntervention.onStep)
-	static function onJudgmentStep(self:Dynamic, step:Dynamic, result:Void):Void {
+	static function onJudgmentStep(self:Dynamic, step:Dynamic):Void {
 		if (!scriptOwnerIsLocalPriest(self))
 			return;
 		PrayerCache.spendAll();
@@ -410,8 +401,7 @@ class HealthHooks {
 		}
 	}
 
-	@:hlx.postfix(ent.hero.PriestComponent.chargePrayer)
-	static function onChargePrayer(self:Dynamic, prayerId:String, result:Void):Void {
+	static function onChargePrayer(self:Dynamic, prayerId:String):Void {
 		try {
 			var hero = FieldWalk.extractObject(self, "hero");
 			if (hero != null && !HealthCache.isLocalHero(hero))
@@ -457,14 +447,17 @@ class HealthHooks {
 			HealthCache.clearMana();
 			return;
 		}
-		var m = FieldWalk.extractNumberAny(attr, ["mana", "mp"], -1);
+		// v6 exposes no `mana` field on ent.UnitAttributes; the generic class resource is
+		// `specialEnergy` (cdb attribute `SpecialEnergyRegen`). Legacy mana names stay as a
+		// last-ditch fallback so this still resolves if a build renames the field.
+		var m = FieldWalk.extractNumberAny(attr, ["specialEnergy", "mana", "mp"], -1);
 		if (m < 0) {
 			HealthCache.clearMana();
 			return;
 		}
-		var mx = FieldWalk.extractNumberAny(attr, ["maxMana", "manaMax"], 100);
+		var mx = FieldWalk.extractNumberAny(attr, ["specialEnergyMax", "maxSpecialEnergy", "maxMana", "manaMax"], 100);
 		HealthCache.setMana(m, mx > 0 ? mx : 100);
-		ledgerNum("health.mana", "fieldwalk", "HealthHooks.sampleMana", "mana", m, "ent.HeroAttributes", "hero.attr");
+		ledgerNum("health.specialEnergy", "fieldwalk", "HealthHooks.sampleMana", "specialEnergy", m, "ent.UnitAttributes", "hero.attr");
 	}
 
 	static function sampleSpark(heroDyn:Dynamic):Void {
@@ -649,7 +642,6 @@ class HealthHooks {
 		return "";
 	}
 
-	@:hlx.postfix(ent.HeroAttributes.set_comboPoint)
 	static function onSetComboPoint(self:Dynamic, value:Float, result:Float):Float {
 		try {
 			var ha:ent.HeroAttributes = self;
@@ -662,15 +654,13 @@ class HealthHooks {
 		return result;
 	}
 
-	@:hlx.postfix(script.skills.Rogue_Sig_Finisher.onStart)
-	static function onFinisherStart(self:Dynamic, ctx:Dynamic, result:Void):Void {
+	static function onFinisherStart(self:Dynamic, ctx:Dynamic):Void {
 		if (!scriptOwnerIsLocal(self))
 			return;
 		ComboPointsCache.noteRogue();
 	}
 
-	@:hlx.postfix(script.skills.Rogue_ComboPoints.tryGetComboPoint)
-	static function onTryGetComboPoint(self:Dynamic, a0:Dynamic, a1:String, a2:Bool, result:Void):Void {
+	static function onTryGetComboPoint(self:Dynamic, a0:Dynamic, a1:String, a2:Bool):Void {
 		if (!scriptOwnerIsLocal(self))
 			return;
 		ComboPointsCache.noteRogue();
@@ -687,7 +677,6 @@ class HealthHooks {
 	}
 
 	/** Native: ent.Unit.set_health(a0:Float):Float — HP is not a Unit field; mutations go through this setter. */
-	@:hlx.postfix(ent.Unit.set_health)
 	static function onSetHealth(self:Dynamic, value:Float, result:Float):Float {
 		if (HealthCache.isLocalHero(self)) {
 			HealthCache.setCurrent(result);
@@ -712,26 +701,15 @@ class HealthHooks {
 	 * Leaf receive path (condensed: ent.Hero.onReceiveDamage). Incoming hits update local vitals.
 	 * Native: (self, a0:st.skill.DamageResult):Void
 	 */
-	@:hlx.prefix(ent.Hero.onReceiveDamage)
 	static function beforeHeroReceiveDamage(self:Dynamic, dmgObj:Dynamic):hlx.runtime.HlxPrefixControl {
-		try
-			solarflare.combatlog.CombatLogHooks.beginDamage(dmgObj)
-		catch (_:Dynamic) {}
 		return hlx.runtime.HlxPrefixControl.Continue;
 	}
 
-	@:hlx.postfix(ent.Hero.onReceiveDamage)
-	static function onHeroReceiveDamage(self:Dynamic, dmgObj:Dynamic, result:Void):Void {
-		solarflare.combatlog.CombatLogHooks.endDamage(self, dmgObj, "ent.Hero.onReceiveDamage");
-		if (!HealthCache.isLocalHero(self))
-			return;
-		try {
-			var hero:ent.Hero = cast self;
-			HealthCache.set(hero.get_health(), hero.get_maxHealth());
-		} catch (_:Dynamic) {}
+	static function onHeroReceiveDamage(self:Dynamic, dmgObj:Dynamic):Void {
+		if (HealthCache.isLocalHero(self))
+			solarflare.combatlog.CombatLogCache.noteHit(self, dmgObj, "ent.Hero.onReceiveDamage");
 	}
 
-	@:hlx.postfix(ent.HeroAttributes.set_rage)
 	static function onSetRage(self:Dynamic, value:Float, result:Float):Float {
 		try {
 			var ha:ent.HeroAttributes = self;
@@ -755,7 +733,6 @@ class HealthHooks {
 		return result;
 	}
 
-	@:hlx.postfix(ent.HeroAttributes.set_spark)
 	static function onSetSpark(self:Dynamic, value:Float, result:Float):Float {
 		try {
 			var ha:ent.HeroAttributes = self;
@@ -788,16 +765,9 @@ class HealthHooks {
 	 * Postfix N+1: (self, damageResult, result:Void)
 	 * CheatSheet Phase 0 DPS path — `self` is attacker (hero or owned summon).
 	 */
-	@:hlx.postfix(ent.Unit.onInflictDamage)
-	static function onInflictDamage(self:Dynamic, dmgObj:Dynamic, result:Void):Void {
+	static function onInflictDamage(self:Dynamic, dmgObj:Dynamic):Void {
 		if (self == null || dmgObj == null)
 			return;
-		if (HealthCache.isLocalHero(self)) {
-			try {
-				var hero:ent.Hero = cast self;
-				HealthCache.set(hero.get_health(), hero.get_maxHealth());
-			} catch (_:Dynamic) {}
-		}
 		// Credit bee/imp/… via summonOwner; Lightsaber ingests ROLE_YOU combat-log lines.
 		try
 			solarflare.combatlog.CombatLogCache.noteInflict(self, dmgObj)
@@ -940,8 +910,8 @@ class HealthHooks {
 		return null;
 	}
 
-	@:hlx.postfix(st.skill.Status.set_stacks)
-	static function onStatusSetStacks(self:Dynamic, value:Int, result:Int):Int {
+	/** Fan-out called by the sole Status.set_stacks trampoline in StatusObserveHooks. */
+	public static function handleMageStatusStacks(self:Dynamic, result:Int):Void {
 		if (isLocalChaincastStatus(self)) {
 			ChaincastCache.noteMage();
 			var kind = "";
@@ -962,13 +932,11 @@ class HealthHooks {
 			}
 		} else if (isLocalConduitStatus(self)) {
 			ConduitCache.noteMage();
-			sampleConduit(HealthCache.localHero);
+			ObserveDemand.markOverlayDirty();
 		}
-		return result;
 	}
 
-	@:hlx.postfix(ent.hero.MageComponent.propagateMageChainCast)
-	static function onPropagateChainCast(self:Dynamic, ctx:Dynamic, result:Void):Void {
+	static function onPropagateChainCast(self:Dynamic, ctx:Dynamic):Void {
 		try {
 			var mage:ent.hero.MageComponent = self;
 			var hero = FieldWalk.extractObject(mage, "hero");
@@ -976,35 +944,23 @@ class HealthHooks {
 				hero = FieldWalk.extractObject(self, "hero");
 			if (hero != null && HealthCache.isLocalHero(hero)) {
 				ChaincastCache.noteMage();
-				sampleChaincast(hero);
+				ObserveDemand.markOverlayDirty();
 			}
 		} catch (_:Dynamic) {}
 	}
 
-	@:hlx.postfix(script.skills.Mage_Talent_Chaincast.onMageChainCast)
-	static function onTalentChainCast(self:Dynamic, ctx:Dynamic, result:Void):Void {
+	static function onTalentChainCast(self:Dynamic, ctx:Dynamic):Void {
 		if (!scriptOwnerIsLocal(self))
 			return;
 		ChaincastCache.noteMage();
-		try {
-			var script:script.SkillScript = self;
-			var hero = script.get_ownerHero();
-			if (hero != null)
-				sampleChaincast(hero);
-		} catch (_:Dynamic) {}
+		ObserveDemand.markOverlayDirty();
 	}
 
-	@:hlx.postfix(script.skills.Mage_Talent_Chaincast.onSkillProc)
-	static function onTalentChaincastProc(self:Dynamic, ctx:Dynamic, result:Void):Void {
+	static function onTalentChaincastProc(self:Dynamic, ctx:Dynamic):Void {
 		if (!scriptOwnerIsLocal(self))
 			return;
 		ChaincastCache.noteMage();
-		try {
-			var script:script.SkillScript = self;
-			var hero = script.get_ownerHero();
-			if (hero != null)
-				sampleChaincast(hero);
-		} catch (_:Dynamic) {}
+		ObserveDemand.markOverlayDirty();
 	}
 
 	static function isLocalChaincastStatus(statusDyn:Dynamic):Bool {
@@ -1299,64 +1255,86 @@ class HealthHooks {
 		return null;
 	}
 
-	@:hlx.postfix(ent.hero.MageComponent.set_conduits)
 	static function onSetConduits(self:Dynamic, value:Dynamic, result:Dynamic):Dynamic {
 		var hero = mageHeroFromComponent(self);
 		if (hero != null) {
 			ConduitCache.noteMage();
-			sampleConduit(hero);
+			ObserveDemand.markOverlayDirty();
 		}
 		return result;
 	}
 
-	@:hlx.postfix(ent.hero.MageComponent.syncConduit)
-	static function onSyncConduit(self:Dynamic, result:Void):Void {
+	static function onSyncConduit(self:Dynamic):Void {
 		var hero = mageHeroFromComponent(self);
 		if (hero != null) {
 			ConduitCache.noteMage();
-			sampleConduit(hero);
+			ObserveDemand.markOverlayDirty();
 		}
 	}
 
-	@:hlx.postfix(script.skills.Mage_Conduit_Power.onStartConduit)
-	static function onPowerConduitStart(self:Dynamic, result:Void):Void {
+	static function onPowerConduitStart(self:Dynamic):Void {
 		if (!scriptOwnerIsLocal(self))
 			return;
 		ConduitCache.noteMage();
-		sampleConduit(HealthCache.localHero);
+		ObserveDemand.markOverlayDirty();
 	}
 
-	@:hlx.postfix(script.skills.Mage_Conduit_Projectile.onStartConduit)
-	static function onProjectileConduitStart(self:Dynamic, result:Void):Void {
+	static function onProjectileConduitStart(self:Dynamic):Void {
 		if (!scriptOwnerIsLocal(self))
 			return;
 		ConduitCache.noteMage();
-		sampleConduit(HealthCache.localHero);
+		ObserveDemand.markOverlayDirty();
 	}
 
-	@:hlx.postfix(script.skills.Mage_Talent_ConduitSparkExplosion_Conduit.onStartConduit)
-	static function onSparkConduitStart(self:Dynamic, result:Void):Void {
+	static function onSparkConduitStart(self:Dynamic):Void {
 		if (!scriptOwnerIsLocal(self))
 			return;
 		ConduitCache.noteMage();
-		sampleConduit(HealthCache.localHero);
+		ObserveDemand.markOverlayDirty();
 	}
 
-	@:hlx.postfix(script.skills.Mage_Talent_ConduitLifebolt_Conduit.onStartConduit)
-	static function onLifeboltConduitStart(self:Dynamic, result:Void):Void {
+	static function onLifeboltConduitStart(self:Dynamic):Void {
 		if (!scriptOwnerIsLocal(self))
 			return;
 		ConduitCache.noteMage();
-		sampleConduit(HealthCache.localHero);
+		ObserveDemand.markOverlayDirty();
 	}
 
-	@:hlx.postfix(script.skills.Mage_Talent_ConduitResidues.onConduitTriggers)
-	static function onConduitResidues(self:Dynamic, a0:Dynamic, result:Void):Void {
+	static function onConduitResidues(self:Dynamic, a0:Dynamic):Void {
 		if (!scriptOwnerIsLocal(self))
 			return;
 		ConduitCache.noteMage();
-		sampleConduit(HealthCache.localHero);
+		ObserveDemand.markOverlayDirty();
 	}
+
+	// Thin public surface for domain-specific hook adapter classes. Business logic
+	// and samplers remain here during the staged split; no adapter walks engine state.
+	public static inline function hookPlayerUpdate(self:Dynamic, dt:Float):Void onPlayerUpdate(self, dt);
+	public static inline function hookHeroSkillUse(self:Dynamic, skill:Dynamic):Void onHeroSkillUse(self, skill);
+	public static inline function hookScriptChargePrayer(self:Dynamic):Void onScriptChargePrayer(self);
+	public static inline function hookPrayerTrigger(self:Dynamic, skill:Dynamic):Void onPrayerTrigger(self, skill);
+	public static inline function hookJudgmentProc(self:Dynamic, ctx:Dynamic):Void onJudgmentProc(self, ctx);
+	public static inline function hookJudgmentStep(self:Dynamic, step:Dynamic):Void onJudgmentStep(self, step);
+	public static inline function hookChargePrayer(self:Dynamic, prayerId:String):Void onChargePrayer(self, prayerId);
+	public static inline function hookSetComboPoint(self:Dynamic, value:Float, result:Float):Float return onSetComboPoint(self, value, result);
+	public static inline function hookFinisherStart(self:Dynamic, ctx:Dynamic):Void onFinisherStart(self, ctx);
+	public static inline function hookTryGetComboPoint(self:Dynamic, a0:Dynamic, a1:String, a2:Bool):Void onTryGetComboPoint(self, a0, a1, a2);
+	public static inline function hookSetHealth(self:Dynamic, value:Float, result:Float):Float return onSetHealth(self, value, result);
+	public static inline function hookBeforeHeroDamage(self:Dynamic, dmgObj:Dynamic):hlx.runtime.HlxPrefixControl return beforeHeroReceiveDamage(self, dmgObj);
+	public static inline function hookHeroDamage(self:Dynamic, dmgObj:Dynamic):Void onHeroReceiveDamage(self, dmgObj);
+	public static inline function hookSetRage(self:Dynamic, value:Float, result:Float):Float return onSetRage(self, value, result);
+	public static inline function hookSetSpark(self:Dynamic, value:Float, result:Float):Float return onSetSpark(self, value, result);
+	public static inline function hookInflictDamage(self:Dynamic, dmgObj:Dynamic):Void onInflictDamage(self, dmgObj);
+	public static inline function hookPropagateChaincast(self:Dynamic, ctx:Dynamic):Void onPropagateChainCast(self, ctx);
+	public static inline function hookTalentChaincast(self:Dynamic, ctx:Dynamic):Void onTalentChainCast(self, ctx);
+	public static inline function hookTalentChaincastProc(self:Dynamic, ctx:Dynamic):Void onTalentChaincastProc(self, ctx);
+	public static inline function hookSetConduits(self:Dynamic, value:Dynamic, result:Dynamic):Dynamic return onSetConduits(self, value, result);
+	public static inline function hookSyncConduit(self:Dynamic):Void onSyncConduit(self);
+	public static inline function hookPowerConduit(self:Dynamic):Void onPowerConduitStart(self);
+	public static inline function hookProjectileConduit(self:Dynamic):Void onProjectileConduitStart(self);
+	public static inline function hookSparkConduit(self:Dynamic):Void onSparkConduitStart(self);
+	public static inline function hookLifeboltConduit(self:Dynamic):Void onLifeboltConduitStart(self);
+	public static inline function hookConduitResidues(self:Dynamic, a0:Dynamic):Void onConduitResidues(self, a0);
 
 	/** Two bound rows per emit site; hp/max previews only rebuild when the value moves. */
 	static var hpBinds:Map<String, HpBinds> = new Map();

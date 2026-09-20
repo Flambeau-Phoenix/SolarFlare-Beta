@@ -491,11 +491,13 @@ class AuraBuilder {
 		ImGui.dummy(ImGui.vec2(0, 4));
 		drawHomeRow("Resource threshold (HP/Rage/Mana %)", "home_util_res", function() createFromHome("utility", "resource.health.ratio", ""));
 		drawHomeRow("Buff / debuff on me", "home_util_buff", function() createFromHome("utility", "status.present", ""));
-		drawHomeRow("Buff stacks on me", "home_util_stacks", function() createFromHome("utility", "status.stacks", ""));
+		drawHomeRow("Track status stacks on me", "home_util_stacks", function() createFromHome("utility", "status.stacks", ""));
 		drawHomeRow("Combo points", "home_util_combo", function() createFromHome("utility", "resource.combo.count", ""));
 		drawHomeRow("Combo at max", "home_util_combo_max", function() createFromHome("utility", "resource.combo.atMax", ""));
 		drawHomeRow("Target HP percent", "home_util_thp", function() createFromHome("utility", "target.hpRatio", ""));
 		drawHomeRow("In rift / encounter", "home_util_rift", function() createFromHome("utility", "encounter.inRift", ""));
+		drawHomeRow("In rift boss fight", "home_util_boss", function() createFromHome("utility", "encounter.inBossFight", ""));
+		drawHomeRow("Rift timer remaining", "home_util_rtm", function() createFromHome("utility", "encounter.riftRemain", ""));
 		drawHomeRow("Has current target", "home_util_tgt", function() createFromHome("utility", "target.valid", ""));
 		drawHomeRow("Damage taken spike", "home_util_dmg", function() createFromHome("utility", "combat.damageTakenRecent", ""));
 		drawHomeRow("Counter (increment each trigger)", "home_util_cnt", function() createFromHome("utility", "status.count", ""));
@@ -602,7 +604,13 @@ class AuraBuilder {
 	function drawCreationTemplates(disabled:Bool):Void {
 		if (disabled) ImGui.beginDisabled();
 		drawHomeRow("Emergency Low Health", "ab_home_low_hp", function() addHomeTemplate(AuraTemplates.createEmergencyLowHpAlert(), "Low Health"));
-		drawHomeRow("Buff / Debuff Stacks", "ab_home_stacks", function() addHomeTemplate(AuraTemplates.createBuffStackTracker(), "Stack Tracker"));
+		drawHomeRow("Track Status Stacks on Me", "ab_home_stacks", function() addHomeTemplate(AuraTemplates.createBuffStackTracker(), "Stack Tracker"));
+		drawHomeRow("Demonic Charge Stacks", "ab_home_demonic", function() addHomeTemplate(AuraTemplates.createDemonicChargeStacks(), "Demonic Charge"));
+		drawHomeRow("Pyroclasm Proc", "ab_home_pyro", function() addHomeTemplate(AuraTemplates.createPyroclasmProcAlert(), "Pyroclasm"));
+		drawHomeRow("Conduit Stacks", "ab_home_conduit", function() addHomeTemplate(AuraTemplates.createConduitStacksAlert(), "Conduit"));
+		drawHomeRow("Chaincast Ready", "ab_home_chain", function() addHomeTemplate(AuraTemplates.createChaincastReadyAlert(), "Chaincast"));
+		drawHomeRow("Life Prayer Ready", "ab_home_prayer", function() addHomeTemplate(AuraTemplates.createPrayerLifeReadyAlert(), "Life Prayer"));
+		drawHomeRow("Rift Boss Fight", "ab_home_riftboss", function() addHomeTemplate(AuraTemplates.createRiftBossFightAlert(), "Rift Boss"));
 		drawHomeRow("Enemy Spell Cast", "ab_home_cast", function() addHomeTemplate(AuraTemplates.createEnemySpellCastAlert(), "Enemy Spell Cast"));
 		drawHomeRow("Heavy Damage Warning", "ab_home_damage", function() addHomeTemplate(AuraTemplates.createDamageTakenSpike(), "Damage Warning"));
 		if (disabled) ImGui.endDisabled();
@@ -921,7 +929,10 @@ class AuraBuilder {
 						case 2: drawFxTile("Ring", "ab_fx_ring", fxState(function(x) return x.progressRing.get()), w, 32,
 							function(v) applyFxToTargets(function(x) x.progressRing.set(v)));
 						case 3: drawFxTile("Stacks", "ab_fx_stk", fxState(function(x) return x.stackCounter.get()), w, 32,
-							function(v) applyFxToTargets(function(x) x.stackCounter.set(v)));
+							function(v) applyFxToTargets(function(x) {
+								x.stackCounter.set(v);
+								if (v) x.isCounter.set(false);
+							}));
 						case 4: drawFxTile("Bottom", "ab_fx_fbot", fxState(function(x) return x.fuseBottom.get()), w, 32,
 							function(v) applyFxToTargets(function(x) x.fuseBottom.set(v)));
 						case 5: drawFxTile("Label", "ab_fx_lbl", fxState(function(x) return x.showLabel.get()), w, 32,
@@ -1080,7 +1091,11 @@ class AuraBuilder {
 	/** Kill / activation counter, kept beside the timer since users reach for both. */
 	function drawCounterRow(a:AuraDef):Void {
 		UiLayout.propertyRow("Counter", function() {
-			if (ImGui.checkbox("Count activations##ab_counter", a.isCounter)) SettingsStore.markDirty();
+			if (ImGui.checkbox("Count activations##ab_counter", a.isCounter)) {
+				if (a.isCounter.get())
+					a.stackCounter.set(false);
+				SettingsStore.markDirty();
+			}
 			if (!a.isCounter.get())
 				return;
 			ImGui.sameLine(0, 8);
@@ -1091,7 +1106,7 @@ class AuraBuilder {
 				a.stacks = 1;
 				SettingsStore.markDirty();
 			}
-		}, "Increments every time the condition becomes true. Survives reloads.");
+		}, "Increments every time the condition becomes true. Survives reloads. Mutually exclusive with the Stacks badge.");
 	}
 
 	function drawThenPreview(a:AuraDef):Void {
@@ -1454,11 +1469,13 @@ class AuraBuilder {
 		if (wizardStep == 0) {
 			if (ImGui.selectable("Resource threshold (HP/Rage/Mana %)", false)) { wizardSignal = "resource.health.ratio"; wizardStep = 1; }
 			if (ImGui.selectable("Buff / debuff on me", false)) { wizardSignal = "status.present"; wizardStep = 1; }
-			if (ImGui.selectable("Buff stacks on me", false)) { wizardSignal = "status.stacks"; wizardStep = 1; }
+			if (ImGui.selectable("Track status stacks on me", false)) { wizardSignal = "status.stacks"; wizardStep = 1; }
 			if (ImGui.selectable("Combo points", false)) { wizardSignal = "resource.combo.count"; wizardStep = 1; }
 			if (ImGui.selectable("Combo at max", false)) { wizardSignal = "resource.combo.atMax"; wizardStep = 1; }
 			if (ImGui.selectable("Target HP percent", false)) { wizardSignal = "target.hpRatio"; wizardStep = 1; }
 			if (ImGui.selectable("In rift / encounter", false)) { wizardSignal = "encounter.inRift"; wizardStep = 1; }
+			if (ImGui.selectable("In rift boss fight", false)) { wizardSignal = "encounter.inBossFight"; wizardStep = 1; }
+			if (ImGui.selectable("Rift timer remaining", false)) { wizardSignal = "encounter.riftRemain"; wizardStep = 1; }
 			if (ImGui.selectable("Has current target", false)) { wizardSignal = "target.valid"; wizardStep = 1; }
 			if (ImGui.selectable("Damage taken spike", false)) { wizardSignal = "combat.damageTakenRecent"; wizardStep = 1; }
 			if (ImGui.selectable("Counter (increment each trigger)", false)) { wizardSignal = "status.count"; wizardStep = 1; }
@@ -1617,6 +1634,11 @@ class AuraBuilder {
 			a.showCountdown.set(true);
 			a.followBuffDuration.set(true);
 			a.showIcon.set(true);
+			// status.stacks is useless without the corner badge — enable it by default.
+			if (wizardSignal == "status.stacks") {
+				a.stackCounter.set(true);
+				a.isCounter.set(false);
+			}
 		}
 		applyBehavior(a, wizardBehavior);
 		if (setupIssue(a).length == 0)

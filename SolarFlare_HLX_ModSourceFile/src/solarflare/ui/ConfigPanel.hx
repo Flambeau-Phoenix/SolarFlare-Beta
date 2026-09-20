@@ -9,7 +9,6 @@ import solarflare.geaux.GeauxConfig;
 import solarflare.geaux.GeauxBuilder;
 import solarflare.getrifty.GetRifty;
 import solarflare.lightsaber.Lightsaber;
-import solarflare.localtime.LocalTime;
 import solarflare.notebook.Notebook;
 import solarflare.resourcetracker.ResourceTrackerBuilder;
 import solarflare.target.TargetConfig;
@@ -52,7 +51,6 @@ class ConfigPanel {
 	public var combo:ComboConfig;
 	public var chaincast:ChaincastConfig;
 	public var conduit:ConduitConfig;
-	public var localTime:LocalTimeConfig;
 	public var combatLog:CombatLogConfig;
 	public var target:TargetConfig;
 	public var notebook:Notebook;
@@ -121,7 +119,6 @@ class ConfigPanel {
 		combo = new ComboConfig();
 		chaincast = new ChaincastConfig();
 		conduit = new ConduitConfig();
-		localTime = new LocalTimeConfig();
 		combatLog = new CombatLogConfig();
 		target = new TargetConfig();
 		notebook = new Notebook();
@@ -147,7 +144,6 @@ class ConfigPanel {
 		auras.enabled.set(false);
 		lightsaber.hidden.set(true);
 		getRifty.hidden.set(true);
-		localTime.enabled.set(false);
 		combatLog.hidden.set(true);
 		if (launchers != null) {
 			if (launchers.f6 != null) launchers.f6.hidden.set(true);
@@ -185,7 +181,6 @@ class ConfigPanel {
 		if (combo != null) registerInteractive(combo.open);
 		if (chaincast != null) registerInteractive(chaincast.open);
 		if (conduit != null) registerInteractive(conduit.open);
-		if (localTime != null) registerInteractive(localTime.open);
 		if (target != null) registerInteractive(target.open);
 		if (attackCombo != null) registerInteractive(attackCombo.open);
 		if (lightsaber != null) {

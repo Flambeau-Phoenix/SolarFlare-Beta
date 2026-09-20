@@ -5,8 +5,8 @@ import solarflare.FieldWalk;
 
 /**
  * Capture Heaps skill-book drag so Geaux cells can call Hero.setSkillSlot.
- * Sole SolarFlare postfix on Skill.onTriggerCD / reduceCooldown / resetCooldown —
- * do not add a second hook class (docs/SkillCdHooks.hx is a draft only).
+ * Cooldown values are owned by GeauxCache's demanded 20 Hz sample. No
+ * cooldown mutator trampolines are installed alongside that authority.
  */
 class GeauxHooks {
 	public static var dragging:Dynamic = null;
@@ -16,57 +16,6 @@ class GeauxHooks {
 	@:hlx.postfix(ui.BaseUI.startDrag)
 	static function onStartDrag(self:Dynamic, el:Dynamic, result:Void):Void {
 		dragging = el;
-	}
-
-	@:hlx.postfix(st.skill.Skill.onTriggerCD)
-	static function onTriggerCD(skill:Dynamic, result:Void):Void {
-		if (!isLocalSkill(skill))
-			return;
-		GeauxCache.noteTriggerCd(skill);
-	}
-
-	@:hlx.postfix(st.skill.Skill.reduceCooldown)
-	static function onReduceCooldown(skill:Dynamic, seconds:Float, result:Void):Void {
-		if (!isLocalSkill(skill))
-			return;
-		GeauxCache.noteReduceCd(skill, seconds);
-	}
-
-	@:hlx.postfix(st.skill.Skill.resetCooldown)
-	static function onResetCooldown(skill:Dynamic, result:Void):Void {
-		if (!isLocalSkill(skill))
-			return;
-		GeauxCache.noteResetCd(skill);
-	}
-
-	static function isLocalSkill(skill:Dynamic):Bool {
-		if (skill == null)
-			return false;
-		// solarflare.debug.PayloadProbe.capture("cast", skill); // once: confirm owner/parent in payload-probe.jsonl
-		try {
-			var bs:st.skill.BaseSkill = skill;
-			var unit = bs.get_ownerUnit();
-			if (unit != null)
-				return HealthCache.isLocalHero(unit);
-			var hero = bs.get_ownerHero();
-			if (hero != null)
-				return HealthCache.isLocalHero(hero);
-			var foe = bs.get_ownerFoe();
-			if (foe != null)
-				return HealthCache.isLocalHero(foe);
-			if (bs.owner != null)
-				return HealthCache.isLocalHero(bs.owner);
-		} catch (_:Dynamic) {}
-		var owner = FieldWalk.extractObject(skill, "owner");
-		if (owner != null)
-			return HealthCache.isLocalHero(owner);
-		var parent = FieldWalk.extractObject(skill, "parent");
-		if (parent != null && HealthCache.isLocalHero(parent))
-			return true;
-		owner = FieldWalk.extractObject(parent, "owner");
-		if (owner != null)
-			return HealthCache.isLocalHero(owner);
-		return false;
 	}
 
 	public static function pollGuiDrag():Void {

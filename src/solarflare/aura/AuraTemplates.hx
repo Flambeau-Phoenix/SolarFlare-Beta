@@ -114,7 +114,8 @@ class AuraTemplates {
 		var a = new AuraDef("buff_stack_tracker", "Buff Stack Tracker");
 		a.announce = "Buff Active";
 		a.syncAnnounceBuf();
-		a.region = "bar";
+		// Icon region draws the corner stack badge (bar only appended "[N]" to a label).
+		a.region = "icon";
 		a.showIcon.set(true);
 		a.progressRing.set(true);
 		a.stackCounter.set(true);
@@ -327,6 +328,125 @@ class AuraTemplates {
 		alert.hold = 2.0;
 		alert.holdRef.set(2.0);
 		a.effects = [win, alert];
+		return a;
+	}
+
+	/** Untimed stack persistence: Demonic Charge (`duration: 0` in CDB). */
+	public static function createDemonicChargeStacks():AuraDef {
+		var a = new AuraDef("demonic_charge_stacks", "Demonic Charge Stacks");
+		a.announce = "DEMONIC CHARGE";
+		a.syncAnnounceBuf();
+		a.skillId = "Staff_SummonDemon_Skill1_Status";
+		a.syncSkillBuf();
+		a.iconId = "Staff_SummonDemon_Skill1_Status";
+		a.syncIconBuf();
+		a.region = "icon";
+		a.showIcon.set(true);
+		a.showLabel.set(true);
+		a.stackCounter.set(true);
+		a.progressRing.set(true);
+
+		var r = new AuraRuleDef();
+		r.mode = "all";
+		var c = new AuraConditionDef();
+		c.signal = "status.stacks";
+		c.op = "gte";
+		c.numberValue = 1;
+		c.subject = "Staff_SummonDemon_Skill1_Status";
+		c.subjectLabel = "Demonic Charge";
+		r.conditions.push(c);
+		a.rule = r;
+
+		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
+		return a;
+	}
+
+	public static function createConduitStacksAlert():AuraDef {
+		var a = new AuraDef("conduit_stacks", "Conduit Stacks");
+		a.announce = "CONDUIT";
+		a.syncAnnounceBuf();
+		a.region = "ring";
+		a.showIcon.set(true);
+		a.showLabel.set(true);
+		a.stackCounter.set(true);
+
+		var r = new AuraRuleDef();
+		r.mode = "all";
+		var c = new AuraConditionDef();
+		c.signal = "conduit.effectiveStacks";
+		c.op = "gte";
+		c.numberValue = 1;
+		r.conditions.push(c);
+		a.rule = r;
+
+		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
+		return a;
+	}
+
+	public static function createChaincastReadyAlert():AuraDef {
+		var a = new AuraDef("chaincast_ready", "Chaincast Ready");
+		a.announce = "CHAINCAST READY";
+		a.syncAnnounceBuf();
+		a.region = "ring";
+		a.showIcon.set(true);
+		a.showLabel.set(true);
+
+		var r = new AuraRuleDef();
+		r.mode = "all";
+		var c = new AuraConditionDef();
+		c.signal = "chaincast.ready";
+		c.op = "is";
+		c.boolValue = true;
+		r.conditions.push(c);
+		a.rule = r;
+
+		var win = new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE);
+		var alert = new AuraEffect("rise_alert", AuraEffect.KIND_ALERT, AuraEffect.WHEN_ON_RISE_HOLD);
+		alert.hold = 1.5;
+		alert.holdRef.set(1.5);
+		a.effects = [win, alert];
+		return a;
+	}
+
+	public static function createPrayerLifeReadyAlert():AuraDef {
+		var a = new AuraDef("prayer_life_ready", "Life Prayer Ready");
+		a.announce = "LIFE PRAYER";
+		a.syncAnnounceBuf();
+		a.region = "ring";
+		a.showIcon.set(true);
+		a.showLabel.set(true);
+
+		var r = new AuraRuleDef();
+		r.mode = "all";
+		var c = new AuraConditionDef();
+		c.signal = "prayer.lifeReady";
+		c.op = "is";
+		c.boolValue = true;
+		r.conditions.push(c);
+		a.rule = r;
+
+		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
+		return a;
+	}
+
+	public static function createRiftBossFightAlert():AuraDef {
+		var a = new AuraDef("rift_boss_fight", "Rift Boss Fight");
+		a.announce = "BOSS FIGHT";
+		a.syncAnnounceBuf();
+		a.region = "ring";
+		a.showIcon.set(true);
+		a.showLabel.set(true);
+
+		var r = new AuraRuleDef();
+		r.mode = "all";
+		var c = new AuraConditionDef();
+		c.signal = "encounter.inBossFight";
+		c.op = "is";
+		c.boolValue = true;
+		r.conditions.push(c);
+		a.rule = r;
+
+		a.effects = [new AuraEffect("win", AuraEffect.KIND_ALERT, AuraEffect.WHEN_WHILE_TRUE)];
 		return a;
 	}
 

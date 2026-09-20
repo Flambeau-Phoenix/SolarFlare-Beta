@@ -13,6 +13,7 @@ import sys.FileSystem;
 import sys.io.File;
 import solarflare.aura.signal.AuraRuleCodec;
 import solarflare.aura.signal.AuraRuleEvaluator;
+import solarflare.aura.signal.AuraConditionValidator;
 import solarflare.aura.signal.AuraSignalFrame;
 import solarflare.aura.signal.AuraSignalFrameBuilder;
 import imgui.ref.BoolRef;
@@ -232,8 +233,7 @@ class AuraEngine {
 		var known = a.ruleResult.known;
 		var prog = a.ruleResult.progress;
 		if (!Math.isFinite(prog)) prog = hit ? 1 : 0;
-		var stacks = a.ruleResult.stacks;
-		if (stacks < 1) stacks = 1;
+		var stacks = a.ruleResult.stacks > 0 ? a.ruleResult.stacks : (hit ? 1 : 0);
 		var buffLeft = a.ruleResult.timeLeft;
 		var buffInf = Math.isFinite(buffLeft) && buffLeft < 0;
 		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf);

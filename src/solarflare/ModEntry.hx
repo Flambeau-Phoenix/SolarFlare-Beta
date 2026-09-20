@@ -48,7 +48,7 @@ class ModEntry {
 		solarflare.geaux.GeauxCdTable.keep();
 		solarflare.geaux.GeauxTalentTable.keep();
 		solarflare.HealthHooks.keep();
-		solarflare.aura.StatusObserveHooks.keep();
+		solarflare.hooks.IdentityVitalsHooks.keep();
 		solarflare.attackcombo.AttackComboCache.keep();
 		solarflare.geaux.GeauxHooks.keep();
 		solarflare.combatlog.CombatLogHooks.keep();

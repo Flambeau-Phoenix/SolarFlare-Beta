@@ -118,7 +118,7 @@ class AuraConditionEditor {
 		var d = AuraSignalCatalog.find(c.signal);
 		var sigLabel = d != null ? d.label : (c.signal.length > 0 ? c.signal : "Signal");
 		var subLabel = subjectName(c);
-		var subjectPart = subLabel.length > 0 ? " (" + subLabel + ")" : "";
+		var subjectPart = subLabel.length > 0 ? ' ($subLabel)' : "";
 		var opStr = friendlyOp(c.op);
 		var valStr = formatValue(c, d);
 		var stmt = sigLabel + subjectPart + " " + opStr + " " + valStr;
@@ -393,31 +393,39 @@ class AuraConditionEditor {
 		var name = subjectName(c);
 		if (name.length > 0) c.subjectLabel = name;
 
+		// Same beginCombo pattern as AuraBuilder.drawWizardCatalogPicker / signal combo.
+		// ghostButton+popup inside AutoResizeY condition cards eats clicks and sticks.
 		var previewText = name.length > 0 ? name : "Select " + kind + "…";
-		var btnW = Math.max(120, Math.min(180, ImGui.calcTextSize(previewText).x + 20));
-		if (UiChrome.ghostButton(previewText + "##pick_" + tag, ImGui.vec2(btnW, 24))) {
-			ImGui.openPopup("##subjects_" + tag);
+		ImGui.setNextItemWidth(210);
+		if (!ImGui.beginCombo("##cond_subj_" + tag, previewText)) {
+			if (ImGui.isItemHovered() && c.subject != null && c.subject.length > 0)
+				ImGui.setTooltip(c.subjectLabel + " [" + c.subject + "]");
+			return;
 		}
-		if (ImGui.isItemHovered() && c.subject.length > 0) {
-			ImGui.setTooltip(c.subjectLabel + " [" + c.subject + "]");
-		}
-
-		ImGui.setNextWindowSize(ImGui.vec2(620, 500), imgui.Enums.ImGuiCond.Appearing);
-		if (!ImGui.beginPopup("##subjects_" + tag)) return;
 		try {
-			ImGui.text("Search " + kind + " catalog");
-			if (ImGui.inputText("Search##subject_search_" + tag, ui.searchBuf, AuraConditionUiState.SEARCH_BUF))
-				ui.search = ByteUtil.readString(ui.searchBuf, AuraConditionUiState.SEARCH_BUF, true).toLowerCase();
-			ImGui.textDisabled("Pick from list or enter search filter.");
+			if (ImGui.isItemHovered() && c.subject != null && c.subject.length > 0)
+				ImGui.setTooltip(c.subjectLabel + " [" + c.subject + "]");
 
-			solarflare.ui.UiScope.child("##subject_list_" + tag, ImGui.vec2(0, 380), function() {
-				drawSubjectList(c, ui, kind, tag, bossFocusId);
-			}, ImGuiChildFlags.Borders);
+			ImGui.text("Search " + kind + " catalog");
+			if (ImGui.inputText("##cond_subj_search_" + tag, ui.searchBuf, AuraConditionUiState.SEARCH_BUF))
+				ui.search = ByteUtil.readString(ui.searchBuf, AuraConditionUiState.SEARCH_BUF, true).toLowerCase();
+			ImGui.separator();
+
+			// Child begin always pairs with end (AGENTS.md); content only when open.
+			var childOpen = ImGui.beginChild("##cond_subj_list_" + tag, ImGui.vec2(440, 280), ImGuiChildFlags.Borders);
+			try {
+				if (childOpen)
+					drawSubjectList(c, ui, kind, tag, bossFocusId);
+			} catch (e:Dynamic) {
+				ImGui.endChild();
+				throw e;
+			}
+			ImGui.endChild();
 		} catch (e:Dynamic) {
-			ImGui.endPopup();
+			ImGui.endCombo();
 			throw e;
 		}
-		ImGui.endPopup();
+		ImGui.endCombo();
 	}
 
 	static function drawSubjectList(c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String, bossFocusId:String):Void {
@@ -452,9 +460,9 @@ class AuraConditionEditor {
 				if (solarflare.cdb.AuraCatalog.matchesSearch(status.rawId, label, ui.search))
 					observed.push({id: status.rawId, name: label, kind: "active status"});
 			}
-			shown += drawSubjectSection(c, ui, tag + "_live", "Currently on your character", observed);
-			shown += drawSubjectSection(c, ui, tag, "Status / Proc IDs", statusSkills);
-			shown += drawSubjectSection(c, ui, tag, "Other skills", otherSkills);
+			shown += drawSubjectSection(c, ui, tag + "_live", "Currently on your character", observed, kind);
+			shown += drawSubjectSection(c, ui, tag, "Status / Proc IDs", statusSkills, kind);
+			shown += drawSubjectSection(c, ui, tag, "Other skills", otherSkills, kind);
 		} else if (kind == "unit") {
 			var recent:Array<{id:String, name:String, kind:String}> = [];
 			var rids = solarflare.target.RecentTargetCache.ids();
@@ -467,27 +475,35 @@ class AuraConditionEditor {
 					recent.push({id: rid, name: rlab, kind: "recent target"});
 				ri++;
 			}
-			shown += drawSubjectSection(c, ui, tag + "_recent", "Recent targets", recent);
-			shown += drawSubjectSection(c, ui, tag, "Units", units);
+			shown += drawSubjectSection(c, ui, tag + "_recent", "Recent targets", recent, kind);
+			shown += drawSubjectSection(c, ui, tag, "Units", units, kind);
 		} else {
-			shown += drawSubjectSection(c, ui, tag, "Skills", otherSkills);
+			shown += drawSubjectSection(c, ui, tag, "Skills", otherSkills, kind);
 		}
 		ImGui.textDisabled(shown + " matching");
 	}
 
 	static function drawSubjectSection(c:AuraConditionDef, ui:AuraConditionUiState, tag:String, title:String,
-			rows:Array<{id:String, name:String, kind:String}>):Int {
+			rows:Array<{id:String, name:String, kind:String}>, subjectKind:String):Int {
 		if (rows == null || rows.length == 0) return 0;
 		ImGui.separatorText(title + " (" + rows.length + ")");
 		var n = 0;
 		for (entry in rows) {
-			drawSubjectRow(c, ui, entry.id, entry.name, entry.kind, tag);
+			drawSubjectRow(c, ui, entry.id, entry.name, entry.kind, tag, subjectKind);
 			n++;
 		}
 		return n;
 	}
 
-	static function drawSubjectRow(c:AuraConditionDef, ui:AuraConditionUiState, id:String, name:String, entryKind:String, tag:String):Void {
+	/**
+	 * Status pickers can list either the real stacking status (Status / Proc IDs, Currently
+	 * on your character) or the ability that grants it (Other skills). Picking the ability by
+	 * mistake used to leave `status.stacks`/`status.present` pointed at an id the engine never
+	 * stacks — the granted status underneath it does. Redirect to the granted status id here so
+	 * every entry point (wizard, Home templates, manual edit) lands on the trackable id.
+	 */
+	static function drawSubjectRow(c:AuraConditionDef, ui:AuraConditionUiState, id:String, name:String, entryKind:String, tag:String,
+			subjectKind:String = ""):Void {
 		if (!ImGui.isRectVisible(ImGui.vec2(ImGui.getContentRegionAvail().x, 28))) {
 			ImGui.dummy(ImGui.vec2(1, 28));
 			return;
@@ -496,8 +512,19 @@ class AuraConditionEditor {
 		ImGui.sameLine();
 		var kindTag = entryKind == "statustype" ? "category" : entryKind;
 		if (ImGui.selectable(name + " [" + id + "] · " + kindTag + "##subject_" + tag + id, c.subject == id)) {
-			c.subject = id;
-			c.subjectLabel = name;
+			var resolvedId = id;
+			var resolvedName = name;
+			if (subjectKind == "status") {
+				var grant = solarflare.cdb.CdbAuraTable.grantedStatusId(id);
+				if (grant.length > 0 && grant != id) {
+					resolvedId = grant;
+					var grantName = solarflare.cdb.AuraCatalog.label(grant);
+					resolvedName = solarflare.cdb.AuraCatalog.validName(grantName) ? grantName : solarflare.cdb.CdbAuraTable.name(grant);
+					if (resolvedName == null || resolvedName.length == 0) resolvedName = grant;
+				}
+			}
+			c.subject = resolvedId;
+			c.subjectLabel = resolvedName;
 			ui.sync(c);
 			ui.flashContext();
 			SettingsStore.markDirty();

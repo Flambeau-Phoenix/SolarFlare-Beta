@@ -57,11 +57,12 @@ class ObserveDemand {
 	static var lastGetRifty:Float = 0;
 	static var lastAttackCombo:Float = 0;
 
-	public static inline var OVERLAY_IDLE_S:Float = 0.25; // ~4 Hz fallback
-	public static inline var OVERLAY_ACTIVE_S:Float = 0.12; // ~8 Hz when dirty/active
+	/** Continuous class state authority after removal of class-specific trampolines. */
+	public static inline var OVERLAY_IDLE_S:Float = 0.05; // 20 Hz demanded sample
+	public static inline var OVERLAY_ACTIVE_S:Float = 0.05;
 	public static inline var IDENTITY_S:Float = 1.0;
 	public static inline var TARGET_HP_S:Float = 0.10; // 10 Hz
-	/** 20 Hz safety poll; StatusObserveHooks dirty-wake owns edges. */
+	/** Sole 20 Hz authority for demanded local status values. */
 	public static inline var AURA_STATUS_IDLE_S:Float = 0.05;
 	public static inline var AURA_STATUS_HOT_S:Float = 0.05;
 	/**
@@ -119,7 +120,7 @@ class ObserveDemand {
 		aurasNeedStatus = statusIds.length > 0 || auraBuilderOpen;
 		getRifty = cfg.getRifty != null && !cfg.getRifty.hidden.get();
 		var saberRift = cfg.lightsaber != null && !cfg.lightsaber.hidden.get() && cfg.lightsaber.showRiftMeter.get();
-		riftFlag = getRifty || combatLog || saberRift;
+		riftFlag = getRifty || combatLog || saberRift || auras || auraBuilderOpen || (solarflare.debug.ResolutionLedger.armed());
 	}
 
 	public static function markStatusDemandDirty():Void {
@@ -286,19 +287,34 @@ class ObserveDemand {
 	}
 
 	public static inline function markOverlayDirty():Void
+	{
 		overlayDirty = true;
+		solarflare.runtime.HookIngress.mark(solarflare.runtime.DirtyDomains.OVERLAYS);
+	}
 
 	public static inline function markGeauxDirty():Void
+	{
 		geauxDirty = true;
+		solarflare.runtime.HookIngress.mark(solarflare.runtime.DirtyDomains.SKILLS);
+	}
 
 	public static inline function markAttackComboDirty():Void
+	{
 		attackComboDirty = true;
+		solarflare.runtime.HookIngress.mark(solarflare.runtime.DirtyDomains.ATTACK_COMBO);
+	}
 
 	public static inline function markTargetPtrDirty():Void
+	{
 		targetPtrDirty = true;
+		solarflare.runtime.HookIngress.mark(solarflare.runtime.DirtyDomains.TARGET);
+	}
 
 	public static inline function markAuraStatusDirty():Void
+	{
 		auraStatusDirty = true;
+		solarflare.runtime.HookIngress.mark(solarflare.runtime.DirtyDomains.STATUS);
+	}
 
 	public static function dueOverlayReconcile(now:Float):Bool {
 		if (!(prayers || comboPoints || chaincast || conduit))

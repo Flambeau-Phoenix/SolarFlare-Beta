@@ -31,7 +31,11 @@ class AuraSignalFrameBuilder {
 		frame.conduitPowerStacks = ConduitCache.powerStacks; frame.conduitPowerLeft = ConduitCache.powerLeft;
 		frame.attackComboKnown = frame.heroKnown; frame.attackComboStep = AttackComboCache.step;
 		frame.attackComboWithin = AttackComboCache.withinCombo; frame.attackComboFinal = AttackComboCache.flashFinal;
-		frame.inRift = GetRiftyCache.inInstance; frame.encounterKnown = true;
+		frame.inRift = GetRiftyCache.inInstance;
+		frame.inBossFight = GetRiftyCache.inBossFight;
+		frame.riftRemain = GetRiftyCache.remainingTime;
+		frame.targetBossId = GetRiftyCache.targetBossId;
+		frame.encounterKnown = true;
 		fillTarget(frame);
 		var kk = CombatLogCache.consumeKillKind();
 		frame.killKind = kk;

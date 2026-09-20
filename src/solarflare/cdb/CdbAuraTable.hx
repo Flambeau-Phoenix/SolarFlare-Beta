@@ -1,4 +1,4 @@
-﻿package solarflare.cdb;
+package solarflare.cdb;
 
 import haxe.Json;
 

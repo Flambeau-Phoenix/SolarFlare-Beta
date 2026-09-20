@@ -43,7 +43,7 @@ class AuraRuleEvaluator {
 	static inline function finite(a:Float, b:Float):Bool return Math.isFinite(a) && Math.isFinite(b);
 	static function copy(v:AuraResolvedValue, o:AuraConditionResult):Void {
 		o.known = v.known; o.kind = v.kind; o.value = v.numberValue; o.intValue = v.intValue; o.boolValue = v.boolValue;
-		o.stringValue = v.stringValue; o.progress = v.progress; o.stacks = v.kind == Count ? v.intValue : -1; o.timeLeft = v.timeLeft; o.code = v.code;
+		o.stringValue = v.stringValue; o.progress = v.progress; o.stacks = v.intValue > 0 ? v.intValue : (v.kind == Count ? v.intValue : -1); o.timeLeft = v.timeLeft; o.code = v.code;
 	}
 	static function aggregate(r:AuraRuleResult, all:Bool):Void {
 		for (i in 0...r.totalCount) if (r.conditions[i].known) { r.knownCount++; if (r.conditions[i].hit) r.hitCount++; }

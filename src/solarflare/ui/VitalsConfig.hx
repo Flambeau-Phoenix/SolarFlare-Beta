@@ -537,6 +537,37 @@ class VerticalBarGauge {
 	}
 }
 
+/**
+ * Horizontal fill bar (left → right) with optional overlay label. Drawn straight to the
+ * ImDrawList — like every other vitals gauge here — instead of ImGui.progressBar's
+ * pushStyleColor(ImGuiCol.PlotHistogram/FrameBg) path, whose native color-table slot can
+ * drift out of sync with a swapped ImGui build (see sfimgui.hdll notes) and silently fall
+ * back to ImGui's built-in default frame color instead of the intended tint.
+ */
+class HorizontalBarGauge {
+	public static function draw(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, ratio:Single, color:ImVec4,
+			label:String = ""):Void {
+		if (ratio < 0)
+			ratio = 0;
+		if (ratio > 1)
+			ratio = 1;
+		var track = ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.10, 0.11, 0.12, 0.95 * color.w));
+		var fill = ImGui.colorConvertFloat4ToU32(color);
+		var border = ImGui.colorConvertFloat4ToU32(ImGui.vec4(color.x * 0.5, color.y * 0.5, color.z * 0.5, 0.55 * color.w));
+		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), track, 4);
+		if (ratio > 0.001) {
+			var fillW:Single = w * ratio;
+			ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + fillW, y + h), fill, 4);
+		}
+		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), border, 4, 1);
+		if (label != null && label.length > 0) {
+			var ts = ImGui.calcTextSize(label);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + (w - ts.x) * 0.5, y + (h - ts.y) * 0.5),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, 0.92 * color.w)), label);
+		}
+	}
+}
+
 class RingGauge {
 	public static function draw(dl:Dynamic, center:imgui.Structs.ImVec2, radius:Single, ratio:Float,
 			color:imgui.Structs.ImVec4, label:String = "", vectorScale:Float = 1):Void {

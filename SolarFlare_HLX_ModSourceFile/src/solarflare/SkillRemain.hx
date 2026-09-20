@@ -1,4 +1,4 @@
-﻿package solarflare;
+package solarflare;
 
 import hlx.runtime.ResolvedMember;
 
@@ -170,6 +170,11 @@ class SkillRemain {
 				if (st.isInfinite())
 					return lastResult.set(1, INFINITE_LEFT, true, true);
 			} catch (_:Dynamic) {}
+			var dur = 0.0;
+			try dur = st.duration catch (_:Dynamic) dur = 0;
+			if (dur <= 0.05) {
+				return lastResult.set(1, INFINITE_LEFT, true, true);
+			}
 			var left = 0.0;
 			var gotLeft = false;
 			try {
@@ -182,11 +187,9 @@ class SkillRemain {
 				prog = st.getDurationProgress()
 			catch (_:Dynamic)
 				prog = Math.NaN;
-			// A live progress value already proves the duration domain and is the value
-			// finish() would use, so the native getStatusInfo() call adds nothing.
-			var progLive = !Math.isNaN(prog) && prog >= 0 && prog < 0.999;
-			var max = 0.0;
-			if (!progLive) {
+			var progLive = !Math.isNaN(prog) && prog > 0.001 && prog < 0.999;
+			var max = dur;
+			if (max <= 0.05 && !progLive) {
 				try {
 					var info = st.getStatusInfo();
 					if (info != null) {
@@ -196,11 +199,9 @@ class SkillRemain {
 					}
 				} catch (_:Dynamic) {}
 			}
-			// Known finite expiry only when a duration domain exists (max/progress), not bare 0.
-			if (gotLeft && left <= 0.02) {
-				var hadTimer = max > 0.05 || progLive;
-				if (hadTimer)
-					return lastResult.set(0, left < 0 ? 0 : left, true, false);
+			// Known finite expiry only when a duration domain exists (max > 0.05), not untimed 0.
+			if (gotLeft && left <= 0.02 && max > 0.05) {
+				return lastResult.set(0, left < 0 ? 0 : left, true, false);
 			}
 			return finish(left, prog, max, false);
 		} catch (_:Dynamic) {}
@@ -210,6 +211,11 @@ class SkillRemain {
 	static function typedRemain(item:Dynamic):SkillRemainResult {
 		try {
 			var bs:st.skill.BaseSkill = item;
+			var dur = 0.0;
+			try dur = bs.duration catch (_:Dynamic) dur = 0;
+			if (dur <= 0.05) {
+				return lastResult.set(1, INFINITE_LEFT, true, true);
+			}
 			var left = 0.0;
 			var gotLeft = false;
 			try {
@@ -222,9 +228,9 @@ class SkillRemain {
 				prog = bs.getDurationProgress()
 			catch (_:Dynamic)
 				prog = Math.NaN;
-			if (gotLeft && left <= 0.02 && !Math.isNaN(prog) && prog >= 0 && prog < 0.999)
+			if (gotLeft && left <= 0.02 && dur > 0.05)
 				return lastResult.set(0, left < 0 ? 0 : left, true, false);
-			return finish(left, prog, 0, false);
+			return finish(left, prog, dur, false);
 		} catch (_:Dynamic) {}
 		return miss();
 	}

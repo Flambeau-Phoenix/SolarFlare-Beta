@@ -26,10 +26,29 @@
 
 ---
 
-## Installation (Farever 0.2.4+ Ready)
+## Six-Hook Runtime Release
+
+SolarFlare's default runtime has been reduced from **44 hooks to only 6 event hooks**—an 86% reduction in installed hook targets. Continuous values such as health, shields, resources, cooldowns, statuses, stacks, durations, Combo Points, Chaincast, and Conduit state are now read through bounded sampling instead of competing hook paths.
+
+The six remaining hooks are reserved for events that cannot be reconstructed reliably from current state:
+
+1. Skill cast started
+2. Skill cast stopped
+3. Local skill use for prayer classification
+4. Local incoming damage
+5. Outgoing damage
+6. SolarFlare UI drag start
+
+This release was tested live with **Priest, Mage, Warrior, and Rogue**. Five combat captures recorded 1,834 ordered events with no hook installation failures, event-ring drops, SolarFlare exceptions, crashes, or missing behavior observed. Gameplay was noticeably smoother throughout the four-class test.
+
+Diagnostic hooks are excluded from the normal `solarflare.hl` release and remain available only in the separate telemetry build.
+
+---
+
+## Installation (HLB v2–v6 Compatible)
 
 > [!IMPORTANT]
-> **Farever 0.2.4** requires HashLink bytecode v6 and MinHook-capable loaders. The bundled `libhl64.dll` and `hlx-loader.hl` provide full compatibility for SolarFlare, Minimap, and legacy mods (e.g. *Better Mod Settings*).
+> SolarFlare bundles its tested local HLX runtime build with support for HashLink bytecode versions **2, 3, 4, 5, and 6**. This includes Farever 0.2.4 / HLB v6 while retaining compatibility with older community mods. The bundled DLL exposes the HLX 0.0.9 API surface but is not claimed to be the byte-identical upstream release artifact.
 
 1. Download **`SolarFlare_Live_v1.4b.zip`**.
 2. Extract the contents directly into your **`Farever`** game root directory:
@@ -107,6 +126,14 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 
 ## SolarFlare v1.4b — Changelog
 
+### Six-Hook Runtime Optimization
+* **44 → 6 Hooks:** Removed 38 redundant release hooks while retaining all required cast, prayer, damage, and UI-drag events.
+* **Single Value Authority:** Health, resources, cooldowns, statuses, class state, and other continuous values are now sample-owned instead of being maintained by duplicate hooks and polling.
+* **Lower Runtime Pressure:** Greatly reduced hook dispatch during normal play, producing a noticeable improvement in responsiveness during four-class live testing.
+* **Release Hook Guard:** The build verifier now freezes the six allowed release targets, rejects duplicates, and prevents continuous-state hooks from returning accidentally.
+* **Replay Verification:** Recorded primitive samples and events are replayed through SolarFlare's caches and ordered event ring as the standard behavioral regression gate.
+* **Performance Telemetry:** Runtime export now includes median, p95, and p99 frame time alongside hook, event, queue-depth, and drop counts.
+
 ### What's New in SolarFlare
 * **Hide All Hotkey:** Toggle all SolarFlare HUD overlays on and off with a single bind (Numpad by default, or Middle Mouse via Resource Tracker settings). The F6 hub and builder windows remain unaffected.
 * **Aura Builder Redesign:** Reorganized interface featuring quick-reference condition cards that launch directly into a new aura build.
@@ -127,9 +154,9 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 
 ---
 
-## HLX Core & Runtime Update (v0.0.9)
+## HLX Core & Runtime Update (v0.0.9-Compatible API)
 
-SolarFlare v1.4b includes an upgraded, fully compatible HLX loader stack targeting **Farever 0.2.4**:
+SolarFlare v1.4b includes its locally built and tested HLX loader stack. It supports HLB bytecode versions **2 through 6**, including **Farever 0.2.4**, and exposes the same 350 exports and 27 `hlp_hlx_*` exports as the official HLX 0.0.9 runtime:
 
 * **Farever 0.2.4 Ready (`HLB v6`):** Full HashLink 2.0 bytecode support (`max_version = 6` with 3rd debug-assignment index). Fixes `Found version 6 while HL supports up to 5`.
 * **MinHook 1.3.4 Engine:** Replaced the legacy hand-rolled assembly whitelist in `patching.c` with MinHook. Relocates `CALL`, `JMP`, `Jcc`, and RIP-relative memory offsets cleanly, eliminating `no safe cut found` / `install_patch failed` crashes on tight JIT function prologues (`Player.update`, combat hooks).

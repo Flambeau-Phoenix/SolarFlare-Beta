@@ -34,6 +34,8 @@ class AuraSignalReader {
 			case "attackCombo.withinChain": bool(out, frame.attackComboKnown, frame.attackComboWithin);
 			case "attackCombo.finalFlash": bool(out, frame.attackComboKnown, frame.attackComboFinal);
 			case "encounter.inRift": bool(out, frame.encounterKnown, frame.inRift);
+			case "encounter.inBossFight": bool(out, frame.encounterKnown, frame.inBossFight);
+			case "encounter.riftRemain": duration(out, frame.encounterKnown, frame.riftRemain);
 			case "target.valid": bool(out, frame.targetKnown, frame.targetValid);
 			case "target.kindMatches": bool(out, frame.targetKnown, frame.targetValid && kindEq(frame.targetKind, subject));
 			case "target.isBoss": bool(out, frame.targetKnown && frame.targetValid, frame.targetIsBoss || frame.targetIsMiniboss);

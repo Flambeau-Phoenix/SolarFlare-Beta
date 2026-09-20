@@ -41,6 +41,9 @@ class AuraSignalFrame {
 	public var attackComboFinal:Bool = false;
 	public var attackComboKnown:Bool = false;
 	public var inRift:Bool = false;
+	public var inBossFight:Bool = false;
+	public var riftRemain:Float = 0;
+	public var targetBossId:String = "";
 	public var encounterKnown:Bool = false;
 	public var targetKnown:Bool = false;
 	public var targetValid:Bool = false;
@@ -119,12 +122,24 @@ class AuraSignalFrame {
 		return null;
 	}
 
+	/** A live row always outranks a known-absent row carrying the same id. */
 	function findStatusExact(key:String):StatusSignalSnap {
+		var absent:StatusSignalSnap = null;
 		for (i in 0...statusCount) {
 			var s = statuses[i];
-			if (s.rawId.toLowerCase() == key) return s;
-			for (alias in s.ids) if (alias.toLowerCase() == key) return s;
+			var match = s.rawId.toLowerCase() == key;
+			if (!match) {
+				for (alias in s.ids) {
+					if (alias.toLowerCase() == key) {
+						match = true;
+						break;
+					}
+				}
+			}
+			if (!match) continue;
+			if (s.present) return s;
+			if (absent == null) absent = s;
 		}
-		return null;
+		return absent;
 	}
 }

@@ -1,11 +1,11 @@
 package solarflare.ui;
 
 /**
- * Pure profile snapshot normalization and v17 -> v18 schema migration.
+ * Pure profile snapshot normalization and legacy -> v19 schema migration.
  * Free of native ImGui, hl.Bytes, or runtime dependencies for isolated validation.
  */
 class ProfileMigration {
-	public static inline var VERSION:Int = 18;
+	public static inline var VERSION:Int = 19;
 
 	/** Remove retired feature-local profile banks from one universal snapshot and enforce schema v18. */
 	public static function normalizeProfileSnapshot(data:Dynamic):Dynamic {

@@ -3,17 +3,28 @@
 import imgui.ref.BoolRef;
 
 /**
- * JSONL combat recording under hlx/mods/solarflare/logs/combatlog/. Buffered; flushed from observe.
+ * JSONL combat recording under hlx/mods/solarflare/logs/combatlog/.
+ *
+ * Recording is passive: it runs whenever `enabled` is true and does not depend on the
+ * combat overlay being on screen. Writes are flushed on the recorder's own cadence from
+ * `queue`, so a hidden meter or a stalled/crashed frame loop cannot discard queued combat.
  */
 class CombatLogRecorder {
 	public static inline var IDLE_S:Float = 30;
+	/** Opportunistic flush cadence so recording never rides on the draw/observe loop. */
+	public static inline var FLUSH_S:Float = 0.5;
+	/** Hard per-session cap; once exceeded the oldest lines are dropped to keep the newest. */
+	public static inline var MAX_BYTES:Int = 5 * 1024 * 1024;
 
-	public static var enabled = new BoolRef(true);
+	/** Fresh installs are silent; SettingsStore restores an explicit persisted opt-in. */
+	public static var enabled = new BoolRef(false);
 	public static var lastPath:String = "";
 	public static var lastStatus:String = "record idle";
 	public static var written:Int = 0;
+	public static var trimmed:Int = 0;
 
 	static var buf:Array<String> = [];
+	static var bufBytes:Int = 0;
 	static var sessionPath:String = "";
 	static var lastFlushAt:Float = 0;
 	static var lastEventAt:Float = 0;
@@ -22,10 +33,20 @@ class CombatLogRecorder {
 		if (!enabled.get() || line == null)
 			return;
 		ensureSession(false);
-		try
-			buf.push(line.toJson())
-		catch (_:Dynamic) {}
+		try {
+			var json = line.toJson();
+			buf.push(json);
+			bufBytes += json.length + 1;
+		} catch (_:Dynamic) {}
 		lastEventAt = stamp();
+		// Passive durability: flush on our own cadence. A hidden overlay or a stalled
+		// frame loop (modal exception dialog) must never discard queued combat.
+		var now = stamp();
+		if (bufBytes >= MAX_BYTES || now - lastFlushAt >= FLUSH_S)
+			flush();
+		// If the disk write failed we still bound RAM rather than grow forever.
+		if (bufBytes > MAX_BYTES)
+			trimBuf();
 	}
 
 	public static function tick():Void {
@@ -47,15 +68,47 @@ class CombatLogRecorder {
 		try {
 			var chunk = buf.join("\n") + "\n";
 			buf = [];
+			bufBytes = 0;
 			var out = sys.io.File.append(sessionPath);
 			out.writeString(chunk);
 			out.close();
 			written += chunk.split("\n").length - 1;
 			lastFlushAt = stamp();
-			lastStatus = "recording " + written + "  " + fileName();
+			enforceCap();
+			lastStatus = "recording " + written + "  " + fileName()
+				+ (trimmed > 0 ? "  (trimmed " + trimmed + ")" : "");
 		} catch (_:Dynamic) {
 			lastStatus = "record fail";
 		}
+	}
+
+	/** Bounds in-RAM queue when a disk write fails, so a stuck loop cannot leak. */
+	static function trimBuf():Void {
+		while (bufBytes > MAX_BYTES && buf.length > 0) {
+			var first = buf.shift();
+			bufBytes -= first.length + 1;
+			trimmed++;
+		}
+	}
+
+	/** Hard size cap: drop the oldest bytes so one session can never grow unbounded. */
+	static function enforceCap():Void {
+		if (sessionPath.length == 0)
+			return;
+		try {
+			if (!sys.FileSystem.exists(sessionPath))
+				return;
+			if (sys.FileSystem.stat(sessionPath).size <= MAX_BYTES)
+				return;
+			var content = sys.io.File.getContent(sessionPath);
+			var cut = content.length - MAX_BYTES;
+			if (cut <= 0)
+				return;
+			var nl = content.indexOf("\n", cut);
+			var head = nl >= 0 ? content.substr(nl + 1) : content.substr(cut);
+			trimmed += nl >= 0 ? nl + 1 : cut;
+			sys.io.File.saveContent(sessionPath, head);
+		} catch (_:Dynamic) {}
 	}
 
 	public static function endSession():Void {
