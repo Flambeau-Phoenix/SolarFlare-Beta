@@ -1,6 +1,6 @@
 ![Aura instant cast proc](ghub.gif)
 
-# SolarFlare — v1.4 Beta
+# SolarFlare — v2.1b (Beta)
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
 
 ![Bee + Imp DPS](TrinketBee_Imp.png)
