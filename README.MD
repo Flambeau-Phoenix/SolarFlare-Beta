@@ -124,7 +124,21 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 
 ---
 
-## SolarFlare v2b — Changelog
+# SolarFlare — v2.1b Patch Notes
+
+### What's New
+
+* **Trackable Status Stacks:** Auras can now display and react to live stack counts for buffs, debuffs, and other player statuses.
+* **Dedicated Stacks Display:** The Aura Builder now features a spot dedicated entirely to stacks display.
+* **Inner Demon Tracking:** Added dedicated tracking for Inner Demon stacks in Auras.
+* **Minion DPS Attribution:** Minions are now identified individually, with their damage credited to the owning player in the DPS meter.
+* **Enemy Cast Bars:** Enemy unit frames can now display active casts.
+* **Custom Cast Bars:** Create and configure personalized cast bars for tracked abilities.
+* **Character Profiles:** Profiles can now be assigned to individual characters for automatic switching.
+
+---
+
+## SolarFlare v2b
 
 ### Six-Hook Runtime Optimization
 * **44 → 6 Hooks:** Removed 38 redundant release hooks while retaining all required cast, prayer, damage, and UI-drag events.
