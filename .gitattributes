@@ -1,0 +1,2 @@
+*.zip filter=lfs diff=lfs merge=lfs -text
+F:/SolarFlareGitRepo/SolarFlare-Beta/src/solarflare/castbar/SolarFlare-Beta-live.zip filter=lfs diff=lfs merge=lfs -text
