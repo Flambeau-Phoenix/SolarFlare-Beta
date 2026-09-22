@@ -94,6 +94,8 @@ typedef AuraImportExportModel = {
 	@:optional var followBuffDuration:Bool;
 	@:optional var glowColor:Int;
 	@:optional var stackCounter:Bool;
+	@:optional var stackScale:Float;
+	@:optional var stackPlace:Int;
 	@:optional var showLabel:Bool;
 	@:optional var isCounter:Bool;
 	@:optional var bannerText:String;

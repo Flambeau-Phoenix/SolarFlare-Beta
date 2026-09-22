@@ -52,9 +52,16 @@ class AuraOverlay {
 	public var openBuilder:Void->Void;
 	function drawOne(a:AuraDef):Void {
 		if (a == null || !a.enabled.get()) return;
-		var layout = cfg.unlockAll.get() || (a.chrome != null && !a.chrome.locked.get());
-		if (a.alertShow) drawAlert(a);
+		// A window that is individually locked must hide when conditions are not met,
+		// regardless of the global unlockAll flag (which defaults to true and would
+		// otherwise keep every window visible as a ghost even when locked).
+		var indivLocked = a.chrome != null && a.chrome.locked.get();
+		var layout = cfg.unlockAll.get() || !indivLocked;
+		if (!a.show && indivLocked) return;
+		// Unlocked windows in layout mode stay visible as a ghost so the author can
+		// see and reposition them even when the condition is not active.
 		if (!a.show && !layout) return;
+		if (a.alertShow) drawAlert(a);
 		var sc:Single = Math.max(0.4, Math.min(2.5, a.scale.get()));
 		var w:Single = Math.max(24, a.w.get() * sc);
 		var h:Single = Math.max(24, a.h.get() * sc);

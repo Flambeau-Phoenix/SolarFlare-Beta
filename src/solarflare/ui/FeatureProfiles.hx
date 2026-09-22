@@ -2,6 +2,7 @@ package solarflare.ui;
 
 import haxe.Json;
 import imgui.ImGui;
+import solarflare.HealthCache;
 import solarflare.ui.ToastManager;
 import solarflare.ui.ByteUtil;
 
@@ -16,10 +17,13 @@ class FeatureProfiles {
 	public static var activeProfile:String = DEFAULT_KEY;
 	public static var profiles:Map<String, Dynamic> = new Map();
 	public static var order:Array<String> = [DEFAULT_KEY];
+	/** One universal profile per observed GameApp.connectionInfo.heroID. */
+	public static var characterProfiles:Map<String, String> = new Map();
 
 	static var nameBuf:hl.Bytes;
 	static var statusMsg:String = "";
 	static var statusTimer:Float = 0;
+	static var observedCharacterUid:String = "";
 
 	public static function init(cfg:ConfigPanel):Void {
 		ensureBuffer();
@@ -40,6 +44,8 @@ class FeatureProfiles {
 	public static function load(cfg:ConfigPanel, data:Dynamic):Void {
 		profiles = new Map();
 		order = [];
+		characterProfiles = new Map();
+		observedCharacterUid = "";
 
 		if (data != null) {
 			// 1. Check for modern universal profiles
@@ -58,6 +64,19 @@ class FeatureProfiles {
 				var act = normalizeName(Reflect.field(universal, "active"));
 				if (act.length > 0)
 					activeProfile = act;
+
+				// Character bindings are rows instead of object fields so every UID
+				// remains safe to round-trip through JSON regardless of its contents.
+				var bindings = Reflect.field(universal, "characterProfiles");
+				if (bindings != null && Std.isOfType(bindings, Array)) {
+					var rows:Array<Dynamic> = cast bindings;
+					for (row in rows) {
+						var uid = normalizeUid(Reflect.field(row, "uid"));
+						var profile = normalizeName(Reflect.field(row, "profile"));
+						if (uid.length > 0 && profile.length > 0)
+							characterProfiles.set(uid, profile);
+					}
+				}
 			}
 
 			// 2. Backward compatibility & Migration: check legacy domain banks
@@ -98,15 +117,39 @@ class FeatureProfiles {
 		storeCurrent(cfg);
 	}
 
+	/** One-time v24 repair: the initial cast-bar release saved every new block hidden. */
+	public static function migrateCastBarVisible(cfg:ConfigPanel):Void {
+		if (cfg != null && cfg.castBar != null)
+			cfg.castBar.hidden.set(false);
+		for (key in profiles.keys()) {
+			var snap = profiles.get(key);
+			var resources = snap != null ? Reflect.field(snap, "resources") : null;
+			var castBar = resources != null ? Reflect.field(resources, "castBar") : null;
+			if (castBar != null)
+				Reflect.setField(castBar, "hidden", false);
+		}
+	}
+
 	public static function dump():Dynamic {
 		var profsObj:Dynamic = {};
 		for (key in order) {
 			if (profiles.exists(key))
 				Reflect.setField(profsObj, key, profiles.get(key));
 		}
+		var bindings:Array<Dynamic> = [];
+		var uids:Array<String> = [];
+		for (uid in characterProfiles.keys())
+			uids.push(uid);
+		uids.sort(function(a:String, b:String):Int return Reflect.compare(a, b));
+		for (uid in uids) {
+			var profile = characterProfiles.get(uid);
+			if (profile != null && profiles.exists(profile))
+				bindings.push({uid: uid, profile: profile});
+		}
 		return {
 			active: activeProfile,
-			profiles: profsObj
+			profiles: profsObj,
+			characterProfiles: bindings
 		};
 	}
 
@@ -119,6 +162,8 @@ class FeatureProfiles {
 
 		// One compact row: combo + actions. Leaves ~half the window free on wide hubs.
 		drawProfileRow(cfg, id);
+		ImGui.spacing();
+		drawCharacterDefault(cfg, id);
 
 		if (ImGui.beginPopupModal("New Universal Profile##fp_new_popup_" + id, null, imgui.Enums.ImGuiWindowFlags.AlwaysAutoResize)) {
 			UiChrome.heading("New Profile", 1.15);
@@ -180,13 +225,33 @@ class FeatureProfiles {
 		var avail = ImGui.getContentRegionAvail().x;
 		if (avail > 420) comboW = 180;
 
+		var currentUid = currentCharacterUid();
+		var assignedProfile = currentUid.length > 0 ? characterProfiles.get(currentUid) : null;
+		var preview = activeProfile + (assignedProfile == activeProfile ? "  [Character default]" : "");
+
 		ImGui.setNextItemWidth(comboW);
-		if (ImGui.beginCombo("##fp_select_" + id, activeProfile)) {
+		if (ImGui.beginCombo("##fp_select_" + id, preview)) {
 			for (key in order) {
-				if (ImGui.selectable(key + "##fp_opt_" + id + "_" + key, key == activeProfile)) {
+				var label = key + (key == assignedProfile ? "  [Current character]" : "");
+				if (ImGui.selectable(label + "##fp_opt_" + id + "_" + key, key == activeProfile)) {
 					if (key != activeProfile)
 						switchTo(cfg, key);
 				}
+			}
+			ImGui.separator();
+			if (currentUid.length == 0) {
+				ImGui.textDisabled("Character unavailable");
+			} else {
+				ImGui.textDisabled(currentCharacterLabel());
+				if (assignedProfile == activeProfile) {
+					if (ImGui.selectable("Unassign current character##fp_unassign_" + id))
+						unassignCurrentCharacter(cfg);
+				} else {
+					if (ImGui.selectable('Assign "$activeProfile" to current character##fp_assign_' + id))
+						assignCurrentCharacter(cfg);
+				}
+				if (ImGui.isItemHovered())
+					ImGui.setTooltip("Automatically loads this profile when this character becomes active.");
 			}
 			ImGui.endCombo();
 		}
@@ -212,6 +277,45 @@ class FeatureProfiles {
 		}
 	}
 
+	/**
+	 * Keeps per-character auto-loading visible instead of hiding it in the
+	 * profile selector. This appears in full profile toolbars; compact builder
+	 * bars retain the dropdown actions so they do not grow vertically.
+	 */
+	static function drawCharacterDefault(cfg:ConfigPanel, id:String):Void {
+		var uid = currentCharacterUid();
+		var assignedProfile = uid.length > 0 ? characterProfiles.get(uid) : null;
+		var validAssignment = assignedProfile != null && profiles.exists(assignedProfile);
+
+		UiChrome.subHeader("Character Default");
+		UiLayout.propertyGrid("##fp_character_default_" + id, function() {
+			UiLayout.propertyRow("Current character", function() {
+				ImGui.textUnformatted(uid.length > 0 ? currentCharacterLabel() : "Unavailable");
+			});
+			UiLayout.propertyRow("Assigned profile", function() {
+				ImGui.textUnformatted(validAssignment ? assignedProfile : "Not assigned");
+			});
+			UiLayout.propertyRow("Auto-load", function() {
+				if (uid.length == 0) {
+					ImGui.textDisabled("Enter the world to assign a profile.");
+				} else if (validAssignment && assignedProfile == activeProfile) {
+					UiLayout.inlinePair("##fp_character_actions_" + id, function(_:Single) {
+						ImGui.textColored(ImGui.vec4(0.45, 0.88, 0.55, 1.0), 'Using "$activeProfile"');
+					}, function(w:Single) {
+						if (UiChrome.ghostButton("Unassign##fp_character_unassign_" + id, ImGui.vec2(w, 28)))
+							unassignCurrentCharacter(cfg);
+					}, 8);
+				} else {
+					var action = validAssignment
+						? 'Replace "$assignedProfile" with "$activeProfile"'
+						: 'Use "$activeProfile" for this character';
+					if (UiChrome.accentButton(action + "##fp_character_assign_" + id, ImGui.vec2(-1, 28)))
+						assignCurrentCharacter(cfg);
+				}
+			}, "The assigned profile loads automatically when this character becomes active.");
+		}, 0, 132, 28);
+	}
+
 	public static function save(cfg:ConfigPanel):Void {
 		storeCurrent(cfg);
 		setStatus('Profile "$activeProfile" saved.');
@@ -220,15 +324,63 @@ class FeatureProfiles {
 		ToastManager.success('Universal Profile "$activeProfile" saved!');
 	}
 
-	public static function switchTo(cfg:ConfigPanel, key:String):Void {
+	public static function switchTo(cfg:ConfigPanel, key:String, automatic:Bool = false):Void {
 		if (cfg == null || key == null || !profiles.exists(key)) return;
 		storeCurrent(cfg);
 		activeProfile = key;
 		applyUniversal(cfg, key);
-		setStatus('Loaded profile "$key".');
+		setStatus(automatic ? 'Auto-loaded "$key".' : 'Loaded profile "$key".');
 		SettingsStore.markDirty();
-		SettingsStore.saveNow();
-		ToastManager.info('Switched to profile "$key"');
+		if (automatic)
+			SettingsStore.save(cfg);
+		else
+			SettingsStore.saveNow();
+		ToastManager.info(automatic
+			? 'Loaded character profile "$key"'
+			: 'Switched to profile "$key"');
+	}
+
+	/** Called from the observe layer after HealthCache has frozen the current identity. */
+	public static function observeCharacter(cfg:ConfigPanel):Void {
+		var uid = currentCharacterUid();
+		if (uid.length == 0) {
+			observedCharacterUid = "";
+			return;
+		}
+		var migrated = migrateLegacyCharacterAssignment(cfg, uid);
+		if (uid == observedCharacterUid && !migrated)
+			return;
+		observedCharacterUid = uid;
+		var assigned = characterProfiles.get(uid);
+		if (assigned != null && profiles.exists(assigned) && assigned != activeProfile)
+			switchTo(cfg, assigned, true);
+	}
+
+	public static function assignCurrentCharacter(cfg:ConfigPanel):Void {
+		var uid = currentCharacterUid();
+		if (uid.length == 0) {
+			setStatus("Character unavailable.");
+			ToastManager.warn("Current character is not available yet.");
+			return;
+		}
+		characterProfiles.set(uid, activeProfile);
+		observedCharacterUid = uid;
+		setStatus('Assigned ${currentCharacterLabel()} to "$activeProfile".');
+		SettingsStore.markDirty();
+		SettingsStore.save(cfg);
+		ToastManager.success('${currentCharacterLabel()} now defaults to "$activeProfile".');
+	}
+
+	public static function unassignCurrentCharacter(cfg:ConfigPanel):Void {
+		var uid = currentCharacterUid();
+		if (uid.length == 0)
+			return;
+		characterProfiles.remove(uid);
+		observedCharacterUid = uid;
+		setStatus('Unassigned ${currentCharacterLabel()}.');
+		SettingsStore.markDirty();
+		SettingsStore.save(cfg);
+		ToastManager.info('${currentCharacterLabel()} no longer has a default profile.');
 	}
 
 	public static function create(cfg:ConfigPanel, requested:String):Bool {
@@ -274,6 +426,13 @@ class FeatureProfiles {
 		}
 		profiles.remove(key);
 		order.remove(key);
+		var staleBindings:Array<String> = [];
+		for (uid in characterProfiles.keys()) {
+			if (characterProfiles.get(uid) == key)
+				staleBindings.push(uid);
+		}
+		for (uid in staleBindings)
+			characterProfiles.remove(uid);
 		activeProfile = DEFAULT_KEY;
 		applyUniversal(cfg, DEFAULT_KEY);
 		setStatus('Deleted "$key".');
@@ -298,6 +457,7 @@ class FeatureProfiles {
 			combo: SettingsStore.comboDump(cfg.combo),
 			attackCombo: SettingsStore.attackComboDump(cfg.attackCombo),
 			target: SettingsStore.targetDump(cfg.target),
+			castBar: SettingsStore.castBarDump(cfg.castBar),
 			chaincast: SettingsStore.chaincastDump(cfg.chaincast),
 			conduit: SettingsStore.conduitDump(cfg.conduit)
 		};
@@ -327,6 +487,7 @@ class FeatureProfiles {
 			SettingsStore.applyCombo(cfg.combo, Reflect.field(resSnap, "combo"));
 			SettingsStore.applyAttackCombo(cfg.attackCombo, Reflect.field(resSnap, "attackCombo"));
 			SettingsStore.applyTarget(cfg.target, Reflect.field(resSnap, "target"));
+			SettingsStore.applyCastBar(cfg.castBar, Reflect.field(resSnap, "castBar"));
 			SettingsStore.applyChaincast(cfg.chaincast, Reflect.field(resSnap, "chaincast"));
 			SettingsStore.applyConduit(cfg.conduit, Reflect.field(resSnap, "conduit"));
 		}
@@ -355,6 +516,41 @@ class FeatureProfiles {
 		s = StringTools.replace(s, "\n", " ");
 		s = StringTools.replace(s, "\r", "");
 		if (s.length > 48) s = s.substr(0, 48);
+		return s;
+	}
+
+	static function currentCharacterUid():String {
+		var id = normalizeUid(HealthCache.characterId);
+		return id.length > 0 ? "hero:" + id : "";
+	}
+
+	/** Move the prior account-wide binding onto the first actual character observed. */
+	static function migrateLegacyCharacterAssignment(cfg:ConfigPanel, uid:String):Bool {
+		if (uid.length == 0 || characterProfiles.exists(uid))
+			return false;
+		var legacyUid = normalizeUid(HealthCache.playerUid);
+		if (legacyUid.length == 0 || !characterProfiles.exists(legacyUid))
+			return false;
+		var assigned = characterProfiles.get(legacyUid);
+		if (assigned == null || !profiles.exists(assigned))
+			return false;
+		characterProfiles.set(uid, assigned);
+		characterProfiles.remove(legacyUid);
+		SettingsStore.markDirty();
+		SettingsStore.save(cfg);
+		return true;
+	}
+
+	static function currentCharacterLabel():String {
+		var name = HealthCache.heroName != null ? StringTools.trim(HealthCache.heroName) : "";
+		return name.length > 0 ? name : "Current character";
+	}
+
+	static function normalizeUid(v:Dynamic):String {
+		if (v == null) return "";
+		var s = StringTools.trim(Std.string(v));
+		if (s == "null" || s == "undefined") return "";
+		if (s.length > 256) s = s.substr(0, 256);
 		return s;
 	}
 

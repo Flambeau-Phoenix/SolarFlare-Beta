@@ -61,6 +61,10 @@ class AuraDef {
 	/** Packed 0xAARRGGBB glow accent (used when iconGlow is active). */
 	public var glowColor:Int;
 	public var stackCounter:BoolRef;
+	/** Stack / activation count text size multiplier vs. the auto-fit base. */
+	public var stackScale:FloatRef;
+	/** Same placement contract as countdownPlace: 0 = center, 1 = above, 2 = below. */
+	public var stackPlace:Int;
 	public var showLabel:BoolRef;
 	public var isCounter:BoolRef;
 	public var counterValue:Int;
@@ -180,6 +184,8 @@ class AuraDef {
 		canvasElements = [];
 		glowColor = 0xFFFF8800;
 		stackCounter = new BoolRef(false);
+		stackScale = new FloatRef(1);
+		stackPlace = 2;
 		showLabel = new BoolRef(false);
 		isCounter = new BoolRef(false);
 		counterValue = 0;

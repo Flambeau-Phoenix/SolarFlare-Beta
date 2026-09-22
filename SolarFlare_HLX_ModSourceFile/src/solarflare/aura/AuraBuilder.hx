@@ -911,7 +911,7 @@ class AuraBuilder {
 		if (a == null) return;
 		var selectionCount = countSelected();
 		if (selectionCount > 1) ImGui.textDisabled("Selection shortcuts — " + selectionCount + " auras");
-		var columns = UiLayout.columnCount(ImGui.getContentRegionAvail().x, 108, 4, 6);
+		var columns = UiLayout.columnCount(ImGui.getContentRegionAvail().x, 108, 2, 6);
 		ImGui.pushStyleVar(ImGuiStyleVar.CellPadding, ImGui.vec2(3, 3));
 		try {
 			UiScope.table("##ab_fx_tiles", columns, function() {
@@ -926,22 +926,41 @@ class AuraBuilder {
 							function(v) applyFxToTargets(function(x) AuraEffects.setIconGlow(x, v)));
 						case 1: drawFxTile("Fuse", "ab_fx_fuse", fxState(function(x) return x.showFuse.get()), w, 32,
 							function(v) applyFxToTargets(function(x) x.showFuse.set(v)));
-						case 2: drawFxTile("Ring", "ab_fx_ring", fxState(function(x) return x.progressRing.get()), w, 32,
+						case 2: drawFxTile("CD Bar", "ab_fx_fbot", fxState(function(x) return x.fuseBottom.get()), w, 32,
+							function(v) applyFxToTargets(function(x) x.fuseBottom.set(v)));
+						case 3: drawFxTile("Label", "ab_fx_lbl", fxState(function(x) return x.showLabel.get()), w, 32,
+							function(v) applyFxToTargets(function(x) x.showLabel.set(v)));
+						case 4: drawFxTile("Ring", "ab_fx_ring", fxState(function(x) return x.progressRing.get()), w, 32,
 							function(v) applyFxToTargets(function(x) x.progressRing.set(v)));
-						case 3: drawFxTile("Stacks", "ab_fx_stk", fxState(function(x) return x.stackCounter.get()), w, 32,
+						case 5: drawFxTile("Stacks", "ab_fx_stk", fxState(function(x) return x.stackCounter.get()), w, 32,
 							function(v) applyFxToTargets(function(x) {
 								x.stackCounter.set(v);
 								if (v) x.isCounter.set(false);
 							}));
-						case 4: drawFxTile("Bottom", "ab_fx_fbot", fxState(function(x) return x.fuseBottom.get()), w, 32,
-							function(v) applyFxToTargets(function(x) x.fuseBottom.set(v)));
-						case 5: drawFxTile("Label", "ab_fx_lbl", fxState(function(x) return x.showLabel.get()), w, 32,
-							function(v) applyFxToTargets(function(x) x.showLabel.set(v)));
 					}
 				}
 			}, imgui.Enums.ImGuiTableFlags.SizingStretchProp | imgui.Enums.ImGuiTableFlags.NoSavedSettings);
 		} catch (e:Dynamic) { ImGui.popStyleVar(); throw e; }
 		ImGui.popStyleVar();
+		if (a.stackCounter.get() || a.isCounter.get()) {
+			UiLayout.propertyGrid("##ab_stack_display", function() {
+				UiLayout.propertyRow("Stack position", function() {
+					ImGui.setNextItemWidth(-1);
+					if (ImGui.beginCombo("##ab_stack_place", stackPlaceLabel(a.stackPlace))) {
+						for (p in 0...3)
+							if (ImGui.selectable(stackPlaceLabel(p) + "##ab_stackp_" + p, a.stackPlace == p)) {
+								a.stackPlace = p;
+								SettingsStore.markDirty();
+							}
+						ImGui.endCombo();
+					}
+				}, "Places the tracked stack count above, over, or below the aura face.");
+				UiLayout.propertyRow("Stack size", function() {
+					if (BuilderSlider.draw("##ab_stack_scale", a.stackScale, 0.5, 3, "%.2fx"))
+						SettingsStore.markDirty();
+				});
+			});
+		}
 		syncGlowColor(a);
 		UiLayout.propertyGrid("##ab_fx_glow_col", function() {
 			UiLayout.propertyRow("Glow color", function() {
@@ -1110,61 +1129,20 @@ class AuraBuilder {
 	}
 
 	function drawThenPreview(a:AuraDef):Void {
-		// Compact transport toolbar: fixed-size actions and a bounded speed control.
-		if (ImGui.button((advancedPreview.autoPlay ? "Pause" : "Play") + "##ab_appear_playbtn", ImGui.vec2(60, 26)))
-			advancedPreview.autoPlay = !advancedPreview.autoPlay;
-		ImGui.sameLine(0, 8);
-		ImGui.alignTextToFramePadding();
-		ImGui.text("Speed");
-		ImGui.sameLine(0, 4);
-		var utilityW = ImGui.calcTextSize("Grid").x + ImGui.calcTextSize("Bounds").x + ImGui.calcTextSize("Ghost").x + 48;
-		ImGui.setNextItemWidth(Math.max(60, Math.min(100, ImGui.getContentRegionAvail().x - utilityW)));
-		BuilderSlider.draw("##ab_appear_speed", advancedPreview.animSpeed, 0.2, 2.5, "%.1fx");
-
-		ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, 4);
-		ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
-		try {
-			var theme = solarflare.ui.ThemePalette.current();
-			for (i in 0...3) {
-				var on = i == 0 ? advancedPreview.showGrid : (i == 1 ? advancedPreview.showBounds : advancedPreview.ghostPreview);
-				var label = i == 0 ? "Grid##ab_grid" : (i == 1 ? "Bounds##ab_bounds" : "Ghost##ab_ghost");
-				ImGui.sameLine(0, 4);
-				ImGui.pushStyleColor(ImGuiCol.Button, on ? ImGui.vec4(
-					theme.cellBg.x * 0.6 + theme.accent.x * 0.4,
-					theme.cellBg.y * 0.6 + theme.accent.y * 0.4,
-					theme.cellBg.z * 0.6 + theme.accent.z * 0.4, 1) : theme.windowBg);
-				var clicked = false;
-				try { clicked = ImGui.smallButton(label); }
-				catch (e:Dynamic) { ImGui.popStyleColor(); throw e; }
-				ImGui.popStyleColor();
-				if (clicked) {
-					if (i == 0) advancedPreview.showGrid = !on;
-					else if (i == 1) advancedPreview.showBounds = !on;
-					else advancedPreview.ghostPreview = !on;
-				}
-			}
-		} catch (e:Dynamic) { ImGui.popStyleVar(2); throw e; }
-		ImGui.popStyleVar(2);
-
 		var width = ImGui.getContentRegionAvail().x;
-		var stage:Single = Math.max(96, Math.min(176, width * 0.5));
-		advancedPreview.draw(a, stage, stage, false, true);
-		if (ImGui.isItemHovered()) ImGui.setTooltip("Live preview of the current settings.");
-		ImGui.sameLine(0, 10);
-		drawSummaryBlock(a, Math.max(120, width - stage - 10));
-		advancedPreview.drawFxButtons(a);
-		drawSectionCard("Timers and Display", "", false, function() drawAppearanceFxStrip(a));
-
-		UiLayout.propertyGrid("##ab_appear_sim", function() {
-			UiLayout.propertyRow("Simulation", function() {
-				UiLayout.inlinePair("##ab_appear_sim_pair", function(_:Single) {
-					if (BuilderSlider.draw("Progress##ab_ap_prog", advancedPreview.progress, 0, 1, "%.2f"))
-						advancedPreview.autoPlay = false;
-				}, function(_:Single) {
-					ImGui.sliderInt("Stacks##ab_ap_stk", advancedPreview.stacks, 0, 20, "%d");
-				});
-			});
-		});
+		var previewW:Single = Math.max(160, Math.min(220, width * 0.38));
+		UiScope.table("##ab_preview_controls", 2, function() {
+			ImGui.tableSetupColumn("##preview", imgui.Enums.ImGuiTableColumnFlags.WidthFixed, previewW);
+			ImGui.tableSetupColumn("##controls", imgui.Enums.ImGuiTableColumnFlags.WidthStretch, 1);
+			ImGui.tableNextRow();
+			ImGui.tableSetColumnIndex(0);
+			advancedPreview.draw(a, previewW, previewW, false, true);
+			if (ImGui.isItemHovered()) ImGui.setTooltip("Live preview of the current settings.");
+			drawSummaryBlock(a, previewW);
+			ImGui.tableSetColumnIndex(1);
+			UiChrome.subHeader("Display shortcuts");
+			drawAppearanceFxStrip(a);
+		}, imgui.Enums.ImGuiTableFlags.SizingStretchProp | imgui.Enums.ImGuiTableFlags.NoSavedSettings);
 		ImGui.separator();
 	}
 
@@ -1535,7 +1513,7 @@ class AuraBuilder {
 		}
 
 		var shown = 0;
-		var childOpen = ImGui.beginChild(id + "_results", ImGui.vec2(440, 260), ImGuiChildFlags.Borders);
+		var childOpen = ImGui.beginChild(id + "_results", ImGui.vec2(440, 340), ImGuiChildFlags.Borders);
 		if (childOpen) {
 			for (entry in AuraCatalog.entries) {
 				var matchesKind = kind == "status"
@@ -1603,8 +1581,6 @@ class AuraBuilder {
 					var grant = CdbAuraTable.grantedStatusId(wizardSubject);
 					if (grant.length > 0 && grant != wizardSubject) {
 						c.subject = grant;
-						c.subjectLabel = wizardSubjectName(grant);
-						wizardSubject = grant;
 					}
 				}
 			}
@@ -2428,6 +2404,14 @@ class AuraBuilder {
 		return switch (p) {
 			case 1: "Above";
 			case 2: "Below";
+			default: "Center";
+		};
+	}
+
+	static inline function stackPlaceLabel(p:Int):String {
+		return switch (p) {
+			case 1: "Top";
+			case 2: "Bottom";
 			default: "Center";
 		};
 	}

@@ -48,6 +48,9 @@ class TelemetryKernel {
 			GameIcons.get(GameIcons.CHROME_SUN);
 			GameIcons.get(GameIcons.RIFT_SUN);
 			GameIcons.get(GameIcons.HUB_LOGO);
+			GameIcons.get("castbar_solar");
+			GameIcons.get("castbar_obsidian");
+			GameIcons.get("castbar_gilded");
 		}
 		if (GameIcons.hasPending())
 			GameIcons.tickPreload();

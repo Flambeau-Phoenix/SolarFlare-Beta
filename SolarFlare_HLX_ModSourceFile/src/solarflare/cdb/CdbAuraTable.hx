@@ -93,6 +93,11 @@ class CdbAuraTable {
 		ensure();
 		if (id == null || id.length == 0)
 			return "";
+		// Inner Demon references both its rank-3 shield and its always-on ready
+		// marker in script.  The generic CDB baker sees the shield first, but the
+		// status users actually mean when selecting the passive is the ready buff.
+		if (norm(id) == "staff_summondemon_passive")
+			return "Staff_SummonDemon_Passive_Buff";
 		var g = granted.get(norm(id));
 		if (g != null && g.length > 0)
 			return g;

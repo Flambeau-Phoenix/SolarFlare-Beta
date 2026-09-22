@@ -384,9 +384,12 @@ class AuraConditionEditor {
 	}
 
 	static function subjectName(c:AuraConditionDef):String {
+		// subjectLabel is the stable user-facing identity selected in the catalog.
+		// `subject` may intentionally be rewritten to an engine status id.
+		if (solarflare.cdb.AuraCatalog.validName(c.subjectLabel)) return c.subjectLabel;
 		var name = solarflare.cdb.AuraCatalog.label(c.subject);
 		if (solarflare.cdb.AuraCatalog.validName(name)) return name;
-		return solarflare.cdb.AuraCatalog.validName(c.subjectLabel) ? c.subjectLabel : c.subject;
+		return c.subject;
 	}
 
 	static function drawSubjectInline(a:AuraDef, c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String, bossFocusId:String):Void {
@@ -510,21 +513,17 @@ class AuraConditionEditor {
 		}
 		if (!solarflare.ui.GameIcons.imageKey(id, 28, 28)) ImGui.dummy(ImGui.vec2(28, 28));
 		ImGui.sameLine();
+		var resolvedId = id;
+		if (subjectKind == "status") {
+			var grant = solarflare.cdb.CdbAuraTable.grantedStatusId(id);
+			if (grant.length > 0 && grant != id)
+				resolvedId = grant;
+		}
 		var kindTag = entryKind == "statustype" ? "category" : entryKind;
-		if (ImGui.selectable(name + " [" + id + "] · " + kindTag + "##subject_" + tag + id, c.subject == id)) {
-			var resolvedId = id;
-			var resolvedName = name;
-			if (subjectKind == "status") {
-				var grant = solarflare.cdb.CdbAuraTable.grantedStatusId(id);
-				if (grant.length > 0 && grant != id) {
-					resolvedId = grant;
-					var grantName = solarflare.cdb.AuraCatalog.label(grant);
-					resolvedName = solarflare.cdb.AuraCatalog.validName(grantName) ? grantName : solarflare.cdb.CdbAuraTable.name(grant);
-					if (resolvedName == null || resolvedName.length == 0) resolvedName = grant;
-				}
-			}
+		if (ImGui.selectable(name + " [" + id + "] · " + kindTag + "##subject_" + tag + id, c.subject == resolvedId)) {
 			c.subject = resolvedId;
-			c.subjectLabel = resolvedName;
+			// Keep the catalog identity stable; the tooltip shows the resolved id.
+			c.subjectLabel = name;
 			ui.sync(c);
 			ui.flashContext();
 			SettingsStore.markDirty();

@@ -506,6 +506,8 @@ class AuraEngine {
 			followBuffDuration: boolRef(a.followBuffDuration, true),
 			glowColor: a.glowColor,
 			stackCounter: boolRef(a.stackCounter, false),
+			stackScale: floatRef(a.stackScale, 1),
+			stackPlace: a.stackPlace,
 			showLabel: boolRef(a.showLabel, true),
 			isCounter: boolRef(a.isCounter, false),
 			bannerText: safeString(a.bannerText),

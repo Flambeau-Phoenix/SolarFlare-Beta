@@ -15,6 +15,7 @@ class ObserveDemand {
 	public static var conduit:Bool = false;
 	public static var attackCombo:Bool = false;
 	public static var targetHud:Bool = false;
+	public static var castBars:Bool = false;
 	public static var combatLog:Bool = false;
 	public static var geaux:Bool = false;
 	public static var geauxBuilder:Bool = false;
@@ -86,6 +87,8 @@ class ObserveDemand {
 		conduit = cfg.conduit != null && !cfg.conduit.hidden.get();
 		attackCombo = cfg.attackCombo != null && (!cfg.attackCombo.hidden.get() || cfg.attackCombo.open.get());
 		targetHud = cfg.target != null && !cfg.target.hidden.get();
+		castBars = (cfg.castBar != null && !cfg.castBar.hidden.get())
+			|| (cfg.target != null && !cfg.target.hidden.get() && cfg.target.showCastBar.get());
 		combatLog = cfg.combatLog != null && !cfg.combatLog.hidden.get();
 		geaux = cfg.geaux != null && cfg.geaux.enabled.get();
 		geauxBuilder = cfg.geauxBuilder != null && cfg.geauxBuilder.open.get();

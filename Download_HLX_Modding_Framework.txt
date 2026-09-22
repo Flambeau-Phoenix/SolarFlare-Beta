@@ -1,0 +1,5 @@
+Solar Flare requires you to install the HLX modding framework, download it here:
+https://github.com/hlx-framework/hlx-core/releases
+
+Download the latest release and extract it to your Farever installation folder.
+The extract the Solar Flare mod to your Farever installation folder and it should load the next time you boot up.

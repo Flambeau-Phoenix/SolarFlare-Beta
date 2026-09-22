@@ -8,6 +8,7 @@ import solarflare.combo.Combo;
 import solarflare.conduit.Conduit;
 import solarflare.combatlog.CombatLogCache;
 import solarflare.combatlog.CombatLogOverlay;
+import solarflare.castbar.PlayerCastOverlay;
 import solarflare.geaux.GeauxBar;
 import solarflare.geaux.GeauxCache;
 import solarflare.geaux.GeauxHooks;
@@ -52,6 +53,7 @@ class SolarFlarePanel {
 	var attackComboOverlay:AttackComboOverlay;
 	var combatLogOverlay:CombatLogOverlay;
 	var targetOverlay:TargetOverlay;
+	var playerCastOverlay:PlayerCastOverlay;
 	var launchers:solarflare.ui.HudLaunchers;
 	var auraOverlay:solarflare.aura.AuraOverlay;
 	var lightsaber:LightsaberOverlay;
@@ -78,6 +80,7 @@ class SolarFlarePanel {
 		attackComboOverlay = new AttackComboOverlay();
 		combatLogOverlay = new CombatLogOverlay();
 		targetOverlay = new TargetOverlay();
+		playerCastOverlay = new PlayerCastOverlay();
 		launchers = config.launchers;
 		auraOverlay = new solarflare.aura.AuraOverlay(config.auras);
 		auraOverlay.openBuilder = function() { config.auraBuilder.open.set(true); };
@@ -88,6 +91,7 @@ class SolarFlarePanel {
 		attackComboOverlay.openBuilder = function() { config.resourceTracker.open.set(true); };
 
 		targetOverlay.openBuilder = function() { config.target.open.set(true); };
+		playerCastOverlay.openBuilder = function() { config.castBar.open.set(true); };
 		lightsaber = new LightsaberOverlay();
 		getRiftyOverlay = new GetRiftyOverlay();
 		payloadProbe = new PayloadProbeOverlay();
@@ -142,6 +146,12 @@ class SolarFlarePanel {
 		catch (_:Dynamic) {}
 
 		solarflare.runtime.TelemetryKernel.observe(app, config, restoreNativeChat);
+		// Profile switching consumes the frozen identity only after telemetry has
+		// refreshed it; no live game objects are touched from the profile system.
+		try
+			solarflare.ui.FeatureProfiles.observeCharacter(config)
+		catch (_:Dynamic) {}
+
 	}
 
 	/** Layer 2: ImGui presentation from caches only. */
@@ -208,6 +218,10 @@ class SolarFlarePanel {
 		try {
 			if (!suppressed)
 				targetOverlay.draw(config.target);
+		} catch (_:Dynamic) {}
+		try {
+			if (!suppressed)
+				playerCastOverlay.draw(config.castBar);
 		} catch (_:Dynamic) {}
 		try {
 			if (launchers != null && !suppressed)

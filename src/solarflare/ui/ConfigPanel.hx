@@ -1,10 +1,11 @@
-package solarflare.ui;
+﻿package solarflare.ui;
 
 import solarflare.attackcombo.AttackComboConfig;
 import solarflare.chaincast.Chaincast;
 import solarflare.combo.Combo;
 import solarflare.conduit.Conduit;
 import solarflare.combatlog.CombatLogConfig;
+import solarflare.castbar.CastBarConfig;
 import solarflare.geaux.GeauxConfig;
 import solarflare.geaux.GeauxBuilder;
 import solarflare.getrifty.GetRifty;
@@ -53,6 +54,7 @@ class ConfigPanel {
 	public var conduit:ConduitConfig;
 	public var combatLog:CombatLogConfig;
 	public var target:TargetConfig;
+	public var castBar:CastBarConfig;
 	public var notebook:Notebook;
 	public var launchers:HudLaunchers;
 	public var auras:solarflare.aura.AuraConfig;
@@ -81,6 +83,7 @@ class ConfigPanel {
 	var showCombo:BoolRef;
 	var showAttack:BoolRef;
 	var showTarget:BoolRef;
+	var showCastBar:BoolRef;
 	var showChain:BoolRef;
 	var showConduit:BoolRef;
 	var showF6Btn:BoolRef;
@@ -109,6 +112,7 @@ class ConfigPanel {
 		showCombo = new BoolRef(false);
 		showAttack = new BoolRef(false);
 		showTarget = new BoolRef(false);
+		showCastBar = new BoolRef(false);
 		showChain = new BoolRef(false);
 		showConduit = new BoolRef(false);
 		showF6Btn = new BoolRef(false);
@@ -121,6 +125,7 @@ class ConfigPanel {
 		conduit = new ConduitConfig();
 		combatLog = new CombatLogConfig();
 		target = new TargetConfig();
+		castBar = new CastBarConfig();
 		notebook = new Notebook();
 		launchers = new HudLaunchers();
 		auras = new solarflare.aura.AuraConfig();
@@ -138,6 +143,7 @@ class ConfigPanel {
 		combo.hidden.set(true);
 		attackCombo.hidden.set(true);
 		target.hidden.set(true);
+		castBar.hidden.set(false);
 		chaincast.hidden.set(true);
 		conduit.hidden.set(true);
 		geaux.enabled.set(false);
@@ -182,6 +188,7 @@ class ConfigPanel {
 		if (chaincast != null) registerInteractive(chaincast.open);
 		if (conduit != null) registerInteractive(conduit.open);
 		if (target != null) registerInteractive(target.open);
+		if (castBar != null) registerInteractive(castBar.open);
 		if (attackCombo != null) registerInteractive(attackCombo.open);
 		if (lightsaber != null) {
 			registerInteractive(lightsaber.open);
@@ -399,6 +406,14 @@ class ConfigPanel {
 							if (auras != null && ImGui.checkbox("Auras##hub_aura_show", auras.enabled))
 								SettingsStore.markDirty();
 						});
+						UiLayout.propertyRow("Target Frame", function() {
+							if (target != null)
+								visCheck("Enabled##hub_target_show", target.hidden, showTarget);
+						});
+						UiLayout.propertyRow("Cast Bar", function() {
+							if (castBar != null)
+								visCheck("Enabled##hub_castbar_show", castBar.hidden, showCastBar);
+						});
 						if (launchers != null) {
 							UiLayout.propertyRow("MENU button", function() {
 								visCheck("Show##hub_f6b", launchers.f6.hidden, showF6Btn);
@@ -490,6 +505,9 @@ class ConfigPanel {
 		if (target != null) {
 			try target.draw() catch (_:Dynamic) {}
 		}
+		if (castBar != null) {
+			try castBar.draw() catch (_:Dynamic) {}
+		}
 		try
 			notebook.draw()
 		catch (_:Dynamic) {}
@@ -515,6 +533,8 @@ class ConfigPanel {
 				geauxBuilder.open.set(true);
 			if (ImGui.menuItem("Resource Tracker"))
 				resourceTracker.open.set(true);
+			if (ImGui.menuItem("Player Cast Bar"))
+				castBar.open.set(true);
 			if (ImGui.menuItem("Notebook"))
 				notebook.open.set(true);
 			if (ImGui.menuItem("Lightsaber"))
@@ -713,8 +733,6 @@ class ConfigPanel {
 				ImGui.spacing();
 				drawResourceToggleGrid();
 				ImGui.spacing();
-				resourceQuickRow("Target Frame", "target", target.hidden, target.chrome);
-
 				if (UiChrome.accentButton("Open Resource Tracker Builder##tab_rt_open", ImGui.vec2(-1, 40)))
 					resourceTracker.open.set(true);
 		}
@@ -724,7 +742,6 @@ class ConfigPanel {
 		UiChrome.subHeader("Tracking Bars");
 		var v = vitals;
 		var items:Array<{id:String, label:String, hidden:BoolRef}> = [];
-		if (target != null) items.push({id: "target", label: "Target Frame", hidden: target.hidden});
 		if (v != null) items.push({id: "health", label: "Health Bar", hidden: v.hpHidden});
 		if (v != null) items.push({id: "rage", label: "Rage Bar", hidden: v.rageHidden});
 		if (v != null) items.push({id: "mana", label: "Mana/Spark", hidden: v.manaHidden});
@@ -733,6 +750,9 @@ class ConfigPanel {
 		if (attackCombo != null) items.push({id: "attack", label: "Combo Tracker", hidden: attackCombo.hidden});
 		if (chaincast != null) items.push({id: "chaincast", label: "Chaincast", hidden: chaincast.hidden});
 		if (conduit != null) items.push({id: "conduit", label: "Conduits", hidden: conduit.hidden});
+		if (target != null) items.push({id: "target", label: "Target Frame", hidden: target.hidden});
+		if (castBar != null) items.push({id: "castbar", label: "Player Cast Bar", hidden: castBar.hidden});
+		
 
 		var avail = ImGui.getContentRegionAvail().x;
 		var cols = UiLayout.columnCount(avail, 120, 3, 4);
@@ -807,7 +827,8 @@ class ConfigPanel {
 		}
 	}
 
-	function resourceQuickRow(label:String, id:String, hidden:BoolRef, chrome:HudChrome):Void {
+	function resourceQuickRow(label:String, id:String, hidden:BoolRef, chrome:HudChrome,
+			secondaryLabel:String = null, secondary:BoolRef = null):Void {
 		ImGui.spacing();
 		UiChrome.subHeader(label);
 		UiLayout.propertyGrid("##hub_rt_quick_" + id, function() {
@@ -823,6 +844,12 @@ class ConfigPanel {
 				if (chrome != null && UiChrome.toggleTileRef("##hub_rt_trans_" + id, "Transparent", chrome.transparent, colW, 28))
 					SettingsStore.markDirty();
 			});
+			if (secondary != null) {
+				UiLayout.propertyRow(secondaryLabel != null ? secondaryLabel : "Feature", function() {
+					if (UiChrome.toggleTileRef("##hub_rt_secondary_" + id, "Enabled", secondary, 108, 28))
+						SettingsStore.markDirty();
+				}, "Displays the target's active cast directly beneath its health bar.");
+			}
 		});
 		if (ImGui.button("Settings##hub_rt_settings_" + id, ImGui.vec2(-1, 0)))
 			resourceTracker.openFor(StringTools.startsWith(id, "tab_") ? id.substr(4) : id);

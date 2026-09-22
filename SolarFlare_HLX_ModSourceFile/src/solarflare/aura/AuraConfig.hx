@@ -183,6 +183,10 @@ class AuraConfig {
 			a.glowColor = Std.int(d.glowColor);
 		if (d.stackCounter == true)
 			a.stackCounter.set(true);
+		if (d.stackScale != null)
+			a.stackScale.set(d.stackScale);
+		if (d.stackPlace != null)
+			a.stackPlace = Std.int(d.stackPlace);
 		if (d.showLabel == false)
 			a.showLabel.set(false);
 		if (d.isCounter == true)

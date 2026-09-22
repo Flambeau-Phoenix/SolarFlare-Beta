@@ -1,11 +1,13 @@
 package solarflare.target;
 
 import solarflare.combatlog.CombatLogCache;
+import solarflare.castbar.CastBarRenderer;
+import solarflare.castbar.CastCache;
+import solarflare.castbar.CastSnap;
 import solarflare.ui.EnhancedText;
 import solarflare.ui.GameIcons;
 import solarflare.ui.HudChrome;
 import solarflare.ui.SettingsStore;
-import solarflare.ui.ThemePalette;
 import solarflare.ui.UiCol;
 import imgui.ImGui;
 import imgui.Enums.ImGuiCol;
@@ -17,10 +19,10 @@ import imgui.Theme;
 /**
  * Current-target HUD. Draws frozen TargetSnap only — no live unit reads.
  * Portrait via GameIcons.get(snap.kind) after observe preload (same as skill icons).
+ * HP widget uses cfg.width/height only (backup geometry). Cast strip is a sibling
+ * window under the chrome — never grows the HP widget.
  */
 class TargetOverlay {
-	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
-		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
 	static inline var EMPTY_LABEL:String = "No target";
 	static inline var PORTRAIT_GAP:Single = 6;
 	static inline var PAD:Single = 4;
@@ -31,12 +33,27 @@ class TargetOverlay {
 	static inline var BAR_MAX:Single = 30;
 	static inline var PORTRAIT_MIN:Single = 24;
 	static inline var PORTRAIT_MAX:Single = 128;
+	/** First-frame guess for chrome overhead above content (strip + padding). */
+	static inline var CHROME_OVERHEAD:Single = HudChrome.STRIP + 28;
+	static inline var CAST_GAP:Single = 3;
+	static inline var CAST_FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
+		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
+		| ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove
+		| ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoDocking
+		| ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav;
 
 	var theme:Theme;
 	var snap:TargetSnap;
+	var castSnap:CastSnap;
+	/** Last drawn HP window height (content + chrome), for cast sibling placement. */
+	var lastHpWinH:Single = 0;
+	var lastHpWinW:Single = 0;
+	var lastBodyW:Single = 0;
+	var lastBodyH:Single = 0;
 
 	public function new() {
 		snap = new TargetSnap();
+		castSnap = new CastSnap();
 		theme = new Theme()
 			.varV(ImGuiStyleVar.WindowPadding, ImGui.vec2(6, 4))
 			.varF(ImGuiStyleVar.WindowRounding, 4)
@@ -46,35 +63,98 @@ class TargetOverlay {
 	}
 
 	public function draw(cfg:TargetConfig):Void {
-		if (cfg == null || cfg.hidden.get())
+		if (cfg == null || cfg.hidden.get()) {
+			touchDraw("hidden", "", "", false, 0, 0);
 			return;
-		snap.copyFrom(CombatLogCache.currentTargetSnap());
-		if (cfg.bossesOnly.get() && snap.valid) {
-			if (!snap.isBoss && !snap.isMiniboss && !snap.isElite)
-				snap.valid = false;
 		}
-		if (!snap.valid && !cfg.alwaysShow.get())
+		if (cfg.sizeDirty && cfg.chrome != null) {
+			cfg.chrome.expandSizeDirty = true;
+			cfg.sizeDirty = false;
+		}
+		snap.copyFrom(CombatLogCache.currentTargetSnap());
+		castSnap.copyFrom(CastCache.targetSnap());
+		if (cfg.bossesOnly.get() && snap.valid) {
+			if (!snap.isBoss && !snap.isMiniboss && !snap.isElite) {
+				snap.valid = false;
+				touchDraw("filtered", snap.name, snap.kind, false, 0, 0);
+			}
+		}
+		if (!snap.valid && !cfg.alwaysShow.get()) {
+			touchDraw("empty", "", "", false, 0, 0);
 			return;
+		}
 		theme.wrap(() -> drawWindow(cfg));
 	}
 
 	public function drawPreview(cfg:TargetConfig, sample:TargetSnap, w:Single, h:Single):Void {
 		var diagnostic = lastHealthDiagnostic;
 		snap.copyFrom(sample);
+		castSnap.clear();
 		drawBody(cfg, w, h);
 		lastHealthDiagnostic = diagnostic;
 	}
+
 	public var openBuilder:Void->Void;
+
 	function drawWindow(cfg:TargetConfig):Void {
 		var w:Single = Math.max(TargetConfig.MIN_W, Math.min(TargetConfig.MAX_W, cfg.width.get()));
 		var h:Single = Math.max(TargetConfig.MIN_H, Math.min(TargetConfig.MAX_H, cfg.height.get()));
 		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Target", "Target", cfg.chrome, w, h, function(size) {
+			lastBodyW = size.x;
+			lastBodyH = size.y;
 			drawBody(cfg, size.x, size.y);
+			var hasIcon = snap.valid && snap.kind.length > 0 && GameIcons.hasKey(snap.kind);
+			touchDraw(snap.valid ? "shown" : "empty", snap.name, snap.kind, hasIcon, size.x, size.y);
 		}, openBuilder, function() { cfg.hidden.set(true); SettingsStore.markDirty(); }, false, null, function(newW:Single, newH:Single) {
 			cfg.width.set(Math.max(TargetConfig.MIN_W, Math.min(TargetConfig.MAX_W, newW)));
 			cfg.height.set(Math.max(TargetConfig.MIN_H, Math.min(TargetConfig.MAX_H, newH)));
 			SettingsStore.markDirty();
 		});
+		// chrome.winH is set inside HUDWidgetWindow while the window is open.
+		if (cfg.chrome != null && cfg.chrome.winH > 0) {
+			lastHpWinH = cfg.chrome.winH;
+			lastHpWinW = cfg.chrome.winW > 0 ? cfg.chrome.winW : w;
+		} else if (lastHpWinH <= 0) {
+			lastHpWinH = h + CHROME_OVERHEAD;
+			lastHpWinW = w;
+		}
+		drawCastSibling(cfg, w);
+	}
+
+	/** Plain cast strip under the HP chrome — never resizes the HP widget. */
+	function drawCastSibling(cfg:TargetConfig, contentW:Single):Void {
+		if (cfg == null || !cfg.showCastBar.get() || !snap.valid || !castSnap.active)
+			return;
+		if (cfg.chrome == null || cfg.chrome.collapsed.get())
+			return;
+		var castH:Single = Math.max(12, Math.min(28, cfg.castBarHeight.get()));
+		var wx:Single = cfg.chrome.x.get();
+		var wy:Single = cfg.chrome.y.get();
+		var hpH:Single = lastHpWinH > 0 ? lastHpWinH : (contentW > 0 ? cfg.height.get() + CHROME_OVERHEAD : cfg.height.get() + CHROME_OVERHEAD);
+		var winW:Single = lastHpWinW > 0 ? lastHpWinW : contentW;
+		ImGui.setNextWindowPos(ImGui.vec2(wx, wy + hpH + CAST_GAP), ImGuiCond.Always);
+		ImGui.setNextWindowSize(ImGui.vec2(Math.max(80, winW), castH + 8), ImGuiCond.Always);
+		ImGui.setNextWindowBgAlpha(cfg.chrome.isTransparent() ? 0 : 0.90);
+		var began = ImGui.begin("##SolarFlare TargetCast", null, CAST_FLAGS);
+		try {
+			if (began) {
+				var origin = ImGui.getCursorScreenPos();
+				var pad:Single = 4;
+				CastBarRenderer.drawPlainCompact(castSnap, origin.x + pad, origin.y + 2,
+					Math.max(1, ImGui.getContentRegionAvail().x - pad * 2), castH);
+			}
+		} catch (_:Dynamic) {}
+		if (began)
+			ImGui.end();
+	}
+
+	static function touchDraw(method:String, name:String, kind:String, hasIcon:Bool, bw:Single, bh:Single):Void {
+		if (!solarflare.debug.ResolutionLedger.armed())
+			return;
+		var preview = (name != null ? name : "") + "|" + (kind != null ? kind : "")
+			+ "|" + (hasIcon ? "icon" : "noIcon") + "|" + Std.int(bw) + "x" + Std.int(bh);
+		solarflare.debug.ResolutionLedger.touch("target.draw", method, "TargetOverlay.draw",
+			name != null ? name : "", "string", preview);
 	}
 
 	function drawBody(cfg:TargetConfig, w:Single, h:Single):Void {
@@ -87,7 +167,6 @@ class TargetOverlay {
 		var contentW:Single = Math.max(1, w - PAD * 2);
 
 		if (cfg.showPortrait.get()) {
-			// Square, sized to the frame, so a tall frame has no dead space beside it.
 			var side:Single = contentH;
 			if (side > PORTRAIT_MAX)
 				side = PORTRAIT_MAX;
@@ -96,9 +175,6 @@ class TargetOverlay {
 			if (side < PORTRAIT_MIN)
 				side = PORTRAIT_MIN;
 			drawPortrait(cfg, dl, contentX, origin.y + PAD, side);
-			// drawPortrait submits the image item and leaves the cursor inside the
-			// portrait. Re-assert the box from a real item here, before any early
-			// return below: ImGui must never grow a parent off a bare cursor move.
 			ImGui.setCursorScreenPos(origin);
 			ImGui.dummy(ImGui.vec2(w, h));
 			contentX = contentX + side + PORTRAIT_GAP;
@@ -115,7 +191,6 @@ class TargetOverlay {
 			barH = BAR_MAX;
 		if (barH < BAR_MIN)
 			barH = BAR_MIN;
-		// Header + bar travel together, centred against the portrait.
 		var blockH:Single = headerH + gap + barH;
 		var blockY:Single = origin.y + PAD + Math.max(0, (contentH - blockH) * 0.5);
 		var barY:Single = blockY + headerH + gap;
@@ -186,28 +261,39 @@ class TargetOverlay {
 	function drawPortrait(cfg:TargetConfig, dl:Dynamic, px:Single, py:Single, side:Single):Void {
 		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(px, py), ImGui.vec2(px + side, py + side), 0xCC16100E, 3);
 		ImGui.pushClipRect(ImGui.vec2(px, py), ImGui.vec2(px + side, py + side), true);
-		var failure:Dynamic = null;
 		try {
-			if (snap.valid && snap.kind.length > 0) {
+			var key = snap.valid ? snap.kind : "";
+			var drew = false;
+			if (key.length > 0 && GameIcons.hasKey(key)) {
 				ImGui.setCursorScreenPos(ImGui.vec2(px, py));
-				var tw = GameIcons.texW(snap.kind);
-				var th = GameIcons.texH(snap.kind);
+				var tw = GameIcons.texW(key);
+				var th = GameIcons.texH(key);
 				var u:Single = tw > th && tw > 0 ? (1 - th / tw) / 2 : 0;
 				var v:Single = th > tw && th > 0 ? (1 - tw / th) / 2 : 0;
-				GameIcons.imageKeyUv(snap.kind, side, side, u, v, 1 - u, 1 - v);
-			} else {
-				drawSilhouette(dl, px, py, side);
+				drew = GameIcons.imageKeyUv(key, side, side, u, v, 1 - u, 1 - v);
+			} else if (key.length > 0) {
+				// Atlas miss: still try imageKeyUv (loose PNG); silhouette if that fails.
+				ImGui.setCursorScreenPos(ImGui.vec2(px, py));
+				var tw2 = GameIcons.texW(key);
+				var th2 = GameIcons.texH(key);
+				var u2:Single = tw2 > th2 && tw2 > 0 ? (1 - th2 / tw2) / 2 : 0;
+				var v2:Single = th2 > tw2 && th2 > 0 ? (1 - tw2 / th2) / 2 : 0;
+				drew = GameIcons.imageKeyUv(key, side, side, u2, v2, 1 - u2, 1 - v2);
 			}
-		} catch (e:Dynamic) { failure = e; }
+			if (!drew)
+				drawSilhouette(dl, px, py, side);
+		} catch (_:Dynamic) {
+			try
+				drawSilhouette(dl, px, py, side)
+			catch (__:Dynamic) {}
+		}
 		ImGui.popClipRect();
-		if (failure != null) throw failure;
 
 		var elite = snap.valid && (snap.isBoss || snap.isMiniboss || snap.isElite);
 		var trim = elite ? UiCol.rgb(0xD6AD55) : 0x88888888;
 		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(px - 1, py - 1), ImGui.vec2(px + side + 1, py + side + 1),
 			trim, 3, elite ? 2 : 1);
 		if (elite && cfg.showBadge.get()) {
-			// Symmetric wing trim outside the portrait's clip.
 			var wingY:Single = py + side * 0.25;
 			for (i in 0...3) {
 				var yy:Single = wingY + i * 5;
@@ -215,7 +301,6 @@ class TargetOverlay {
 				ImGui.ImDrawList_AddLine(dl, ImGui.vec2(px + side, yy + 5), ImGui.vec2(px + side + 3, yy), trim, 2);
 			}
 		}
-		// A level badge with nothing to report just reads as a stray "?".
 		if (cfg.showBadge.get() && snap.valid)
 			drawLevelBadge(dl, px + side - 3, py + side - 3);
 	}
@@ -248,7 +333,6 @@ class TargetOverlay {
 		ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(x,y), 11, 0xEF171717, 16);
 		ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(x,y), 11, col, 16, 1.5);
 		if (compared && TargetDifficulty.skull(delta)) {
-			// Vector skull avoids depending on a font's Unicode glyph coverage.
 			ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(x,y-2), 6, col, 12);
 			ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x-3,y+1), ImGui.vec2(x+3,y+6), col);
 			ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(x-2,y-2), 1.5, 0xFF171717, 6);
@@ -266,14 +350,12 @@ class TargetOverlay {
 			EnhancedText.shadowed(dl, ImGui.vec2(x, blockY), EMPTY_LABEL, 0x99AAAAAA, 0x66000000, 1, 1);
 
 		if (!cfg.showEmptyBar.get()) {
-			// Nothing else would render — keep the label wherever there is room.
 			if (nameH == 0)
 				EnhancedText.shadowed(dl, ImGui.vec2(x, barY), EMPTY_LABEL, 0x99AAAAAA, 0x66000000, 1, 1);
 			return;
 		}
 
 		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, barY), ImGui.vec2(x + w, barY + barH), 0xAA0E1016, rounding);
-		// Subtle dashed-feel: dim inner fill strip so the empty frame reads as a real bar slot.
 		ImGui.ImDrawList_AddRectFilled(dl,
 			ImGui.vec2(x + 3, barY + barH * 0.35),
 			ImGui.vec2(x + w - 3, barY + barH * 0.55),

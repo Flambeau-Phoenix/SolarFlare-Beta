@@ -8,6 +8,26 @@ package solarflare.combatlog;
  * but that returns a network Int, not the unit pointer — prefer `summonOwner`.
  */
 class CombatOwnership {
+	/**
+	 * Keep the most specific actor that is provably an owned summon. DamageResult
+	 * can collapse a summoned hit to its hero owner on v6, while hook `self` or
+	 * the runtime skill owner still carries the leaf ent.Foe.
+	 */
+	public static function preferLeaf(attacker:Dynamic, skillOwner:Dynamic, payloadSource:Dynamic,
+			read:(Dynamic, String)->Dynamic):Dynamic {
+		if (isOwnedSummon(attacker, read))
+			return attacker;
+		if (isOwnedSummon(skillOwner, read))
+			return skillOwner;
+		if (isOwnedSummon(payloadSource, read))
+			return payloadSource;
+		if (payloadSource != null)
+			return payloadSource;
+		if (skillOwner != null)
+			return skillOwner;
+		return attacker;
+	}
+
 	public static function resolve(source:Dynamic, read:(Dynamic, String)->Dynamic, ownerOfSkill:Dynamic->Dynamic):Dynamic {
 		var current = source;
 		var seen:Array<Dynamic> = [];
@@ -25,7 +45,12 @@ class CombatOwnership {
 		return null;
 	}
 
-	/** Typed Foe.summonOwner first; FieldWalk fallback. */
+	/**
+	 * Owner of a summoned minion. Typed `Foe.summonOwner` first, then FieldWalk.
+	 * The raw field is the authority; `get_summonHero()` is only the same field
+	 * cast to ent.Hero, and calling a Foe-native accessor on a non-Foe unit (the
+	 * attacker can be a Hero) risks a bad native field read — so it is not used.
+	 */
 	public static function summonOwnerOf(unit:Dynamic, read:(Dynamic, String)->Dynamic):Dynamic {
 		if (unit == null)
 			return null;

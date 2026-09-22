@@ -7,6 +7,7 @@ import imgui.ImGui;
 import imgui.Enums.ImGuiCond;
 import imgui.ref.BoolRef;
 import imgui.ref.FloatRef;
+import imgui.ref.IntRef;
 
 /**
  * Current-target HUD settings. Snapshot authority stays in CombatLogCache.
@@ -30,6 +31,9 @@ class TargetConfig {
 	public var showPercent = new BoolRef(true);
 	public var showHpText = new BoolRef(true);
 	public var showEmptyBar = new BoolRef(true);
+	public var showCastBar = new BoolRef(true);
+	public var castBarHeight = new FloatRef(16);
+	public var castBarSkin = new IntRef(0);
 	public var lowHpPulse = new BoolRef(true);
 	/** Provisional — isBoss() not yet ledger-verified in a live boss fight. */
 	public var bossesOnly = new BoolRef(false);
@@ -141,6 +145,20 @@ class TargetConfig {
 							SettingsStore.markDirty();
 					}
 				);
+			});
+		});
+
+		ImGui.separatorText("Target cast bar");
+		UiLayout.propertyGrid("##" + id + "_cast_props", function() {
+			UiLayout.propertyRow("Enabled", function() {
+				if (ImGui.checkbox("##" + id + "_cast", showCastBar))
+					SettingsStore.markDirty();
+			}, "Displays the target's active cast directly beneath its health bar.");
+			UiLayout.propertyRow("Height", function() {
+				if (!showCastBar.get()) ImGui.beginDisabled();
+				if (ImGui.sliderFloat("##" + id + "_cast_h", castBarHeight, 12, 28, "%.0f px"))
+					SettingsStore.markDirty();
+				if (!showCastBar.get()) ImGui.endDisabled();
 			});
 		});
 	}

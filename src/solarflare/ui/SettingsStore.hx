@@ -15,7 +15,7 @@ import imgui.ImGui;
  * Persist SolarFlare layout + toggles next to the installed mod.
  */
 class SettingsStore {
-	static inline var VERSION:Int = 22;
+	static inline var VERSION:Int = 24;
 	static var dirty = false;
 	static var lastCfg:ConfigPanel = null;
 	static var lastSaveMs:Float = 0;
@@ -90,6 +90,12 @@ class SettingsStore {
 				backupBeforeMigration(path, raw, oldVersion);
 			apply(cfg, data);
 			FeatureProfiles.load(cfg, data);
+			// v24: the first cast-bar build persisted the new overlay as hidden,
+			// including in the active universal profile, so no telemetry was demanded.
+			if (oldVersion < 24) {
+				FeatureProfiles.migrateCastBarVisible(cfg);
+				dirty = true;
+			}
 			applyUiState(cfg, Reflect.field(data, "uiState"));
 			try
 				solarflare.ObserveDemand.markStatusDemandDirty()
@@ -185,6 +191,7 @@ class SettingsStore {
 		assignDump(data, "resourceTracker", function() return resourceTrackerDump(cfg));
 		assignDump(data, "clog", function() return clogDump(cfg.combatLog));
 		assignDump(data, "target", function() return targetDump(cfg.target));
+		assignDump(data, "castBar", function() return castBarDump(cfg.castBar));
 		assignDump(data, "launchers", function() return cfg.launchers != null ? cfg.launchers.dump() : {});
 		assignDump(data, "saber", function() return saberDump(cfg.lightsaber));
 		assignDump(data, "auras", function() return aurasDump(cfg.auras));
@@ -478,10 +485,19 @@ class SettingsStore {
 			low: c.lowHpPercent.get(),
 			round: c.barRounding.get(),
 			boss: c.bossesOnly.get(),
+			targetCast: c.showCastBar.get(),
+			castH: c.castBarHeight.get(),
+			castSkin: c.castBarSkin.get(),
 			w: c.width.get(),
 			h: c.height.get(),
 			chrome: chromeDump(c.chrome)
 		};
+	}
+
+	public static function castBarDump(c:solarflare.castbar.CastBarConfig):Dynamic {
+		if (c == null) return {};
+		return {hidden: c.hidden.get(), icon: c.showIcon.get(), name: c.showName.get(), time: c.showTime.get(),
+			skin: c.skin.get(), w: c.width.get(), h: c.height.get(), chrome: chromeDump(c.chrome)};
 	}
 
 	public static function aurasDump(c:solarflare.aura.AuraConfig):Dynamic {
@@ -616,6 +632,7 @@ class SettingsStore {
 		applyResourceTracker(cfg, data);
 		applyClog(cfg.combatLog, data.clog);
 		applyTarget(cfg.target, data.target);
+		applyCastBar(cfg.castBar, data.castBar);
 		applySaber(cfg.lightsaber, data.saber);
 		applyAurasProfile(cfg.auras, data.auras);
 		// Saves written earlier today carry the binding under the old `smartHide` key.
@@ -851,6 +868,22 @@ class SettingsStore {
 		}
 		setFloat(c.barRounding, data.round);
 		setBool(c.bossesOnly, data.boss);
+		setBool(c.showCastBar, data.targetCast);
+		setFloat(c.castBarHeight, data.castH);
+		// castSkin ignored: target strip is unstyled; field kept for JSON dump compat.
+		setFloat(c.width, data.w);
+		setFloat(c.height, data.h);
+		c.sizeDirty = true;
+		applyChrome(c.chrome, data.chrome);
+	}
+
+	public static function applyCastBar(c:solarflare.castbar.CastBarConfig, data:Dynamic):Void {
+		if (c == null || data == null) return;
+		setBool(c.hidden, data.hidden);
+		setBool(c.showIcon, data.icon);
+		setBool(c.showName, data.name);
+		setBool(c.showTime, data.time);
+		setInt(c.skin, data.skin);
 		setFloat(c.width, data.w);
 		setFloat(c.height, data.h);
 		c.sizeDirty = true;

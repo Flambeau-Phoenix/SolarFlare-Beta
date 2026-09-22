@@ -1,6 +1,8 @@
 package solarflare.preview;
 
 import imgui.ImGui;
+import solarflare.castbar.CastBarRenderer;
+import solarflare.castbar.CastSnap;
 import solarflare.attackcombo.AttackComboRenderer;
 import solarflare.chaincast.ChaincastRenderer;
 import solarflare.conduit.Conduit;
@@ -18,17 +20,25 @@ import solarflare.ui.VitalsConfig;
  * their live overlays.
  */
 class ResourcePreviewRenderer {
-	static var ALL_IDS = ["target", "health", "attack", "rage", "mana", "prayers", "combo", "chaincast", "conduit"];
+	static var ALL_IDS = ["target", "castbar", "health", "attack", "rage", "mana", "prayers", "combo", "chaincast", "conduit"];
 	var hp = new VitalSnap();
 	var rage = new VitalSnap();
 	var mana = new VitalSnap();
 	var targetRenderer = new solarflare.target.TargetOverlay();
 	var targetSample = new solarflare.target.TargetSnap();
+	var castSample = new CastSnap();
 
 	public function new() {
 		hp.kind = VitalSnap.HP;
 		rage.kind = VitalSnap.RAGE;
 		mana.kind = VitalSnap.MANA;
+		castSample.active = true;
+		castSample.skillId = "Mage_RayOfSpark";
+		castSample.label = "Ray Of Spark";
+		castSample.duration = 3.5;
+		castSample.elapsed = 2.15;
+		castSample.remaining = 1.35;
+		castSample.progress = castSample.elapsed / castSample.duration;
 	}
 
 	public function drawSelected(id:String, state:PreviewState, cfg:ConfigPanel, width:Single):Void {
@@ -46,6 +56,9 @@ class ResourcePreviewRenderer {
 
 	public function elementHeight(id:String, cfg:ConfigPanel):Single {
 		if (id == "target") return 64;
+		if (id == "castbar" && cfg != null && cfg.castBar != null)
+			return Math.max(solarflare.castbar.CastBarConfig.MIN_H,
+				Math.min(solarflare.castbar.CastBarConfig.MAX_H, cfg.castBar.height.get()));
 		if (cfg == null || cfg.vitals == null) return 30;
 		var v = cfg.vitals;
 		return switch (id) {
@@ -100,6 +113,11 @@ class ResourcePreviewRenderer {
 				targetSample.targetLevel = 12; targetSample.playerLevel = 10;
 				targetSample.isElite = true;
 				targetRenderer.drawPreview(cfg.target, targetSample, width, Math.max(64, height));
+			case "castbar":
+				var p = ImGui.getCursorScreenPos();
+				ImGui.dummy(ImGui.vec2(width, height));
+				CastBarRenderer.drawPlayer(castSample, cfg.castBar.skin.get(), cfg.castBar.showIcon.get(),
+					cfg.castBar.showName.get(), cfg.castBar.showTime.get(), p.x, p.y, width, height);
 			case "chaincast":
 				var showBadge = cfg.chaincast == null || cfg.chaincast.showStackBadge == null
 					|| cfg.chaincast.showStackBadge.get();
@@ -176,6 +194,7 @@ class ResourcePreviewRenderer {
 			case "combo": "Combo Points";
 			case "attack": "Attack Combo";
 			case "target": "Current Target";
+			case "castbar": "Player Cast Bar";
 			case "chaincast": "Chaincast";
 			case "conduit": "Conduits";
 			default: id;

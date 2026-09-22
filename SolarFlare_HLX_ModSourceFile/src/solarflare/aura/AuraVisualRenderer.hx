@@ -44,9 +44,6 @@ class AuraVisualRenderer {
 			count = counterValue;
 		}
 		var label = a.region == "text" ? (a.announce != null ? a.announce : "") : a.displayLabel();
-		if (showCount && a.region != "icon" && a.region != "canvas")
-			label += " [" + Std.string(count) + "]";
-
 		if (a.region == "canvas") {
 			drawCanvas(dl, a, x, y, w, h, p, count, showCount, ghost, alpha, vectorScale);
 			return;
@@ -67,7 +64,7 @@ class AuraVisualRenderer {
 			if (faceFx && wantCountdown(a))
 				drawCountdown(dl, x, y, w, h, a, alpha);
 			if (showCount)
-				drawStackBadge(dl, x, y, w, h, count, alpha);
+				drawStackDisplay(dl, x, y, w, h, count, a, alpha);
 			return;
 		}
 		if (a.region == "text") {
@@ -86,19 +83,35 @@ class AuraVisualRenderer {
 		if (faceFx && wantCountdown(a))
 			drawCountdown(dl, x + 4, y + 4, w - 8, h - 8, a, alpha);
 		if (showCount)
-			drawStackBadge(dl, x, y, w, h, count, alpha);
+			drawStackDisplay(dl, x, y, w, h, count, a, alpha);
 	}
 
-	/** Corner stack / counter badge shared by icon, canvas, bar, and ring regions. */
-	static function drawStackBadge(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, count:Int, alpha:Float):Void {
+	/** Stack / counter plate with the same Top / Center / Bottom placement model as countdown text. */
+	static function drawStackDisplay(dl:Dynamic, x:Single, y:Single, w:Single, h:Single,
+			count:Int, a:AuraDef, alpha:Float):Void {
 		var st = Std.string(count);
+		var side:Single = w < h ? w : h;
+		var scale = a.stackScale != null ? a.stackScale.get() : 1;
+		var fontSize:Single = side * 0.28 * scale;
+		if (fontSize < 11) fontSize = 11;
+		if (fontSize > 48) fontSize = 48;
+		ImGui.pushFont(ImGui.getFont(), fontSize);
 		var ts = ImGui.calcTextSize(st);
-		var bx0 = x + w - ts.x - 10;
-		var by0 = y + h - ts.y - 7;
-		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(bx0, by0), ImGui.vec2(x + w - 1, y + h - 1),
-			ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.03, 0.05, 0.9 * alpha)), 5);
-		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(bx0 + 4, by0 + 2),
+		var tx = x + (w - ts.x) * 0.5;
+		var ty:Single = switch (a.stackPlace) {
+			case 1: y - ts.y - 2;
+			case 2: y + h + 2;
+			default: y + (h - ts.y) * 0.5;
+		};
+		var pad:Single = 4;
+		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(tx - pad, ty - 2),
+			ImGui.vec2(tx + ts.x + pad, ty + ts.y + 2),
+			ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.03, 0.05, 0.82 * alpha)), 6);
+		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + 1, ty + 1),
+			ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.95 * alpha)), st);
+		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty),
 			ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, alpha)), st);
+		ImGui.popFont();
 	}
 
 	static function bindFace(a:AuraDef, ghost:Bool, previewLeft:Null<Float>, previewGlow:Bool):Void {
@@ -165,7 +178,7 @@ class AuraVisualRenderer {
 		if (faceFx && wantCountdown(a))
 			drawCountdown(dl, x, y, w, h, a, alpha);
 		if (showCount) {
-			drawStackBadge(dl, x, y, w, h, count, alpha);
+			drawStackDisplay(dl, x, y, w, h, count, a, alpha);
 		}
 	}
 
@@ -207,7 +220,7 @@ class AuraVisualRenderer {
 		if (faceFx && wantCountdown(a))
 			drawCountdown(dl, ix, iy, side, side, a, alpha);
 		if (showCount)
-			drawStackBadge(dl, ix, iy, side, side, count, alpha);
+			drawStackDisplay(dl, ix, iy, side, side, count, a, alpha);
 		if (labelH > 0) {
 			var label = a.displayLabel();
 			var ts = ImGui.calcTextSize(label);

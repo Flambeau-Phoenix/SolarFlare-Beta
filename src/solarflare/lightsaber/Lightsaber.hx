@@ -677,11 +677,19 @@ class LightsaberHooks {
 			var skillId = solarflare.EngineSkillId.ofSkill(dmgObj);
 			if (skillId.length == 0)
 				skillId = readSkillId(dmgObj);
+			// v6 resolution: leaf kind -> CDB unit name, else the CDB summon map on
+			// the hit skill (never the raw engine kind / guessed prefix).
 			var minion = "";
 			if (credited != null && (cast self : Dynamic) != (cast credited : Dynamic)) {
 				var kind = FieldWalk.extractString(self, "kind", "");
-				if (kind.length > 0)
-					minion = kind;
+				var label = solarflare.cdb.CdbUnitNames.lookup(kind);
+				if (label.length == 0)
+					label = solarflare.cdb.CdbSummonUnits.labelForSkill(skillId);
+				if (label.length == 0)
+					label = kind;
+				minion = label;
+			} else {
+				minion = solarflare.cdb.CdbSummonUnits.labelForSkill(skillId);
 			}
 			LightsaberCache.noteHit(amount, skillId, skillId, nowSec(), false, HealthCache.heroName, minion);
 		} catch (_:Dynamic) {}

@@ -3,6 +3,7 @@ package solarflare.combatlog;
 import solarflare.HealthCache;
 import solarflare.FieldWalk;
 import solarflare.cdb.CdbUnitNames;
+import solarflare.cdb.CdbSummonUnits;
 import solarflare.geaux.GeauxCache;
 import solarflare.target.TargetSnap;
 import solarflare.target.RecentTargetCache;
@@ -82,61 +83,34 @@ class CombatLogCache {
 	 * HP at ObserveDemand target cadence while the Target HUD is shown.
 	 */
 	public static function tick(localHero:Dynamic):Void {
-		currentTarget = null;
+		currentTarget = resolveCurrentTarget(localHero);
 		if (localHero == null) {
+			// Cast observe must never abort identity cleanup.
+			try
+				solarflare.castbar.CastCache.observe(null, null)
+			catch (_:Dynamic) {}
 			if (lastTargetRef != null) {
 				lastTargetRef = null;
 				targetSnap.clear();
 			}
 			return;
 		}
-		try {
-			var unit:ent.Unit = cast localHero;
-			var t = unit.getTarget();
-			if (t != null)
-				currentTarget = t;
-		} catch (_:Dynamic) {}
-		if (currentTarget == null) {
-			try {
-				var hero:ent.Hero = cast localHero;
-				var t = hero.getTarget();
-				if (t != null)
-					currentTarget = t;
-			} catch (_:Dynamic) {}
-		}
-		if (currentTarget == null) {
-			try {
-				var unit:ent.Unit = cast localHero;
-				currentTarget = unit.get_targetUnit();
-			} catch (_:Dynamic) {}
-		}
-		if (currentTarget == null) {
-			var rawTarget = extractObject(localHero, "target");
-			if (rawTarget != null) {
-				try {
-					var res = FieldWalk.extractObject(rawTarget, "resolveProxy");
-					if (res != null)
-						currentTarget = (rawTarget : Dynamic).resolveProxy();
-				} catch (_:Dynamic) {}
-				if (currentTarget == null)
-					currentTarget = rawTarget;
-			}
-		}
-		if (currentTarget == null)
-			currentTarget = extractObject(localHero, "targetUnit");
-
 		if (solarflare.debug.ResolutionLedger.armed()) {
 			var tName = currentTarget != null ? unitName(currentTarget) : "none";
 			solarflare.debug.ResolutionLedger.touch("target.live", currentTarget != null ? "found" : "none", "CombatLogCache.tick", tName, "string", currentTarget != null ? "hasTarget" : "noTarget");
 		}
 
-		// Combat-log-only: keep pointer for involvesCurrentTarget; skip HUD snap unless auras need target.
-		if (!solarflare.ObserveDemand.targetHud && !solarflare.ObserveDemand.aurasNeedTarget
-			&& !solarflare.ObserveDemand.auraBuilderOpen) {
-			if (currentTarget != lastTargetRef)
-				lastTargetRef = currentTarget;
+		// Combat-log-only / cast-bar-only: keep `currentTarget` for involvement + CastCache,
+		// but do NOT consume `lastTargetRef` or skip ahead of HUD identity. Cast observe
+		// runs after identity so a native throw cannot block TargetSnap fill.
+		var needHudSnap = solarflare.ObserveDemand.targetHud || solarflare.ObserveDemand.aurasNeedTarget
+			|| solarflare.ObserveDemand.auraBuilderOpen;
+		if (!needHudSnap) {
 			if (currentTarget == null)
 				targetSnap.clear();
+			try
+				solarflare.castbar.CastCache.observe(localHero, currentTarget)
+			catch (_:Dynamic) {}
 			return;
 		}
 
@@ -146,21 +120,80 @@ class CombatLogCache {
 		if (currentTarget == null) {
 			lastTargetRef = null;
 			targetSnap.clear();
+			try
+				solarflare.castbar.CastCache.observe(localHero, null)
+			catch (_:Dynamic) {}
 			return;
 		}
-		if (ptrChanged)
-			fillTargetIdentity(currentTarget);
+		// Refresh identity while Target HUD / aura demand is live. Always attempt a
+		// fill, but fillTargetIdentity refuses to wipe good name/kind with empties
+		// on the same pointer (ledger showed hasTarget + blank identity thrash).
+		fillTargetIdentity(currentTarget, ptrChanged || !targetSnap.valid);
 		var now = haxe.Timer.stamp();
-		if (ptrChanged || solarflare.ObserveDemand.dueTargetHp(now))
+		if (ptrChanged || solarflare.ObserveDemand.dueTargetHp(now) || !targetSnap.healthValid)
 			fillTargetHp(currentTarget);
+
+		if (solarflare.debug.ResolutionLedger.armed()) {
+			solarflare.debug.ResolutionLedger.touch("target.snap", targetSnap.valid ? "valid" : "empty",
+				"CombatLogCache.tick", targetSnap.name, "string", targetSnap.kind);
+		}
+
+		try
+			solarflare.castbar.CastCache.observe(localHero, currentTarget)
+		catch (_:Dynamic) {}
 	}
 
-	static function fillTargetIdentity(unit:Dynamic):Void {
+	/**
+	 * One authority for the selected live target. Local hero is a Hero: use
+	 * ent.Hero.getTarget (f7689) — lockedTarget, else Unit.getTarget, else autoTarget.
+	 * Unit.getTarget alone (f4785) only resolves this.target and misses locked/auto.
+	 * Do not layer raw target fields / FieldWalk proxies over this.
+	 */
+	static function resolveCurrentTarget(localHero:Dynamic):Dynamic {
+		if (localHero == null)
+			return null;
+		try {
+			var hero:ent.Hero = cast localHero;
+			if (hero != null)
+				return hero.getTarget();
+		} catch (_:Dynamic) {}
+		try {
+			var unit:ent.Unit = cast localHero;
+			return unit != null ? unit.getTarget() : null;
+		} catch (_:Dynamic) {
+			return null;
+		}
+	}
+
+	/**
+	 * @param forceReplace when true (pointer change / snap invalid), accept empty
+	 *        clears. When false, keep prior non-empty name/kind across transient fails.
+	 */
+	static function fillTargetIdentity(unit:Dynamic, forceReplace:Bool):Void {
 		if (unit == null)
 			return;
+		var kind = unitKindId(unit);
+		var name = unitName(unit);
+		if (name.length == 0 && kind.length > 0)
+			name = CdbUnitNames.lookup(kind);
+		var priorName = targetSnap.name;
+		var priorKind = targetSnap.kind;
+		if (!forceReplace) {
+			if (kind.length == 0 && priorKind.length > 0)
+				kind = priorKind;
+			if (name.length == 0 && priorName.length > 0)
+				name = priorName;
+		}
+		var populated = name.length > 0 || kind.length > 0;
+		if (!populated) {
+			if (forceReplace)
+				targetSnap.clear();
+			// Same pointer, still blank: keep prior snap (may already be valid).
+			return;
+		}
 		targetSnap.valid = true;
-		targetSnap.name = unitName(unit);
-		targetSnap.kind = unitKindId(unit);
+		targetSnap.name = name;
+		targetSnap.kind = kind;
 		targetSnap.role = classify(unit);
 		targetSnap.observedAt = haxe.Timer.stamp();
 		targetSnap.isBoss = false;
@@ -181,8 +214,10 @@ class CombatLogCache {
 			}
 		} catch (_:Dynamic) {}
 		if (targetSnap.kind.length > 0) {
-			GameIcons.preload(targetSnap.kind);
-			RecentTargetCache.note(targetSnap.kind, targetSnap.name);
+			try {
+				GameIcons.preload(targetSnap.kind);
+				RecentTargetCache.note(targetSnap.kind, targetSnap.name);
+			} catch (_:Dynamic) {}
 		}
 	}
 
@@ -309,11 +344,14 @@ class CombatLogCache {
 		if (!shouldCapture(source, target) && !shouldCapture(rawSource, target))
 			return;
 		var skill = skillOfDamage(dmg);
+		if (minion.length == 0)
+			minion = minionNameFromSkill(skill);
 		pushHit(skill, source, minion, target, dmg, hook);
 	}
 
 	/**
-	 * CheatSheet Phase 0 DPS path: `ent.Unit.onInflictDamage` — attacker is `self`.
+	 * CheatSheet Phase 0 DPS path: `ent.Unit.onInflictDamage`.
+	 * v6 attribution comes from DamageResult first; hook `self` is fallback only.
 	 * Credits owned summons (bee/imp/…) to summonOwner; dedupes against receive-side noteHit.
 	 */
 	public static function noteInflict(attacker:Dynamic, dmg:Dynamic):Void {
@@ -322,14 +360,25 @@ class CombatLogCache {
 		try
 			solarflare.debug.PayloadProbe.capture("hit", dmg)
 		catch (_:Dynamic) {}
-		var source = CombatOwnership.resolve(attacker, extractObject, ownerOfSkill);
+		// v6 may expose the hero in DamageResult even when hook self or the runtime
+		// skill owner is the summoned foe. Prefer whichever candidate proves it has
+		// summon ownership, then resolve that leaf back to its credited hero.
+		var payloadSource = sourceCandidateOfDamage(dmg);
+		var skillOwner = sourceSkillOwnerOfDamage(dmg);
+		var rawSource = CombatOwnership.preferLeaf(attacker, skillOwner, payloadSource, extractObject);
+		var source = CombatOwnership.resolve(rawSource, extractObject, ownerOfSkill);
 		if (source == null)
-			source = attacker;
-		var minion = minionNameOf(attacker, source);
+			source = rawSource;
+		var minion = minionNameOf(rawSource, source);
 		var target = targetOfDamage(dmg, null);
-		if (!shouldCapture(source, target) && !shouldCapture(attacker, target))
+		if (!shouldCapture(source, target) && !shouldCapture(rawSource, target))
 			return;
 		var skill = skillOfDamage(dmg);
+		// Fallback: the v6 network payload can collapse a summoned actor to its
+		// summoner. Resolve the minion from the CDB summon map on the hit skill
+		// (e.g. Summon_Imp_Auto -> Summon_Imp "Nightling Terror").
+		if (minion.length == 0)
+			minion = minionNameFromSkill(skill);
 		pushHit(skill, source, minion, target, dmg, "ent.Unit.onInflictDamage");
 	}
 
@@ -788,6 +837,25 @@ class CombatLogCache {
 		return src;
 	}
 
+	/** Runtime skill owner is often the only surviving leaf summon on v6. */
+	static function sourceSkillOwnerOfDamage(dmg:Dynamic):Dynamic {
+		if (dmg == null)
+			return null;
+		try {
+			var dr:st.skill.DamageResult = dmg;
+			if (dr != null && dr.ctx != null) {
+				var owner = ownerOfSkill(dr.ctx.skill);
+				if (owner != null)
+					return owner;
+				var active = extractObject(dr.ctx, "activeSkill");
+				owner = ownerOfSkill(active);
+				if (owner != null)
+					return owner;
+			}
+		} catch (_:Dynamic) {}
+		return ownerOfSkill(extractObject(dmg, "baseSkill"));
+	}
+
 	/** Display minion only when runtime ownership changed its credited source. */
 	static function minionNameOf(rawSource:Dynamic, creditedSource:Dynamic):String {
 		if (rawSource == null || sameUnit(rawSource, creditedSource))
@@ -797,6 +865,18 @@ class CombatLogCache {
 			return "";
 		var label = CdbUnitNames.lookup(kind);
 		return label.length > 0 ? label : unitName(rawSource);
+	}
+
+	/**
+	 * Display-only fallback for summon-exclusive attacks after the network payload
+	 * has collapsed the actor to the hero. Resolved from the CDB summon map, so the
+	 * credited minion is the actual summoned unit (never inferred from ID prefixes).
+	 * This never establishes ownership.
+	 */
+	static function minionNameFromSkill(skillId:String):String {
+		if (skillId == null || skillId.length == 0)
+			return "";
+		return CdbSummonUnits.labelForSkill(skillId);
 	}
 
 	static function targetOfDamage(dmg:Dynamic, victim:Dynamic):Dynamic {

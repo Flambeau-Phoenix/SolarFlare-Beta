@@ -40,6 +40,7 @@ class HealthHooks {
 
 	/** Present-loop identity authority; no per-frame player trampoline is installed. */
 	public static function observeLocalPlayer(app:GameApp):Void {
+		sampleCharacterId(app);
 		var heroDyn:Dynamic = app == null ? null : app.hero;
 		if (heroDyn == null) {
 			if (HealthCache.localHero != null) HealthCache.clearLocalHero();
@@ -708,6 +709,24 @@ class HealthHooks {
 	static function onHeroReceiveDamage(self:Dynamic, dmgObj:Dynamic):Void {
 		if (HealthCache.isLocalHero(self))
 			solarflare.combatlog.CombatLogCache.noteHit(self, dmgObj, "ent.Hero.onReceiveDamage");
+	}
+
+	/** The connection hero ID is stable per character; st.Player.uid is account-wide. */
+	static function sampleCharacterId(app:GameApp):Void {
+		if (app == null)
+			return;
+		var id = "";
+		try
+			id = haxe.Int64.toStr(app.connectionInfo.heroID)
+		catch (_:Dynamic) {}
+		if (id == null || id.length == 0 || id == "0")
+			return;
+		HealthCache.setCharacterId(id);
+		if (solarflare.debug.ResolutionLedger.armed()) {
+			var L = solarflare.debug.ResolutionLedger;
+			L.touch("identity.characterId", "typed", "HealthHooks.sampleCharacterId",
+				"GameApp.connectionInfo.heroID", "haxe.Int64", L.clip(id, 48));
+		}
 	}
 
 	static function onSetRage(self:Dynamic, value:Float, result:Float):Float {

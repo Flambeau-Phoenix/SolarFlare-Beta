@@ -36,6 +36,8 @@ class HealthCache {
 	public static var serverRegion:String = "";
 	/** `st.Player.uid` when the engine exposes one. */
 	public static var playerUid:String = "";
+	/** Per-character `GameApp.connectionInfo.heroID`, unlike account-level playerUid. */
+	public static var characterId:String = "";
 	/** Bumped on rage / spark / mana writes so Geaux affordability can skip unchanged frames. */
 	public static var resourceGen:Int = 0;
 
@@ -59,6 +61,10 @@ class HealthCache {
 	/** Drop pinned hero on zone unload / null Player.hero so HL can collect the prior stage. */
 	public static function clearLocalHero():Void {
 		localHero = null;
+		heroName = "";
+		serverRegion = "";
+		playerUid = "";
+		characterId = "";
 		valid = false; deadKnown = false; dead = false;
 		identityGen++;
 		resetMissRing();
@@ -103,6 +109,11 @@ class HealthCache {
 			serverRegion = region;
 		if (uid != null)
 			playerUid = uid;
+	}
+
+	public static function setCharacterId(id:String):Void {
+		if (id != null && id.length > 0 && id != "0")
+			characterId = id;
 	}
 
 	/**

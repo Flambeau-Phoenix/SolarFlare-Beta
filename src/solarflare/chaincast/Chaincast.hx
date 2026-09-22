@@ -36,7 +36,6 @@ class ChaincastCache {
 	public static var remainValid:Bool = false;
 	public static var readyLeft:Float = 0;
 	public static var readyProgress:Float = 0;
-	public static var alertUntil:Float = 0;
 	public static var pulseUntil:Float = 0;
 	static var lastShown:Int = 0;
 
@@ -57,7 +56,6 @@ class ChaincastCache {
 		remainValid = false;
 		readyLeft = 0;
 		readyProgress = 0;
-		alertUntil = 0;
 		pulseUntil = 0;
 		lastShown = 0;
 	}
@@ -95,15 +93,12 @@ class ChaincastCache {
 	}
 
 	public static function setReady():Void {
-		var was = ready;
 		current = ACCUM_MAX;
 		max = ACCUM_MAX;
 		ready = true;
 		valid = true;
 		active = true;
 		notePulse(SLOT_COUNT);
-		if (!was)
-			alertUntil = solarflare.ui.ResourceMaxAlert.nowSec() + solarflare.ui.ResourceMaxAlert.ALERT_SEC;
 	}
 
 	static function notePulse(shown:Int):Void {
@@ -122,10 +117,6 @@ class ChaincastCache {
 
 	public static function pulseActive():Bool {
 		return solarflare.ui.ResourceMaxAlert.nowSec() < pulseUntil;
-	}
-
-	public static function alertActive():Bool {
-		return solarflare.ui.ResourceMaxAlert.active(alertUntil);
 	}
 
 	public static function set(stacks:Int, cap:Int = -1):Void {
@@ -469,15 +460,13 @@ class ChaincastOverlay {
 		// Must match the draw order below, or the last row clips off the bottom.
 		var contentH:Single = 8 + HEAD_H
 			+ (ChaincastCache.remainValid ? TIMER_H + GAP : 0)
-			+ (rows > 0 ? rows * (HINT_H + GAP) : 0)
-			+ (ChaincastCache.alertActive() ? solarflare.ui.ResourceMaxAlert.TOAST_H + GAP : 0);
+			+ (rows > 0 ? rows * (HINT_H + GAP) : 0);
 		var h:Single = Math.max(contentH, cfg.height.get());
 		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Chaincast", "Chaincast", cfg.chrome, w, h, function(size) {
 			var p = ImGui.getCursorScreenPos();
 			ImGui.dummy(size);
 			ImGui.setCursorScreenPos(ImGui.vec2(p.x+4, p.y+4));
 			var rowW:Single = size.x - 8;
-			if (ChaincastCache.alertActive()) solarflare.ui.ResourceMaxAlert.drawToast(rowW, solarflare.ui.ResourceMaxAlert.TOAST_H);
 			// Chain time sits above the blocks: underneath it was the first thing clipped.
 			if (ChaincastCache.remainValid) drawTimer(rowW, TIMER_H);
 			drawHead(cfg, rowW, HEAD_H);

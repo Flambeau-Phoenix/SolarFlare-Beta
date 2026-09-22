@@ -21,7 +21,7 @@ class DemandSnapshot {
 		overlays = d.prayers || d.comboPoints || d.chaincast || d.conduit || d.attackCombo;
 		skills = d.geaux || d.geauxBuilder || d.auras || d.aurasNeedInstant
 			|| d.aurasNeedSpecial || d.auraBuilderOpen;
-		target = d.targetHud || d.combatLog || d.aurasNeedTarget || d.auraBuilderOpen;
+		target = d.targetHud || d.castBars || d.combatLog || d.aurasNeedTarget || d.auraBuilderOpen;
 		status = d.aurasNeedStatus;
 		auras = d.auras || d.auraBuilderOpen;
 		lightsaber = cfg != null && cfg.lightsaber != null && !cfg.lightsaber.hidden.get();

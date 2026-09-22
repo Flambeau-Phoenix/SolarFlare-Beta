@@ -1,4 +1,4 @@
-package solarflare.resourcetracker;
+﻿package solarflare.resourcetracker;
 
 import imgui.ImGui;
 import imgui.Enums.ImGuiCond;
@@ -99,6 +99,7 @@ class ResourceTrackerBuilder {
 		section("Common Resources");
 		var v = host.vitals;
 		if (host.target != null) navRow("target", "Current Target", host.target.hidden);
+		if (host.castBar != null) navRow("castbar", "Player Cast Bar", host.castBar.hidden);
 		if (v != null) navRow("health", "Health", v.hpHidden);
 		if (host.attackCombo != null) navRow("attack", "Combo Tracker", host.attackCombo.hidden);
 		section("Class Resources");
@@ -228,6 +229,9 @@ class ResourceTrackerBuilder {
 			case "target":
 				if (host.target != null)
 					host.target.drawSettings("rt_tgt");
+			case "castbar":
+				if (host.castBar != null)
+					host.castBar.drawSettings("rt_castbar");
 			case "chaincast":
 				drawWindow(host.chaincast.hidden, host.chaincast.chrome, host.chaincast.width, host.chaincast.height, "chaincast");
 				section("Appearance"); ImGui.textDisabled("Chaincast uses its fixed rail and ready-gem presentation.");
@@ -297,27 +301,32 @@ class ResourceTrackerBuilder {
 		case "combo": host.combo.sizeDirty = true;
 		case "attack": host.attackCombo.sizeDirty = true;
 		case "target": host.target.sizeDirty = true;
+		case "castbar": host.castBar.sizeDirty = true;
 		case "chaincast": host.chaincast.sizeDirty = true;
 		case "conduit": host.conduit.sizeDirty = true;
 	}
 
 	static function minWidth(id:String):Single return switch (id) {
 		case "combo": ComboConfig.MIN_W; case "attack": AttackComboConfig.MIN_W; case "target": TargetConfig.MIN_W;
+		case "castbar": solarflare.castbar.CastBarConfig.MIN_W;
 		case "chaincast": ChaincastConfig.MIN_W;
 		case "conduit": ConduitConfig.MIN_W; default: VitalsConfig.HP_MIN_W;
 	};
 	static function maxWidth(id:String):Single return switch (id) {
 		case "combo": ComboConfig.MAX_W; case "attack": AttackComboConfig.MAX_W; case "target": TargetConfig.MAX_W;
+		case "castbar": solarflare.castbar.CastBarConfig.MAX_W;
 		case "chaincast": ChaincastConfig.MAX_W;
 		case "conduit": ConduitConfig.MAX_W; default: VitalsConfig.HP_MAX_W;
 	};
 	static function minHeight(id:String):Single return switch (id) {
 		case "combo": ComboConfig.MIN_H; case "attack": AttackComboConfig.MIN_H; case "target": TargetConfig.MIN_H;
+		case "castbar": solarflare.castbar.CastBarConfig.MIN_H;
 		case "chaincast": ChaincastConfig.MIN_H;
 		case "conduit": ConduitConfig.MIN_H; default: 28;
 	};
 	static function maxHeight(id:String):Single return switch (id) {
 		case "combo": ComboConfig.MAX_H; case "attack": AttackComboConfig.MAX_H; case "target": TargetConfig.MAX_H;
+		case "castbar": solarflare.castbar.CastBarConfig.MAX_H;
 		case "chaincast": ChaincastConfig.MAX_H;
 		case "conduit": ConduitConfig.MAX_H; default: VitalsConfig.HP_MAX_H;
 	};
@@ -328,10 +337,11 @@ class ResourceTrackerBuilder {
 	function selectedLabel():String return switch (selected) {
 		case "health": "Health"; case "rage": "Rage"; case "mana": "Mana/Spark"; case "prayers": "Prayers";
 		case "combo": "Combo Points"; case "attack": "Combo Tracker"; case "target": "Current Target";
+		case "castbar": "Player Cast Bar";
 		case "chaincast": "Chaincast";
 		case "conduit": "Conduits"; default: "Resource";
 	};
 
 	static function isResourceId(id:String):Bool return id == "health" || id == "rage" || id == "mana" || id == "prayers"
-		|| id == "combo" || id == "attack" || id == "target" || id == "chaincast" || id == "conduit";
+		|| id == "combo" || id == "attack" || id == "target" || id == "castbar" || id == "chaincast" || id == "conduit";
 }

@@ -42,6 +42,7 @@ class ModEntry {
 	static function keepRoots():Void {
 		solarflare.cdb.CdbNames.keep();
 		solarflare.cdb.CdbUnitNames.keep();
+		solarflare.cdb.CdbSummonUnits.keep();
 		solarflare.cdb.AuraCatalog.keep();
 		solarflare.cdb.AuraQuickStartCatalog.keep();
 		solarflare.cdb.CdbAuraTable.keep();
