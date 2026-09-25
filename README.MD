@@ -123,6 +123,7 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 * **Profiles & Themes:** Save, duplicate, and switch whole-HUD profiles across characters; choose curated color schemes or define your own.
 
 ---
+
 # SolarFlare — v2.2b Patch Notes
 
 ### Codebase Optimization & Dead Code Pruning
@@ -140,7 +141,6 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 
 # SolarFlare — v2.1b Patch Notes
 
-### What's New
 
 * **Trackable Status Stacks:** Auras can now display and react to live stack counts for buffs, debuffs, and other player statuses.
 * **Dedicated Stacks Display:** The Aura Builder now features a spot dedicated entirely to stacks display.
