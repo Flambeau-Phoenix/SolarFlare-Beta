@@ -93,24 +93,8 @@ class CdbSummonUnits {
 		} catch (_:Dynamic) {}
 	}
 
-	static function jsonPath():String {
-		var candidates = new Array<String>();
-		try candidates.push(Path.join([ModPaths.modDir(), "assets", "cdb", "summon-units.json"])) catch (_:Dynamic) {}
-		try candidates.push(Path.join([ModPaths.modDir(), "cdb", "summon-units.json"])) catch (_:Dynamic) {}
-		try {
-			var exeDir = Path.directory(Sys.programPath());
-			candidates.push(Path.join([exeDir, "hlx", "mods", "solarflare", "cdb", "summon-units.json"]));
-		} catch (_:Dynamic) {}
-		try
-			candidates.push(Path.join([Sys.getCwd(), "assets", "cdb", "summon-units.json"]))
-		catch (_:Dynamic) {}
-		for (c in candidates) {
-			try {
-				if (c != null && FileSystem.exists(c))
-					return c;
-			} catch (_:Dynamic) {}
-		}
-		return null;
+	static inline function jsonPath():String {
+		return ModPaths.findCdbFile("summon-units.json");
 	}
 
 	static function dynStr(v:Dynamic):String {

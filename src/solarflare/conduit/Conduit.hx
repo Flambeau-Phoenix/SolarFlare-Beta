@@ -153,21 +153,6 @@ class ConduitCache {
 		return powerKey;
 	}
 
-	public static function powerHashId():String {
-		ensureHashes();
-		return powerHash;
-	}
-
-	public static function projectileId():String {
-		ensureHashes();
-		return projectileKey;
-	}
-
-	public static function projectileHashId():String {
-		ensureHashes();
-		return projectileHash;
-	}
-
 	public static function lookupIds():Array<String> {
 		ensureHashes();
 		return lookupKeys;

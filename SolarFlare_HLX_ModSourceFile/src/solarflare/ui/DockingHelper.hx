@@ -58,54 +58,6 @@ class DockingHelper {
 			enableDocking();
 	}
 
-	/**
-	 * Floating dockable window (CursorCaptureFix look-lock gating).
-	 * No default dock target — user docks onto another window only.
-	 */
-	public static function dockableWindow(title:String, content:Void->Void, open:Null<imgui.ref.BoolRef> = null, flags:Int = 0):Bool {
-		if (!initialized)
-			init();
-
-		if (open != null && !open.get())
-			return false;
-
-		var effectiveFlags = CursorCaptureFix.windowFlags(flags);
-		var visible = ImGui.begin(title, open, effectiveFlags);
-		if (visible) {
-			content();
-		}
-		ImGui.end();
-
-		return open != null ? open.get() : visible;
-	}
-
-	/**
-	 * Floating dockable window with first-use position/size hints.
-	 */
-	public static function dockableWindowWithPosition(title:String, content:Void->Void, open:Null<imgui.ref.BoolRef>, pos:ImVec2, size:ImVec2, flags:Int = 0):Bool {
-		if (!initialized)
-			init();
-
-		if (open != null && !open.get())
-			return false;
-
-		ImGui.setNextWindowPos(pos, ImGuiCond.FirstUseEver);
-		ImGui.setNextWindowSize(size, ImGuiCond.FirstUseEver);
-
-		var effectiveFlags = CursorCaptureFix.windowFlags(flags);
-		var visible = ImGui.begin(title, open, effectiveFlags);
-		if (visible) {
-			content();
-		}
-		ImGui.end();
-
-		return open != null ? open.get() : visible;
-	}
-
-	public static inline function getCurrentDockID():Int {
-		return ImGui.getWindowDockID();
-	}
-
 	public static inline function isWindowDocked():Bool {
 		return ImGui.isWindowDocked();
 	}

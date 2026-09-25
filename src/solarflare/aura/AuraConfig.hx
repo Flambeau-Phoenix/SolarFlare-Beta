@@ -613,74 +613,6 @@ class AuraConfig {
 		return StringTools.trim(out);
 	}
 
-	function ensureNameBuf():Void {
-		if (profileNameBytes != null)
-			return;
-		profileNameBytes = haxe.io.Bytes.alloc(NAME_BUF);
-	}
-
-	function readNameBuf():String {
-		ensureNameBuf();
-		var out = "";
-		var i = 0;
-		while (i < NAME_BUF) {
-			var c = profileNameBytes.get(i);
-			if (c == 0)
-				break;
-			out += String.fromCharCode(c);
-			i++;
-		}
-		return StringTools.trim(out);
-	}
-
-	function drawPackCombiner():Void {
-		if (!ImGui.collapsingHeader("Combine → export key / DRM fight script"))
-			return;
-		ImGui.textWrapped("Check Pack on each aura, set fight + pack id, then export one share key (Base64) or a DRM INI bundle for packs/custom/.");
-		if (ImGui.inputText("Pack id##pkid", packIdBuf, PACK_ID))
-			packId = bytesToString(packIdBuf, PACK_ID);
-		if (ImGui.inputText("Pack name##pknm", packNameBuf, PACK_NAME))
-			packName = bytesToString(packNameBuf, PACK_NAME);
-		if (ImGui.beginCombo("Pack fight##pkfg", packFight)) {
-			for (f in AuraPack.FIGHTS) {
-				if (ImGui.selectable(f, packFight == f))
-					packFight = f;
-			}
-			ImGui.endCombo();
-		}
-		if (ImGui.button("Select all##pksel")) {
-			for (a in auras)
-				a.packSelect.set(true);
-		}
-		ImGui.sameLine();
-		if (ImGui.button("Select none##pknone")) {
-			for (a in auras)
-				a.packSelect.set(false);
-		}
-		var selected = selectedAuras();
-		ImGui.text(Std.string(selected.length) + " selected · DRM-mappable need skillId");
-		if (ImGui.button("Export pack key##pkex")) {
-			if (selected.length > 0) {
-				lastExport = AuraPack.encode(packFight, packId, packName, selected);
-				lastDrmIni = AuraPack.drmIniBundle(packFight, packId, packName, selected);
-			}
-		}
-		ImGui.sameLine();
-		if (ImGui.button("DRM INI only##pkini")) {
-			if (selected.length > 0)
-				lastDrmIni = AuraPack.drmIniBundle(packFight, packId, packName, selected);
-		}
-	}
-
-	function selectedAuras():Array<AuraDef> {
-		var out:Array<AuraDef> = [];
-		for (a in auras) {
-			if (a != null && a.packSelect.get())
-				out.push(a);
-		}
-		return out;
-	}
-
 	function nextId():String {
 		return allocateAuraId("aura_" + Std.string(auras.length + 1));
 	}
@@ -810,58 +742,6 @@ class AuraConfig {
 			a.syncKeyBuf();
 			SettingsStore.markDirty();
 		}
-	}
-
-	function exportOne(a:AuraDef):String {
-		return ShareCodec.wrapJson(haxe.Json.stringify(AuraEngine.toObj(a)));
-	}
-
-	function importOne():Void {
-		try {
-			var s = bytesToString(importBuf);
-			if (s.length < 4)
-				return;
-			var d = AuraPack.decode(s);
-			if (d != null && (Std.isOfType(d, Array) || d.kind == AuraPack.KIND || d.auras != null)) {
-				importPackDyn(d);
-				return;
-			}
-			var a = fromDyn(d);
-			a.id = allocateAuraId(a.id);
-			if (auras.length < AuraEngine.MAX)
-				auras.push(a);
-			SettingsStore.markDirty();
-		} catch (_:Dynamic) {}
-	}
-
-	function importPack():Void {
-		try {
-			var s = bytesToString(importBuf);
-			var d = AuraPack.decode(s);
-			importPackDyn(d);
-		} catch (_:Dynamic) {}
-	}
-
-	function importPackDyn(d:Dynamic):Void {
-		if (d == null)
-			return;
-		if (d.fight != null && Std.string(d.fight).length > 0)
-			packFight = Std.string(d.fight);
-		if (d.id != null)
-			packId = Std.string(d.id);
-		if (d.name != null)
-			packName = Std.string(d.name);
-		fillBuf(packIdBuf, PACK_ID, packId);
-		fillBuf(packNameBuf, PACK_NAME, packName);
-		var list = AuraPack.unpackAuras(d);
-		var i = 0;
-		while (i < list.length && auras.length < AuraEngine.MAX) {
-			var a = list[i];
-			a.id = allocateAuraId(a.id);
-			auras.push(a);
-			i++;
-		}
-		SettingsStore.markDirty();
 	}
 
 	static function fillBuf(buf:hl.Bytes, cap:Int, s:String):Void ByteUtil.fillBuf(buf, cap, s);

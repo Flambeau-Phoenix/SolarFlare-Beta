@@ -87,20 +87,6 @@ class RecentTargetCache {
 		return labelBuf;
 	}
 
-	public static function lookupName(kind:String):String {
-		if (kind == null || kind.length == 0)
-			return "";
-		var i = 0;
-		while (i < items.length) {
-			if (items[i].kind == kind) {
-				var n = items[i].name;
-				return n != null ? n : "";
-			}
-			i++;
-		}
-		return "";
-	}
-
 	public static function count():Int {
 		return items.length;
 	}

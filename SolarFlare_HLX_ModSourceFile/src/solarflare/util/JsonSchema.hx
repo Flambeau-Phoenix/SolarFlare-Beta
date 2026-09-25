@@ -170,10 +170,4 @@ class JsonSchema {
 		};
 	}
 
-	/**
-	 * Check if a JSON string matches the Aura import schema.
-	 */
-	public static function isValidAuraImport(jsonString:String):Bool {
-		return parseAuraImport(jsonString) != null;
-	}
 }

@@ -71,8 +71,6 @@ class AuraBuilder {
 	var iconSearch:String = "";
 	var iconKindFilter:String = "All";
 
-	var visualBuilder = new solarflare.aura.signal.VisualConditionBuilder();
-	var testHarness = new solarflare.aura.test.AuraTestHarness();
 	var advancedPreview = new solarflare.aura.preview.AdvancedAuraPreview();
 
 	var boundEditorAura:AuraDef = null;
@@ -563,42 +561,6 @@ class AuraBuilder {
 		creationHomeOpen = false;
 		SettingsStore.markDirty();
 		ToastManager.success("Created: " + created.name);
-	}
-
-	function drawCreationCard(id:String, kicker:String, title:String, description:String, action:String,
-			primary:Bool, onClick:Void->Void, width:Single):Void {
-		var theme = solarflare.ui.ThemePalette.current();
-		var mix:Single = primary ? 0.20 : 0.07;
-		var bg = ImGui.vec4(
-			theme.cellBg.x * (1 - mix) + theme.accent.x * mix,
-			theme.cellBg.y * (1 - mix) + theme.accent.y * mix,
-			theme.cellBg.z * (1 - mix) + theme.accent.z * mix, 0.98);
-		ImGui.pushStyleColor(ImGuiCol.ChildBg, bg);
-		ImGui.pushStyleColor(ImGuiCol.Border, primary ? theme.accent : theme.border);
-		ImGui.pushStyleVar(ImGuiStyleVar.ChildBorderSize, primary ? 2.25 : 1.5);
-		ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, ImGui.vec2(16, 13));
-		// AutoResizeY lets the card grow to fit content so the action button's
-		// full 34px hit rect is never clipped by a fixed client boundary.
-		// Width is still fixed; height expands. A minimum dummy of 30px is
-		// inserted before the button to guarantee at least the visual push-down.
-		UiScope.child("##ab_create_card_" + id, ImGui.vec2(width, 0), function() {
-			ImGui.textColored(primary ? theme.accent : theme.textDisabled, kicker);
-			var font = ImGui.getFont();
-			if (font != null) ImGui.pushFont(font, ImGui.getFontSize() * 1.28);
-			ImGui.text(title);
-			if (font != null) ImGui.popFont();
-			ImGui.textWrapped(description);
-			// Guarantee at least 6px breathing room between the description and
-			// the action button; AutoResizeY absorbs whatever height is needed.
-			ImGui.spacing();
-			ImGui.spacing();
-			var clicked = primary
-				? UiChrome.accentButton(action + "##ab_create_" + id, ImGui.vec2(-1, 34))
-				: UiChrome.ghostButton(action + "##ab_create_" + id, ImGui.vec2(-1, 34));
-			if (clicked && onClick != null) onClick();
-		}, ImGuiChildFlags.Borders | ImGuiChildFlags.AutoResizeY | ImGuiChildFlags.AlwaysUseWindowPadding);
-		ImGui.popStyleVar(2);
-		ImGui.popStyleColor(2);
 	}
 
 	function drawCreationTemplates(disabled:Bool):Void {
@@ -1243,13 +1205,6 @@ class AuraBuilder {
 		solarflare.ui.ByteUtil.clearBytes(wizardCatalogSearchBuf, 96);
 		solarflare.ui.ByteUtil.clearBytes(wizardFightBuf, 32);
 		wizardOpenRequest = true;
-	}
-
-	function openSkillReadyTemplate():Void {
-		openWizard("skill");
-		wizardSignal = "skill.ready";
-		wizardPreset = "skillReady";
-		ToastManager.info("Choose the skill for this template.");
 	}
 
 	function drawWizardModal():Void {
@@ -1911,47 +1866,6 @@ class AuraBuilder {
 	}
 
 	inline function formLabel(label:String):Void { ImGui.alignTextToFramePadding(); ImGui.text(label); }
-
-	function drawAuraDetails():Void {
-		var a = selectedAura(); if (a == null) return;
-		UiLayout.propertyGrid("##ab_ed_details", function() {
-			UiLayout.propertyRow("Name", function() {
-				if (ImGui.inputText("##ab_ed_name", a.nameBuf, AuraDef.NAME_BUF)) {
-					a.name = readBytes(a.nameBuf, AuraDef.NAME_BUF);
-					SettingsStore.markDirty();
-				}
-			});
-			UiLayout.propertyRow("Scope", function() {
-				var scope = isShared(a) ? "Shared / any encounter" : a.fight;
-				if (ImGui.beginCombo("##ab_ed_scope", scope)) {
-					if (ImGui.selectable("Shared / any encounter##ab_scope_shared", isShared(a))) {
-						a.fight = "";
-						a.syncFightBuf();
-						SettingsStore.markDirty();
-					}
-					for (fight in AuraPack.FIGHTS) {
-						if (fight == "shared") continue;
-						if (ImGui.selectable(fight + "##ab_fight_" + fight, a.fight == fight)) {
-							a.fight = fight;
-							a.syncFightBuf();
-							SettingsStore.markDirty();
-						}
-					}
-					ImGui.endCombo();
-				}
-			});
-		});
-		if (ImGui.collapsingHeader("Custom encounter tag##ab_custom_scope")) {
-			UiLayout.propertyGrid("##ab_ed_custom_scope", function() {
-				UiLayout.propertyRow("Tag", function() {
-					if (ImGui.inputText("##ab_ed_fight", a.fightBuf, AuraDef.FIGHT_BUF)) {
-						a.fight = readBytes(a.fightBuf, AuraDef.FIGHT_BUF);
-						SettingsStore.markDirty();
-					}
-				});
-			});
-		}
-	}
 
 	function drawIoModal():Void {
 		if (ioModalRequest) { ImGui.openPopup("Aura Import / Export##ab_io_modal"); ioModalRequest = false; }

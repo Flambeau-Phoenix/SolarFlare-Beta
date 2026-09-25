@@ -1,4 +1,4 @@
-﻿package solarflare.cdb;
+package solarflare.cdb;
 
 import haxe.Json;
 import solarflare.ui.ModPaths;
@@ -50,28 +50,8 @@ class CdbNames {
 		} catch (_:Dynamic) {}
 	}
 
-	static function jsonPath():String {
-		var candidates = new Array<String>();
-		try candidates.push(Path.join([ModPaths.modDir(), "assets", "class-signatures.json"])) catch (_:Dynamic) {}
-		try candidates.push(Path.join([ModPaths.modDir(), "assets", "cdb", "class-signatures.json"])) catch (_:Dynamic) {}
-		try candidates.push(Path.join([ModPaths.modDir(), "cdb", "class-signatures.json"])) catch (_:Dynamic) {}
-		try {
-			var exeDir = Path.directory(Sys.programPath());
-			candidates.push(Path.join([exeDir, "hlx", "mods", "solarflare", "cdb", "class-signatures.json"]));
-		} catch (_:Dynamic) {}
-		try
-			candidates.push(Path.join([Sys.getCwd(), "hlx", "mods", "solarflare", "cdb", "class-signatures.json"]))
-		catch (_:Dynamic) {}
-		try
-			candidates.push(Path.join([Sys.getCwd(), "assets", "cdb", "class-signatures.json"]))
-		catch (_:Dynamic) {}
-		for (c in candidates) {
-			try {
-				if (c != null && FileSystem.exists(c))
-					return c;
-			} catch (_:Dynamic) {}
-		}
-		return null;
+	static inline function jsonPath():String {
+		return ModPaths.findCdbFile("class-signatures.json");
 	}
 
 	static function dynStr(v:Dynamic):String {

@@ -1,4 +1,4 @@
-﻿package solarflare.geaux;
+package solarflare.geaux;
 
 import haxe.Json;
 import solarflare.ui.ModPaths;
@@ -184,28 +184,8 @@ class GeauxTalentTable {
 		list.push(row);
 	}
 
-	static function jsonPath():String {
-		var candidates = new Array<String>();
-		try candidates.push(Path.join([ModPaths.modDir(), "assets", "talent-effects.json"])) catch (_:Dynamic) {}
-		try candidates.push(Path.join([ModPaths.modDir(), "assets", "cdb", "talent-effects.json"])) catch (_:Dynamic) {}
-		try candidates.push(Path.join([ModPaths.modDir(), "cdb", "talent-effects.json"])) catch (_:Dynamic) {}
-		try {
-			var exeDir = Path.directory(Sys.programPath());
-			candidates.push(Path.join([exeDir, "hlx", "mods", "solarflare", "cdb", "talent-effects.json"]));
-		} catch (_:Dynamic) {}
-		try
-			candidates.push(Path.join([Sys.getCwd(), "hlx", "mods", "solarflare", "cdb", "talent-effects.json"]))
-		catch (_:Dynamic) {}
-		try
-			candidates.push(Path.join([Sys.getCwd(), "assets", "cdb", "talent-effects.json"]))
-		catch (_:Dynamic) {}
-		for (c in candidates) {
-			try {
-				if (c != null && FileSystem.exists(c))
-					return c;
-			} catch (_:Dynamic) {}
-		}
-		return null;
+	static inline function jsonPath():String {
+		return ModPaths.findCdbFile("talent-effects.json");
 	}
 
 	static function dynStr(v:Dynamic):String {

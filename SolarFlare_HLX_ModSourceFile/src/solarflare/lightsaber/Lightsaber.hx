@@ -357,31 +357,6 @@ class LightsaberCache {
 		return you.dps();
 	}
 
-	public static var active(get, never):Bool;
-	static function get_active():Bool {
-		return you.active;
-	}
-
-	public static var ended(get, never):Bool;
-	static function get_ended():Bool {
-		return you.ended;
-	}
-
-	public static var totalDamage(get, never):Float;
-	static function get_totalDamage():Float {
-		return you.totalDamage;
-	}
-
-	public static var elapsedSec(get, never):Float;
-	static function get_elapsedSec():Float {
-		return you.elapsedSec;
-	}
-
-	public static var skills(get, never):Array<LightsaberSkillRow>;
-	static function get_skills():Array<LightsaberSkillRow> {
-		return you.skills;
-	}
-
 	public static function noteHit(amount:Float, skillId:String, skillLabel:String, nowSec:Float, crit:Bool = false,
 			source:String = "", minion:String = "", target:String = "", targetHp:Float = 0, targetMaxHp:Float = 0):Void {
 		you.noteHit(amount, skillId, skillLabel, nowSec, crit, source, minion, target, targetHp, targetMaxHp);

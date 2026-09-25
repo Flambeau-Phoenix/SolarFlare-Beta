@@ -107,14 +107,6 @@ class ChaincastCache {
 		lastShown = shown;
 	}
 
-	public static function shownCount():Int {
-		if (ready)
-			return SLOT_COUNT;
-		if (current < 0)
-			return 0;
-		return current;
-	}
-
 	public static function pulseActive():Bool {
 		return solarflare.ui.ResourceMaxAlert.nowSec() < pulseUntil;
 	}
@@ -136,11 +128,6 @@ class ChaincastCache {
 	public static function statusId():String {
 		ensureHashes();
 		return statusKey;
-	}
-
-	public static function accumId():String {
-		ensureHashes();
-		return accumKey;
 	}
 
 	public static function lookupReadyIds():Array<String> {
@@ -196,16 +183,6 @@ class ChaincastCache {
 		var low = s.toLowerCase();
 		return low.indexOf("chaincast_accum") >= 0
 			|| low.indexOf("mage_talent_chaincast_accum") >= 0;
-	}
-
-	public static function isMageSkillId(id:String):Bool {
-		if (id == null || id.length == 0)
-			return false;
-		ensureHashes();
-		if (isChaincastKind(id))
-			return true;
-		var s = id.toLowerCase();
-		return s.indexOf("mage_") == 0;
 	}
 
 	static function ensureHashes():Void {
@@ -476,12 +453,6 @@ class ChaincastOverlay {
 			cfg.height.set(Math.max(contentH, newH));
 			SettingsStore.markDirty();
 		});
-	}
-
-	static function captionOf(cfg:ChaincastConfig):String {
-		if (cfg != null && cfg.title != null && cfg.title.length > 0)
-			return cfg.title;
-		return "Chaincast";
 	}
 
 	static function drawHead(cfg:ChaincastConfig, rowW:Single, rowH:Single):Void {

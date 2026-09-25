@@ -38,6 +38,26 @@ class ModPaths {
 	public static inline function child(name:String):String
 		return Path.join([modDir(), name]);
 
+	public static function findCdbFile(filename:String):String {
+		var candidates = new Array<String>();
+		try candidates.push(Path.join([modDir(), "assets", filename])) catch (_:Dynamic) {}
+		try candidates.push(Path.join([modDir(), "assets", "cdb", filename])) catch (_:Dynamic) {}
+		try candidates.push(Path.join([modDir(), "cdb", filename])) catch (_:Dynamic) {}
+		try {
+			var exeDir = Path.directory(Sys.programPath());
+			candidates.push(Path.join([exeDir, "hlx", "mods", "solarflare", "cdb", filename]));
+		} catch (_:Dynamic) {}
+		try candidates.push(Path.join([Sys.getCwd(), "hlx", "mods", "solarflare", "cdb", filename])) catch (_:Dynamic) {}
+		try candidates.push(Path.join([Sys.getCwd(), "assets", "cdb", filename])) catch (_:Dynamic) {}
+		for (c in candidates) {
+			try {
+				if (c != null && FileSystem.exists(c))
+					return c;
+			} catch (_:Dynamic) {}
+		}
+		return null;
+	}
+
 	static function findLoadedMod(root:String):String {
 		if (root == null || root.length == 0)
 			return null;

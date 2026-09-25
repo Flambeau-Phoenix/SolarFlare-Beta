@@ -8,34 +8,6 @@ import solarflare.aura.signal.AuraRuleDef;
  * Kill Counters, Low HP Alerts, Skill Ready Alerts, Combo Finishers, Buff Stack Trackers, Damage Spikes.
  */
 class AuraTemplates {
-	public static function createBossKillCounter():AuraDef {
-		var a = new AuraDef("boss_kill_counter", "Boss Kill Counter");
-		a.announce = "Boss Kills";
-		a.syncAnnounceBuf();
-		a.isCounter.set(true);
-		a.alwaysOn.set(true);
-		a.counterValue = 0;
-		a.region = "text";
-		a.showIcon.set(true);
-		a.showLabel.set(true);
-		a.stackCounter.set(true);
-
-		var r = new AuraRuleDef();
-		r.mode = "all";
-		var c = new AuraConditionDef();
-		c.signal = "combat.killKindMatches";
-		c.op = "is";
-		c.subject = "";
-		c.subjectLabel = "";
-		r.conditions.push(c);
-		a.rule = r;
-
-		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_ON_RISE_HOLD)];
-		a.effects[0].hold = 5.0;
-		a.effects[0].holdRef.set(5.0);
-		return a;
-	}
-
 	public static function createEmergencyLowHpAlert():AuraDef {
 		var a = new AuraDef("emergency_low_hp", "Emergency Low HP");
 		a.announce = "LOW HP! HEAL / DODGE!";
@@ -56,57 +28,6 @@ class AuraTemplates {
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_ALERT, AuraEffect.WHEN_WHILE_TRUE)];
-		return a;
-	}
-
-	public static function createSkillReadyAlert():AuraDef {
-		var a = new AuraDef("skill_ready_alert", "Skill Cooldown Ready");
-		a.announce = "SKILL READY!";
-		a.syncAnnounceBuf();
-		a.region = "icon";
-		a.showIcon.set(true);
-		a.progressRing.set(true);
-
-		var r = new AuraRuleDef();
-		r.mode = "all";
-		var c = new AuraConditionDef();
-		c.signal = "skill.ready";
-		c.op = "is";
-		c.boolValue = true;
-		c.subject = "";
-		c.subjectLabel = "Main Skill";
-		r.conditions.push(c);
-		a.rule = r;
-
-		a.effects = AuraEffect.presetCdReady("SKILL READY!");
-		return a;
-	}
-
-	public static function createMaxComboFinisher():AuraDef {
-		var a = new AuraDef("max_combo_finisher", "Max Combo Finisher");
-		a.announce = "MAX COMBO! CAST FINISHER!";
-		a.syncAnnounceBuf();
-		a.region = "text";
-		a.showIcon.set(true);
-		a.showLabel.set(true);
-		a.stackCounter.set(false);
-		a.enabled.set(false);
-
-		var r = new AuraRuleDef();
-		r.mode = "all";
-		var c = new AuraConditionDef();
-		c.signal = "resource.combo.count";
-		c.op = "gte";
-		c.numberValue = 5;
-		r.conditions.push(c);
-		a.rule = r;
-
-		a.effects = [new AuraEffect("win", AuraEffect.KIND_ALERT, AuraEffect.WHEN_WHILE_TRUE)];
-		if (a.chrome != null) {
-			a.chrome.x.set(80);
-			a.chrome.y.set(200);
-			a.chrome.locked.set(true);
-		}
 		return a;
 	}
 
