@@ -1,6 +1,6 @@
 ![Aura instant cast proc](ghub.gif)
 
-# SolarFlare — v2.1b (Beta)
+# SolarFlare — v2.2b (Beta)
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
 
 ![Bee + Imp DPS](TrinketBee_Imp.png)
@@ -48,7 +48,7 @@ Diagnostic hooks are excluded from the normal `solarflare.hl` release and remain
 ## Installation (HLB v2–v6 Compatible)
 
 > [!IMPORTANT]
-> SolarFlare bundles its tested local HLX runtime build with support for HashLink bytecode versions **2, 3, 4, 5, and 6**. This includes Farever 0.2.4 / HLB v6 while retaining compatibility with older community mods. The bundled DLL exposes the HLX 0.0.9 API surface but is not claimed to be the byte-identical upstream release artifact.
+> SolarFlare bundles its tested local HLX runtime build with support for HashLink bytecode versions **2, 3, 4, 5, and 6**. This includes Farever 0.2.4 / HLB v6 while retaining compatibility with older community mods. The bundled DLL exposes the HLX 0.0.10 API surface but is not claimed to be the byte-identical upstream release artifact.
 
 1. Download **`SolarFlare_Live_v1.4b.zip`**.
 2. Extract the contents directly into your **`Farever`** game root directory:
@@ -123,6 +123,20 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 * **Profiles & Themes:** Save, duplicate, and switch whole-HUD profiles across characters; choose curated color schemes or define your own.
 
 ---
+# SolarFlare — v2.2b Patch Notes
+
+### Codebase Optimization & Dead Code Pruning
+
+* **2,923 Lines of Dead Weight Trimmed:** Executed a comprehensive dead-code and duplicate-boilerplate purge across the entire codebase, reducing total source lines from 45,187 to 42,264 while passing `-dce full` build checks.
+* **14 Unreferenced Files Deleted:** Completely excised obsolete/dormant files with zero active call sites:
+  * UI components: `SortableTable.hx`, `ScriptGuide.hx`, `ProgressHelpers.hx`, `DrawListExt.hx`, `EnhancedBorders.hx`.
+  * Builders & Harnesses: `VisualConditionBuilder.hx`, `AuraTestHarness.hx`, `LegacyTriggerConverter.hx`, `LegacyTriggerRuleFactory.hx`.
+  * Trackers & Models: `AttackComboTracker.hx`, `DamageObservation.hx`.
+  * Empty hook modules: `MageHooks.hx`, `PriestHooks.hx`, `RogueHooks.hx`.
+* **Obsolete Hooks & Trampolines Excised:** Stripped 17 uncalled forwarding inline hooks and dead MinHook trampoline handlers from `HealthHooks.hx` (`onSetHealth`, `onSetRage`, `onSetSpark`, `onSetComboPoint`, `onPropagateChainCast`, `onTalentChainCast`, `onPowerConduitStart`, etc.), consolidating strictly around present-loop state sampling.
+* **Vanilla HUD DOM Scraper Purged:** Removed legacy fallback reflection code (`applyHudCooldowns`, `walkHudNode`, `ingestHudSlot`, `ingestTypedButton`, `putHudCd`) from `GeauxCache.hx`, establishing direct skill-object inspection as the exclusive authority.
+* **Aura Builder & Config Pruned:** Removed unreferenced starter templates, dead builder views, deprecated single-aura export/import routines, and abandoned pack-combiner UI from `AuraBuilder.hx`, `AuraConfig.hx`, and `AuraTemplates.hx`.
+* **Centralized CastleDB Resolution:** Replaced duplicate 25-line path resolution loops across `CdbNames`, `CdbUnitNames`, `CdbSummonUnits`, `GeauxCdTable`, and `GeauxTalentTable` with a single unified `ModPaths.findCdbFile()` helper.
 
 # SolarFlare — v2.1b Patch Notes
 
@@ -168,9 +182,9 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 
 ---
 
-## HLX Core & Runtime Update (v0.0.9-Compatible API)
+## HLX Core & Runtime Update (v0.0.10-Compatible API)
 
-SolarFlare v1.4b includes its locally built and tested HLX loader stack. It supports HLB bytecode versions **2 through 6**, including **Farever 0.2.4**, and exposes the same 350 exports and 27 `hlp_hlx_*` exports as the official HLX 0.0.9 runtime:
+SolarFlare v1.4b includes its locally built and tested HLX loader stack. It supports HLB bytecode versions **2 through 6**, including **Farever 0.2.4**, and exposes the same 350 exports and 27 `hlp_hlx_*` exports as the official HLX 0.0.10 runtime:
 
 * **Farever 0.2.4 Ready (`HLB v6`):** Full HashLink 2.0 bytecode support (`max_version = 6` with 3rd debug-assignment index). Fixes `Found version 6 while HL supports up to 5`.
 * **MinHook 1.3.4 Engine:** Replaced the legacy hand-rolled assembly whitelist in `patching.c` with MinHook. Relocates `CALL`, `JMP`, `Jcc`, and RIP-relative memory offsets cleanly, eliminating `no safe cut found` / `install_patch failed` crashes on tight JIT function prologues (`Player.update`, combat hooks).
@@ -214,6 +228,32 @@ SolarFlare v1.4b includes its locally built and tested HLX loader stack. It supp
 * **Data Isolation:** Saved IDs operate independently from live units, ensuring counters don't reset when unit IDs drift in memory.
 
 </details>
+
+---
+
+## Developer & Build Reference
+
+### Build from Source
+```powershell
+haxe compile.hxml
+```
+* Generates `solarflare.hl`.
+
+### Deployment
+```powershell
+.\deploy.ps1 -FareverRoot "C:\Path\To\Farever"
+```
+
+### Runtime Data Paths
+| Kind | Path |
+|---|---|
+| Settings | `hlx/mods/SolarFlare/solarflare.json` |
+| ImGui State | `hlx/mods/SolarFlare/imgui.ini` |
+| In-game Notebook | `hlx/mods/SolarFlare/notebook.json` |
+| Auras | `hlx/mods/SolarFlare/auras/` |
+| CastleDB Assets | `hlx/mods/solarflare/assets/cdb/` |
+| Icons & Atlases | `hlx/mods/solarflare/assets/icons/` |
+| Lightsaber DPS Logs | `hlx/mods/SolarFlare/logs/saber/` |
 
 ---
 
