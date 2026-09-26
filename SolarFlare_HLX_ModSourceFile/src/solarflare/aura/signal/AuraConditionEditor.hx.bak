@@ -3,7 +3,6 @@ package solarflare.aura.signal;
 import imgui.ImGui;
 import imgui.Enums.ImGuiChildFlags;
 import imgui.Enums.ImGuiCol;
-import imgui.Enums.ImGuiCond;
 import imgui.Enums.ImGuiKey;
 import imgui.Enums.ImGuiStyleVar;
 import solarflare.aura.AuraDef;
@@ -401,7 +400,6 @@ class AuraConditionEditor {
 		// ghostButton+popup inside AutoResizeY condition cards eats clicks and sticks.
 		var previewText = name.length > 0 ? name : "Select " + kind + "…";
 		ImGui.setNextItemWidth(210);
-		ImGui.setNextWindowSize(ImGui.vec2(480, 420), ImGuiCond.Always);
 		if (!ImGui.beginCombo("##cond_subj_" + tag, previewText)) {
 			if (ImGui.isItemHovered() && c.subject != null && c.subject.length > 0)
 				ImGui.setTooltip(c.subjectLabel + " [" + c.subject + "]");
@@ -417,7 +415,7 @@ class AuraConditionEditor {
 			ImGui.separator();
 
 			// Child begin always pairs with end (AGENTS.md); content only when open.
-			var childOpen = ImGui.beginChild("##cond_subj_list_" + tag, ImGui.vec2(0, 0), ImGuiChildFlags.Borders);
+			var childOpen = ImGui.beginChild("##cond_subj_list_" + tag, ImGui.vec2(440, 280), ImGuiChildFlags.Borders);
 			try {
 				if (childOpen)
 					drawSubjectList(c, ui, kind, tag, bossFocusId);
@@ -513,7 +511,7 @@ class AuraConditionEditor {
 			ImGui.dummy(ImGui.vec2(1, 28));
 			return;
 		}
-		drawSubjectIcon(id, 28, 28);
+		if (!solarflare.ui.GameIcons.imageKey(id, 28, 28)) ImGui.dummy(ImGui.vec2(28, 28));
 		ImGui.sameLine();
 		var resolvedId = id;
 		if (subjectKind == "status") {
@@ -536,41 +534,5 @@ class AuraConditionEditor {
 	static function adjustPresentation(r:AuraRuleDef, fromIdx:Int, toIdx:Int):Void {
 		if (r.presentationSource == fromIdx) r.presentationSource = toIdx;
 		else if (r.presentationSource == toIdx) r.presentationSource = fromIdx;
-	}
-
-	static function drawSubjectIcon(id:String, w:Single, h:Single):Void {
-		if (solarflare.ui.GameIcons.imageKey(id, w, h)) return;
-
-		var stem = solarflare.cdb.CdbAuraTable.iconStem(id);
-		if (stem.length > 0 && stem != id && solarflare.ui.GameIcons.imageKey(stem, w, h)) return;
-
-		var stripped = id;
-		for (suffix in ["_Status", "_status", "_Proc", "_proc", "Status", "Proc"]) {
-			if (StringTools.endsWith(stripped, suffix) && stripped.length > suffix.length) {
-				stripped = stripped.substr(0, stripped.length - suffix.length);
-				break;
-			}
-		}
-		if (stripped != id && solarflare.ui.GameIcons.imageKey(stripped, w, h)) return;
-		if (stripped != id) {
-			var strippedStem = solarflare.cdb.CdbAuraTable.iconStem(stripped);
-			if (strippedStem.length > 0 && strippedStem != stripped && solarflare.ui.GameIcons.imageKey(strippedStem, w, h)) return;
-		}
-
-		var grant = solarflare.cdb.CdbAuraTable.grantedStatusId(id);
-		if (grant.length > 0 && grant != id && solarflare.ui.GameIcons.imageKey(grant, w, h)) return;
-
-		drawIconPlaceholder(id, w, h);
-	}
-
-	static function drawIconPlaceholder(id:String, w:Single, h:Single):Void {
-		var p = ImGui.getCursorScreenPos();
-		ImGui.dummy(ImGui.vec2(w, h));
-		var dl = ImGui.getWindowDrawList();
-		ImGui.ImDrawList_AddRectFilled(dl, p, ImGui.vec2(p.x + w, p.y + h), ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.13, 0.16, 0.21, 1)), 4);
-		ImGui.ImDrawList_AddRect(dl, p, ImGui.vec2(p.x + w, p.y + h), ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.36, 0.45, 0.58, 1)), 4, 1);
-		var mark = id != null && id.length > 0 ? id.substr(0, 1).toUpperCase() : "?";
-		var ts = ImGui.calcTextSize(mark);
-		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(p.x + (w - ts.x) * 0.5, p.y + (h - ts.y) * 0.5), ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.72, 0.8, 0.92, 1)), mark);
 	}
 }

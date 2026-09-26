@@ -124,21 +124,14 @@ class SettingsStore {
 		} catch (_:Dynamic) {}
 	}
 
-	public static function tick(?cfg:ConfigPanel):Void {
+	public static function tick(cfg:ConfigPanel):Void {
 		tryLoadIni();
-		var target = cfg != null ? cfg : lastCfg;
-		if (!dirty || target == null)
+		if (!dirty || cfg == null)
 			return;
 		var now = Date.now().getTime();
 		if (now - lastSaveMs < 300)
 			return;
-		save(target);
-	}
-
-	public static function flushDirty():Void {
-		if (dirty && lastCfg != null) {
-			save(lastCfg);
-		}
+		save(cfg);
 	}
 
 	public static function save(cfg:ConfigPanel):Void {

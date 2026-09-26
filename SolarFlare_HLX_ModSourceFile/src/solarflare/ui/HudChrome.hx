@@ -231,12 +231,10 @@ class HudChrome {
 				}
 			}
 		} catch (_:Dynamic) {}
+		if (maxX < 320 || maxY < 240)
+			return;
 		var px = x.get();
 		var py = y.get();
-		if (maxX < 200)
-			maxX = 1920;
-		if (maxY < 200)
-			maxY = 1080;
 		if (px > maxX - 40)
 			px = maxX - 200;
 		if (py > maxY - 40)
@@ -251,8 +249,13 @@ class HudChrome {
 
 	public function capturePos():Void {
 		var p = ImGui.getWindowPos();
-		x.set(p.x);
-		y.set(p.y);
+		var ox = x.get();
+		var oy = y.get();
+		if (Math.abs(p.x - ox) > 0.5 || Math.abs(p.y - oy) > 0.5) {
+			x.set(p.x);
+			y.set(p.y);
+			SettingsStore.markDirty();
+		}
 	}
 
 	public function drawToggles(id:String):Bool {

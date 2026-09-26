@@ -3,6 +3,7 @@ package solarflare.ui;
 import imgui.ImGui;
 import imgui.Enums.ImGuiChildFlags;
 import imgui.Enums.ImGuiCond;
+import imgui.Enums.ImGuiMouseButton;
 import imgui.Enums.ImGuiWindowFlags;
 import imgui.Structs.ImVec2;
 
@@ -73,7 +74,8 @@ class HUDWidgetWindow {
 		ImGui.setNextWindowBgAlpha(chrome.isTransparent() ? 0 : 0.82);
 		// Until the chrome has been measured once the seed above is a guess, so the size
 		// has to be asserted every frame; FirstUseEver would freeze the guess in place.
-		var sizeCond = (external || !measured) ? ImGuiCond.Always : ImGuiCond.FirstUseEver;
+		var locked = chrome.isLocked() && !layoutOverride;
+		var sizeCond = (locked || external || !measured) ? ImGuiCond.Always : ImGuiCond.FirstUseEver;
 		ImGui.setNextWindowSize(ImGui.vec2(w + oW, h + oH), sizeCond);
 		chrome.clampToViewport();
 		chrome.applyPos();
@@ -81,7 +83,9 @@ class HUDWidgetWindow {
 			ImGui.setNextWindowPos(ImGui.vec2(chrome.x.get(), chrome.y.get()), ImGuiCond.FirstUseEver);
 
 		var editable = !chrome.isLocked() || layoutOverride;
-		var flags = editable ? chrome.windowFlagsKeepClicks(FLAGS) : chrome.windowFlags(FLAGS);
+		var flags = chrome.windowFlagsKeepClicks(FLAGS);
+		if (locked)
+			flags |= ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
 		chrome.extraMenu = function() {
 			if (openBuilder != null && ImGui.menuItem("Open Builder##hw_build"))
 				openBuilder();
@@ -98,6 +102,10 @@ class HUDWidgetWindow {
 				var win = ImGui.getWindowSize();
 				if (editable) {
 					chrome.capturePos();
+					if (ImGui.isMouseReleased(ImGuiMouseButton.Left)) {
+						if (SettingsStore.isDirty())
+							SettingsStore.flushDirty();
+					}
 					// Native edge resize, reported back in content units. A frame that
 					// asserts its own size is not a drag: subtracting an overhead that
 					// changed this frame would report a resize the player never made,
@@ -109,6 +117,7 @@ class HUDWidgetWindow {
 							lastW.set(id, cw);
 							lastH.set(id, ch);
 							onResize(cw, ch);
+							SettingsStore.markDirty();
 						}
 					}
 				}

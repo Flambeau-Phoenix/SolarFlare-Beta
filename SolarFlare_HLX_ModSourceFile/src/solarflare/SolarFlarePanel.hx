@@ -145,6 +145,11 @@ class SolarFlarePanel {
 			solarflare.ui.UiActionQueue.drain()
 		catch (_:Dynamic) {}
 
+		try {
+			if (solarflare.ui.SettingsStore.isDirty())
+				solarflare.ui.SettingsStore.tick(config);
+		} catch (_:Dynamic) {}
+
 		solarflare.runtime.TelemetryKernel.observe(app, config, restoreNativeChat);
 		// Profile switching consumes the frozen identity only after telemetry has
 		// refreshed it; no live game objects are touched from the profile system.

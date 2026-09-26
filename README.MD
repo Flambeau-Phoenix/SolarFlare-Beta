@@ -1,6 +1,6 @@
 ![Aura instant cast proc](ghub.gif)
 
-# SolarFlare — v2.2b (Beta)
+# SolarFlare — v2.3b (Beta)
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
 
 ![Bee + Imp DPS](TrinketBee_Imp.png)
@@ -124,6 +124,35 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 
 ---
 
+## SolarFlare v2.3b
+
+### HUD Window Anchoring, Resizing & Geometry Stability
+* **Permanent Window Anchoring Across Relogs:** Solved the issue where repositioned HUD windows moved or drifted to random coordinates upon logging out and back in. Window dragging now sets the dirty state immediately, and positions are saved both upon mouse button release and through a continuous debounced background tick (Layer 1 observe loop).
+* **Early Viewport Clamping Guard:** Fixed `clampToViewport` corrupting window positions during game launch or resolution switches before the graphics viewport is fully initialized.
+* **Window Sizing & Clipping Resolution:** Fixed graphics clipping (e.g. Geaux action bar partially hidden) when locking windows or switching characters. Locked windows now strictly enforce their calculated content and chrome dimensions every frame via `ImGuiCond.Always`. Switching character profiles reasserts geometry dynamically.
+* **Native Resize Grip Elimination:** Eliminated unwanted ImGui edge resize bars on locked windows by strictly assigning `NoMove | NoResize` when locked, while preserving button clicks and right-click context menu access.
+
+### Aura Builder Dropdown Usability & Icon Improvements
+* **Expanded Search Catalog Height:** Enlarged the condition subject dropdown from a cramped ~180px to a comfortable 420px height (`480x420`), making searching and browsing catalog entries fast and readable.
+* **Single Scrollbar Elimination:** Fixed double scrollbar behavior (nested popup scrollbar + inner child scrollbar) by expanding the child list to fill all available popup space (`vec2(0, 0)`).
+* **Status Icon Resolution Fallback Chain:** Implemented a multi-tier fallback lookup (`direct key → CastleDB stem → suffix-strip (_Status, _Proc, etc.) → granted status mapping`), restoring visible icons for character statuses such as `ItemStatus`, `Whetstone_Status`, and procs.
+* **Styled Letter Fallback Badges:** Any status without texture art now displays a clean, rounded letter badge tile matching Aura Builder styling rather than an empty invisible gap.
+
+
+---
+
+# SolarFlare — v2.1b Patch Notes
+
+### What's New
+
+* **Trackable Status Stacks:** Auras can now display and react to live stack counts for buffs, debuffs, and other player statuses.
+* **Dedicated Stacks Display:** The Aura Builder now features a spot dedicated entirely to stacks display.
+* **Inner Demon Tracking:** Added dedicated tracking for Inner Demon stacks in Auras.
+* **Minion DPS Attribution:** Minions are now identified individually, with their damage credited to the owning player in the DPS meter.
+* **Enemy Cast Bars:** Enemy unit frames can now display active casts.
+* **Custom Cast Bars:** Create and configure personalized cast bars for tracked abilities.
+* **Character Profiles:** Profiles can now be assigned to individual characters for automatic switching.
+
 # SolarFlare — v2.2b Patch Notes
 
 ### Codebase Optimization & Dead Code Pruning
@@ -138,17 +167,6 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 * **Vanilla HUD DOM Scraper Purged:** Removed legacy fallback reflection code (`applyHudCooldowns`, `walkHudNode`, `ingestHudSlot`, `ingestTypedButton`, `putHudCd`) from `GeauxCache.hx`, establishing direct skill-object inspection as the exclusive authority.
 * **Aura Builder & Config Pruned:** Removed unreferenced starter templates, dead builder views, deprecated single-aura export/import routines, and abandoned pack-combiner UI from `AuraBuilder.hx`, `AuraConfig.hx`, and `AuraTemplates.hx`.
 * **Centralized CastleDB Resolution:** Replaced duplicate 25-line path resolution loops across `CdbNames`, `CdbUnitNames`, `CdbSummonUnits`, `GeauxCdTable`, and `GeauxTalentTable` with a single unified `ModPaths.findCdbFile()` helper.
-
-# SolarFlare — v2.1b Patch Notes
-
-
-* **Trackable Status Stacks:** Auras can now display and react to live stack counts for buffs, debuffs, and other player statuses.
-* **Dedicated Stacks Display:** The Aura Builder now features a spot dedicated entirely to stacks display.
-* **Inner Demon Tracking:** Added dedicated tracking for Inner Demon stacks in Auras.
-* **Minion DPS Attribution:** Minions are now identified individually, with their damage credited to the owning player in the DPS meter.
-* **Enemy Cast Bars:** Enemy unit frames can now display active casts.
-* **Custom Cast Bars:** Create and configure personalized cast bars for tracked abilities.
-* **Character Profiles:** Profiles can now be assigned to individual characters for automatic switching.
 
 ---
 

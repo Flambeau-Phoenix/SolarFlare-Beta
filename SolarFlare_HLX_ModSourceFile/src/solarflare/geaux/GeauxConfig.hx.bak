@@ -1,4 +1,4 @@
-package solarflare.geaux;
+﻿package solarflare.geaux;
 
 import solarflare.ui.CursorCaptureFix;
 import solarflare.ui.HudChrome;
@@ -214,7 +214,6 @@ class GeauxConfig {
 				if (ch.y != null)
 					chrome.y.set(ch.y);
 				chrome.posDirty = true;
-				chrome.expandSizeDirty = true;
 			}
 		} catch (_:Dynamic) {}
 		if (style == null)
