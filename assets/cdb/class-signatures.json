@@ -2,7 +2,6 @@
   "skills": [
     {
       "id": "Warrior_Rage_Strike",
-      "name": "Raging Smash",
       "duration": 0.4,
       "cooldown": null,
       "type": 17,
@@ -16,10 +15,11 @@
       "aiProps": null,
       "gfx": {
         "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
         "x": 0,
-        "y": 0,
-        "size": 96
+        "y": 0
       },
+      "name": "Raging Smash",
       "steps": [
         {
           "id": null,
@@ -75,7 +75,6 @@
     },
     {
       "id": "Mage_RayOfSpark",
-      "name": "Spark Beam",
       "duration": null,
       "cooldown": 10,
       "type": 17,
@@ -88,10 +87,11 @@
       "aiProps": null,
       "gfx": {
         "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
         "x": 0,
-        "y": 0,
-        "size": 96
+        "y": 0
       },
+      "name": "Spark Beam",
       "steps": [
         {
           "id": "ChannelTick",
@@ -187,7 +187,6 @@
     },
     {
       "id": "Priest_Sig_DivineIntervention",
-      "name": "Judgment",
       "duration": 0.45,
       "cooldown": 12,
       "type": 17,
@@ -197,10 +196,11 @@
       "aiProps": null,
       "gfx": {
         "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
         "x": 0,
-        "y": 0,
-        "size": 96
+        "y": 0
       },
+      "name": "Judgment",
       "steps": [
         {
           "id": "ProcDelay",
@@ -212,14 +212,10 @@
           "targetSkill": null,
           "summon": null
         }
-      ],
-      "facts": {
-        "checkEnabled": "var priest = ownerHero?.priest; if(priest == null) return Reason.Invalid; if(priest.getChargedPrayerCount() == 0) return Reason.RequireActivePrayer; return Reason.Ok;"
-      }
+      ]
     },
     {
       "id": "Rogue_Sig_Finisher",
-      "name": "Finisher",
       "duration": 0.45,
       "cooldown": 8,
       "type": 17,
@@ -231,11 +227,42 @@
       "aiProps": null,
       "gfx": {
         "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
         "x": 0,
-        "y": 0,
-        "size": 96
+        "y": 0
       },
+      "name": "Finisher",
       "steps": [
+        {
+          "id": null,
+          "on": 0,
+          "type": 11,
+          "delay": null,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 11,
+          "delay": null,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 11,
+          "delay": 0.2,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
         {
           "id": null,
           "on": 0,
@@ -272,7 +299,7 @@
           "type": 8,
           "delay": 0.2,
           "duration": 0.1,
-          "range": 12,
+          "range": 8,
           "targetSkill": null,
           "summon": null
         },
@@ -280,7 +307,7 @@
           "id": null,
           "on": 0,
           "type": 8,
-          "delay": 0.25,
+          "delay": 0.3,
           "duration": 0.23,
           "range": 2,
           "targetSkill": null,
@@ -297,12 +324,42 @@
           "summon": null
         },
         {
+          "id": null,
+          "on": 0,
+          "type": 11,
+          "delay": 0.25,
+          "duration": null,
+          "range": null,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
           "id": "Damage",
           "on": 0,
           "type": 4,
           "delay": 0.2,
           "duration": 0.25,
-          "range": 14,
+          "range": 10,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": "DamageRanged",
+          "on": 0,
+          "type": 7,
+          "delay": 0.2,
+          "duration": null,
+          "range": 40,
+          "targetSkill": null,
+          "summon": null
+        },
+        {
+          "id": null,
+          "on": 0,
+          "type": 24,
+          "delay": null,
+          "duration": 0.55,
+          "range": null,
           "targetSkill": null,
           "summon": null
         },

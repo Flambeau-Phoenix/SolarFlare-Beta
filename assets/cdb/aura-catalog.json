@@ -56,6 +56,11 @@
       "kind": "icon"
     },
     {
+      "id": "Phrixes_NightGod",
+      "name": "???",
+      "kind": "unit"
+    },
+    {
       "id": "Abigail",
       "name": "Abigail",
       "kind": "unit"
@@ -151,6 +156,11 @@
       "kind": "icon"
     },
     {
+      "id": "AddFriend",
+      "name": "Add friend",
+      "kind": "icon"
+    },
+    {
       "id": "Item_SkillPoint",
       "name": "Add skill point to a weapon",
       "kind": "icon"
@@ -239,6 +249,11 @@
       "id": "Summon_Bee",
       "name": "Angry Bee",
       "kind": "unit"
+    },
+    {
+      "id": "Phrixes_H_NG_ChaosBeam",
+      "name": "Annihilation",
+      "kind": "skill"
     },
     {
       "id": "Anubis",
@@ -446,9 +461,19 @@
       "kind": "skill"
     },
     {
+      "id": "Back",
+      "name": "Back",
+      "kind": "icon"
+    },
+    {
       "id": "Backdrop1",
       "name": "Backdrop1",
       "kind": "icon"
+    },
+    {
+      "id": "Infusion_Crimson_DPS",
+      "name": "Balance of Justice",
+      "kind": "skill"
     },
     {
       "id": "Bank",
@@ -526,6 +551,11 @@
       "kind": "skill"
     },
     {
+      "id": "Luck_Mount_Status",
+      "name": "Beastcaller",
+      "kind": "skill"
+    },
+    {
       "id": "Bee_Champion_SwiftStep",
       "name": "Bee_Champion_SwiftStep",
       "kind": "skill"
@@ -568,6 +598,11 @@
     {
       "id": "BeeRoyalGuard_HoneyBarrage",
       "name": "BeeRoyalGuard_HoneyBarrage",
+      "kind": "skill"
+    },
+    {
+      "id": "BeeRoyalGuard_HoneyBarrage_Multi",
+      "name": "BeeRoyalGuard_HoneyBarrage_Multi",
       "kind": "skill"
     },
     {
@@ -654,6 +689,11 @@
       "id": "BindConflict",
       "name": "BindConflict",
       "kind": "icon"
+    },
+    {
+      "id": "Gastbee_Heroic_Swarm_Status",
+      "name": "Biting Swarm",
+      "kind": "skill"
     },
     {
       "id": "DemonDog_Orange",
@@ -794,6 +834,16 @@
       "id": "Blocks_Test",
       "name": "Blocks_Test",
       "kind": "icon"
+    },
+    {
+      "id": "Infusion_Nightling_Tank",
+      "name": "Blood Oath",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Tank_Status",
+      "name": "Blood Oath",
+      "kind": "skill"
     },
     {
       "id": "Warrior_Talent_Bloodfeast",
@@ -1046,6 +1096,31 @@
       "kind": "skill"
     },
     {
+      "id": "R1CrabBoss_Heroic_Bubble",
+      "name": "Bubble",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_DPS_Ultimate",
+      "name": "Bubble Bullet",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_Bubble_Roam",
+      "name": "Bubble Run",
+      "kind": "skill"
+    },
+    {
+      "id": "R1CrabBoss_Heroic_Bubble_Status",
+      "name": "Bubble Shock",
+      "kind": "skill"
+    },
+    {
+      "id": "Spongeblob_Heroic_Bubble_Wall",
+      "name": "Bubble Wall",
+      "kind": "skill"
+    },
+    {
       "id": "Crimson_Z2W_Peasant_2",
       "name": "Bucolic Crimson Farmhand",
       "kind": "unit"
@@ -1181,6 +1256,26 @@
       "kind": "skill"
     },
     {
+      "id": "DA_Water_Combo_PassiveRank3",
+      "name": "Cascade's Axe",
+      "kind": "skill"
+    },
+    {
+      "id": "castbar_gilded",
+      "name": "castbar_gilded",
+      "kind": "icon"
+    },
+    {
+      "id": "castbar_obsidian",
+      "name": "castbar_obsidian",
+      "kind": "icon"
+    },
+    {
+      "id": "castbar_solar",
+      "name": "castbar_solar",
+      "kind": "icon"
+    },
+    {
       "id": "CasterManfish_Auto",
       "name": "CasterManfish_Auto",
       "kind": "skill"
@@ -1209,6 +1304,16 @@
       "id": "cfg_f7",
       "name": "cfg_f7",
       "kind": "icon"
+    },
+    {
+      "id": "Infusion_Manfish_Support",
+      "name": "Chain Heal",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Support_Ultimate_Proc",
+      "name": "Chain Heal",
+      "kind": "skill"
     },
     {
       "id": "Mage_Talent_Chaincast",
@@ -1256,6 +1361,11 @@
       "kind": "icon"
     },
     {
+      "id": "Queenslayer_ChaosAwakening",
+      "name": "Chaos Awakening",
+      "kind": "skill"
+    },
+    {
       "id": "Staff_SummonDemon_Combo",
       "name": "Chaos Bolts",
       "kind": "skill"
@@ -1268,6 +1378,21 @@
     {
       "id": "Daggers_Demondash_Mark",
       "name": "Chaos Mark",
+      "kind": "skill"
+    },
+    {
+      "id": "Queenslayer_ChaosMark",
+      "name": "Chaos Mark",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NG_ChaosMeteor",
+      "name": "Chaos Meteor",
+      "kind": "skill"
+    },
+    {
+      "id": "RiftstalkersReputation_RiftKillBuff",
+      "name": "Chaos Predator",
       "kind": "skill"
     },
     {
@@ -1291,8 +1416,23 @@
       "kind": "skill"
     },
     {
+      "id": "Queenslayer_ChaosSlow",
+      "name": "Chaos Slow",
+      "kind": "skill"
+    },
+    {
       "id": "SuperEliteDemon_Storm",
       "name": "Chaos Storm",
+      "kind": "skill"
+    },
+    {
+      "id": "Queenslayer_ChaosStrike",
+      "name": "Chaos Strike",
+      "kind": "skill"
+    },
+    {
+      "id": "RiftstalkersReputation_SoulwellVitality",
+      "name": "Chaos Vitality",
       "kind": "skill"
     },
     {
@@ -1307,11 +1447,6 @@
     },
     {
       "id": "ChaoticPortal",
-      "name": "Chaotic Portal",
-      "kind": "unit"
-    },
-    {
-      "id": "ChaoticPortalPhrixes",
       "name": "Chaotic Portal",
       "kind": "unit"
     },
@@ -1391,6 +1526,11 @@
       "kind": "skill"
     },
     {
+      "id": "Reblochonk_Heroic_CheeseExplosion",
+      "name": "Cheese Explosion",
+      "kind": "skill"
+    },
+    {
       "id": "Daggers_DuplicatePoison_ComboAttack_Status",
       "name": "Cheese-blessed",
       "kind": "skill"
@@ -1413,6 +1553,11 @@
     {
       "id": "Picker_Conduit",
       "name": "Choose a Conduit",
+      "kind": "icon"
+    },
+    {
+      "id": "Picker_Pin",
+      "name": "Choose a marker",
       "kind": "icon"
     },
     {
@@ -1536,6 +1681,16 @@
       "kind": "skill"
     },
     {
+      "id": "Cleodora_SparkAfllux_End",
+      "name": "Cleodora_SparkAfllux_End",
+      "kind": "skill"
+    },
+    {
+      "id": "Cleodora_SparkAfllux_Start",
+      "name": "Cleodora_SparkAfllux_Start",
+      "kind": "skill"
+    },
+    {
       "id": "Cleodora_SparkRayFireArea",
       "name": "Cleodora_SparkRayFireArea",
       "kind": "skill"
@@ -1621,6 +1776,11 @@
       "kind": "icon"
     },
     {
+      "id": "Collection",
+      "name": "Collection",
+      "kind": "icon"
+    },
+    {
       "id": "Rogue_ComboMax",
       "name": "Combo Master",
       "kind": "skill"
@@ -1646,23 +1806,33 @@
       "kind": "icon"
     },
     {
-      "id": "CompassEast",
-      "name": "CompassEast",
+      "id": "CompassE",
+      "name": "CompassE",
       "kind": "icon"
     },
     {
-      "id": "CompassNorth",
-      "name": "CompassNorth",
+      "id": "CompassL",
+      "name": "CompassL",
       "kind": "icon"
     },
     {
-      "id": "CompassSouth",
-      "name": "CompassSouth",
+      "id": "CompassN",
+      "name": "CompassN",
       "kind": "icon"
     },
     {
-      "id": "CompassWest",
-      "name": "CompassWest",
+      "id": "CompassO",
+      "name": "CompassO",
+      "kind": "icon"
+    },
+    {
+      "id": "CompassS",
+      "name": "CompassS",
+      "kind": "icon"
+    },
+    {
+      "id": "CompassW",
+      "name": "CompassW",
       "kind": "icon"
     },
     {
@@ -1781,8 +1951,8 @@
       "kind": "icon"
     },
     {
-      "id": "ConsumeElixir",
-      "name": "ConsumeElixir",
+      "id": "ConsumeDrink",
+      "name": "ConsumeDrink",
       "kind": "skill"
     },
     {
@@ -1816,6 +1986,11 @@
       "kind": "icon"
     },
     {
+      "id": "Phrixes_H_NG_CosmicPower",
+      "name": "Cosmic Power",
+      "kind": "skill"
+    },
+    {
       "id": "Count",
       "name": "Count",
       "kind": "skill"
@@ -1843,6 +2018,11 @@
     {
       "id": "Crab_Z1D",
       "name": "Crab of the Lost City",
+      "kind": "unit"
+    },
+    {
+      "id": "Crab_Crabgantua_Summon_Heroic",
+      "name": "Crab Summon",
       "kind": "unit"
     },
     {
@@ -2231,6 +2411,16 @@
       "kind": "skill"
     },
     {
+      "id": "Currencies",
+      "name": "Currencies",
+      "kind": "icon"
+    },
+    {
+      "id": "Infusion_Nightling_Support",
+      "name": "Cursed Link",
+      "kind": "skill"
+    },
+    {
       "id": "CursorButton",
       "name": "CursorButton",
       "kind": "icon"
@@ -2336,11 +2526,6 @@
       "kind": "skill"
     },
     {
-      "id": "DA_Water_Combo_PassiveRank3",
-      "name": "DA_Water_Combo_PassiveRank3",
-      "kind": "skill"
-    },
-    {
       "id": "DA_Water_Passive_Status",
       "name": "DA_Water_Passive_Status",
       "kind": "skill"
@@ -2423,6 +2608,21 @@
     {
       "id": "Dash_Status",
       "name": "Dash_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Dead",
+      "name": "Dead",
+      "kind": "skill"
+    },
+    {
+      "id": "Dead_Hidden",
+      "name": "Dead_Hidden",
+      "kind": "skill"
+    },
+    {
+      "id": "Dead_Resurrect",
+      "name": "Dead_Resurrect",
       "kind": "skill"
     },
     {
@@ -2576,6 +2776,11 @@
       "kind": "unit"
     },
     {
+      "id": "Phrixes_NC_Bonus",
+      "name": "Demonic Power",
+      "kind": "skill"
+    },
+    {
       "id": "Goat_Demon",
       "name": "Demonic Raminiature",
       "kind": "unit"
@@ -2666,6 +2871,11 @@
       "kind": "skill"
     },
     {
+      "id": "Queenslayer_DivideToReign",
+      "name": "Divide to Reign",
+      "kind": "skill"
+    },
+    {
       "id": "DM_Base_Attack1",
       "name": "DM_Base_Attack1",
       "kind": "skill"
@@ -2731,6 +2941,26 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_LethalPoison_Dose_ClassSkill",
+      "name": "Dose : Class Skill",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose_FCA",
+      "name": "Dose : Final Combo",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose_Finisher",
+      "name": "Dose : Signature",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose_WeaponSkill",
+      "name": "Dose : Weapon Skill",
+      "kind": "skill"
+    },
+    {
       "id": "dpstext",
       "name": "dpstext",
       "kind": "icon"
@@ -2776,6 +3006,11 @@
       "kind": "skill"
     },
     {
+      "id": "Duel",
+      "name": "Duel",
+      "kind": "icon"
+    },
+    {
       "id": "Dueling",
       "name": "Dueling",
       "kind": "skill"
@@ -2786,12 +3021,22 @@
       "kind": "unit"
     },
     {
+      "id": "Dungeon",
+      "name": "Dungeon",
+      "kind": "icon"
+    },
+    {
       "id": "DungeonFoe",
       "name": "DungeonFoe",
       "kind": "icon"
     },
     {
       "id": "Dungeons",
+      "name": "Dungeons",
+      "kind": "icon"
+    },
+    {
+      "id": "FilterDungeons",
       "name": "Dungeons",
       "kind": "icon"
     },
@@ -2843,6 +3088,11 @@
     {
       "id": "ElixirOfAbundanceStatus",
       "name": "Elixir of Abundance",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Support_Ultimate",
+      "name": "Empowered Chain Heal",
       "kind": "skill"
     },
     {
@@ -3053,6 +3303,16 @@
     {
       "id": "GA_Demon_Combo",
       "name": "Feeding the Beast",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Support",
+      "name": "Fermentation",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Support_CheeseDebuff",
+      "name": "Fermented",
       "kind": "skill"
     },
     {
@@ -3431,6 +3691,11 @@
       "kind": "skill"
     },
     {
+      "id": "GA_Craft_Passive_Proc",
+      "name": "GA_Craft_Passive_Proc",
+      "kind": "skill"
+    },
+    {
       "id": "GainItem",
       "name": "GainItem",
       "kind": "skill"
@@ -3471,9 +3736,19 @@
       "kind": "skill"
     },
     {
+      "id": "Phrixes_ChaoticPortal",
+      "name": "Gate to Niflel",
+      "kind": "unit"
+    },
+    {
       "id": "Phrixes_Demon_Summon",
       "name": "Gate to Niflel",
       "kind": "skill"
+    },
+    {
+      "id": "Phrixes_NightGodGate",
+      "name": "Gate to Niflel",
+      "kind": "unit"
     },
     {
       "id": "Gather",
@@ -3486,8 +3761,23 @@
       "kind": "unit"
     },
     {
+      "id": "Gatsbee_Auto",
+      "name": "Gatsbee_Auto",
+      "kind": "skill"
+    },
+    {
       "id": "Gatsbee_Barrage",
       "name": "Gatsbee_Barrage",
+      "kind": "skill"
+    },
+    {
+      "id": "Gatsbee_Heroic_Barrage_Bounce",
+      "name": "Gatsbee_Heroic_Barrage_Bounce",
+      "kind": "skill"
+    },
+    {
+      "id": "Gatsbee_Heroic_Barrage_Puddle",
+      "name": "Gatsbee_Heroic_Barrage_Puddle",
       "kind": "skill"
     },
     {
@@ -3526,6 +3816,31 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Nightling_DPS",
+      "name": "Gift Beyond Realities",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_AP",
+      "name": "Gift of ArmorPenetration",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_Crit",
+      "name": "Gift of CritChance",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_Fervor",
+      "name": "Gift of Fervor",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_MP",
+      "name": "Gift of SpellPenetration",
+      "kind": "skill"
+    },
+    {
       "id": "OgreManfish_Z2W_Claws_E",
       "name": "Gilliver",
       "kind": "unit"
@@ -3539,6 +3854,11 @@
       "id": "FeedbackWindow",
       "name": "Give feedback",
       "kind": "icon"
+    },
+    {
+      "id": "TODO_MOG_Merchant",
+      "name": "Glory Merchant",
+      "kind": "unit"
     },
     {
       "id": "GM_Base_Attack",
@@ -3618,6 +3938,16 @@
     {
       "id": "Golcano_Shield",
       "name": "Golcano_Shield",
+      "kind": "skill"
+    },
+    {
+      "id": "Golcano_Volcano",
+      "name": "Golcano_Volcano",
+      "kind": "skill"
+    },
+    {
+      "id": "Golcano_Volcano_Spill",
+      "name": "Golcano_Volcano_Spill",
       "kind": "skill"
     },
     {
@@ -3771,6 +4101,11 @@
       "kind": "skill"
     },
     {
+      "id": "Dungeon_OtherPlayerBonusReward",
+      "name": "Group Bonus Reward",
+      "kind": "icon"
+    },
+    {
       "id": "OgreHuman_Z2W_Peasant_E",
       "name": "Gruffy",
       "kind": "unit"
@@ -3801,12 +4136,12 @@
       "kind": "skill"
     },
     {
-      "id": "TODO_StableMaster",
+      "id": "StableMaster",
       "name": "Guild Merchant",
       "kind": "unit"
     },
     {
-      "id": "TODO_WanderingMerchant",
+      "id": "WanderingMerchant",
       "name": "Guild Merchant",
       "kind": "unit"
     },
@@ -3841,11 +4176,6 @@
       "kind": "skill"
     },
     {
-      "id": "Dungeon_LevelMax",
-      "name": "Hard",
-      "kind": "icon"
-    },
-    {
       "id": "Thrown_Seeds_Skill1",
       "name": "Harvesting Scythe",
       "kind": "skill"
@@ -3873,6 +4203,11 @@
     {
       "id": "Spear_Eruption_Passive_Status",
       "name": "Heart of the Furnace",
+      "kind": "skill"
+    },
+    {
+      "id": "Gatsbee_Heroic_Swarm",
+      "name": "Heart of the Swarm",
       "kind": "skill"
     },
     {
@@ -3921,6 +4256,16 @@
       "kind": "icon"
     },
     {
+      "id": "Dungeon_BonusReward",
+      "name": "Heroic Bonus Reward",
+      "kind": "icon"
+    },
+    {
+      "id": "Dungeon_HeroicCleared",
+      "name": "Heroic Cleared",
+      "kind": "icon"
+    },
+    {
       "id": "Staff_Censer_Passive",
       "name": "Hidden Power",
       "kind": "skill"
@@ -3936,6 +4281,11 @@
       "kind": "skill"
     },
     {
+      "id": "Hide",
+      "name": "Hide",
+      "kind": "icon"
+    },
+    {
       "id": "Phrixes",
       "name": "High Inquisitor Chakram",
       "kind": "unit"
@@ -3949,6 +4299,11 @@
       "id": "Mage_Talent_HighVoltage_Status",
       "name": "High Voltage",
       "kind": "skill"
+    },
+    {
+      "id": "HigherArrow",
+      "name": "HigherArrow",
+      "kind": "icon"
     },
     {
       "id": "HildaLambert",
@@ -3978,6 +4333,16 @@
     {
       "id": "Sword_Swarm_Passive_Swarm",
       "name": "Hive Swarm",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_DPS",
+      "name": "Hive Venom",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_DPS_Dot",
+      "name": "Hive Venom",
       "kind": "skill"
     },
     {
@@ -4026,6 +4391,11 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Bee_Support_Ultimate_Proc",
+      "name": "Honey Bomb",
+      "kind": "skill"
+    },
+    {
       "id": "CannonHoney",
       "name": "Honey Cannon",
       "kind": "unit"
@@ -4051,6 +4421,11 @@
       "kind": "unit"
     },
     {
+      "id": "Infusion_Bee_Support_Ultimate",
+      "name": "Honey Shot",
+      "kind": "skill"
+    },
+    {
       "id": "Slime_Z1W_Honey",
       "name": "Honey Slime",
       "kind": "unit"
@@ -4073,6 +4448,16 @@
     {
       "id": "HoneySlime_Auto",
       "name": "HoneySlime_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Tank_Status",
+      "name": "Honor",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Tank",
+      "name": "Honorable Defender",
       "kind": "skill"
     },
     {
@@ -4116,6 +4501,11 @@
       "kind": "skill"
     },
     {
+      "id": "Ignore",
+      "name": "Ignore",
+      "kind": "icon"
+    },
+    {
       "id": "Warrior_IgnorePain",
       "name": "Ignore Pain",
       "kind": "skill"
@@ -4151,6 +4541,11 @@
       "kind": "skill"
     },
     {
+      "id": "InLayer",
+      "name": "In Layer",
+      "kind": "icon"
+    },
+    {
       "id": "FoeStealthStatus",
       "name": "In Stealth",
       "kind": "skill"
@@ -4164,6 +4559,11 @@
       "id": "Golem_Z2W_FireExplosive_2",
       "name": "Incandescent Pyrh Golem",
       "kind": "unit"
+    },
+    {
+      "id": "InCombat",
+      "name": "InCombat",
+      "kind": "icon"
     },
     {
       "id": "Daggers_Demondash_Skill1",
@@ -4182,7 +4582,12 @@
     },
     {
       "id": "MoreInfo",
-      "name": "Informations",
+      "name": "Information",
+      "kind": "icon"
+    },
+    {
+      "id": "Gear_Infuse",
+      "name": "Infuse",
       "kind": "icon"
     },
     {
@@ -4211,6 +4616,81 @@
       "kind": "skill"
     },
     {
+      "id": "InfusionUI",
+      "name": "Infusion Crucible",
+      "kind": "icon"
+    },
+    {
+      "id": "Infusion_Bee_Support_Buff",
+      "name": "Infusion_Bee_Support_Buff",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Support_Counter",
+      "name": "Infusion_Bee_Support_Counter",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Tank_Shield",
+      "name": "Infusion_Bee_Tank_Shield",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Tank_Status",
+      "name": "Infusion_Bee_Tank_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_DPS_Magic",
+      "name": "Infusion_Crimson_DPS_Magic",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_DPS_Physical",
+      "name": "Infusion_Crimson_DPS_Physical",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_DPS_Ultimate_Counter",
+      "name": "Infusion_Manfish_DPS_Ultimate_Counter",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_DPS_Ultimate_Proc",
+      "name": "Infusion_Manfish_DPS_Ultimate_Proc",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Support_Ultimate_Counter",
+      "name": "Infusion_Manfish_Support_Ultimate_Counter",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Tank_Cooldown",
+      "name": "Infusion_Manfish_Tank_Cooldown",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Support_Shield",
+      "name": "Infusion_Nightling_Support_Shield",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Support_Status",
+      "name": "Infusion_Nightling_Support_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Support_Status_Tracker",
+      "name": "Infusion_Nightling_Support_Status_Tracker",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Tank_Summon_Auto",
+      "name": "Infusion_Nightling_Tank_Summon_Auto",
+      "kind": "skill"
+    },
+    {
       "id": "Staff_SummonDemon_Passive",
       "name": "Inner Demon",
       "kind": "skill"
@@ -4219,6 +4699,11 @@
       "id": "Fists_LightMonk_Passive",
       "name": "Inner Peace",
       "kind": "skill"
+    },
+    {
+      "id": "Inspect",
+      "name": "Inspect",
+      "kind": "icon"
     },
     {
       "id": "Rogue_Talent_IntentToKill",
@@ -4264,6 +4749,11 @@
       "id": "Invisible",
       "name": "Invisible",
       "kind": "skill"
+    },
+    {
+      "id": "GroupInvite",
+      "name": "Invite to party",
+      "kind": "icon"
     },
     {
       "id": "Golem_Z2_FS",
@@ -4411,7 +4901,7 @@
       "kind": "unit"
     },
     {
-      "id": "TODO_ProfessionTrainer",
+      "id": "ProfessionTrainer",
       "name": "Job Welldon",
       "kind": "unit"
     },
@@ -4616,9 +5106,9 @@
       "kind": "icon"
     },
     {
-      "id": "Rogue_Talent_LeechingPoison",
-      "name": "Leeching Poison",
-      "kind": "skill"
+      "id": "LeaveGroup",
+      "name": "Leave party",
+      "kind": "icon"
     },
     {
       "id": "MouseLeft",
@@ -4631,7 +5121,12 @@
       "kind": "unit"
     },
     {
-      "id": "Rogue_Talent_LethalDose",
+      "id": "Luck_LegendaryWeapon_Status",
+      "name": "Legendary Insight",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose",
       "name": "Lethal Dose",
       "kind": "skill"
     },
@@ -4653,6 +5148,11 @@
     {
       "id": "Mage_Talent_LifeCurrent",
       "name": "Life Current",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Tank",
+      "name": "Life-giving Spring",
       "kind": "skill"
     },
     {
@@ -4736,6 +5236,11 @@
       "kind": "skill"
     },
     {
+      "id": "LowerArrow",
+      "name": "LowerArrow",
+      "kind": "icon"
+    },
+    {
       "id": "Demon_Z1_Spear_Soulstone",
       "name": "Luciferrari",
       "kind": "unit"
@@ -4806,6 +5311,11 @@
       "kind": "skill"
     },
     {
+      "id": "MChuck_MadBombing",
+      "name": "Mad bombing",
+      "kind": "skill"
+    },
+    {
       "id": "GM_MassGrab_Passive",
       "name": "Mad Buzz",
       "kind": "skill"
@@ -4856,18 +5366,18 @@
       "kind": "icon"
     },
     {
-      "id": "BtnManageParty",
-      "name": "Manage Party",
-      "kind": "icon"
-    },
-    {
-      "id": "ManageGroup",
-      "name": "Manage Party",
-      "kind": "icon"
-    },
-    {
       "id": "ManfishBoss_Auto",
       "name": "ManfishBoss_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_Bubble_Roam_Status_Slow",
+      "name": "ManfishBoss_Bubble_Roam_Status_Slow",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_Totem_HealBeam",
+      "name": "ManfishBoss_Totem_HealBeam",
       "kind": "skill"
     },
     {
@@ -4911,8 +5421,43 @@
       "kind": "icon"
     },
     {
-      "id": "MapPinGreen",
-      "name": "MapPinGreen",
+      "id": "MapPinFg1",
+      "name": "MapPinFg1",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg2",
+      "name": "MapPinFg2",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg3",
+      "name": "MapPinFg3",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg4",
+      "name": "MapPinFg4",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg5",
+      "name": "MapPinFg5",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg6",
+      "name": "MapPinFg6",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg7",
+      "name": "MapPinFg7",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg8",
+      "name": "MapPinFg8",
       "kind": "icon"
     },
     {
@@ -4946,13 +5491,33 @@
       "kind": "skill"
     },
     {
+      "id": "MChuck_Heroic",
+      "name": "MChuck_Heroic",
+      "kind": "skill"
+    },
+    {
       "id": "MChuck_IsolatedHeal",
       "name": "MChuck_IsolatedHeal",
       "kind": "skill"
     },
     {
+      "id": "MChuck_MadBombingArea",
+      "name": "MChuck_MadBombingArea",
+      "kind": "skill"
+    },
+    {
       "id": "MChuck_SprayedFondueArea",
       "name": "MChuck_SprayedFondueArea",
+      "kind": "skill"
+    },
+    {
+      "id": "MChuck_StaticBombArea",
+      "name": "MChuck_StaticBombArea",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Support_Status",
+      "name": "Melted Cheese",
       "kind": "skill"
     },
     {
@@ -5211,6 +5776,11 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Bee_Support",
+      "name": "Nectar Balls",
+      "kind": "skill"
+    },
+    {
       "id": "Crescent_FlowerSpiral_Passive",
       "name": "Nectar-infused Blade",
       "kind": "skill"
@@ -5321,6 +5891,11 @@
       "kind": "unit"
     },
     {
+      "id": "Phrixes_H_NG_NightSalvo",
+      "name": "Night Salvo",
+      "kind": "skill"
+    },
+    {
       "id": "Phrixes_NightSalvo",
       "name": "Night Salvo",
       "kind": "skill"
@@ -5343,6 +5918,11 @@
     {
       "id": "ImpDemon_Rift_Major",
       "name": "Nightbringer Invader",
+      "kind": "unit"
+    },
+    {
+      "id": "Phrixes_Crawler",
+      "name": "Nightcrawler",
       "kind": "unit"
     },
     {
@@ -5401,8 +5981,23 @@
       "kind": "unit"
     },
     {
+      "id": "RiftstalkersReputation_Skill",
+      "name": "Nightlings' Favor",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_NightGod_NL",
+      "name": "Nightlord",
+      "kind": "unit"
+    },
+    {
       "id": "Demon_Z3W_Claws_E",
       "name": "Nightlord Asmoderator",
+      "kind": "unit"
+    },
+    {
+      "id": "Nightling_Infusion_DPS",
+      "name": "Nightlord Aspirant",
       "kind": "unit"
     },
     {
@@ -5516,6 +6111,11 @@
       "kind": "icon"
     },
     {
+      "id": "Nightling_Infusion_Tank",
+      "name": "Obedient Servant",
+      "kind": "unit"
+    },
+    {
       "id": "ObeliskMarker",
       "name": "ObeliskMarker",
       "kind": "icon"
@@ -5541,6 +6141,11 @@
       "kind": "icon"
     },
     {
+      "id": "Queenslayer_Obliterate",
+      "name": "Obliterate",
+      "kind": "skill"
+    },
+    {
       "id": "Crimson_Z2W_Bow",
       "name": "Observant Crimson Archer",
       "kind": "unit"
@@ -5554,6 +6159,11 @@
       "id": "Crimson_Z3W_Sword_E",
       "name": "Obsessive Crimson Soldier",
       "kind": "unit"
+    },
+    {
+      "id": "Offline",
+      "name": "Offline",
+      "kind": "icon"
     },
     {
       "id": "Ogre2H_Spin",
@@ -5606,6 +6216,11 @@
       "kind": "unit"
     },
     {
+      "id": "Online",
+      "name": "Online",
+      "kind": "icon"
+    },
+    {
       "id": "Phrixes_OpenRift",
       "name": "Open Rift",
       "kind": "skill"
@@ -5636,11 +6251,6 @@
       "kind": "unit"
     },
     {
-      "id": "MChuck_OrganicBomb",
-      "name": "Organic Bomb",
-      "kind": "skill"
-    },
-    {
       "id": "GS_Nova_Skill2",
       "name": "Outburst",
       "kind": "skill"
@@ -5659,6 +6269,11 @@
       "id": "FaerieBee_Z2W_GreatMace",
       "name": "Overqualified Apix Royal Guard",
       "kind": "unit"
+    },
+    {
+      "id": "Infusion_Manfish_DPS",
+      "name": "Overwhelming Tides",
+      "kind": "skill"
     },
     {
       "id": "FaerieBee_Z2W_Spear",
@@ -5688,6 +6303,11 @@
     {
       "id": "Pad_B",
       "name": "Pad_B",
+      "kind": "icon"
+    },
+    {
+      "id": "Pad_Back",
+      "name": "Pad_Back",
       "kind": "icon"
     },
     {
@@ -5726,6 +6346,16 @@
       "kind": "icon"
     },
     {
+      "id": "Pad_LB",
+      "name": "Pad_LB",
+      "kind": "icon"
+    },
+    {
+      "id": "Pad_LT",
+      "name": "Pad_LT",
+      "kind": "icon"
+    },
+    {
       "id": "Pad_R",
       "name": "Pad_R",
       "kind": "icon"
@@ -5736,8 +6366,28 @@
       "kind": "icon"
     },
     {
+      "id": "Pad_RB",
+      "name": "Pad_RB",
+      "kind": "icon"
+    },
+    {
+      "id": "Pad_RT",
+      "name": "Pad_RT",
+      "kind": "icon"
+    },
+    {
       "id": "Pad_Start",
       "name": "Pad_Start",
+      "kind": "icon"
+    },
+    {
+      "id": "Pad_X",
+      "name": "Pad_X",
+      "kind": "icon"
+    },
+    {
+      "id": "Pad_Y",
+      "name": "Pad_Y",
       "kind": "icon"
     },
     {
@@ -5786,6 +6436,16 @@
       "kind": "unit"
     },
     {
+      "id": "Infusion_Kobold_Tank",
+      "name": "Pestilential Aura",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Tank_Aura",
+      "name": "Pestilential Aura",
+      "kind": "skill"
+    },
+    {
       "id": "Mage_Blink_Mastery3",
       "name": "Phase Strike",
       "kind": "skill"
@@ -5816,6 +6476,36 @@
       "kind": "skill"
     },
     {
+      "id": "Phrixes_H_NC_Explosion",
+      "name": "Phrixes_H_NC_Explosion",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NC_Passive",
+      "name": "Phrixes_H_NC_Passive",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NC_Spawn",
+      "name": "Phrixes_H_NC_Spawn",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NG_NightSalvo_Voley",
+      "name": "Phrixes_H_NG_NightSalvo_Voley",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NG_Spawn",
+      "name": "Phrixes_H_NG_Spawn",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NGGate_Visual_Status",
+      "name": "Phrixes_H_NGGate_Visual_Status",
+      "kind": "skill"
+    },
+    {
       "id": "Phrixes_HeapsChaosHorizontal",
       "name": "Phrixes_HeapsChaosHorizontal",
       "kind": "skill"
@@ -5833,6 +6523,11 @@
     {
       "id": "Phrixes_HeapsChaosVerticalArea",
       "name": "Phrixes_HeapsChaosVerticalArea",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_NC_Bonus_Scale",
+      "name": "Phrixes_NC_Bonus_Scale",
       "kind": "skill"
     },
     {
@@ -5911,6 +6606,41 @@
       "kind": "skill"
     },
     {
+      "id": "Pilgrims_FlaskSpeed_Status",
+      "name": "Pilgrim's Stride",
+      "kind": "skill"
+    },
+    {
+      "id": "Pin0",
+      "name": "Pin0",
+      "kind": "icon"
+    },
+    {
+      "id": "Pin1",
+      "name": "Pin1",
+      "kind": "icon"
+    },
+    {
+      "id": "Pin2",
+      "name": "Pin2",
+      "kind": "icon"
+    },
+    {
+      "id": "Pin3",
+      "name": "Pin3",
+      "kind": "icon"
+    },
+    {
+      "id": "Pin4",
+      "name": "Pin4",
+      "kind": "icon"
+    },
+    {
+      "id": "Pin5",
+      "name": "Pin5",
+      "kind": "icon"
+    },
+    {
       "id": "Rabbit_Pink",
       "name": "Pink Buttontail",
       "kind": "unit"
@@ -5966,6 +6696,11 @@
       "kind": "statustype"
     },
     {
+      "id": "Poison_Dose",
+      "name": "Poison_Dose",
+      "kind": "statustype"
+    },
+    {
       "id": "Poisoned",
       "name": "Poisoned",
       "kind": "skill"
@@ -6008,6 +6743,11 @@
     {
       "id": "Halos_Totem_Passive_Status",
       "name": "Power of the Tides",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LethalDose",
+      "name": "Powerful Toxins",
       "kind": "skill"
     },
     {
@@ -6096,6 +6836,11 @@
       "kind": "unit"
     },
     {
+      "id": "Luck_PrismaticGear_Status",
+      "name": "Prismatic Fortune",
+      "kind": "skill"
+    },
+    {
       "id": "PrismaticPearl",
       "name": "Prismatic Pearl",
       "kind": "skill"
@@ -6123,6 +6868,11 @@
     {
       "id": "Priest_Talent_Prosecutor",
       "name": "Prosecutor",
+      "kind": "skill"
+    },
+    {
+      "id": "Luck_RareMaterial_Status",
+      "name": "Prospector's Eye",
       "kind": "skill"
     },
     {
@@ -6226,6 +6976,11 @@
       "kind": "skill"
     },
     {
+      "id": "Queenslayer",
+      "name": "Queenslayer",
+      "kind": "unit"
+    },
+    {
       "id": "R1CrabBoss_ChitinousExoskeleton",
       "name": "R1CrabBoss_ChitinousExoskeleton",
       "kind": "skill"
@@ -6233,6 +6988,11 @@
     {
       "id": "R1CrabBoss_ChitinousExoskeleton_Spike",
       "name": "R1CrabBoss_ChitinousExoskeleton_Spike",
+      "kind": "skill"
+    },
+    {
+      "id": "R1CrabBoss_Heroic_Avalanche",
+      "name": "R1CrabBoss_Heroic_Avalanche",
       "kind": "skill"
     },
     {
@@ -6396,6 +7156,16 @@
       "kind": "skill"
     },
     {
+      "id": "Ratsar_Heroic_Attack_Bleed",
+      "name": "Ratsar_Heroic_Attack_Bleed",
+      "kind": "skill"
+    },
+    {
+      "id": "Ratsar_Heroic_Burn",
+      "name": "Ratsar_Heroic_Burn",
+      "kind": "skill"
+    },
+    {
       "id": "Ratsar_KingRageFailState",
       "name": "Ratsar_KingRageFailState",
       "kind": "skill"
@@ -6446,6 +7216,16 @@
       "kind": "unit"
     },
     {
+      "id": "Rogue_Talent_LeechingPoison",
+      "name": "Recovery Toxins",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LeechingPoison_Status",
+      "name": "Recovery Toxins",
+      "kind": "skill"
+    },
+    {
       "id": "DemonDog_Red",
       "name": "Red Demodoggo",
       "kind": "unit"
@@ -6471,11 +7251,6 @@
       "kind": "unit"
     },
     {
-      "id": "Rogue_Talent_RegeneratingMiasmas",
-      "name": "Regenerating Miasmas",
-      "kind": "skill"
-    },
-    {
       "id": "OgreKobold_Z2W_Claws",
       "name": "Reliable Kobold Docker",
       "kind": "unit"
@@ -6486,6 +7261,16 @@
       "kind": "skill"
     },
     {
+      "id": "Reputation",
+      "name": "Reputations",
+      "kind": "icon"
+    },
+    {
+      "id": "ReputationUnknown",
+      "name": "ReputationUnknown",
+      "kind": "icon"
+    },
+    {
       "id": "GA_Demon_Passive",
       "name": "Resilience of the Unkillable Demon King",
       "kind": "skill"
@@ -6493,6 +7278,11 @@
     {
       "id": "GA_Demon_Passive_Status",
       "name": "Resilience of the Unkillable Demon King",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Tank",
+      "name": "Resine Armor",
       "kind": "skill"
     },
     {
@@ -6518,6 +7308,11 @@
     {
       "id": "Resurrect",
       "name": "Resurrect",
+      "kind": "skill"
+    },
+    {
+      "id": "Resurrected",
+      "name": "Resurrected",
       "kind": "skill"
     },
     {
@@ -6554,6 +7349,11 @@
       "id": "Sprout_Rice_Z2W",
       "name": "Rice Seedling",
       "kind": "unit"
+    },
+    {
+      "id": "Phrixes_H_NG_Status",
+      "name": "Rift bound",
+      "kind": "skill"
     },
     {
       "id": "rift-sun",
@@ -6616,6 +7416,21 @@
       "kind": "unit"
     },
     {
+      "id": "RobinHoof_Heroic_Caltrops",
+      "name": "RobinHoof_Heroic_Caltrops",
+      "kind": "skill"
+    },
+    {
+      "id": "RobinHoof_Heroic_Caltrops_Slow",
+      "name": "RobinHoof_Heroic_Caltrops_Slow",
+      "kind": "skill"
+    },
+    {
+      "id": "RobinHoof_Heroic_Dog_Buff",
+      "name": "RobinHoof_Heroic_Dog_Buff",
+      "kind": "skill"
+    },
+    {
       "id": "RobinHoof_Summon",
       "name": "RobinHoof_Summon",
       "kind": "skill"
@@ -6666,8 +7481,18 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_CripplingPoison_Status",
+      "name": "Rogue_Talent_CripplingPoison_Status",
+      "kind": "skill"
+    },
+    {
       "id": "Rogue_Talent_CripplingPoison_Tracker",
       "name": "Rogue_Talent_CripplingPoison_Tracker",
+      "kind": "icon"
+    },
+    {
+      "id": "Rogue_Talent_ImprovedMixture_Status",
+      "name": "Rogue_Talent_ImprovedMixture_Status",
       "kind": "skill"
     },
     {
@@ -6702,6 +7527,11 @@
     },
     {
       "id": "FaerieBee_Z1D_GreatMace",
+      "name": "Royal Guard of the Hivetree",
+      "kind": "unit"
+    },
+    {
+      "id": "Mokshi_Heroic_Summon",
       "name": "Royal Guard of the Hivetree",
       "kind": "unit"
     },
@@ -6841,6 +7671,21 @@
       "kind": "unit"
     },
     {
+      "id": "Infusion_Crimson_Support_Peace",
+      "name": "Seal of Peace",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Support_Wrath",
+      "name": "Seal of Wrath",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Support",
+      "name": "Seals of Atonement",
+      "kind": "skill"
+    },
+    {
       "id": "Scepter_Flamie_Combo",
       "name": "Searing Furnace",
       "kind": "skill"
@@ -6886,6 +7731,11 @@
       "kind": "icon"
     },
     {
+      "id": "SendMessage",
+      "name": "Send message",
+      "kind": "icon"
+    },
+    {
       "id": "Kobold_Z2W_Mace",
       "name": "Senior Kobold Miner",
       "kind": "unit"
@@ -6902,6 +7752,16 @@
     },
     {
       "id": "BtnPause",
+      "name": "Settings",
+      "kind": "icon"
+    },
+    {
+      "id": "Settings",
+      "name": "Settings",
+      "kind": "icon"
+    },
+    {
+      "id": "SocialSettings",
       "name": "Settings",
       "kind": "icon"
     },
@@ -6971,6 +7831,21 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Crimson_Tank_Skill",
+      "name": "Shield of Honor",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Tank_Skill_Proc",
+      "name": "Shield of Honor",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Tank_Skill_Recharging",
+      "name": "Shield of Honor cooldown",
+      "kind": "skill"
+    },
+    {
       "id": "ShieldPotion_Status",
       "name": "Shield Potion",
       "kind": "skill"
@@ -6978,6 +7853,11 @@
     {
       "id": "PunchingBagShield",
       "name": "Shielded",
+      "kind": "unit"
+    },
+    {
+      "id": "MedalogGloryTrader",
+      "name": "Shiro James",
       "kind": "unit"
     },
     {
@@ -7023,6 +7903,16 @@
     {
       "id": "Shop",
       "name": "Shop",
+      "kind": "icon"
+    },
+    {
+      "id": "ShowCurrencies",
+      "name": "Show Currencies",
+      "kind": "icon"
+    },
+    {
+      "id": "ShowInventory",
+      "name": "Show Items",
       "kind": "icon"
     },
     {
@@ -7261,6 +8151,16 @@
       "kind": "unit"
     },
     {
+      "id": "BtnSocial",
+      "name": "Social",
+      "kind": "icon"
+    },
+    {
+      "id": "Social",
+      "name": "Social",
+      "kind": "icon"
+    },
+    {
       "id": "Priest_Talent_SolarDevotion",
       "name": "Solar Devotion",
       "kind": "skill"
@@ -7301,6 +8201,11 @@
       "kind": "icon"
     },
     {
+      "id": "Soulwell",
+      "name": "Soulwell",
+      "kind": "icon"
+    },
+    {
       "id": "Ratsar_SparkAbsorption",
       "name": "Spark Absorption",
       "kind": "skill"
@@ -7324,6 +8229,11 @@
       "id": "Warrior_Talent_InfusedWound_Status",
       "name": "Spark Hemorrhage",
       "kind": "skill"
+    },
+    {
+      "id": "Scrap",
+      "name": "Spark Recycler",
+      "kind": "icon"
     },
     {
       "id": "Mage_ShieldOfSpark",
@@ -7556,6 +8466,11 @@
       "kind": "skill"
     },
     {
+      "id": "SpeedBoost",
+      "name": "SpeedBoost",
+      "kind": "skill"
+    },
+    {
       "id": "Spirit_Z2W_Claws2",
       "name": "Spirit of Night",
       "kind": "unit"
@@ -7603,6 +8518,21 @@
     {
       "id": "Spongeblob_Auto",
       "name": "Spongeblob_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "Spongeblob_Dance_DoubleJump",
+      "name": "Spongeblob_Dance_DoubleJump",
+      "kind": "skill"
+    },
+    {
+      "id": "Spongeblob_Dance_High",
+      "name": "Spongeblob_Dance_High",
+      "kind": "skill"
+    },
+    {
+      "id": "Spongeblob_Dance_Low",
+      "name": "Spongeblob_Dance_Low",
       "kind": "skill"
     },
     {
@@ -7716,6 +8646,11 @@
       "kind": "statustype"
     },
     {
+      "id": "MChuck_StaticBomb",
+      "name": "Static Bomb",
+      "kind": "skill"
+    },
+    {
       "id": "Mage_StaticNova_Status_M1",
       "name": "Static Drag",
       "kind": "skill"
@@ -7743,6 +8678,16 @@
     {
       "id": "FoeStealth",
       "name": "Stealthy",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Tank_Debuff",
+      "name": "Stench",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Tank_Status",
+      "name": "Stench",
       "kind": "skill"
     },
     {
@@ -7791,6 +8736,11 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Nightling_DPS_Summon_Auto",
+      "name": "Strike",
+      "kind": "skill"
+    },
+    {
       "id": "SuperEliteDemon_Auto",
       "name": "Strike",
       "kind": "skill"
@@ -7799,31 +8749,6 @@
       "id": "Stun",
       "name": "Stun",
       "kind": "statustype"
-    },
-    {
-      "id": "Style2_0Combo",
-      "name": "Style2_0Combo",
-      "kind": "icon"
-    },
-    {
-      "id": "Style2_1Combo",
-      "name": "Style2_1Combo",
-      "kind": "icon"
-    },
-    {
-      "id": "Style2_2Combo",
-      "name": "Style2_2Combo",
-      "kind": "icon"
-    },
-    {
-      "id": "Style2_3Combo",
-      "name": "Style2_3Combo",
-      "kind": "icon"
-    },
-    {
-      "id": "Style2_4FullCombo",
-      "name": "Style2_4FullCombo",
-      "kind": "icon"
     },
     {
       "id": "Style_01ComboAttack",
@@ -7854,6 +8779,11 @@
       "id": "FaerieDemon_Rift_Caster",
       "name": "Subjugator Invader",
       "kind": "unit"
+    },
+    {
+      "id": "Spongeblob_Suffocation",
+      "name": "Suffocation",
+      "kind": "skill"
     },
     {
       "id": "FilterSuggestedActivities",
@@ -8011,6 +8941,11 @@
       "kind": "icon"
     },
     {
+      "id": "Symbiosis",
+      "name": "Symbiosis",
+      "kind": "icon"
+    },
+    {
       "id": "Sword_Craft_Combo",
       "name": "Tactician Assault",
       "kind": "skill"
@@ -8081,6 +9016,16 @@
       "kind": "icon"
     },
     {
+      "id": "Mokshi_Heroic_Last_Stand",
+      "name": "The Last Queen",
+      "kind": "skill"
+    },
+    {
+      "id": "Cleodora_Heroic_Dark_Champion",
+      "name": "The Usurper",
+      "kind": "unit"
+    },
+    {
       "id": "ThinBackDrop",
       "name": "ThinBackDrop",
       "kind": "icon"
@@ -8116,7 +9061,17 @@
       "kind": "icon"
     },
     {
+      "id": "Infusion_Manfish_Tank_Shield",
+      "name": "Tidal Bulwark",
+      "kind": "skill"
+    },
+    {
       "id": "R1CrabBoss_TidalSlash",
+      "name": "Tidal Slash",
+      "kind": "skill"
+    },
+    {
+      "id": "R1CrabBoss_TidalSlash_Heroic",
       "name": "Tidal Slash",
       "kind": "skill"
     },
@@ -8124,6 +9079,11 @@
       "id": "Halos_Totem_Skill",
       "name": "Tidal Totem",
       "kind": "skill"
+    },
+    {
+      "id": "Nepsilon_Totem",
+      "name": "Tidal Totem",
+      "kind": "unit"
     },
     {
       "id": "Totem_BeaconOfHope",
@@ -8136,7 +9096,7 @@
       "kind": "unit"
     },
     {
-      "id": "Spongblob_Skill1",
+      "id": "Spongeblob_Skill1",
       "name": "Tidal Whirlwind",
       "kind": "skill"
     },
@@ -8147,6 +9107,11 @@
     },
     {
       "id": "Book_WaterOrbs_Rise_Charge",
+      "name": "Tide",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Tank_Status",
       "name": "Tide",
       "kind": "skill"
     },
@@ -8176,9 +9141,24 @@
       "kind": "unit"
     },
     {
+      "id": "Lizard_Shop_Dragon",
+      "name": "TODO",
+      "kind": "unit"
+    },
+    {
+      "id": "Phrixes_H_NGGate_Beam",
+      "name": "TODO",
+      "kind": "skill"
+    },
+    {
       "id": "Turtle_Grey",
       "name": "Tortrock",
       "kind": "unit"
+    },
+    {
+      "id": "Rogue_Talent_RegeneratingMiasmas",
+      "name": "Toxic Miasmas",
+      "kind": "skill"
     },
     {
       "id": "Dog_Z3W_RamPatrol08",
@@ -8286,6 +9266,11 @@
       "kind": "icon"
     },
     {
+      "id": "Unignore",
+      "name": "Unignore",
+      "kind": "icon"
+    },
+    {
       "id": "UnknownActivity",
       "name": "UnknownActivity",
       "kind": "icon"
@@ -8304,6 +9289,11 @@
       "id": "Kobold_Z1W_Caster_2",
       "name": "Unpredictable Kobold Overseer",
       "kind": "unit"
+    },
+    {
+      "id": "Infusion_Kobold_DPS",
+      "name": "Unstable Bomblets",
+      "kind": "skill"
     },
     {
       "id": "Spear_Goo_Passive",
@@ -8356,8 +9346,13 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_VenomInfusion_Status",
+      "name": "Venom Infusion",
+      "kind": "skill"
+    },
+    {
       "id": "Rogue_Talent_VenomousFinisher",
-      "name": "Venomous Finisher",
+      "name": "Venomous Assassin",
       "kind": "skill"
     },
     {
@@ -8374,6 +9369,16 @@
       "id": "VesselPotion_Status",
       "name": "VesselPotion_Status",
       "kind": "skill"
+    },
+    {
+      "id": "Dungeon_LevelMax",
+      "name": "Veteran",
+      "kind": "icon"
+    },
+    {
+      "id": "Dungeon_VeteranCleared",
+      "name": "Veteran Cleared",
+      "kind": "icon"
     },
     {
       "id": "Crimson_Z3W_Daggers_2",
@@ -8397,7 +9402,12 @@
     },
     {
       "id": "Rogue_Talent_VirulentMagic",
-      "name": "Virulent Magic",
+      "name": "Virulent Contamination",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_VirulentMagic_Status",
+      "name": "Virulent Contamination",
       "kind": "skill"
     },
     {
@@ -8511,8 +9521,18 @@
       "kind": "skill"
     },
     {
+      "id": "ManfishBoss_Bubble_Roam_Status",
+      "name": "Water Scar",
+      "kind": "skill"
+    },
+    {
       "id": "Book_WaterOrbs_Passive",
       "name": "Water Veil",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_WaterVolley",
+      "name": "Water Volley",
       "kind": "skill"
     },
     {
@@ -8651,6 +9671,11 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Manfish_DPS_Status",
+      "name": "Wet",
+      "kind": "skill"
+    },
+    {
       "id": "Whetstone_Status",
       "name": "Whetstone_Status",
       "kind": "skill"
@@ -8668,6 +9693,11 @@
     {
       "id": "GS_Nova_Skill1",
       "name": "Wild Whirlwind",
+      "kind": "skill"
+    },
+    {
+      "id": "Luck_Glider_Status",
+      "name": "Windborn",
       "kind": "skill"
     },
     {
@@ -8799,3161 +9829,6 @@
       "id": "Dog_Z3W_RamPatrol05",
       "name": "Zuma",
       "kind": "unit"
-    },
-    {
-      "id": "Anticipation_ScratchingFloorDust",
-      "name": "Anticipation_ScratchingFloorDust",
-      "kind": "fxset"
-    },
-    {
-      "id": "Anticipation_StompDust",
-      "name": "Anticipation_StompDust",
-      "kind": "fxset"
-    },
-    {
-      "id": "Anticipation_Stomp_Golem",
-      "name": "Anticipation_Stomp_Golem",
-      "kind": "fxset"
-    },
-    {
-      "id": "ApixEgg_Hatch",
-      "name": "ApixEgg_Hatch",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Chaos",
-      "name": "Arrow_Telegraph_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Cheese",
-      "name": "Arrow_Telegraph_Cheese",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Earth",
-      "name": "Arrow_Telegraph_Earth",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Electric",
-      "name": "Arrow_Telegraph_Electric",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Fire",
-      "name": "Arrow_Telegraph_Fire",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Honey",
-      "name": "Arrow_Telegraph_Honey",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Ice",
-      "name": "Arrow_Telegraph_Ice",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Light",
-      "name": "Arrow_Telegraph_Light",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Nature",
-      "name": "Arrow_Telegraph_Nature",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Physical",
-      "name": "Arrow_Telegraph_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Poison",
-      "name": "Arrow_Telegraph_Poison",
-      "kind": "fxset"
-    },
-    {
-      "id": "Arrow_Telegraph_Spark",
-      "name": "Arrow_Telegraph_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Base_Bomb",
-      "name": "Base_Bomb",
-      "kind": "fxset"
-    },
-    {
-      "id": "Bees_AoeBelt_Unit",
-      "name": "Bees_AoeBelt_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Block_Generic",
-      "name": "Block_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Block_Shield",
-      "name": "Block_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Boss_HuntDown_Hunted",
-      "name": "Boss_HuntDown_Hunted",
-      "kind": "fxset"
-    },
-    {
-      "id": "Boss_HuntDown_Hunting",
-      "name": "Boss_HuntDown_Hunting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Boss_HuntDown_Link",
-      "name": "Boss_HuntDown_Link",
-      "kind": "fxset"
-    },
-    {
-      "id": "BreakableWall_Crumble_01",
-      "name": "BreakableWall_Crumble_01",
-      "kind": "fxset"
-    },
-    {
-      "id": "BreakableWall_Crumble_02",
-      "name": "BreakableWall_Crumble_02",
-      "kind": "fxset"
-    },
-    {
-      "id": "Campfire",
-      "name": "Campfire",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cart_Braking_Sparkles",
-      "name": "Cart_Braking_Sparkles",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_AOE_Cloud_Blue",
-      "name": "Chaos_AOE_Cloud_Blue",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_AOE_FromBottom",
-      "name": "Chaos_AOE_FromBottom",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_AOE_Ground",
-      "name": "Chaos_AOE_Ground",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_AOE_Ground_Big",
-      "name": "Chaos_AOE_Ground_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_AOE_Lasting_Cloud",
-      "name": "Chaos_AOE_Lasting_Cloud",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Afflux",
-      "name": "Chaos_Afflux",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Ally_AOE_Ground_Lasting",
-      "name": "Chaos_Ally_AOE_Ground_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_AoE_Ground_Lasting",
-      "name": "Chaos_AoE_Ground_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Aura",
-      "name": "Chaos_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Aura_Enraged_Arm_L",
-      "name": "Chaos_Aura_Enraged_Arm_L",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Aura_Enraged_Arm_R",
-      "name": "Chaos_Aura_Enraged_Arm_R",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Aura_Enraged_Chest",
-      "name": "Chaos_Aura_Enraged_Chest",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Aura_Mace",
-      "name": "Chaos_Aura_Mace",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Axe_Aura",
-      "name": "Chaos_Axe_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Blast",
-      "name": "Chaos_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Blast_Launch",
-      "name": "Chaos_Blast_Launch",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Blink_Appear",
-      "name": "Chaos_Blink_Appear",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Blink_Disappear",
-      "name": "Chaos_Blink_Disappear",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Bomb",
-      "name": "Chaos_Bomb",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Breath_Lasting",
-      "name": "Chaos_Breath_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Burst_Cone",
-      "name": "Chaos_Burst_Cone",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Cast",
-      "name": "Chaos_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Cast_Conjure",
-      "name": "Chaos_Cast_Conjure",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Cast_Fast",
-      "name": "Chaos_Cast_Fast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Cast_Summon",
-      "name": "Chaos_Cast_Summon",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Crack",
-      "name": "Chaos_Crack",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Cry",
-      "name": "Chaos_Cry",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_EyeSigil",
-      "name": "Chaos_EyeSigil",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Heap_Circle",
-      "name": "Chaos_Heap_Circle",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Heap_Horizontal",
-      "name": "Chaos_Heap_Horizontal",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Heap_Vertical",
-      "name": "Chaos_Heap_Vertical",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Lasting_Cone",
-      "name": "Chaos_Lasting_Cone",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Puff_Disappear",
-      "name": "Chaos_Puff_Disappear",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Puff_Unit",
-      "name": "Chaos_Puff_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Rift_Gate",
-      "name": "Chaos_Rift_Gate",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Rift_Intensify",
-      "name": "Chaos_Rift_Intensify",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Shield",
-      "name": "Chaos_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Shield_Small",
-      "name": "Chaos_Shield_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Shockwave_Big",
-      "name": "Chaos_Shockwave_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Skill_Activate",
-      "name": "Chaos_Skill_Activate",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Skill_Glyphe",
-      "name": "Chaos_Skill_Glyphe",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Summon_Spawn",
-      "name": "Chaos_Summon_Spawn",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Utimate_Zap",
-      "name": "Chaos_Utimate_Zap",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Zap",
-      "name": "Chaos_Zap",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chaos_Zap_loop",
-      "name": "Chaos_Zap_loop",
-      "kind": "fxset"
-    },
-    {
-      "id": "Charcoal_AOE_Ground",
-      "name": "Charcoal_AOE_Ground",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cheese_AOE_Ground_Big",
-      "name": "Cheese_AOE_Ground_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cheese_AOE_Ground_Small",
-      "name": "Cheese_AOE_Ground_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cheese_Bomb",
-      "name": "Cheese_Bomb",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cheese_Bomb_Ignite",
-      "name": "Cheese_Bomb_Ignite",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cheese_QuickSpin",
-      "name": "Cheese_QuickSpin",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cheese_QuickSpin_Invert",
-      "name": "Cheese_QuickSpin_Invert",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cheese_Splosh_Ground_Big",
-      "name": "Cheese_Splosh_Ground_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cheese_TrailFloor",
-      "name": "Cheese_TrailFloor",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chest_Box_Locked",
-      "name": "Chest_Box_Locked",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chest_Box_Open",
-      "name": "Chest_Box_Open",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chest_Box_UnlockedLoop",
-      "name": "Chest_Box_UnlockedLoop",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chest_Camp_Locked",
-      "name": "Chest_Camp_Locked",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chest_Camp_Open",
-      "name": "Chest_Camp_Open",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chest_Camp_Unlocked",
-      "name": "Chest_Camp_Unlocked",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chest_Orb_Active",
-      "name": "Chest_Orb_Active",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chest_Orb_Direction",
-      "name": "Chest_Orb_Direction",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chest_Orb_Locked",
-      "name": "Chest_Orb_Locked",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chest_Orb_Shield",
-      "name": "Chest_Orb_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Chest_Orb_Unlocked",
-      "name": "Chest_Orb_Unlocked",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cleodora_AbdomenFall",
-      "name": "Cleodora_AbdomenFall",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cleodora_DeathAnimation",
-      "name": "Cleodora_DeathAnimation",
-      "kind": "fxset"
-    },
-    {
-      "id": "Cleodora_Devastation_Floor",
-      "name": "Cleodora_Devastation_Floor",
-      "kind": "fxset"
-    },
-    {
-      "id": "Crabgantua_BackShardExplosion",
-      "name": "Crabgantua_BackShardExplosion",
-      "kind": "fxset"
-    },
-    {
-      "id": "Crabgantua_BackShardProjectile",
-      "name": "Crabgantua_BackShardProjectile",
-      "kind": "fxset"
-    },
-    {
-      "id": "Crabgantua_Charge",
-      "name": "Crabgantua_Charge",
-      "kind": "fxset"
-    },
-    {
-      "id": "Crabgantua_DeathAnimation",
-      "name": "Crabgantua_DeathAnimation",
-      "kind": "fxset"
-    },
-    {
-      "id": "Crabgantua_ShardExplosion",
-      "name": "Crabgantua_ShardExplosion",
-      "kind": "fxset"
-    },
-    {
-      "id": "Crabgantua_Slash",
-      "name": "Crabgantua_Slash",
-      "kind": "fxset"
-    },
-    {
-      "id": "Dash_Start_Generic",
-      "name": "Dash_Start_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "DeathPuff_Big",
-      "name": "DeathPuff_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "DeathPuff_Medium",
-      "name": "DeathPuff_Medium",
-      "kind": "fxset"
-    },
-    {
-      "id": "DeathPuff_Small",
-      "name": "DeathPuff_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Death_Elite",
-      "name": "Death_Elite",
-      "kind": "fxset"
-    },
-    {
-      "id": "DirectionCursor",
-      "name": "DirectionCursor",
-      "kind": "fxset"
-    },
-    {
-      "id": "DirectionCursor_Secondary",
-      "name": "DirectionCursor_Secondary",
-      "kind": "fxset"
-    },
-    {
-      "id": "DreamSphere",
-      "name": "DreamSphere",
-      "kind": "fxset"
-    },
-    {
-      "id": "Earth_AOE_Ground",
-      "name": "Earth_AOE_Ground",
-      "kind": "fxset"
-    },
-    {
-      "id": "Earth_Aura",
-      "name": "Earth_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Earth_Blast",
-      "name": "Earth_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Earth_Breath_Lasting",
-      "name": "Earth_Breath_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Earth_Burst_Cone",
-      "name": "Earth_Burst_Cone",
-      "kind": "fxset"
-    },
-    {
-      "id": "Earth_Explosion",
-      "name": "Earth_Explosion",
-      "kind": "fxset"
-    },
-    {
-      "id": "Earth_Shield",
-      "name": "Earth_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Electric_AOE_FromTop",
-      "name": "Electric_AOE_FromTop",
-      "kind": "fxset"
-    },
-    {
-      "id": "Electric_Aura",
-      "name": "Electric_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Electric_Blast",
-      "name": "Electric_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Electric_Breath_Lasting",
-      "name": "Electric_Breath_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Electric_Shield",
-      "name": "Electric_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "FireLight_Aoe_Ground_Lasting",
-      "name": "FireLight_Aoe_Ground_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "FireLight_Aura_Sword",
-      "name": "FireLight_Aura_Sword",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_AOE_FromBottom",
-      "name": "Fire_AOE_FromBottom",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_AOE_Ground_Lasting",
-      "name": "Fire_AOE_Ground_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Ally_AOE_Ground_Lasting",
-      "name": "Fire_Ally_AOE_Ground_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Ally_AOE_Unit",
-      "name": "Fire_Ally_AOE_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Aoe_Unit",
-      "name": "Fire_Aoe_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Aura",
-      "name": "Fire_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Aura_Enraged_Arm_L",
-      "name": "Fire_Aura_Enraged_Arm_L",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Aura_Enraged_Arm_R",
-      "name": "Fire_Aura_Enraged_Arm_R",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Aura_Enraged_Chest",
-      "name": "Fire_Aura_Enraged_Chest",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Aura_Sword",
-      "name": "Fire_Aura_Sword",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Beam_Unit_Lasting",
-      "name": "Fire_Beam_Unit_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Blast",
-      "name": "Fire_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Breath_Lasting",
-      "name": "Fire_Breath_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Burst_Cone",
-      "name": "Fire_Burst_Cone",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Cast_Fast",
-      "name": "Fire_Cast_Fast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Cast_SpellBook_Combo",
-      "name": "Fire_Cast_SpellBook_Combo",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Cast_SpellBook_Skill",
-      "name": "Fire_Cast_SpellBook_Skill",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fire_Shield",
-      "name": "Fire_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Flamie",
-      "name": "Flamie",
-      "kind": "fxset"
-    },
-    {
-      "id": "Flower_Aura",
-      "name": "Flower_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Flower_Aura_Sword",
-      "name": "Flower_Aura_Sword",
-      "kind": "fxset"
-    },
-    {
-      "id": "Flower_Cry",
-      "name": "Flower_Cry",
-      "kind": "fxset"
-    },
-    {
-      "id": "Flower_QuickSpin",
-      "name": "Flower_QuickSpin",
-      "kind": "fxset"
-    },
-    {
-      "id": "Flower_QuickSpin_Invert",
-      "name": "Flower_QuickSpin_Invert",
-      "kind": "fxset"
-    },
-    {
-      "id": "Fly_Obelisk",
-      "name": "Fly_Obelisk",
-      "kind": "fxset"
-    },
-    {
-      "id": "Gatsbee_DeathAnimation",
-      "name": "Gatsbee_DeathAnimation",
-      "kind": "fxset"
-    },
-    {
-      "id": "Generic_Bomb_Lasting",
-      "name": "Generic_Bomb_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Generic_Crack",
-      "name": "Generic_Crack",
-      "kind": "fxset"
-    },
-    {
-      "id": "Generic_Heal",
-      "name": "Generic_Heal",
-      "kind": "fxset"
-    },
-    {
-      "id": "Generic_Puff_Unit",
-      "name": "Generic_Puff_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Glider_Generic",
-      "name": "Glider_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Golcano_DeathAnimation",
-      "name": "Golcano_DeathAnimation",
-      "kind": "fxset"
-    },
-    {
-      "id": "Golem_Bomb",
-      "name": "Golem_Bomb",
-      "kind": "fxset"
-    },
-    {
-      "id": "Golem_Bomb_Cast",
-      "name": "Golem_Bomb_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Grapple_Generic",
-      "name": "Grapple_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Grapple_Hero_Generic",
-      "name": "Grapple_Hero_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hero_LevelUp",
-      "name": "Hero_LevelUp",
-      "kind": "fxset"
-    },
-    {
-      "id": "HexagonalPlatform_Crumble_01",
-      "name": "HexagonalPlatform_Crumble_01",
-      "kind": "fxset"
-    },
-    {
-      "id": "HexagonalPlatform_Crumble_02",
-      "name": "HexagonalPlatform_Crumble_02",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Blood",
-      "name": "Hit_Blood",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Chaos",
-      "name": "Hit_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Chaos_Epic",
-      "name": "Hit_Chaos_Epic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Directional_Honey",
-      "name": "Hit_Directional_Honey",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Directional_Water",
-      "name": "Hit_Directional_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Fire",
-      "name": "Hit_Fire",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Fire_Tick",
-      "name": "Hit_Fire_Tick",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Generic",
-      "name": "Hit_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_HoneySpark",
-      "name": "Hit_HoneySpark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_LavaRocks",
-      "name": "Hit_LavaRocks",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Light",
-      "name": "Hit_Light",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_LightFire_Tick",
-      "name": "Hit_LightFire_Tick",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Light_Big",
-      "name": "Hit_Light_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Light_Epic",
-      "name": "Hit_Light_Epic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Physic",
-      "name": "Hit_Physic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Poison",
-      "name": "Hit_Poison",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Proc_Blood",
-      "name": "Hit_Proc_Blood",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Proc_Flower",
-      "name": "Hit_Proc_Flower",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Proc_Honey",
-      "name": "Hit_Proc_Honey",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Proc_Poison",
-      "name": "Hit_Proc_Poison",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_RogueFinisher",
-      "name": "Hit_RogueFinisher",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_RogueFinisher_Big",
-      "name": "Hit_RogueFinisher_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_RoguePoisonProc",
-      "name": "Hit_RoguePoisonProc",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Big",
-      "name": "Hit_Slash_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Chaos",
-      "name": "Hit_Slash_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Earth",
-      "name": "Hit_Slash_Earth",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Electric",
-      "name": "Hit_Slash_Electric",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Fire",
-      "name": "Hit_Slash_Fire",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Flower",
-      "name": "Hit_Slash_Flower",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Ice",
-      "name": "Hit_Slash_Ice",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Light",
-      "name": "Hit_Slash_Light",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Nature",
-      "name": "Hit_Slash_Nature",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Poison",
-      "name": "Hit_Slash_Poison",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Small",
-      "name": "Hit_Slash_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Spark",
-      "name": "Hit_Slash_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Water",
-      "name": "Hit_Slash_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Slash_Wind",
-      "name": "Hit_Slash_Wind",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Spark",
-      "name": "Hit_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Spark_Big",
-      "name": "Hit_Spark_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Spark_Loop",
-      "name": "Hit_Spark_Loop",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Violence",
-      "name": "Hit_Violence",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Violence_Big",
-      "name": "Hit_Violence_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_WarriorCharge",
-      "name": "Hit_WarriorCharge",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Water",
-      "name": "Hit_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "Hit_Water_Big",
-      "name": "Hit_Water_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "HiveChampion_Eclosion",
-      "name": "HiveChampion_Eclosion",
-      "kind": "fxset"
-    },
-    {
-      "id": "HoneyCristallized_AOE_Unit",
-      "name": "HoneyCristallized_AOE_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "HoneyFlower_QuickSpin",
-      "name": "HoneyFlower_QuickSpin",
-      "kind": "fxset"
-    },
-    {
-      "id": "HoneyFlower_QuickSpin_Invert",
-      "name": "HoneyFlower_QuickSpin_Invert",
-      "kind": "fxset"
-    },
-    {
-      "id": "HoneySpark_Blink_Appear",
-      "name": "HoneySpark_Blink_Appear",
-      "kind": "fxset"
-    },
-    {
-      "id": "HoneySpark_Blink_Disappear",
-      "name": "HoneySpark_Blink_Disappear",
-      "kind": "fxset"
-    },
-    {
-      "id": "HoneySpark_Blink_Local",
-      "name": "HoneySpark_Blink_Local",
-      "kind": "fxset"
-    },
-    {
-      "id": "HoneySpark_Cast_Influx",
-      "name": "HoneySpark_Cast_Influx",
-      "kind": "fxset"
-    },
-    {
-      "id": "HoneySpark_LaserBeam",
-      "name": "HoneySpark_LaserBeam",
-      "kind": "fxset"
-    },
-    {
-      "id": "HoneySpark_TrailFloor",
-      "name": "HoneySpark_TrailFloor",
-      "kind": "fxset"
-    },
-    {
-      "id": "HoneySpark_Zap",
-      "name": "HoneySpark_Zap",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_AOE_FloorImpact",
-      "name": "Honey_AOE_FloorImpact",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_AOE_Ground_Lasting_Heal",
-      "name": "Honey_AOE_Ground_Lasting_Heal",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_AOE_Heal_Unit",
-      "name": "Honey_AOE_Heal_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_AOE_Unit",
-      "name": "Honey_AOE_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Ally_AOE_Ground_Lasting",
-      "name": "Honey_Ally_AOE_Ground_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Aoe_Pull",
-      "name": "Honey_Aoe_Pull",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Aura",
-      "name": "Honey_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Aura_Spear",
-      "name": "Honey_Aura_Spear",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Bomb",
-      "name": "Honey_Bomb",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Burst_Cone",
-      "name": "Honey_Burst_Cone",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Cast_Fast",
-      "name": "Honey_Cast_Fast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Dash",
-      "name": "Honey_Dash",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Heal_Proc",
-      "name": "Honey_Heal_Proc",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Link",
-      "name": "Honey_Link",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Puddle",
-      "name": "Honey_Puddle",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_QuickSpin",
-      "name": "Honey_QuickSpin",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_QuickSpin_Invert",
-      "name": "Honey_QuickSpin_Invert",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Shield",
-      "name": "Honey_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Honey_Tornado",
-      "name": "Honey_Tornado",
-      "kind": "fxset"
-    },
-    {
-      "id": "Ice_AOE_Unit",
-      "name": "Ice_AOE_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Ice_Aura",
-      "name": "Ice_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Ice_Blast",
-      "name": "Ice_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Ice_Breath_Lasting",
-      "name": "Ice_Breath_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Ice_Shield",
-      "name": "Ice_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Jump_Air_Generic",
-      "name": "Jump_Air_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Jump_Generic",
-      "name": "Jump_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Jump_Generic_High",
-      "name": "Jump_Generic_High",
-      "kind": "fxset"
-    },
-    {
-      "id": "KoboldDocker_Auto",
-      "name": "KoboldDocker_Auto",
-      "kind": "fxset"
-    },
-    {
-      "id": "Koboldminer_Auto",
-      "name": "Koboldminer_Auto",
-      "kind": "fxset"
-    },
-    {
-      "id": "Land_Generic",
-      "name": "Land_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Land_Water",
-      "name": "Land_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "Land_Water_Big",
-      "name": "Land_Water_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Lava_AOE_FromBottom",
-      "name": "Lava_AOE_FromBottom",
-      "kind": "fxset"
-    },
-    {
-      "id": "Lava_AoeBelt_Unit",
-      "name": "Lava_AoeBelt_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Lava_Aoe_Pull",
-      "name": "Lava_Aoe_Pull",
-      "kind": "fxset"
-    },
-    {
-      "id": "Lava_Aura_Spear",
-      "name": "Lava_Aura_Spear",
-      "kind": "fxset"
-    },
-    {
-      "id": "Lava_Shield_Small",
-      "name": "Lava_Shield_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Lava_Sparkling_Cast",
-      "name": "Lava_Sparkling_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Lava_Zap",
-      "name": "Lava_Zap",
-      "kind": "fxset"
-    },
-    {
-      "id": "Lavatest",
-      "name": "Lavatest",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_AOE_FloorImpact",
-      "name": "Light_AOE_FloorImpact",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_AOE_FromTop_Heal",
-      "name": "Light_AOE_FromTop_Heal",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_AOE_Ground_Rectangle",
-      "name": "Light_AOE_Ground_Rectangle",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_AOE_Heal_Unit",
-      "name": "Light_AOE_Heal_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_AOE_Unit",
-      "name": "Light_AOE_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Ally_AOE_Ground_Lasting",
-      "name": "Light_Ally_AOE_Ground_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Ally_AOE_Unit",
-      "name": "Light_Ally_AOE_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Aura",
-      "name": "Light_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Aura_Mace",
-      "name": "Light_Aura_Mace",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Blast",
-      "name": "Light_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Blast_Launch",
-      "name": "Light_Blast_Launch",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Cast_Fast",
-      "name": "Light_Cast_Fast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Cast_Hand",
-      "name": "Light_Cast_Hand",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Cast_LuonDischarge",
-      "name": "Light_Cast_LuonDischarge",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Cast_Scepter_Combo",
-      "name": "Light_Cast_Scepter_Combo",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Cast_SpellBook_Combo",
-      "name": "Light_Cast_SpellBook_Combo",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Cast_SpellBook_Skill",
-      "name": "Light_Cast_SpellBook_Skill",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Cry",
-      "name": "Light_Cry",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Dash",
-      "name": "Light_Dash",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Debuff_Proc",
-      "name": "Light_Debuff_Proc",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Effect_Activate_Weapon",
-      "name": "Light_Effect_Activate_Weapon",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Explosion",
-      "name": "Light_Explosion",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_FallingArrow",
-      "name": "Light_FallingArrow",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Nova_Ground",
-      "name": "Light_Nova_Ground",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_PiercingShot_Arrow",
-      "name": "Light_PiercingShot_Arrow",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_PiercingShot_Cast",
-      "name": "Light_PiercingShot_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Shield",
-      "name": "Light_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Shield_Small",
-      "name": "Light_Shield_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Shockwave_Big",
-      "name": "Light_Shockwave_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Spirit_Cast",
-      "name": "Light_Spirit_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Light_Totem",
-      "name": "Light_Totem",
-      "kind": "fxset"
-    },
-    {
-      "id": "Loot_Equipment_Generic",
-      "name": "Loot_Equipment_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Loot_Generic",
-      "name": "Loot_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "MaatDemon_ChaosFlames",
-      "name": "MaatDemon_ChaosFlames",
-      "kind": "fxset"
-    },
-    {
-      "id": "MaatDemon_Death",
-      "name": "MaatDemon_Death",
-      "kind": "fxset"
-    },
-    {
-      "id": "Magic_Orb",
-      "name": "Magic_Orb",
-      "kind": "fxset"
-    },
-    {
-      "id": "ManfishBoss_WaterBreath_Geyser",
-      "name": "ManfishBoss_WaterBreath_Geyser",
-      "kind": "fxset"
-    },
-    {
-      "id": "MokshiStalactite_Crumble",
-      "name": "MokshiStalactite_Crumble",
-      "kind": "fxset"
-    },
-    {
-      "id": "Mokshi_Chrysalid",
-      "name": "Mokshi_Chrysalid",
-      "kind": "fxset"
-    },
-    {
-      "id": "Mokshi_DeathAnimation",
-      "name": "Mokshi_DeathAnimation",
-      "kind": "fxset"
-    },
-    {
-      "id": "Mokshi_ShurikenExplosion",
-      "name": "Mokshi_ShurikenExplosion",
-      "kind": "fxset"
-    },
-    {
-      "id": "MunsterChuck_CheeseReactors",
-      "name": "MunsterChuck_CheeseReactors",
-      "kind": "fxset"
-    },
-    {
-      "id": "MunsterChuck_CheeseReactors_HitFloor",
-      "name": "MunsterChuck_CheeseReactors_HitFloor",
-      "kind": "fxset"
-    },
-    {
-      "id": "MunsterChuck_DeathAnimation",
-      "name": "MunsterChuck_DeathAnimation",
-      "kind": "fxset"
-    },
-    {
-      "id": "Nature_Aura",
-      "name": "Nature_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Nature_Aura_Thrown",
-      "name": "Nature_Aura_Thrown",
-      "kind": "fxset"
-    },
-    {
-      "id": "Nature_Blast",
-      "name": "Nature_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Nature_Cast_Fast",
-      "name": "Nature_Cast_Fast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Nature_Shield",
-      "name": "Nature_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Nature_Shield_Small",
-      "name": "Nature_Shield_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Nepsilon_DeathAnimation",
-      "name": "Nepsilon_DeathAnimation",
-      "kind": "fxset"
-    },
-    {
-      "id": "Obelisk_Heal",
-      "name": "Obelisk_Heal",
-      "kind": "fxset"
-    },
-    {
-      "id": "Obelisk_Lifestone_SparkLake",
-      "name": "Obelisk_Lifestone_SparkLake",
-      "kind": "fxset"
-    },
-    {
-      "id": "Orb_Chaos",
-      "name": "Orb_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "Orb_Chaos_GroundDecal",
-      "name": "Orb_Chaos_GroundDecal",
-      "kind": "fxset"
-    },
-    {
-      "id": "Orb_Electric",
-      "name": "Orb_Electric",
-      "kind": "fxset"
-    },
-    {
-      "id": "Orb_Light",
-      "name": "Orb_Light",
-      "kind": "fxset"
-    },
-    {
-      "id": "OreAffix_Chaos",
-      "name": "OreAffix_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "OreAffix_Physical",
-      "name": "OreAffix_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "OreAffix_Spark",
-      "name": "OreAffix_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "OreAffix_Wind",
-      "name": "OreAffix_Wind",
-      "kind": "fxset"
-    },
-    {
-      "id": "Ore_Pickaxe_Hit_PLACEHOLDER",
-      "name": "Ore_Pickaxe_Hit_PLACEHOLDER",
-      "kind": "fxset"
-    },
-    {
-      "id": "PH_Hit_Skill",
-      "name": "PH_Hit_Skill",
-      "kind": "fxset"
-    },
-    {
-      "id": "Parry_Blade",
-      "name": "Parry_Blade",
-      "kind": "fxset"
-    },
-    {
-      "id": "Parry_Perfect",
-      "name": "Parry_Perfect",
-      "kind": "fxset"
-    },
-    {
-      "id": "Phrixes_DeathAnimation",
-      "name": "Phrixes_DeathAnimation",
-      "kind": "fxset"
-    },
-    {
-      "id": "PhysicalSlash_NoGlow",
-      "name": "PhysicalSlash_NoGlow",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_AOE_FloorImpact",
-      "name": "Physical_AOE_FloorImpact",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_AOE_Unit",
-      "name": "Physical_AOE_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_Aura_Shield",
-      "name": "Physical_Aura_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_Blast",
-      "name": "Physical_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_Cry",
-      "name": "Physical_Cry",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_Effect_Activate_Weapon",
-      "name": "Physical_Effect_Activate_Weapon",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_Filet",
-      "name": "Physical_Filet",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_Nova_Ground",
-      "name": "Physical_Nova_Ground",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_PiercingShot_Arrow",
-      "name": "Physical_PiercingShot_Arrow",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_PiercingShot_Cast",
-      "name": "Physical_PiercingShot_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_PiercingShot_Hit",
-      "name": "Physical_PiercingShot_Hit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_QuickSpin",
-      "name": "Physical_QuickSpin",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_QuickSpin_Invert",
-      "name": "Physical_QuickSpin_Invert",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_Shield",
-      "name": "Physical_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_SlashSpin_Big",
-      "name": "Physical_SlashSpin_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_SlashSpin_Small",
-      "name": "Physical_SlashSpin_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Physical_aura",
-      "name": "Physical_aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "PlantAffix_Chaos",
-      "name": "PlantAffix_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "PlantAffix_Fire",
-      "name": "PlantAffix_Fire",
-      "kind": "fxset"
-    },
-    {
-      "id": "PlantAffix_Ice",
-      "name": "PlantAffix_Ice",
-      "kind": "fxset"
-    },
-    {
-      "id": "PlantAffix_Nature",
-      "name": "PlantAffix_Nature",
-      "kind": "fxset"
-    },
-    {
-      "id": "PlantAffix_Physical",
-      "name": "PlantAffix_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "PlantAffix_Spark",
-      "name": "PlantAffix_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "PlantAffix_Wind",
-      "name": "PlantAffix_Wind",
-      "kind": "fxset"
-    },
-    {
-      "id": "Poison_AoE_Ground_Lasting",
-      "name": "Poison_AoE_Ground_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Poison_Aura",
-      "name": "Poison_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Poison_Blast",
-      "name": "Poison_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Poison_Breath_Lasting",
-      "name": "Poison_Breath_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Poison_Emanation",
-      "name": "Poison_Emanation",
-      "kind": "fxset"
-    },
-    {
-      "id": "Poison_Shield",
-      "name": "Poison_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Pollen_AOE_Ground_Lasting",
-      "name": "Pollen_AOE_Ground_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Potion_Heal_Basic",
-      "name": "Potion_Heal_Basic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Priest_Prayer_Damage",
-      "name": "Priest_Prayer_Damage",
-      "kind": "fxset"
-    },
-    {
-      "id": "Priest_Prayer_Damage_Wave",
-      "name": "Priest_Prayer_Damage_Wave",
-      "kind": "fxset"
-    },
-    {
-      "id": "Priest_Prayer_Heal",
-      "name": "Priest_Prayer_Heal",
-      "kind": "fxset"
-    },
-    {
-      "id": "Priest_Prayer_Heal_Wave",
-      "name": "Priest_Prayer_Heal_Wave",
-      "kind": "fxset"
-    },
-    {
-      "id": "Priest_Prayer_Shield_Wave",
-      "name": "Priest_Prayer_Shield_Wave",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Arrow_Physical",
-      "name": "Projectile_Arrow_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Arrow_Physical_Big",
-      "name": "Projectile_Arrow_Physical_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Arrow_PiercingShot_Physical",
-      "name": "Projectile_Arrow_PiercingShot_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Arrow_Spark",
-      "name": "Projectile_Arrow_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Arrow_Spark_Big",
-      "name": "Projectile_Arrow_Spark_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Axe_Physical",
-      "name": "Projectile_Axe_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Chaos",
-      "name": "Projectile_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Chaos_Big",
-      "name": "Projectile_Chaos_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Charcoal",
-      "name": "Projectile_Charcoal",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Cheese",
-      "name": "Projectile_Cheese",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_CheeseBomb",
-      "name": "Projectile_CheeseBomb",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_DualAxe_Water",
-      "name": "Projectile_DualAxe_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Earth",
-      "name": "Projectile_Earth",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Earth_Big",
-      "name": "Projectile_Earth_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Electric",
-      "name": "Projectile_Electric",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Electric_Big",
-      "name": "Projectile_Electric_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Example",
-      "name": "Projectile_Example",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Fang_Chaos_Spawn",
-      "name": "Projectile_Fang_Chaos_Spawn",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Filet_Physical",
-      "name": "Projectile_Filet_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Fire",
-      "name": "Projectile_Fire",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Fire_Big",
-      "name": "Projectile_Fire_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Fire_Epic",
-      "name": "Projectile_Fire_Epic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Flower_Bladeleaf_Spawn",
-      "name": "Projectile_Flower_Bladeleaf_Spawn",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Flower_Shuriken_Small",
-      "name": "Projectile_Flower_Shuriken_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Flower_Shuriken_Spawn",
-      "name": "Projectile_Flower_Shuriken_Spawn",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Flower_Shuriken_Vertical_Big",
-      "name": "Projectile_Flower_Shuriken_Vertical_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Flower_Shuriken_Vertical_Spawn",
-      "name": "Projectile_Flower_Shuriken_Vertical_Spawn",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Honey",
-      "name": "Projectile_Honey",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_HoneySpark",
-      "name": "Projectile_HoneySpark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Honey_Big",
-      "name": "Projectile_Honey_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Honey_Canon_Hard",
-      "name": "Projectile_Honey_Canon_Hard",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Honey_Canon_Soft",
-      "name": "Projectile_Honey_Canon_Soft",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Honey_Shuriken_Spawn",
-      "name": "Projectile_Honey_Shuriken_Spawn",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Honey_Stinger",
-      "name": "Projectile_Honey_Stinger",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Ice",
-      "name": "Projectile_Ice",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Ice_Big",
-      "name": "Projectile_Ice_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Light",
-      "name": "Projectile_Light",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Light_Big",
-      "name": "Projectile_Light_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Light_Fist_Big",
-      "name": "Projectile_Light_Fist_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Nature",
-      "name": "Projectile_Nature",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Nature_Big",
-      "name": "Projectile_Nature_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Poison",
-      "name": "Projectile_Poison",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Poison_Big",
-      "name": "Projectile_Poison_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Spark",
-      "name": "Projectile_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Spark_Big",
-      "name": "Projectile_Spark_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Spark_Heal",
-      "name": "Projectile_Spark_Heal",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Spark_Tiny",
-      "name": "Projectile_Spark_Tiny",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Water",
-      "name": "Projectile_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_WaterBubble",
-      "name": "Projectile_WaterBubble",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Water_Big",
-      "name": "Projectile_Water_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Water_Epic",
-      "name": "Projectile_Water_Epic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Water_Tiny",
-      "name": "Projectile_Water_Tiny",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Wind",
-      "name": "Projectile_Wind",
-      "kind": "fxset"
-    },
-    {
-      "id": "Projectile_Wind_Big",
-      "name": "Projectile_Wind_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Propulsion_Trail",
-      "name": "Propulsion_Trail",
-      "kind": "fxset"
-    },
-    {
-      "id": "R1CrabBoss_MovementDust",
-      "name": "R1CrabBoss_MovementDust",
-      "kind": "fxset"
-    },
-    {
-      "id": "R1KoboldBoss_AutoAttack",
-      "name": "R1KoboldBoss_AutoAttack",
-      "kind": "fxset"
-    },
-    {
-      "id": "R1KoboldBoss_GreatSlam",
-      "name": "R1KoboldBoss_GreatSlam",
-      "kind": "fxset"
-    },
-    {
-      "id": "R1KoboldBoss_Nova_Impact",
-      "name": "R1KoboldBoss_Nova_Impact",
-      "kind": "fxset"
-    },
-    {
-      "id": "R1_MunsterChuck_AutoAttack",
-      "name": "R1_MunsterChuck_AutoAttack",
-      "kind": "fxset"
-    },
-    {
-      "id": "RaceGate",
-      "name": "RaceGate",
-      "kind": "fxset"
-    },
-    {
-      "id": "Ratsar_DeathAnimation",
-      "name": "Ratsar_DeathAnimation",
-      "kind": "fxset"
-    },
-    {
-      "id": "Reblochonk_DeathAnimation",
-      "name": "Reblochonk_DeathAnimation",
-      "kind": "fxset"
-    },
-    {
-      "id": "Rogue_KnifeTempest",
-      "name": "Rogue_KnifeTempest",
-      "kind": "fxset"
-    },
-    {
-      "id": "Rogue_Puff_Disappear",
-      "name": "Rogue_Puff_Disappear",
-      "kind": "fxset"
-    },
-    {
-      "id": "Rogue_Stealth",
-      "name": "Rogue_Stealth",
-      "kind": "fxset"
-    },
-    {
-      "id": "Rogue_Trail",
-      "name": "Rogue_Trail",
-      "kind": "fxset"
-    },
-    {
-      "id": "Rogue_Trail_Big",
-      "name": "Rogue_Trail_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "ShaarlizeTeror_Death",
-      "name": "ShaarlizeTeror_Death",
-      "kind": "fxset"
-    },
-    {
-      "id": "Shadow_AOE_Ground_Big",
-      "name": "Shadow_AOE_Ground_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Shadow_Aura",
-      "name": "Shadow_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Shadow_Blast_Launch",
-      "name": "Shadow_Blast_Launch",
-      "kind": "fxset"
-    },
-    {
-      "id": "Shadow_Cry",
-      "name": "Shadow_Cry",
-      "kind": "fxset"
-    },
-    {
-      "id": "Shadow_Ground_Generic",
-      "name": "Shadow_Ground_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Shadow_Puff_Unit",
-      "name": "Shadow_Puff_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Shadow_QuickSpin",
-      "name": "Shadow_QuickSpin",
-      "kind": "fxset"
-    },
-    {
-      "id": "Shadow_QuickSpin_Invert",
-      "name": "Shadow_QuickSpin_Invert",
-      "kind": "fxset"
-    },
-    {
-      "id": "Slash_Generic",
-      "name": "Slash_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Slash_Generic_360",
-      "name": "Slash_Generic_360",
-      "kind": "fxset"
-    },
-    {
-      "id": "Slipping_Loop_Generic",
-      "name": "Slipping_Loop_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_AOE_Trap_Floor",
-      "name": "Spark_AOE_Trap_Floor",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Ally_AOE_Unit",
-      "name": "Spark_Ally_AOE_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Aura",
-      "name": "Spark_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Blast",
-      "name": "Spark_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Blast_Launch",
-      "name": "Spark_Blast_Launch",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Blink_Appear",
-      "name": "Spark_Blink_Appear",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Blink_Disappear",
-      "name": "Spark_Blink_Disappear",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Blink_Disappear_Fast",
-      "name": "Spark_Blink_Disappear_Fast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Breath_Lasting",
-      "name": "Spark_Breath_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Burst_Cone",
-      "name": "Spark_Burst_Cone",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Cast_Fast",
-      "name": "Spark_Cast_Fast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Link",
-      "name": "Spark_Link",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Shield",
-      "name": "Spark_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Shield_Small",
-      "name": "Spark_Shield_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Sparkling_Cast",
-      "name": "Spark_Sparkling_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Target_Mark",
-      "name": "Spark_Target_Mark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Zap",
-      "name": "Spark_Zap",
-      "kind": "fxset"
-    },
-    {
-      "id": "Spark_Zap_Loop",
-      "name": "Spark_Zap_Loop",
-      "kind": "fxset"
-    },
-    {
-      "id": "SparksParticle_Add_Burst_Cone",
-      "name": "SparksParticle_Add_Burst_Cone",
-      "kind": "fxset"
-    },
-    {
-      "id": "SpongeBlob_DeathAnimation",
-      "name": "SpongeBlob_DeathAnimation",
-      "kind": "fxset"
-    },
-    {
-      "id": "Sprint_Loop_Generic",
-      "name": "Sprint_Loop_Generic",
-      "kind": "fxset"
-    },
-    {
-      "id": "Sprint_Loop_Water",
-      "name": "Sprint_Loop_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "StaggerPerfect_Loop",
-      "name": "StaggerPerfect_Loop",
-      "kind": "fxset"
-    },
-    {
-      "id": "Stagger_Break",
-      "name": "Stagger_Break",
-      "kind": "fxset"
-    },
-    {
-      "id": "Stagger_Loop",
-      "name": "Stagger_Loop",
-      "kind": "fxset"
-    },
-    {
-      "id": "State_Bleeding",
-      "name": "State_Bleeding",
-      "kind": "fxset"
-    },
-    {
-      "id": "State_Bleeding_Spark",
-      "name": "State_Bleeding_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "State_Blinded",
-      "name": "State_Blinded",
-      "kind": "fxset"
-    },
-    {
-      "id": "State_Bubble",
-      "name": "State_Bubble",
-      "kind": "fxset"
-    },
-    {
-      "id": "State_Burning",
-      "name": "State_Burning",
-      "kind": "fxset"
-    },
-    {
-      "id": "State_Burning_Chaos",
-      "name": "State_Burning_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "State_Burning_Light",
-      "name": "State_Burning_Light",
-      "kind": "fxset"
-    },
-    {
-      "id": "State_HoneyCovered",
-      "name": "State_HoneyCovered",
-      "kind": "fxset"
-    },
-    {
-      "id": "State_Immobilized",
-      "name": "State_Immobilized",
-      "kind": "fxset"
-    },
-    {
-      "id": "State_Poisonned",
-      "name": "State_Poisonned",
-      "kind": "fxset"
-    },
-    {
-      "id": "State_Stealth",
-      "name": "State_Stealth",
-      "kind": "fxset"
-    },
-    {
-      "id": "Status_Chaos_Mark",
-      "name": "Status_Chaos_Mark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Status_Light_Luon_Mark",
-      "name": "Status_Light_Luon_Mark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Status_Light_Sunlight_Mark",
-      "name": "Status_Light_Sunlight_Mark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Status_Light_Zeal_Mark",
-      "name": "Status_Light_Zeal_Mark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Status_Mage_Foresight",
-      "name": "Status_Mage_Foresight",
-      "kind": "fxset"
-    },
-    {
-      "id": "Status_Rogue_Mark",
-      "name": "Status_Rogue_Mark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Stunned_Loop",
-      "name": "Stunned_Loop",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Chaos",
-      "name": "Telegraph_Circle_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Cheese",
-      "name": "Telegraph_Circle_Cheese",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Earth",
-      "name": "Telegraph_Circle_Earth",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Electric",
-      "name": "Telegraph_Circle_Electric",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Fire",
-      "name": "Telegraph_Circle_Fire",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Honey",
-      "name": "Telegraph_Circle_Honey",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Ice",
-      "name": "Telegraph_Circle_Ice",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Light",
-      "name": "Telegraph_Circle_Light",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Nature",
-      "name": "Telegraph_Circle_Nature",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Physical",
-      "name": "Telegraph_Circle_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Poison",
-      "name": "Telegraph_Circle_Poison",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Preview",
-      "name": "Telegraph_Circle_Preview",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Spark",
-      "name": "Telegraph_Circle_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Water",
-      "name": "Telegraph_Circle_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Circle_Wind",
-      "name": "Telegraph_Circle_Wind",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Chaos",
-      "name": "Telegraph_Cone_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_ChaosEye",
-      "name": "Telegraph_Cone_ChaosEye",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Chaos_Big",
-      "name": "Telegraph_Cone_Chaos_Big",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Cheese",
-      "name": "Telegraph_Cone_Cheese",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Earth",
-      "name": "Telegraph_Cone_Earth",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Electric",
-      "name": "Telegraph_Cone_Electric",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Fire",
-      "name": "Telegraph_Cone_Fire",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Ice",
-      "name": "Telegraph_Cone_Ice",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Light",
-      "name": "Telegraph_Cone_Light",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Nature",
-      "name": "Telegraph_Cone_Nature",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Physical",
-      "name": "Telegraph_Cone_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Poison",
-      "name": "Telegraph_Cone_Poison",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Preview",
-      "name": "Telegraph_Cone_Preview",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Spark",
-      "name": "Telegraph_Cone_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Water",
-      "name": "Telegraph_Cone_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Cone_Wind",
-      "name": "Telegraph_Cone_Wind",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Generic_Circle",
-      "name": "Telegraph_Generic_Circle",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Generic_Circle_FillUp",
-      "name": "Telegraph_Generic_Circle_FillUp",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Generic_ConeDyn_180",
-      "name": "Telegraph_Generic_ConeDyn_180",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Generic_Cone_180",
-      "name": "Telegraph_Generic_Cone_180",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Generic_Cue",
-      "name": "Telegraph_Generic_Cue",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Generic_Rectangle",
-      "name": "Telegraph_Generic_Rectangle",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Chaos",
-      "name": "Telegraph_Line_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Cheese",
-      "name": "Telegraph_Line_Cheese",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Earth",
-      "name": "Telegraph_Line_Earth",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Electric",
-      "name": "Telegraph_Line_Electric",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Fire",
-      "name": "Telegraph_Line_Fire",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_HoneyFlower",
-      "name": "Telegraph_Line_HoneyFlower",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Ice",
-      "name": "Telegraph_Line_Ice",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Light",
-      "name": "Telegraph_Line_Light",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Nature",
-      "name": "Telegraph_Line_Nature",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Physical",
-      "name": "Telegraph_Line_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Poison",
-      "name": "Telegraph_Line_Poison",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Preview",
-      "name": "Telegraph_Line_Preview",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Spark",
-      "name": "Telegraph_Line_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Water",
-      "name": "Telegraph_Line_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Line_Wind",
-      "name": "Telegraph_Line_Wind",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Chaos",
-      "name": "Telegraph_Mobile_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Cheese",
-      "name": "Telegraph_Mobile_Cheese",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Earth",
-      "name": "Telegraph_Mobile_Earth",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Electric",
-      "name": "Telegraph_Mobile_Electric",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Fire",
-      "name": "Telegraph_Mobile_Fire",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Honey",
-      "name": "Telegraph_Mobile_Honey",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Ice",
-      "name": "Telegraph_Mobile_Ice",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Light",
-      "name": "Telegraph_Mobile_Light",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Nature",
-      "name": "Telegraph_Mobile_Nature",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Physical",
-      "name": "Telegraph_Mobile_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Poison",
-      "name": "Telegraph_Mobile_Poison",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Spark",
-      "name": "Telegraph_Mobile_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Water",
-      "name": "Telegraph_Mobile_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Mobile_Wind",
-      "name": "Telegraph_Mobile_Wind",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Chaos",
-      "name": "Telegraph_Soak_Chaos",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Cheese",
-      "name": "Telegraph_Soak_Cheese",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Earth",
-      "name": "Telegraph_Soak_Earth",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Electric",
-      "name": "Telegraph_Soak_Electric",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Fire",
-      "name": "Telegraph_Soak_Fire",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Honey",
-      "name": "Telegraph_Soak_Honey",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Ice",
-      "name": "Telegraph_Soak_Ice",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Light",
-      "name": "Telegraph_Soak_Light",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Nature",
-      "name": "Telegraph_Soak_Nature",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Physical",
-      "name": "Telegraph_Soak_Physical",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Poison",
-      "name": "Telegraph_Soak_Poison",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Spark",
-      "name": "Telegraph_Soak_Spark",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Water",
-      "name": "Telegraph_Soak_Water",
-      "kind": "fxset"
-    },
-    {
-      "id": "Telegraph_Soak_Wind",
-      "name": "Telegraph_Soak_Wind",
-      "kind": "fxset"
-    },
-    {
-      "id": "TeleportRift_Cast",
-      "name": "TeleportRift_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "TeleportRift_End",
-      "name": "TeleportRift_End",
-      "kind": "fxset"
-    },
-    {
-      "id": "TeleportRift_Lasting",
-      "name": "TeleportRift_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "TeleportStone_Cast",
-      "name": "TeleportStone_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "TeleportStone_End",
-      "name": "TeleportStone_End",
-      "kind": "fxset"
-    },
-    {
-      "id": "TeleportStone_Lasting",
-      "name": "TeleportStone_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Torch",
-      "name": "Torch",
-      "kind": "fxset"
-    },
-    {
-      "id": "UnderWater_Current_Horizontal",
-      "name": "UnderWater_Current_Horizontal",
-      "kind": "fxset"
-    },
-    {
-      "id": "UnderWater_Current_Upward",
-      "name": "UnderWater_Current_Upward",
-      "kind": "fxset"
-    },
-    {
-      "id": "Violence_Aura",
-      "name": "Violence_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Violence_Blast",
-      "name": "Violence_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Violence_Burst_Cone",
-      "name": "Violence_Burst_Cone",
-      "kind": "fxset"
-    },
-    {
-      "id": "Violence_Cry",
-      "name": "Violence_Cry",
-      "kind": "fxset"
-    },
-    {
-      "id": "Violence_Shield_Small",
-      "name": "Violence_Shield_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Warrior_Aura_Berserk",
-      "name": "Warrior_Aura_Berserk",
-      "kind": "fxset"
-    },
-    {
-      "id": "Warrior_Charge_Loop",
-      "name": "Warrior_Charge_Loop",
-      "kind": "fxset"
-    },
-    {
-      "id": "Warrior_Enraged",
-      "name": "Warrior_Enraged",
-      "kind": "fxset"
-    },
-    {
-      "id": "Warrior_Execute",
-      "name": "Warrior_Execute",
-      "kind": "fxset"
-    },
-    {
-      "id": "WaterBubble_Cast",
-      "name": "WaterBubble_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_AOE_FloorImpact",
-      "name": "Water_AOE_FloorImpact",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_AOE_Unit",
-      "name": "Water_AOE_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Ally_AOE_Unit",
-      "name": "Water_Ally_AOE_Unit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_AoE_FromBottom",
-      "name": "Water_AoE_FromBottom",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_AoE_FromBottom_Telegraph",
-      "name": "Water_AoE_FromBottom_Telegraph",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_AoE_Ground_Lasting_Heal",
-      "name": "Water_AoE_Ground_Lasting_Heal",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Aura",
-      "name": "Water_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Aura_Shield",
-      "name": "Water_Aura_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Beam_Unit_Lasting",
-      "name": "Water_Beam_Unit_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Blast",
-      "name": "Water_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Breath_Cast",
-      "name": "Water_Breath_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Breath_Lasting",
-      "name": "Water_Breath_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Bubble",
-      "name": "Water_Bubble",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Bubble_Oxygen",
-      "name": "Water_Bubble_Oxygen",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Bubble_Oxygen_hit",
-      "name": "Water_Bubble_Oxygen_hit",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Bubble_Splash",
-      "name": "Water_Bubble_Splash",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Bubble_Splash_Small",
-      "name": "Water_Bubble_Splash_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Burst_Cone",
-      "name": "Water_Burst_Cone",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Cast",
-      "name": "Water_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Cast_Fast",
-      "name": "Water_Cast_Fast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Cast_Halo_Combo",
-      "name": "Water_Cast_Halo_Combo",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Cast_SpellBook_Combo",
-      "name": "Water_Cast_SpellBook_Combo",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Cast_Spellbook_Skill",
-      "name": "Water_Cast_Spellbook_Skill",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Crabgantua_Nova",
-      "name": "Water_Crabgantua_Nova",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Crabgantua_Nova_Cast",
-      "name": "Water_Crabgantua_Nova_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Cry",
-      "name": "Water_Cry",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Dash",
-      "name": "Water_Dash",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Dash_Cast",
-      "name": "Water_Dash_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_EmpoweredWeapon_Attack",
-      "name": "Water_EmpoweredWeapon_Attack",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Geyser_Beam",
-      "name": "Water_Geyser_Beam",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Geyser_Beam_Plateforms",
-      "name": "Water_Geyser_Beam_Plateforms",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Geyser_Cast",
-      "name": "Water_Geyser_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Heal_Proc",
-      "name": "Water_Heal_Proc",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Heal_Proc_Manfish",
-      "name": "Water_Heal_Proc_Manfish",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Link_Heal",
-      "name": "Water_Link_Heal",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Rise",
-      "name": "Water_Rise",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Shield",
-      "name": "Water_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Shield_Small",
-      "name": "Water_Shield_Small",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Sparkling_Cast",
-      "name": "Water_Sparkling_Cast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Water_Zap",
-      "name": "Water_Zap",
-      "kind": "fxset"
-    },
-    {
-      "id": "Wind_AOE_Ground_Rectangle",
-      "name": "Wind_AOE_Ground_Rectangle",
-      "kind": "fxset"
-    },
-    {
-      "id": "Wind_Aura",
-      "name": "Wind_Aura",
-      "kind": "fxset"
-    },
-    {
-      "id": "Wind_Beam_Unit_Lasting",
-      "name": "Wind_Beam_Unit_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Wind_Blast",
-      "name": "Wind_Blast",
-      "kind": "fxset"
-    },
-    {
-      "id": "Wind_Breath_Lasting",
-      "name": "Wind_Breath_Lasting",
-      "kind": "fxset"
-    },
-    {
-      "id": "Wind_Shield",
-      "name": "Wind_Shield",
-      "kind": "fxset"
-    },
-    {
-      "id": "Wolf_Howl",
-      "name": "Wolf_Howl",
-      "kind": "fxset"
     }
   ]
 }
