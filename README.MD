@@ -55,20 +55,22 @@ Diagnostic hooks are excluded from the normal `solarflare.hl` release and remain
 
 ```text
 Farever/
-├── libhl64.dll                       <- Updated v6 + MinHook native loader
+├── libhl64.dll                        <- Updated v6 + MinHook native loader
 └── hlx/
     ├── config/
     │   └── loader.conf
     ├── loader/
-    │   └── hlx-loader.hl             <- Synchronized loader bytecode (PBBDB_i ABI)
+    │   └── hlx-loader.hl              <- Synchronized loader bytecode (PBBDB_i ABI)
     ├── plugins/
-    │   └── imgui/
-    │       ├── sfimgui.hdll          <- Isolated SolarFlare ImGui plugin
-    │       └── fonts/                <- Bundled UI fonts
+    │   ├── imgui/
+    │   │   ├── sfimgui.hdll           <- Isolated SolarFlare ImGui plugin
+    │   │   └── fonts/                 <- Bundled UI fonts
+    │   └── sfcursor/
+    │       └── sfcursor.hdll          <- Lightweight Win32 cursor confinement plugin
     └── mods/
         └── solarflare/
-            ├── solarflare.hl         <- Mod bytecode
-            └── assets/               <- Supplied CDB tables, icons, and atlases
+            ├── solarflare.hl          <- Mod bytecode
+            └── assets/                <- Supplied CDB tables, icons, and atlases
 ```
 
 
