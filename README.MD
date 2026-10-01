@@ -71,6 +71,7 @@ Farever/
             └── assets/               <- Supplied CDB tables, icons, and atlases
 ```
 
+
 3. Launch **Farever** and press **F6**.
 
 > [!NOTE]
