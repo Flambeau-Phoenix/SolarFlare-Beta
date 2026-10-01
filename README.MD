@@ -62,7 +62,7 @@ Farever/
     ├── loader/
     │   └── hlx-loader.hl              <- Synchronized loader bytecode (PBBDB_i ABI)
     ├── plugins/
-    │   ├── imgui/
+    │   ├── sfimgui/
     │   │   ├── sfimgui.hdll           <- Isolated SolarFlare ImGui plugin
     │   │   └── fonts/                 <- Bundled UI fonts
     │   └── sfcursor/
