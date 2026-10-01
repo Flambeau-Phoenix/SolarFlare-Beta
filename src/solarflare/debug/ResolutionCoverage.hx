@@ -11,7 +11,9 @@ import solarflare.debug.ResolutionLedger.LedgerAgg;
  * tracked checklist: per key, whether the observation fired, which route won,
  * which routes were tried and missed, and what paid off. Written on Stop Recording.
  */
+#if solarflare_telemetry
 @:keep
+#end
 class ResolutionCoverage {
 	public static function writeReport():Void {
 		var mdPath:String = "";

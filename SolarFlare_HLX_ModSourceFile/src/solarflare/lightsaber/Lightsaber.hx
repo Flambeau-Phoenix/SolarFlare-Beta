@@ -714,7 +714,11 @@ class LightsaberHooks {
 }
 
 class LightsaberOverlay {
-	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse;
+	// Only the meter table children scroll; the title and resize controls stay fixed.
+	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
+		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
+	static inline var RESIZE_INSET:Single = 6;
+	static inline var RESIZE_FOOTER:Single = HudChrome.RESIZE_GRIP + RESIZE_INSET + 4;
 
 	var theme:Theme;
 	var logView:LightsaberLogViewer;
@@ -757,9 +761,11 @@ class LightsaberOverlay {
 			h = LightsaberConfig.MAX_H;
 
 		var trans = cfg.chrome != null && cfg.chrome.isTransparent();
+		var collapsed = cfg.chrome != null && cfg.chrome.isCollapsed();
 		ImGui.setNextWindowBgAlpha(trans ? 0 : 0.88);
 		ImGui.setNextWindowSizeConstraints(
-			ImGui.vec2(LightsaberConfig.MIN_W, LightsaberConfig.MIN_H),
+			ImGui.vec2(collapsed ? HudChrome.SUN + HudChrome.CLOSE + 18 : LightsaberConfig.MIN_W,
+				collapsed ? HudChrome.STRIP + 6 : LightsaberConfig.MIN_H),
 			ImGui.vec2(LightsaberConfig.MAX_W, LightsaberConfig.MAX_H)
 		);
 		if (cfg.chrome != null && cfg.chrome.takeExpandDirty())
@@ -781,12 +787,6 @@ class LightsaberOverlay {
 		var began = ImGui.begin("SolarFlare Lightsaber", null, flags);
 		if (began) {
 			if (cfg.chrome == null || !cfg.chrome.isLocked()) {
-				var win = ImGui.getWindowSize();
-				if (Math.abs(win.x - w) > 1 || Math.abs(win.y - h) > 1) {
-					cfg.width.set(Math.max(LightsaberConfig.MIN_W, Math.min(LightsaberConfig.MAX_W, win.x)));
-					cfg.height.set(Math.max(LightsaberConfig.MIN_H, Math.min(LightsaberConfig.MAX_H, win.y)));
-					SettingsStore.markDirty();
-				}
 				if (cfg.chrome != null)
 					cfg.chrome.capturePos();
 			}
@@ -795,7 +795,7 @@ class LightsaberOverlay {
 				showBody = cfg.chrome.beginBody(function() {
 					cfg.hidden.set(true);
 					SettingsStore.markDirty();
-				}, null, "Lightsaber");
+				}, null, "Lightsaber", false, ImGuiWindowFlags.NoScrollWithMouse, 0, RESIZE_FOOTER);
 			}
 			if (showBody) {
 				drawSaberTitleLeading(cfg);
@@ -811,6 +811,18 @@ class LightsaberOverlay {
 						drawSkillTable("saber_skills", LightsaberCache.you);
 					ImGui.endChild();
 				}
+			}
+			if (cfg.chrome != null) {
+				cfg.chrome.closeBodyChild();
+				cfg.chrome.drawResizeCorner("lightsaber", !cfg.chrome.isLocked(),
+					LightsaberConfig.MIN_W, LightsaberConfig.MIN_H,
+					LightsaberConfig.MAX_W, LightsaberConfig.MAX_H,
+					function(nextW:Single, nextH:Single) {
+						cfg.width.set(nextW);
+						cfg.height.set(nextH);
+						SettingsStore.markDirty();
+					}, RESIZE_INSET);
+				cfg.chrome.pollTransparentSurfaceDrag("lightsaber", !cfg.chrome.isLocked());
 			}
 		}
 		solarflare.ui.HudChrome.endOverlayWindow(began, cfg.chrome);
@@ -829,11 +841,15 @@ class LightsaberOverlay {
 			h = LightsaberConfig.MAX_H;
 
 		var trans = cfg.riftChrome != null && cfg.riftChrome.isTransparent();
+		var collapsed = cfg.riftChrome != null && cfg.riftChrome.isCollapsed();
 		ImGui.setNextWindowBgAlpha(trans ? 0 : 0.88);
 		ImGui.setNextWindowSizeConstraints(
-			ImGui.vec2(LightsaberConfig.MIN_W, LightsaberConfig.MIN_H),
+			ImGui.vec2(collapsed ? HudChrome.SUN + HudChrome.CLOSE + 18 : LightsaberConfig.MIN_W,
+				collapsed ? HudChrome.STRIP + 6 : LightsaberConfig.MIN_H),
 			ImGui.vec2(LightsaberConfig.MAX_W, LightsaberConfig.MAX_H)
 		);
+		if (cfg.riftChrome != null && cfg.riftChrome.takeExpandDirty())
+			cfg.riftSizeDirty = true;
 		if (cfg.riftSizeDirty) {
 			ImGui.setNextWindowSize(ImGui.vec2(w, h), ImGuiCond.Always);
 			cfg.riftSizeDirty = false;
@@ -841,20 +857,16 @@ class LightsaberOverlay {
 			ImGui.setNextWindowSize(ImGui.vec2(w, h), ImGuiCond.FirstUseEver);
 			ImGui.setNextWindowPos(ImGui.vec2(480, 280), ImGuiCond.FirstUseEver);
 		}
-		if (cfg.riftChrome != null)
+		if (cfg.riftChrome != null) {
+			cfg.riftChrome.clampToViewport();
 			cfg.riftChrome.applyPos();
+		}
 
-		var flags = cfg.riftChrome != null ? cfg.riftChrome.windowFlags(FLAGS) : FLAGS;
+		var flags = cfg.riftChrome != null ? cfg.riftChrome.windowFlagsKeepClicks(FLAGS) : FLAGS;
 		flags |= ImGuiWindowFlags.NoSavedSettings;
 		var began = ImGui.begin("SolarFlare Lightsaber Rift", null, flags);
 		if (began) {
 			if (cfg.riftChrome == null || !cfg.riftChrome.isLocked()) {
-				var win = ImGui.getWindowSize();
-				if (Math.abs(win.x - w) > 1 || Math.abs(win.y - h) > 1) {
-					cfg.riftWidth.set(Math.max(LightsaberConfig.MIN_W, Math.min(LightsaberConfig.MAX_W, win.x)));
-					cfg.riftHeight.set(Math.max(LightsaberConfig.MIN_H, Math.min(LightsaberConfig.MAX_H, win.y)));
-					SettingsStore.markDirty();
-				}
 				if (cfg.riftChrome != null)
 					cfg.riftChrome.capturePos();
 			}
@@ -878,7 +890,7 @@ class LightsaberOverlay {
 					ImGui.popStyleColor(3);
 					ImGui.sameLine();
 					drawRiftTimerBox("saber_rift_grp");
-				}, "");
+				}, "", false, ImGuiWindowFlags.NoScrollWithMouse, 0, RESIZE_FOOTER);
 			} else {
 				ImGui.text("In that rift  heroes [" + meterStatus(LightsaberCache.rift) + "]");
 				ImGui.sameLine();
@@ -906,6 +918,18 @@ class LightsaberOverlay {
 						drawSkillTable("saber_rift_skills", m);
 					ImGui.endChild();
 				}
+			}
+			if (cfg.riftChrome != null) {
+				cfg.riftChrome.closeBodyChild();
+				cfg.riftChrome.drawResizeCorner("lightsaber_rift", !cfg.riftChrome.isLocked(),
+					LightsaberConfig.MIN_W, LightsaberConfig.MIN_H,
+					LightsaberConfig.MAX_W, LightsaberConfig.MAX_H,
+					function(nextW:Single, nextH:Single) {
+						cfg.riftWidth.set(nextW);
+						cfg.riftHeight.set(nextH);
+						SettingsStore.markDirty();
+					}, RESIZE_INSET);
+				cfg.riftChrome.pollTransparentSurfaceDrag("lightsaber_rift", !cfg.riftChrome.isLocked());
 			}
 		}
 		solarflare.ui.HudChrome.endOverlayWindow(began, cfg.riftChrome);

@@ -1,11 +1,9 @@
 {
-  "source": "D:/FareverDevSpace/Farever/res.light.pak#data.cdb",
+  "source": "E:\\Solar_Flare_2_Mod\\9-30_Patch_Stuff\\data.cdb",
   "notes": [
-    "Class talents are skill rows with props.talent (type 21).",
-    "cooldownReductionPct is a flat CooldownReduction affix (usually 3% rank 1 / 6% rank 2).",
-    "reduceWeaponSkills / reduceNamedSkill are proc CDR from talent scripts, not a global haste stat.",
-    "affectedSkills come from texts.refs and reduceCooldown(Skill.Id) in scripts.",
-    "Live remaining CD still comes from Skill getters / onTriggerCD; this table is observation metadata."
+    "Generated from current CDB skill rows with props.talent.",
+    "CooldownReduction affixes carry authored percentages and rank conditions.",
+    "Weapon and named cooldown reductions are script metadata; live remaining CD comes from Skill getters."
   ],
   "talents": [
     {
@@ -56,8 +54,8 @@
       ],
       "scope": "other",
       "affectedSkills": [
-        "Mage_Talent_Chaincast_Status",
-        "Mage_Talent_Chaincast_Accum_Status"
+        "Mage_Talent_Chaincast_Accum_Status",
+        "Mage_Talent_Chaincast_Status"
       ],
       "cooldownReduction": [],
       "affixes": [],
@@ -73,7 +71,6 @@
       "class": "Mage",
       "maxPoints": 2,
       "kinds": [
-        "stat:SpellPenetration",
         "stat:SpellPenetration"
       ],
       "scope": "other",
@@ -82,13 +79,13 @@
       "affixes": [
         {
           "attribute": "SpellPenetration",
-          "val": 5.0,
+          "val": 5,
           "ref": "TAttribute_Flat",
           "maxRank": 1
         },
         {
           "attribute": "SpellPenetration",
-          "val": 10.0,
+          "val": 10,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -172,12 +169,12 @@
       "affixes": [
         {
           "attribute": "MagicMastery",
-          "val": 5.0,
+          "val": 5,
           "ref": "TAttribute_Flat"
         },
         {
           "attribute": "PhysicalMastery",
-          "val": 1.0,
+          "val": 1,
           "ref": "TAttribute_Flat"
         }
       ],
@@ -213,7 +210,6 @@
       "class": "Mage",
       "maxPoints": 2,
       "kinds": [
-        "stat:MaxSpark",
         "stat:MaxSpark"
       ],
       "scope": "other",
@@ -222,13 +218,13 @@
       "affixes": [
         {
           "attribute": "MaxSpark",
-          "val": 10.0,
+          "val": 10,
           "ref": "TAttribute_Flat",
           "maxRank": 1
         },
         {
           "attribute": "MaxSpark",
-          "val": 20.0,
+          "val": 20,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -245,7 +241,6 @@
       "class": "Mage",
       "maxPoints": 2,
       "kinds": [
-        "stat:Fervor",
         "stat:Fervor"
       ],
       "scope": "other",
@@ -260,7 +255,7 @@
         },
         {
           "attribute": "Fervor",
-          "val": 3.0,
+          "val": 3,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -373,13 +368,10 @@
       "class": "Mage",
       "maxPoints": 2,
       "kinds": [
-        "reduceWeaponSkills",
-        "reduceNamedSkill"
+        "reduceWeaponSkills"
       ],
-      "scope": "skill",
-      "affectedSkills": [
-        "s"
-      ],
+      "scope": "weaponSkills",
+      "affectedSkills": [],
       "cooldownReduction": [],
       "affixes": [],
       "procChance": 0.07,
@@ -470,17 +462,14 @@
       "class": "Mage",
       "maxPoints": 2,
       "kinds": [
-        "reduceWeaponSkills",
-        "reduceNamedSkill"
+        "reduceWeaponSkills"
       ],
-      "scope": "skill",
-      "affectedSkills": [
-        "s"
-      ],
+      "scope": "weaponSkills",
+      "affectedSkills": [],
       "cooldownReduction": [],
       "affixes": [],
       "procChance": 0.02,
-      "reduceSeconds": 1.0,
+      "reduceSeconds": 1,
       "selfCooldown": null,
       "desc": "Each [Spark] point spent has a ::chance:: chance to reduce the cooldown of your [WeaponSkill]s by ::time::.",
       "rankDescs": []
@@ -535,8 +524,8 @@
       ],
       "scope": "other",
       "affectedSkills": [
-        "Priest_Talent_Sunlight_Status",
-        "Priest_Talent_BurningRays_Status"
+        "Priest_Talent_BurningRays_Status",
+        "Priest_Talent_Sunlight_Status"
       ],
       "cooldownReduction": [],
       "affixes": [],
@@ -552,7 +541,6 @@
       "class": "Priest",
       "maxPoints": 2,
       "kinds": [
-        "stat:Armor",
         "stat:Armor"
       ],
       "scope": "other",
@@ -584,7 +572,6 @@
       "class": "Priest",
       "maxPoints": 2,
       "kinds": [
-        "stat:Fervor",
         "stat:Fervor"
       ],
       "scope": "other",
@@ -599,7 +586,7 @@
         },
         {
           "attribute": "Fervor",
-          "val": 3.0,
+          "val": 3,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -715,7 +702,6 @@
       "class": "Priest",
       "maxPoints": 2,
       "kinds": [
-        "stat:MagicMastery",
         "stat:MagicMastery"
       ],
       "scope": "other",
@@ -724,13 +710,13 @@
       "affixes": [
         {
           "attribute": "MagicMastery",
-          "val": 2.0,
+          "val": 2,
           "ref": "TAttribute_Flat",
           "maxRank": 1
         },
         {
           "attribute": "MagicMastery",
-          "val": 4.0,
+          "val": 4,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -791,8 +777,8 @@
       ],
       "scope": "other",
       "affectedSkills": [
-        "Priest_Talent_Sunlight_Status",
-        "Priest_Talent_PurgingStrikes_Status"
+        "Priest_Talent_PurgingStrikes_Status",
+        "Priest_Talent_Sunlight_Status"
       ],
       "cooldownReduction": [],
       "affixes": [],
@@ -835,13 +821,13 @@
       "cooldownReduction": [
         {
           "attribute": "CooldownReduction",
-          "val": 3.0,
+          "val": 3,
           "ref": "TAttribute_Flat",
           "maxRank": 1
         },
         {
           "attribute": "CooldownReduction",
-          "val": 6.0,
+          "val": 6,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -849,13 +835,13 @@
       "affixes": [
         {
           "attribute": "CooldownReduction",
-          "val": 3.0,
+          "val": 3,
           "ref": "TAttribute_Flat",
           "maxRank": 1
         },
         {
           "attribute": "CooldownReduction",
-          "val": 6.0,
+          "val": 6,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -950,17 +936,16 @@
       "class": "Priest",
       "maxPoints": 1,
       "kinds": [
-        "reduceWeaponSkills",
-        "reduceNamedSkill"
+        "reduceWeaponSkills"
       ],
-      "scope": "skill",
+      "scope": "weaponSkills",
       "affectedSkills": [
         "Priest_Talent_Sunlight_Status"
       ],
       "cooldownReduction": [],
       "affixes": [],
       "procChance": null,
-      "reduceSeconds": 1.0,
+      "reduceSeconds": 1,
       "selfCooldown": null,
       "desc": "::ref_name:: reduces the cooldown of [WeaponSkill]s by ::time::.",
       "rankDescs": []
@@ -1001,14 +986,14 @@
       "procChance": 0.2,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "::ref_name:: has a ::chance:: chance per [ComboPoint] to spread acid to enemies, poisoning them for ::ref2_dmg:: over ::ref2_duration:: while reducing their [MagicArmor] by ::ref2_val1%::.",
+      "desc": "::ref_name:: has a ::chance:: chance per [ComboPoint] to spread acid to enemies, poisoning them for ::ref2_dmg:: over ::ref2_duration:: while reducing their [Armor] and [MagicArmor] by ::ref2_val1%::.",
       "rankDescs": []
     },
     {
       "id": "Rogue_Talent_Adrenaline",
       "name": "Adrenaline",
       "class": "Rogue",
-      "maxPoints": 1,
+      "maxPoints": 2,
       "kinds": [
         "other"
       ],
@@ -1022,7 +1007,7 @@
       "procChance": null,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "Your [MoveSpeedFactor] is increased by ::ref_val1%:: as long as an enemy is affected by ::ref2_name::.",
+      "desc": "Your [MoveSpeedFactor] is increased by ::ref_val1%:: and your [DodgeChance] by ::ref_val2%:: as long as an enemy is affected by ::ref2_name::.",
       "rankDescs": []
     },
     {
@@ -1042,7 +1027,7 @@
       "procChance": null,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "::ref_name:: reduces all damage dealt by affected enemies by ::damage%:: per stack.",
+      "desc": "::ref_name:: reduces all damage dealt by affected enemies by ::damage%::.",
       "rankDescs": []
     },
     {
@@ -1057,10 +1042,10 @@
       "affectedSkills": [],
       "cooldownReduction": [],
       "affixes": [],
-      "procChance": null,
+      "procChance": 0.1,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "Damage dealt to poisoned enemies increased by ::damage%::.",
+      "desc": "Against enemies under ::threshold%:: [maxHealth] :\nYour [WeaponSkill]s dealing Magic damage deal ::damage%:: more damage.\nYour [WeaponSkill]s dealing Physical damage have an additional ::chance:: chance to critically strike.",
       "rankDescs": []
     },
     {
@@ -1069,10 +1054,9 @@
       "class": "Rogue",
       "maxPoints": 1,
       "kinds": [
-        "reduceNamedSkill",
         "selfCooldown"
       ],
-      "scope": "skill",
+      "scope": "other",
       "affectedSkills": [
         "Rogue_Talent_CheatDeath_Status"
       ],
@@ -1080,7 +1064,7 @@
       "affixes": [],
       "procChance": null,
       "reduceSeconds": null,
-      "selfCooldown": 120.0,
+      "selfCooldown": 120,
       "desc": "Damage that should kill you leaves you at ::var1%:: of your [MaxHealth]. For ::ref_duration::, you take ::ref_val1%:: reduced damage. (::cooldown:: cooldown).",
       "rankDescs": []
     },
@@ -1088,12 +1072,13 @@
       "id": "Rogue_Talent_CripplingPoison",
       "name": "Crippling Poison",
       "class": "Rogue",
-      "maxPoints": 1,
+      "maxPoints": 2,
       "kinds": [
         "other"
       ],
       "scope": "other",
       "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Dose",
         "Rogue_Talent_LethalPoison_Status"
       ],
       "cooldownReduction": [],
@@ -1101,7 +1086,7 @@
       "procChance": null,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "The first time ::ref_name:: reaches the maximum number of stacks on an enemy, it stuns them for ::dur1::.",
+      "desc": "::ref_name:: and ::ref2_name:: slow enemies by ::var1%::.",
       "rankDescs": []
     },
     {
@@ -1118,10 +1103,10 @@
       ],
       "cooldownReduction": [],
       "affixes": [],
-      "procChance": 0.02,
+      "procChance": 0.25,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "::ref_name:: has a ::chance:: chance per stack to critically strike.",
+      "desc": "::ref_name::'s direct damage have an additional ::chance:: chance to critically strike.",
       "rankDescs": []
     },
     {
@@ -1138,10 +1123,10 @@
       ],
       "cooldownReduction": [],
       "affixes": [],
-      "procChance": 1.0,
+      "procChance": 0.5,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "Your [ComboAttack] always applies ::ref_name:: to the target and to nearby enemies.",
+      "desc": "Your [BasicAttack]s against enemies affected by ::ref_name::\nhave a ::chance:: chance to deal ::dmg:: and refresh it.",
       "rankDescs": []
     },
     {
@@ -1166,32 +1151,21 @@
       "id": "Rogue_Talent_Footwork",
       "name": "Footwork",
       "class": "Rogue",
-      "maxPoints": 2,
+      "maxPoints": 1,
       "kinds": [
-        "stat:DodgeChance",
-        "stat:DodgeChance"
+        "reduceNamedSkill"
       ],
-      "scope": "other",
-      "affectedSkills": [],
+      "scope": "skill",
+      "affectedSkills": [
+        "Dash_Base",
+        "Rogue_Talent_LethalPoison_Status"
+      ],
       "cooldownReduction": [],
-      "affixes": [
-        {
-          "attribute": "DodgeChance",
-          "val": 3.0,
-          "ref": "TAttribute_Flat",
-          "maxRank": 1
-        },
-        {
-          "attribute": "DodgeChance",
-          "val": 6.0,
-          "ref": "TAttribute_Flat",
-          "minRank": 2
-        }
-      ],
+      "affixes": [],
       "procChance": null,
-      "reduceSeconds": null,
+      "reduceSeconds": 5,
       "selfCooldown": null,
-      "desc": "[DodgeChance] increased by ::val1%::.",
+      "desc": "Applying ::ref_name:: reduces the cooldown of your ::ref2_name:: by ::time::.",
       "rankDescs": []
     },
     {
@@ -1204,39 +1178,20 @@
       ],
       "scope": "other",
       "affectedSkills": [
-        "Rogue_Talent_LethalPoison_Status"
+        "Rogue_Talent_ImprovedMixture_Status",
+        "Rogue_Talent_LethalPoison_Dose"
       ],
       "cooldownReduction": [],
       "affixes": [],
       "procChance": null,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "::ref_name:: now stacks up to ::var1:: times.",
+      "desc": "Each time you apply a ::ref_name::, you gain a stack of ::ref2_name::, stacking up to ::ref2_stacks:: times. Your [ComboAttack] consume all the stacks to increase its damage by ::ref2_damage%:: per stack.",
       "rankDescs": []
     },
     {
       "id": "Rogue_Talent_IntentToKill",
       "name": "Intent to Kill",
-      "class": "Rogue",
-      "maxPoints": 1,
-      "kinds": [
-        "other"
-      ],
-      "scope": "other",
-      "affectedSkills": [
-        "Rogue_Talent_LethalPoison_Status"
-      ],
-      "cooldownReduction": [],
-      "affixes": [],
-      "procChance": null,
-      "reduceSeconds": null,
-      "selfCooldown": null,
-      "desc": "Gain ::var1:: [ComboPoint]s when an enemy affected by your ::ref_name:: dies.",
-      "rankDescs": []
-    },
-    {
-      "id": "Rogue_Talent_LeechingPoison",
-      "name": "Leeching Poison",
       "class": "Rogue",
       "maxPoints": 2,
       "kinds": [
@@ -1251,12 +1206,33 @@
       "procChance": null,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "::ref_name:: heals you for ::damage%:: of the damage dealt.",
+      "desc": "Your periodic damage effect deal ::damage%:: increased damage to enemies for each poison you have applied on them.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_LeechingPoison",
+      "name": "Recovery Toxins",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_LeechingPoison_Status",
+        "Rogue_Talent_LethalPoison_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Applying ::ref_name:: heals you for ::ref2_heal:: over ::ref2_duration::.",
       "rankDescs": []
     },
     {
       "id": "Rogue_Talent_LethalDose",
-      "name": "Lethal Dose",
+      "name": "Powerful Toxins",
       "class": "Rogue",
       "maxPoints": 2,
       "kinds": [
@@ -1282,6 +1258,7 @@
       ],
       "scope": "other",
       "affectedSkills": [
+        "Rogue_Talent_LethalPoison_Dose",
         "Rogue_Talent_LethalPoison_Status"
       ],
       "cooldownReduction": [],
@@ -1289,7 +1266,7 @@
       "procChance": 0.2,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "Your [Attack]s have a ::chance:: chance to apply a stack of ::ref_name::, poisoning them for ::ref_dmg:: over ::ref_duration::, stacking up to ::ref_stacks::.",
+      "desc": "When your [ComboAttack], [WeaponSkill]s, [ClassSkill]s and [SignatureSkill] deal damage, they can each apply 1 unique ::ref_name:: maximum.\nAt ::ref_stacks:: ::ref_name::, they are consumed to apply ::ref2_name::, poisoning them for ::ref2_dmg:: over ::ref2_duration::. If it is already applied, deal direct ::ref2_dmg2::.",
       "rankDescs": []
     },
     {
@@ -1298,16 +1275,15 @@
       "class": "Rogue",
       "maxPoints": 2,
       "kinds": [
-        "reduceWeaponSkills",
-        "reduceNamedSkill"
+        "reduceWeaponSkills"
       ],
-      "scope": "skill",
+      "scope": "weaponSkills",
       "affectedSkills": [
         "Rogue_Talent_LethalPoison_Status"
       ],
       "cooldownReduction": [],
       "affixes": [],
-      "procChance": 0.07,
+      "procChance": 0.15,
       "reduceSeconds": 0.5,
       "selfCooldown": null,
       "desc": "::ref_name:: damage has a ::chance:: chance to reduce the cooldown of your [WeaponSkill]s by ::time::.",
@@ -1323,21 +1299,21 @@
       ],
       "scope": "other",
       "affectedSkills": [
-        "Rogue_Talent_LethalPoison_Status"
+        "Rogue_Talent_Envenom"
       ],
       "cooldownReduction": [],
       "affixes": [],
-      "procChance": 0.5,
+      "procChance": 0.3,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "Your [BasicAttack]s applying ::ref_name:: have a ::chance:: chance to strike again.",
+      "desc": "Your [BasicAttack]s triggering ::ref_name:: have a ::chance:: chance to strike again.",
       "rankDescs": []
     },
     {
       "id": "Rogue_Talent_RegeneratingMiasmas",
-      "name": "Regenerating Miasmas",
+      "name": "Toxic Miasmas",
       "class": "Rogue",
-      "maxPoints": 2,
+      "maxPoints": 1,
       "kinds": [
         "other"
       ],
@@ -1350,7 +1326,7 @@
       "procChance": null,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "Heals you for ::var1%:: of your [MaxHealth] when you kill an enemy affected by ::ref1_name::.",
+      "desc": "When an enemy affected by ::ref_name:: dies, they explode, dealing ::dmg:: to nearby enemies and spreading ::ref_name::.",
       "rankDescs": []
     },
     {
@@ -1366,13 +1342,13 @@
       "cooldownReduction": [
         {
           "attribute": "CooldownReduction",
-          "val": 3.0,
+          "val": 3,
           "ref": "TAttribute_Flat",
           "maxRank": 1
         },
         {
           "attribute": "CooldownReduction",
-          "val": 6.0,
+          "val": 6,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -1380,13 +1356,13 @@
       "affixes": [
         {
           "attribute": "CooldownReduction",
-          "val": 3.0,
+          "val": 3,
           "ref": "TAttribute_Flat",
           "maxRank": 1
         },
         {
           "attribute": "CooldownReduction",
-          "val": 6.0,
+          "val": 6,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -1398,49 +1374,29 @@
       "rankDescs": []
     },
     {
-      "id": "Rogue_Talent_VenomInfusion",
-      "name": "Venom Infusion",
-      "class": "Rogue",
-      "maxPoints": 2,
-      "kinds": [
-        "other"
-      ],
-      "scope": "other",
-      "affectedSkills": [
-        "Rogue_Talent_LethalPoison_Status"
-      ],
-      "cooldownReduction": [],
-      "affixes": [],
-      "procChance": 0.25,
-      "reduceSeconds": null,
-      "selfCooldown": null,
-      "desc": "Your [WeaponSkill]s have a ::chance:: chance to apply ::ref_name::.",
-      "rankDescs": []
-    },
-    {
       "id": "Rogue_Talent_VenomousFinisher",
-      "name": "Venomous Finisher",
+      "name": "Venomous Assassin",
       "class": "Rogue",
       "maxPoints": 1,
       "kinds": [
-        "other"
+        "reduceNamedSkill"
       ],
-      "scope": "other",
+      "scope": "skill",
       "affectedSkills": [
         "Rogue_Sig_Finisher",
-        "Rogue_Talent_LethalPoison_Status"
+        "Rogue_Talent_LethalPoison_Dose"
       ],
       "cooldownReduction": [],
       "affixes": [],
       "procChance": null,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "::ref_name:: always applied ::ref2_name:: and deals ::damage%:: increased damage for each stack.",
+      "desc": "Your [ComboAttack] reduces the cooldown of your ::ref_name:: by ::dur1::. It reduces by ::dur2:: instead if it applies a new ::ref2_name::.",
       "rankDescs": []
     },
     {
       "id": "Rogue_Talent_VirulentMagic",
-      "name": "Virulent Magic",
+      "name": "Virulent Contamination",
       "class": "Rogue",
       "maxPoints": 1,
       "kinds": [
@@ -1448,14 +1404,15 @@
       ],
       "scope": "other",
       "affectedSkills": [
-        "Rogue_Talent_LethalPoison_Status"
+        "Rogue_Talent_LethalPoison_Status",
+        "Rogue_Talent_VirulentMagic_Status"
       ],
       "cooldownReduction": [],
       "affixes": [],
       "procChance": null,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "Excess applications of ::ref_name:: will deal ::dmg::.",
+      "desc": "[WeaponSkill]s that critically strike poison enemies, dealing ::damage%:: of the amount over ::ref2_duration::.",
       "rankDescs": []
     },
     {
@@ -1509,13 +1466,13 @@
       "cooldownReduction": [
         {
           "attribute": "CooldownReduction",
-          "val": 3.0,
+          "val": 3,
           "ref": "TAttribute_Flat",
           "maxRank": 1
         },
         {
           "attribute": "CooldownReduction",
-          "val": 6.0,
+          "val": 6,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -1523,13 +1480,13 @@
       "affixes": [
         {
           "attribute": "CooldownReduction",
-          "val": 3.0,
+          "val": 3,
           "ref": "TAttribute_Flat",
           "maxRank": 1
         },
         {
           "attribute": "CooldownReduction",
-          "val": 6.0,
+          "val": 6,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -1553,7 +1510,7 @@
       "cooldownReduction": [],
       "affixes": [],
       "procChance": 0.12,
-      "reduceSeconds": 1.0,
+      "reduceSeconds": 1,
       "selfCooldown": null,
       "desc": "Damage from bleeding effects have a ::chance:: chance to reduce the cooldown of all your [WeaponSkill]s by ::time::.",
       "rankDescs": []
@@ -1574,7 +1531,7 @@
       "affixes": [],
       "procChance": null,
       "reduceSeconds": null,
-      "selfCooldown": 120.0,
+      "selfCooldown": 120,
       "desc": "Damage that should kill you leaves you at ::var1:: [Health] and grants you the effects of ::ref_name:: (::cooldown:: cooldown).",
       "rankDescs": []
     },
@@ -1702,7 +1659,6 @@
       "class": "Warrior",
       "maxPoints": 2,
       "kinds": [
-        "stat:CritChance",
         "stat:CritChance"
       ],
       "scope": "other",
@@ -1711,13 +1667,13 @@
       "affixes": [
         {
           "attribute": "CritChance",
-          "val": 2.0,
+          "val": 2,
           "ref": "TAttribute_Flat",
           "maxRank": 1
         },
         {
           "attribute": "CritChance",
-          "val": 4.0,
+          "val": 4,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -1751,13 +1707,11 @@
     },
     {
       "id": "Warrior_Talent_HoldTheLine_Status",
-      "name": "",
+      "name": "Warrior_Talent_HoldTheLine_Status",
       "class": "Warrior",
       "maxPoints": 2,
       "kinds": [
         "stat:DamageModifier",
-        "stat:DamageModifier",
-        "stat:DamageTakenModifier",
         "stat:DamageTakenModifier"
       ],
       "scope": "other",
@@ -1957,7 +1911,6 @@
       "class": "Warrior",
       "maxPoints": 2,
       "kinds": [
-        "stat:Fervor",
         "stat:Fervor"
       ],
       "scope": "other",
@@ -1966,13 +1919,13 @@
       "affixes": [
         {
           "attribute": "Fervor",
-          "val": 2.0,
+          "val": 2,
           "ref": "TAttribute_Flat",
           "maxRank": 1
         },
         {
           "attribute": "Fervor",
-          "val": 4.0,
+          "val": 4,
           "ref": "TAttribute_Flat",
           "minRank": 2
         }
@@ -1991,8 +1944,10 @@
     "Priest_Talent_SharpMind",
     "Priest_Talent_SwiftJustice",
     "Rogue_Talent_CheatDeath",
+    "Rogue_Talent_Footwork",
     "Rogue_Talent_NoxiousStrategem",
     "Rogue_Talent_UpTheAnte",
+    "Rogue_Talent_VenomousFinisher",
     "Warrior_RashSoul",
     "Warrior_RedTempo",
     "Warrior_SecondWind"

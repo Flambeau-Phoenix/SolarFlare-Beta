@@ -39,6 +39,7 @@ class DockingHelper {
 				// ImGuiConfigFlags_DockingEnable is bit 6 (64), NoMouseCursorChange is bit 5 (32)
 				var flags = mem.getI32(0) | ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.NoMouseCursorChange;
 				mem.setI32(0, flags);
+				mem.setUI8(89, 0); // io.ConfigWindowsResizeFromEdges = false
 			}
 		} catch (_:Dynamic) {}
 	}

@@ -8,16 +8,15 @@ import imgui.Enums.ImGuiWindowFlags;
 /**
  * Look-lock input gating while Farever retains native-cursor ownership.
  *
- * THIS IS THE SHIPPED SolarFlare-Beta POLICY, restored verbatim apart from the Alt
- * note below. It was replaced at one point by a "never set NoMouse" variant, which
- * is what left the player unable to interact with the world while the cursor was
- * hidden. Do not reintroduce that variant; see docs and the notes here first.
+ * Retains Beta's NoMouse and capture policy, with native confinement repaired
+ * only when the actual Windows rectangle differs. Removing NoMouse previously
+ * prevented world interaction while hidden; preserve that input handoff.
  *
  * When the cursor is NOT free:
  *   - windows carry ImGuiWindowFlags.NoInputs
  *   - io.ConfigFlags carries ImGuiConfigFlags.NoMouse
  *   - every WantCapture* claim is dropped
- *   - mouseClip is reasserted
+ *   - actual native confinement is checked and repaired when its rectangle differs
  * All four together are what hand the mouse back to Farever. Per-window flags alone
  * leave ImGui hovering and reporting WantCaptureMouse, and the backend holds clicks
  * on that basis.
@@ -45,8 +44,6 @@ class CursorCaptureFix {
 	static inline var FLAG_NO_MOUSE:Int = ImGuiConfigFlags.NoMouse; // 16
 	static inline var FLAG_NO_CURSOR_CHANGE:Int = ImGuiConfigFlags.NoMouseCursorChange; // 32
 
-	static var clipKnown:Bool = false;
-	static var lastClip:Bool = false;
 	static var freeKnown:Bool = false;
 	static var lastFree:Bool = false;
 	static var blockGameKeys:Bool = false;
@@ -79,7 +76,6 @@ class CursorCaptureFix {
 		catch (_:Dynamic) {}
 		cursorFree = free;
 		applyInputPolicy(free);
-		applyWindowClip(!free);
 		ensureEventHook();
 	}
 
@@ -94,13 +90,16 @@ class CursorCaptureFix {
 			var desired = existing | FLAG_NO_CURSOR_CHANGE;
 			if (existing != desired)
 				mem.setI32(0, desired);
+			// Disable 4-sided edge resizing and border grip bars globally.
+			// Window expansion is handled exclusively by the corner marker.
+			mem.setUI8(89, 0); // io.ConfigWindowsResizeFromEdges = false
 		} catch (_:Dynamic) {}
 	}
 
 	/** Call at the start of draw when tools may be open — claim capture early. */
 	public static function beginFrameCapture(interactiveOpen:Bool):Void {
 		interactiveActive = ENABLED && interactiveOpen;
-		keyboardCaptureActive = interactiveActive;
+		keyboardCaptureActive = cursorFree && interactiveActive;
 		if (!ENABLED || !cursorFree)
 			return;
 		claimCapture(interactiveOpen);
@@ -113,7 +112,7 @@ class CursorCaptureFix {
 	 */
 	public static function finishFrame(interactiveOpen:Bool = false):Void {
 		interactiveActive = ENABLED && interactiveOpen;
-		keyboardCaptureActive = interactiveActive;
+		keyboardCaptureActive = cursorFree && interactiveActive;
 		if (!ENABLED)
 			return;
 		// Sampled here because every SolarFlare window has been submitted by now.
@@ -129,17 +128,20 @@ class CursorCaptureFix {
 		catch (_:Dynamic) {}
 		if (cursorFree) {
 			claimCapture(interactiveOpen);
-			return;
+		} else {
+			blockGameKeys = false;
+			ImGui.setNextFrameWantCaptureMouse(false);
+			ImGui.setNextFrameWantCaptureKeyboard(false);
 		}
-		blockGameKeys = false;
+		// The engine's cached mouseClip field cannot detect another UI layer
+		// releasing confinement. Query the actual rectangle and repair mismatches.
 		try {
-			var window = hxd.Window.getInstance();
-			if (window == null)
-				return;
-			window.set_mouseClip(true);
-			lastClip = true;
-			clipKnown = true;
-		} catch (_:Dynamic) {}
+			solarflare.runtime.RuntimeMetrics.clipChecks++;
+			var result = CursorConfinement.sync(!cursorFree);
+			if (result == 1) solarflare.runtime.RuntimeMetrics.clipUpdates++;
+			if (result == 2) solarflare.runtime.RuntimeMetrics.clipReleases++;
+			if (result < 0) solarflare.runtime.RuntimeMetrics.clipFailures++;
+		} catch (_:Dynamic) { solarflare.runtime.RuntimeMetrics.clipFailures++; }
 	}
 
 	static function claimCapture(interactiveOpen:Bool):Void {
@@ -147,19 +149,6 @@ class CursorCaptureFix {
 		try {
 			ImGui.setNextFrameWantCaptureKeyboard(interactiveOpen);
 			ImGui.setNextFrameWantCaptureMouse(interactiveOpen);
-		} catch (_:Dynamic) {}
-	}
-
-	static function applyWindowClip(locked:Bool):Void {
-		if (clipKnown && lastClip == locked)
-			return;
-		try {
-			var window = hxd.Window.getInstance();
-			if (window == null)
-				return;
-			window.set_mouseClip(locked);
-			lastClip = locked;
-			clipKnown = true;
 		} catch (_:Dynamic) {}
 	}
 
@@ -225,8 +214,13 @@ class CursorCaptureFix {
 			// NoMouse parks the mouse off-screen while ImGui still holds an active drag/resize,
 			// so it keeps moving the window towards a position that no longer exists. Releasing
 			// held input on the transition ends the drag instead of stranding it.
-			if (freeKnown && lastFree && !free)
+			if (freeKnown && lastFree && !free) {
 				ImGui.clearInput();
+				ImGui.setWindowFocus((null:String));
+				typingActive = false;
+				keyboardCaptureActive = false;
+				ImGui.setKeyboardBlock(false);
+			}
 			freeKnown = true;
 			lastFree = free;
 		} catch (_:Dynamic) {}
@@ -247,6 +241,7 @@ class CursorCaptureFix {
 				ImGui.setNextFrameWantCaptureKeyboard(false);
 			}
 			mem.setI32(0, flags);
+			mem.setUI8(89, 0); // io.ConfigWindowsResizeFromEdges = false
 		} catch (_:Dynamic) {}
 	}
 

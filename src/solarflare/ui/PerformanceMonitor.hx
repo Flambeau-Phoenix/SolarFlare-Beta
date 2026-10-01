@@ -17,10 +17,10 @@ class PerformanceMonitor {
 	static var plotValues = new Bytes(MAX_SAMPLES * 4);
 
 	public static function update():Void {
-		var now = Date.now().getTime() / 1000.0;
+		var now = haxe.Timer.stamp();
 		var dt = (lastTime > 0.0) ? (now - lastTime) : 0.016;
 		lastTime = now;
-		if (dt > 0.2) dt = 0.2;
+		if (dt < 0) dt = 0;
 
 		frameTimes.push(dt);
 		if (frameTimes.length > MAX_SAMPLES)
@@ -44,7 +44,7 @@ class PerformanceMonitor {
 
 	public static function frameStats():Dynamic {
 		if (frameTimes.length == 0)
-			return {samples: 0, averageMs: 0.0, medianMs: 0.0, p95Ms: 0.0, p99Ms: 0.0};
+			return {samples: 0, averageMs: 0.0, medianMs: 0.0, p95Ms: 0.0, p99Ms: 0.0, maxMs: 0.0};
 		var sorted = frameTimes.copy();
 		sorted.sort(function(a:Float, b:Float):Int return a < b ? -1 : (a > b ? 1 : 0));
 		var sum = 0.0;
@@ -55,7 +55,8 @@ class PerformanceMonitor {
 			averageMs: sum * 1000.0 / sorted.length,
 			medianMs: percentile(sorted, 0.50),
 			p95Ms: percentile(sorted, 0.95),
-			p99Ms: percentile(sorted, 0.99)
+			p99Ms: percentile(sorted, 0.99),
+			maxMs: sorted[sorted.length - 1] * 1000
 		};
 	}
 
@@ -72,7 +73,6 @@ class PerformanceMonitor {
 	}
 
 	public static function draw():Void {
-		update();
 		if (!open.get())
 			return;
 
@@ -86,7 +86,8 @@ class PerformanceMonitor {
 				plotValues.setF32(i * 4, frameTimes[i] * 1000.0);
 			}
 
-			ImGui.plotLines("Frametime (ms)", plotValues, frameTimes.length, 0, null, 0.0, 33.3, ImGui.vec2(0, 65));
+			ImGui.plotLines("Frametime (ms)", plotValues, frameTimes.length, 0, null, 0.0,
+				Math.max(33.3, stats.maxMs), ImGui.vec2(0, 65));
 
 			ImGui.separatorText("ImGui Render Statistics");
 			var io = ImGui.getIO();
@@ -98,7 +99,10 @@ class PerformanceMonitor {
 			var m = solarflare.runtime.RuntimeMetrics;
 			UiLayout.propertyGrid("##sf_runtime_metrics", function() {
 				UiLayout.propertyRow("Frame latency", function() {
-					ImGui.text('median ${roundMs(stats.medianMs)} ms  p95 ${roundMs(stats.p95Ms)} ms  p99 ${roundMs(stats.p99Ms)} ms');
+					ImGui.text('median ${roundMs(stats.medianMs)} ms  p95 ${roundMs(stats.p95Ms)} ms  p99 ${roundMs(stats.p99Ms)} ms  max ${roundMs(stats.maxMs)} ms');
+				});
+				UiLayout.propertyRow("Cursor confinement", function() {
+					ImGui.text('${m.clipChecks} checks  ${m.clipUpdates} updates  ${m.clipReleases} releases  ${m.clipFailures} failures');
 				});
 				UiLayout.propertyRow("Hook ingress", function() {
 					ImGui.text('${m.hookEdges} edges  ${m.coalescedEdges} coalesced');

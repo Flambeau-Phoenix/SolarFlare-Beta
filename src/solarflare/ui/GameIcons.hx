@@ -47,7 +47,7 @@ class AtlasFrame {
 
 /**
  * Loads official skill/status PNGs via ImGui.registerTexture / ImGui.image.
- * IntegratesTexture Atlas support (`atlas.png` + `atlas.json`).
+ * Atlas1 contains skill art, atlas2 contains unit portraits, atlas3 contains custom UI art.
  * Callers fall back to DrawList glyphs when a PNG is missing.
  * Gate with AlertBlit.ENABLED (see docs/deadly-rift-mods/BLIT_READINESS.md).
  */
@@ -110,13 +110,23 @@ class GameIcons {
 		if (searchDirs == null)
 			return;
 		var loadedSheets = new Map<String, Bool>();
-		// Prefer assets/icons (mod-local atlas + atlas2) before legacy icons/ copies.
-		var ordered = prioritizeAssetsIcons(searchDirs);
+		for (entry in atlasLoadPlan(searchDirs))
+			tryLoadAtlasPair(entry.root, entry.stem, loadedSheets);
+	}
+
+	/** A current atlas1 selects its whole family; stale legacy sheets cannot fill it in. */
+	static function atlasLoadPlan(dirs:Array<String>):Array<{root:String, stem:String}> {
+		var ordered = prioritizeAssetsIcons(dirs);
 		for (root in ordered) {
-			tryLoadAtlasPair(root, "atlas", loadedSheets);
-			tryLoadAtlasPair(root, "atlas2", loadedSheets);
-			tryLoadAtlasPair(root, "atlas3", loadedSheets);
+			if (FileSystem.exists(Path.join([root, "atlas1.json"])) && FileSystem.exists(Path.join([root, "atlas1.png"])))
+				return [{root:root, stem:"atlas3"}, {root:root, stem:"atlas1"}, {root:root, stem:"atlas2"}];
 		}
+		// Compatibility with older installs that only have atlas.png.
+		var plan:Array<{root:String, stem:String}> = [];
+		for (root in ordered)
+			for (stem in ["atlas3", "atlas", "atlas2"])
+				plan.push({root:root, stem:stem});
+		return plan;
 	}
 
 	static function prioritizeAssetsIcons(dirs:Array<String>):Array<String> {
@@ -152,38 +162,47 @@ class GameIcons {
 
 	static function loadAtlasSheet(jsonPath:String, pngPath:String, stem:String = "atlas"):Void {
 		try {
-			var tex = loadFilePng(pngPath, stem + ":" + Path.withoutDirectory(Path.directory(pngPath)));
+			var parsed:Dynamic = haxe.Json.parse(File.getContent(jsonPath));
+			var framesObj:Dynamic = Reflect.field(parsed, "frames");
+			if (framesObj == null)
+				return;
+			var textureKey = stem + ":" + Path.withoutDirectory(Path.directory(pngPath));
+			var tex = loadFilePng(pngPath, textureKey);
 			if (tex == 0)
 				return;
 			if (atlasTex == (0:TextureHandle))
 				atlasTex = tex;
 			atlasSheetCount++;
-			var content = File.getContent(jsonPath);
-			var parsed:Dynamic = haxe.Json.parse(content);
-			var framesObj:Dynamic = Reflect.field(parsed, "frames");
-			if (framesObj == null)
-				return;
-			for (field in Reflect.fields(framesObj)) {
-				var f:Dynamic = Reflect.field(framesObj, field);
-				if (f == null)
-					continue;
-				var x:Float = Std.parseFloat(Std.string(Reflect.field(f, "x")));
-				var y:Float = Std.parseFloat(Std.string(Reflect.field(f, "y")));
-				var w:Float = Std.parseFloat(Std.string(Reflect.field(f, "w")));
-				var h:Float = Std.parseFloat(Std.string(Reflect.field(f, "h")));
-				var aw:Float = Std.parseFloat(Std.string(Reflect.field(f, "atlas_w")));
-				var ah:Float = Std.parseFloat(Std.string(Reflect.field(f, "atlas_h")));
-				var frame = new AtlasFrame(field, x, y, w, h, aw, ah, tex);
-				// First loaded sheet wins (assets/icons atlas before atlas2 before icons/).
-				if (!atlasMap.exists(field))
-					atlasMap.set(field, frame);
-				if (StringTools.endsWith(field, ".png")) {
-					var baseKey = field.substr(0, field.length - 4);
-					if (!atlasMap.exists(baseKey))
-						atlasMap.set(baseKey, frame);
-				}
-			}
+			indexAtlasFrames(framesObj, tex, dimW.get(textureKey), dimH.get(textureKey));
 		} catch (_:Dynamic) {}
+	}
+
+	/** Index source keys and aliases with their owning texture and validated UV bounds. */
+	static function indexAtlasFrames(framesObj:Dynamic, tex:TextureHandle, atlasW:Int, atlasH:Int):Void {
+		for (field in Reflect.fields(framesObj)) {
+			var f:Dynamic = Reflect.field(framesObj, field);
+			if (f == null)
+				continue;
+			var x:Float = Std.parseFloat(Std.string(Reflect.field(f, "x")));
+			var y:Float = Std.parseFloat(Std.string(Reflect.field(f, "y")));
+			var w:Float = Std.parseFloat(Std.string(Reflect.field(f, "w")));
+			var h:Float = Std.parseFloat(Std.string(Reflect.field(f, "h")));
+			var aw:Float = Std.parseFloat(Std.string(Reflect.field(f, "atlas_w")));
+			var ah:Float = Std.parseFloat(Std.string(Reflect.field(f, "atlas_h")));
+			if (!Math.isFinite(x) || !Math.isFinite(y) || !Math.isFinite(w) || !Math.isFinite(h)
+				|| aw != atlasW || ah != atlasH || x < 0 || y < 0 || w <= 0 || h <= 0
+				|| x + w > atlasW || y + h > atlasH)
+				continue;
+			var frame = new AtlasFrame(field, x, y, w, h, aw, ah, tex);
+			// Custom art is indexed first; equivalent IDs keep distinct aliases.
+			if (!atlasMap.exists(field))
+				atlasMap.set(field, frame);
+			if (StringTools.endsWith(field, ".png")) {
+				var baseKey = field.substr(0, field.length - 4);
+				if (!atlasMap.exists(baseKey))
+					atlasMap.set(baseKey, frame);
+			}
+		}
 	}
 
 	static inline function atlasHandle(frame:AtlasFrame):TextureHandle {
@@ -195,9 +214,6 @@ class GameIcons {
 	}
 
 	public static function getFrame(id:String):AtlasFrame {
-		// Branding ships beside the atlases and must not use stale packed copies.
-		if (id == CHROME_SUN || id == HUB_LOGO)
-			return null;
 		if (atlasMap != null && id != null) {
 			if (atlasMap.exists(id))
 				return atlasMap.get(id);

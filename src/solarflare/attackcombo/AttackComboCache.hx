@@ -2,7 +2,9 @@ package solarflare.attackcombo;
 
 import solarflare.FieldWalk;
 import solarflare.HealthCache;
+#if solarflare_telemetry
 import solarflare.debug.ResolutionLedger;
+#end
 
 /** Live weapon attack-chain state. This is separate from Rogue ComboPoints. */
 class AttackComboCache {
@@ -116,8 +118,16 @@ class AttackComboCache {
 		debugLine = route + " step=" + step + "/" + comboLength + " raw=" + raw + " within=" + withinCombo + (moveSetId.length > 0 ? " ms=" + moveSetId : "");
 	}
 
-	static function noteEdge(kind:String, expected:Int, raw:Int):Void { if (ResolutionLedger.armed()) ResolutionLedger.touch("ATTACK_COMBO_EDGE", "hook", "AttackComboCache.onBaseSkillStart", kind, "string", "exp=" + expected + " raw=" + raw); }
-	static function noteTarget(raw:Int, within:Bool, why:String):Void { if (ResolutionLedger.armed()) ResolutionLedger.touch("ATTACK_COMBO_TARGET", "poll", "AttackComboCache.observe", why, "string", "raw=" + raw + " within=" + within + " route=" + route); }
+	static inline function noteEdge(kind:String, expected:Int, raw:Int):Void {
+		#if solarflare_telemetry
+		if (ResolutionLedger.armed()) ResolutionLedger.touch("ATTACK_COMBO_EDGE", "hook", "AttackComboCache.onBaseSkillStart", kind, "string", "exp=" + expected + " raw=" + raw);
+		#end
+	}
+	static inline function noteTarget(raw:Int, within:Bool, why:String):Void {
+		#if solarflare_telemetry
+		if (ResolutionLedger.armed()) ResolutionLedger.touch("ATTACK_COMBO_TARGET", "poll", "AttackComboCache.observe", why, "string", "raw=" + raw + " within=" + within + " route=" + route);
+		#end
+	}
 	static function readComboCount(hero:Dynamic):Int {
 		if (hero == null) return -1;
 		try { var h:ent.Hero = cast hero; return Std.int(h.attackComboCount); } catch (_:Dynamic) {}

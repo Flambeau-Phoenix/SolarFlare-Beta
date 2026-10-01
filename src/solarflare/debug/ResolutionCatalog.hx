@@ -4,7 +4,9 @@ package solarflare.debug;
  * Semantic keys the HUD actually uses. Live hits join these so analysis can
  * flag catalog-but-never-hit vs hit-but-not-cataloged.
  */
+#if solarflare_telemetry
 @:keep
+#end
 class ResolutionDef {
 	public var key:String;
 	public var feature:String;
@@ -21,7 +23,9 @@ class ResolutionDef {
 	}
 }
 
+#if solarflare_telemetry
 @:keep
+#end
 class ResolutionCatalog {
 	static var byKey:Map<String, ResolutionDef>;
 	static var list:Array<ResolutionDef>;

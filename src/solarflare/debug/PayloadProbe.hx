@@ -10,7 +10,9 @@ import sys.io.File;
  * Opt-in FieldWalk probe. Session-only. Classify live postfix/observe objects
  * by fixed GameLib name packs. Never Std.string on Dynamic; never Reflect.fields.
  */
+#if solarflare_telemetry
 @:keep
+#end
 class PayloadProbe {
 	public static var enabled = new BoolRef(false);
 	/** Write JSONL / snapshots. Session-only; defaults off. Separate from panel open. */

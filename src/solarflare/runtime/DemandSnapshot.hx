@@ -25,8 +25,10 @@ class DemandSnapshot {
 		status = d.aurasNeedStatus;
 		auras = d.auras || d.auraBuilderOpen;
 		lightsaber = cfg != null && cfg.lightsaber != null && !cfg.lightsaber.hidden.get();
+		#if solarflare_telemetry
 		diagnostics = solarflare.debug.ResolutionLedger.armed()
 			|| solarflare.debug.PayloadProbe.armed() || solarflare.debug.FieldWalkLog.armed();
+		#end
 		encounter = d.riftFlag || diagnostics;
 	}
 }

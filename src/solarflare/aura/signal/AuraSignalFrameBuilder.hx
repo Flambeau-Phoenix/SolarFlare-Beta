@@ -194,10 +194,13 @@ class AuraSignalFrameBuilder {
 			dst.specialReadyKnown = known;
 		}
 		if (probe && instant) {
+			#if solarflare_telemetry
 			try
 				solarflare.debug.PayloadProbe.noteInstant(skillId, known, ready)
 			catch (_:Dynamic) {}
+			#end
 		}
+		#if solarflare_telemetry
 		if (instant && solarflare.debug.ResolutionLedger.armed())
 			solarflare.debug.ResolutionLedger.touch(
 				"skill.instantReady",
@@ -208,6 +211,7 @@ class AuraSignalFrameBuilder {
 				ready ? "true" : "false",
 				known ? "known" : "unknown"
 			);
+		#end
 	}
 
 	static function fillEnemyCasts(frame:AuraSignalFrame, now:Float):Void {

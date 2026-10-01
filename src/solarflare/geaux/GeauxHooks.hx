@@ -83,7 +83,8 @@ class GeauxHooks {
 		return "";
 	}
 
-	static function ledgerDrag(id:String, method:String, name:String):Void {
+	static inline function ledgerDrag(id:String, method:String, name:String):Void {
+		#if solarflare_telemetry
 		if (!solarflare.debug.ResolutionLedger.armed())
 			return;
 		solarflare.debug.ResolutionLedger.note("geaux.drag.skillId")
@@ -96,6 +97,7 @@ class GeauxHooks {
 			.tryRoute("fieldwalk", "inf.id")
 			.str(id)
 			.emit();
+		#end
 	}
 
 	/** Never Std.string Dynamic fields — Bytes become `{bytes :…}`. */

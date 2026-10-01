@@ -45,7 +45,7 @@ class AuraTimerBoard {
 			}, openBuilder, function() {
 				cfg.timerBoardHidden.set(true);
 				SettingsStore.markDirty();
-			}, cfg.unlockAll.get(), null, function(newW:Single, _:Single) {
+			}, false, null, function(newW:Single, _:Single) {
 				cfg.timerBoardW.set(Math.max(96, newW));
 				SettingsStore.markDirty();
 			});

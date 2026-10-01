@@ -85,10 +85,13 @@ class EngineSkillId {
 	}
 
 	/** One bound row per (method, name) winner; ids repeat heavily so previews are deduped. */
+	#if solarflare_telemetry
 	static var skillBinds:Map<String, solarflare.debug.LedgerBinding> = new Map();
 	static var lastSkillId:String = "";
+	#end
 
-	static function ledgerSkill(id:String, method:String, name:String):Void {
+	static inline function ledgerSkill(id:String, method:String, name:String):Void {
+		#if solarflare_telemetry
 		if (!solarflare.debug.ResolutionLedger.armed())
 			return;
 		var bindKey = method + "|" + name;
@@ -105,6 +108,7 @@ class EngineSkillId {
 			prev = solarflare.debug.ResolutionLedger.clip(id, 48);
 		}
 		solarflare.debug.ResolutionLedger.bump(b, prev);
+		#end
 	}
 
 	static function ensure():Void {

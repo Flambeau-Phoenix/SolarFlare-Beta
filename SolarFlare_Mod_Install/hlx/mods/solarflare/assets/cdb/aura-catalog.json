@@ -56,6 +56,11 @@
       "kind": "icon"
     },
     {
+      "id": "Phrixes_NightGod",
+      "name": "???",
+      "kind": "unit"
+    },
+    {
       "id": "Abigail",
       "name": "Abigail",
       "kind": "unit"
@@ -151,6 +156,11 @@
       "kind": "icon"
     },
     {
+      "id": "AddFriend",
+      "name": "Add friend",
+      "kind": "icon"
+    },
+    {
       "id": "Item_SkillPoint",
       "name": "Add skill point to a weapon",
       "kind": "icon"
@@ -239,6 +249,11 @@
       "id": "Summon_Bee",
       "name": "Angry Bee",
       "kind": "unit"
+    },
+    {
+      "id": "Phrixes_H_NG_ChaosBeam",
+      "name": "Annihilation",
+      "kind": "skill"
     },
     {
       "id": "Anubis",
@@ -446,9 +461,19 @@
       "kind": "skill"
     },
     {
+      "id": "Back",
+      "name": "Back",
+      "kind": "icon"
+    },
+    {
       "id": "Backdrop1",
       "name": "Backdrop1",
       "kind": "icon"
+    },
+    {
+      "id": "Infusion_Crimson_DPS",
+      "name": "Balance of Justice",
+      "kind": "skill"
     },
     {
       "id": "Bank",
@@ -526,6 +551,11 @@
       "kind": "skill"
     },
     {
+      "id": "Luck_Mount_Status",
+      "name": "Beastcaller",
+      "kind": "skill"
+    },
+    {
       "id": "Bee_Champion_SwiftStep",
       "name": "Bee_Champion_SwiftStep",
       "kind": "skill"
@@ -568,6 +598,11 @@
     {
       "id": "BeeRoyalGuard_HoneyBarrage",
       "name": "BeeRoyalGuard_HoneyBarrage",
+      "kind": "skill"
+    },
+    {
+      "id": "BeeRoyalGuard_HoneyBarrage_Multi",
+      "name": "BeeRoyalGuard_HoneyBarrage_Multi",
       "kind": "skill"
     },
     {
@@ -654,6 +689,11 @@
       "id": "BindConflict",
       "name": "BindConflict",
       "kind": "icon"
+    },
+    {
+      "id": "Gastbee_Heroic_Swarm_Status",
+      "name": "Biting Swarm",
+      "kind": "skill"
     },
     {
       "id": "DemonDog_Orange",
@@ -794,6 +834,16 @@
       "id": "Blocks_Test",
       "name": "Blocks_Test",
       "kind": "icon"
+    },
+    {
+      "id": "Infusion_Nightling_Tank",
+      "name": "Blood Oath",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Tank_Status",
+      "name": "Blood Oath",
+      "kind": "skill"
     },
     {
       "id": "Warrior_Talent_Bloodfeast",
@@ -1046,6 +1096,31 @@
       "kind": "skill"
     },
     {
+      "id": "R1CrabBoss_Heroic_Bubble",
+      "name": "Bubble",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_DPS_Ultimate",
+      "name": "Bubble Bullet",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_Bubble_Roam",
+      "name": "Bubble Run",
+      "kind": "skill"
+    },
+    {
+      "id": "R1CrabBoss_Heroic_Bubble_Status",
+      "name": "Bubble Shock",
+      "kind": "skill"
+    },
+    {
+      "id": "Spongeblob_Heroic_Bubble_Wall",
+      "name": "Bubble Wall",
+      "kind": "skill"
+    },
+    {
       "id": "Crimson_Z2W_Peasant_2",
       "name": "Bucolic Crimson Farmhand",
       "kind": "unit"
@@ -1181,6 +1256,26 @@
       "kind": "skill"
     },
     {
+      "id": "DA_Water_Combo_PassiveRank3",
+      "name": "Cascade's Axe",
+      "kind": "skill"
+    },
+    {
+      "id": "castbar_gilded",
+      "name": "castbar_gilded",
+      "kind": "icon"
+    },
+    {
+      "id": "castbar_obsidian",
+      "name": "castbar_obsidian",
+      "kind": "icon"
+    },
+    {
+      "id": "castbar_solar",
+      "name": "castbar_solar",
+      "kind": "icon"
+    },
+    {
       "id": "CasterManfish_Auto",
       "name": "CasterManfish_Auto",
       "kind": "skill"
@@ -1209,6 +1304,16 @@
       "id": "cfg_f7",
       "name": "cfg_f7",
       "kind": "icon"
+    },
+    {
+      "id": "Infusion_Manfish_Support",
+      "name": "Chain Heal",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Support_Ultimate_Proc",
+      "name": "Chain Heal",
+      "kind": "skill"
     },
     {
       "id": "Mage_Talent_Chaincast",
@@ -1256,6 +1361,11 @@
       "kind": "icon"
     },
     {
+      "id": "Queenslayer_ChaosAwakening",
+      "name": "Chaos Awakening",
+      "kind": "skill"
+    },
+    {
       "id": "Staff_SummonDemon_Combo",
       "name": "Chaos Bolts",
       "kind": "skill"
@@ -1268,6 +1378,21 @@
     {
       "id": "Daggers_Demondash_Mark",
       "name": "Chaos Mark",
+      "kind": "skill"
+    },
+    {
+      "id": "Queenslayer_ChaosMark",
+      "name": "Chaos Mark",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NG_ChaosMeteor",
+      "name": "Chaos Meteor",
+      "kind": "skill"
+    },
+    {
+      "id": "RiftstalkersReputation_RiftKillBuff",
+      "name": "Chaos Predator",
       "kind": "skill"
     },
     {
@@ -1291,8 +1416,23 @@
       "kind": "skill"
     },
     {
+      "id": "Queenslayer_ChaosSlow",
+      "name": "Chaos Slow",
+      "kind": "skill"
+    },
+    {
       "id": "SuperEliteDemon_Storm",
       "name": "Chaos Storm",
+      "kind": "skill"
+    },
+    {
+      "id": "Queenslayer_ChaosStrike",
+      "name": "Chaos Strike",
+      "kind": "skill"
+    },
+    {
+      "id": "RiftstalkersReputation_SoulwellVitality",
+      "name": "Chaos Vitality",
       "kind": "skill"
     },
     {
@@ -1307,11 +1447,6 @@
     },
     {
       "id": "ChaoticPortal",
-      "name": "Chaotic Portal",
-      "kind": "unit"
-    },
-    {
-      "id": "ChaoticPortalPhrixes",
       "name": "Chaotic Portal",
       "kind": "unit"
     },
@@ -1391,6 +1526,11 @@
       "kind": "skill"
     },
     {
+      "id": "Reblochonk_Heroic_CheeseExplosion",
+      "name": "Cheese Explosion",
+      "kind": "skill"
+    },
+    {
       "id": "Daggers_DuplicatePoison_ComboAttack_Status",
       "name": "Cheese-blessed",
       "kind": "skill"
@@ -1413,6 +1553,11 @@
     {
       "id": "Picker_Conduit",
       "name": "Choose a Conduit",
+      "kind": "icon"
+    },
+    {
+      "id": "Picker_Pin",
+      "name": "Choose a marker",
       "kind": "icon"
     },
     {
@@ -1536,6 +1681,16 @@
       "kind": "skill"
     },
     {
+      "id": "Cleodora_SparkAfllux_End",
+      "name": "Cleodora_SparkAfllux_End",
+      "kind": "skill"
+    },
+    {
+      "id": "Cleodora_SparkAfllux_Start",
+      "name": "Cleodora_SparkAfllux_Start",
+      "kind": "skill"
+    },
+    {
       "id": "Cleodora_SparkRayFireArea",
       "name": "Cleodora_SparkRayFireArea",
       "kind": "skill"
@@ -1621,6 +1776,11 @@
       "kind": "icon"
     },
     {
+      "id": "Collection",
+      "name": "Collection",
+      "kind": "icon"
+    },
+    {
       "id": "Rogue_ComboMax",
       "name": "Combo Master",
       "kind": "skill"
@@ -1646,23 +1806,33 @@
       "kind": "icon"
     },
     {
-      "id": "CompassEast",
-      "name": "CompassEast",
+      "id": "CompassE",
+      "name": "CompassE",
       "kind": "icon"
     },
     {
-      "id": "CompassNorth",
-      "name": "CompassNorth",
+      "id": "CompassL",
+      "name": "CompassL",
       "kind": "icon"
     },
     {
-      "id": "CompassSouth",
-      "name": "CompassSouth",
+      "id": "CompassN",
+      "name": "CompassN",
       "kind": "icon"
     },
     {
-      "id": "CompassWest",
-      "name": "CompassWest",
+      "id": "CompassO",
+      "name": "CompassO",
+      "kind": "icon"
+    },
+    {
+      "id": "CompassS",
+      "name": "CompassS",
+      "kind": "icon"
+    },
+    {
+      "id": "CompassW",
+      "name": "CompassW",
       "kind": "icon"
     },
     {
@@ -1781,8 +1951,8 @@
       "kind": "icon"
     },
     {
-      "id": "ConsumeElixir",
-      "name": "ConsumeElixir",
+      "id": "ConsumeDrink",
+      "name": "ConsumeDrink",
       "kind": "skill"
     },
     {
@@ -1816,6 +1986,11 @@
       "kind": "icon"
     },
     {
+      "id": "Phrixes_H_NG_CosmicPower",
+      "name": "Cosmic Power",
+      "kind": "skill"
+    },
+    {
       "id": "Count",
       "name": "Count",
       "kind": "skill"
@@ -1843,6 +2018,11 @@
     {
       "id": "Crab_Z1D",
       "name": "Crab of the Lost City",
+      "kind": "unit"
+    },
+    {
+      "id": "Crab_Crabgantua_Summon_Heroic",
+      "name": "Crab Summon",
       "kind": "unit"
     },
     {
@@ -2231,6 +2411,16 @@
       "kind": "skill"
     },
     {
+      "id": "Currencies",
+      "name": "Currencies",
+      "kind": "icon"
+    },
+    {
+      "id": "Infusion_Nightling_Support",
+      "name": "Cursed Link",
+      "kind": "skill"
+    },
+    {
       "id": "CursorButton",
       "name": "CursorButton",
       "kind": "icon"
@@ -2336,11 +2526,6 @@
       "kind": "skill"
     },
     {
-      "id": "DA_Water_Combo_PassiveRank3",
-      "name": "DA_Water_Combo_PassiveRank3",
-      "kind": "skill"
-    },
-    {
       "id": "DA_Water_Passive_Status",
       "name": "DA_Water_Passive_Status",
       "kind": "skill"
@@ -2423,6 +2608,21 @@
     {
       "id": "Dash_Status",
       "name": "Dash_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Dead",
+      "name": "Dead",
+      "kind": "skill"
+    },
+    {
+      "id": "Dead_Hidden",
+      "name": "Dead_Hidden",
+      "kind": "skill"
+    },
+    {
+      "id": "Dead_Resurrect",
+      "name": "Dead_Resurrect",
       "kind": "skill"
     },
     {
@@ -2576,6 +2776,11 @@
       "kind": "unit"
     },
     {
+      "id": "Phrixes_NC_Bonus",
+      "name": "Demonic Power",
+      "kind": "skill"
+    },
+    {
       "id": "Goat_Demon",
       "name": "Demonic Raminiature",
       "kind": "unit"
@@ -2666,6 +2871,11 @@
       "kind": "skill"
     },
     {
+      "id": "Queenslayer_DivideToReign",
+      "name": "Divide to Reign",
+      "kind": "skill"
+    },
+    {
       "id": "DM_Base_Attack1",
       "name": "DM_Base_Attack1",
       "kind": "skill"
@@ -2731,6 +2941,26 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_LethalPoison_Dose_ClassSkill",
+      "name": "Dose : Class Skill",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose_FCA",
+      "name": "Dose : Final Combo",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose_Finisher",
+      "name": "Dose : Signature",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose_WeaponSkill",
+      "name": "Dose : Weapon Skill",
+      "kind": "skill"
+    },
+    {
       "id": "dpstext",
       "name": "dpstext",
       "kind": "icon"
@@ -2776,6 +3006,11 @@
       "kind": "skill"
     },
     {
+      "id": "Duel",
+      "name": "Duel",
+      "kind": "icon"
+    },
+    {
       "id": "Dueling",
       "name": "Dueling",
       "kind": "skill"
@@ -2786,12 +3021,22 @@
       "kind": "unit"
     },
     {
+      "id": "Dungeon",
+      "name": "Dungeon",
+      "kind": "icon"
+    },
+    {
       "id": "DungeonFoe",
       "name": "DungeonFoe",
       "kind": "icon"
     },
     {
       "id": "Dungeons",
+      "name": "Dungeons",
+      "kind": "icon"
+    },
+    {
+      "id": "FilterDungeons",
       "name": "Dungeons",
       "kind": "icon"
     },
@@ -2843,6 +3088,11 @@
     {
       "id": "ElixirOfAbundanceStatus",
       "name": "Elixir of Abundance",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Support_Ultimate",
+      "name": "Empowered Chain Heal",
       "kind": "skill"
     },
     {
@@ -3053,6 +3303,16 @@
     {
       "id": "GA_Demon_Combo",
       "name": "Feeding the Beast",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Support",
+      "name": "Fermentation",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Support_CheeseDebuff",
+      "name": "Fermented",
       "kind": "skill"
     },
     {
@@ -3431,6 +3691,11 @@
       "kind": "skill"
     },
     {
+      "id": "GA_Craft_Passive_Proc",
+      "name": "GA_Craft_Passive_Proc",
+      "kind": "skill"
+    },
+    {
       "id": "GainItem",
       "name": "GainItem",
       "kind": "skill"
@@ -3471,9 +3736,19 @@
       "kind": "skill"
     },
     {
+      "id": "Phrixes_ChaoticPortal",
+      "name": "Gate to Niflel",
+      "kind": "unit"
+    },
+    {
       "id": "Phrixes_Demon_Summon",
       "name": "Gate to Niflel",
       "kind": "skill"
+    },
+    {
+      "id": "Phrixes_NightGodGate",
+      "name": "Gate to Niflel",
+      "kind": "unit"
     },
     {
       "id": "Gather",
@@ -3486,8 +3761,23 @@
       "kind": "unit"
     },
     {
+      "id": "Gatsbee_Auto",
+      "name": "Gatsbee_Auto",
+      "kind": "skill"
+    },
+    {
       "id": "Gatsbee_Barrage",
       "name": "Gatsbee_Barrage",
+      "kind": "skill"
+    },
+    {
+      "id": "Gatsbee_Heroic_Barrage_Bounce",
+      "name": "Gatsbee_Heroic_Barrage_Bounce",
+      "kind": "skill"
+    },
+    {
+      "id": "Gatsbee_Heroic_Barrage_Puddle",
+      "name": "Gatsbee_Heroic_Barrage_Puddle",
       "kind": "skill"
     },
     {
@@ -3526,6 +3816,31 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Nightling_DPS",
+      "name": "Gift Beyond Realities",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_AP",
+      "name": "Gift of ArmorPenetration",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_Crit",
+      "name": "Gift of CritChance",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_Fervor",
+      "name": "Gift of Fervor",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_MP",
+      "name": "Gift of SpellPenetration",
+      "kind": "skill"
+    },
+    {
       "id": "OgreManfish_Z2W_Claws_E",
       "name": "Gilliver",
       "kind": "unit"
@@ -3539,6 +3854,11 @@
       "id": "FeedbackWindow",
       "name": "Give feedback",
       "kind": "icon"
+    },
+    {
+      "id": "TODO_MOG_Merchant",
+      "name": "Glory Merchant",
+      "kind": "unit"
     },
     {
       "id": "GM_Base_Attack",
@@ -3618,6 +3938,16 @@
     {
       "id": "Golcano_Shield",
       "name": "Golcano_Shield",
+      "kind": "skill"
+    },
+    {
+      "id": "Golcano_Volcano",
+      "name": "Golcano_Volcano",
+      "kind": "skill"
+    },
+    {
+      "id": "Golcano_Volcano_Spill",
+      "name": "Golcano_Volcano_Spill",
       "kind": "skill"
     },
     {
@@ -3771,6 +4101,11 @@
       "kind": "skill"
     },
     {
+      "id": "Dungeon_OtherPlayerBonusReward",
+      "name": "Group Bonus Reward",
+      "kind": "icon"
+    },
+    {
       "id": "OgreHuman_Z2W_Peasant_E",
       "name": "Gruffy",
       "kind": "unit"
@@ -3801,12 +4136,12 @@
       "kind": "skill"
     },
     {
-      "id": "TODO_StableMaster",
+      "id": "StableMaster",
       "name": "Guild Merchant",
       "kind": "unit"
     },
     {
-      "id": "TODO_WanderingMerchant",
+      "id": "WanderingMerchant",
       "name": "Guild Merchant",
       "kind": "unit"
     },
@@ -3841,11 +4176,6 @@
       "kind": "skill"
     },
     {
-      "id": "Dungeon_LevelMax",
-      "name": "Hard",
-      "kind": "icon"
-    },
-    {
       "id": "Thrown_Seeds_Skill1",
       "name": "Harvesting Scythe",
       "kind": "skill"
@@ -3873,6 +4203,11 @@
     {
       "id": "Spear_Eruption_Passive_Status",
       "name": "Heart of the Furnace",
+      "kind": "skill"
+    },
+    {
+      "id": "Gatsbee_Heroic_Swarm",
+      "name": "Heart of the Swarm",
       "kind": "skill"
     },
     {
@@ -3921,6 +4256,16 @@
       "kind": "icon"
     },
     {
+      "id": "Dungeon_BonusReward",
+      "name": "Heroic Bonus Reward",
+      "kind": "icon"
+    },
+    {
+      "id": "Dungeon_HeroicCleared",
+      "name": "Heroic Cleared",
+      "kind": "icon"
+    },
+    {
       "id": "Staff_Censer_Passive",
       "name": "Hidden Power",
       "kind": "skill"
@@ -3936,6 +4281,11 @@
       "kind": "skill"
     },
     {
+      "id": "Hide",
+      "name": "Hide",
+      "kind": "icon"
+    },
+    {
       "id": "Phrixes",
       "name": "High Inquisitor Chakram",
       "kind": "unit"
@@ -3949,6 +4299,11 @@
       "id": "Mage_Talent_HighVoltage_Status",
       "name": "High Voltage",
       "kind": "skill"
+    },
+    {
+      "id": "HigherArrow",
+      "name": "HigherArrow",
+      "kind": "icon"
     },
     {
       "id": "HildaLambert",
@@ -3978,6 +4333,16 @@
     {
       "id": "Sword_Swarm_Passive_Swarm",
       "name": "Hive Swarm",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_DPS",
+      "name": "Hive Venom",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_DPS_Dot",
+      "name": "Hive Venom",
       "kind": "skill"
     },
     {
@@ -4026,6 +4391,11 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Bee_Support_Ultimate_Proc",
+      "name": "Honey Bomb",
+      "kind": "skill"
+    },
+    {
       "id": "CannonHoney",
       "name": "Honey Cannon",
       "kind": "unit"
@@ -4051,6 +4421,11 @@
       "kind": "unit"
     },
     {
+      "id": "Infusion_Bee_Support_Ultimate",
+      "name": "Honey Shot",
+      "kind": "skill"
+    },
+    {
       "id": "Slime_Z1W_Honey",
       "name": "Honey Slime",
       "kind": "unit"
@@ -4073,6 +4448,16 @@
     {
       "id": "HoneySlime_Auto",
       "name": "HoneySlime_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Tank_Status",
+      "name": "Honor",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Tank",
+      "name": "Honorable Defender",
       "kind": "skill"
     },
     {
@@ -4116,6 +4501,11 @@
       "kind": "skill"
     },
     {
+      "id": "Ignore",
+      "name": "Ignore",
+      "kind": "icon"
+    },
+    {
       "id": "Warrior_IgnorePain",
       "name": "Ignore Pain",
       "kind": "skill"
@@ -4151,6 +4541,11 @@
       "kind": "skill"
     },
     {
+      "id": "InLayer",
+      "name": "In Layer",
+      "kind": "icon"
+    },
+    {
       "id": "FoeStealthStatus",
       "name": "In Stealth",
       "kind": "skill"
@@ -4164,6 +4559,11 @@
       "id": "Golem_Z2W_FireExplosive_2",
       "name": "Incandescent Pyrh Golem",
       "kind": "unit"
+    },
+    {
+      "id": "InCombat",
+      "name": "InCombat",
+      "kind": "icon"
     },
     {
       "id": "Daggers_Demondash_Skill1",
@@ -4182,7 +4582,12 @@
     },
     {
       "id": "MoreInfo",
-      "name": "Informations",
+      "name": "Information",
+      "kind": "icon"
+    },
+    {
+      "id": "Gear_Infuse",
+      "name": "Infuse",
       "kind": "icon"
     },
     {
@@ -4211,6 +4616,81 @@
       "kind": "skill"
     },
     {
+      "id": "InfusionUI",
+      "name": "Infusion Crucible",
+      "kind": "icon"
+    },
+    {
+      "id": "Infusion_Bee_Support_Buff",
+      "name": "Infusion_Bee_Support_Buff",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Support_Counter",
+      "name": "Infusion_Bee_Support_Counter",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Tank_Shield",
+      "name": "Infusion_Bee_Tank_Shield",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Tank_Status",
+      "name": "Infusion_Bee_Tank_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_DPS_Magic",
+      "name": "Infusion_Crimson_DPS_Magic",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_DPS_Physical",
+      "name": "Infusion_Crimson_DPS_Physical",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_DPS_Ultimate_Counter",
+      "name": "Infusion_Manfish_DPS_Ultimate_Counter",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_DPS_Ultimate_Proc",
+      "name": "Infusion_Manfish_DPS_Ultimate_Proc",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Support_Ultimate_Counter",
+      "name": "Infusion_Manfish_Support_Ultimate_Counter",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Tank_Cooldown",
+      "name": "Infusion_Manfish_Tank_Cooldown",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Support_Shield",
+      "name": "Infusion_Nightling_Support_Shield",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Support_Status",
+      "name": "Infusion_Nightling_Support_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Support_Status_Tracker",
+      "name": "Infusion_Nightling_Support_Status_Tracker",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Tank_Summon_Auto",
+      "name": "Infusion_Nightling_Tank_Summon_Auto",
+      "kind": "skill"
+    },
+    {
       "id": "Staff_SummonDemon_Passive",
       "name": "Inner Demon",
       "kind": "skill"
@@ -4219,6 +4699,11 @@
       "id": "Fists_LightMonk_Passive",
       "name": "Inner Peace",
       "kind": "skill"
+    },
+    {
+      "id": "Inspect",
+      "name": "Inspect",
+      "kind": "icon"
     },
     {
       "id": "Rogue_Talent_IntentToKill",
@@ -4264,6 +4749,11 @@
       "id": "Invisible",
       "name": "Invisible",
       "kind": "skill"
+    },
+    {
+      "id": "GroupInvite",
+      "name": "Invite to party",
+      "kind": "icon"
     },
     {
       "id": "Golem_Z2_FS",
@@ -4411,7 +4901,7 @@
       "kind": "unit"
     },
     {
-      "id": "TODO_ProfessionTrainer",
+      "id": "ProfessionTrainer",
       "name": "Job Welldon",
       "kind": "unit"
     },
@@ -4616,9 +5106,9 @@
       "kind": "icon"
     },
     {
-      "id": "Rogue_Talent_LeechingPoison",
-      "name": "Leeching Poison",
-      "kind": "skill"
+      "id": "LeaveGroup",
+      "name": "Leave party",
+      "kind": "icon"
     },
     {
       "id": "MouseLeft",
@@ -4631,7 +5121,12 @@
       "kind": "unit"
     },
     {
-      "id": "Rogue_Talent_LethalDose",
+      "id": "Luck_LegendaryWeapon_Status",
+      "name": "Legendary Insight",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose",
       "name": "Lethal Dose",
       "kind": "skill"
     },
@@ -4653,6 +5148,11 @@
     {
       "id": "Mage_Talent_LifeCurrent",
       "name": "Life Current",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Tank",
+      "name": "Life-giving Spring",
       "kind": "skill"
     },
     {
@@ -4736,6 +5236,11 @@
       "kind": "skill"
     },
     {
+      "id": "LowerArrow",
+      "name": "LowerArrow",
+      "kind": "icon"
+    },
+    {
       "id": "Demon_Z1_Spear_Soulstone",
       "name": "Luciferrari",
       "kind": "unit"
@@ -4806,6 +5311,11 @@
       "kind": "skill"
     },
     {
+      "id": "MChuck_MadBombing",
+      "name": "Mad bombing",
+      "kind": "skill"
+    },
+    {
       "id": "GM_MassGrab_Passive",
       "name": "Mad Buzz",
       "kind": "skill"
@@ -4856,18 +5366,18 @@
       "kind": "icon"
     },
     {
-      "id": "BtnManageParty",
-      "name": "Manage Party",
-      "kind": "icon"
-    },
-    {
-      "id": "ManageGroup",
-      "name": "Manage Party",
-      "kind": "icon"
-    },
-    {
       "id": "ManfishBoss_Auto",
       "name": "ManfishBoss_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_Bubble_Roam_Status_Slow",
+      "name": "ManfishBoss_Bubble_Roam_Status_Slow",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_Totem_HealBeam",
+      "name": "ManfishBoss_Totem_HealBeam",
       "kind": "skill"
     },
     {
@@ -4911,8 +5421,43 @@
       "kind": "icon"
     },
     {
-      "id": "MapPinGreen",
-      "name": "MapPinGreen",
+      "id": "MapPinFg1",
+      "name": "MapPinFg1",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg2",
+      "name": "MapPinFg2",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg3",
+      "name": "MapPinFg3",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg4",
+      "name": "MapPinFg4",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg5",
+      "name": "MapPinFg5",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg6",
+      "name": "MapPinFg6",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg7",
+      "name": "MapPinFg7",
+      "kind": "icon"
+    },
+    {
+      "id": "MapPinFg8",
+      "name": "MapPinFg8",
       "kind": "icon"
     },
     {
@@ -4946,13 +5491,33 @@
       "kind": "skill"
     },
     {
+      "id": "MChuck_Heroic",
+      "name": "MChuck_Heroic",
+      "kind": "skill"
+    },
+    {
       "id": "MChuck_IsolatedHeal",
       "name": "MChuck_IsolatedHeal",
       "kind": "skill"
     },
     {
+      "id": "MChuck_MadBombingArea",
+      "name": "MChuck_MadBombingArea",
+      "kind": "skill"
+    },
+    {
       "id": "MChuck_SprayedFondueArea",
       "name": "MChuck_SprayedFondueArea",
+      "kind": "skill"
+    },
+    {
+      "id": "MChuck_StaticBombArea",
+      "name": "MChuck_StaticBombArea",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Support_Status",
+      "name": "Melted Cheese",
       "kind": "skill"
     },
     {
@@ -5211,6 +5776,11 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Bee_Support",
+      "name": "Nectar Balls",
+      "kind": "skill"
+    },
+    {
       "id": "Crescent_FlowerSpiral_Passive",
       "name": "Nectar-infused Blade",
       "kind": "skill"
@@ -5321,6 +5891,11 @@
       "kind": "unit"
     },
     {
+      "id": "Phrixes_H_NG_NightSalvo",
+      "name": "Night Salvo",
+      "kind": "skill"
+    },
+    {
       "id": "Phrixes_NightSalvo",
       "name": "Night Salvo",
       "kind": "skill"
@@ -5343,6 +5918,11 @@
     {
       "id": "ImpDemon_Rift_Major",
       "name": "Nightbringer Invader",
+      "kind": "unit"
+    },
+    {
+      "id": "Phrixes_Crawler",
+      "name": "Nightcrawler",
       "kind": "unit"
     },
     {
@@ -5401,8 +5981,23 @@
       "kind": "unit"
     },
     {
+      "id": "RiftstalkersReputation_Skill",
+      "name": "Nightlings' Favor",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_NightGod_NL",
+      "name": "Nightlord",
+      "kind": "unit"
+    },
+    {
       "id": "Demon_Z3W_Claws_E",
       "name": "Nightlord Asmoderator",
+      "kind": "unit"
+    },
+    {
+      "id": "Nightling_Infusion_DPS",
+      "name": "Nightlord Aspirant",
       "kind": "unit"
     },
     {
@@ -5516,6 +6111,11 @@
       "kind": "icon"
     },
     {
+      "id": "Nightling_Infusion_Tank",
+      "name": "Obedient Servant",
+      "kind": "unit"
+    },
+    {
       "id": "ObeliskMarker",
       "name": "ObeliskMarker",
       "kind": "icon"
@@ -5541,6 +6141,11 @@
       "kind": "icon"
     },
     {
+      "id": "Queenslayer_Obliterate",
+      "name": "Obliterate",
+      "kind": "skill"
+    },
+    {
       "id": "Crimson_Z2W_Bow",
       "name": "Observant Crimson Archer",
       "kind": "unit"
@@ -5554,6 +6159,11 @@
       "id": "Crimson_Z3W_Sword_E",
       "name": "Obsessive Crimson Soldier",
       "kind": "unit"
+    },
+    {
+      "id": "Offline",
+      "name": "Offline",
+      "kind": "icon"
     },
     {
       "id": "Ogre2H_Spin",
@@ -5606,6 +6216,11 @@
       "kind": "unit"
     },
     {
+      "id": "Online",
+      "name": "Online",
+      "kind": "icon"
+    },
+    {
       "id": "Phrixes_OpenRift",
       "name": "Open Rift",
       "kind": "skill"
@@ -5636,11 +6251,6 @@
       "kind": "unit"
     },
     {
-      "id": "MChuck_OrganicBomb",
-      "name": "Organic Bomb",
-      "kind": "skill"
-    },
-    {
       "id": "GS_Nova_Skill2",
       "name": "Outburst",
       "kind": "skill"
@@ -5659,6 +6269,11 @@
       "id": "FaerieBee_Z2W_GreatMace",
       "name": "Overqualified Apix Royal Guard",
       "kind": "unit"
+    },
+    {
+      "id": "Infusion_Manfish_DPS",
+      "name": "Overwhelming Tides",
+      "kind": "skill"
     },
     {
       "id": "FaerieBee_Z2W_Spear",
@@ -5688,6 +6303,11 @@
     {
       "id": "Pad_B",
       "name": "Pad_B",
+      "kind": "icon"
+    },
+    {
+      "id": "Pad_Back",
+      "name": "Pad_Back",
       "kind": "icon"
     },
     {
@@ -5726,6 +6346,16 @@
       "kind": "icon"
     },
     {
+      "id": "Pad_LB",
+      "name": "Pad_LB",
+      "kind": "icon"
+    },
+    {
+      "id": "Pad_LT",
+      "name": "Pad_LT",
+      "kind": "icon"
+    },
+    {
       "id": "Pad_R",
       "name": "Pad_R",
       "kind": "icon"
@@ -5736,8 +6366,28 @@
       "kind": "icon"
     },
     {
+      "id": "Pad_RB",
+      "name": "Pad_RB",
+      "kind": "icon"
+    },
+    {
+      "id": "Pad_RT",
+      "name": "Pad_RT",
+      "kind": "icon"
+    },
+    {
       "id": "Pad_Start",
       "name": "Pad_Start",
+      "kind": "icon"
+    },
+    {
+      "id": "Pad_X",
+      "name": "Pad_X",
+      "kind": "icon"
+    },
+    {
+      "id": "Pad_Y",
+      "name": "Pad_Y",
       "kind": "icon"
     },
     {
@@ -5786,6 +6436,16 @@
       "kind": "unit"
     },
     {
+      "id": "Infusion_Kobold_Tank",
+      "name": "Pestilential Aura",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Tank_Aura",
+      "name": "Pestilential Aura",
+      "kind": "skill"
+    },
+    {
       "id": "Mage_Blink_Mastery3",
       "name": "Phase Strike",
       "kind": "skill"
@@ -5816,6 +6476,36 @@
       "kind": "skill"
     },
     {
+      "id": "Phrixes_H_NC_Explosion",
+      "name": "Phrixes_H_NC_Explosion",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NC_Passive",
+      "name": "Phrixes_H_NC_Passive",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NC_Spawn",
+      "name": "Phrixes_H_NC_Spawn",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NG_NightSalvo_Voley",
+      "name": "Phrixes_H_NG_NightSalvo_Voley",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NG_Spawn",
+      "name": "Phrixes_H_NG_Spawn",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NGGate_Visual_Status",
+      "name": "Phrixes_H_NGGate_Visual_Status",
+      "kind": "skill"
+    },
+    {
       "id": "Phrixes_HeapsChaosHorizontal",
       "name": "Phrixes_HeapsChaosHorizontal",
       "kind": "skill"
@@ -5833,6 +6523,11 @@
     {
       "id": "Phrixes_HeapsChaosVerticalArea",
       "name": "Phrixes_HeapsChaosVerticalArea",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_NC_Bonus_Scale",
+      "name": "Phrixes_NC_Bonus_Scale",
       "kind": "skill"
     },
     {
@@ -5911,6 +6606,41 @@
       "kind": "skill"
     },
     {
+      "id": "Pilgrims_FlaskSpeed_Status",
+      "name": "Pilgrim's Stride",
+      "kind": "skill"
+    },
+    {
+      "id": "Pin0",
+      "name": "Pin0",
+      "kind": "icon"
+    },
+    {
+      "id": "Pin1",
+      "name": "Pin1",
+      "kind": "icon"
+    },
+    {
+      "id": "Pin2",
+      "name": "Pin2",
+      "kind": "icon"
+    },
+    {
+      "id": "Pin3",
+      "name": "Pin3",
+      "kind": "icon"
+    },
+    {
+      "id": "Pin4",
+      "name": "Pin4",
+      "kind": "icon"
+    },
+    {
+      "id": "Pin5",
+      "name": "Pin5",
+      "kind": "icon"
+    },
+    {
       "id": "Rabbit_Pink",
       "name": "Pink Buttontail",
       "kind": "unit"
@@ -5966,6 +6696,11 @@
       "kind": "statustype"
     },
     {
+      "id": "Poison_Dose",
+      "name": "Poison_Dose",
+      "kind": "statustype"
+    },
+    {
       "id": "Poisoned",
       "name": "Poisoned",
       "kind": "skill"
@@ -6008,6 +6743,11 @@
     {
       "id": "Halos_Totem_Passive_Status",
       "name": "Power of the Tides",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LethalDose",
+      "name": "Powerful Toxins",
       "kind": "skill"
     },
     {
@@ -6096,6 +6836,11 @@
       "kind": "unit"
     },
     {
+      "id": "Luck_PrismaticGear_Status",
+      "name": "Prismatic Fortune",
+      "kind": "skill"
+    },
+    {
       "id": "PrismaticPearl",
       "name": "Prismatic Pearl",
       "kind": "skill"
@@ -6123,6 +6868,11 @@
     {
       "id": "Priest_Talent_Prosecutor",
       "name": "Prosecutor",
+      "kind": "skill"
+    },
+    {
+      "id": "Luck_RareMaterial_Status",
+      "name": "Prospector's Eye",
       "kind": "skill"
     },
     {
@@ -6226,6 +6976,11 @@
       "kind": "skill"
     },
     {
+      "id": "Queenslayer",
+      "name": "Queenslayer",
+      "kind": "unit"
+    },
+    {
       "id": "R1CrabBoss_ChitinousExoskeleton",
       "name": "R1CrabBoss_ChitinousExoskeleton",
       "kind": "skill"
@@ -6233,6 +6988,11 @@
     {
       "id": "R1CrabBoss_ChitinousExoskeleton_Spike",
       "name": "R1CrabBoss_ChitinousExoskeleton_Spike",
+      "kind": "skill"
+    },
+    {
+      "id": "R1CrabBoss_Heroic_Avalanche",
+      "name": "R1CrabBoss_Heroic_Avalanche",
       "kind": "skill"
     },
     {
@@ -6396,6 +7156,16 @@
       "kind": "skill"
     },
     {
+      "id": "Ratsar_Heroic_Attack_Bleed",
+      "name": "Ratsar_Heroic_Attack_Bleed",
+      "kind": "skill"
+    },
+    {
+      "id": "Ratsar_Heroic_Burn",
+      "name": "Ratsar_Heroic_Burn",
+      "kind": "skill"
+    },
+    {
       "id": "Ratsar_KingRageFailState",
       "name": "Ratsar_KingRageFailState",
       "kind": "skill"
@@ -6446,6 +7216,16 @@
       "kind": "unit"
     },
     {
+      "id": "Rogue_Talent_LeechingPoison",
+      "name": "Recovery Toxins",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_LeechingPoison_Status",
+      "name": "Recovery Toxins",
+      "kind": "skill"
+    },
+    {
       "id": "DemonDog_Red",
       "name": "Red Demodoggo",
       "kind": "unit"
@@ -6471,11 +7251,6 @@
       "kind": "unit"
     },
     {
-      "id": "Rogue_Talent_RegeneratingMiasmas",
-      "name": "Regenerating Miasmas",
-      "kind": "skill"
-    },
-    {
       "id": "OgreKobold_Z2W_Claws",
       "name": "Reliable Kobold Docker",
       "kind": "unit"
@@ -6486,6 +7261,16 @@
       "kind": "skill"
     },
     {
+      "id": "Reputation",
+      "name": "Reputations",
+      "kind": "icon"
+    },
+    {
+      "id": "ReputationUnknown",
+      "name": "ReputationUnknown",
+      "kind": "icon"
+    },
+    {
       "id": "GA_Demon_Passive",
       "name": "Resilience of the Unkillable Demon King",
       "kind": "skill"
@@ -6493,6 +7278,11 @@
     {
       "id": "GA_Demon_Passive_Status",
       "name": "Resilience of the Unkillable Demon King",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Tank",
+      "name": "Resine Armor",
       "kind": "skill"
     },
     {
@@ -6518,6 +7308,11 @@
     {
       "id": "Resurrect",
       "name": "Resurrect",
+      "kind": "skill"
+    },
+    {
+      "id": "Resurrected",
+      "name": "Resurrected",
       "kind": "skill"
     },
     {
@@ -6554,6 +7349,11 @@
       "id": "Sprout_Rice_Z2W",
       "name": "Rice Seedling",
       "kind": "unit"
+    },
+    {
+      "id": "Phrixes_H_NG_Status",
+      "name": "Rift bound",
+      "kind": "skill"
     },
     {
       "id": "rift-sun",
@@ -6616,6 +7416,21 @@
       "kind": "unit"
     },
     {
+      "id": "RobinHoof_Heroic_Caltrops",
+      "name": "RobinHoof_Heroic_Caltrops",
+      "kind": "skill"
+    },
+    {
+      "id": "RobinHoof_Heroic_Caltrops_Slow",
+      "name": "RobinHoof_Heroic_Caltrops_Slow",
+      "kind": "skill"
+    },
+    {
+      "id": "RobinHoof_Heroic_Dog_Buff",
+      "name": "RobinHoof_Heroic_Dog_Buff",
+      "kind": "skill"
+    },
+    {
       "id": "RobinHoof_Summon",
       "name": "RobinHoof_Summon",
       "kind": "skill"
@@ -6666,8 +7481,18 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_CripplingPoison_Status",
+      "name": "Rogue_Talent_CripplingPoison_Status",
+      "kind": "skill"
+    },
+    {
       "id": "Rogue_Talent_CripplingPoison_Tracker",
       "name": "Rogue_Talent_CripplingPoison_Tracker",
+      "kind": "icon"
+    },
+    {
+      "id": "Rogue_Talent_ImprovedMixture_Status",
+      "name": "Rogue_Talent_ImprovedMixture_Status",
       "kind": "skill"
     },
     {
@@ -6702,6 +7527,11 @@
     },
     {
       "id": "FaerieBee_Z1D_GreatMace",
+      "name": "Royal Guard of the Hivetree",
+      "kind": "unit"
+    },
+    {
+      "id": "Mokshi_Heroic_Summon",
       "name": "Royal Guard of the Hivetree",
       "kind": "unit"
     },
@@ -6841,6 +7671,21 @@
       "kind": "unit"
     },
     {
+      "id": "Infusion_Crimson_Support_Peace",
+      "name": "Seal of Peace",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Support_Wrath",
+      "name": "Seal of Wrath",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Support",
+      "name": "Seals of Atonement",
+      "kind": "skill"
+    },
+    {
       "id": "Scepter_Flamie_Combo",
       "name": "Searing Furnace",
       "kind": "skill"
@@ -6886,6 +7731,11 @@
       "kind": "icon"
     },
     {
+      "id": "SendMessage",
+      "name": "Send message",
+      "kind": "icon"
+    },
+    {
       "id": "Kobold_Z2W_Mace",
       "name": "Senior Kobold Miner",
       "kind": "unit"
@@ -6902,6 +7752,16 @@
     },
     {
       "id": "BtnPause",
+      "name": "Settings",
+      "kind": "icon"
+    },
+    {
+      "id": "Settings",
+      "name": "Settings",
+      "kind": "icon"
+    },
+    {
+      "id": "SocialSettings",
       "name": "Settings",
       "kind": "icon"
     },
@@ -6971,6 +7831,21 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Crimson_Tank_Skill",
+      "name": "Shield of Honor",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Tank_Skill_Proc",
+      "name": "Shield of Honor",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_Tank_Skill_Recharging",
+      "name": "Shield of Honor cooldown",
+      "kind": "skill"
+    },
+    {
       "id": "ShieldPotion_Status",
       "name": "Shield Potion",
       "kind": "skill"
@@ -6978,6 +7853,11 @@
     {
       "id": "PunchingBagShield",
       "name": "Shielded",
+      "kind": "unit"
+    },
+    {
+      "id": "MedalogGloryTrader",
+      "name": "Shiro James",
       "kind": "unit"
     },
     {
@@ -7023,6 +7903,16 @@
     {
       "id": "Shop",
       "name": "Shop",
+      "kind": "icon"
+    },
+    {
+      "id": "ShowCurrencies",
+      "name": "Show Currencies",
+      "kind": "icon"
+    },
+    {
+      "id": "ShowInventory",
+      "name": "Show Items",
       "kind": "icon"
     },
     {
@@ -7261,6 +8151,16 @@
       "kind": "unit"
     },
     {
+      "id": "BtnSocial",
+      "name": "Social",
+      "kind": "icon"
+    },
+    {
+      "id": "Social",
+      "name": "Social",
+      "kind": "icon"
+    },
+    {
       "id": "Priest_Talent_SolarDevotion",
       "name": "Solar Devotion",
       "kind": "skill"
@@ -7301,6 +8201,11 @@
       "kind": "icon"
     },
     {
+      "id": "Soulwell",
+      "name": "Soulwell",
+      "kind": "icon"
+    },
+    {
       "id": "Ratsar_SparkAbsorption",
       "name": "Spark Absorption",
       "kind": "skill"
@@ -7324,6 +8229,11 @@
       "id": "Warrior_Talent_InfusedWound_Status",
       "name": "Spark Hemorrhage",
       "kind": "skill"
+    },
+    {
+      "id": "Scrap",
+      "name": "Spark Recycler",
+      "kind": "icon"
     },
     {
       "id": "Mage_ShieldOfSpark",
@@ -7556,6 +8466,11 @@
       "kind": "skill"
     },
     {
+      "id": "SpeedBoost",
+      "name": "SpeedBoost",
+      "kind": "skill"
+    },
+    {
       "id": "Spirit_Z2W_Claws2",
       "name": "Spirit of Night",
       "kind": "unit"
@@ -7603,6 +8518,21 @@
     {
       "id": "Spongeblob_Auto",
       "name": "Spongeblob_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "Spongeblob_Dance_DoubleJump",
+      "name": "Spongeblob_Dance_DoubleJump",
+      "kind": "skill"
+    },
+    {
+      "id": "Spongeblob_Dance_High",
+      "name": "Spongeblob_Dance_High",
+      "kind": "skill"
+    },
+    {
+      "id": "Spongeblob_Dance_Low",
+      "name": "Spongeblob_Dance_Low",
       "kind": "skill"
     },
     {
@@ -7716,6 +8646,11 @@
       "kind": "statustype"
     },
     {
+      "id": "MChuck_StaticBomb",
+      "name": "Static Bomb",
+      "kind": "skill"
+    },
+    {
       "id": "Mage_StaticNova_Status_M1",
       "name": "Static Drag",
       "kind": "skill"
@@ -7743,6 +8678,16 @@
     {
       "id": "FoeStealth",
       "name": "Stealthy",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Tank_Debuff",
+      "name": "Stench",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Kobold_Tank_Status",
+      "name": "Stench",
       "kind": "skill"
     },
     {
@@ -7791,6 +8736,11 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Nightling_DPS_Summon_Auto",
+      "name": "Strike",
+      "kind": "skill"
+    },
+    {
       "id": "SuperEliteDemon_Auto",
       "name": "Strike",
       "kind": "skill"
@@ -7799,31 +8749,6 @@
       "id": "Stun",
       "name": "Stun",
       "kind": "statustype"
-    },
-    {
-      "id": "Style2_0Combo",
-      "name": "Style2_0Combo",
-      "kind": "icon"
-    },
-    {
-      "id": "Style2_1Combo",
-      "name": "Style2_1Combo",
-      "kind": "icon"
-    },
-    {
-      "id": "Style2_2Combo",
-      "name": "Style2_2Combo",
-      "kind": "icon"
-    },
-    {
-      "id": "Style2_3Combo",
-      "name": "Style2_3Combo",
-      "kind": "icon"
-    },
-    {
-      "id": "Style2_4FullCombo",
-      "name": "Style2_4FullCombo",
-      "kind": "icon"
     },
     {
       "id": "Style_01ComboAttack",
@@ -7854,6 +8779,11 @@
       "id": "FaerieDemon_Rift_Caster",
       "name": "Subjugator Invader",
       "kind": "unit"
+    },
+    {
+      "id": "Spongeblob_Suffocation",
+      "name": "Suffocation",
+      "kind": "skill"
     },
     {
       "id": "FilterSuggestedActivities",
@@ -8011,6 +8941,11 @@
       "kind": "icon"
     },
     {
+      "id": "Symbiosis",
+      "name": "Symbiosis",
+      "kind": "icon"
+    },
+    {
       "id": "Sword_Craft_Combo",
       "name": "Tactician Assault",
       "kind": "skill"
@@ -8081,6 +9016,16 @@
       "kind": "icon"
     },
     {
+      "id": "Mokshi_Heroic_Last_Stand",
+      "name": "The Last Queen",
+      "kind": "skill"
+    },
+    {
+      "id": "Cleodora_Heroic_Dark_Champion",
+      "name": "The Usurper",
+      "kind": "unit"
+    },
+    {
       "id": "ThinBackDrop",
       "name": "ThinBackDrop",
       "kind": "icon"
@@ -8116,7 +9061,17 @@
       "kind": "icon"
     },
     {
+      "id": "Infusion_Manfish_Tank_Shield",
+      "name": "Tidal Bulwark",
+      "kind": "skill"
+    },
+    {
       "id": "R1CrabBoss_TidalSlash",
+      "name": "Tidal Slash",
+      "kind": "skill"
+    },
+    {
+      "id": "R1CrabBoss_TidalSlash_Heroic",
       "name": "Tidal Slash",
       "kind": "skill"
     },
@@ -8124,6 +9079,11 @@
       "id": "Halos_Totem_Skill",
       "name": "Tidal Totem",
       "kind": "skill"
+    },
+    {
+      "id": "Nepsilon_Totem",
+      "name": "Tidal Totem",
+      "kind": "unit"
     },
     {
       "id": "Totem_BeaconOfHope",
@@ -8136,7 +9096,7 @@
       "kind": "unit"
     },
     {
-      "id": "Spongblob_Skill1",
+      "id": "Spongeblob_Skill1",
       "name": "Tidal Whirlwind",
       "kind": "skill"
     },
@@ -8147,6 +9107,11 @@
     },
     {
       "id": "Book_WaterOrbs_Rise_Charge",
+      "name": "Tide",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Tank_Status",
       "name": "Tide",
       "kind": "skill"
     },
@@ -8176,9 +9141,24 @@
       "kind": "unit"
     },
     {
+      "id": "Lizard_Shop_Dragon",
+      "name": "TODO",
+      "kind": "unit"
+    },
+    {
+      "id": "Phrixes_H_NGGate_Beam",
+      "name": "TODO",
+      "kind": "skill"
+    },
+    {
       "id": "Turtle_Grey",
       "name": "Tortrock",
       "kind": "unit"
+    },
+    {
+      "id": "Rogue_Talent_RegeneratingMiasmas",
+      "name": "Toxic Miasmas",
+      "kind": "skill"
     },
     {
       "id": "Dog_Z3W_RamPatrol08",
@@ -8286,6 +9266,11 @@
       "kind": "icon"
     },
     {
+      "id": "Unignore",
+      "name": "Unignore",
+      "kind": "icon"
+    },
+    {
       "id": "UnknownActivity",
       "name": "UnknownActivity",
       "kind": "icon"
@@ -8304,6 +9289,11 @@
       "id": "Kobold_Z1W_Caster_2",
       "name": "Unpredictable Kobold Overseer",
       "kind": "unit"
+    },
+    {
+      "id": "Infusion_Kobold_DPS",
+      "name": "Unstable Bomblets",
+      "kind": "skill"
     },
     {
       "id": "Spear_Goo_Passive",
@@ -8356,8 +9346,13 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_VenomInfusion_Status",
+      "name": "Venom Infusion",
+      "kind": "skill"
+    },
+    {
       "id": "Rogue_Talent_VenomousFinisher",
-      "name": "Venomous Finisher",
+      "name": "Venomous Assassin",
       "kind": "skill"
     },
     {
@@ -8374,6 +9369,16 @@
       "id": "VesselPotion_Status",
       "name": "VesselPotion_Status",
       "kind": "skill"
+    },
+    {
+      "id": "Dungeon_LevelMax",
+      "name": "Veteran",
+      "kind": "icon"
+    },
+    {
+      "id": "Dungeon_VeteranCleared",
+      "name": "Veteran Cleared",
+      "kind": "icon"
     },
     {
       "id": "Crimson_Z3W_Daggers_2",
@@ -8397,7 +9402,12 @@
     },
     {
       "id": "Rogue_Talent_VirulentMagic",
-      "name": "Virulent Magic",
+      "name": "Virulent Contamination",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_VirulentMagic_Status",
+      "name": "Virulent Contamination",
       "kind": "skill"
     },
     {
@@ -8511,8 +9521,18 @@
       "kind": "skill"
     },
     {
+      "id": "ManfishBoss_Bubble_Roam_Status",
+      "name": "Water Scar",
+      "kind": "skill"
+    },
+    {
       "id": "Book_WaterOrbs_Passive",
       "name": "Water Veil",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_WaterVolley",
+      "name": "Water Volley",
       "kind": "skill"
     },
     {
@@ -8651,6 +9671,11 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Manfish_DPS_Status",
+      "name": "Wet",
+      "kind": "skill"
+    },
+    {
       "id": "Whetstone_Status",
       "name": "Whetstone_Status",
       "kind": "skill"
@@ -8668,6 +9693,11 @@
     {
       "id": "GS_Nova_Skill1",
       "name": "Wild Whirlwind",
+      "kind": "skill"
+    },
+    {
+      "id": "Luck_Glider_Status",
+      "name": "Windborn",
       "kind": "skill"
     },
     {

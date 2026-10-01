@@ -161,6 +161,7 @@ class GetRiftyCache {
 
 			inInstance = riftFlag;
 
+			#if solarflare_telemetry
 			if (solarflare.debug.ResolutionLedger.armed()) {
 				var method = "typed";
 				var name = "isRift";
@@ -170,6 +171,7 @@ class GetRiftyCache {
 				}
 				solarflare.debug.ResolutionLedger.touch("getrifty.inInstance", method, "GetRiftyCache.observeApp", name, "bool", inInstance ? "true" : "false");
 			}
+			#end
 
 			if (inInstance) {
 				var bossId:String = null;
@@ -202,8 +204,10 @@ class GetRiftyCache {
 				}
 				if (bossId != null && bossId.length > 0) {
 					targetBossId = bossId;
+					#if solarflare_telemetry
 					if (solarflare.debug.ResolutionLedger.armed())
 						solarflare.debug.ResolutionLedger.touch("getrifty.targetBossId", "typed", "st.activity.Rift", "targetBossId", "String", bossId);
+					#end
 				}
 
 				if (left < 0) {
@@ -212,13 +216,17 @@ class GetRiftyCache {
 				if (left > 0) {
 					remainingTime = left;
 					instanceRemainText = formatRemain(left);
+					#if solarflare_telemetry
 					if (solarflare.debug.ResolutionLedger.armed())
 						solarflare.debug.ResolutionLedger.touch("getrifty.remain", "typed", "st.activity.RiftContext", "getRemainingTime", "number", Std.string(Math.round(left * 1000) / 1000));
+					#end
 				}
 
+				#if solarflare_telemetry
 				if (solarflare.debug.ResolutionLedger.armed()) {
 					solarflare.debug.ResolutionLedger.touch("getrifty.inBossFight", "typed", "st.activity.RiftContext", "inBossFight", "bool", inBossFight ? "true" : "false");
 				}
+				#end
 			}
 		} catch (_:Dynamic) {}
 	}
@@ -551,9 +559,9 @@ class GetRiftyOverlay {
 		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
 		| ImGuiWindowFlags.NoBackground;
 	static inline var RAYS:Int = 16;
+	static inline var RESIZE_FOOTER:Single = solarflare.ui.HudChrome.RESIZE_GRIP + 4;
 
 	/** Prior frame's real window width — edge-drag delta feeds cfg.size. */
-	var lastWinW:Single = 0;
 
 	var theme:Theme;
 
@@ -582,17 +590,22 @@ class GetRiftyOverlay {
 		var winW:Single = size;
 		var winH:Single = size + bannerH;
 
-		// The strip sits above the sun; grow the window so the art keeps its configured size.
+		// Keep the sun's configured size; chrome and its resize footer are extra height.
 		var stripH:Single = solarflare.ui.HudChrome.STRIP + 2;
+		var footerH:Single = cfg.chrome != null ? RESIZE_FOOTER : 0;
+		var collapsed = cfg.chrome != null && cfg.chrome.isCollapsed();
 		ImGui.setNextWindowBgAlpha(0);
-		ImGui.setNextWindowSizeConstraints(ImGui.vec2(GetRiftyConfig.MIN_SIZE, GetRiftyConfig.MIN_SIZE),
-			ImGui.vec2(GetRiftyConfig.MAX_SIZE, GetRiftyConfig.MAX_SIZE + 60 + stripH));
+		ImGui.setNextWindowSizeConstraints(
+			ImGui.vec2(collapsed ? solarflare.ui.HudChrome.SUN + solarflare.ui.HudChrome.CLOSE + 18 : GetRiftyConfig.MIN_SIZE,
+				collapsed ? solarflare.ui.HudChrome.STRIP + 6 : GetRiftyConfig.MIN_SIZE + stripH + footerH),
+			ImGui.vec2(GetRiftyConfig.MAX_SIZE, GetRiftyConfig.MAX_SIZE + 60 + stripH + footerH));
+		if (cfg.chrome != null && cfg.chrome.takeExpandDirty())
+			cfg.sizeDirty = true;
 		if (cfg.sizeDirty) {
-			ImGui.setNextWindowSize(ImGui.vec2(winW, winH + stripH), ImGuiCond.Always);
+			ImGui.setNextWindowSize(ImGui.vec2(winW, winH + stripH + footerH), ImGuiCond.Always);
 			cfg.sizeDirty = false;
-			lastWinW = 0;
 		} else {
-			ImGui.setNextWindowSize(ImGui.vec2(winW, winH + stripH), ImGuiCond.FirstUseEver);
+			ImGui.setNextWindowSize(ImGui.vec2(winW, winH + stripH + footerH), ImGuiCond.FirstUseEver);
 			ImGui.setNextWindowPos(ImGui.vec2(40, 40), ImGuiCond.FirstUseEver);
 		}
 		if (cfg.chrome != null) {
@@ -600,30 +613,18 @@ class GetRiftyOverlay {
 			cfg.chrome.applyPos();
 		}
 
-		var flags = cfg.chrome != null ? cfg.chrome.windowFlags(FLAGS) : FLAGS;
+		var flags = cfg.chrome != null ? cfg.chrome.windowFlagsKeepClicks(FLAGS) : FLAGS;
 		flags |= ImGuiWindowFlags.NoSavedSettings;
 		var began = ImGui.begin("SolarFlare GetRifty", null, flags);
 		if (began) {
 			if (cfg.chrome == null || !cfg.chrome.isLocked()) {
-				// Edge-drag delta drives the art size; the strip covers the top border.
-				var win = ImGui.getWindowSize();
-				if (lastWinW > 0 && Math.abs(win.x - lastWinW) > 1) {
-					var next:Single = size + (win.x - lastWinW);
-					if (next < GetRiftyConfig.MIN_SIZE)
-						next = GetRiftyConfig.MIN_SIZE;
-					if (next > GetRiftyConfig.MAX_SIZE)
-						next = GetRiftyConfig.MAX_SIZE;
-					cfg.size.set(next);
-					SettingsStore.markDirty();
-				}
-				lastWinW = win.x;
 				if (cfg.chrome != null)
 					cfg.chrome.capturePos();
 			}
 			if (cfg.chrome == null || cfg.chrome.beginBody(function() {
 				cfg.hidden.set(true);
 				SettingsStore.markDirty();
-			}, null, "GetRifty")) {
+			}, null, "GetRifty", false, ImGuiWindowFlags.NoScrollWithMouse, 0, footerH)) {
 			var origin = ImGui.getCursorScreenPos();
 			// Reserve body size with a real item first — GameIcons.draw uses SetCursorScreenPos.
 			ImGui.dummy(ImGui.vec2(winW, winH));
@@ -655,6 +656,20 @@ class GetRiftyOverlay {
 			// Settle cursor with an item so EndChild does not see a bare SetCursorScreenPos extend.
 			ImGui.setCursorScreenPos(settle);
 			ImGui.dummy(ImGui.vec2(1, 1));
+			}
+			if (cfg.chrome != null) {
+				cfg.chrome.closeBodyChild();
+				cfg.chrome.drawResizeCorner("getrifty", !cfg.chrome.isLocked(),
+					GetRiftyConfig.MIN_SIZE, GetRiftyConfig.MIN_SIZE + stripH + footerH,
+					GetRiftyConfig.MAX_SIZE, GetRiftyConfig.MAX_SIZE + 60 + stripH + footerH,
+					function(outerW:Single, _:Single) {
+						var next:Single = Math.max(GetRiftyConfig.MIN_SIZE,
+							Math.min(GetRiftyConfig.MAX_SIZE, outerW));
+						cfg.size.set(next);
+						ImGui.setWindowSize(ImGui.vec2(next, next + bannerH + stripH + footerH));
+						SettingsStore.markDirty();
+					});
+				cfg.chrome.pollTransparentSurfaceDrag("getrifty", !cfg.chrome.isLocked());
 			}
 		}
 		solarflare.ui.HudChrome.endOverlayWindow(began, cfg.chrome);

@@ -1,6 +1,8 @@
 ﻿package solarflare.debug;
 
+#if solarflare_telemetry
 @:keep
+#end
 class PayloadSnap {
 	public var src:String = "";
 	public var pack:String = "";

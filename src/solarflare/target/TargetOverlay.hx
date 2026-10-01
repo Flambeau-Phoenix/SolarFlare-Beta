@@ -73,12 +73,6 @@ class TargetOverlay {
 		}
 		snap.copyFrom(CombatLogCache.currentTargetSnap());
 		castSnap.copyFrom(CastCache.targetSnap());
-		if (cfg.bossesOnly.get() && snap.valid) {
-			if (!snap.isBoss && !snap.isMiniboss && !snap.isElite) {
-				snap.valid = false;
-				touchDraw("filtered", snap.name, snap.kind, false, 0, 0);
-			}
-		}
 		if (!snap.valid && !cfg.alwaysShow.get()) {
 			touchDraw("empty", "", "", false, 0, 0);
 			return;
@@ -144,17 +138,18 @@ class TargetOverlay {
 					Math.max(1, ImGui.getContentRegionAvail().x - pad * 2), castH);
 			}
 		} catch (_:Dynamic) {}
-		if (began)
-			ImGui.end();
+		ImGui.end();
 	}
 
-	static function touchDraw(method:String, name:String, kind:String, hasIcon:Bool, bw:Single, bh:Single):Void {
+	static inline function touchDraw(method:String, name:String, kind:String, hasIcon:Bool, bw:Single, bh:Single):Void {
+		#if solarflare_telemetry
 		if (!solarflare.debug.ResolutionLedger.armed())
 			return;
 		var preview = (name != null ? name : "") + "|" + (kind != null ? kind : "")
 			+ "|" + (hasIcon ? "icon" : "noIcon") + "|" + Std.int(bw) + "x" + Std.int(bh);
 		solarflare.debug.ResolutionLedger.touch("target.draw", method, "TargetOverlay.draw",
 			name != null ? name : "", "string", preview);
+		#end
 	}
 
 	function drawBody(cfg:TargetConfig, w:Single, h:Single):Void {

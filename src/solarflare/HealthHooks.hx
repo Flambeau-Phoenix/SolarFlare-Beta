@@ -6,6 +6,7 @@ import solarflare.conduit.Conduit;
 import solarflare.HealthCache;
 
 /** Latched health.current / health.max rows for one ledgerHp emit site. */
+#if solarflare_telemetry
 class HpBinds {
 	public var cur = new solarflare.debug.LedgerBinding();
 	public var max = new solarflare.debug.LedgerBinding();
@@ -13,6 +14,7 @@ class HpBinds {
 
 	public function new() {}
 }
+#end
 
 /**
  * Ring-1 postfix + Layer 1 resource poll. ImGui draws from HealthCache only.
@@ -141,8 +143,10 @@ class HealthHooks {
 			var hp = FieldWalk.extractNumber(heroDyn, "health", Math.NaN);
 			var maxHp = FieldWalk.extractNumber(heroDyn, "maxHealth", Math.NaN);
 			HealthCache.set(hp, maxHp);
+			#if solarflare_telemetry
 			ledgerHp("fieldwalk", src, hp, maxHp, "health",
 				solarflare.debug.ResolutionLedger.fieldStep(heroDyn, "health"), hook, "ent.Hero", role);
+			#end
 		}
 	}
 
@@ -202,6 +206,7 @@ class HealthHooks {
 		if (uid == null)
 			uid = "";
 		HealthCache.setIdentity(name, region, uid);
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed()) {
 			var L = solarflare.debug.ResolutionLedger;
 			if (name.length > 0)
@@ -211,6 +216,7 @@ class HealthHooks {
 			if (uid.length > 0)
 				L.touch("identity.playerUid", "typed", "HealthHooks.sampleIdentity", "uid", "string", L.clip(uid, 48));
 		}
+		#end
 	}
 
 	static function playerUidOf(obj:Dynamic):String {
@@ -277,8 +283,10 @@ class HealthHooks {
 			try
 				slots = priest.getAvailablePrayerSlots()
 			catch (_:Dynamic) {}
+			#if solarflare_telemetry
 			if (solarflare.debug.ResolutionLedger.armed())
 				solarflare.debug.ResolutionLedger.touch("prayer.ready", "typed", "HealthHooks.samplePrayers", "getChargedPrayerCount", "number", Std.string(charged));
+			#end
 			PrayerCache.notePriest(charged, slots);
 		} catch (_:Dynamic) {
 			PrayerCache.clear();
@@ -610,11 +618,13 @@ class HealthHooks {
 		if (id == null || id.length == 0 || id == "0")
 			return;
 		HealthCache.setCharacterId(id);
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed()) {
 			var L = solarflare.debug.ResolutionLedger;
 			L.touch("identity.characterId", "typed", "HealthHooks.sampleCharacterId",
 				"GameApp.connectionInfo.heroID", "haxe.Int64", L.clip(id, 48));
 		}
+		#end
 	}
 
 	/**
@@ -979,8 +989,10 @@ class HealthHooks {
 	static function applyChainRemain(item:Dynamic):Void {
 		var dur = solarflare.SkillRemain.read(item);
 		ChaincastCache.setRemain(dur.left, dur.progress, dur.valid);
+		#if solarflare_telemetry
 		if (!dur.valid)
 			solarflare.debug.PayloadProbe.captureStatus(item);
+		#end
 	}
 
 	static function detectMageConduit(heroDyn:Dynamic):Bool {
@@ -1008,11 +1020,14 @@ class HealthHooks {
 	public static inline function hookInflictDamage(self:Dynamic, dmgObj:Dynamic):Void onInflictDamage(self, dmgObj);
 
 	/** Two bound rows per emit site; hp/max previews only rebuild when the value moves. */
+	#if solarflare_telemetry
 	static var hpBinds:Map<String, HpBinds> = new Map();
 	static var lastHpMilli:Int = -1;
 	static var lastMaxHpMilli:Int = -1;
+	#end
 
-	static function ledgerHp(method:String, src:String, hp:Float, maxHp:Float, name:String, step:String, hook:String, payloadType:String, role:String):Void {
+	static inline function ledgerHp(method:String, src:String, hp:Float, maxHp:Float, name:String, step:String, hook:String, payloadType:String, role:String):Void {
+		#if solarflare_telemetry
 		if (!solarflare.debug.ResolutionLedger.armed())
 			return;
 		var L = solarflare.debug.ResolutionLedger;
@@ -1041,17 +1056,22 @@ class HealthHooks {
 			}
 			L.bump(b.max, prev);
 		}
+		#end
 	}
 
-	static function ledgerIdent(method:String, src:String, name:String, hook:String, payloadType:String, role:String):Void {
+	static inline function ledgerIdent(method:String, src:String, name:String, hook:String, payloadType:String, role:String):Void {
+		#if solarflare_telemetry
 		if (!solarflare.debug.ResolutionLedger.armed())
 			return;
 		solarflare.debug.ResolutionLedger.touch("identity.localHero", method, src, name, "bool", "true", "", hook);
+		#end
 	}
 
-	static function ledgerNum(key:String, method:String, src:String, name:String, v:Float, payloadType:String, role:String):Void {
+	static inline function ledgerNum(key:String, method:String, src:String, name:String, v:Float, payloadType:String, role:String):Void {
+		#if solarflare_telemetry
 		if (!solarflare.debug.ResolutionLedger.armed())
 			return;
 		solarflare.debug.ResolutionLedger.touch(key, method, src, name, "number", Std.string(Math.round(v * 1000) / 1000));
+		#end
 	}
 }

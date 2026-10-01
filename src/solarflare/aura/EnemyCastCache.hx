@@ -41,10 +41,12 @@ class EnemyCastCache {
 			liveSkills[i] = skill;
 			bumpToFront(i);
 		}
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed()) {
 			solarflare.debug.ResolutionLedger.touch("enemy.cast.skillId", "typed", "EnemyCastCache.noteStart", "skillId", "string", sid);
 			solarflare.debug.ResolutionLedger.touch("enemy.cast.active", "typed", "EnemyCastCache.noteStart", "active", "bool", "true");
 		}
+		#end
 	}
 
 	public static function noteStop(skill:Dynamic):Void {
@@ -169,11 +171,13 @@ class EnemyCastCache {
 		}
 	}
 
-	static function ledgerAge(sid:String, i:Int):Void {
+	static inline function ledgerAge(sid:String, i:Int):Void {
+		#if solarflare_telemetry
 		if (!solarflare.debug.ResolutionLedger.armed() || i < 0 || i >= startedAt.length)
 			return;
 		var age = haxe.Timer.stamp() - startedAt[i];
 		solarflare.debug.ResolutionLedger.touch("enemy.cast.active", "typed", "EnemyCastCache.noteStop", "active", "bool", "false");
 		solarflare.debug.ResolutionLedger.touch("enemy.cast.age", "typed", "EnemyCastCache", "age", "number", Std.string(Math.round(age * 1000) / 1000));
+		#end
 	}
 }

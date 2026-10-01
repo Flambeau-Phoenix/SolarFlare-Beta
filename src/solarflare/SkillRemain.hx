@@ -339,10 +339,13 @@ class SkillRemain {
 	}
 
 	/** One binding per (method, name) winner; the ladder only ever uses a handful. */
+	#if solarflare_telemetry
 	static var remainBinds:Map<String, solarflare.debug.LedgerBinding> = new Map();
 	static var lastLeftMilli:Int = -1;
+	#end
 
-	static function ledgerRemain(method:String, name:String, r:SkillRemainResult, item:Dynamic):Void {
+	static inline function ledgerRemain(method:String, name:String, r:SkillRemainResult, item:Dynamic):Void {
+		#if solarflare_telemetry
 		if (r == null || !solarflare.debug.ResolutionLedger.armed())
 			return;
 		var bindKey = method + "|" + name;
@@ -361,6 +364,7 @@ class SkillRemain {
 			val = r.infinite ? "inf" : Std.string(milli / 1000);
 		}
 		solarflare.debug.ResolutionLedger.bump(b, val);
+		#end
 	}
 
 	static function callFloat(item:Dynamic, mem:ResolvedMember, method:String):Float {

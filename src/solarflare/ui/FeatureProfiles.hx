@@ -111,6 +111,20 @@ class FeatureProfiles {
 	public static function storeCurrent(cfg:ConfigPanel, domain:String = ""):Void {
 		if (cfg == null) return;
 		profiles.set(activeProfile, clone(captureAll(cfg)));
+		// Keep Geaux screen placement synchronized across all profiles
+		if (cfg.geaux != null && cfg.geaux.chrome != null) {
+			var gx = cfg.geaux.chrome.x.get();
+			var gy = cfg.geaux.chrome.y.get();
+			for (p in profiles.iterator()) {
+				var g = Reflect.field(p, "geaux");
+				var l = g != null ? Reflect.field(g, "layout") : null;
+				var c = l != null ? Reflect.field(l, "chrome") : null;
+				if (c != null) {
+					Reflect.setField(c, "x", gx);
+					Reflect.setField(c, "y", gy);
+				}
+			}
+		}
 	}
 
 	public static function storeAll(cfg:ConfigPanel):Void {
@@ -471,7 +485,15 @@ class FeatureProfiles {
 		// 1. Geaux Layout
 		var geauxSnap = Reflect.field(snap, "geaux");
 		if (geauxSnap != null) {
+			var hasPos = (cfg.geaux != null && cfg.geaux.chrome != null);
+			var curX:Single = hasPos ? cfg.geaux.chrome.x.get() : -1;
+			var curY:Single = hasPos ? cfg.geaux.chrome.y.get() : -1;
 			SettingsStore.applyGeauxProfile(cfg.geaux, Reflect.field(geauxSnap, "layout"));
+			if (hasPos && (curX > 0 || curY > 0)) {
+				cfg.geaux.chrome.x.set(curX);
+				cfg.geaux.chrome.y.set(curY);
+				cfg.geaux.chrome.posDirty = true;
+			}
 		}
 
 		// 2. Auras

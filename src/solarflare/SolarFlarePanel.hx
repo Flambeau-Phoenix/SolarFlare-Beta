@@ -27,10 +27,12 @@ import imgui.Enums.ImGuiStyleVar;
 import imgui.Enums.ImGuiWindowFlags;
 import imgui.Theme;
 
+#if solarflare_telemetry
 import solarflare.debug.PayloadProbe;
 import solarflare.debug.PayloadProbeOverlay;
 import solarflare.debug.ResolutionLedger;
 import solarflare.debug.ResolutionLedgerOverlay;
+#end
 import solarflare.HealthCache;
 
 /**
@@ -58,8 +60,10 @@ class SolarFlarePanel {
 	var auraOverlay:solarflare.aura.AuraOverlay;
 	var lightsaber:LightsaberOverlay;
 	var getRiftyOverlay:GetRiftyOverlay;
+	#if solarflare_telemetry
 	var payloadProbe:PayloadProbeOverlay;
 	var resolutionLedger:ResolutionLedgerOverlay;
+	#end
 	var vitalsTheme:Theme;
 	/** Persistent VitalSnap pool — reused every frame (DRAW-002). */
 	var snapHp:VitalSnap;
@@ -94,8 +98,10 @@ class SolarFlarePanel {
 		playerCastOverlay.openBuilder = function() { config.castBar.open.set(true); };
 		lightsaber = new LightsaberOverlay();
 		getRiftyOverlay = new GetRiftyOverlay();
+		#if solarflare_telemetry
 		payloadProbe = new PayloadProbeOverlay();
 		resolutionLedger = new ResolutionLedgerOverlay();
+		#end
 		vitalsTheme = new Theme()
 			.varV(ImGuiStyleVar.WindowPadding, ImGui.vec2(6, 6))
 			.varV(ImGuiStyleVar.ItemSpacing, ImGui.vec2(4, BAR_GAP))
@@ -124,20 +130,12 @@ class SolarFlarePanel {
 		catch (_:Dynamic) {}
 
 		CursorCaptureFix.apply(app);
-		// Look-lock closes hub/builders only when no interactive editor is open.
-		// Cursor lock must not tear down an active Aura/profile editor (keyboard
-		// ownership is independent of cursorFree — leaked inventory hotkeys used
-		// to flip cursor and cascade into suspendForCamera).
-		if (prevCursorFree && !CursorCaptureFix.cursorFree) {
-			var keepEditors = false;
-			try
-				keepEditors = config.anyInteractiveOpen()
-			catch (_:Dynamic) {}
-			if (!keepEditors) {
-				try
-					config.suspendForCamera()
-				catch (_:Dynamic) {}
-			}
+		// Every independently retained editor closes on entry to camera mode.
+		// An open editor cannot exempt itself: NoMouse alone leaves its lifetime
+		// and drag/text state alive behind the hidden cursor.
+		var enteringCamera = prevCursorFree && !CursorCaptureFix.cursorFree;
+		if (enteringCamera) {
+			try config.closeInteractiveWindows() catch (_:Dynamic) {}
 		}
 		prevCursorFree = CursorCaptureFix.cursorFree;
 
@@ -145,22 +143,23 @@ class SolarFlarePanel {
 			solarflare.ui.UiActionQueue.drain()
 		catch (_:Dynamic) {}
 
-		try {
-			if (solarflare.ui.SettingsStore.isDirty())
-				solarflare.ui.SettingsStore.tick(config);
-		} catch (_:Dynamic) {}
-
 		solarflare.runtime.TelemetryKernel.observe(app, config, restoreNativeChat);
 		// Profile switching consumes the frozen identity only after telemetry has
 		// refreshed it; no live game objects are touched from the profile system.
 		try
 			solarflare.ui.FeatureProfiles.observeCharacter(config)
 		catch (_:Dynamic) {}
+		// A character/profile restore in this observation can restore open refs.
+		if (enteringCamera && config.anyInteractiveOpen()) {
+			try config.closeInteractiveWindows() catch (_:Dynamic) {}
+		}
 
 	}
 
 	/** Layer 2: ImGui presentation from caches only. */
 	public function draw():Void {
+		// Sample every present, including title/logout frames where HUD drawing skips.
+		solarflare.ui.PerformanceMonitor.update();
 		var interactive = config.anyInteractiveOpen();
 		CursorCaptureFix.beginFrameCapture(interactive);
 		solarflare.ui.ThemePalette.init();
@@ -244,6 +243,7 @@ class SolarFlarePanel {
 			if (getRiftyOverlay != null && !suppressed)
 				getRiftyOverlay.draw(config.getRifty);
 		} catch (_:Dynamic) {}
+		#if solarflare_telemetry
 		try {
 			if (payloadProbe != null)
 				payloadProbe.draw(CursorCaptureFix.cursorFree);
@@ -252,6 +252,7 @@ class SolarFlarePanel {
 			if (resolutionLedger != null)
 				resolutionLedger.draw(CursorCaptureFix.cursorFree);
 		} catch (_:Dynamic) {}
+		#end
 		try {
 			solarflare.ui.PerformanceMonitor.draw();
 		} catch (_:Dynamic) {}

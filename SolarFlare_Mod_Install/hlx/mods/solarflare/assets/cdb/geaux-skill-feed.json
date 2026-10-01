@@ -1,55 +1,50 @@
 {
   "title": "Geaux skill feed",
-  "doc": "docs/GEAUX_SKILL_FEED.md",
-  "observe": "HudPanel.observe → GeauxCache.sample → GeauxBar.draw snaps only",
+  "source": "E:\\Solar_Flare_2_Mod\\9-30_Patch_Stuff\\data.cdb",
+  "observe": "TelemetryKernel.observe -> GeauxCache.sample -> GeauxBar.draw snapshots",
+  "deployDir": "hlx/mods/solarflare/assets/cdb",
+  "regen": "python tools/refresh_cdb_assets.py",
   "keep": [
-    "hudmod.geaux.GeauxHooks",
-    "hudmod.geaux.GeauxCdTable",
-    "hudmod.geaux.GeauxTalentTable",
-    "hudmod.cdb.CdbNames"
-  ],
-  "deployDir": "hlx/mods/hudmod/cdb",
-  "regen": "python docs/cdb-schema/tools/extract_cdb_tables.py",
-  "snapFields": [
-    "index",
-    "id",
-    "iconId",
-    "label",
-    "group",
-    "present",
-    "ready",
-    "affordable",
-    "cdLeft",
-    "cdMax",
-    "remaining",
-    "iconCandidates"
-  ],
-  "cooldownPriority": [
-    "typed getCooldownLeft / getEffectiveCooldown / getCooldownProgress / isInCooldown",
-    "HlxRuntime.callResolved then untyped getters",
-    "read-only Reflect.field / getProperty / 0-arg CD getters",
-    "GeauxCdTable.resolveMax from skill-cooldowns.json",
-    "cdUntil / cdMaxById from onTriggerCD reduceCooldown resetCooldown"
+    "solarflare.geaux.GeauxCdTable",
+    "solarflare.geaux.GeauxTalentTable",
+    "solarflare.cdb.CdbNames"
   ],
   "files": {
     "skill-cooldowns.json": {
-      "loader": "hudmod.geaux.GeauxCdTable",
-      "feeds": ["cdMax", "rank CD", "costs", "charges max"]
+      "loader": "solarflare.geaux.GeauxCdTable"
     },
     "talent-effects.json": {
-      "loader": "hudmod.geaux.GeauxTalentTable",
-      "feeds": ["talent CDR %", "proc reduceWeaponSkills", "named skill CDR", "selfCooldown"]
+      "loader": "solarflare.geaux.GeauxTalentTable"
     },
     "class-signatures.json": {
-      "loader": "hudmod.cdb.CdbNames",
-      "feeds": ["signature labels"]
+      "loader": "solarflare.cdb.CdbNames"
     }
   },
   "chargesMax": [
-    { "id": "Dash_Base", "name": "Dash", "charges": 2, "cooldown": 10 },
-    { "id": "Rogue_KnivesTempest", "name": "Knives Tempest", "charges": 2, "cooldown": 30 },
-    { "id": "Spear_Goo_Skill2", "name": "Apix Dash", "charges": 1, "cooldown": 12 },
-    { "id": "Fists_WaterUppercut_S2", "name": "Twin Claws", "charges": 1, "cooldown": 6 }
+    {
+      "id": "Dash_Base",
+      "name": "Dash",
+      "charges": 2,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Fists_WaterUppercut_S2",
+      "name": "Twin Claws",
+      "charges": 1,
+      "cooldown": 6.0
+    },
+    {
+      "id": "Rogue_KnivesTempest",
+      "name": "Knives Tempest",
+      "charges": 2,
+      "cooldown": 30.0
+    },
+    {
+      "id": "Spear_Goo_Skill2",
+      "name": "Apix Dash",
+      "charges": 1,
+      "cooldown": 12.0
+    }
   ],
   "cooldownTalents": [
     "Mage_Talent_NimbleFingers",
@@ -58,8 +53,10 @@
     "Priest_Talent_SharpMind",
     "Priest_Talent_SwiftJustice",
     "Rogue_Talent_CheatDeath",
+    "Rogue_Talent_Footwork",
     "Rogue_Talent_NoxiousStrategem",
     "Rogue_Talent_UpTheAnte",
+    "Rogue_Talent_VenomousFinisher",
     "Warrior_RashSoul",
     "Warrior_RedTempo",
     "Warrior_SecondWind"

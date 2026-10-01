@@ -1,6 +1,8 @@
 ﻿package solarflare.debug;
 
+#if solarflare_telemetry
 @:keep
+#end
 class ResolutionNote {
 	public var key:String = "";
 	public var method:String = "";

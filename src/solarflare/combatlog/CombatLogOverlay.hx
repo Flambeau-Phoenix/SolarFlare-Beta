@@ -15,7 +15,10 @@ import imgui.Theme;
  * Scrolling combat log. Draws snapshots from CombatLogCache only.
  */
 class CombatLogOverlay {
-	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse;
+	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
+		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
+	static inline var RESIZE_INSET:Single = 8;
+	static inline var RESIZE_FOOTER:Single = HudChrome.RESIZE_GRIP + RESIZE_INSET + 4;
 	static inline var MIN_W:Single = 280;
 	static inline var MIN_H:Single = 120;
 	static inline var MAX_W:Single = 2400;
@@ -45,34 +48,45 @@ class CombatLogOverlay {
 
 	function drawWindow(cfg:CombatLogConfig):Void {
 		var trans = cfg.chrome != null && cfg.chrome.isTransparent();
-		var w:Single = Math.max(MIN_W, cfg.width.get());
-		var h:Single = Math.max(MIN_H, cfg.height.get());
+		var w:Single = Math.max(MIN_W, Math.min(MAX_W, cfg.width.get()));
+		var h:Single = Math.max(MIN_H, Math.min(MAX_H, cfg.height.get()));
 		ImGui.setNextWindowBgAlpha(trans ? 0 : 0.88);
+		var collapsed = cfg.chrome != null && cfg.chrome.isCollapsed();
+		ImGui.setNextWindowSizeConstraints(
+			ImGui.vec2(collapsed ? HudChrome.SUN + HudChrome.CLOSE + 18 : MIN_W,
+				collapsed ? HudChrome.STRIP + 6 : MIN_H), ImGui.vec2(MAX_W, MAX_H));
+		if (cfg.chrome != null && cfg.chrome.takeExpandDirty())
+			cfg.sizeDirty = true;
 		ImGui.setNextWindowSize(ImGui.vec2(w, h), cfg.sizeDirty ? ImGuiCond.Always : ImGuiCond.FirstUseEver);
 		cfg.sizeDirty = false;
-		if (cfg.chrome != null)
+		if (cfg.chrome != null) {
+			cfg.chrome.clampToViewport();
 			cfg.chrome.applyPos();
-		var flags = cfg.chrome != null ? cfg.chrome.windowFlags(FLAGS) : FLAGS;
+		}
+		var flags = cfg.chrome != null ? cfg.chrome.windowFlagsKeepClicks(FLAGS) : FLAGS;
 		var began = ImGui.begin("SolarFlare Combat Log", null, flags);
 		if (began) {
 			if (cfg.chrome == null || !cfg.chrome.isLocked()) {
-				// Native edge resize, read straight back into the saved size.
-				var win = ImGui.getWindowSize();
-				if (Math.abs(win.x - w) > 1 || Math.abs(win.y - h) > 1) {
-					cfg.width.set(Math.max(MIN_W, Math.min(MAX_W, win.x)));
-					cfg.height.set(Math.max(MIN_H, Math.min(MAX_H, win.y)));
-					solarflare.ui.SettingsStore.markDirty();
-				}
 				if (cfg.chrome != null)
 					cfg.chrome.capturePos();
 			}
 			if (cfg.chrome == null || cfg.chrome.beginBody(function() {
 				cfg.hidden.set(true);
 				solarflare.ui.SettingsStore.markDirty();
-			}, null, "Combat Log")) {
-			var rows = CombatLogCache.linesForDraw(cfg);
-			var avail = ImGui.getContentRegionAvail();
-			drawRows(rows, avail.x, avail.y);
+			}, null, "Combat Log", false, ImGuiWindowFlags.NoScrollWithMouse, 0, RESIZE_FOOTER)) {
+				var rows = CombatLogCache.linesForDraw(cfg);
+				var avail = ImGui.getContentRegionAvail();
+				drawRows(rows, avail.x, avail.y);
+			}
+			if (cfg.chrome != null) {
+				cfg.chrome.closeBodyChild();
+				cfg.chrome.drawResizeCorner("combat_log", !cfg.chrome.isLocked(),
+					MIN_W, MIN_H, MAX_W, MAX_H, function(nextW:Single, nextH:Single) {
+						cfg.width.set(nextW);
+						cfg.height.set(nextH);
+						solarflare.ui.SettingsStore.markDirty();
+					}, RESIZE_INSET);
+				cfg.chrome.pollTransparentSurfaceDrag("combat_log", !cfg.chrome.isLocked());
 			}
 		}
 		HudChrome.endOverlayWindow(began, cfg.chrome);

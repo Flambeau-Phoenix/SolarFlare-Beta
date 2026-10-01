@@ -19,7 +19,8 @@ import solarflare.aura.signal.AuraConditionEditor;
 class AuraConfig {
 	public var open = new BoolRef(false);
 	public var enabled = new BoolRef(true);
-	public var unlockAll = new BoolRef(true);
+	/** Legacy profile field; individual runtime locks remain authoritative. */
+	public var unlockAll = new BoolRef(false);
 	/** Draw a countdown on every aura with a known remaining time. */
 	public var countdownAll = new BoolRef(true);
 	/** Seconds ceiling for the automatic countdown; 0 = no ceiling. */

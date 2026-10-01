@@ -123,7 +123,10 @@ class ObserveDemand {
 		aurasNeedStatus = statusIds.length > 0 || auraBuilderOpen;
 		getRifty = cfg.getRifty != null && !cfg.getRifty.hidden.get();
 		var saberRift = cfg.lightsaber != null && !cfg.lightsaber.hidden.get() && cfg.lightsaber.showRiftMeter.get();
-		riftFlag = getRifty || combatLog || saberRift || auras || auraBuilderOpen || (solarflare.debug.ResolutionLedger.armed());
+		riftFlag = getRifty || combatLog || saberRift || auras || auraBuilderOpen;
+		#if solarflare_telemetry
+		riftFlag = riftFlag || solarflare.debug.ResolutionLedger.armed();
+		#end
 	}
 
 	public static function markStatusDemandDirty():Void {
@@ -153,7 +156,7 @@ class ObserveDemand {
 	static function addStatusId(id:String):Void {
 		if (id == null) return;
 		// HL String subjects can look like String but Json/ImGui show {bytes:???}.
-		id = solarflare.debug.ResolutionLedger.cleanId(id);
+		id = solarflare.EngineText.cleanId(id);
 		if (id.length == 0) return;
 		pushStatusId(id);
 		// Status alerts: plain skill ids expand to common companions on the hero.

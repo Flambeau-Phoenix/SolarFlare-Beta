@@ -6,8 +6,8 @@ class AuraRuleCodec {
 		var cs:Array<Dynamic> = [];
 		if (rule.conditions != null) for (c in rule.conditions) if (c != null) cs.push({
 			signal: c.signal,
-			subject: solarflare.debug.ResolutionLedger.cleanId(c.subject),
-			subjectLabel: solarflare.debug.ResolutionLedger.cleanId(c.subjectLabel),
+			subject: solarflare.EngineText.cleanId(c.subject),
+			subjectLabel: solarflare.EngineText.cleanId(c.subjectLabel),
 			op: c.op,
 			numberValue: c.numberValue, boolValue: c.boolValue, stringValue: c.stringValue, negate: c.negate
 		});
@@ -27,8 +27,8 @@ class AuraRuleCodec {
 				if (item == null) continue;
 				var c = new AuraConditionDef();
 				if (item.signal != null) c.signal = Std.string(item.signal);
-				if (item.subject != null) c.subject = solarflare.debug.ResolutionLedger.cleanId(item.subject);
-				if (item.subjectLabel != null) c.subjectLabel = solarflare.debug.ResolutionLedger.cleanId(item.subjectLabel);
+				if (item.subject != null) c.subject = solarflare.EngineText.cleanId(item.subject);
+				if (item.subjectLabel != null) c.subjectLabel = solarflare.EngineText.cleanId(item.subjectLabel);
 				if (item.op != null) c.op = Std.string(item.op);
 				if (item.numberValue != null) c.numberValue = item.numberValue;
 				if (item.boolValue == true) c.boolValue = true;

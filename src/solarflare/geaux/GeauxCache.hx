@@ -70,6 +70,7 @@ class GeauxCdPoll {
 }
 
 /** Latched ledger rows for one GeauxCache cooldown emit site. */
+#if solarflare_telemetry
 class GeauxCdBinds {
 	public var owner:String = "";
 	public var cdLeft = new solarflare.debug.LedgerBinding();
@@ -80,6 +81,7 @@ class GeauxCdBinds {
 
 	public function new() {}
 }
+#end
 
 class GeauxCache {
 	static var readyFlashes = new Map<String, ReadyFlashState>();
@@ -2865,12 +2867,15 @@ class GeauxCache {
 	}
 
 	/** Four bound ledger rows per emit site — this is the highest-rate caller in the mod. */
+	#if solarflare_telemetry
 	static var cdBinds:Map<String, GeauxCdBinds> = new Map();
 	static var lastCdLeftMilli:Int = -1;
 	static var lastCdMaxMilli:Int = -1;
 	static var affordBind = new solarflare.debug.LedgerBinding();
+	#end
 
-	static function ledgerGeauxCd(method:String, src:String, name:String, hook:String, snap:GeauxSlotSnap):Void {
+	static inline function ledgerGeauxCd(method:String, src:String, name:String, hook:String, snap:GeauxSlotSnap):Void {
+		#if solarflare_telemetry
 		if (snap == null || !solarflare.debug.ResolutionLedger.armed())
 			return;
 		if (!snap.onBar)
@@ -2906,6 +2911,7 @@ class GeauxCache {
 			L.bump(b.ready, snap.ready ? "true" : "false");
 		if (snap.id != null && snap.id.length > 0 && L.bind(b.id, "geaux.slot.id", "typed", b.owner, "id"))
 			L.bump(b.id, snap.id == b.lastId ? null : (b.lastId = solarflare.debug.ResolutionLedger.clip(snap.id, 48)));
+		#end
 	}
 
 	/**
@@ -2938,12 +2944,14 @@ class GeauxCache {
 				current = 0;
 			snap.charges = current;
 			snap.chargesMax = max;
+			#if solarflare_telemetry
 			if (solarflare.debug.ResolutionLedger.armed() && snap.onBar) {
 				var L = solarflare.debug.ResolutionLedger;
 				var key = snap.id != null ? snap.id : "";
 				L.touch("geaux.slot.charges", "typed", "GeauxCache.applySkillCharges", "getCurrentCharges", "number", Std.string(current), key);
 				L.touch("geaux.slot.chargesMax", "typed", "GeauxCache.applySkillCharges", "getMaxCharges", "number", Std.string(max), key);
 			}
+			#end
 		} catch (_:Dynamic) {}
 	}
 
@@ -3079,10 +3087,12 @@ class GeauxCache {
 		if (skill != null)
 			rememberSkill(skill, snap.id);
 		snap.affordable = skillAffordable(hero, skill, snap.id);
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed() && snap.onBar
 			&& solarflare.debug.ResolutionLedger.bind(affordBind, "geaux.slot.affordable", "typed",
 				"GeauxCache.applyAffordSnap", "ownerHaveAllCost"))
 			solarflare.debug.ResolutionLedger.bump(affordBind, snap.affordable ? "true" : "false");
+		#end
 	}
 
 	static function skillAffordable(hero:ent.Hero, skill:Dynamic, snapId:String):Bool {
@@ -3296,6 +3306,7 @@ class GeauxCache {
 			if (max <= 0) {
 				try {
 					max = GeauxCdTable.resolveMax("", skillIdAliases(skill), skillRank(skill), max);
+					#if solarflare_telemetry
 					if (max > 0 && solarflare.debug.ResolutionLedger.armed())
 						solarflare.debug.ResolutionLedger.note("geaux.slot.cdMaxCdb")
 							.withMethod("cdb")
@@ -3303,6 +3314,7 @@ class GeauxCache {
 							.withName("GeauxCdTable.resolveMax")
 							.num(max)
 							.emit();
+					#end
 				} catch (_:Dynamic) {}
 			}
 			return max;

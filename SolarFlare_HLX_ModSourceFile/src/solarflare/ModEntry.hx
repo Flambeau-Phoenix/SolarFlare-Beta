@@ -57,9 +57,11 @@ class ModEntry {
 		solarflare.lightsaber.Lightsaber.LightsaberHooks.keep();
 		solarflare.lightsaber.Lightsaber.SaberJsonlArchive.keep();
 		solarflare.EngineSkillId.keep();
+		#if solarflare_telemetry
 		solarflare.debug.PayloadProbe.keep();
 		solarflare.debug.ResolutionLedger.keep();
 		solarflare.debug.FieldWalkLog.keep();
+		#end
 		solarflare.ui.CursorCaptureFix.keep();
 	}
 }

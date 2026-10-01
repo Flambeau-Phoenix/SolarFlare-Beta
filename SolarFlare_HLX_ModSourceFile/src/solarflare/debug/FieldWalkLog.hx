@@ -6,7 +6,9 @@ import sys.io.File;
  * Unique FieldWalk winners → JSONL so we can promote typed helpers.
  * Arm Payload probe or Resolution ledger (F6 ImGui debug).
  */
+#if solarflare_telemetry
 @:keep
+#end
 class FieldWalkLog {
 	static var seen:Map<String, Bool> = new Map();
 	static var buf:Array<String> = [];

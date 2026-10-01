@@ -147,7 +147,7 @@ class HudLaunchers {
 		});
 	}
 
-	static inline var GRIP:Single = 14;
+	static inline var GRIP:Single = HudChrome.RESIZE_GRIP;
 	static inline var MENU_GRIP:Single = 28;
 
 	function drawMenu(hubOpen:BoolRef):Void {
@@ -185,6 +185,17 @@ class HudLaunchers {
 					f6.sizeDirty = true;
 					SettingsStore.markDirty();
 				}
+				chrome.drawResizeCorner("f6_launcher", !chrome.isLocked(),
+					F6_MIN + MENU_GRIP, MENU_GRIP,
+					F6_MAX + MENU_GRIP, Math.max(MENU_GRIP, F6_MAX * ratio),
+					function(outerW:Single, _:Single) {
+						var next:Single = clamp(outerW - MENU_GRIP, F6_MIN, F6_MAX);
+						f6.size.set(next);
+						ImGui.setWindowSize(ImGui.vec2(next + MENU_GRIP,
+							Math.max(MENU_GRIP, next * ratio)));
+						SettingsStore.markDirty();
+					});
+				chrome.pollTransparentSurfaceDrag("f6_launcher", !chrome.isLocked());
 			}
 			var origin = ImGui.getCursorScreenPos();
 			ImGui.dummy(win);
@@ -229,6 +240,7 @@ class HudLaunchers {
 		var pad:Single = hitStrip(spec) > 0 ? 4 : 0;
 		ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, ImGui.vec2(pad, pad));
 		if (!ImGui.begin(title, null, flags)) {
+			ImGui.end();
 			ImGui.popStyleVar();
 			return;
 		}
@@ -262,6 +274,19 @@ class HudLaunchers {
 			hitH = winH;
 		if (ImGui.invisibleButton("##hit_" + title, ImGui.vec2(hitW, hitH)))
 			onClick();
+		if (spec.chrome != null) {
+			spec.chrome.drawResizeCorner(title, !spec.chrome.isLocked(),
+				minS, lockAspect ? Math.max(16, winH * (minS / winW)) : minS,
+				maxS, lockAspect ? Math.max(winH, maxS) : maxS + 80,
+				function(outerW:Single, _:Single) {
+					var next:Single = clamp(outerW, minS, maxS);
+					var nextH:Single = lockAspect && tw > 0 && th > 0 ? next * (th / tw) : next;
+					spec.size.set(next);
+					ImGui.setWindowSize(ImGui.vec2(next, nextH));
+					SettingsStore.markDirty();
+				});
+			spec.chrome.pollTransparentSurfaceDrag(title, !spec.chrome.isLocked());
+		}
 		ImGui.end();
 	}
 

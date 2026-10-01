@@ -18,7 +18,6 @@ import solarflare.ui.GameIcons;
  */
 class TelemetryKernel {
 	static inline var VITALS_S:Float = 0.033;
-	static inline var ACTIVE_S:Float = 0.050;
 	static inline var BACKGROUND_S:Float = 0.100;
 	static inline var IDENTITY_S:Float = 1.0;
 	static inline var SETTINGS_S:Float = 0.250;
@@ -27,7 +26,7 @@ class TelemetryKernel {
 	public static var demand(default, null) = new DemandSnapshot();
 	static var lastVitals:Float = 0;
 	static var lastIdentity:Float = 0;
-	static var lastActive:Float = 0;
+	static var activeGate = new ActivePassGate();
 	static var lastBackground:Float = 0;
 	static var lastSettings:Float = 0;
 	static var lastAsset:Float = -1;
@@ -91,6 +90,8 @@ class TelemetryKernel {
 			}
 		}
 
+		// These consumers own an independent ObserveDemand cadence.
+		HookIngress.consume(DirtyDomains.OVERLAYS | DirtyDomains.ATTACK_COMBO);
 		try HealthHooks.reconcileOverlays() catch (_:Dynamic) {}
 		try {
 			if (ObserveDemand.dueAttackCombo(now,
@@ -98,24 +99,23 @@ class TelemetryKernel {
 				AttackComboCache.observe();
 		} catch (_:Dynamic) {}
 
-		var activeDirty = HookIngress.peek(DirtyDomains.STATUS | DirtyDomains.SKILLS
-			| DirtyDomains.TARGET | DirtyDomains.OVERLAYS | DirtyDomains.ATTACK_COMBO);
-		if (activeDirty || now - lastActive >= ACTIVE_S) {
-			lastActive = now;
+		var wanted = (demand.skills ? DirtyDomains.SKILLS : 0)
+			| (demand.target ? DirtyDomains.TARGET : 0)
+			| (demand.auras ? DirtyDomains.STATUS : 0);
+		LightsaberCache.enabled = demand.lightsaber;
+		if (activeGate.due(now, wanted, demand.skills || demand.target || demand.auras || demand.lightsaber)) {
 			RuntimeMetrics.heavyPasses++;
 			if (demand.skills) {
 				try {
 					cfg.geaux.ensureSlots();
 					GeauxCache.sample(HealthCache.localHero, cfg.geaux.visibleCount(), cfg.geaux.slotIds);
 					RuntimeMetrics.skillPolls++;
-					HookIngress.consume(DirtyDomains.SKILLS);
 				} catch (_:Dynamic) {}
 			}
 			if (demand.target) {
 				try {
 					CombatLogCache.tick(HealthCache.localHero);
 					RuntimeMetrics.targetPolls++;
-					HookIngress.consume(DirtyDomains.TARGET);
 				} catch (_:Dynamic) {}
 			}
 			if (demand.auras) {
@@ -124,19 +124,15 @@ class TelemetryKernel {
 					RuntimeMetrics.auraTicks++;
 					if (demand.status)
 						RuntimeMetrics.statusPolls++;
-					HookIngress.consume(DirtyDomains.STATUS);
 				} catch (_:Dynamic) {}
 			}
 			if (demand.lightsaber) {
 				try {
-					LightsaberCache.enabled = true;
 					LightsaberCache.ingestForConfig(cfg.lightsaber);
 					LightsaberCache.tick(now);
 					if (cfg.lightsaber.showLog.get())
 						SaberJsonlArchive.tick();
 				} catch (_:Dynamic) {}
-			} else {
-				LightsaberCache.enabled = false;
 			}
 		}
 
@@ -152,7 +148,10 @@ class TelemetryKernel {
 				try {
 					var inRift = GetRiftyCache.inInstance;
 					if (ObserveDemand.dueGetRifty(now, inRift)
-							|| solarflare.debug.ResolutionLedger.armed()) {
+							#if solarflare_telemetry
+							|| solarflare.debug.ResolutionLedger.armed()
+							#end
+							) {
 						GetRiftyCache.observeApp(app);
 						RuntimeMetrics.encounterPolls++;
 						HookIngress.consume(DirtyDomains.ENCOUNTER);
@@ -161,6 +160,7 @@ class TelemetryKernel {
 					}
 				} catch (_:Dynamic) {}
 			}
+			#if solarflare_telemetry
 			try {
 				if (solarflare.debug.PayloadProbe.armed()) {
 					solarflare.debug.PayloadProbe.sampleApp(app);
@@ -171,7 +171,6 @@ class TelemetryKernel {
 				solarflare.debug.ResolutionLedger.tick() catch (_:Dynamic) {}
 			try if (solarflare.debug.FieldWalkLog.armed())
 				solarflare.debug.FieldWalkLog.tick() catch (_:Dynamic) {}
-			#if solarflare_telemetry
 			try solarflare.geaux.GeauxLog.tick() catch (_:Dynamic) {}
 			#end
 		}
@@ -183,7 +182,8 @@ class TelemetryKernel {
 	}
 
 	public static function reset():Void {
-		lastVitals = lastIdentity = lastActive = lastBackground = lastSettings = 0;
+		lastVitals = lastIdentity = lastBackground = lastSettings = 0;
+		activeGate.reset();
 		settingsInitialized = false;
 		HookIngress.reset();
 	}

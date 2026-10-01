@@ -95,10 +95,12 @@ class CombatLogCache {
 			}
 			return;
 		}
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed()) {
 			var tName = currentTarget != null ? unitName(currentTarget) : "none";
 			solarflare.debug.ResolutionLedger.touch("target.live", currentTarget != null ? "found" : "none", "CombatLogCache.tick", tName, "string", currentTarget != null ? "hasTarget" : "noTarget");
 		}
+		#end
 
 		// Combat-log-only / cast-bar-only: keep `currentTarget` for involvement + CastCache,
 		// but do NOT consume `lastTargetRef` or skip ahead of HUD identity. Cast observe
@@ -133,10 +135,12 @@ class CombatLogCache {
 		if (ptrChanged || solarflare.ObserveDemand.dueTargetHp(now) || !targetSnap.healthValid)
 			fillTargetHp(currentTarget);
 
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed()) {
 			solarflare.debug.ResolutionLedger.touch("target.snap", targetSnap.valid ? "valid" : "empty",
 				"CombatLogCache.tick", targetSnap.name, "string", targetSnap.kind);
 		}
+		#end
 
 		try
 			solarflare.castbar.CastCache.observe(localHero, currentTarget)
@@ -264,6 +268,7 @@ class CombatLogCache {
 		else if (targetSnap.ratio > 1)
 			targetSnap.ratio = 1;
 		targetSnap.observedAt = haxe.Timer.stamp();
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed()) {
 			solarflare.debug.ResolutionLedger.note("combat.target.hp")
 				.withMethod("typed")
@@ -273,6 +278,7 @@ class CombatLogCache {
 				.num(hp.cur)
 				.emit();
 		}
+		#end
 	}
 
 	/** Unit kind basename for GameIcons `{kind}.png` / atlas frame. */
@@ -304,9 +310,11 @@ class CombatLogCache {
 	public static function noteCast(skill:Dynamic):Void {
 		if (skill == null)
 			return;
+		#if solarflare_telemetry
 		try
 			solarflare.debug.PayloadProbe.capture("cast", skill)
 		catch (_:Dynamic) {}
+		#end
 		try {
 			var bs:st.skill.BaseSkill = skill;
 			if (bs.isPassive())
@@ -320,6 +328,7 @@ class CombatLogCache {
 		pushCast(sid, owner, aim);
 		if (classify(owner) == ROLE_ENEMY)
 			solarflare.aura.EnemyCastCache.noteStart(skill, sid);
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed())
 			solarflare.debug.ResolutionLedger.note("combat.cast.skillId")
 				.withMethod("engine")
@@ -329,14 +338,17 @@ class CombatLogCache {
 				.withPayload("st.skill.BaseSkill", "hook.skill")
 				.str(sid)
 				.emit();
+		#end
 	}
 
 	public static function noteHit(victim:Dynamic, dmg:Dynamic, hook:String = ""):Void {
 		if (dmg == null)
 			return;
+		#if solarflare_telemetry
 		try
 			solarflare.debug.PayloadProbe.capture("hit", dmg)
 		catch (_:Dynamic) {}
+		#end
 		var rawSource = sourceCandidateOfDamage(dmg);
 		var source = CombatOwnership.resolve(rawSource, extractObject, ownerOfSkill);
 		var minion = minionNameOf(rawSource, source);
@@ -357,9 +369,11 @@ class CombatLogCache {
 	public static function noteInflict(attacker:Dynamic, dmg:Dynamic):Void {
 		if (attacker == null || dmg == null)
 			return;
+		#if solarflare_telemetry
 		try
 			solarflare.debug.PayloadProbe.capture("hit", dmg)
 		catch (_:Dynamic) {}
+		#end
 		// v6 may expose the hero in DamageResult even when hook self or the runtime
 		// skill owner is the summoned foe. Prefer whichever candidate proves it has
 		// summon ownership, then resolve that leaf back to its credited hero.
@@ -488,6 +502,7 @@ class CombatLogCache {
 				var aff = dr.affinity;
 				if (aff != null && isPlainName(aff))
 					line.affinity = aff;
+				#if solarflare_telemetry
 				if (solarflare.debug.ResolutionLedger.armed()) {
 					var note = solarflare.debug.ResolutionLedger.note("combat.hit.amount")
 						.withMethod("typed")
@@ -515,10 +530,12 @@ class CombatLogCache {
 						.bool(line.kill)
 						.emit();
 				}
+				#end
 			}
 		} catch (_:Dynamic) {}
 		if (line.amount == 0) {
 			line.amount = extractNumber(dmg, "amount", 0);
+			#if solarflare_telemetry
 			if (solarflare.debug.ResolutionLedger.armed() && line.amount != 0)
 				solarflare.debug.ResolutionLedger.note("combat.hit.amount")
 					.withMethod("fieldwalk")
@@ -529,6 +546,7 @@ class CombatLogCache {
 					.tryRoute("fieldwalk", "amount")
 					.num(line.amount)
 					.emit();
+			#end
 		}
 		if (line.blockAmt == 0)
 			line.blockAmt = extractNumber(dmg, "block", 0);

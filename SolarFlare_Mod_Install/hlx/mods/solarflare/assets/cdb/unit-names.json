@@ -1,6 +1,10 @@
 {
   "units": [
     {
+      "id": "Phrixes_NightGod",
+      "name": "???"
+    },
+    {
       "id": "Abigail",
       "name": "Abigail"
     },
@@ -377,12 +381,16 @@
       "name": "Crab"
     },
     {
+      "id": "Crab_Crabgantua",
+      "name": "Crab of the Lost City"
+    },
+    {
       "id": "Crab_Z1D",
       "name": "Crab of the Lost City"
     },
     {
-      "id": "Crab_Crabgantua",
-      "name": "Crab of the Lost City"
+      "id": "Crab_Crabgantua_Summon_Heroic",
+      "name": "Crab Summon"
     },
     {
       "id": "Crabgantua",
@@ -705,7 +713,11 @@
       "name": "Garlic Seedling"
     },
     {
-      "id": "ChaoticPortalPhrixes",
+      "id": "Phrixes_ChaoticPortal",
+      "name": "Gate to Niflel"
+    },
+    {
+      "id": "Phrixes_NightGodGate",
       "name": "Gate to Niflel"
     },
     {
@@ -715,6 +727,10 @@
     {
       "id": "OgreManfish_Z2W_Claws_E",
       "name": "Gilliver"
+    },
+    {
+      "id": "TODO_MOG_Merchant",
+      "name": "Glory Merchant"
     },
     {
       "id": "Golem_Z2W_E",
@@ -801,11 +817,11 @@
       "name": "Gruffy"
     },
     {
-      "id": "TODO_WanderingMerchant",
+      "id": "StableMaster",
       "name": "Guild Merchant"
     },
     {
-      "id": "TODO_StableMaster",
+      "id": "WanderingMerchant",
       "name": "Guild Merchant"
     },
     {
@@ -825,11 +841,11 @@
       "name": "Hilda Lambert"
     },
     {
-      "id": "TODO_SnowPanther_Yellow",
+      "id": "TODO_SnowPanther_Spark",
       "name": "Hill Leopard"
     },
     {
-      "id": "TODO_SnowPanther_Spark",
+      "id": "TODO_SnowPanther_Yellow",
       "name": "Hill Leopard"
     },
     {
@@ -993,7 +1009,7 @@
       "name": "Jimmy Crater"
     },
     {
-      "id": "TODO_ProfessionTrainer",
+      "id": "ProfessionTrainer",
       "name": "Job Welldon"
     },
     {
@@ -1261,6 +1277,10 @@
       "name": "Nightbringer Invader"
     },
     {
+      "id": "Phrixes_Crawler",
+      "name": "Nightcrawler"
+    },
+    {
       "id": "DemonSuperElite",
       "name": "Nightking Maat Demon"
     },
@@ -1305,8 +1325,16 @@
       "name": "Nightling Warbringer"
     },
     {
+      "id": "Phrixes_NightGod_NL",
+      "name": "Nightlord"
+    },
+    {
       "id": "Demon_Z3W_Claws_E",
       "name": "Nightlord Asmoderator"
+    },
+    {
+      "id": "Nightling_Infusion_DPS",
+      "name": "Nightlord Aspirant"
     },
     {
       "id": "Demon_Z3W_Spear_E",
@@ -1329,11 +1357,11 @@
       "name": "Nightqueen Shaarlize Te'ror"
     },
     {
-      "id": "ImpDemon_Red",
+      "id": "ImpDemon_GreyBlue",
       "name": "Nightspawn"
     },
     {
-      "id": "ImpDemon_GreyBlue",
+      "id": "ImpDemon_Red",
       "name": "Nightspawn"
     },
     {
@@ -1347,6 +1375,10 @@
     {
       "id": "FaerieBee_Z2W_Champ_E",
       "name": "Notorious Bee"
+    },
+    {
+      "id": "Nightling_Infusion_Tank",
+      "name": "Obedient Servant"
     },
     {
       "id": "Crimson_Z2W_Bow",
@@ -1457,6 +1489,10 @@
       "name": "Queen Honeyzabeth"
     },
     {
+      "id": "Queenslayer",
+      "name": "Queenslayer"
+    },
+    {
       "id": "Sheep_Black02",
       "name": "Radiated Woolybell"
     },
@@ -1517,11 +1553,11 @@
       "name": "Ripe Invoked Slime"
     },
     {
-      "id": "DemonHunterZoey",
+      "id": "DemonHunterMira",
       "name": "Rita"
     },
     {
-      "id": "DemonHunterMira",
+      "id": "DemonHunterZoey",
       "name": "Rita"
     },
     {
@@ -1542,6 +1578,10 @@
     },
     {
       "id": "FaerieBee_Z1D_GreatMace",
+      "name": "Royal Guard of the Hivetree"
+    },
+    {
+      "id": "Mokshi_Heroic_Summon",
       "name": "Royal Guard of the Hivetree"
     },
     {
@@ -1617,6 +1657,10 @@
       "name": "Shielded"
     },
     {
+      "id": "MedalogGloryTrader",
+      "name": "Shiro James"
+    },
+    {
       "id": "ShiroNext_Pirate",
       "name": "ShiroNext_Pirate"
     },
@@ -1653,7 +1697,11 @@
       "name": "Slick Nepsid Whale"
     },
     {
-      "id": "TODO_OgreBagon_Grey",
+      "id": "TODO_OgreBagon_Beige",
+      "name": "Slick Nepsid Whale"
+    },
+    {
+      "id": "TODO_OgreBagon_BlueGrey",
       "name": "Slick Nepsid Whale"
     },
     {
@@ -1669,11 +1717,7 @@
       "name": "Slick Nepsid Whale"
     },
     {
-      "id": "TODO_OgreBagon_BlueGrey",
-      "name": "Slick Nepsid Whale"
-    },
-    {
-      "id": "TODO_OgreBagon_Beige",
+      "id": "TODO_OgreBagon_Grey",
       "name": "Slick Nepsid Whale"
     },
     {
@@ -1885,11 +1929,19 @@
       "name": "Swamp Grassflopper"
     },
     {
-      "id": "Totem_Tidal",
+      "id": "Cleodora_Heroic_Dark_Champion",
+      "name": "The Usurper"
+    },
+    {
+      "id": "Nepsilon_Totem",
       "name": "Tidal Totem"
     },
     {
       "id": "Totem_BeaconOfHope",
+      "name": "Tidal Totem"
+    },
+    {
+      "id": "Totem_Tidal",
       "name": "Tidal Totem"
     },
     {
@@ -1899,6 +1951,10 @@
     {
       "id": "TODO_Toad",
       "name": "Toad"
+    },
+    {
+      "id": "Lizard_Shop_Dragon",
+      "name": "TODO"
     },
     {
       "id": "Turtle_Grey",

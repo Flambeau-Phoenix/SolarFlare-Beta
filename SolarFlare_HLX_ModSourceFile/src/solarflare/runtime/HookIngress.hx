@@ -16,9 +16,12 @@ class HookIngress {
 	public static inline function peek(domains:Int):Bool return (dirty & domains) != 0;
 
 	public static function consume(domains:Int):Bool {
-		var hit = (dirty & domains) != 0;
-		if (hit)
-			dirty &= ~domains;
+		return consumeMask(domains) != 0;
+	}
+
+	public static function consumeMask(domains:Int):Int {
+		var hit = dirty & domains;
+		dirty &= ~domains;
 		return hit;
 	}
 

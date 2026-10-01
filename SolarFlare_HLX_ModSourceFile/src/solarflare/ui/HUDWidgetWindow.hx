@@ -9,14 +9,15 @@ import imgui.Structs.ImVec2;
 
 /**
  * Runtime HUD content in a single HudChrome window: no native title bar, the
- * thin chrome strip on top, native ImGui move and resize while unlocked.
- * The strip covers the top resize border, so the art underneath cannot be
- * grabbed. `w` / `h` are the window size; ImGui owns them between external
- * changes and hands them back through `onResize`.
+ * thin chrome strip on top, sun-drag movement, and one explicit bottom-right
+ * resize grip while unlocked. `w` / `h` are content dimensions; the wrapper
+ * measures chrome overhead and hands resized content dimensions back through
+ * `onResize`.
  */
 class HUDWidgetWindow {
 	public static inline var PADDING:Single = 10;
 	public static inline var ROW:Single = 30;
+	static inline var RESIZE_FOOTER:Single = HudChrome.RESIZE_GRIP + PADDING + 4;
 
 	/** A one-row widget still needs room for an icon plus its glow ring. */
 	static inline var MIN_CONTENT_H:Single = 18;
@@ -29,7 +30,8 @@ class HUDWidgetWindow {
 	static inline var SEED_PAD:Single = 24;
 
 	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
-		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
+		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
+		| ImGuiWindowFlags.NoResize;
 
 	/** Last content size pushed per id — a caller-side change must re-assert, a drag must not. */
 	static var lastW:Map<String, Single> = new Map();
@@ -70,7 +72,7 @@ class HUDWidgetWindow {
 		// Requested size is the CONTENT box; grow the window by the measured chrome.
 		var measured = ovH.exists(id);
 		var oW:Single = measured ? ovW.get(id) : SEED_PAD;
-		var oH:Single = measured ? ovH.get(id) : HudChrome.STRIP + 2 + SEED_PAD;
+		var oH:Single = measured ? ovH.get(id) : HudChrome.STRIP + 2 + SEED_PAD + RESIZE_FOOTER;
 		ImGui.setNextWindowBgAlpha(chrome.isTransparent() ? 0 : 0.82);
 		// Until the chrome has been measured once the seed above is a guess, so the size
 		// has to be asserted every frame; FirstUseEver would freeze the guess in place.
@@ -79,8 +81,9 @@ class HUDWidgetWindow {
 		ImGui.setNextWindowSize(ImGui.vec2(w + oW, h + oH), sizeCond);
 		chrome.clampToViewport();
 		chrome.applyPos();
-		if (!chrome.collapsed.get())
+		if (!chrome.collapsed.get() && !chrome.isLocked()) {
 			ImGui.setNextWindowPos(ImGui.vec2(chrome.x.get(), chrome.y.get()), ImGuiCond.FirstUseEver);
+		}
 
 		var editable = !chrome.isLocked() || layoutOverride;
 		var flags = chrome.windowFlagsKeepClicks(FLAGS);
@@ -100,31 +103,16 @@ class HUDWidgetWindow {
 		try {
 			if (began) {
 				var win = ImGui.getWindowSize();
+				chrome.winW = win.x;
+				chrome.winH = win.y;
 				if (editable) {
 					chrome.capturePos();
-					if (ImGui.isMouseReleased(ImGuiMouseButton.Left)) {
-						if (SettingsStore.isDirty())
-							SettingsStore.flushDirty();
-					}
-					// Native edge resize, reported back in content units. A frame that
-					// asserts its own size is not a drag: subtracting an overhead that
-					// changed this frame would report a resize the player never made,
-					// which is how widgets drifted and squashed their art.
-					if (onResize != null && !external && measured) {
-						var cw:Single = win.x - oW;
-						var ch:Single = win.y - oH;
-						if (Math.abs(cw - w) > 1 || Math.abs(ch - h) > 1) {
-							lastW.set(id, cw);
-							lastH.set(id, ch);
-							onResize(cw, ch);
-							SettingsStore.markDirty();
-						}
-					}
 				}
 				var onClose:Void->Void = hide;
-				if (chrome.beginBody(onClose, null, caption, false, 0, ImGuiChildFlags.AlwaysUseWindowPadding)) {
+				if (chrome.beginBody(onClose, null, caption, false, ImGuiWindowFlags.NoScrollWithMouse,
+						ImGuiChildFlags.AlwaysUseWindowPadding, RESIZE_FOOTER)) {
 					var avail = ImGui.getContentRegionAvail();
-					// Re-measure the chrome; a stale figure is what clipped content.
+					// Measurement includes the footer, so content dimensions never shrink to fit it.
 					var mW:Single = win.x - avail.x;
 					var mH:Single = win.y - avail.y;
 					if (mH >= 0 && (Math.abs(mW - oW) > 0.5 || Math.abs(mH - oH) > 0.5)) {
@@ -136,9 +124,36 @@ class HUDWidgetWindow {
 					// oversized seed frame the extra space would stretch blit art out of shape.
 					var bodyW:Single = Math.min(avail.x, w);
 					var bodyH:Single = Math.min(avail.y, h);
-					if (bodyW > 1 && bodyH > 1 && drawBody != null)
-						drawBody(ImGui.vec2(bodyW, bodyH));
+					if (bodyW > 1 && bodyH > 1 && drawBody != null) {
+						var clipMin = ImGui.getCursorScreenPos();
+						ImGui.pushClipRect(clipMin,
+							ImGui.vec2(clipMin.x + bodyW, clipMin.y + bodyH), true);
+						var drawFailed = false;
+						var drawFailure:Dynamic = null;
+						try {
+							drawBody(ImGui.vec2(bodyW, bodyH));
+						} catch (e:Dynamic) {
+							drawFailed = true;
+							drawFailure = e;
+						}
+						ImGui.popClipRect();
+						if (drawFailed)
+							throw drawFailure;
+					}
 				}
+				chrome.closeBodyChild();
+				chrome.drawResizeCorner(id, editable,
+					HudChrome.SUN + HudChrome.CLOSE + 12 + oW, MIN_CONTENT_H + oH,
+					10000, 10000, function(outerW:Single, outerH:Single) {
+						var contentW:Single = Math.max(HudChrome.SUN + HudChrome.CLOSE + 12, outerW - oW);
+						var contentH:Single = Math.max(MIN_CONTENT_H, outerH - oH);
+						lastW.set(id, contentW);
+						lastH.set(id, contentH);
+						if (onResize != null)
+							onResize(contentW, contentH);
+						SettingsStore.markDirty();
+					}, PADDING);
+				chrome.pollTransparentSurfaceDrag(id, editable);
 			}
 		} catch (e:Dynamic) {
 			failed = true;

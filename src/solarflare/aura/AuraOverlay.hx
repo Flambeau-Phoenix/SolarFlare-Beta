@@ -53,10 +53,9 @@ class AuraOverlay {
 	function drawOne(a:AuraDef):Void {
 		if (a == null || !a.enabled.get()) return;
 		// A window that is individually locked must hide when conditions are not met,
-		// regardless of the global unlockAll flag (which defaults to true and would
-		// otherwise keep every window visible as a ghost even when locked).
+		// regardless of the legacy global unlock flag.
 		var indivLocked = a.chrome != null && a.chrome.locked.get();
-		var layout = cfg.unlockAll.get() || !indivLocked;
+		var layout = !indivLocked;
 		if (!a.show && indivLocked) return;
 		// Unlocked windows in layout mode stay visible as a ghost so the author can
 		// see and reposition them even when the condition is not active.
@@ -71,7 +70,7 @@ class AuraOverlay {
 			var dl = ImGui.getWindowDrawList();
 			drawRegion(dl, a, p.x, p.y, size.x, size.y, !a.show && layout);
 			drawKeyChip(dl, p.x, p.y, size.x, size.y, a, !a.show && layout);
-		}, openBuilder, function() { a.enabled.set(false); SettingsStore.markDirty(); }, cfg.unlockAll.get(), function() {
+		}, openBuilder, function() { a.enabled.set(false); SettingsStore.markDirty(); }, false, function() {
 			if (a.isCounter.get() && ImGui.menuItem("Reset Counter")) {
 				a.counterValue = 0;
 				a.stacks = 1;
@@ -100,21 +99,26 @@ class AuraOverlay {
 		var flags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar
 			| ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize;
 		flags = CursorCaptureFix.windowFlags(flags);
-		if (a.chrome != null && a.chrome.locked.get() && !cfg.unlockAll.get())
+		if (a.chrome != null && a.chrome.locked.get())
 			flags |= ImGuiWindowFlags.NoInputs;
 		var ax:Single = a.chrome != null ? a.chrome.x.get() : 200;
 		var ay:Single = a.chrome != null ? a.chrome.y.get() - 28 : 172;
 		ImGui.setNextWindowPos(ImGui.vec2(ax, ay), ImGuiCond.Always);
 		ImGui.setNextWindowBgAlpha(0.72 * opacity);
-		if (ImGui.begin("SolarFlare AuraAlert " + a.id, null, flags)) {
-			var scale:Single = a.bannerScale != null ? a.bannerScale.get() : 1.15;
-			if (scale < 1) scale = 1;
-			if (scale > 3) scale = 3;
-			ImGui.pushFont(ImGui.getFont(), ImGui.getFontSize() * (1.75 + scale));
-			ImGui.textColored(ImGui.vec4(1, 0.92, 0.45, opacity), msg);
-			ImGui.popFont();
-			ImGui.end();
-		}
+		var began = ImGui.begin("SolarFlare AuraAlert " + a.id, null, flags);
+		var fontPushed = false;
+		try {
+			if (began) {
+				var scale:Single = a.bannerScale != null ? a.bannerScale.get() : 1.15;
+				if (scale < 1) scale = 1;
+				if (scale > 3) scale = 3;
+				ImGui.pushFont(ImGui.getFont(), ImGui.getFontSize() * (1.75 + scale));
+				fontPushed = true;
+				ImGui.textColored(ImGui.vec4(1, 0.92, 0.45, opacity), msg);
+			}
+		} catch (_:Dynamic) {}
+		if (fontPushed) ImGui.popFont();
+		ImGui.end();
 	}
 
 	/** Geaux-style key chip: dark plate + cream text on the aura face. */

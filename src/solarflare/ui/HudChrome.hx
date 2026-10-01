@@ -9,6 +9,7 @@ import imgui.Enums.ImGuiStyleVar;
 import imgui.Enums.ImGuiWindowFlags;
 import imgui.ref.BoolRef;
 import imgui.ref.FloatRef;
+import imgui.Structs.ImVec2;
 
 /**
  * Overlay / panel chrome: thin custom title strip, no native title bar.
@@ -24,6 +25,14 @@ class HudChrome {
 	public static inline var SUN:Single = 18;
 	public static inline var CLOSE:Single = 14;
 	public static inline var STRIP:Single = 18;
+	public static inline var RESIZE_GRIP:Single = 18;
+
+	static var activeResizeId:String = null;
+	static var resizeGrabX:Single = 0;
+	static var resizeGrabY:Single = 0;
+	static var activeSurfaceDragId:String = null;
+	static var surfaceGrabX:Single = 0;
+	static var surfaceGrabY:Single = 0;
 
 	static var pool = new Map<String, HudChrome>();
 	static var nextUid:Int = 1;
@@ -102,7 +111,7 @@ class HudChrome {
 	public static inline var CHILD_NO_SCROLL:Int = ImGuiWindowFlags.NoScrollWithMouse;
 
 	/** Always pairs beginChild/endChild; swallows draw throws so the stack stays balanced. */
-	public static function safeChild(id:String, size:imgui.Vec2, flags:Int, draw:Void->Void, childFlags:Int = 0):Void {
+	public static function safeChild(id:String, size:ImVec2, flags:Int, draw:Void->Void, childFlags:Int = 0):Void {
 		UiScope.child(id, size, draw, childFlags, flags);
 	}
 
@@ -138,12 +147,11 @@ class HudChrome {
 		return c.beginBody(onClose, null, caption, scrollBody);
 	}
 
-	/** Pair with raw `ImGui.begin()` on HUD overlays — closes body child and ends only when begin succeeded. */
+	/** Every executed Begin needs End, even when its body is clipped. */
 	public static function endOverlayWindow(began:Bool, ?chrome:HudChrome):Void {
 		if (chrome != null)
 			chrome.closeBodyChild();
-		if (began)
-			ImGui.end();
+		ImGui.end();
 	}
 
 	public static function endPanel():Void {
@@ -185,6 +193,11 @@ class HudChrome {
 
 	public function windowFlags(base:Int):Int {
 		var f = CursorCaptureFix.windowFlags(base | ImGuiWindowFlags.NoCollapse | HUD_BASE);
+		// Runtime HUD geometry is owned by the sun drag and the explicit corner
+		// grip. Native ImGui move/resize exposes invisible hit zones on every edge,
+		// which is especially confusing when the window background is transparent.
+		if (bindPos)
+			f |= ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
 		if (isLocked() && !isCollapsed())
 			f |= ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMouseInputs;
 		if (isTransparent())
@@ -195,6 +208,8 @@ class HudChrome {
 	/** Lock move/resize but keep hit-testing (art buttons that must stay clickable). */
 	public function windowFlagsKeepClicks(base:Int):Int {
 		var f = CursorCaptureFix.windowFlags(base | ImGuiWindowFlags.NoCollapse | HUD_BASE);
+		if (bindPos)
+			f |= ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
 		if (isLocked() && !isCollapsed())
 			f |= ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
 		if (isTransparent())
@@ -203,7 +218,16 @@ class HudChrome {
 	}
 
 	public function applyPos():Void {
-		if (bindPos && posDirty) {
+		if (!CursorCaptureFix.cursorFree) {
+			dragSun = false;
+			didDrag = false;
+			activeResizeId = null;
+			activeSurfaceDragId = null;
+		}
+		// A locked HUD is an anchored HUD. Reassert the saved position every frame
+		// so an ImGui window instance left over from another character/profile can
+		// never donate its transient coordinates to the locked layout.
+		if (bindPos && (posDirty || isLocked())) {
 			clampToViewport();
 			ImGui.setNextWindowPos(ImGui.vec2(x.get(), y.get()), ImGuiCond.Always);
 			posDirty = false;
@@ -332,8 +356,12 @@ class HudChrome {
 
 		var sunX:Single = wp.x + 3;
 		var sunY:Single = wp.y + ((STRIP + 2) - SUN) * 0.5;
-		if (!isLocked())
-			pollSunGrip(sunX, sunY);
+		if (!isLocked()) {
+			// The whole title strip is the conventional move target. A click only
+			// collapses when it lands on the sun-sized leading region.
+			var dragW:Single = Math.max(SUN, ws.x - (onClose != null && !isTransparent() ? CLOSE + 8 : 4));
+			pollSunGrip(wp.x + 2, wp.y + 1, dragW, STRIP + 1, SUN + 1);
+		}
 		if (!isTransparent()) {
 			var gripCol = ImGui.colorConvertFloat4ToU32(theme.text);
 			for (i in 0...3)
@@ -387,7 +415,7 @@ class HudChrome {
 
 	/** Title strip then a body child so a window scrollbar cannot cover the X. */
 	public function beginBody(?onClose:Void->Void, ?drawLeading:Void->Void, ?caption:String, scrollBody:Bool = false, bodyFlags:Int = 0,
-			bodyChildFlags:Int = 0):Bool {
+			bodyChildFlags:Int = 0, bottomReserve:Single = 0):Bool {
 		closeBodyChild();
 		bodyScroll = scrollBody;
 		this.bodyChildFlags = bodyChildFlags;
@@ -400,12 +428,12 @@ class HudChrome {
 				return false;
 			if (drawLeading != null)
 				drawLeading();
-			openBodyChild(bodyFlags);
+			openBodyChild(bodyFlags, bottomReserve);
 			return true;
 		}
 		if (!drawTitleTools(onClose, drawLeading, caption))
 			return false;
-		openBodyChild(bodyFlags);
+		openBodyChild(bodyFlags, bottomReserve);
 		return true;
 	}
 
@@ -451,7 +479,7 @@ class HudChrome {
 		}
 	}
 
-	public function openBodyChild(extraFlags:Int = 0):Void {
+	public function openBodyChild(extraFlags:Int = 0, bottomReserve:Single = 0):Void {
 		if (bodyChild)
 			return;
 		var flags = ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoScrollbar;
@@ -459,7 +487,9 @@ class HudChrome {
 			flags = ImGuiWindowFlags.NoBackground;
 		flags |= extraFlags;
 		ImGui.pushStyleColor(ImGuiCol.ChildBg, ImGui.vec4(0, 0, 0, 0));
-		ImGui.beginChild(BODY_CHILD_ID, ImGui.vec2(0, 0), bodyChildFlags, flags);
+		// A reserved footer keeps child hit-testing away from parent resize controls.
+		var childH:Single = bottomReserve > 0 ? -bottomReserve : 0;
+		ImGui.beginChild(BODY_CHILD_ID, ImGui.vec2(0, childH), bodyChildFlags, flags);
 		ImGui.popStyleColor();
 		bodyChild = true;
 		drawContextMenu(lastOnClose, lastCaption);
@@ -470,6 +500,123 @@ class HudChrome {
 			return;
 		ImGui.endChild();
 		bodyChild = false;
+	}
+
+	/**
+	 * The sole resize affordance for runtime HUD windows. Call only after the
+	 * body child has closed, with footer space reserved outside its hit-test area.
+	 * Ending a child scope alone does not remove its hover rectangle.
+	 *
+	 * Width/height are outer-window units. Owners that persist content units
+	 * (HUDWidgetWindow) translate them in the callback.
+	 */
+	public function drawResizeCorner(id:String, enabled:Bool, minW:Single, minH:Single,
+			maxW:Single, maxH:Single, ?onResize:Single->Single->Void, gripInset:Single = 0):Void {
+		if (!CursorCaptureFix.cursorFree) {
+			if (activeResizeId == id)
+				activeResizeId = null;
+			return;
+		}
+		if (!enabled || isCollapsed()) {
+			if (activeResizeId == id) activeResizeId = null;
+			return;
+		}
+		if (id == null || id.length == 0)
+			id = "hud";
+
+		var wp = ImGui.getWindowPos();
+		var ws = ImGui.getWindowSize();
+		if (wp == null || ws == null)
+			return;
+		var hit:Single = RESIZE_GRIP;
+		// Padded parents can inset the grip so its entire hit box remains unclipped.
+		var px:Single = wp.x + ws.x - hit - gripInset;
+		var py:Single = wp.y + ws.y - hit - gripInset;
+		var dl = ImGui.getWindowDrawList();
+
+		// Transparent mode hides the chrome, so reveal the real window bounds only
+		// while it is editable. This makes padding/clip bounds inspectable without
+		// changing the locked HUD appearance.
+		if (isTransparent()) {
+			var outline = ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.75, 0.82, 0.95, 0.28));
+			ImGui.ImDrawList_AddRect(dl, wp, ImGui.vec2(wp.x + ws.x, wp.y + ws.y), outline, 3, 1);
+		}
+
+		ImGui.setCursorScreenPos(ImGui.vec2(px, py));
+		ImGui.invisibleButton("##hm_resize_" + id, ImGui.vec2(hit, hit), ImGuiButtonFlags.AllowOverlap);
+		var hovered = ImGui.isItemHovered();
+		var active = ImGui.isItemActive();
+		var drawW = ws.x;
+		var drawH = ws.y;
+		if (active) {
+			var mouse = ImGui.getMousePos();
+			if (activeResizeId != id) {
+				activeResizeId = id;
+				resizeGrabX = ws.x - (mouse.x - wp.x);
+				resizeGrabY = ws.y - (mouse.y - wp.y);
+			}
+			var nextW:Single = mouse.x - wp.x + resizeGrabX;
+			var nextH:Single = mouse.y - wp.y + resizeGrabY;
+			if (nextW < minW) nextW = minW;
+			if (nextH < minH) nextH = minH;
+			if (maxW > 0 && nextW > maxW) nextW = maxW;
+			if (maxH > 0 && nextH > maxH) nextH = maxH;
+			if (Math.abs(nextW - ws.x) > 0.5 || Math.abs(nextH - ws.y) > 0.5) {
+				ImGui.setWindowSize(ImGui.vec2(nextW, nextH));
+				winW = nextW;
+				winH = nextH;
+				drawW = nextW;
+				drawH = nextH;
+				if (onResize != null)
+					onResize(nextW, nextH);
+			}
+		}
+		if (activeResizeId == id && ImGui.isMouseReleased(ImGuiMouseButton.Left)) {
+			activeResizeId = null;
+		}
+
+		var gripCol:Int = hovered || active ? 0xDDE8D7A0 : 0x88FFFFFF;
+		ResizeGrip.draw(dl, wp.x + drawW - hit - gripInset, wp.y + drawH - hit - gripInset, hit, gripCol);
+	}
+
+	/**
+	 * Transparent HUDs have no visible title strip. Let their non-interactive
+	 * artwork/background act as the move surface, while active controls and the
+	 * resize corner retain priority.
+	 */
+	public function pollTransparentSurfaceDrag(id:String, enabled:Bool):Void {
+		if (!CursorCaptureFix.cursorFree) {
+			if (activeSurfaceDragId == id)
+				activeSurfaceDragId = null;
+			return;
+		}
+		if (!enabled || !isTransparent() || isCollapsed()) {
+			if (activeSurfaceDragId == id) activeSurfaceDragId = null;
+			return;
+		}
+		if (id == null || id.length == 0)
+			id = "hud";
+		var wp = ImGui.getWindowPos();
+		var mouse = ImGui.getMousePos();
+		if (activeSurfaceDragId == id) {
+			if (ImGui.isMouseReleased(ImGuiMouseButton.Left)) {
+				activeSurfaceDragId = null;
+				return;
+			}
+			var nx:Single = mouse.x - surfaceGrabX;
+			var ny:Single = mouse.y - surfaceGrabY;
+			x.set(nx);
+			y.set(ny);
+			ImGui.setWindowPos(ImGui.vec2(nx, ny));
+			SettingsStore.markDirty();
+			return;
+		}
+		if (ImGui.isWindowHovered() && ImGui.isMouseClicked(ImGuiMouseButton.Left)
+				&& !ImGui.isAnyItemActive()) {
+			activeSurfaceDragId = id;
+			surfaceGrabX = mouse.x - wp.x;
+			surfaceGrabY = mouse.y - wp.y;
+		}
 	}
 
 	function blitSun(px:Single, py:Single):Void {
@@ -513,16 +660,20 @@ class HudChrome {
 	/** Standalone launcher grip; shares HUD drag/collapse authority with the title icon. */
 	public function drawLauncherGrip(px:Single, py:Single, hitSize:Single):Void {
 		if (!isLocked())
-			pollSunGrip(px, py, hitSize);
+			pollSunGrip(px, py, hitSize, hitSize, hitSize);
 		var inset:Single = (hitSize - SUN) * 0.5;
 		blitSun(px + inset, py + inset);
 	}
 
-	function pollSunGrip(px:Single, py:Single, hitSize:Single = SUN):Void {
-		if (!CursorCaptureFix.cursorFree)
+	function pollSunGrip(px:Single, py:Single, hitW:Single = SUN,
+			hitH:Single = SUN, collapseHitW:Single = SUN):Void {
+		if (!CursorCaptureFix.cursorFree) {
+			dragSun = false;
+			didDrag = false;
 			return;
+		}
 		ImGui.setCursorScreenPos(ImGui.vec2(px, py));
-		ImGui.invisibleButton(GRIP_ID, ImGui.vec2(hitSize, hitSize), ImGuiButtonFlags.AllowOverlap);
+		ImGui.invisibleButton(GRIP_ID, ImGui.vec2(hitW, hitH), ImGuiButtonFlags.AllowOverlap);
 		if (ImGui.isItemActive()) {
 			var m = ImGui.getMousePos();
 			if (!dragSun) {
@@ -542,7 +693,9 @@ class HudChrome {
 			}
 		}
 		if (ImGui.isItemDeactivated()) {
-			var click = dragSun && !didDrag;
+			var m = ImGui.getMousePos();
+			var click = dragSun && !didDrag && m.x >= px && m.x <= px + collapseHitW
+				&& m.y >= py && m.y <= py + hitH;
 			dragSun = false;
 			didDrag = false;
 			if (click)

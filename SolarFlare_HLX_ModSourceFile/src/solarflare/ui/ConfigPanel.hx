@@ -177,6 +177,11 @@ class ConfigPanel {
 		registerInteractive(open);
 		registerInteractive(dbgMetrics);
 		registerInteractive(dbgLog);
+		registerInteractive(solarflare.debug.DebugSystem.open);
+		#if solarflare_telemetry
+		registerInteractive(solarflare.debug.PayloadProbe.enabled);
+		registerInteractive(solarflare.debug.ResolutionLedger.enabled);
+		#end
 		if (resourceTracker != null) registerInteractive(resourceTracker.open);
 		if (geauxBuilder != null) registerInteractive(geauxBuilder.open);
 		if (auraBuilder != null) registerInteractive(auraBuilder.open);
@@ -219,15 +224,18 @@ class ConfigPanel {
 	}
 
 	function closeInteractiveWindowsImpl():Void {
+		var changed = false;
 		for (ref in interactiveOpenRefs) {
-			if (ref != null)
+			if (ref != null && ref.get()) {
 				ref.set(false);
+				changed = true;
+			}
 		}
 		if (geauxBuilder != null)
 			geauxBuilder.clearTransientState();
 		if (auraBuilder != null)
 			auraBuilder.clearTransientState();
-		SettingsStore.markDirty();
+		if (changed) SettingsStore.markDirty();
 	}
 
 	/**
@@ -333,20 +341,6 @@ class ConfigPanel {
 
 	/** Hub, builders, debug panels, or other editors that must block Farever menu shortcuts. */
 	public function anyInteractiveOpen():Bool {
-		if (solarflare.debug.DebugSystem.open.get())
-			return true;
-		// Session debug overlays: capture keys, but never register in interactiveOpenRefs
-		// so suspendForCamera / inventory cursor flips do not clear them.
-		try {
-			if (solarflare.debug.ResolutionLedger.enabled != null
-				&& solarflare.debug.ResolutionLedger.enabled.get())
-				return true;
-		} catch (_:Dynamic) {}
-		try {
-			if (solarflare.debug.PayloadProbe.enabled != null
-				&& solarflare.debug.PayloadProbe.enabled.get())
-				return true;
-		} catch (_:Dynamic) {}
 		for (ref in interactiveOpenRefs)
 			if (ref != null && ref.get())
 				return true;
@@ -476,17 +470,23 @@ class ConfigPanel {
 							ImGui.sameLine(colW);
 							ImGui.checkbox("Metrics##sf_metrics", dbgMetrics);
 							ImGui.checkbox("Debug log##sf_dbglog", dbgLog);
+							#if solarflare_telemetry
 							ImGui.sameLine(colW);
 							ImGui.checkbox("Payload probe##sf_payload", solarflare.debug.PayloadProbe.enabled);
-						}, "Probe opens panel only. Start/Stop recording inside — session-only, not saved.");
+							#end
+						});
+						#if solarflare_telemetry
 						UiLayout.propertyRow("Ledger", function() {
 							ImGui.checkbox("Resolution ledger##sf_ledger", solarflare.debug.ResolutionLedger.enabled);
 						}, "Panel open is session-only. Recording never auto-starts. JSONL: hlx/mods/solarflare/logs/");
+						#end
 					});
+					#if solarflare_telemetry
 					if (solarflare.debug.FieldWalkLog.lastPath.length > 0)
 						ImGui.textDisabled(solarflare.debug.FieldWalkLog.lastPath);
 					if (ImGui.smallButton("Copy FieldWalk log path##sf_fwlog"))
 						UiActionQueue.copyText(solarflare.debug.FieldWalkLog.lastPath, "FieldWalk path copied");
+					#end
 				}
 			}, false, rememberHubLayout.get());
 		}

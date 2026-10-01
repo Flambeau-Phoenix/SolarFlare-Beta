@@ -19,6 +19,10 @@ class RuntimeMetrics {
 	public static var eventDrained:Int = 0;
 	public static var eventDropped:Int = 0;
 	public static var maxQueueDepth:Int = 0;
+	public static var clipChecks:Int = 0;
+	public static var clipUpdates:Int = 0;
+	public static var clipReleases:Int = 0;
+	public static var clipFailures:Int = 0;
 
 	public static function reset():Void {
 		hookEdges = coalescedEdges = 0;
@@ -26,6 +30,7 @@ class RuntimeMetrics {
 		identityPolls = vitalsPolls = statusPolls = skillPolls = 0;
 		targetPolls = encounterPolls = auraTicks = layoutRecoveryPolls = 0;
 		eventQueued = eventDrained = eventDropped = maxQueueDepth = 0;
+		clipChecks = clipUpdates = clipReleases = clipFailures = 0;
 	}
 
 	public static function toJson():String {
@@ -33,6 +38,7 @@ class RuntimeMetrics {
 			hookEdges: hookEdges,
 			coalescedEdges: coalescedEdges,
 			passes: {fast: fastPasses, active: heavyPasses, background: backgroundPasses},
+			cursor: {checks: clipChecks, updates: clipUpdates, releases: clipReleases, failures: clipFailures},
 			polls: {identity: identityPolls, vitals: vitalsPolls, status: statusPolls,
 				skills: skillPolls, target: targetPolls, encounter: encounterPolls, auras: auraTicks,
 				layoutRecovery: layoutRecoveryPolls},

@@ -10,7 +10,9 @@ import solarflare.debug.ResolutionLedger.LedgerAgg;
  * and preview for every single call. `gen` invalidates the handle when the recording
  * session is cleared, so a stale binding can never write into a detached row.
  */
+#if solarflare_telemetry
 @:keep
+#end
 class LedgerBinding {
 	public var agg:LedgerAgg = null;
 	public var gen:Int = -1;

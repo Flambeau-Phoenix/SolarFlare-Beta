@@ -3,12 +3,12 @@ package solarflare.cdb;
 import haxe.Json;
 
 /**
- * CastleDB timings for Auras, baked by `tools/build_status_durations.py` and embedded
+ * CastleDB timings for Auras, baked by `tools/refresh_cdb_assets.py` and embedded
  * as the `status-durations` resource. Duration / cooldown only — live getters still win
  * when present; this is the fallback when a status exposes no usable timer.
  *
- * Embedded rather than read from disk so there is no path ladder and no dependency on
- * `deploy.ps1` asset sync, which skips existing `assets/cdb` files without -ForceAssets.
+ * Embedded so timing updates take effect with the rebuilt mod bytecode. Deployment
+ * also refreshes the generated disk tables used by the other CDB consumers.
  */
 class CdbAuraTable {
 	static var ready:Bool = false;

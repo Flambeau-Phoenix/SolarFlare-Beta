@@ -85,8 +85,10 @@ class AuraStatusCache {
 		if (hero == null)
 			return;
 		sampledHero = hero;
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed())
 			solarflare.debug.ResolutionLedger.touch("status.sample", "observe", "AuraStatusCache.sample", "hero", "bool", "true");
+		#end
 		// Walk the hero's own container first: a status sitting in that list is a fact.
 		// Typed lookups run after, so a getStatus() miss can only add a demanded id that
 		// the walk never saw — it can no longer land an absent row ahead of the live one.
@@ -489,6 +491,7 @@ class AuraStatusCache {
 			snap.stacks = 0;
 			count++;
 		}
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed() && snap != null) {
 			var id = solarflare.debug.ResolutionLedger.cleanId(want);
 			if (id.length == 0)
@@ -513,6 +516,7 @@ class AuraStatusCache {
 					"typed"
 				);
 		}
+		#end
 		return snap;
 	}
 
@@ -552,6 +556,7 @@ class AuraStatusCache {
 		}
 		if (n < 1)
 			n = 1;
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed()) {
 			var id = "";
 			try
@@ -570,6 +575,7 @@ class AuraStatusCache {
 				method
 			);
 		}
+		#end
 		return n;
 	}
 

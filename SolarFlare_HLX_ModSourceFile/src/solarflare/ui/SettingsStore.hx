@@ -19,6 +19,7 @@ class SettingsStore {
 	static var dirty = false;
 	static var lastCfg:ConfigPanel = null;
 	static var lastSaveMs:Float = 0;
+	static var lastEditMs:Float = 0;
 	static var activeTheme:String = "purple_gold";
 	static var lastCaptureWarning:String = "";
 
@@ -62,6 +63,7 @@ class SettingsStore {
 
 	public static function markDirty():Void {
 		dirty = true;
+		lastEditMs = haxe.Timer.stamp() * 1000;
 		try
 			solarflare.ObserveDemand.markStatusDemandDirty()
 		catch (_:Dynamic) {}
@@ -129,8 +131,8 @@ class SettingsStore {
 		var target = cfg != null ? cfg : lastCfg;
 		if (!dirty || target == null)
 			return;
-		var now = Date.now().getTime();
-		if (now - lastSaveMs < 300)
+		var now = haxe.Timer.stamp() * 1000;
+		if (now - lastEditMs < 500 || now - lastSaveMs < 300)
 			return;
 		save(target);
 	}
@@ -154,7 +156,7 @@ class SettingsStore {
 			// Do not clear dirty until the persisted replacement parses successfully.
 			haxe.Json.parse(sys.io.File.getContent(path));
 			dirty = false;
-			lastSaveMs = Date.now().getTime();
+			lastSaveMs = haxe.Timer.stamp() * 1000;
 			try {
 				var ini = iniPath();
 				if (ini != null)
@@ -491,7 +493,6 @@ class SettingsStore {
 			pulse: c.lowHpPulse.get(),
 			low: c.lowHpPercent.get(),
 			round: c.barRounding.get(),
-			boss: c.bossesOnly.get(),
 			targetCast: c.showCastBar.get(),
 			castH: c.castBarHeight.get(),
 			castSkin: c.castBarSkin.get(),
@@ -874,7 +875,6 @@ class SettingsStore {
 			setFloat(c.lowHpPercent, lowV);
 		}
 		setFloat(c.barRounding, data.round);
-		setBool(c.bossesOnly, data.boss);
 		setBool(c.showCastBar, data.targetCast);
 		setFloat(c.castBarHeight, data.castH);
 		// castSkin ignored: target strip is unstyled; field kept for JSON dump compat.
@@ -905,8 +905,10 @@ class SettingsStore {
 		cfg.hubSizeDirty = true;
 		applyChrome(cfg.hubChrome, data.chrome);
 		// Resolution ledger panel is session-only (like PayloadProbe). Ignore legacy hub.ledger.
+		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.enabled != null)
 			solarflare.debug.ResolutionLedger.enabled.set(false);
+		#end
 	}
 
 	static function applySaber(s:LightsaberConfig, data:Dynamic):Void {

@@ -1,6 +1,8 @@
 ﻿package solarflare.debug;
 
+#if solarflare_telemetry
 @:keep
+#end
 class ProbeRow {
 	public var name:String = "";
 	public var step:String = "miss";

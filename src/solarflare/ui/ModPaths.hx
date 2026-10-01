@@ -40,8 +40,8 @@ class ModPaths {
 
 	public static function findCdbFile(filename:String):String {
 		var candidates = new Array<String>();
-		try candidates.push(Path.join([modDir(), "assets", filename])) catch (_:Dynamic) {}
 		try candidates.push(Path.join([modDir(), "assets", "cdb", filename])) catch (_:Dynamic) {}
+		try candidates.push(Path.join([modDir(), "assets", filename])) catch (_:Dynamic) {}
 		try candidates.push(Path.join([modDir(), "cdb", filename])) catch (_:Dynamic) {}
 		try {
 			var exeDir = Path.directory(Sys.programPath());

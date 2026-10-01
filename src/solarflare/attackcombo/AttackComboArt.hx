@@ -19,7 +19,7 @@ class AttackComboArt {
 		if (n < 0) n = 0;
 		if (n > 4) n = 4;
 		if (artSet == 1) {
-			// Purple-blade series packed in first atlas.
+			// Purple-blade series packed with the other custom art in atlas3.
 			return switch (n) {
 				case 0: "0ComboAttack";
 				case 1: "01ComboAttack";

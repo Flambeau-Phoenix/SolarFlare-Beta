@@ -10,7 +10,9 @@ import sys.io.File;
  * Recording is session-only (never persisted) so logs do not grow across launches.
  * Aggregates winners in memory; JSONL flushes pending deltas ~2s while recording.
  */
+#if solarflare_telemetry
 @:keep
+#end
 class ResolutionLedger {
 	/** Show the overlay panel (may be restored from settings). */
 	public static var enabled = new BoolRef(false);
@@ -274,37 +276,7 @@ class ResolutionLedger {
 
 	/** Decode HL String / Bytes dumps into a stable Haxe id for keys + ImGui. Never returns {bytes…}. */
 	public static function cleanId(raw:Dynamic):String {
-		if (raw == null)
-			return "";
-		// Opaque HL String: UCS-2 char-code copy (not fromUTF8).
-		if (Std.isOfType(raw, String)) {
-			var s:String = cast raw;
-			if (s.length == 0)
-				return "";
-			var mat = "";
-			try
-				mat = solarflare.ui.ByteUtil.materialize(s)
-			catch (_:Dynamic)
-				mat = "";
-			mat = StringTools.trim(mat);
-			if (mat.length > 0 && !isDumpId(mat))
-				return mat;
-		}
-		// Raw hl.Bytes / dump objects via Geaux coerce.
-		var coerced = solarflare.geaux.GeauxCache.coerceSkillId(raw);
-		coerced = StringTools.trim(coerced);
-		if (coerced.length > 0 && !isDumpId(coerced))
-			return coerced;
-		return "";
-	}
-
-	static function isDumpId(s:String):Bool {
-		if (s == null || s.length == 0)
-			return true;
-		if (s.indexOf("{") >= 0 || s.indexOf("}") >= 0)
-			return true;
-		var low = s.toLowerCase();
-		return low.indexOf("bytes") >= 0;
+		return solarflare.EngineText.cleanId(raw);
 	}
 
 	public static function rowsForDraw():Array<LedgerAgg> {
@@ -513,7 +485,9 @@ class ResolutionLedger {
 	}
 }
 
+#if solarflare_telemetry
 @:keep
+#end
 class LedgerAgg {
 	public var key:String = "";
 	public var feature:String = "";

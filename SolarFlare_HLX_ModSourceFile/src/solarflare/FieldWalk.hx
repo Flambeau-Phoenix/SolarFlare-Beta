@@ -249,9 +249,11 @@ class FieldWalk {
 				if (usable(underscored)) {
 					if (remember) {
 						rememberWin(key, "_field", "", null);
+						#if solarflare_telemetry
 						try
 							solarflare.debug.FieldWalkLog.noteWin(tname, name, "_field")
 						catch (_:Dynamic) {}
+						#end
 					}
 					hit.step = "_field";
 					hit.value = underscored;
@@ -266,9 +268,11 @@ class FieldWalk {
 				if (usable(plain)) {
 					if (remember) {
 						rememberWin(key, "field", "", null);
+						#if solarflare_telemetry
 						try
 							solarflare.debug.FieldWalkLog.noteWin(tname, name, "field")
 						catch (_:Dynamic) {}
+						#end
 					}
 					hit.step = "field";
 					hit.value = plain;
@@ -319,9 +323,11 @@ class FieldWalk {
 	static function winHit(hit:ProbeHit, remember:Bool, key:String, tname:String, name:String, step:String, getter:String, value:Dynamic):ProbeHit {
 		if (remember) {
 			rememberWin(key, step, getter, null);
+			#if solarflare_telemetry
 			try
 				solarflare.debug.FieldWalkLog.noteWin(tname, name, step)
 			catch (_:Dynamic) {}
+			#end
 		}
 		hit.step = step;
 		hit.value = value;

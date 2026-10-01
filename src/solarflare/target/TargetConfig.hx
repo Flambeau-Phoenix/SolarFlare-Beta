@@ -35,8 +35,6 @@ class TargetConfig {
 	public var castBarHeight = new FloatRef(16);
 	public var castBarSkin = new IntRef(0);
 	public var lowHpPulse = new BoolRef(true);
-	/** Provisional — isBoss() not yet ledger-verified in a live boss fight. */
-	public var bossesOnly = new BoolRef(false);
 	/** Low-HP pulse threshold as percent of max (5–50). */
 	public var lowHpPercent = new FloatRef(25);
 	public var barRounding = new FloatRef(3);
@@ -95,10 +93,6 @@ class TargetConfig {
 			}, alwaysShow.get()
 				? "Frame stays up with an empty placeholder when nothing is targeted."
 				: "Overlay hides completely until you have a target.");
-			UiLayout.propertyRow("Bosses / elites", function() {
-				if (ImGui.checkbox("##" + id + "_boss", bossesOnly))
-					SettingsStore.markDirty();
-			}, "Boss filter uses Unit.isBoss/isElite — verify live before relying on it.");
 		});
 
 		ImGui.separatorText("Display");

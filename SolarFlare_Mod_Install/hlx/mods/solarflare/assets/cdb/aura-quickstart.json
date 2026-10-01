@@ -1,0 +1,470 @@
+{
+  "source": {
+    "sha256": "96ca48ad164a9be5ec52e28474d4be8c5fb6972256682322cff98563d710b807",
+    "toolVersion": "refresh_cdb_assets"
+  },
+  "bosses": [
+    {
+      "id": "Crabgantua",
+      "name": "Crabgantua",
+      "skills": [
+        {
+          "id": "R1CrabBoss_TidalSlash",
+          "name": "Tidal Slash"
+        },
+        {
+          "id": "R1CrabBoss_TidalSlash_Heroic",
+          "name": "Tidal Slash"
+        },
+        {
+          "id": "R1CrabBoss_Heroic_Bubble",
+          "name": "Bubble"
+        },
+        {
+          "id": "R1CrabBoss_ChitinousExoskeleton",
+          "name": "R1CrabBoss_ChitinousExoskeleton"
+        },
+        {
+          "id": "R1CrabBoss_NayasFury",
+          "name": "Naya's Fury"
+        },
+        {
+          "id": "R1CrabBoss_HuntDown",
+          "name": "Devour"
+        },
+        {
+          "id": "R1CrabBoss_ChitinousExoskeleton_Spike",
+          "name": "R1CrabBoss_ChitinousExoskeleton_Spike"
+        }
+      ]
+    },
+    {
+      "id": "Gatsbee",
+      "name": "Gatsbee",
+      "skills": [
+        {
+          "id": "Gatsbee_Auto",
+          "name": "Gatsbee_Auto"
+        },
+        {
+          "id": "Gatsbee_Barrage",
+          "name": "Gatsbee_Barrage"
+        },
+        {
+          "id": "Gatsbee_Tornado",
+          "name": "Gatsbee_Tornado"
+        },
+        {
+          "id": "Gatsbee_Heroic_Swarm",
+          "name": "Heart of the Swarm"
+        }
+      ]
+    },
+    {
+      "id": "Golcano",
+      "name": "Golcano",
+      "skills": [
+        {
+          "id": "Golcano_Auto",
+          "name": "Golcano_Auto"
+        },
+        {
+          "id": "Golcano_ShieldApply",
+          "name": "Fire Blast"
+        },
+        {
+          "id": "Golcano_Eruption",
+          "name": "Golcano_Eruption"
+        },
+        {
+          "id": "Golem_DeathDoorExplosion_Elite",
+          "name": "Golem_DeathDoorExplosion_Elite"
+        },
+        {
+          "id": "Golem_Explosion_Elite",
+          "name": "Golem_Explosion_Elite"
+        }
+      ]
+    },
+    {
+      "id": "Phrixes",
+      "name": "High Inquisitor Chakram",
+      "skills": [
+        {
+          "id": "Phrixes_Strike",
+          "name": "Phrixes_Strike"
+        },
+        {
+          "id": "Phrixes_Phase1_Passive",
+          "name": "Phrixes_Phase1_Passive"
+        },
+        {
+          "id": "Phrixes_LightBolt",
+          "name": "Light Bolt"
+        },
+        {
+          "id": "Phrixes_Phase1End",
+          "name": "Phrixes_Phase1End"
+        },
+        {
+          "id": "Phrixes_Phase2Entry",
+          "name": "Surrendering to Darkness"
+        },
+        {
+          "id": "Phrixes_Phase2_EnergyRegen",
+          "name": "Phrixes_Phase2_EnergyRegen"
+        },
+        {
+          "id": "Phrixes_NightBolt",
+          "name": "Night Bolt"
+        },
+        {
+          "id": "Phrixes_SigilOfWrath",
+          "name": "Phrixes_SigilOfWrath"
+        },
+        {
+          "id": "Phrixes_DimensionalInstability",
+          "name": "Dimensional Instability"
+        },
+        {
+          "id": "Phrixes_Phase3Entry",
+          "name": "Phrixes_Phase3Entry"
+        },
+        {
+          "id": "Phrixes_EternalNight",
+          "name": "Eternal Night"
+        },
+        {
+          "id": "Phrixes_Phase4Entry",
+          "name": "Phrixes_Phase4Entry"
+        },
+        {
+          "id": "Phrixes_DemonicStrike",
+          "name": "Phrixes_DemonicStrike"
+        },
+        {
+          "id": "Phrixes_NightSalvo",
+          "name": "Night Salvo"
+        },
+        {
+          "id": "Phrixes_PowerExpulsion",
+          "name": "Power Expulsion"
+        },
+        {
+          "id": "Phrixes_OpenRift",
+          "name": "Open Rift"
+        },
+        {
+          "id": "Phrixes_Demon_Summon",
+          "name": "Gate to Niflel"
+        },
+        {
+          "id": "Phrixes_H_NC_Spawn",
+          "name": "Phrixes_H_NC_Spawn"
+        }
+      ]
+    },
+    {
+      "id": "Ratsar",
+      "name": "King Ratsar",
+      "skills": [
+        {
+          "id": "Ratsar_Attack",
+          "name": "Ratsar_Attack"
+        },
+        {
+          "id": "Ratsar_GreatSlam",
+          "name": "Ratsar_GreatSlam"
+        },
+        {
+          "id": "Ratsar_Spin",
+          "name": "Raging Spin"
+        },
+        {
+          "id": "Ratsar_SparkAbsorption",
+          "name": "Spark Absorption"
+        },
+        {
+          "id": "Ratsar_KingRageSuccessState",
+          "name": "Ratsar_KingRageSuccessState"
+        },
+        {
+          "id": "Ratsar_KingRageFailState",
+          "name": "Ratsar_KingRageFailState"
+        }
+      ]
+    },
+    {
+      "id": "Mokshi",
+      "name": "Lady Bee",
+      "skills": [
+        {
+          "id": "Mokshi_Attack",
+          "name": "Mokshi_Attack"
+        },
+        {
+          "id": "Mokshi_Leaves",
+          "name": "Sharp Leaves"
+        },
+        {
+          "id": "Mokshi_DeadlyBlossom",
+          "name": "Deadly Blossom"
+        },
+        {
+          "id": "Mokshi_Barrage",
+          "name": "Royal Barrage"
+        },
+        {
+          "id": "Mokshi_ChrysalisLaser",
+          "name": "Charged Honey Beam"
+        },
+        {
+          "id": "Mokshi_Phase2Screech",
+          "name": "Mokshi_Phase2Screech"
+        },
+        {
+          "id": "Mokshi_EnterChrysalis",
+          "name": "Mokshi_EnterChrysalis"
+        },
+        {
+          "id": "Mokshi_ChrysalisEnd_Stun",
+          "name": "Mokshi_ChrysalisEnd_Stun"
+        },
+        {
+          "id": "Mokshi_Phase3Screech",
+          "name": "Mokshi_Phase3Screech"
+        },
+        {
+          "id": "Mokshi_Heroic_Last_Stand",
+          "name": "The Last Queen"
+        }
+      ]
+    },
+    {
+      "id": "MunsterChuck",
+      "name": "Munster Chuck",
+      "skills": [
+        {
+          "id": "MChuck_Attack",
+          "name": "MChuck_Attack"
+        },
+        {
+          "id": "MChuck_Dash",
+          "name": "MChuck_Dash"
+        },
+        {
+          "id": "MChuck_StaticBomb",
+          "name": "Static Bomb"
+        },
+        {
+          "id": "MChuck_SprayedFondue",
+          "name": "Sprayed Fondue"
+        },
+        {
+          "id": "MChuck_CheeseCatapult",
+          "name": "Cheese catapult"
+        },
+        {
+          "id": "MChuck_IsolatedHeal",
+          "name": "MChuck_IsolatedHeal"
+        },
+        {
+          "id": "MChuck_Heroic",
+          "name": "MChuck_Heroic"
+        },
+        {
+          "id": "MChuck_MadBombing",
+          "name": "Mad bombing"
+        }
+      ]
+    },
+    {
+      "id": "Nepsilon",
+      "name": "Nepsilon",
+      "skills": [
+        {
+          "id": "ManfishBoss_Auto",
+          "name": "ManfishBoss_Auto"
+        },
+        {
+          "id": "ManfishBoss_Aoe",
+          "name": "Aquatic Eruption"
+        },
+        {
+          "id": "ManfishBoss_WaterVolley",
+          "name": "Water Volley"
+        },
+        {
+          "id": "ManfishBoss_WaterBreath",
+          "name": "Water Breath"
+        },
+        {
+          "id": "ManfishBoss_WaterBreathStun",
+          "name": "ManfishBoss_WaterBreathStun"
+        },
+        {
+          "id": "ManfishBoss_Bubble_Roam",
+          "name": "Bubble Run"
+        }
+      ]
+    },
+    {
+      "id": "DemonSuperElite",
+      "name": "Nightking Maat Demon",
+      "skills": [
+        {
+          "id": "SuperEliteDemon_Auto",
+          "name": "Strike"
+        },
+        {
+          "id": "SuperEliteDemon_Slam",
+          "name": "Slam"
+        },
+        {
+          "id": "SuperEliteDemon_Leap",
+          "name": "Leap"
+        },
+        {
+          "id": "SuperEliteDemon_Storm",
+          "name": "Chaos Storm"
+        },
+        {
+          "id": "SuperEliteDemon_Bomb",
+          "name": "Bomb"
+        },
+        {
+          "id": "SuperEliteDemon_FireWall",
+          "name": "SuperEliteDemon_FireWall"
+        }
+      ]
+    },
+    {
+      "id": "DemonSuperElite_Fairy",
+      "name": "Nightqueen Shaarlize Te'ror",
+      "skills": [
+        {
+          "id": "FaerieEliteDemon_NightRain",
+          "name": "Night Rain"
+        },
+        {
+          "id": "FaerieEliteDemon_Auto",
+          "name": "FaerieEliteDemon_Auto"
+        },
+        {
+          "id": "FaerieEliteDemon_Teleport",
+          "name": "Teleport"
+        },
+        {
+          "id": "FairieSuperElite_Clones",
+          "name": "Deceitful Illusions"
+        },
+        {
+          "id": "SuperEliteDemon_FireWall",
+          "name": "SuperEliteDemon_FireWall"
+        }
+      ]
+    },
+    {
+      "id": "Cleodora",
+      "name": "Queen Honeyzabeth",
+      "skills": [
+        {
+          "id": "Cleodora_Devastation",
+          "name": "Devastation"
+        },
+        {
+          "id": "Cleodora_Phase3Entry",
+          "name": "Cleodora_Phase3Entry"
+        },
+        {
+          "id": "Cleodora_RoyalSmash",
+          "name": "Royal Smash"
+        },
+        {
+          "id": "Cleodora_Strike",
+          "name": "Cleodora_Strike"
+        },
+        {
+          "id": "Cleodora_SparkRay",
+          "name": "Spark-infused Ray"
+        }
+      ]
+    },
+    {
+      "id": "Reblochonk",
+      "name": "Reblochonk",
+      "skills": [
+        {
+          "id": "Reblochonk_Auto",
+          "name": "Reblochonk_Auto"
+        },
+        {
+          "id": "Reblochonk_CheeseShot",
+          "name": "Fragrant Wheel"
+        },
+        {
+          "id": "Reblochonk_Skill1",
+          "name": "Rampage"
+        }
+      ]
+    },
+    {
+      "id": "RobinHoof",
+      "name": "Robin Hoof",
+      "skills": [
+        {
+          "id": "RobinHoof_Auto",
+          "name": "Aimed shot"
+        },
+        {
+          "id": "RobinHoof_Disengage",
+          "name": "Disengage"
+        },
+        {
+          "id": "RobinHoof_Arrow",
+          "name": "Bellshot"
+        },
+        {
+          "id": "RobinHoof_Summon",
+          "name": "RobinHoof_Summon"
+        }
+      ]
+    },
+    {
+      "id": "SpongeBlob",
+      "name": "Sponge Blob",
+      "skills": [
+        {
+          "id": "Spongeblob_Auto",
+          "name": "Spongeblob_Auto"
+        },
+        {
+          "id": "Spongeblob_Skill1",
+          "name": "Tidal Whirlwind"
+        },
+        {
+          "id": "Spongeblob_Skill2",
+          "name": "Abyssal Dance"
+        },
+        {
+          "id": "Spongeblob_Heroic_Bubble_Wall",
+          "name": "Bubble Wall"
+        }
+      ]
+    }
+  ],
+  "excludedBosses": [
+    {
+      "id": "Phrixes_NightGod",
+      "reason": "Unidentified phase variant: CDB name is ??? and portrait is portal artwork."
+    },
+    {
+      "id": "Cleodora_Heroic_Dark_Champion",
+      "reason": "The Usurper: user has not confirmed this encounter in game."
+    },
+    {
+      "id": "Ulserous",
+      "reason": "ul'Serous: user has not confirmed this encounter in game."
+    }
+  ]
+}

@@ -1,0 +1,7696 @@
+{
+  "skills": [
+    {
+      "id": "Activity_BallonBouncing_StatusCounter",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Axe_Base_Attack3",
+      "duration": 0.55,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Axe1H_96px.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Axe_Boomerang_Combo",
+      "duration": 0.75,
+      "grantedStatus": "Axe_Boomerang_Skill1",
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Axe1H_96px.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Axe_Boomerang_Skill1",
+      "cooldown": 15.0,
+      "grantedStatus": "Axe_Boomerang_Skill1_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Axe1H_96px.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Axe_Boomerang_Skill1_Status",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Axe1H_96px.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Axe_Boomerang_Skill_Passive_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Axe1H_96px.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "BeeCombcutter_Strike",
+      "cooldown": 3.0
+    },
+    {
+      "id": "BeeCombcutter_SwiftStep",
+      "duration": 4.0,
+      "cooldown": 12.0
+    },
+    {
+      "id": "BeeGuardSpearPOI_Auto",
+      "duration": 1.8,
+      "cooldown": 3.0
+    },
+    {
+      "id": "BeeHarvester_HoneyBolt",
+      "duration": 2.0,
+      "cooldown": 3.0
+    },
+    {
+      "id": "BeeHarvester_Skill",
+      "duration": 5.0,
+      "cooldown": 20.0
+    },
+    {
+      "id": "BeeHarvester_Skill_Elite",
+      "duration": 4.0,
+      "cooldown": 20.0
+    },
+    {
+      "id": "BeeRoyalGuard_HiveSmash",
+      "duration": 2.87,
+      "cooldown": 3.0
+    },
+    {
+      "id": "BeeRoyalGuard_HoneyBarrage",
+      "cooldown": 20.0
+    },
+    {
+      "id": "BeeRoyalGuard_HoneyBarrage_Multi",
+      "cooldown": 20.0
+    },
+    {
+      "id": "BeeRoyalGuard_LeaderPheromones",
+      "duration": 2.0,
+      "cooldown": 15.0
+    },
+    {
+      "id": "BeeRoyalGuard_LeaderPheromonesStatus",
+      "duration": 30.0
+    },
+    {
+      "id": "BeeWatcher_RevitalizingHoney",
+      "duration": 4.0,
+      "cooldown": 15.0
+    },
+    {
+      "id": "BeeWatcher_Scratch",
+      "duration": 1.96,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Bee_Champion_SwiftStep",
+      "duration": 4.0,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Bleed",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Boar_Auto",
+      "duration": 1.67,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Boar_Auto_Bigger",
+      "duration": 1.67,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Boar_Auto_Elite",
+      "duration": 1.93,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Boar_Skill1",
+      "duration": 3.0,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Boar_Skill1Area",
+      "duration": 5.0
+    },
+    {
+      "id": "Book_Start_Combo",
+      "duration": 1.04,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_Start_Skill1",
+      "duration": 1.72,
+      "cooldown": 12.0,
+      "grantedStatus": "Book_Start_Skill1_Burn",
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_Start_Skill1_Burn",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_Start_Skill2",
+      "cooldown": 10.0,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_WaterOrbs_Combo",
+      "duration": 1.04,
+      "grantedStatus": "Book_WaterOrbs_Rise_Charge",
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_WaterOrbs_Orb_Charge",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 7,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_WaterOrbs_Passive_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 9,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_WaterOrbs_Rise_Charge",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_WaterOrbs_Skill1",
+      "cooldown": 10.0,
+      "grantedStatus": "Book_WaterOrbs_Rise_Charge",
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 7,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_WaterOrbs_Skill1_Buff",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_WaterOrbs_Skill1_Shield",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_WaterOrbs_Skill2",
+      "cooldown": 15.0,
+      "grantedStatus": "Book_WaterOrbs_Skill2_Recast",
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 8,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Bow_AttackCombo",
+      "duration": 1.05
+    },
+    {
+      "id": "Bow_Base_Attack4",
+      "duration": 0.63,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_BigGame_Combo",
+      "duration": 1.05,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_BigGame_Passive_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 18,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_BigGame_Skill1",
+      "cooldown": 16.0,
+      "grantedStatus": "Bow_BigGame_Skill1_Status",
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_BigGame_Skill1_Status",
+      "duration": 4.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_BigGame_Skill2",
+      "cooldown": 12.0,
+      "grantedStatus": "Bow_BigGame_Skill2_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_BigGame_Skill2_Status",
+      "duration": 4.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_BigGame_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 18,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_Craft_AttackCombo",
+      "duration": 1.05,
+      "grantedStatus": "Bow_Craft_AttackCombo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_Craft_AttackCombo_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_Craft_Passive_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_Craft_Skill1",
+      "cooldown": 12.0,
+      "grantedStatus": "Bow_Craft_Skill1_Rank3_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_Craft_Skill1_Rank3_Status",
+      "duration": 9.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bow_Craft_Skill2",
+      "cooldown": 10.0,
+      "grantedStatus": "Bow_Craft_Passive_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Bow_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Bulwark",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Burning",
+      "duration": 1.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 9,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "CannonPlant_Load",
+      "cooldown": 1.0
+    },
+    {
+      "id": "CannonPlant_Shoot",
+      "duration": 4.0,
+      "cooldown": 1.0
+    },
+    {
+      "id": "Cannon_HoneyShot_Liquid",
+      "cooldown": 1.0,
+      "gfx": {
+        "file": "UI/icons/atlas_vehicles_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Cannon_HoneyShot_Solid",
+      "cooldown": 1.0,
+      "gfx": {
+        "file": "UI/icons/atlas_vehicles_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Cannon_MokshiShot",
+      "cooldown": 1.0,
+      "gfx": {
+        "file": "UI/icons/atlas_vehicles_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "CasterManfish_Auto",
+      "duration": 2.5,
+      "cooldown": 3.0
+    },
+    {
+      "id": "CleodoraChamp_Spawn",
+      "duration": 2.5
+    },
+    {
+      "id": "CleodoraChamp_Tornado",
+      "duration": 2.5,
+      "cooldown": 20.0
+    },
+    {
+      "id": "CleodoraChamp_TornadoArea",
+      "duration": 30.0
+    },
+    {
+      "id": "CleodoraEgg_Cast",
+      "duration": 0.5
+    },
+    {
+      "id": "Cleodora_ChampionSummon",
+      "duration": 2.0
+    },
+    {
+      "id": "Cleodora_Devastation",
+      "duration": 1.5
+    },
+    {
+      "id": "Cleodora_MiniElite_FirstLife",
+      "isStatus": true
+    },
+    {
+      "id": "Cleodora_MiniElite_Sleep",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Cleodora_Phase3Entry",
+      "duration": 4.0
+    },
+    {
+      "id": "Cleodora_RoyalSmash",
+      "duration": 6.0,
+      "cooldown": 25.0
+    },
+    {
+      "id": "Cleodora_SparkRay",
+      "duration": 1.0,
+      "cooldown": 45.0
+    },
+    {
+      "id": "Cleodora_SparkRayFireArea",
+      "duration": 5.0
+    },
+    {
+      "id": "Cleodora_SparkRayHitArea",
+      "duration": 7.5
+    },
+    {
+      "id": "Cleodora_Strike",
+      "duration": 2.25,
+      "cooldown": 3.0
+    },
+    {
+      "id": "ConsumableStatus",
+      "duration": 10.0,
+      "isStatus": true
+    },
+    {
+      "id": "Crab_Attack",
+      "duration": 2.13,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Crab_Bubble",
+      "duration": 3.5,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Crab_Elite_Attack",
+      "duration": 2.13,
+      "cooldown": 4.0
+    },
+    {
+      "id": "Crescent_Base_Attack",
+      "duration": 0.5,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Crescent_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Crescent_Base_Attack3",
+      "duration": 0.6,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Crescent_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Crescent_FlowerSpiral_FinalCombo",
+      "duration": 0.8,
+      "grantedStatus": "Crescent_FlowerSpiral_FinalCombo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Crescent_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Crescent_FlowerSpiral_FinalCombo_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Crescent_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Crescent_FlowerSpiral_Passive_Slow",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Crescent_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Crescent_FlowerSpiral_Skill_1",
+      "cooldown": 12.0,
+      "grantedStatus": "Crescent_FlowerSpiral_Skill_1_Charge",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Crescent_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Crescent_FlowerSpiral_Skill_1_Charge",
+      "duration": 10.0,
+      "cooldown": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Crescent_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Crescent_FlowerSpiral_Skill_2",
+      "cooldown": 16.0,
+      "grantedStatus": "Crescent_FlowerSpiral_Skill_2_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Crescent_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Crescent_FlowerSpiral_Skill_2_Status",
+      "duration": 4.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Crescent_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Crimson_Book_Aura",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Crimson_Book_Auto",
+      "duration": 2.5,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Crimson_Book_Skill",
+      "cooldown": 10.0
+    },
+    {
+      "id": "Crimson_Bow_AimedShot",
+      "duration": 2.2
+    },
+    {
+      "id": "Crimson_Bow_Disengage",
+      "duration": 1.2,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Crimson_Captain_DoubleStrike",
+      "duration": 2.8,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Crimson_Captain_FanaticalFuryStatus",
+      "duration": 30.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Crimson_Captain_Whirlwind",
+      "duration": 5.0,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Crimson_Daggers_Auto",
+      "duration": 2.8,
+      "cooldown": 2.0
+    },
+    {
+      "id": "Crimson_Daggers_Skill",
+      "duration": 1.8,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Crimson_Fists_Auto",
+      "duration": 2.5,
+      "cooldown": 1.0
+    },
+    {
+      "id": "Crimson_Fists_Skill",
+      "duration": 2.2,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Crimson_GA_Auto",
+      "duration": 3.0,
+      "cooldown": 2.0
+    },
+    {
+      "id": "Crimson_GA_Skill",
+      "duration": 2.5,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Crimson_GA_Skill_E",
+      "duration": 2.5,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Crimson_Peasant_Auto",
+      "duration": 2.25,
+      "cooldown": 1.0
+    },
+    {
+      "id": "Crimson_Peasant_Skill",
+      "duration": 2.0,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Crimson_Scepter_Auto",
+      "cooldown": 3.0,
+      "grantedStatus": "Crimson_Scepter_Auto_Status"
+    },
+    {
+      "id": "Crimson_Scepter_Auto_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Crimson_Scepter_Skill",
+      "duration": 5.0,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Crimson_SwordShield_Auto",
+      "duration": 2.25,
+      "cooldown": 1.0
+    },
+    {
+      "id": "Crimson_SwordShield_Consecration",
+      "duration": 3.0,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Crimson_SwordShield_Consecration_Shield",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DA_Base_Attack4",
+      "duration": 0.5,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_DualAxe_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "DA_Water_Combo",
+      "duration": 0.58,
+      "grantedStatus": "DA_Water_Combo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_DualAxe_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "DA_Water_Combo_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_DualAxe_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "DA_Water_Passive_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_DualAxe_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "DA_Water_Passive_Status_R3",
+      "duration": 120.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_DualAxe_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "DA_Water_Skill1",
+      "cooldown": 20.0,
+      "grantedStatus": "DA_Water_Skill1_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_DualAxe_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "DA_Water_Skill1_Status",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_DualAxe_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "DA_Water_Skill1_StatusShield",
+      "duration": 8.0,
+      "isStatus": true
+    },
+    {
+      "id": "DA_Water_Skill2",
+      "cooldown": 10.0,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_DualAxe_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "DM_Base_Attack4",
+      "duration": 0.5,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Mace_96px.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DM_Multispin_Combo",
+      "duration": 0.58,
+      "grantedStatus": "DM_Multispin_Combo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Mace_96px.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DM_Multispin_Combo_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Mace_96px.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DM_Multispin_Passive_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Mace_96px.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DM_Multispin_Passive_Status2",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Mace_96px.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DM_Multispin_Skill1",
+      "duration": 0.55,
+      "cooldown": 10.0,
+      "grantedStatus": "DM_Multispin_Skill1_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Mace_96px.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DM_Multispin_Skill1_Recast",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Mace_96px.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DM_Multispin_Skill1_Status",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Mace_96px.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DM_Multispin_Skill2",
+      "duration": 0.55,
+      "cooldown": 10.0,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Mace_96px.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DS_Bladeleaf_Combo",
+      "duration": 0.85,
+      "grantedStatus": "DS_Bladeleaf_Combo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Sword_96px.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DS_Bladeleaf_Combo_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Sword_96px.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DS_Bladeleaf_Passive",
+      "cooldown": 30.0,
+      "grantedStatus": "DS_Bladeleaf_Passive_Status",
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Sword_96px.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DS_Bladeleaf_Passive_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Sword_96px.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DS_Bladeleaf_Skill1",
+      "duration": 0.7,
+      "cooldown": 12.0,
+      "grantedStatus": "DS_Bladeleaf_Skill_1Recast",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Sword_96px.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DS_Bladeleaf_Skill2",
+      "duration": 0.65,
+      "cooldown": 45.0,
+      "grantedStatus": "DS_Bladeleaf_Skill2_Status",
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Sword_96px.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DS_Bladeleaf_Skill2_Status",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Sword_96px.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "DS_Bladeleaf_Skill_1Recast",
+      "duration": 4.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dual_Sword_96px.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_Demondash_Combo_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_Demondash_Mark",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_Demondash_Passive_Debuff",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_Demondash_Passive_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_Demondash_Skill1",
+      "cooldown": 12.0,
+      "grantedStatus": "Daggers_Demondash_Mark",
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_Demondash_Skill1_Counter",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_Demondash_Skill1_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_Demondash_Skill2",
+      "cooldown": 20.0,
+      "grantedStatus": "Daggers_Demondash_Mark",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_Demondash_Skill2_Counter",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_Demondash_Skill2_Shoot",
+      "cooldown": 0.5,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_DuplicatePoison_ComboAttack_Status",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_DuplicatePoison_PassiveStatus",
+      "duration": 9.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_DuplicatePoison_Passive_Bonus",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_DuplicatePoison_Skill1",
+      "duration": 0.68,
+      "cooldown": 24.0,
+      "grantedStatus": "Daggers_DuplicatePoison_Skill1_Status",
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_DuplicatePoison_Skill1_Status",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_DuplicatePoison_Skill2",
+      "cooldown": 4.0,
+      "grantedStatus": "Daggers_DuplicatePoison_PassiveStatus",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Daggers_Start_Combo",
+      "duration": 0.75,
+      "grantedStatus": "Daggers_Start_Combo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Daggers_Start_Combo_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Daggers_Start_Skill1",
+      "cooldown": 15.0,
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Daggers_Start_Skill2",
+      "cooldown": 12.0,
+      "grantedStatus": "Daggers_Start_Skill2_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Daggers_Start_Skill2_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Dagger_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Dash_Base",
+      "cooldown": 10.0,
+      "grantedStatus": "Dash_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Dash_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Dead",
+      "isStatus": true
+    },
+    {
+      "id": "Dead_Hidden",
+      "isStatus": true
+    },
+    {
+      "id": "Dead_Resurrect",
+      "isStatus": true
+    },
+    {
+      "id": "DebugShield",
+      "duration": 1.0,
+      "cooldown": 1.0,
+      "gfx": {
+        "file": "UI/Placeholder/abilitiesButton.png",
+        "size": 48,
+        "x": 0,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "DebugShieldStatus",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/abilitiesButton.png",
+        "size": 48,
+        "x": 0,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Demon_Claws_Auto",
+      "duration": 2.25,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Demon_Claws_Shield",
+      "cooldown": 20.0
+    },
+    {
+      "id": "Demon_Claws_Shield_Shield",
+      "duration": 60.0,
+      "isStatus": true
+    },
+    {
+      "id": "Demon_Claws_Skill",
+      "duration": 3.0,
+      "cooldown": 9.0
+    },
+    {
+      "id": "Demon_Fly_Auto",
+      "duration": 2.4
+    },
+    {
+      "id": "Demon_Gate_Visual_Status",
+      "isStatus": true
+    },
+    {
+      "id": "Demon_Slime_Slam_Skill_Elite1",
+      "duration": 4.5,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Demon_Spear_Auto",
+      "duration": 2.25,
+      "cooldown": 3.0,
+      "grantedStatus": "Demon_Spear_Skill_Burn"
+    },
+    {
+      "id": "Demon_Spear_Skill",
+      "duration": 1.4,
+      "cooldown": 10.0,
+      "grantedStatus": "Demon_Spear_Skill_Status"
+    },
+    {
+      "id": "Demon_Spear_Skill_Burn",
+      "duration": 10.0,
+      "isStatus": true
+    },
+    {
+      "id": "Demon_Spear_Skill_Status",
+      "isStatus": true
+    },
+    {
+      "id": "Drowning",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Dueling",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "EarthGolem_Auto",
+      "duration": 2.1,
+      "cooldown": 3.0
+    },
+    {
+      "id": "EliteOutnumbered",
+      "isStatus": true
+    },
+    {
+      "id": "ElixirOfAbundanceStatus",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Abundance.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Enchant_Devote_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/AugmentEnchantWeapon/Items_Loot_Scrolls_Scroll_weapon_Z2.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Enchant_Zealot_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/AugmentEnchantWeapon/Items_Loot_Scrolls_Scroll_weapon_Z2.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Exit_Vehicle",
+      "cooldown": 1.0,
+      "gfx": {
+        "file": "UI/icons/atlas_vehicles_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "FXTest",
+      "duration": 20.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/BattleIcons96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "FaerieEliteDemon_Auto",
+      "duration": 5.0
+    },
+    {
+      "id": "FaerieEliteDemon_NightRain",
+      "duration": 4.4,
+      "cooldown": 12.0,
+      "grantedStatus": "FaerieEliteDemon_NightRain_Status"
+    },
+    {
+      "id": "FaerieEliteDemon_NightRain_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "FaerieEliteDemon_Teleport",
+      "duration": 4.4,
+      "cooldown": 12.0
+    },
+    {
+      "id": "FaerieEliteDemon_Teleport_Cloud_Area",
+      "duration": 60.0
+    },
+    {
+      "id": "Faerie_Demon_Auto",
+      "duration": 1.96,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Faerie_Demon_Skill",
+      "duration": 1.96,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Faerie_Demon_Summon",
+      "duration": 2.5,
+      "cooldown": 20.0
+    },
+    {
+      "id": "FairieSuperElite_Clones_Stealth",
+      "duration": 1000.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "FastSwimPotion",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Swim.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "FastSwimPotionStatus",
+      "isStatus": true
+    },
+    {
+      "id": "FighterManFish_Auto",
+      "duration": 2.25,
+      "cooldown": 3.0
+    },
+    {
+      "id": "FighterManfish_Skill1",
+      "duration": 2.5,
+      "cooldown": 9.0
+    },
+    {
+      "id": "FireGolem_Auto",
+      "duration": 2.1,
+      "cooldown": 3.0
+    },
+    {
+      "id": "FireGolem_Auto_Elite",
+      "duration": 2.0,
+      "cooldown": 3.0
+    },
+    {
+      "id": "FireGolem_Skill",
+      "duration": 3.5,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Fists_LightMonk_Combo",
+      "duration": 0.7,
+      "grantedStatus": "Fists_LightMonk_Combo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_LightMonk_Combo_Status",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_LightMonk_Passive_Shield",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 18,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_LightMonk_Skill1",
+      "cooldown": 12.0,
+      "grantedStatus": "Fists_LightMonk_Skill1_Status",
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_LightMonk_Skill1_Recast",
+      "duration": 0.5,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_LightMonk_Skill1_Status",
+      "duration": 4.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_LightMonk_Skill2",
+      "duration": 0.6,
+      "cooldown": 18.0,
+      "grantedStatus": "Fists_LightMonk_Skill2_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_LightMonk_Skill2_Status",
+      "duration": 1.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_WaterUppercut_C",
+      "duration": 0.7,
+      "grantedStatus": "Fists_WaterUppercut_C_CritStatus",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_WaterUppercut_C_CritStatus",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_WaterUppercut_P_Status_Slow",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_WaterUppercut_S1",
+      "duration": 0.75,
+      "cooldown": 22.0,
+      "grantedStatus": "Fists_WaterUppercut_S3",
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_WaterUppercut_S2",
+      "cooldown": 6.0,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fists_WaterUppercut_S3",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Fists_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "FlyHarvester_Auto",
+      "duration": 1.0,
+      "cooldown": 3.0
+    },
+    {
+      "id": "FoeStealthStatus",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Fracture",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Frailty",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Base_Attack",
+      "duration": 0.75,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Base_Attack2",
+      "duration": 0.7,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Base_Attack3",
+      "duration": 0.7,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Craft_FinalCombo",
+      "duration": 0.85,
+      "grantedStatus": "GA_Craft_FinalCombo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Craft_FinalCombo_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Craft_Passive_Proc",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Craft_Skill1",
+      "duration": 1.0,
+      "cooldown": 16.0,
+      "grantedStatus": "GA_Craft_Skill2",
+      "spanMod": "reset,rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Craft_Skill2",
+      "duration": 1.0,
+      "cooldown": 25.0,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Demon_Combo",
+      "duration": 0.85,
+      "grantedStatus": "GA_Demon_Combo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Demon_Combo_Status",
+      "duration": 20.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Demon_Passive",
+      "cooldown": 30.0,
+      "grantedStatus": "GA_Demon_Passive_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 18,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Demon_Passive_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 18,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Demon_Skill1",
+      "duration": 1.12,
+      "cooldown": 25.0,
+      "grantedStatus": "GA_Demon_Skill1_Status",
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Demon_Skill1_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Demon_Skill2",
+      "cooldown": 40.0,
+      "grantedStatus": "GA_Demon_Skill2_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GA_Demon_Skill2_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GM_Base_Attack",
+      "duration": 0.75,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GM_Base_Attack2",
+      "duration": 0.7,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GM_Base_Attack3",
+      "duration": 0.7,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GM_MassGrab_Combo",
+      "duration": 0.85,
+      "grantedStatus": "GM_MassGrab_Combo_Proc",
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GM_MassGrab_Combo_Proc",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GM_MassGrab_Passive_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GM_MassGrab_Skill1",
+      "duration": 1.5,
+      "cooldown": 16.0,
+      "grantedStatus": "GM_MassGrab_Skill1_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GM_MassGrab_Skill1_Status",
+      "duration": 4.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GM_MassGrab_Skill1_Status2",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GM_MassGrab_Skill2",
+      "cooldown": 24.0,
+      "grantedStatus": "GM_MassGrab_Skill2_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GM_MassGrab_Skill2_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Base_Attack",
+      "duration": 0.75,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Base_Attack2",
+      "duration": 0.7,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Base_Attack3",
+      "duration": 0.7,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Nova_Combo",
+      "duration": 0.85,
+      "grantedStatus": "GS_Nova_Combo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Nova_Combo_Status",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Nova_Passive_Stack",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Nova_Skill1",
+      "cooldown": 15.0,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Nova_Skill2",
+      "cooldown": 30.0,
+      "grantedStatus": "GS_Nova_Skill2_Buff",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Nova_Skill2_Buff",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Nova_Ultimate",
+      "duration": 2.0,
+      "grantedStatus": "GS_Nova_Ultimate_Proc",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Nova_Ultimate_Proc",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "GS_Nova_Ultimate_Slow",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatSword_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Gastbee_Heroic_Swarm_Status",
+      "duration": 60.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Great_Mace_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Gatsbee_Auto",
+      "duration": 2.87,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Gatsbee_Barrage",
+      "cooldown": 20.0
+    },
+    {
+      "id": "Gatsbee_Heroic_Barrage_Bounce",
+      "duration": 10.0
+    },
+    {
+      "id": "Gatsbee_Heroic_Barrage_Puddle",
+      "duration": 15.0
+    },
+    {
+      "id": "Gatsbee_Heroic_Swarm",
+      "cooldown": 30.0
+    },
+    {
+      "id": "Gatsbee_Tornado",
+      "duration": 2.5,
+      "cooldown": 20.0
+    },
+    {
+      "id": "Gatsbee_Tornado_Area",
+      "duration": 10000.0
+    },
+    {
+      "id": "GiantCrawler_Slash_Skill",
+      "duration": 7.5,
+      "cooldown": 2.0
+    },
+    {
+      "id": "Golcano_Auto",
+      "duration": 2.0,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Golcano_Eruption",
+      "duration": 3.5,
+      "cooldown": 18.0
+    },
+    {
+      "id": "Golcano_Minion_Auto",
+      "duration": 2.0,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Golcano_Minion_Eruption",
+      "duration": 3.5,
+      "cooldown": 18.0
+    },
+    {
+      "id": "Golcano_Shield",
+      "isStatus": true
+    },
+    {
+      "id": "Golcano_ShieldApply",
+      "cooldown": 2.0,
+      "grantedStatus": "Golcano_ShieldApply_Status"
+    },
+    {
+      "id": "Golcano_ShieldApply_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 37,
+        "y": 11,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Golcano_Volcano",
+      "duration": 10000.0
+    },
+    {
+      "id": "Golem_Auto_Elite",
+      "duration": 2.0,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Golem_Earth_Elite_Eruption",
+      "duration": 3.5,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Golem_Fire_Elite_Eruption",
+      "duration": 3.5,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Golem_Scream",
+      "cooldown": 5.0
+    },
+    {
+      "id": "Golem_Skill",
+      "duration": 3.5,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Halos_Base_Attack3",
+      "duration": 0.7,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Demon_Combo",
+      "duration": 1.29,
+      "grantedStatus": "Halos_Demon_Combo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Demon_Combo_Status",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Demon_Passive_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 18,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Demon_Skill1",
+      "cooldown": 12.0,
+      "grantedStatus": "Halos_Demon_Skill1_Shield",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Demon_Skill1_Recast",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Demon_Skill1_Shield",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Demon_Skill2",
+      "cooldown": 20.0,
+      "grantedStatus": "Halos_Demon_Skill2_Leash",
+      "spanMod": "reset,rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Demon_Skill2_Leash",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Demon_Skill2_R3_Counter",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Totem_Combo",
+      "duration": 1.29,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Totem_Passive_Slow",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Totem_Passive_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Totem_Skill",
+      "cooldown": 12.0,
+      "grantedStatus": "Halos_Totem_SummonPassive",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Halos_Totem_Skill2",
+      "cooldown": 12.0,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Halos_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "HoneyCovered",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "HoneyCoveredDamage",
+      "duration": 1.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "HoneySlime_Auto",
+      "duration": 2.3,
+      "cooldown": 3.0
+    },
+    {
+      "id": "ImpDemon_Auto",
+      "duration": 2.75
+    },
+    {
+      "id": "ImpDemon_Skill",
+      "duration": 1.25,
+      "cooldown": 12.0
+    },
+    {
+      "id": "ImpDemon_Skill_Elite",
+      "duration": 1.25,
+      "cooldown": 12.0
+    },
+    {
+      "id": "InfusedTusk",
+      "cooldown": 120.0,
+      "grantedStatus": "InfusedTusk_Status",
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_InfusedTusk_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "InfusedTusk_Cooldown",
+      "duration": 120.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_InfusedTusk_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "InfusedTusk_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_InfusedTusk_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Bee_DPS_Dot",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 96,
+        "x": 1,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Bee_Support_Buff",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 96,
+        "x": 2,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Bee_Support_Counter",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 96,
+        "x": 2,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Bee_Support_Ultimate_Proc",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 96,
+        "x": 2,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Bee_Tank_Shield",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 96,
+        "x": 0,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Bee_Tank_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 96,
+        "x": 0,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Crimson_DPS_Magic",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Infusion_96px_.png",
+        "size": 96,
+        "x": 7,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Crimson_DPS_Physical",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Infusion_96px_.png",
+        "size": 96,
+        "x": 6,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Crimson_Support_Peace",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Infusion_96px_.png",
+        "size": 96,
+        "x": 5,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Crimson_Support_Wrath",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Infusion_96px_.png",
+        "size": 96,
+        "x": 4,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Crimson_Tank_Skill_Proc",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Infusion_96px_.png",
+        "size": 96,
+        "x": 3,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Crimson_Tank_Skill_Recharging",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Infusion_96px_.png",
+        "size": 96,
+        "x": 3,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Crimson_Tank_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Infusion_96px_.png",
+        "size": 96,
+        "x": 3,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Kobold_Support_CheeseDebuff",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 96,
+        "x": 5,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Kobold_Support_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 96,
+        "x": 5,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Kobold_Tank_Aura",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 96,
+        "x": 3,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Kobold_Tank_Debuff",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 96,
+        "x": 3,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Kobold_Tank_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 96,
+        "x": 3,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Infusion_Manfish_DPS_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 2,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Manfish_DPS_Ultimate_Counter",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 2,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Manfish_DPS_Ultimate_Proc",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 2,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Manfish_Support_Ultimate_Counter",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 4,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Manfish_Support_Ultimate_Proc",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 4,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Manfish_Tank_Cooldown",
+      "duration": 30.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 0,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Manfish_Tank_Shield",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 0,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Manfish_Tank_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 0,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Nightling_DPS",
+      "cooldown": 1.0,
+      "grantedStatus": "Infusion_Nightling_DPS_Status_Crit",
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_AP",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 14,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_Crit",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 14,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_Fervor",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 14,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Status_MP",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 14,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Nightling_DPS_Summon_Auto",
+      "duration": 2.5,
+      "cooldown": 1.0
+    },
+    {
+      "id": "Infusion_Nightling_Support_Shield",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 12,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Nightling_Support_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 12,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Nightling_Support_Status_Tracker",
+      "duration": 60.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 12,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Nightling_Tank_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Infusion_atlas.png",
+        "size": 48,
+        "x": 16,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Infusion_Nightling_Tank_Summon_Auto",
+      "duration": 1.2
+    },
+    {
+      "id": "Invisible",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "ItemStatus",
+      "isStatus": true
+    },
+    {
+      "id": "KoboldMiner_Auto",
+      "duration": 2.0,
+      "cooldown": 3.0
+    },
+    {
+      "id": "KoboldMiner_Spin",
+      "duration": 6.0,
+      "cooldown": 12.0
+    },
+    {
+      "id": "KoboldMiner_Spin_Elite",
+      "cooldown": 8.0
+    },
+    {
+      "id": "KoboldOverseer_Auto",
+      "duration": 2.75
+    },
+    {
+      "id": "KoboldOverseer_MadRun",
+      "duration": 2.4,
+      "cooldown": 15.0
+    },
+    {
+      "id": "KoboldOverseer_MadRunStatus",
+      "duration": 9.0,
+      "isStatus": true
+    },
+    {
+      "id": "KoboldThief_Auto",
+      "duration": 2.0,
+      "cooldown": 3.0,
+      "grantedStatus": "KoboldThief_Auto_Status"
+    },
+    {
+      "id": "KoboldThief_Auto_Status",
+      "duration": 9.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "LavaSpore_Auto",
+      "duration": 2.67,
+      "cooldown": 3.0
+    },
+    {
+      "id": "LongBreathPotion",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Breath.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Luck_Glider_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Luck_LegendaryWeapon_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Luck_Mount_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Luck_PrismaticGear_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Luck_RareMaterial_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "MChuck_Attack",
+      "duration": 2.0,
+      "cooldown": 2.0
+    },
+    {
+      "id": "MChuck_MadBombing",
+      "cooldown": 60.0
+    },
+    {
+      "id": "MChuck_MadBombingArea",
+      "duration": 30.0
+    },
+    {
+      "id": "MChuck_SprayedFondue",
+      "cooldown": 45.0
+    },
+    {
+      "id": "MChuck_SprayedFondueArea",
+      "duration": 3.5
+    },
+    {
+      "id": "MChuck_SprayedFondueStatus",
+      "duration": 1.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "MChuck_StaticBomb",
+      "duration": 3.0,
+      "cooldown": 20.0
+    },
+    {
+      "id": "Mace_Base_Attack3",
+      "duration": 0.55,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Mace_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mace_Benediction_Combo",
+      "duration": 0.75,
+      "grantedStatus": "Mace_Benediction_Skill1_Proc",
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Mace_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mace_Benediction_Passive_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Mace_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mace_Benediction_Skill1",
+      "duration": 0.5,
+      "cooldown": 8.0,
+      "grantedStatus": "Mace_Benediction_Skill1_Proc",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Mace_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mace_Benediction_Skill1_Proc",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Mace_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mace_Benediction_Skill1_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Mace_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mace_Benediction_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Mace_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mage_Blink",
+      "cooldown": 15.0,
+      "grantedStatus": "Mage_Blink_Mastery3",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_Blink_Mastery2_Position",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_Blink_Mastery3",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_ChronoReset",
+      "duration": 0.8,
+      "cooldown": 180.0,
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_Conduit_Power_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_Foresight_Status",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_MysticEmpowerment",
+      "cooldown": 120.0,
+      "grantedStatus": "Mage_MysticEmpowerment_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_MysticEmpowerment_Status",
+      "duration": 15.0,
+      "cooldown": 25.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_MysticEmpowerment_Status_Physical",
+      "duration": 15.0,
+      "cooldown": 25.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_Overload",
+      "cooldown": 120.0,
+      "grantedStatus": "Mage_Overload_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_Overload_Status",
+      "duration": 9.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_RayOfSpark",
+      "cooldown": 10.0,
+      "grantedStatus": "Slow",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_RayOfSpark_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_ShieldOfSpark",
+      "cooldown": 30.0,
+      "grantedStatus": "Mage_ShieldOfSpark_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 7,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_ShieldOfSpark_Status",
+      "duration": 60.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 7,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_ShieldOfSpark_Status2",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "size": 96,
+        "x": 7,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_StaticNova",
+      "cooldown": 25.0,
+      "grantedStatus": "Mage_StaticNova_Status_M1",
+      "gfx": {
+        "file": "UI/icons/Mage_talent.png",
+        "size": 48,
+        "x": 4,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mage_StaticNova_Status_M1",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Mage_talent.png",
+        "size": 48,
+        "x": 4,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mage_StaticNova_Status_Root",
+      "duration": 4.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 8,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mage_Talent_Chaincast_Accum_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Mage_talent.png",
+        "size": 48,
+        "x": 0,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mage_Talent_Chaincast_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Mage_talent.png",
+        "size": 48,
+        "x": 0,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mage_Talent_HighVoltage_Status",
+      "duration": 20.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Mage_talent.png",
+        "size": 48,
+        "x": 4,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mage_Talent_PowerCircuit_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Mage_talent.png",
+        "size": 48,
+        "x": 2,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "MagicBlock",
+      "cooldown": 0.5,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "ManfishBoss_Aoe",
+      "duration": 3.5,
+      "cooldown": 12.0
+    },
+    {
+      "id": "ManfishBoss_Auto",
+      "duration": 2.25,
+      "cooldown": 3.0
+    },
+    {
+      "id": "ManfishBoss_Bubble_Roam_Status",
+      "duration": 60.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "ManfishBoss_Bubble_Roam_Status_Slow",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "ManfishBoss_Totem_HealBeam",
+      "duration": 200.0
+    },
+    {
+      "id": "ManfishBoss_WaterBreathStun",
+      "duration": 2.0
+    },
+    {
+      "id": "ManfishBoss_WaterBreath_Shield",
+      "isStatus": true
+    },
+    {
+      "id": "ManfishBoss_WaterVolley",
+      "cooldown": 5.0
+    },
+    {
+      "id": "ManfishCaster_Aoe",
+      "duration": 3.0,
+      "cooldown": 12.0
+    },
+    {
+      "id": "MinorShieldPotion_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Shield.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "MinorVelocityPotion_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Velocity.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Mokshi_Barrage",
+      "duration": 6.2,
+      "cooldown": 20.0
+    },
+    {
+      "id": "Mokshi_ChrysalisEnd_Stun",
+      "duration": 12.0
+    },
+    {
+      "id": "Mokshi_ChrysalisLaser",
+      "duration": 1.0,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Mokshi_ChrysalisStatus",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Mokshi_DeadlyBlossom",
+      "duration": 1.0,
+      "cooldown": 50.0
+    },
+    {
+      "id": "Mokshi_Efflorescence",
+      "duration": 2.5
+    },
+    {
+      "id": "Mokshi_EnterChrysalis",
+      "duration": 1.0
+    },
+    {
+      "id": "Mokshi_Heroic_Last_Stand",
+      "duration": 120.0
+    },
+    {
+      "id": "Mokshi_Leaves",
+      "duration": 1.0,
+      "cooldown": 25.0
+    },
+    {
+      "id": "Mokshi_Phase2Screech",
+      "duration": 4.0
+    },
+    {
+      "id": "Mokshi_Phase3Screech",
+      "duration": 4.0
+    },
+    {
+      "id": "Mount",
+      "cooldown": 0.5
+    },
+    {
+      "id": "Net_Capture",
+      "duration": 1.0,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_GreatAxe_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Ogre2H_Spin",
+      "duration": 5.0,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Ogre2H_Spin_E",
+      "duration": 5.0,
+      "cooldown": 10.0
+    },
+    {
+      "id": "OgreElite_Skill1",
+      "duration": 3.0,
+      "cooldown": 10.0
+    },
+    {
+      "id": "OgreGM_Auto",
+      "duration": 2.95,
+      "cooldown": 2.0
+    },
+    {
+      "id": "OgreGM_Skill",
+      "duration": 4.5,
+      "cooldown": 10.0
+    },
+    {
+      "id": "OgreKobold_CheeseShot",
+      "cooldown": 15.0
+    },
+    {
+      "id": "OgreManfishElite_Skill1",
+      "duration": 5.0,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Ogre_Auto",
+      "duration": 2.25,
+      "cooldown": 3.0
+    },
+    {
+      "id": "OreAffix_Air",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "OreAffix_Air_Status",
+      "duration": 120.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "OreAffix_Fire",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "OreAffix_Fire_Status",
+      "duration": 120.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "OreAffix_Ice",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "OreAffix_Ice_Slow",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "OreAffix_Ice_Status",
+      "duration": 120.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "OreAffix_Nature",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "OreAffix_Nature_Status",
+      "duration": 120.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Phrixes_ChaosOrb",
+      "duration": 2.5
+    },
+    {
+      "id": "Phrixes_ChaosOrbStatus",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Phrixes_Demon_Summon",
+      "duration": 2.5,
+      "cooldown": 35.0
+    },
+    {
+      "id": "Phrixes_DemonicStrike",
+      "duration": 2.5,
+      "cooldown": 5.0
+    },
+    {
+      "id": "Phrixes_DimensionalInstability",
+      "duration": 2.0,
+      "cooldown": 10.0,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Phrixes_DimensionalInstabilityStatus",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Phrixes_EternalNight",
+      "duration": 4.0
+    },
+    {
+      "id": "Phrixes_EternalNightStatus",
+      "isStatus": true
+    },
+    {
+      "id": "Phrixes_H_NC_Spawn",
+      "duration": 0.5,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Phrixes_H_NGGate_Visual_Status",
+      "isStatus": true
+    },
+    {
+      "id": "Phrixes_H_NG_ChaosBeam",
+      "cooldown": 12.0
+    },
+    {
+      "id": "Phrixes_H_NG_ChaosMeteor",
+      "duration": 3.8,
+      "cooldown": 20.0
+    },
+    {
+      "id": "Phrixes_H_NG_CosmicPower",
+      "duration": 3.8,
+      "cooldown": 1200.0
+    },
+    {
+      "id": "Phrixes_H_NG_NightSalvo",
+      "duration": 3.1
+    },
+    {
+      "id": "Phrixes_H_NG_Spawn",
+      "duration": 16.0
+    },
+    {
+      "id": "Phrixes_H_NG_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Phrixes_HeapsChaosHorizontal",
+      "duration": 0.5
+    },
+    {
+      "id": "Phrixes_HeapsChaosHorizontalArea",
+      "duration": 15.0
+    },
+    {
+      "id": "Phrixes_HeapsChaosVertical",
+      "duration": 0.5
+    },
+    {
+      "id": "Phrixes_HeapsChaosVerticalArea",
+      "duration": 15.0
+    },
+    {
+      "id": "Phrixes_LightBolt",
+      "duration": 3.0,
+      "cooldown": 5.0
+    },
+    {
+      "id": "Phrixes_NC_Bonus",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Phrixes_NC_Bonus_Scale",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Phrixes_NightBolt",
+      "duration": 3.0,
+      "cooldown": 5.0
+    },
+    {
+      "id": "Phrixes_NightSalvo",
+      "duration": 3.1,
+      "cooldown": 5.0
+    },
+    {
+      "id": "Phrixes_OpenRift",
+      "duration": 1.0,
+      "cooldown": 30.0
+    },
+    {
+      "id": "Phrixes_OpenRiftStatus",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Phrixes_Phase1End",
+      "duration": 2.7
+    },
+    {
+      "id": "Phrixes_Phase2Entry",
+      "duration": 7.0
+    },
+    {
+      "id": "Phrixes_Phase3Entry",
+      "duration": 5.0
+    },
+    {
+      "id": "Phrixes_Phase4Entry",
+      "duration": 7.6
+    },
+    {
+      "id": "Phrixes_PowerExpulsion",
+      "duration": 4.3,
+      "cooldown": 20.0
+    },
+    {
+      "id": "Phrixes_RiftExplosion",
+      "duration": 0.5
+    },
+    {
+      "id": "Phrixes_SigilOfWrath",
+      "duration": 0.5,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Phrixes_SigilOfWrathArea",
+      "duration": 3.0
+    },
+    {
+      "id": "Phrixes_Strike",
+      "duration": 2.5,
+      "cooldown": 3.0
+    },
+    {
+      "id": "PhysicalBlock",
+      "cooldown": 0.5,
+      "grantedStatus": "PhysicalBlock_Status_WellTimed",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "PhysicalBlock_Status_WellTimed",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Pilgrims_FlaskSpeed_Status",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Velocity.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "PirateMelee_Auto",
+      "duration": 1.0,
+      "cooldown": 5.0
+    },
+    {
+      "id": "Poisoned",
+      "duration": 1.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_BeaconOfHope",
+      "duration": 0.5,
+      "cooldown": 180.0,
+      "grantedStatus": "Priest_BeaconOfHope_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_BeaconOfHope_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_BeaconOfHope_Status_Buff",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_BeaconOfHope_Status_Debuff",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_BlessingOfFervor",
+      "cooldown": 120.0,
+      "grantedStatus": "Priest_BlessingOfFervor_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_BlessingOfFervor_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_Crusader",
+      "duration": 0.8,
+      "cooldown": 120.0,
+      "grantedStatus": "Priest_Crusader_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_Crusader_Status",
+      "duration": 20.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_FaithfulWinds",
+      "duration": 0.5,
+      "cooldown": 25.0,
+      "grantedStatus": "Priest_FaithfulWindsStatus",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_FaithfulWindsStatus",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_Judgment_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_Judgment_Status2",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_Miracle_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_PenanceStatus",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 2,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_Prayer_Life",
+      "cooldown": 1.0,
+      "grantedStatus": "Priest_Sig_DivineIntervention",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 2,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_Prayer_Shield",
+      "cooldown": 1.0,
+      "grantedStatus": "Priest_Prayer_Shield_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 2,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_Prayer_Shield_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 2,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_Prayer_Smite",
+      "cooldown": 1.0,
+      "grantedStatus": "Priest_Sig_DivineIntervention",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 2,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_RadiantVerdict",
+      "cooldown": 45.0,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_Sig_DivineIntervention",
+      "cooldown": 12.0,
+      "grantedStatus": "Priest_Judgment_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Priest_Talent_BurningRays_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Priest_talent.png",
+        "size": 48,
+        "x": 8,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Priest_Talent_MeltingFaith_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Priest_talent.png",
+        "size": 48,
+        "x": 2,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Priest_Talent_PotentFortitude_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Priest_talent.png",
+        "size": 48,
+        "x": 6,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Priest_Talent_PurgingStrikes_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Priest_talent.png",
+        "size": 48,
+        "x": 4,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Priest_Talent_Sunlight_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Priest_talent.png",
+        "size": 48,
+        "x": 0,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "PrismaticPearl_Status",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_pearl_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "PrismaticPearl_Status2",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_pearl_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "ProjTest",
+      "cooldown": 1.0,
+      "gfx": {
+        "file": "UI/Placeholder/BattleIcons96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 6,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "PurifiedHeart_Proc",
+      "duration": 20.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_pearl_02.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "PurifiedHeart_Status",
+      "duration": 20.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_pearl_02.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Queenslayer_ChaosAwakening",
+      "duration": 2.5,
+      "cooldown": 22.0
+    },
+    {
+      "id": "Queenslayer_ChaosMark",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Queenslayer_ChaosSlow",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Queenslayer_ChaosStrike",
+      "duration": 4.0,
+      "grantedStatus": "Queenslayer_ChaosMark"
+    },
+    {
+      "id": "Queenslayer_DivideToReign",
+      "cooldown": 30.0
+    },
+    {
+      "id": "Queenslayer_Obliterate",
+      "duration": 6.0,
+      "cooldown": 30.0
+    },
+    {
+      "id": "R1CrabBoss_Heroic_Bubble",
+      "duration": 3.9,
+      "cooldown": 15.0,
+      "grantedStatus": "R1CrabBoss_Heroic_Bubble_Status"
+    },
+    {
+      "id": "R1CrabBoss_Heroic_Bubble_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "R1CrabBoss_HuntDown",
+      "duration": 3.0,
+      "cooldown": 35.0,
+      "grantedStatus": "R1CrabBoss_HuntDownStatus",
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "R1CrabBoss_HuntDownStatus",
+      "duration": 13.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "R1CrabBoss_NayasFury",
+      "duration": 6.0,
+      "cooldown": 15.0
+    },
+    {
+      "id": "R1CrabBoss_NayasFuryMoveStatus",
+      "isStatus": true
+    },
+    {
+      "id": "R1CrabBoss_TidalSlash",
+      "duration": 6.5
+    },
+    {
+      "id": "R1CrabBoss_TidalSlash_Heroic",
+      "duration": 5.0
+    },
+    {
+      "id": "Ratsar_Attack",
+      "duration": 2.7,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Ratsar_GreatSlam",
+      "duration": 8.0,
+      "cooldown": 36.0
+    },
+    {
+      "id": "Ratsar_GreatSlamArea",
+      "duration": 6.0
+    },
+    {
+      "id": "Ratsar_Heroic_Attack_Bleed",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Ratsar_Heroic_Burn",
+      "duration": 9.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 9,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Ratsar_KingRage",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Ratsar_KingRageFailState",
+      "duration": 3.0
+    },
+    {
+      "id": "Ratsar_KingRageSuccessState",
+      "duration": 3.0
+    },
+    {
+      "id": "Ratsar_SparklingShield",
+      "isStatus": true
+    },
+    {
+      "id": "Ratsar_Spin",
+      "duration": 2.8,
+      "cooldown": 25.0
+    },
+    {
+      "id": "Reblochonk_Auto",
+      "duration": 2.5,
+      "cooldown": 2.0
+    },
+    {
+      "id": "Reblochonk_CheeseShot",
+      "duration": 4.6,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Reblochonk_Skill1",
+      "duration": 4.5,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Respawn_Remaining",
+      "isStatus": true
+    },
+    {
+      "id": "Rested",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Resurrected",
+      "isStatus": true
+    },
+    {
+      "id": "RiftstalkersReputation_RiftKillBuff",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "RiftstalkersReputation_SoulwellVitality",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "RobinHoof_Arrow",
+      "duration": 0.8,
+      "cooldown": 10.0
+    },
+    {
+      "id": "RobinHoof_Auto",
+      "duration": 2.2
+    },
+    {
+      "id": "RobinHoof_Disengage",
+      "duration": 0.9,
+      "cooldown": 10.0
+    },
+    {
+      "id": "RobinHoof_Heroic_Caltrops_Slow",
+      "duration": 6.0,
+      "isStatus": true
+    },
+    {
+      "id": "RobinHoof_Heroic_Dog_Buff",
+      "duration": 30.0,
+      "isStatus": true
+    },
+    {
+      "id": "Rogue_AssassinMark_Status",
+      "duration": 30.0,
+      "isStatus": true,
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_Darkness",
+      "cooldown": 120.0,
+      "grantedStatus": "Rogue_Sig_Finisher",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_DeathMark",
+      "cooldown": 90.0,
+      "grantedStatus": "Rogue_AssassinMark_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_Finisher_Combo_Point",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_KnivesTempest",
+      "cooldown": 30.0,
+      "grantedStatus": "Rogue_KnivesTempest_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_KnivesTempest_Status",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_KnivesTempest_Status2",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_KnivesTempest_StatusBis",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_Poison_DeadlyStatus",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Shadowstep",
+      "cooldown": 15.0,
+      "grantedStatus": "Rogue_ShadowstepStatus",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_ShadowstepStatus",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_Sig_Finisher",
+      "cooldown": 8.0,
+      "grantedStatus": "Rogue_Finisher_Combo_Point",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_SmokeBomb",
+      "cooldown": 60.0,
+      "grantedStatus": "Rogue_SmokeBomb_MoveSpeed",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_SmokeBomb_MoveSpeed",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_SmokeBomb_Status",
+      "duration": 1.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_Talent_AcidicSplatter_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 2,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_Adrenaline_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 4,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_AtrophicPoison_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 6,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_CheatDeath_Cooldown",
+      "duration": 120.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 10,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_CheatDeath_Status",
+      "duration": 3.0,
+      "cooldown": 120.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 10,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_CripplingPoison_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 8,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_ImprovedMixture_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 18,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_LeechingPoison_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 12,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 0,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose_ClassSkill",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose_FCA",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose_Finisher",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Dose_WeaponSkill",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_LethalPoison_Status",
+      "duration": 20.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 0,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_VenomInfusion_Status",
+      "duration": 45.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 16,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_Talent_VirulentMagic_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Rogue_talent.png",
+        "size": 48,
+        "x": 14,
+        "y": 6,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Rogue_UrgeToKill",
+      "cooldown": 120.0,
+      "grantedStatus": "Rogue_UrgeToKill_Status",
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_UrgeToKill_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Rogue_UrgeToKill_Status2",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Root",
+      "duration": 2.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 8,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "SacrificePotion_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_Potion_Sacrifice.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Scepter_Flamie_Combo",
+      "duration": 1.04,
+      "grantedStatus": "Scepter_Flamie_Combo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Flamie_Combo_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Flamie_Flamie",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Flamie_S2",
+      "cooldown": 20.0,
+      "grantedStatus": "Scepter_Flamie_S2_R2",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Flamie_S2_R2",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Flamie_S2_R3",
+      "duration": 1.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Flamie_Skill1",
+      "cooldown": 8.0,
+      "grantedStatus": "Scepter_Flamie_Skill1_Area",
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Flamie_Skill1_Area",
+      "duration": 1.0,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Flamie_Skill1_Shield",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Start_Combo",
+      "duration": 1.04,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Start_Skill1",
+      "cooldown": 12.0,
+      "grantedStatus": "Scepter_Start_Skill1_Burn",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Start_Skill1_Burn",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Start_Skill2",
+      "duration": 1.9,
+      "cooldown": 10.0,
+      "grantedStatus": "Scepter_Start_Skill2_Shield",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Scepter_Start_Skill2_Shield",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Scepter_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "ShieldBlock",
+      "cooldown": 0.1,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "ShieldPotion_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Shield_Z2.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Shield_Craft_Passive",
+      "cooldown": 20.0,
+      "grantedStatus": "Shield_Craft_Passive_Status",
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Shield_Craft_Passive_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Shield_Craft_Skill1",
+      "cooldown": 40.0,
+      "grantedStatus": "Shield_Craft_Status",
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Shield_Craft_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Shield_Firebreath_Passive_Status",
+      "duration": 4.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Shield_Firebreath_Skill1",
+      "cooldown": 18.0,
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Shield_OrbitWater_P_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Shield_OrbitWater_P_StatusBlockBuffed",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Shield_OrbitWater_S1",
+      "cooldown": 15.0,
+      "grantedStatus": "Shield_OrbitWater_S1_OrbStatus",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Shield_OrbitWater_S1_OrbStatus",
+      "duration": 20.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Shield_Start_Skill1",
+      "cooldown": 12.0,
+      "grantedStatus": "Shield_Start_Skill1_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Shield_Start_Skill1_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Shield_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Silence",
+      "duration": 2.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Skunk_Auto",
+      "duration": 1.84,
+      "cooldown": 3.0,
+      "grantedStatus": "Skunk_Auto_Status"
+    },
+    {
+      "id": "Skunk_Auto_Bigger",
+      "duration": 1.84,
+      "cooldown": 3.0,
+      "grantedStatus": "Skunk_Auto_Status"
+    },
+    {
+      "id": "Skunk_Auto_Status",
+      "duration": 9.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Slime_Attack",
+      "duration": 2.2,
+      "cooldown": 5.0
+    },
+    {
+      "id": "Slime_Attack_Elite",
+      "duration": 3.0,
+      "cooldown": 5.0
+    },
+    {
+      "id": "Slime_Slam_Skill",
+      "duration": 4.54,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Slime_Slam_Skill_Elite",
+      "duration": 4.5,
+      "cooldown": 12.0
+    },
+    {
+      "id": "Slow",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 7,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "SparkSurge_Mark",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "SparkSurge_Status",
+      "duration": 20.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "SpearManfish_Auto",
+      "duration": 2.25,
+      "cooldown": 3.0
+    },
+    {
+      "id": "SpearManfish_Auto_Elite",
+      "duration": 2.25,
+      "cooldown": 3.0
+    },
+    {
+      "id": "SpearManfish_Skill1",
+      "duration": 4.0,
+      "cooldown": 9.0
+    },
+    {
+      "id": "SpearManfish_Skill1_Elite",
+      "duration": 4.0,
+      "cooldown": 9.0
+    },
+    {
+      "id": "Spear_Base_Attack3",
+      "duration": 0.6,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Eruption_Combo",
+      "duration": 1.1,
+      "grantedStatus": "Spear_Eruption_Combo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Eruption_Combo_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Eruption_Passive_Shield",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Eruption_Passive_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Eruption_Skill1",
+      "duration": 0.5,
+      "cooldown": 18.0,
+      "grantedStatus": "Spear_Eruption_Skill1_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Eruption_Skill1_Status",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Eruption_Skill2",
+      "duration": 1.25,
+      "cooldown": 20.0,
+      "spanMod": "rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Goo_Combo",
+      "duration": 1.1,
+      "grantedStatus": "Spear_Goo_Combo_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Goo_Combo_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Goo_PassiveStatus",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Goo_Passive_Dot",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Goo_Skill1",
+      "duration": 0.8,
+      "cooldown": 8.0,
+      "grantedStatus": "Spear_Goo_Skill1_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Goo_Skill1_Status",
+      "duration": 4.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Spear_Goo_Skill2",
+      "cooldown": 12.0,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Spear_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "SpeedBoost",
+      "isStatus": true
+    },
+    {
+      "id": "Spirit_Auto",
+      "duration": 3.5,
+      "cooldown": 2.0
+    },
+    {
+      "id": "Spirit_Skill",
+      "duration": 5.0,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Spongeblob_Auto",
+      "duration": 2.67,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Spongeblob_Heroic_Bubble_Wall",
+      "cooldown": 15.0
+    },
+    {
+      "id": "Spongeblob_Skill1",
+      "duration": 7.5,
+      "cooldown": 20.0
+    },
+    {
+      "id": "Spongeblob_Suffocation",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Spore_Auto",
+      "duration": 2.67,
+      "cooldown": 3.0
+    },
+    {
+      "id": "Spore_Skill",
+      "duration": 7.5,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Sprout_Auto",
+      "duration": 1.4,
+      "cooldown": 4.0
+    },
+    {
+      "id": "Sprout_Auto_Elite",
+      "duration": 1.4,
+      "cooldown": 4.0
+    },
+    {
+      "id": "Sprout_Burrowed",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Base_Attack2",
+      "duration": 0.6,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Base_Attack3",
+      "duration": 0.55,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Censer_Combo",
+      "duration": 1.4,
+      "grantedStatus": "Staff_Censer_Combo_Buff",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Censer_Combo_Buff",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Censer_Mark",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Censer_Passive_Buff",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Censer_Skill1",
+      "cooldown": 15.0,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Censer_Skill2",
+      "cooldown": 20.0,
+      "grantedStatus": "Staff_Censer_Skill2_Slow",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 2,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Staff_Censer_Skill2_Slow",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 2,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Staff_Censer_Ultimate",
+      "duration": 1.0,
+      "grantedStatus": "Staff_Censer_Ultimate_Proc",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Censer_Ultimate_Proc",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 4,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Craft_C",
+      "duration": 1.4,
+      "grantedStatus": "Staff_Craft_Passive_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Craft_C_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Craft_Passive_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 10,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Craft_S1",
+      "duration": 1.5,
+      "cooldown": 12.0,
+      "grantedStatus": "Staff_Craft_S1_Proc",
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Craft_S1_Proc",
+      "duration": 4.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Craft_S1_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Craft_S2",
+      "cooldown": 18.0,
+      "grantedStatus": "Staff_Craft_S2_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_Craft_S2_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_SummonDemon_Combo",
+      "duration": 1.4,
+      "grantedStatus": "Staff_SummonDemon_Combo_R3_Buff",
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_SummonDemon_Combo_R3_Buff",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 12,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_SummonDemon_Passive",
+      "cooldown": 30.0,
+      "grantedStatus": "Staff_SummonDemon_Passive_Buff",
+      "spanMod": "reset,rank",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 18,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_SummonDemon_Passive_Buff",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 18,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_SummonDemon_Passive_Shield",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 18,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_SummonDemon_Skill1",
+      "duration": 1.5,
+      "cooldown": 6.0,
+      "grantedStatus": "Staff_SummonDemon_Skill1_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_SummonDemon_Skill1_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 14,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Staff_SummonDemon_Skill2",
+      "cooldown": 20.0,
+      "grantedStatus": "Staff_SummonDemon_Skill1_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Staff_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "StoneOfCunning_Trinket_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_Stone_02.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "StoneOfPower_Trinket_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_Stone_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "StoneOfRighteousness_Trinket_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_Stone_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "StoneOfWisdom_Trinket_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_Stone_03.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Stun",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "SummonBee_HoneyBolt",
+      "duration": 2.0,
+      "cooldown": 1.0
+    },
+    {
+      "id": "Summon_Imp_Auto",
+      "duration": 1.5
+    },
+    {
+      "id": "SuperEliteDemon_Auto",
+      "duration": 4.0,
+      "cooldown": 1.0
+    },
+    {
+      "id": "SuperEliteDemon_Bomb",
+      "cooldown": 25.0,
+      "grantedStatus": "SuperEliteDemon_Bomb_Status"
+    },
+    {
+      "id": "SuperEliteDemon_Bomb_Status",
+      "duration": 5.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "SuperEliteDemon_Leap",
+      "duration": 3.0
+    },
+    {
+      "id": "SuperEliteDemon_Rage_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "SuperEliteDemon_Slam",
+      "duration": 5.6
+    },
+    {
+      "id": "SuperEliteDemon_Status_Stackable",
+      "duration": 30.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Sword_Base_Attack3",
+      "duration": 0.55,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Craft_Combo",
+      "duration": 0.75,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Craft_Passive_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 9,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Craft_Skill1",
+      "cooldown": 9.0,
+      "grantedStatus": "Sword_Craft_Skill1_Status",
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 7,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Craft_Skill1_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 7,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Start_Combo",
+      "duration": 0.75,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Start_Skill1",
+      "duration": 0.8,
+      "cooldown": 10.0,
+      "grantedStatus": "Sword_Start_Skill1Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Start_Skill1Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Swarm_Combo",
+      "duration": 0.75,
+      "grantedStatus": "Sword_Swarm_Passive_Swarm",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 0,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Swarm_Passive_Poison",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 2,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Swarm_Passive_Swarm",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 2,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Swarm_Skill1",
+      "duration": 0.7,
+      "cooldown": 18.0,
+      "grantedStatus": "Sword_Swarm_Skill1_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Swarm_Skill1_SelfBuff",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Sword_Swarm_Skill1_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Sword1H_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 1,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "TankFairy_Auto",
+      "duration": 2.0,
+      "cooldown": 3.0
+    },
+    {
+      "id": "TankFairy_Block",
+      "duration": 3.0,
+      "cooldown": 10.0
+    },
+    {
+      "id": "TankManfish_Auto",
+      "duration": 2.25,
+      "cooldown": 2.0
+    },
+    {
+      "id": "TankManfish_Block",
+      "duration": 3.83,
+      "cooldown": 10.0
+    },
+    {
+      "id": "Thrown_Base_Attack2",
+      "duration": 0.68,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Thrown_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Thrown_Base_Attack3",
+      "duration": 0.75,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Thrown_96PX.png",
+        "size": 48,
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Thrown_Seeds_AttackCombo",
+      "duration": 1.1,
+      "grantedStatus": "Thrown_Seeds_Sprout",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Thrown_96PX.png",
+        "size": 48,
+        "x": 2,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Thrown_Seeds_Dot",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Thrown_96PX.png",
+        "size": 48,
+        "x": 8,
+        "y": 2,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Thrown_Seeds_Skill1",
+      "duration": 1.0,
+      "cooldown": 15.0,
+      "grantedStatus": "Thrown_Seeds_Sprout",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Thrown_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Thrown_Seeds_Skill2",
+      "duration": 0.5,
+      "cooldown": 24.0,
+      "grantedStatus": "Thrown_Seeds_Skill2_Status",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Thrown_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Thrown_Seeds_Skill2_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "spanMod": "reset",
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Thrown_96PX.png",
+        "size": 48,
+        "x": 6,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Thrown_Seeds_Sprout",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_weapon_Thrown_96PX.png",
+        "size": 48,
+        "x": 4,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Trap",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 8,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Trinket_Bee_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_EternalFlowerHeart_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Trinket_Crimson_Status",
+      "duration": 3.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_LostRelicFound_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Trinket_Demon_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_FingerOfSukunaMaatata_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Trinket_Kobold_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_RaclettePan_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Trinket_Manfish_Status",
+      "duration": 6.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/GearTrinket/Items_Loot_Trinket_Trinket_Poetrident_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Ulserous_Auto",
+      "duration": 4.17,
+      "cooldown": 5.0
+    },
+    {
+      "id": "Ulserous_Keekoho",
+      "duration": 5.73,
+      "cooldown": 8.0
+    },
+    {
+      "id": "Ulserous_LuonDischarge",
+      "duration": 23.0,
+      "cooldown": 20.0
+    },
+    {
+      "id": "Ulserous_LuonDischargeArea",
+      "duration": 2.0
+    },
+    {
+      "id": "Ulserous_Summon",
+      "duration": 5.28,
+      "cooldown": 15.0
+    },
+    {
+      "id": "UnderWater",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "VesselPotion_Status",
+      "duration": 20.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_VesselPotion.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Ward",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources.png",
+        "size": 48,
+        "x": 36,
+        "y": 38,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "Warrior_BattleShout",
+      "cooldown": 120.0,
+      "grantedStatus": "Warrior_BattleShoutStatus",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_BattleShoutStatus",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_BattleShout_Buff",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 5,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_Berserk",
+      "cooldown": 120.0,
+      "grantedStatus": "Warrior_BerserkStatus",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 7,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_BerserkStatus",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 7,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_BurstOfAnger_Status",
+      "duration": 20.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 8,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_Charge",
+      "cooldown": 15.0,
+      "grantedStatus": "Warrior_Charge_DestabilisationStatus",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_Charge_DestabilisationStatus",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 1,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_Hemorrhage_Status",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 3,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_IgnorePain",
+      "duration": 0.5,
+      "cooldown": 60.0,
+      "grantedStatus": "Warrior_IgnorePainStatus",
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_IgnorePainStatus",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_IgnorePainStatus_Allies",
+      "duration": 12.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 2,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_SecondWind",
+      "cooldown": 120.0,
+      "grantedStatus": "Warrior_Talent_RageShield_Status",
+      "spanMod": "vars",
+      "gfx": {
+        "file": "UI/icons/Warrior_talent.png",
+        "size": 96,
+        "x": 1,
+        "y": 2,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_SecondWind_Cooldown",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Warrior_talent.png",
+        "size": 96,
+        "x": 7,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_SurgingForce",
+      "duration": 0.5,
+      "cooldown": 45.0,
+      "gfx": {
+        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_Talent_Bruise_Status",
+      "duration": 15.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Warrior_talent.png",
+        "size": 96,
+        "x": 1,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_Talent_CrippingBloodloss_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Warrior_talent.png",
+        "size": 96,
+        "x": 5,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_Talent_HoldTheLine_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Warrior_talent.png",
+        "size": 96,
+        "x": 6,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_Talent_InfusedWound_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Warrior_talent.png",
+        "size": 96,
+        "x": 3,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_Talent_RageShield_Status",
+      "duration": 8.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Warrior_talent.png",
+        "size": 96,
+        "x": 4,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Warrior_Talent_SurgeOfViolence_Status",
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/Warrior_talent.png",
+        "size": 96,
+        "x": 2,
+        "y": 3,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "WaterSpore_Auto",
+      "duration": 2.67,
+      "cooldown": 3.0
+    },
+    {
+      "id": "WaterSpore_Skill1",
+      "duration": 7.5,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Weighstone_Status",
+      "isStatus": true
+    },
+    {
+      "id": "Whetstone_Status",
+      "isStatus": true
+    },
+    {
+      "id": "Wolf_Auto",
+      "duration": 2.23,
+      "cooldown": 4.0,
+      "grantedStatus": "Wolf_Auto_Status"
+    },
+    {
+      "id": "Wolf_Auto_Status",
+      "duration": 9.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Wolf_Elite_Auto",
+      "duration": 2.0,
+      "cooldown": 4.0
+    },
+    {
+      "id": "Wolf_Skill1",
+      "duration": 3.0,
+      "cooldown": 15.0,
+      "grantedStatus": "Wolf_Skill1_Status"
+    },
+    {
+      "id": "Wolf_Skill1_Status",
+      "duration": 10.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 6,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Wolf_Skill2",
+      "duration": 3.0,
+      "cooldown": 15.0
+    }
+  ]
+}
