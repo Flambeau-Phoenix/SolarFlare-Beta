@@ -296,6 +296,13 @@ class HealthHooks {
 	static function onHeroSkillUse(self:Dynamic, skill:Dynamic):Void {
 		if (!HealthCache.isLocalHero(self))
 			return;
+		if (ObserveDemand.auras || ObserveDemand.auraBuilderOpen) {
+			var casts = solarflare.aura.LocalCastHistory.shared;
+			casts.bindHero(self);
+			casts.note(EngineSkillId.ofSkill(skill), haxe.Timer.stamp(), solarflare.aura.AuraStatusCache.capturePresentIds(self),
+				solarflare.aura.AuraStatusCache.isCurrent(self) && solarflare.aura.AuraStatusCache.domainKnown);
+			solarflare.runtime.HookIngress.mark(solarflare.runtime.DirtyDomains.STATUS);
+		}
 		if (!ensureLocalPriest(self))
 			return;
 		PrayerCache.applySkill(skill);

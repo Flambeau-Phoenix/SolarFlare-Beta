@@ -44,6 +44,19 @@ class AuraSignalReader {
 			case "combat.killKindMatches": bool(out, frame.killKnown, kindEq(frame.killKind, subject));
 			case "combat.damageTakenRecent": number(out, frame.damageTakenKnown, frame.damageTakenRecent);
 			case "event.cast.recent", "event.cast.active": readCast(frame, signal, subject, out);
+			case "event.playerCast.recent":
+				var key = solarflare.geaux.GeauxCache.sanitizeSkillId(subject).toLowerCase();
+				duration(out, frame.heroKnown, 1e9);
+				out.timeLeft = Math.NaN; // Cast age is elapsed, never buff remaining.
+				for (i in 0...frame.playerCastCount) {
+					var c = frame.playerCasts[i];
+					if (c.skillId == key) {
+						duration(out, c.known, c.age);
+						out.timeLeft = Math.NaN;
+						out.eventSerial = c.serial;
+						break;
+					}
+				}
 			case "custom.script": bool(out, true, solarflare.scripting.ScriptEngine.evalBool(subject, frame));
 			default: out.code = UNKNOWN_SIGNAL;
 		}

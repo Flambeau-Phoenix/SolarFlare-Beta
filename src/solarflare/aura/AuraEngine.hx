@@ -23,6 +23,7 @@ class AuraEngine {
 	public static inline var MAX:Int = 32;
 	static inline var STATUS_HOLD:Float = 0.18;
 	static var frame:AuraSignalFrame;
+	static var timerHero:Dynamic;
 
 	/** Explicit runtime initialization; called by AuraConfig construction. */
 	public static function initialize():Void {
@@ -41,6 +42,10 @@ class AuraEngine {
 			return;
 		}
 		var now = stamp();
+		if (timerHero != HealthCache.localHero) {
+			timerHero = HealthCache.localHero;
+			clearAllPresentation(cfg);
+		}
 		var hot = frame != null && frame.statusCount > 0;
 		if (!AuraStatusCache.isCurrent(HealthCache.localHero) || solarflare.ObserveDemand.dueAuraStatus(now, hot)) {
 			try
@@ -228,7 +233,7 @@ class AuraEngine {
 	}
 
 	static function evalDeclarative(a:AuraDef, now:Float):Void {
-		AuraRuleEvaluator.evaluate(a.rule, frame, a.ruleResult);
+		AuraRuleEvaluator.evaluate(a.rule, frame, a.ruleResult, AuraTimer.keepsAura(a) && a.timerSource == AuraTimer.SRC_FIXED);
 		var hit = a.ruleResult.hit;
 		var known = a.ruleResult.known;
 		var prog = a.ruleResult.progress;
@@ -236,7 +241,10 @@ class AuraEngine {
 		var stacks = a.ruleResult.stacks > 0 ? a.ruleResult.stacks : (hit ? 1 : 0);
 		var buffLeft = a.ruleResult.timeLeft;
 		var buffInf = Math.isFinite(buffLeft) && buffLeft < 0;
-		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf);
+		var serial = a.ruleResult.eventSerial;
+		var restart = hit && serial > 0 && serial != a.timerEventSerial;
+		if (serial > 0) a.timerEventSerial = serial;
+		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf, restart);
 		a.stacks = stacks;
 		if (a.iconId != null && a.iconId.length > 0) {
 			a.resolvedIcon = a.iconId;
@@ -499,12 +507,18 @@ class AuraEngine {
 			timerMode: a.timerMode,
 			timerSource: a.timerSource,
 			timerSeconds: floatRef(a.timerSeconds, 60),
+			timerStartEdge: a.timerStartEdge,
 			timerBoard: boolRef(a.timerBoard, true),
 			timerKeepExpired: floatRef(a.timerKeepExpired, 3),
 			showFuse: boolRef(a.showFuse, false),
 			fuseBottom: boolRef(a.fuseBottom, false),
 			followBuffDuration: boolRef(a.followBuffDuration, true),
 			glowColor: a.glowColor,
+			glowStyle: AuraGlowStyle.normalize(a.glowStyle),
+			glowStrength: floatRef(a.glowStrength, 1),
+			glowOuter: floatRef(a.glowOuter, 12),
+			glowInner: floatRef(a.glowInner, 0),
+			textSize: floatRef(a.textSize, 24),
 			stackCounter: boolRef(a.stackCounter, false),
 			stackScale: floatRef(a.stackScale, 1),
 			stackPlace: a.stackPlace,

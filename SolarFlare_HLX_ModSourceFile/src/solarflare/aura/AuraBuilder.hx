@@ -31,6 +31,7 @@ import solarflare.util.JsonSchema;
 import imgui.ImGui;
 import imgui.Enums.ImGuiChildFlags;
 import imgui.Enums.ImGuiCol;
+import imgui.Enums.ImGuiCond;
 import imgui.Enums.ImGuiKey;
 import imgui.Enums.ImGuiStyleVar;
 import imgui.Enums.ImGuiWindowFlags;
@@ -48,11 +49,6 @@ import haxe.Json;
  */
 class AuraBuilder {
 	public var open = new BoolRef(false);
-	// Timer checkboxes mirror the exclusive timerMode int and the timerSource pair.
-	// Persistent so the draw loop never allocates refs.
-	var timerDown = new BoolRef(false);
-	var timerUp = new BoolRef(false);
-	var useGameTime = new BoolRef(true);
 	var cfg:AuraConfig;
 	var host:ConfigPanel;
 	var selected:Int = -1;
@@ -158,6 +154,7 @@ class AuraBuilder {
 	}
 
 	public function clearTransientState():Void {
+		advancedPreview.reset();
 		boundEditorAura = null;
 		canvasSel = -1;
 		lastGlowAuraId = "";
@@ -355,6 +352,7 @@ class AuraBuilder {
 			return;
 		}
 		if (boundEditorAura != a) {
+			advancedPreview.reset();
 			boundEditorAura = a;
 			canvasSel = -1;
 			lastGlowAuraId = "";
@@ -520,6 +518,7 @@ class AuraBuilder {
 		ImGui.dummy(ImGui.vec2(0, 6));
 		drawHomeRow("Cooldown ready (not on CD)", "home_sk_ready", function() createFromHome("skill", "skill.ready", ""));
 		drawHomeRow("In cooldown", "home_sk_incd", function() createFromHome("skill", "skill.inCooldown", ""));
+		drawHomeRow("My skill cast", "home_sk_cast", function() createFromHome("skill", "event.playerCast.recent", ""));
 		drawHomeRow("Cooldown time left", "home_sk_left", function() createFromHome("skill", "skill.cooldownLeft", ""));
 		drawHomeRow("Instant cast ready", "home_sk_inst", function() createFromHome("skill", "skill.instantReady", ""));
 		drawHomeRow("Skill affordable", "home_sk_aff", function() createFromHome("skill", "skill.affordable", ""));
@@ -531,6 +530,8 @@ class AuraBuilder {
 		ImGui.textDisabled("Empty rule — you already know the WHEN");
 		ImGui.dummy(ImGui.vec2(0, 4));
 		drawHomeRow("Start blank", "home_blank", function() createBlankFromHome());
+		drawHomeRow("Static text box", "home_text_box", function() createStaticTextBox());
+		drawHomeRow("Cast + buff timer", "home_cast_buff_timer", function() createCastBuffTimer());
 		ImGui.dummy(ImGui.vec2(0, 8));
 		if (UiChrome.ghostButton("Jump to encounter gallery##home_boss_jump", ImGui.vec2(-1, 26)))
 			creationScrollToGallery = true;
@@ -604,6 +605,41 @@ class AuraBuilder {
 		ToastManager.success("New blank aura created.");
 	}
 
+	function createStaticTextBox():Void {
+		var a = new AuraDef(uniqueAuraId("text_box"), "Text box");
+		a.region = "text";
+		a.announce = "Your message";
+		a.syncAnnounceBuf();
+		a.alwaysOn.set(true);
+		a.chrome.transparent.set(true);
+		a.showKey.set(false);
+		a.w.set(320);
+		a.h.set(120);
+		a.rule = new solarflare.aura.signal.AuraRuleDef();
+		acceptBossStarterAura(a);
+	}
+	function createCastBuffTimer():Void {
+		var a = new AuraDef(uniqueAuraId("cast_buff_timer"), "Cast + buff timer");
+		a.region = "icon";
+		a.rule = new solarflare.aura.signal.AuraRuleDef();
+		var castCondition = new solarflare.aura.signal.AuraConditionDef();
+		castCondition.signal = "event.playerCast.recent";
+		castCondition.op = "within";
+		castCondition.numberValue = 1;
+		var buff = new solarflare.aura.signal.AuraConditionDef();
+		buff.signal = "status.present";
+		buff.subject = "Staff_SummonDemon_Passive_Buff";
+		buff.op = "present";
+		a.rule.conditions = [castCondition, buff];
+		a.rule.mode = "all";
+		a.timerMode = AuraTimer.MODE_DOWN;
+		a.timerSource = AuraTimer.SRC_FIXED;
+		a.timerSeconds.set(20);
+		a.followBuffDuration.set(false);
+		a.showCountdown.set(true);
+		a.enabled.set(false);
+		acceptBossStarterAura(a);
+	}
 	function centeredText(value:String, disabled:Bool):Void {
 		var start = ImGui.getCursorPosX();
 		var available = ImGui.getContentRegionAvail().x;
@@ -654,6 +690,10 @@ class AuraBuilder {
 			if (issue.length > 0)
 				ImGui.textColored(ImGui.vec4(0.95, 0.72, 0.25, 1), "! " + issue);
 		});
+		if (ImGui.collapsingHeader("Preview controls##ab_preview_controls_fold")) {
+			advancedPreview.drawControls();
+		}
+		drawDrmSound(a, true);
 	}
 
 	function drawThenColumn(a:AuraDef):Void {
@@ -664,9 +704,7 @@ class AuraBuilder {
 		if (a.region == "canvas")
 			drawSectionCard("Canvas Elements", "", false, function() drawCanvasElements(a));
 		drawSectionCard("Alerts and Actions", "", false, function() {
-			drawBehavior(a);
-			cfg.drawEffects(a, false);
-			drawDrmSound(a, true);
+			cfg.drawEffects(a, true);
 		});
 	}
 	/** Compact Home | Name | Scope identity row; the table owns cursor advancement. */
@@ -778,6 +816,8 @@ class AuraBuilder {
 
 	static function buildSummary(a:AuraDef):String {
 		if (a == null) return "";
+		if (a.alwaysOn.get() && (a.rule == null || a.rule.conditions == null || a.rule.conditions.length == 0))
+			return "Always show " + regionLabel(a.region) + ". Add conditions if you want a trigger.";
 		var parts = new StringBuf();
 		if (a.rule != null && a.rule.conditions != null && a.rule.conditions.length > 0) {
 			var isAll = a.rule.mode == "all";
@@ -807,9 +847,11 @@ class AuraBuilder {
 			case "whileFalse": parts.add('show $visual while NOT true');
 			default: parts.add('show $visual while true');
 		}
+		if (AuraTimer.keepsAura(a))
+			parts.add('; also show during ' + (a.timerSource == AuraTimer.SRC_FIXED ? 'the ${a.timerSeconds.get()}s timer' : "the timer") + ' started when conditions ' + (a.timerStartEdge == 1 ? "stop being true" : "become true"));
 		if (a.showFuse.get()) parts.add(" + fuse");
-		if (a.showCountdown.get()) parts.add(" + countdown");
-		if (a.iconGlow) parts.add(" + glow");
+		if (a.showCountdown.get()) parts.add(a.timerMode == AuraTimer.MODE_UP ? " + countup" : " + countdown");
+		if (AuraEffects.hasIconGlow(a)) parts.add(" + glow");
 		if (a.isCounter.get()) parts.add(" (counter)");
 		parts.add(".");
 		return parts.toString();
@@ -904,9 +946,13 @@ class AuraBuilder {
 			}, imgui.Enums.ImGuiTableFlags.SizingStretchProp | imgui.Enums.ImGuiTableFlags.NoSavedSettings);
 		} catch (e:Dynamic) { ImGui.popStyleVar(); throw e; }
 		ImGui.popStyleVar();
+		ImGui.setNextItemOpen(a.timerMode != AuraTimer.MODE_OFF || a.showCountdown.get(), ImGuiCond.Once);
+		if (ImGui.collapsingHeader("Timer##ab_timer_options")) {
+			UiLayout.propertyGrid("##ab_timer_options_grid", function() drawTimerRows(a));
+		}
 		if (a.stackCounter.get() || a.isCounter.get()) {
 			UiLayout.propertyGrid("##ab_stack_display", function() {
-				UiLayout.propertyRow("Stack position", function() {
+				UiLayout.propertyRow("Badge position", function() {
 					ImGui.setNextItemWidth(-1);
 					if (ImGui.beginCombo("##ab_stack_place", stackPlaceLabel(a.stackPlace))) {
 						for (p in 0...3)
@@ -917,7 +963,7 @@ class AuraBuilder {
 						ImGui.endCombo();
 					}
 				}, "Places the tracked stack count above, over, or below the aura face.");
-				UiLayout.propertyRow("Stack size", function() {
+				UiLayout.propertyRow("Badge size", function() {
 					if (BuilderSlider.draw("##ab_stack_scale", a.stackScale, 0.5, 3, "%.2fx"))
 						SettingsStore.markDirty();
 				});
@@ -935,8 +981,45 @@ class AuraBuilder {
 					ImGui.sameLine(0, 8);
 					ImGui.textDisabled("Glow is off");
 				}
-			}, "Tints the Glow tile above plus the Pulse / Expire / Ready overlays.");
+			}, "Tints the configured icon glow.");
+			if (AuraEffects.hasIconGlow(a)) {
+				UiLayout.propertyRow("Glow style", function() {
+					if (ImGui.beginCombo("##ab_glow_style", glowStyleLabel(a.glowStyle))) {
+						for (style in ["proc", "soft", "pulse"])
+							if (ImGui.selectable(glowStyleLabel(style) + "##ab_gs_" + style, a.glowStyle == style)) {
+								a.glowStyle = style;
+								SettingsStore.markDirty();
+							}
+						ImGui.endCombo();
+					}
+				});
+				UiLayout.propertyRow("Strength", function() {
+					if (ImGui.inputFloat("##ab_glow_strength", a.glowStrength, 0, 0, "%.2fx")) {
+						a.glowStrength.set(AuraGlowStyle.strength(a.glowStrength.get()));
+						SettingsStore.markDirty();
+					}
+				});
+				UiLayout.propertyRow("Outside spread", function() {
+					if (ImGui.inputFloat("##ab_glow_outer", a.glowOuter, 0, 0, "%.1f px")) {
+						a.glowOuter.set(AuraGlowStyle.spread(a.glowOuter.get()));
+						SettingsStore.markDirty();
+					}
+				});
+				UiLayout.propertyRow("Inside spread", function() {
+					if (ImGui.inputFloat("##ab_glow_inner", a.glowInner, 0, 0, "%.1f px")) {
+						a.glowInner.set(AuraGlowStyle.spread(a.glowInner.get()));
+						SettingsStore.markDirty();
+					}
+				}, "Spread inward is limited by the face size; outward spread gets its own drawing space.");
+			}
 		});
+	}
+	static function glowStyleLabel(style:String):String {
+		return switch (AuraGlowStyle.normalize(style)) {
+			case "soft": "Soft bloom";
+			case "pulse": "Pulsing bloom";
+			default: "Proc sparks";
+		};
 	}
 
 	/**
@@ -948,90 +1031,87 @@ class AuraBuilder {
 	 * at once would need a second accumulator in AuraTimer.
 	 */
 	function drawTimerRows(a:AuraDef):Void {
-		timerDown.set(a.timerMode == AuraTimer.MODE_DOWN);
-		timerUp.set(a.timerMode == AuraTimer.MODE_UP);
-		UiLayout.propertyRow("Timer", function() {
-			if (ImGui.checkbox("Count down##ab_timer_down", timerDown))
-				setTimerMode(a, timerDown.get() ? AuraTimer.MODE_DOWN : AuraTimer.MODE_OFF);
-			ImGui.sameLine(0, 14);
-			if (ImGui.checkbox("Count up##ab_timer_up", timerUp))
-				setTimerMode(a, timerUp.get() ? AuraTimer.MODE_UP : AuraTimer.MODE_OFF);
-		}, "Counts on the rising edge of this aura's condition.");
-
+		UiLayout.propertyRow("Direction", function() {
+			var labels = ["Off", "Count down", "Count up"];
+			if (ImGui.beginCombo("##ab_timer_mode", labels[a.timerMode >= 0 && a.timerMode <= 2 ? a.timerMode : 0])) {
+				for (mode in 0...3)
+					if (ImGui.selectable(labels[mode] + "##ab_tm_" + mode, a.timerMode == mode)) setTimerMode(a, mode);
+				ImGui.endCombo();
+			}
+		});
 		if (a.timerMode != AuraTimer.MODE_OFF) {
-			useGameTime.set(a.timerSource == AuraTimer.SRC_FOLLOW);
-			UiLayout.propertyRow("Seconds", function() {
-				UiLayout.inlinePair("##ab_timer_secs_pair", function(_:Single) {
-					if (ImGui.checkbox("Use the game's time##ab_timer_follow", useGameTime)) {
-						a.timerSource = useGameTime.get() ? AuraTimer.SRC_FOLLOW : AuraTimer.SRC_FIXED;
-						// Same question Alerts and Actions used to ask separately.
-						if (a.followBuffDuration != null) a.followBuffDuration.set(useGameTime.get());
-						AuraTimer.reset(a);
-						if (!useGameTime.get()) primeTimerSeconds(a);
-						SettingsStore.markDirty();
-					}
-					if (!useGameTime.get() && BuilderSlider.draw("##ab_timer_secs", a.timerSeconds, 1, 600, "%.0f s"))
-						SettingsStore.markDirty();
-				}, function(_:Single) {
-					var listed = listedTimerSpan(a);
-					if (listed <= 0.05)
-						return;
-					var subject = a.timingSubjectId();
-					var field = solarflare.cdb.CdbAuraTable.listedSpanSource(subject);
-					var shown = Math.round(listed * 10) / 10;
-					var following = useGameTime.get();
-					if (ImGui.smallButton("Listed: " + shown + "s##ab_timer_listed")) {
-						// Applying a baked span means a fixed timer by definition, so following
-						// the game's own span is turned off here rather than making the user
-						// find the checkbox first. Same state the checkbox itself writes.
-						if (following) {
-							useGameTime.set(false);
-							a.timerSource = AuraTimer.SRC_FIXED;
-							if (a.followBuffDuration != null) a.followBuffDuration.set(false);
+			UiLayout.propertyRow("Duration source", function() {
+				var fixed = a.timerSource == AuraTimer.SRC_FIXED;
+				if (ImGui.beginCombo("##ab_timer_source", fixed ? "Fixed seconds" : "Game time")) {
+					for (source in 0...2)
+						if (ImGui.selectable(source == 0 ? "Game time" : "Fixed seconds", a.timerSource == source)) {
+							a.timerSource = source;
+							a.followBuffDuration.set(source == AuraTimer.SRC_FOLLOW);
 							AuraTimer.reset(a);
-						}
-						a.timerSeconds.set(listed);
-						SettingsStore.markDirty();
-					}
-					if (ImGui.isItemHovered())
-						ImGui.setTooltip("CastleDB lists " + shown + "s " + field + " for " + subject + "."
-							+ (following ? " Click to use it as a fixed span (turns off \"Use the game's time\")." : " Click to use it."));
-				});
-			}, "Where the span comes from: the live buff / cooldown the game reports, or your own number.");
-		}
-
-		UiLayout.propertyRow("On the aura", function() {
-			UiLayout.inlinePair("##ab_cd_face", function(_:Single) {
-				if (ImGui.checkbox("Show seconds##ab_cd_force", a.showCountdown)) SettingsStore.markDirty();
-			}, function(w:Single) {
-				if (!a.showCountdown.get())
-					return;
-				ImGui.setNextItemWidth(w);
-				if (ImGui.beginCombo("##ab_cd_place", countdownPlaceLabel(a.countdownPlace))) {
-					for (p in 0...3)
-						if (ImGui.selectable(countdownPlaceLabel(p) + "##ab_cdp_" + p, a.countdownPlace == p)) {
-							a.countdownPlace = p;
+							if (source == AuraTimer.SRC_FIXED) primeTimerSeconds(a);
 							SettingsStore.markDirty();
 						}
 					ImGui.endCombo();
 				}
 			});
-			ImGui.textDisabled(timingReadout(a));
-		}, "Prints the tracked seconds on the aura face: the live status time when the game reports one, else the CastleDB span, else the timer above.");
-
+			if (a.timerSource == AuraTimer.SRC_FIXED) {
+				UiLayout.propertyRow("Fixed seconds", function() {
+					var previous = a.timerSeconds.get();
+					if (ImGui.inputFloat("##ab_timer_secs", a.timerSeconds, 0, 0, "%.3f")) {
+						var value = a.timerSeconds.get();
+						a.timerSeconds.set(Math.isFinite(value) ? Math.max(1, Math.min(600, value)) : previous);
+						AuraTimer.reset(a);
+						SettingsStore.markDirty();
+					}
+					if (ImGui.isItemHovered()) ImGui.setTooltip("Enter 1–600 seconds. Decimal values are supported.");
+					var listed = listedTimerSpan(a);
+					if (listed > 0.05 && ImGui.smallButton("Use listed " + (Math.round(listed * 10) / 10) + "s##ab_timer_listed")) {
+						a.timerSeconds.set(listed);
+						AuraTimer.reset(a);
+						SettingsStore.markDirty();
+					}
+				});
+			}
+			UiLayout.propertyRow("Start when", function() {
+				var labels = ["Conditions become true", "Conditions stop being true"];
+				if (ImGui.beginCombo("##ab_timer_edge", labels[a.timerStartEdge])) {
+					for (edge in 0...2)
+						if (ImGui.selectable(labels[edge] + "##ab_te_" + edge, a.timerStartEdge == edge)) {
+							a.timerStartEdge = edge;
+							AuraTimer.reset(a);
+							SettingsStore.markDirty();
+						}
+					ImGui.endCombo();
+				}
+			});
+		}
+		UiLayout.propertyRow("On aura", function() {
+			if (ImGui.checkbox("Show time##ab_cd_force", a.showCountdown)) SettingsStore.markDirty();
+			if (a.showCountdown.get() && ImGui.beginCombo("##ab_cd_place", countdownPlaceLabel(a.countdownPlace))) {
+				for (place in 0...3)
+					if (ImGui.selectable(countdownPlaceLabel(place) + "##ab_cdp_" + place, a.countdownPlace == place)) {
+						a.countdownPlace = place;
+						SettingsStore.markDirty();
+					}
+				ImGui.endCombo();
+			}
+		});
 		if (a.showCountdown.get())
-			UiLayout.propertyRow("Seconds size", function() {
+			UiLayout.propertyRow("Time size", function() {
 				if (BuilderSlider.draw("##ab_cd_scale", a.countdownScale, 0.5, 3, "%.2fx")) SettingsStore.markDirty();
 			});
-
-		if (a.timerMode != AuraTimer.MODE_OFF)
+		if (a.timerMode != AuraTimer.MODE_OFF) {
 			UiLayout.propertyRow("Timers window", function() {
-				UiLayout.inlinePair("##ab_timer_board_pair", function(_:Single) {
-					if (ImGui.checkbox("Show in Timers##ab_timer_board", a.timerBoard)) SettingsStore.markDirty();
-				}, function(_:Single) {
-					if (BuilderSlider.draw("Keep at 0##ab_timer_linger", a.timerKeepExpired, 0, 30, "%.0f s")) SettingsStore.markDirty();
-				});
-			}, "Stacks this timer in the movable Timers window. Keep at 0 is how long the finished row lingers.");
+				if (ImGui.checkbox("Show timer##ab_timer_board", a.timerBoard)) SettingsStore.markDirty();
+			});
+			if (a.timerBoard.get()) UiLayout.propertyRow("Finished row", function() {
+				if (ImGui.inputFloat("##ab_timer_linger", a.timerKeepExpired, 0, 0, "%.1f s")) {
+					var value = a.timerKeepExpired.get();
+					a.timerKeepExpired.set(Math.isFinite(value) ? Math.max(0, Math.min(30, value)) : 3);
+					SettingsStore.markDirty();
+				}
+			}, "Time the finished board row stays visible. This does not extend the aura's interval.");
+		}
 	}
 
 	/** Exclusive: ticking both directions would need a second accumulator in AuraTimer. */
@@ -1098,6 +1178,9 @@ class AuraBuilder {
 			ImGui.tableSetupColumn("##controls", imgui.Enums.ImGuiTableColumnFlags.WidthStretch, 1);
 			ImGui.tableNextRow();
 			ImGui.tableSetColumnIndex(0);
+			AuraVisualRenderer.countdownAll = cfg.countdownAll.get();
+			AuraVisualRenderer.countdownCeiling = cfg.countdownAutoMax.get();
+			AuraVisualRenderer.countdownGlobalScale = Math.max(0.5, Math.min(3, cfg.countdownScale.get()));
 			advancedPreview.draw(a, previewW, previewW, false, true);
 			if (ImGui.isItemHovered()) ImGui.setTooltip("Live preview of the current settings.");
 			drawSummaryBlock(a, previewW);
@@ -1105,6 +1188,7 @@ class AuraBuilder {
 			UiChrome.subHeader("Display shortcuts");
 			drawAppearanceFxStrip(a);
 		}, imgui.Enums.ImGuiTableFlags.SizingStretchProp | imgui.Enums.ImGuiTableFlags.NoSavedSettings);
+		drawBehavior(a);
 		ImGui.separator();
 	}
 
@@ -1903,16 +1987,26 @@ class AuraBuilder {
 					ImGui.endCombo();
 				}
 			}, "The face this aura wears. The add-on prints a large line across the screen on top of it.");
-			drawTimerRows(a);
 			drawCounterRow(a);
 			drawBannerRows(a);
 			drawCanvasTextRow(a);
-			UiLayout.propertyRow("Alert text", function() {
-				if (ImGui.inputText("##ab_announce", a.announceBuf, AuraDef.ANN_BUF)) {
-					a.announce = readBytes(a.announceBuf, AuraDef.ANN_BUF);
+			UiLayout.propertyRow(a.region == "text" ? "Message" : "Alert text", function() {
+				var edited = a.region == "text"
+					? ImGui.inputTextMultiline("##ab_announce", a.announceBuf, AuraDef.ANN_BUF, ImGui.vec2(-1, 90))
+					: ImGui.inputText("##ab_announce", a.announceBuf, AuraDef.ANN_BUF);
+				if (edited) {
+					a.announce = ByteUtil.readString(a.announceBuf, AuraDef.ANN_BUF, false);
 					SettingsStore.markDirty();
 				}
 			});
+			if (a.region == "text") {
+				UiLayout.propertyRow("Font size", function() {
+					if (ImGui.inputFloat("##ab_text_size", a.textSize, 0, 0, "%.1f px")) {
+						a.textSize.set(AuraTextLayout.fontSize(a.textSize.get()));
+						SettingsStore.markDirty();
+					}
+				}, "Text wraps to the box width. Resize the box with its corner, or enter dimensions below.");
+			}
 			UiLayout.propertyRow("Opacity", function() {
 				opacityPercent.set(a.opacity.get() * 100);
 				if (BuilderSlider.draw("##ab_opacity", opacityPercent, 10, 100, "%.0f%%")) {
@@ -1955,13 +2049,19 @@ class AuraBuilder {
 				UiLayout.inlinePair(
 					"##ab_wh",
 					function(_:Single) {
-						if (BuilderSlider.draw("W##ab_w", a.w, 32, 720, "%.0f px")) {
+						var changed = a.region == "text" ? ImGui.inputFloat("W##ab_w", a.w, 0, 0, "%.0f px")
+							: BuilderSlider.draw("W##ab_w", a.w, 32, 720, "%.0f px");
+						if (changed) {
+							if (a.region == "text") a.w.set(Math.isFinite(a.w.get()) ? Math.max(24, Math.min(10000, a.w.get())) : 320);
 							a.sizeDirty = true;
 							SettingsStore.markDirty();
 						}
 					},
 					function(_:Single) {
-						if (BuilderSlider.draw("H##ab_h", a.h, 24, 480, "%.0f px")) {
+						var changed = a.region == "text" ? ImGui.inputFloat("H##ab_h", a.h, 0, 0, "%.0f px")
+							: BuilderSlider.draw("H##ab_h", a.h, 24, 480, "%.0f px");
+						if (changed) {
+							if (a.region == "text") a.h.set(Math.isFinite(a.h.get()) ? Math.max(24, Math.min(10000, a.h.get())) : 120);
 							a.sizeDirty = true;
 							SettingsStore.markDirty();
 						}
@@ -2044,7 +2144,7 @@ class AuraBuilder {
 	function drawBehavior(a:AuraDef):Void {
 		var mode = behaviorMode(a);
 		UiLayout.propertyGrid("##ab_behavior_props", function() {
-			UiLayout.propertyRow("Show alert", function() {
+			UiLayout.propertyRow("Show aura", function() {
 				if (ImGui.beginCombo("##ab_behavior", behaviorLabel(mode))) {
 					for (key in ["whileTrue", "onRiseHold", "whileFalse"])
 						if (ImGui.selectable(behaviorLabel(key) + "##ab_behavior_" + key, mode == key)) {
@@ -2053,7 +2153,7 @@ class AuraBuilder {
 						}
 					ImGui.endCombo();
 				}
-			});
+			}, "Conditions control the normal display. A running countdown or countup also keeps the aura visible.");
 			var wantDuration = mode == "onRiseHold" || (a.showBanner != null && a.showBanner.get());
 			if (wantDuration) {
 				UiLayout.propertyRow("Duration", function() {
@@ -2276,8 +2376,8 @@ class AuraBuilder {
 	function setupIssue(a:AuraDef):String {
 		if (a == null) return "Select an Aura.";
 		if (StringTools.trim(a.name).length == 0) return "Give this Aura a name.";
-		if (a.rule == null || a.rule.conditions == null || a.rule.conditions.length == 0) return "Add at least one condition.";
-		for (c in a.rule.conditions) {
+		if ((a.rule == null || a.rule.conditions == null || a.rule.conditions.length == 0) && !a.alwaysOn.get()) return "Add at least one condition.";
+		if (a.rule != null && a.rule.conditions != null) for (c in a.rule.conditions) {
 			if (c == null || AuraSignalCatalog.find(c.signal) == null) return "Choose what each condition should check.";
 			var d = AuraSignalCatalog.find(c.signal);
 			if (d != null && d.subjectKind.length > 0 && StringTools.trim(c.subject).length == 0) return "Choose a specific target for the highlighted condition.";
@@ -2334,7 +2434,7 @@ class AuraBuilder {
 		return switch (region) {
 			case "bar": "HUD Status Bar";
 			case "ring": "Hero Ring";
-			case "text": "Screen Text Banner";
+			case "text": "Text box";
 			case "icon": "Icon Alert";
 			case "canvas": "Freeform Canvas";
 			default: "HUD Status Bar";

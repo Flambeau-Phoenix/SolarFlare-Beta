@@ -597,7 +597,6 @@ class ConfigPanel {
 		if (!GameIcons.imageKeyUv(HUB_LOGO, w, h, HUB_LOGO_U0, HUB_LOGO_V0, HUB_LOGO_U1, HUB_LOGO_V1))
 			ImGui.dummy(ImGui.vec2(w, h));
 
-		ImGui.setCursorPosX(startX);
 	}
 
 	/** Feature selection changes the option surface in-place; editors are secondary windows. */

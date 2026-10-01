@@ -62,7 +62,6 @@ class UiChrome {
 		var width = ImGui.getContentRegionAvail().x;
 		ImGui.setCursorPosX(x + Math.max(0, (width - ImGui.calcTextSize(caption).x) * 0.5));
 		ImGui.text(caption);
-		ImGui.setCursorPosX(x);
 		if (font != null) ImGui.popFont();
 	}
 

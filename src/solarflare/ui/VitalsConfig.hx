@@ -579,7 +579,7 @@ class RingGauge {
 		var end:Single = start + Math.PI * 2;
 		var fillEnd:Single = start + Math.PI * 2 * ratio;
 		if (vectorScale <= 0) vectorScale = 1;
-		var thickness:Single = Math.max(5.5 * vectorScale, radius * 0.28);
+		var thickness:Single = HUDVisualBounds.ringThickness(radius, vectorScale);
 		var trackCol = ImGui.colorConvertFloat4ToU32(ImGui.vec4(color.x * 0.18, color.y * 0.18, color.z * 0.18, 0.72 * color.w));
 		var fillCol = ImGui.colorConvertFloat4ToU32(color);
 		var glowCol = ImGui.colorConvertFloat4ToU32(ImGui.vec4(color.x, color.y, color.z, 0.22 * color.w));

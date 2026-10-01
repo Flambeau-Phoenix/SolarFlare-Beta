@@ -343,7 +343,7 @@ class AuraConditionEditor {
 				ImGui.textDisabled("Count is full character status container length. Overflow means > " + AuraSignalFrame.MAX_STATUSES + " entries.");
 			else if (d.id == "skill.instantReady")
 				ImGui.textDisabled("Skill script shouldPlayInstantly (e.g. Staff_Craft_S1). For buffs, prefer Statuses.");
-			else if (d.id == "event.cast.recent")
+			else if (d.id == "event.cast.recent" || d.id == "event.playerCast.recent")
 				ImGui.textDisabled("Seconds since cast. Use 'within' operator for windows (e.g. within 5s).");
 		}
 
@@ -360,7 +360,7 @@ class AuraConditionEditor {
 		// validator rejects and compareValue routes to boolValue instead of present.
 		if (d != null && d.id == "status.present")
 			ops = ["present", "absent"];
-		else if (d != null && d.id == "event.cast.recent")
+		else if (d != null && (d.id == "event.cast.recent" || d.id == "event.playerCast.recent"))
 			ops = ["within", "lt", "lte", "eq", "gte", "gt"];
 		else
 			ops = switch (d.kind) {

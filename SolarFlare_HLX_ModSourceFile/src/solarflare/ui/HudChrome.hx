@@ -52,6 +52,14 @@ class HudChrome {
 	public var bindPos:Bool = true;
 	public var winW:Single = 0;
 	public var winH:Single = 0;
+	/** Draw-only expansion around an Aura face; persisted x/y keep their legacy anchor. */
+	public var visualOffsetX:Single = 0;
+	public var visualOffsetY:Single = 0;
+	public function setVisualOffset(left:Single, top:Single):Void {
+		if (Math.abs(left - visualOffsetX) > 0.01 || Math.abs(top - visualOffsetY) > 0.01) posDirty = true;
+		visualOffsetX = left;
+		visualOffsetY = top;
+	}
 
 	public function captureSize(w:FloatRef, h:FloatRef):Void {
 		if (w != null && h != null && winW > 0 && winH > 0) {
@@ -229,7 +237,8 @@ class HudChrome {
 		// never donate its transient coordinates to the locked layout.
 		if (bindPos && (posDirty || isLocked())) {
 			clampToViewport();
-			ImGui.setNextWindowPos(ImGui.vec2(x.get(), y.get()), ImGuiCond.Always);
+			ImGui.setNextWindowPos(ImGui.vec2(HUDVisualBounds.hostCoordinate(x.get(), visualOffsetX),
+				HUDVisualBounds.hostCoordinate(y.get(), visualOffsetY)), ImGuiCond.Always);
 			posDirty = false;
 		}
 		if (collapsed.get())
@@ -272,7 +281,9 @@ class HudChrome {
 	}
 
 	public function capturePos():Void {
-		var p = ImGui.getWindowPos();
+		var host = ImGui.getWindowPos();
+		var p = ImGui.vec2(HUDVisualBounds.anchorCoordinate(host.x, visualOffsetX),
+			HUDVisualBounds.anchorCoordinate(host.y, visualOffsetY));
 		var ox = x.get();
 		var oy = y.get();
 		if (Math.abs(p.x - ox) > 0.5 || Math.abs(p.y - oy) > 0.5) {
@@ -438,6 +449,7 @@ class HudChrome {
 	}
 
 	public function drawContextMenu(?onClose:Void->Void, ?caption:String):Void {
+		if (!CursorCaptureFix.cursorFree) return;
 		if (ImGui.beginPopupContextWindow(null, 1)) {
 			var title = caption != null ? caption : "Window Controls";
 			ImGui.separatorText('$title');
@@ -485,7 +497,7 @@ class HudChrome {
 		var flags = ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoScrollbar;
 		if (bodyScroll)
 			flags = ImGuiWindowFlags.NoBackground;
-		flags |= extraFlags;
+		flags = CursorCaptureFix.windowFlags(flags | extraFlags);
 		ImGui.pushStyleColor(ImGuiCol.ChildBg, ImGui.vec4(0, 0, 0, 0));
 		// A reserved footer keeps child hit-testing away from parent resize controls.
 		var childH:Single = bottomReserve > 0 ? -bottomReserve : 0;
@@ -605,8 +617,8 @@ class HudChrome {
 			}
 			var nx:Single = mouse.x - surfaceGrabX;
 			var ny:Single = mouse.y - surfaceGrabY;
-			x.set(nx);
-			y.set(ny);
+			x.set(HUDVisualBounds.anchorCoordinate(nx, visualOffsetX));
+			y.set(HUDVisualBounds.anchorCoordinate(ny, visualOffsetY));
 			ImGui.setWindowPos(ImGui.vec2(nx, ny));
 			SettingsStore.markDirty();
 			return;
@@ -686,8 +698,8 @@ class HudChrome {
 				didDrag = true;
 				var nx = m.x - dragOffX;
 				var ny = m.y - dragOffY;
-				this.x.set(nx);
-				this.y.set(ny);
+				this.x.set(HUDVisualBounds.anchorCoordinate(nx, visualOffsetX));
+				this.y.set(HUDVisualBounds.anchorCoordinate(ny, visualOffsetY));
 				ImGui.setWindowPos(ImGui.vec2(nx, ny));
 				SettingsStore.markDirty();
 			}

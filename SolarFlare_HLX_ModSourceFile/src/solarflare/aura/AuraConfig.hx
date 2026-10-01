@@ -170,6 +170,7 @@ class AuraConfig {
 			a.timerSource = Std.int(d.timerSource);
 		if (d.timerSeconds != null)
 			a.timerSeconds.set(d.timerSeconds);
+		if (d.timerStartEdge != null) a.timerStartEdge = d.timerStartEdge == 1 ? 1 : 0;
 		if (d.timerBoard == false)
 			a.timerBoard.set(false);
 		if (d.timerKeepExpired != null)
@@ -182,6 +183,11 @@ class AuraConfig {
 			a.followBuffDuration.set(false);
 		if (d.glowColor != null)
 			a.glowColor = Std.int(d.glowColor);
+		if (d.glowStyle != null) a.glowStyle = AuraGlowStyle.normalize(Std.string(d.glowStyle));
+		if (d.glowStrength != null) a.glowStrength.set(AuraGlowStyle.strength(d.glowStrength));
+		if (d.glowOuter != null) a.glowOuter.set(AuraGlowStyle.spread(d.glowOuter));
+		if (d.glowInner != null) a.glowInner.set(AuraGlowStyle.spread(d.glowInner));
+		if (d.textSize != null) a.textSize.set(AuraTextLayout.fontSize(d.textSize));
 		if (d.stackCounter == true)
 			a.stackCounter.set(true);
 		if (d.stackScale != null)
@@ -463,25 +469,7 @@ class AuraConfig {
 		if (withHeader && !ImGui.collapsingHeader("Advanced Effects##fx" + a.id))
 			return;
 		AuraEffects.ensure(a);
-		ImGui.textWrapped("Layered reactions for when the aura matches. Use Visual FX below for Pulse / Expire / Ready overlays.");
-
-		UiChrome.subHeader("Visual FX (live + preview)");
-		UiLayout.propertyGrid("##fx_visual_" + a.id, function() {
-			UiLayout.propertyRow("Overlays", function() {
-				var avail:Single = ImGui.getContentRegionAvail().x;
-				var colW:Single = avail / 3;
-				if (ImGui.checkbox("Pulse##fxpulse" + a.id, a.fxPulse))
-					SettingsStore.markDirty();
-				ImGui.sameLine(colW);
-				if (ImGui.checkbox("Expire##fxexp" + a.id, a.fxExpire))
-					SettingsStore.markDirty();
-				ImGui.sameLine(colW * 2);
-				if (ImGui.checkbox("Ready##fxrdy" + a.id, a.fxReady))
-					SettingsStore.markDirty();
-			});
-		});
-
-		ImGui.separator();
+		ImGui.textWrapped("Layered reactions for when the aura matches.");
 		drawEffectPresets(a);
 		var ei = 0;
 		while (ei < a.effects.length) {

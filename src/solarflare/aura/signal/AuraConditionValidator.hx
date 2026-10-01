@@ -43,7 +43,7 @@ class AuraConditionValidator {
 	public static function defaultOperator(d:AuraSignalDescriptor):String {
 		if (d == null) return "";
 		if (d.id == "status.present") return "present";
-		if (d.id == "event.cast.recent") return "within";
+		if (d.id == "event.cast.recent" || d.id == "event.playerCast.recent") return "within";
 		return switch (d.kind) { case Boolean: "is"; case Identity: "eq"; default: "gte"; };
 	}
 	public static function isEventOperator(op:String):Bool {

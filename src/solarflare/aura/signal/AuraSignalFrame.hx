@@ -64,6 +64,8 @@ class AuraSignalFrame {
 	public var statusCount:Int = 0;
 	public var casts:Array<EnemyCastSignalSnap> = [];
 	public var castCount:Int = 0;
+	public var playerCasts:Array<EnemyCastSignalSnap> = [];
+	public var playerCastCount:Int = 0;
 	public var statusDomainKnown:Bool = false;
 	public var statusContainerKnown:Bool = false;
 	public var statusContainerCount:Int = 0;
@@ -79,11 +81,14 @@ class AuraSignalFrame {
 		for (_ in 0...MAX_SKILLS) skills.push(new SkillSignalSnap());
 		for (_ in 0...MAX_STATUSES) statuses.push(new StatusSignalSnap());
 		for (_ in 0...MAX_CASTS) casts.push(new EnemyCastSignalSnap());
+		for (_ in 0...solarflare.aura.LocalCastHistory.MAX) playerCasts.push(new EnemyCastSignalSnap());
 	}
 	public function resetCollections():Void {
 		for (i in 0...skillCount) skills[i].reset();
 		for (i in 0...statusCount) statuses[i].reset();
 		for (i in 0...castCount) casts[i].reset();
+		for (i in 0...playerCastCount) playerCasts[i].reset();
+		playerCastCount = 0;
 		skillCount = 0; statusCount = 0; castCount = 0;
 		statusDomainKnown = false;
 		damageTakenRecent = 0;

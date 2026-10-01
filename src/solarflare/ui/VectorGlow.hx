@@ -110,7 +110,7 @@ class VectorGlow {
 	 * @param bloomRgb 0xRRGGBB outer amber bloom
 	 */
 	public static function procOverlay(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, time:Float,
-			coreRgb:Int = 0xFFF6A0, bloomRgb:Int = 0xFFB000):Void {
+			coreRgb:Int = 0xFFF6A0, bloomRgb:Int = 0xFFB000, intensity:Float = 1):Void {
 		if (dl == null || w < 1 || h < 1)
 			return;
 		var core = coreRgb & 0x00FFFFFF;
@@ -121,10 +121,11 @@ class VectorGlow {
 		var x1:Single = x + w + pad;
 		var y1:Single = y + h + pad;
 		var rounding:Single = 4.0;
-		var pulse = 0.875 + 0.125 * Math.sin(time * 6.0);
+		if (intensity <= 0) return;
+		var pulse = (0.875 + 0.125 * Math.sin(time * 6.0)) * Math.min(2, intensity);
 
 		// 1. Soft outer bloom (layered alpha falloff)
-		var bloomAlpha = Std.int(0x44 * pulse);
+		var bloomAlpha = Std.int(Math.min(255, 0x44 * pulse));
 		if (bloomAlpha < 1)
 			bloomAlpha = 1;
 		var bloomColor = (bloomAlpha << 24) | bloom;
@@ -139,7 +140,7 @@ class VectorGlow {
 		}
 
 		// 2. High-intensity core border
-		var coreAlpha = Std.int(0xEE * pulse);
+		var coreAlpha = Std.int(Math.min(255, 0xEE * pulse));
 		if (coreAlpha < 1)
 			coreAlpha = 1;
 		var coreColor = (coreAlpha << 24) | core;
@@ -155,7 +156,7 @@ class VectorGlow {
 		var speed = 40.0;
 		var step = perimeter / sparkCount;
 		var baseOffset = (time * speed) % step;
-		var flareA = Std.int(0xE6 * pulse);
+		var flareA = Std.int(Math.min(255, 0xE6 * pulse));
 		if (flareA < 1)
 			flareA = 1;
 		var flareColor = (flareA << 24) | 0x00FFF8D9;
@@ -175,7 +176,7 @@ class VectorGlow {
 	 * its own pulse alphas. Shared by the aura Glow tile and the Geaux ready-glow mode so the
 	 * two effects cannot drift apart.
 	 */
-	public static function procTinted(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, time:Float, packed:Int):Void {
+	public static function procTinted(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, time:Float, packed:Int, intensity:Float = 1):Void {
 		var rgb = packed != 0 ? (packed & 0x00FFFFFF) : 0xFFB000;
 		var core = rgb;
 		var bloom = rgb;
@@ -187,7 +188,7 @@ class VectorGlow {
 			bloom = 0xFFB000;
 		else if (r + g + b < 120)
 			core = 0xFFF6A0;
-		procOverlay(dl, x, y, w, h, time, core, bloom);
+		procOverlay(dl, x, y, w, h, time, core, bloom, intensity);
 	}
 
 	/** Distance along rect perimeter → point + outward normal into static scratch. */

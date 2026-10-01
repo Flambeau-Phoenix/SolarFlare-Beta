@@ -23,7 +23,7 @@ class AuraEffects {
 		}
 	}
 
-	public static function apply(a:AuraDef, hit:Bool, known:Bool, now:Float, prog:Float, buffLeft:Float, buffInfinite:Bool):Void {
+	public static function apply(a:AuraDef, hit:Bool, known:Bool, now:Float, prog:Float, buffLeft:Float, buffInfinite:Bool, timerRestart:Bool = false):Void {
 		if (a == null)
 			return;
 		ensure(a);
@@ -118,17 +118,22 @@ class AuraEffects {
 		a.timerInfinite = drawInf;
 		var rise = hit && !a.condWas;
 		// Must run while condWas still holds the previous frame's edge.
-		AuraTimer.tick(a, hit, rise, now);
+		var timerEdge = AuraTimerClock.trigger(known, hit, a.condWas, a.timerStartEdge);
+		AuraTimer.tick(a, hit, timerEdge || (a.timerStartEdge == 0 && timerRestart), now);
+		if (AuraTimer.keepsAura(a)) {
+			var running = AuraTimerClock.running(a);
+			a.show = AuraTimerClock.visible(a.show, a.visual.get(), a);
+			if (running) a.iconGlow = hasIconGlow(a);
+		}
 		// An armed condition timer owns the face countdown. The follow path above only
 		// knows buff spans, which procs and untimed statuses never publish, so without
 		// this a configured timer would only ever appear on the Timers board.
 		if (a.timerActive && a.timerMode != AuraTimer.MODE_OFF) {
 			a.timeLeft = a.timerValue;
 			a.timerInfinite = false;
-			if (!(Math.isFinite(drawProg) && drawProg > 0.001 && drawProg < 0.999)) {
+			if (a.timerSource == AuraTimer.SRC_FIXED || !(Math.isFinite(drawProg) && drawProg > 0.001 && drawProg < 0.999)) {
 				var frac = AuraTimer.fraction(a);
-				if (frac > 0)
-					a.progress = frac;
+				a.progress = frac;
 			}
 		}
 		if (rise && a.isCounter != null && a.isCounter.get()) {
@@ -171,6 +176,9 @@ class AuraEffects {
 		if (a == null)
 			return;
 		a.show = false;
+		AuraTimer.reset(a);
+		a.condWas = false;
+		a.timerEventSerial = 0;
 		clearAlertRuntime(a);
 	}
 

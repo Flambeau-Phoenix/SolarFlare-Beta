@@ -19,6 +19,7 @@ class AuraOverlay {
 
 	var cfg:AuraConfig;
 	var theme:Theme;
+	var visualBounds = new solarflare.ui.HUDVisualBounds();
 
 	public function new(cfg:AuraConfig) {
 		this.cfg = cfg;
@@ -64,12 +65,14 @@ class AuraOverlay {
 		var sc:Single = Math.max(0.4, Math.min(2.5, a.scale.get()));
 		var w:Single = Math.max(24, a.w.get() * sc);
 		var h:Single = Math.max(24, a.h.get() * sc);
+		AuraVisualRenderer.measureBounds(a, w, h, a.stacks, a.counterValue, visualBounds, sc);
 		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Aura " + a.id, a.displayLabel(), a.chrome, w, h, function(size) {
 			var p = ImGui.getCursorScreenPos();
 			ImGui.dummy(size);
 			var dl = ImGui.getWindowDrawList();
-			drawRegion(dl, a, p.x, p.y, size.x, size.y, !a.show && layout);
-			drawKeyChip(dl, p.x, p.y, size.x, size.y, a, !a.show && layout);
+			AuraVisualRenderer.draw(dl, a, p.x, p.y, size.x, size.y, a.progress, a.stacks,
+				a.counterValue, !a.show && layout, a.fxAlpha, sc);
+			AuraVisualRenderer.drawKeyChip(dl, p.x, p.y, size.x, size.y, a, !a.show && layout);
 		}, openBuilder, function() { a.enabled.set(false); SettingsStore.markDirty(); }, false, function() {
 			if (a.isCounter.get() && ImGui.menuItem("Reset Counter")) {
 				a.counterValue = 0;
@@ -80,11 +83,7 @@ class AuraOverlay {
 			a.w.set(Math.max(24, newW) / sc);
 			a.h.set(Math.max(24, newH) / sc);
 			SettingsStore.markDirty();
-		});
-	}
-
-	function drawRegion(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single, ghost:Bool):Void {
-		AuraVisualRenderer.draw(dl, a, x, y, w, h, a.progress, a.stacks, a.counterValue, ghost, a.fxAlpha);
+		}, visualBounds);
 	}
 
 	function drawAlert(a:AuraDef):Void {
@@ -121,39 +120,4 @@ class AuraOverlay {
 		ImGui.end();
 	}
 
-	/** Geaux-style key chip: dark plate + cream text on the aura face. */
-	function drawKeyChip(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, a:AuraDef, ghost:Bool):Void {
-		if (a == null || a.showKey == null || !a.showKey.get())
-			return;
-		var hk = AuraDef.sanitizeKey(a.keyText);
-		if (hk.length == 0)
-			return;
-		var size:Single = w < h ? w : h;
-		var fontSize:Single = Math.max(ImGui.getFontSize() * 1.05, size * 0.28);
-		if (fontSize > 22)
-			fontSize = 22;
-		if (fontSize < 12)
-			fontSize = 12;
-		ImGui.pushFont(ImGui.getFont(), fontSize);
-		var ts = ImGui.calcTextSize(hk);
-		var padX:Single = Math.max(4, size * 0.06);
-		var padY:Single = Math.max(2, size * 0.04);
-		var tx:Single = x + 3;
-		var ty:Single = y + 2;
-		var bx0:Single = tx - 1;
-		var by0:Single = ty - 1;
-		var bx1:Single = tx + ts.x + padX;
-		var by1:Single = ty + ts.y + padY;
-		var lit = !ghost;
-		var plateA:Single = lit ? 0.88 : 0.55;
-		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(bx0, by0), ImGui.vec2(bx1, by1),
-			ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.02, 0.03, plateA)), 4);
-		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(bx0, by0), ImGui.vec2(bx1, by1),
-			ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, lit ? 0.35 : 0.18)), 4, 1);
-		var textCol = lit ? ImGui.vec4(1, 0.96, 0.78, 1) : ImGui.vec4(0.78, 0.76, 0.70, 0.75);
-		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + 1, ty + 1),
-			ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.95)), hk);
-		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty), ImGui.colorConvertFloat4ToU32(textCol), hk);
-		ImGui.popFont();
-	}
 }

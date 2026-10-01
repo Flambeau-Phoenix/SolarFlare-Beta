@@ -4,6 +4,7 @@ import solarflare.ui.GameIcons;
 import solarflare.ui.VitalsConfig.RingGauge;
 import solarflare.ui.VitalsConfig.VerticalBarGauge;
 import imgui.ImGui;
+import solarflare.ui.HUDVisualBounds;
 
 /** Shared, presentation-only Aura renderer used by the live HUD and builder preview. */
 class AuraVisualRenderer {
@@ -20,10 +21,132 @@ class AuraVisualRenderer {
 	static var faceInf:Bool = false;
 	static var faceGlow:Bool = false;
 	static var faceFx:Bool = true;
+	/** Maximum procOverlay reach: icon outset 2 + bloom 10 + stroke/AA 2. */
+	public static inline var GLOW_REACH:Float = 14;
+
+	/** Measure the same face and plates as draw(), before choosing the host/preview clip. */
+	public static function measureBounds(a:AuraDef, w:Single, h:Single, stacks:Int, counterValue:Int,
+			out:HUDVisualBounds, vectorScale:Float = 1, previewLeft:Null<Float> = null,
+			previewGlow:Null<Bool> = null):Void {
+		out.reset(w, h);
+		bindFace(a, false, previewLeft, previewGlow);
+		var fx:Single = 0;
+		var fy:Single = 0;
+		var fw:Single = w;
+		var fh:Single = h;
+		var icon = a.region == "icon" || (a.region == "canvas" && (a.canvasElements == null || a.canvasElements.length == 0));
+		if (icon) {
+			var labelH:Single = a.showLabel.get() ? Math.min(22, h * 0.24) : 0;
+			fw = fh = Math.min(w, h - labelH);
+			fx = (w - fw) * 0.5;
+			fy = (h - labelH - fh) * 0.5;
+			if (labelH > 0) {
+				var ts = ImGui.calcTextSize(a.displayLabel());
+				out.include((w - ts.x) * 0.5, h - labelH + 2, ts.x, ts.y + 1);
+			}
+		} else if (a.region == "text") {
+			var ts = measureTextFace(a, w, vectorScale);
+			out.include((w - ts.x) * 0.5, (h - ts.y) * 0.5, ts.x, ts.y);
+			fy = (h + ts.y) * 0.5;
+			fh = ts.y;
+		} else if (a.region != "canvas" && a.showLabel.get()) {
+			var ts = ImGui.calcTextSize(a.displayLabel());
+			out.include((w - ts.x) * 0.5, (h - ts.y) * 0.5, ts.x, ts.y);
+		}
+		if (a.region == "ring") out.includeRing(w * 0.5, h * 0.5, Math.min(w, h) * 0.42, vectorScale);
+		if (icon && a.progressRing.get()) out.includeRing(fx + fw * 0.5, fy + fh * 0.5, fw * 0.46, vectorScale);
+		if (faceGlow && a.region != "text" && a.glowStrength.get() > 0) {
+			var reach:Single = AuraGlowStyle.reach(a.glowStyle, a.glowOuter.get()) + (icon ? 2 : 0);
+			out.include(fx - reach, fy - reach, fw + reach * 2, fh + reach * 2);
+		}
+		if (a.region == "canvas" && !icon) {
+			for (el in a.canvasElements) {
+				if (el == null) continue;
+				if (el.kind == AuraCanvasElement.KIND_ICON) {
+					out.include(el.x * vectorScale, el.y * vectorScale,
+						el.w > 1 ? el.w * vectorScale : w, el.h > 1 ? el.h * vectorScale : h);
+				} else {
+					var ts = textSize(formatTokens(el.content, a, a.stackCounter.get() ? stacks : counterValue),
+						(el.fontSize > 4 ? el.fontSize : 16) * vectorScale);
+					out.include(el.x * vectorScale, el.y * vectorScale, ts.x, ts.y);
+				}
+			}
+		}
+		if (wantCountdown(a)) {
+			var side = Math.min(fw, fh);
+			var size = HUDVisualBounds.fontSize(side, 0.34, a.countdownScale.get() * countdownGlobalScale);
+			var text = faceInf ? "\u221E" : formatRemain(faceLeft);
+			var ts = textSize(text, size);
+			// Reserve a stable usual timer width so second-by-second changes don't resize the host.
+			var reserve = textSize("00:00", size);
+			out.includePlate(fx, fy, fw, fh, Math.max(ts.x, reserve.x), Math.max(ts.y, reserve.y), a.countdownPlace);
+		}
+		if (a.region != "text" && ((a.stackCounter.get() && stacks >= 1) || a.isCounter.get())) {
+			var count = a.stackCounter.get() && stacks >= 1 ? stacks : counterValue;
+			var ts = textSize(Std.string(count), HUDVisualBounds.fontSize(Math.min(fw, fh), 0.28, a.stackScale.get()));
+			out.includePlate(fx, fy, fw, fh, ts.x, ts.y, a.stackPlace);
+		}
+		if (a.showKey.get()) {
+			var key = AuraDef.sanitizeKey(a.keyText);
+			if (key.length > 0) {
+				var side = Math.min(w, h);
+				var ts = textSize(key, keyFontSize(side));
+				out.include(1, 0, ts.x + Math.max(4, side * 0.06) + 3, ts.y + Math.max(2, side * 0.04) + 3);
+			}
+		}
+	}
+
+	static function textSize(text:String, size:Single):imgui.Structs.ImVec2 {
+		ImGui.pushFont(ImGui.getFont(), size);
+		var result:imgui.Structs.ImVec2 = null;
+		try { result = ImGui.calcTextSize(text); }
+		catch (e:Dynamic) { ImGui.popFont(); throw e; }
+		ImGui.popFont();
+		return result;
+	}
+
+	static function keyFontSize(side:Single):Single {
+		return Math.max(12, Math.min(22, Math.max(ImGui.getFontSize() * 1.05, side * 0.28)));
+	}
+	static function textFace(a:AuraDef, width:Single, vectorScale:Float):String {
+		return a.textWrapCache.resolve(a.announce != null ? a.announce : "", width,
+			AuraTextLayout.fontSize(a.textSize.get() * vectorScale), ImGui.getFont(),
+			function(value:String) return ImGui.calcTextSize(value).x);
+	}
+	static function measureTextFace(a:AuraDef, width:Single, vectorScale:Float):imgui.Structs.ImVec2 {
+		ImGui.pushFont(ImGui.getFont(), AuraTextLayout.fontSize(a.textSize.get() * vectorScale));
+		var ts:imgui.Structs.ImVec2 = null;
+		try { ts = ImGui.calcTextSize(textFace(a, width, vectorScale)); }
+		catch (e:Dynamic) { ImGui.popFont(); throw e; }
+		ImGui.popFont();
+		return ts;
+	}
+
+	/** Same key reminder in preview and live output. */
+	public static function drawKeyChip(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, a:AuraDef, ghost:Bool):Void {
+		if (!a.showKey.get()) return;
+		var key = AuraDef.sanitizeKey(a.keyText);
+		if (key.length == 0) return;
+		var side = Math.min(w, h);
+		ImGui.pushFont(ImGui.getFont(), keyFontSize(side));
+		try {
+			var ts = ImGui.calcTextSize(key);
+			var tx:Single = x + 3;
+			var ty:Single = y + 2;
+			var alpha:Single = ghost ? 0.55 : 0.88;
+			ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(tx - 1, ty - 1),
+				ImGui.vec2(tx + ts.x + Math.max(4, side * 0.06), ty + ts.y + Math.max(2, side * 0.04)),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.02, 0.03, alpha)), 4);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + 1, ty + 1), 0xEE000000, key);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 0.96, 0.78, ghost ? 0.75 : 1)), key);
+		} catch (e:Dynamic) { ImGui.popFont(); throw e; }
+		ImGui.popFont();
+	}
 
 	public static function draw(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single,
 			progress:Float, stacks:Int, counterValue:Int, ghost:Bool, effectAlpha:Float = 1,
-			vectorScale:Float = 1, previewLeft:Null<Float> = null, previewGlow:Bool = false):Void {
+			vectorScale:Float = 1, previewLeft:Null<Float> = null, previewGlow:Null<Bool> = null):Void {
 		if (a == null || w < 1 || h < 1)
 			return;
 		bindFace(a, ghost, previewLeft, previewGlow);
@@ -56,10 +179,7 @@ class AuraVisualRenderer {
 		var col = ImGui.vec4(0.35, 0.78, 0.95, alpha);
 		if (a.region == "ring") {
 			var rad:Single = (w < h ? w : h) * 0.42;
-			if (!ghost && (a.show || (a.alwaysOn != null && a.alwaysOn.get()))) {
-				var ringGlowCol = a.glowColor != 0 ? (a.glowColor & 0x00FFFFFF) : ImGui.colorConvertFloat4ToU32(col);
-				solarflare.ui.VectorGlow.radial(dl, x + w * 0.5, y + h * 0.5, rad * 1.08, (Std.int(0x55 * alpha) << 24) | (ringGlowCol & 0x00FFFFFF), 0.35, 4);
-			}
+			if (faceFx && faceGlow) drawGlowRect(dl, x, y, w, h, a, alpha);
 			RingGauge.draw(dl, ImGui.vec2(x + w * 0.5, y + h * 0.5), rad, p, col, visibleLabel, vectorScale);
 			if (faceFx && wantCountdown(a))
 				drawCountdown(dl, x, y, w, h, a, alpha);
@@ -68,17 +188,20 @@ class AuraVisualRenderer {
 			return;
 		}
 		if (a.region == "text") {
-			var ts = ImGui.calcTextSize(label);
-			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + (w - ts.x) * 0.5, y + (h - ts.y) * 0.5),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, alpha)), label);
+			ImGui.pushFont(ImGui.getFont(), AuraTextLayout.fontSize(a.textSize.get() * vectorScale));
+			var ts:imgui.Structs.ImVec2 = null;
+			try {
+				var wrapped = textFace(a, w, vectorScale);
+				ts = ImGui.calcTextSize(wrapped);
+				ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + (w - ts.x) * 0.5, y + (h - ts.y) * 0.5),
+					ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, alpha)), wrapped);
+			} catch (e:Dynamic) { ImGui.popFont(); throw e; }
+			ImGui.popFont();
 			if (faceFx && wantCountdown(a))
 				drawCountdown(dl, x, y + (h + ts.y) * 0.5, w, ts.y, a, alpha);
 			return;
 		}
-		if (faceFx && (a.show || (a.alwaysOn != null && a.alwaysOn.get()))) {
-			var barGlowCol = a.glowColor != 0 ? (a.glowColor & 0x00FFFFFF) : ImGui.colorConvertFloat4ToU32(col);
-			solarflare.ui.VectorGlow.rect(dl, x + 4, y + 4, w - 8, h - 8, (Std.int(0x77 * alpha) << 24) | (barGlowCol & 0x00FFFFFF), 4.0, 1.5);
-		}
+		if (faceFx && faceGlow) drawGlowRect(dl, x + 4, y + 4, w - 8, h - 8, a, alpha);
 		VerticalBarGauge.draw(dl, x + 4, y + 4, w - 8, h - 8, p, col, visibleLabel);
 		if (faceFx && wantCountdown(a))
 			drawCountdown(dl, x + 4, y + 4, w - 8, h - 8, a, alpha);
@@ -92,29 +215,25 @@ class AuraVisualRenderer {
 		var st = Std.string(count);
 		var side:Single = w < h ? w : h;
 		var scale = a.stackScale != null ? a.stackScale.get() : 1;
-		var fontSize:Single = side * 0.28 * scale;
-		if (fontSize < 11) fontSize = 11;
-		if (fontSize > 48) fontSize = 48;
+		var fontSize:Single = HUDVisualBounds.fontSize(side, 0.28, scale);
 		ImGui.pushFont(ImGui.getFont(), fontSize);
-		var ts = ImGui.calcTextSize(st);
-		var tx = x + (w - ts.x) * 0.5;
-		var ty:Single = switch (a.stackPlace) {
-			case 1: y - ts.y - 2;
-			case 2: y + h + 2;
-			default: y + (h - ts.y) * 0.5;
-		};
-		var pad:Single = 4;
-		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(tx - pad, ty - 2),
-			ImGui.vec2(tx + ts.x + pad, ty + ts.y + 2),
-			ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.03, 0.05, 0.82 * alpha)), 6);
-		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + 1, ty + 1),
-			ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.95 * alpha)), st);
-		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty),
-			ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, alpha)), st);
+		try {
+			var ts = ImGui.calcTextSize(st);
+			var tx = x + (w - ts.x) * 0.5;
+			var ty:Single = HUDVisualBounds.plateY(y, h, ts.y, a.stackPlace);
+			var pad:Single = 4;
+			ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(tx - pad, ty - 2),
+				ImGui.vec2(tx + ts.x + pad, ty + ts.y + 2),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.03, 0.05, 0.82 * alpha)), 6);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + 1, ty + 1),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.95 * alpha)), st);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, alpha)), st);
+		} catch (e:Dynamic) { ImGui.popFont(); throw e; }
 		ImGui.popFont();
 	}
 
-	static function bindFace(a:AuraDef, ghost:Bool, previewLeft:Null<Float>, previewGlow:Bool):Void {
+	static function bindFace(a:AuraDef, ghost:Bool, previewLeft:Null<Float>, previewGlow:Null<Bool>):Void {
 		faceFx = !ghost;
 		faceInf = a.timerInfinite;
 		faceLeft = a.timeLeft;
@@ -122,25 +241,19 @@ class AuraVisualRenderer {
 			faceLeft = previewLeft;
 			faceInf = previewLeft < 0;
 		}
-		faceGlow = a.iconGlow || previewGlow;
+		faceGlow = previewGlow != null ? previewGlow : a.iconGlow;
 	}
 
 	/** Freeform element placements + optional glow / fuse / countdown overlays. */
 	static function drawCanvas(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single,
 			progress:Float, count:Int, showCount:Bool, ghost:Bool, alpha:Float, vectorScale:Float):Void {
-		if (faceFx && faceGlow) {
-			drawGlowRect(dl, x, y, w, h, a.glowColor, alpha);
-		} else if (faceFx && (a.show || (a.alwaysOn != null && a.alwaysOn.get()))) {
-			var canvasGlowCol = a.glowColor != 0 ? (a.glowColor & 0x00FFFFFF) : 0x44CCFF;
-			solarflare.ui.VectorGlow.rect(dl, x, y, w, h, (Std.int(0x66 * alpha) << 24) | (canvasGlowCol & 0x00FFFFFF), 6.0, 1.5);
-		}
-
 		var els = a.canvasElements;
 		if (els == null || els.length == 0) {
 			// Fallback: treat like icon region when no freeform layout yet.
 			drawIcon(dl, a, x, y, w, h, progress, count, showCount, ghost, alpha, vectorScale);
 			return;
 		}
+		if (faceFx && faceGlow) drawGlowRect(dl, x, y, w, h, a, alpha);
 
 		var i = 0;
 		while (i < els.length) {
@@ -149,22 +262,26 @@ class AuraVisualRenderer {
 			if (el == null)
 				continue;
 			if (el.kind == AuraCanvasElement.KIND_ICON) {
-				var iw:Single = el.w > 1 ? el.w : w;
-				var ih:Single = el.h > 1 ? el.h : h;
+				var iw:Single = el.w > 1 ? el.w * vectorScale : w;
+				var ih:Single = el.h > 1 ? el.h * vectorScale : h;
+				var ex:Single = x + el.x * vectorScale;
+				var ey:Single = y + el.y * vectorScale;
 				var id = el.content != null && el.content.length > 0 ? el.content : a.preferredIconId();
 				var tint = applyAlphaToPacked(el.color, alpha);
-				if (!GameIcons.drawKey(dl, id, x + el.x, y + el.y, iw, ih, tint)) {
-					ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x + el.x, y + el.y),
-						ImGui.vec2(x + el.x + iw, y + el.y + ih),
+				if (!GameIcons.drawKey(dl, id, ex, ey, iw, ih, tint)) {
+					ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(ex, ey),
+						ImGui.vec2(ex + iw, ey + ih),
 						ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.1, 0.12, 0.16, alpha * 0.85)), 6);
 				}
 			} else {
 				var raw = el.content != null ? el.content : "";
 				var formatted = formatTokens(raw, a, count);
-				var fontSize:Single = el.fontSize > 4 ? el.fontSize : 16;
+				var fontSize:Single = (el.fontSize > 4 ? el.fontSize : 16) * vectorScale;
 				ImGui.pushFont(ImGui.getFont(), fontSize);
-				var col = applyAlphaToPacked(el.color, alpha);
-				ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + el.x, y + el.y), col, formatted);
+				try {
+					var col = applyAlphaToPacked(el.color, alpha);
+					ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + el.x * vectorScale, y + el.y * vectorScale), col, formatted);
+				} catch (e:Dynamic) { ImGui.popFont(); throw e; }
 				ImGui.popFont();
 			}
 		}
@@ -201,10 +318,7 @@ class AuraVisualRenderer {
 				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.7, 0.75, 0.82, alpha)), missing);
 		}
 		if (faceFx && faceGlow) {
-			drawGlowRect(dl, ix - 2, iy - 2, side + 4, side + 4, a.glowColor, alpha);
-		} else if (faceFx && (a.show || (a.alwaysOn != null && a.alwaysOn.get()))) {
-			var iconGlowCol = a.glowColor != 0 ? (a.glowColor & 0x00FFFFFF) : 0x44CCFF;
-			solarflare.ui.VectorGlow.rect(dl, ix, iy, side, side, (Std.int(0x77 * alpha) << 24) | (iconGlowCol & 0x00FFFFFF), 6.0, 1.5);
+			drawGlowRect(dl, ix - 2, iy - 2, side + 4, side + 4, a, alpha);
 		}
 		if (a.progressRing != null && a.progressRing.get() && progress > 0.001 && progress < 0.999) {
 			var rad:Single = side * 0.46;
@@ -229,11 +343,10 @@ class AuraVisualRenderer {
 		}
 	}
 
-	static function drawGlowRect(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, packed:Int, alpha:Float):Void {
+	static function drawGlowRect(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, a:AuraDef, alpha:Float):Void {
 		if (alpha <= 0.02)
 			return;
-		// packed is 0xAARRGGBB — strip alpha; procOverlay owns pulse alphas.
-		solarflare.ui.VectorGlow.procTinted(dl, x, y, w, h, ImGui.getTime(), packed);
+		AuraGlowRenderer.draw(dl, a, x, y, w, h, alpha);
 	}
 
 	/** Vertical fuse on the right edge: filled height = remaining ratio, drains top→bottom. */
@@ -286,28 +399,22 @@ class AuraVisualRenderer {
 			return;
 		var side:Single = w < h ? w : h;
 		var scale = (a.countdownScale != null ? a.countdownScale.get() : 1) * countdownGlobalScale;
-		var fontSize:Single = side * 0.34 * scale;
-		if (fontSize < 11)
-			fontSize = 11;
-		if (fontSize > 48)
-			fontSize = 48;
+		var fontSize:Single = HUDVisualBounds.fontSize(side, 0.34, scale);
 		ImGui.pushFont(ImGui.getFont(), fontSize);
-		var ts = ImGui.calcTextSize(text);
-		var tx = x + (w - ts.x) * 0.5;
-		var ty:Single = switch (a.countdownPlace) {
-			case 1: y - ts.y - 2;
-			case 2: y + h + 2;
-			default: y + (h - ts.y) * 0.5;
-		};
-		var pad:Single = 4;
-		ImGui.ImDrawList_AddRectFilled(dl,
-			ImGui.vec2(tx - pad, ty - 2),
-			ImGui.vec2(tx + ts.x + pad, ty + ts.y + 2),
-			ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.03, 0.05, 0.72 * alpha)), 6);
-		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + 1, ty + 1),
-			ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.95 * alpha)), text);
-		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty),
-			ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 0.95, 0.75, alpha)), text);
+		try {
+			var ts = ImGui.calcTextSize(text);
+			var tx = x + (w - ts.x) * 0.5;
+			var ty:Single = HUDVisualBounds.plateY(y, h, ts.y, a.countdownPlace);
+			var pad:Single = 4;
+			ImGui.ImDrawList_AddRectFilled(dl,
+				ImGui.vec2(tx - pad, ty - 2),
+				ImGui.vec2(tx + ts.x + pad, ty + ts.y + 2),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.03, 0.05, 0.72 * alpha)), 6);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + 1, ty + 1),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.95 * alpha)), text);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 0.95, 0.75, alpha)), text);
+		} catch (e:Dynamic) { ImGui.popFont(); throw e; }
 		ImGui.popFont();
 	}
 
@@ -348,15 +455,9 @@ class AuraVisualRenderer {
 		return countdownCeiling <= 0 || faceLeft <= countdownCeiling;
 	}
 
-	/** Explicit fuse, or auto alongside short known remaining timers. */
+	/** A fuse is artwork only when one of its explicit display options is enabled. */
 	static function wantFuse(a:AuraDef, progress:Float):Bool {
-		if (a.showFuse != null && a.showFuse.get())
-			return true;
-		if (faceInf)
-			return false;
-		if (!(Math.isFinite(faceLeft) && faceLeft >= 0 && faceLeft <= AUTO_COUNTDOWN_MAX))
-			return false;
-		return progress > 0.001 && progress < 0.999;
+		return (a.showFuse != null && a.showFuse.get()) || (a.fuseBottom != null && a.fuseBottom.get());
 	}
 
 	/** Substitute canvas tokens. `stacks` is the effective count already resolved by drawCanvas. */
@@ -368,10 +469,10 @@ class AuraVisualRenderer {
 			s = s.split("{name}").join(a != null ? a.displayLabel() : "");
 		if (s.indexOf("{time}") >= 0) {
 			var t = "";
-			if (a != null && a.timerInfinite)
+			if (faceInf)
 				t = "inf";
-			else if (a != null && Math.isFinite(a.timeLeft) && a.timeLeft >= 0)
-				t = Std.string(Math.max(0, Math.round(a.timeLeft * 10) / 10));
+			else if (Math.isFinite(faceLeft) && faceLeft >= 0)
+				t = Std.string(Math.max(0, Math.round(faceLeft * 10) / 10));
 			s = s.split("{time}").join(t);
 		}
 		if (s.indexOf("{stacks}") >= 0)

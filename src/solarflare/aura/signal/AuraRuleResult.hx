@@ -2,6 +2,7 @@ package solarflare.aura.signal;
 
 class AuraRuleResult {
 	public var known:Bool = false;
+	public var eventSerial:Int = 0;
 	public var hit:Bool = false;
 	public var conditions:Array<AuraConditionResult> = [];
 	public var resolved:Array<AuraResolvedValue> = [];
@@ -20,6 +21,7 @@ class AuraRuleResult {
 		}
 	}
 	public function reset():Void {
+		eventSerial = 0;
 		known = false; hit = false; progress = Math.NaN; stacks = -1; timeLeft = Math.NaN;
 		knownCount = 0; hitCount = 0; totalCount = 0; code = EMPTY_RULE;
 		for (i in 0...AuraRuleDef.MAX_CONDITIONS) { conditions[i].reset(); resolved[i].reset(); }

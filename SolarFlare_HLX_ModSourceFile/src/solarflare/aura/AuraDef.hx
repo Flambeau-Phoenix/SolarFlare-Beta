@@ -60,6 +60,13 @@ class AuraDef {
 	public var canvasElements:Array<AuraCanvasElement>;
 	/** Packed 0xAARRGGBB glow accent (used when iconGlow is active). */
 	public var glowColor:Int;
+	public var glowStyle:String = "proc";
+	public var glowStrength = new FloatRef(1);
+	public var glowOuter = new FloatRef(12);
+	public var glowInner = new FloatRef(0);
+	/** Font pixels for the text face, independent of window size. */
+	public var textSize = new FloatRef(24);
+	public var textWrapCache = new AuraTextCache();
 	public var stackCounter:BoolRef;
 	/** Stack / activation count text size multiplier vs. the auto-fit base. */
 	public var stackScale:FloatRef;
@@ -96,6 +103,10 @@ class AuraDef {
 	/** 0 = follow the condition's remaining time, 1 = fixed timerSeconds. */
 	public var timerSource:Int;
 	public var timerSeconds:FloatRef;
+	/** 0 = condition becomes true, 1 = confirmed condition becomes false. */
+	public var timerStartEdge:Int = 0;
+	/** Last accepted player-cast sequence; transient and never serialized. */
+	public var timerEventSerial:Int = 0;
 	/** Show this timer in the shared AuraTimerBoard window. */
 	public var timerBoard:BoolRef;
 	/** Seconds the finished timer lingers at 0 before it is dropped. */
@@ -140,7 +151,7 @@ class AuraDef {
 	public static inline var ICON_BUF:Int = 160;
 	public static inline var CUE_BUF:Int = 48;
 	public static inline var PLATE_BUF:Int = 80;
-	public static inline var ANN_BUF:Int = 120;
+	public static inline var ANN_BUF:Int = 2048;
 	public static inline var FIGHT_BUF:Int = 32;
 	public static inline var KEY_BUF:Int = 16;
 

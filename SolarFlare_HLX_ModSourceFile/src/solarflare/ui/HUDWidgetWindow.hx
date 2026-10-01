@@ -40,27 +40,39 @@ class HUDWidgetWindow {
 	static var ovW:Map<String, Single> = new Map();
 	static var ovH:Map<String, Single> = new Map();
 	static var reassert:Map<String, Bool> = new Map();
+	static var lastVisualW:Map<String, Single> = new Map();
+	static var lastVisualH:Map<String, Single> = new Map();
 
 	public static function draw(id:String, caption:String, chrome:HudChrome, w:Single, h:Single,
 			drawBody:ImVec2->Void, ?openBuilder:Void->Void, ?hide:Void->Void, layoutOverride:Bool = false,
-			?quickActions:Void->Void, onResize:Single->Single->Void = null):Void {
+			?quickActions:Void->Void, onResize:Single->Single->Void = null, visualBounds:HUDVisualBounds = null):Void {
 		UiLayout.contentSpacing(function() {
-			drawContent(id, caption, chrome, w, h, drawBody, openBuilder, hide, layoutOverride, quickActions, onResize);
+			drawContent(id, caption, chrome, w, h, drawBody, openBuilder, hide, layoutOverride, quickActions, onResize, visualBounds);
 		});
 	}
 
 	static function drawContent(id:String, caption:String, chrome:HudChrome, w:Single, h:Single,
 			drawBody:ImVec2->Void, openBuilder:Void->Void, hide:Void->Void, layoutOverride:Bool,
-			quickActions:Void->Void, onResize:Single->Single->Void):Void {
+			quickActions:Void->Void, onResize:Single->Single->Void, visualBounds:HUDVisualBounds):Void {
 		if (chrome == null)
 			return;
-		w = Math.max(HudChrome.SUN + HudChrome.CLOSE + 12, w);
+		var minFaceW:Single = visualBounds != null ? 24 : HudChrome.SUN + HudChrome.CLOSE + 12;
+		w = Math.max(minFaceW, w);
 		h = Math.max(MIN_CONTENT_H, h);
+		var left:Single = visualBounds != null ? Math.max(0, -visualBounds.minX) : 0;
+		var top:Single = visualBounds != null ? Math.max(0, -visualBounds.minY) : 0;
+		var extraW:Single = visualBounds != null ? Math.max(0, visualBounds.maxX - w) + left : 0;
+		var extraH:Single = visualBounds != null ? Math.max(0, visualBounds.maxY - h) + top : 0;
+		chrome.setVisualOffset(left, top);
 
 		// Re-assert only when the owner changed the numbers (slider, scale, profile load).
 		var prevW:Single = lastW.exists(id) ? lastW.get(id) : -1;
 		var prevH:Single = lastH.exists(id) ? lastH.get(id) : -1;
 		var external = Math.abs(prevW - w) > 1 || Math.abs(prevH - h) > 1;
+		if (!lastVisualW.exists(id) || Math.abs(lastVisualW.get(id) - extraW) > 0.5
+				|| !lastVisualH.exists(id) || Math.abs(lastVisualH.get(id) - extraH) > 0.5) external = true;
+		lastVisualW.set(id, extraW);
+		lastVisualH.set(id, extraH);
 		if (chrome.takeExpandDirty())
 			external = true;
 		if (reassert.exists(id) && reassert.get(id))
@@ -78,11 +90,12 @@ class HUDWidgetWindow {
 		// has to be asserted every frame; FirstUseEver would freeze the guess in place.
 		var locked = chrome.isLocked() && !layoutOverride;
 		var sizeCond = (locked || external || !measured) ? ImGuiCond.Always : ImGuiCond.FirstUseEver;
-		ImGui.setNextWindowSize(ImGui.vec2(w + oW, h + oH), sizeCond);
+		ImGui.setNextWindowSize(ImGui.vec2(w + extraW + oW, h + extraH + oH), sizeCond);
 		chrome.clampToViewport();
 		chrome.applyPos();
 		if (!chrome.collapsed.get() && !chrome.isLocked()) {
-			ImGui.setNextWindowPos(ImGui.vec2(chrome.x.get(), chrome.y.get()), ImGuiCond.FirstUseEver);
+			ImGui.setNextWindowPos(ImGui.vec2(HUDVisualBounds.hostCoordinate(chrome.x.get(), left),
+				HUDVisualBounds.hostCoordinate(chrome.y.get(), top)), ImGuiCond.FirstUseEver);
 		}
 
 		var editable = !chrome.isLocked() || layoutOverride;
@@ -122,31 +135,37 @@ class HUDWidgetWindow {
 					}
 					// Hand the body its configured content box, never a larger region: on an
 					// oversized seed frame the extra space would stretch blit art out of shape.
-					var bodyW:Single = Math.min(avail.x, w);
-					var bodyH:Single = Math.min(avail.y, h);
+					var bodyW:Single = Math.min(Math.max(0, avail.x - extraW), w);
+					var bodyH:Single = Math.min(Math.max(0, avail.y - extraH), h);
 					if (bodyW > 1 && bodyH > 1 && drawBody != null) {
 						var clipMin = ImGui.getCursorScreenPos();
 						ImGui.pushClipRect(clipMin,
-							ImGui.vec2(clipMin.x + bodyW, clipMin.y + bodyH), true);
+							ImGui.vec2(clipMin.x + bodyW + extraW, clipMin.y + bodyH + extraH), true);
 						var drawFailed = false;
 						var drawFailure:Dynamic = null;
 						try {
+							if (visualBounds != null) ImGui.setCursorScreenPos(ImGui.vec2(clipMin.x + left, clipMin.y + top));
 							drawBody(ImGui.vec2(bodyW, bodyH));
 						} catch (e:Dynamic) {
 							drawFailed = true;
 							drawFailure = e;
 						}
 						ImGui.popClipRect();
+						if (visualBounds != null) {
+							// Submit the full visual allocation, including above/below plates.
+							ImGui.setCursorScreenPos(clipMin);
+							ImGui.dummy(ImGui.vec2(bodyW + extraW, bodyH + extraH));
+						}
 						if (drawFailed)
 							throw drawFailure;
 					}
 				}
 				chrome.closeBodyChild();
 				chrome.drawResizeCorner(id, editable,
-					HudChrome.SUN + HudChrome.CLOSE + 12 + oW, MIN_CONTENT_H + oH,
+					minFaceW + extraW + oW, MIN_CONTENT_H + extraH + oH,
 					10000, 10000, function(outerW:Single, outerH:Single) {
-						var contentW:Single = Math.max(HudChrome.SUN + HudChrome.CLOSE + 12, outerW - oW);
-						var contentH:Single = Math.max(MIN_CONTENT_H, outerH - oH);
+						var contentW:Single = Math.max(minFaceW, outerW - oW - extraW);
+						var contentH:Single = Math.max(MIN_CONTENT_H, outerH - oH - extraH);
 						lastW.set(id, contentW);
 						lastH.set(id, contentH);
 						if (onResize != null)

@@ -63,6 +63,16 @@ class AuraStatusCache {
 	}
 
 	public static function isCurrent(hero:Dynamic):Bool return hero != null && sampledHero == hero;
+	/** Cached primitives only, captured at local skill-use before deferred proc consumption. */
+	public static function capturePresentIds(hero:Dynamic):Array<String> {
+		var ids:Array<String> = [];
+		if (!isCurrent(hero)) return ids;
+		for (i in 0...count) {
+			var s = snaps[i];
+			if (s != null && s.known && s.present) for (id in s.idsLower) ids.push(id);
+		}
+		return ids;
+	}
 
 	/**
 	 * Gate: skip unless hero change or 50 ms elapsed.

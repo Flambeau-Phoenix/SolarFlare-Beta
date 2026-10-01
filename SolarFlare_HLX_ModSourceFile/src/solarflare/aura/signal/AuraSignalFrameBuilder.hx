@@ -15,6 +15,17 @@ class AuraSignalFrameBuilder {
 	public static function build(frame:AuraSignalFrame, now:Float):Void {
 		frame.resetCollections(); frame.generation++; frame.builtAt = now;
 		frame.heroKnown = HealthCache.localHero != null;
+		var localCasts = solarflare.aura.LocalCastHistory.shared;
+		localCasts.bindHero(HealthCache.localHero);
+		for (r in localCasts.records) {
+			var dst = frame.playerCasts[frame.playerCastCount++];
+			dst.skillId = r.skillId;
+			dst.age = Math.max(0, now - r.at);
+			dst.known = frame.heroKnown;
+			dst.serial = r.serial;
+			dst.statusIds = r.statusIds;
+			dst.statusKnown = r.statusKnown;
+		}
 		frame.healthKnown = HealthCache.valid; frame.healthCurrent = HealthCache.current;
 		frame.healthRatio = HealthCache.valid ? HealthCache.ratio() : 0;
 		frame.shieldRatio = HealthCache.valid ? clamp01(HealthCache.shield / (HealthCache.max > 0 ? HealthCache.max : 1)) : 0;

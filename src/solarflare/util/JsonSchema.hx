@@ -87,6 +87,14 @@ typedef AuraImportExportModel = {
 	@:optional var timerMode:Int;
 	@:optional var timerSource:Int;
 	@:optional var timerSeconds:Float;
+	/** Legacy import field; timer visibility is now automatic and this value is ignored. */
+	@:optional var timerKeepsAura:Bool;
+	@:optional var timerStartEdge:Int;
+	@:optional var glowStyle:String;
+	@:optional var glowStrength:Float;
+	@:optional var glowOuter:Float;
+	@:optional var glowInner:Float;
+	@:optional var textSize:Float;
 	@:optional var timerBoard:Bool;
 	@:optional var timerKeepExpired:Float;
 	@:optional var showFuse:Bool;
