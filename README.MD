@@ -1,6 +1,6 @@
 ![Aura instant cast proc](ghub.gif)
 
-# SolarFlare — v2.4b (Beta)
+# SolarFlare — v3.0b (Beta)
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
 
 ![Bee + Imp DPS](TrinketBee_Imp.png)
@@ -126,53 +126,30 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 * **Profiles & Themes:** Save, duplicate, and switch whole-HUD profiles across characters; choose curated color schemes or define your own.
 
 ---
-# Solar Flare v2.5b - Aura Improvements
-
-## [GitHub Release](https://github.com/Flambeau-Phoenix/SolarFlare-Beta/releases/tag/v2.5b)  || [Nexus Mods Release](https://www.nexusmods.com/farever/mods/12)
-
----
-
-- Single-page builder restored: Conditions, appearance, and preview are together again in the organized WHEN / THEN layout.
-
-- Condition timers: Start a fixed countdown or countup when conditions become true or stop being true. Supports setups such as Summon Demon cast + Inner Demon active → start a 20-second timer.
-
-- Automatic timer visibility: Auras remain visible while their display conditions match or their timer is running. Timer expiry no longer hides an aura whose buff is still active.
-
-- Precise duration entry: Enter timer values directly, including decimals.
-
-- Cleaner timer controls: Timer settings sit beneath the display checkboxes, with nearby Stacks badge position and size controls.
-
-- Static text boxes: Add multiline messages with adjustable font size, wrapping, resizable windows, optional backgrounds, and always-visible or conditional display.
- 
-
-- Expanded glow options: Proc sparks, soft bloom, and pulsing bloom, with adjustable strength and inward/outward spread.
-
-- Improved aura panels: Drawing space accounts for icons, countdown labels, stack badges, and glow to prevent clipping.
-
-- Cleaner previews: Removed forced decorations so previews reflect the effects users configure.
-
-- Window interaction preserved: Locked transparent panels stay inert to the hidden cursor, while right-click menus allow unlocking and repositioning with the cursor visible.
-
-- Early preview of Hemorrhage Tool, which tracks all hemorrhage hits and damage so you can test different builds against crit chance for wars gearing decisions.
 
 
+# SolarFlare v3.0b — Patch Notes
+## Added ExtraBars
+- Create customizable consumable bars with 1–10 visible cells per bar.
+- Adjust layouts, cell size, opacity, transparency, and position locking.
+- Assign items and hotkeys, search your inventory or the full consumable catalog, and drag cells to swap assignments.
+- Choose Hold or Toggle activation, with Undo/Redo support.
+- ExtraBars settings are remembered independently of HUD profiles and gear builds.
+- Added an optional Spark Cube tracker showing Charged/Empty status, active-effect countdown, observed damage, and burst results.
+- Spark Cube can display a custom hotkey label entered in its settings.
+## Added Simple Aura Builder — Quick Build
+- Create basic auras through a guided popup available from Creation Home.
+- Start with quick picks: Skill ready, Instant cast, Low HP, Buff stacks, or Enemy cast.
+- Choose an Icon, Glow, Bar, or Banner appearance.
+- Add optional Stacks, Counter, Countdown, Fuse, and Label overlays.
+- Choose While true, Flash then hold, or Alert once behavior.
+- Review a live condition summary and mini preview before saving.
+- Open the draft in Advanced to continue with complex conditions, scripting, or timing.
+## UI Improvements
+- Distinct ExtraBars navigation tabs and always-visible layout controls.
+- Expanded item catalog space and corrected thumbnail/text spacing.
+- The full Advanced Aura Builder remains available.
 
-
-<details>
-<summary>📦 Previous patches</summary>
-#  Solar Flare v2.4b Patch Notes 
-
-* **Updated CDB, robust cursor control via sfcursor.hdll, UI polish, and intermittent frame drop fixes.
-* **Added sfcursor.hdll Native Plugin: Introduced a lightweight Win32 native wrapper to enforce robust cursor confinement and window focus synchronization via ClipCursor and MapWindowPoints.
-* **Multi-Monitor Drift Fix: Resolved issues with the mouse escaping the game window or clicking outside client bounds during active ImGui overlay menus in borderless windowed mode.
-* **CDB & Atlas Updates: Updated atlas files and data.cdb references across the mod to match the new game patch.
-* **UI Polish: Fixed a bug in the Lightsaber and Combat Log UI where a rogue scrollbar appeared, blocking the close window title bar button and the window resize corner piece.
-* **Performance & Cursor Overhaul: Fixed intermittent frame drops by removing experimental telemetry features, correcting unclosed sfimgui panels (missing end() calls), and fully migrating cursor control away from split game/sfimgui logic over to sfcursor.hdll.
-
-## v1.1.0
-- what changed
-
-</details>
 
 
 ## Developer & Build Reference
