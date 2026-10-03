@@ -39,9 +39,6 @@ class GeauxBuilder {
 	var glowEditBefore:Dynamic = null;
 	static var glowNames = ["Neon Magenta", "Solar Gold", "Arcane Cyan", "Fel Green"];
 	static var glowRgb = [0xFF40C0, 0xFFC040, 0x40DFFF, 0x69FF40];
-	function propertyGrid(id:String, draw:Void->Void):Void {
-		UiLayout.propertyGrid(id, draw, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
-	}
 
 	var searchBar = new SearchBar("Search skills & prayers...", 128);
 	var search:String = "";
@@ -81,6 +78,18 @@ class GeauxBuilder {
 
 	function bumpRevision():Void layoutRevision++;
 
+	function drawGlowNumber(id:String, value:imgui.ref.FloatRef, spread:Bool):Void {
+		var before = cfg.dumpLayout();
+		var changed = ImGui.inputFloat(id, value, 0, 0, spread ? "%.1f px" : "%.2fx");
+		if (ImGui.isItemActivated()) glowEditBefore = before;
+		if (changed) {
+			value.set(spread ? solarflare.aura.AuraGlowStyle.spread(value.get()) : solarflare.aura.AuraGlowStyle.strength(value.get()));
+			SettingsStore.markDirty();
+		}
+		if (ImGui.isItemDeactivatedAfterEdit() && glowEditBefore != null) {
+			undoMgr.push("Glow setting", glowEditBefore); glowEditBefore = null;
+		}
+	}
 	function snapshot(actionName:String):Void {
 		if (cfg != null)
 			undoMgr.push(actionName, cfg.dumpLayout());
@@ -231,7 +240,7 @@ class GeauxBuilder {
 
 	function drawLeftControls():Void {
 		UiChrome.sectionHeader("Grid & Slots");
-		propertyGrid("##gb_grid_props", function() {
+		UiLayout.propertyGrid("##gb_grid_props", function() {
 			UiLayout.propertyRow("Rows", function() {
 				var before = cfg.dumpLayout();
 				if (ImGui.sliderInt("##gb_rows", cfg.rows, GeauxConfig.MIN_DIM, GeauxConfig.MAX_DIM)) {
@@ -244,7 +253,7 @@ class GeauxBuilder {
 					undoMgr.push("Resize Columns", before); cfg.ensureSlots(); GeauxCache.markLayoutDirty(); bumpRevision(); SettingsStore.markDirty();
 				}
 			});
-		});
+		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
 
 		UiChrome.subHeader("Quick Presets");
 		var presets = [
@@ -270,7 +279,7 @@ class GeauxBuilder {
 		if (selected >= 0 && selected < cfg.visibleCount()) {
 			var currentSkill = cfg.slotIds[selected];
 			ImGui.text('Slot #${selected + 1}: ${currentSkill.length > 0 ? currentSkill : "Empty"}');
-			propertyGrid("##gb_slot_props", function() {
+			UiLayout.propertyGrid("##gb_slot_props", function() {
 				UiLayout.propertyRow("Actions", function() {
 					UiLayout.inlinePair(
 						"##gb_slot_actions",
@@ -300,7 +309,7 @@ class GeauxBuilder {
 					},
 					"Display label only — does not capture or replace Farever input."
 				);
-			});
+			}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
 		} else {
 			ImGui.textDisabled("Click a cell in the preview to configure it.");
 		}
@@ -309,7 +318,7 @@ class GeauxBuilder {
 		var style = cfg.style != null ? cfg.style : (cfg.style = new GeauxStyle());
 
 		UiChrome.subHeader("Layout");
-		propertyGrid("##gb_look_layout", function() {
+		UiLayout.propertyGrid("##gb_look_layout", function() {
 			UiLayout.propertyRow("Outer pad", function() {
 				if (BuilderSlider.draw("##gb_st_pad", style.padding, 0, 32, "%.0f px")) {
 					cfg.sizeDirty = true;
@@ -336,30 +345,30 @@ class GeauxBuilder {
 				if (BuilderSlider.draw("##gb_st_alpha", style.bgAlpha, 0, 1, "%.2f"))
 					SettingsStore.markDirty();
 			});
-		});
+		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
 
 		UiChrome.subHeader("Bar Size");
-		propertyGrid("##gb_bar_size", function() {
+		UiLayout.propertyGrid("##gb_bar_size", function() {
 			UiLayout.propertyRow("Width", function() {
 				if (ImGui.sliderFloat("##gb_st_w", cfg.width, GeauxConfig.MIN_W, GeauxConfig.MAX_W, "%.0f px")) { cfg.sizeDirty = true; SettingsStore.markDirty(); }
 			});
 			UiLayout.propertyRow("Height", function() {
 				if (ImGui.sliderFloat("##gb_st_h", cfg.height, GeauxConfig.MIN_H, GeauxConfig.MAX_H, "%.0f px")) { cfg.sizeDirty = true; SettingsStore.markDirty(); }
 			});
-		});
+		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
 		ImGui.textDisabled('Grid ${cfg.rows.get()}x${cfg.cols.get()} · cells grow to fill the bar.');
 
 		UiChrome.subHeader("Overlays");
-		propertyGrid("##gb_overlays", function() {
+		UiLayout.propertyGrid("##gb_overlays", function() {
 			UiLayout.propertyRow("Pinwheel", function() { if (ImGui.checkbox("##gb_st_pin", style.showPinwheel)) SettingsStore.markDirty(); });
 			UiLayout.propertyRow("Seconds", function() { if (ImGui.checkbox("##gb_st_cd", style.showCdText)) SettingsStore.markDirty(); });
 			UiLayout.propertyRow("Keybind chips", function() { if (ImGui.checkbox("##gb_st_hk", style.showHotkeys)) SettingsStore.markDirty(); });
 			UiLayout.propertyRow("Charges", function() { if (ImGui.checkbox("##gb_st_ch", style.showCharges)) SettingsStore.markDirty(); });
 			UiLayout.propertyRow("Group tags", function() { if (ImGui.checkbox("##gb_st_tags", style.showGroupTags)) SettingsStore.markDirty(); });
-		});
+		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
 
 		UiChrome.subHeader("On Cooldown");
-		propertyGrid("##gb_cd_props", function() {
+		UiLayout.propertyGrid("##gb_cd_props", function() {
 			UiLayout.propertyRow("Display", function() {
 				var cdMode = style.effectiveCdDisplay();
 				var cdLabel = switch (cdMode) {
@@ -393,10 +402,10 @@ class GeauxBuilder {
 			UiLayout.propertyRow("Lock bar", function() {
 				if (ImGui.checkbox("##gb_st_lock", cfg.chrome.locked)) SettingsStore.markDirty();
 			});
-		});
+		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
 
 		UiChrome.subHeader("Colors");
-		propertyGrid("##gb_colors", function() {
+		UiLayout.propertyGrid("##gb_colors", function() {
 			var flags = imgui.Enums.ImGuiColorEditFlags.AlphaBar | imgui.Enums.ImGuiColorEditFlags.NoInputs;
 			UiLayout.propertyRow("Window bg", function() {
 				if (ImGui.colorEdit4("##gb_col_win", style.windowBg, flags))
@@ -424,14 +433,14 @@ class GeauxBuilder {
 				if (ImGui.colorEdit4("##gb_col_cd", style.cdText, flags))
 					SettingsStore.markDirty();
 			});
-		});
+		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
 		if (UiChrome.ghostButton("Reset colors##gb_col_reset", ImGui.vec2(-1, 28))) {
 			style.resetColors();
 			SettingsStore.markDirty();
 		}
 
 		UiChrome.subHeader("Vector Glow");
-		propertyGrid("##gb_glow", function() {
+		UiLayout.propertyGrid("##gb_glow", function() {
 			UiLayout.propertyRow("Glow preset", function() {
 				if (ImGui.beginCombo("##gb_glow_preset", "Choose color")) {
 					for (i in 0...glowNames.length) if (ImGui.selectable(glowNames[i])) {
@@ -457,6 +466,18 @@ class GeauxBuilder {
 					ImGui.endCombo();
 				}
 			}, "Cooldown completion flashes for 15 seconds. Proc alerts retain their own duration.");
+			// Procs use these settings even when the ready flash uses another attention mode.
+			UiLayout.propertyRow("Glow style", function() {
+				if (ImGui.beginCombo("##gb_glow_style", style.glowStyle)) {
+					for (name in ["proc", "soft", "pulse"]) if (ImGui.selectable(name + "##gb_gs_" + name, style.glowStyle == name)) {
+						snapshot("Glow style"); style.glowStyle = name; SettingsStore.markDirty();
+					}
+					ImGui.endCombo();
+				}
+			});
+			UiLayout.propertyRow("Strength", function() drawGlowNumber("##gb_glow_strength", style.glowStrength, false));
+			UiLayout.propertyRow("Outside spread", function() drawGlowNumber("##gb_glow_outer", style.glowOuter, true));
+			UiLayout.propertyRow("Inside spread", function() drawGlowNumber("##gb_glow_inner", style.glowInner, true));
 			UiLayout.propertyRow("Cooldown glow", function() {
 				var modes = ["None", "Dim", "Outline"];
 				var current = style.cooldownAttention.get();
@@ -465,7 +486,7 @@ class GeauxBuilder {
 					ImGui.endCombo();
 				}
 			});
-		});
+		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
 
 		if (showDiag) {
 			UiChrome.sectionHeader("Diagnostics");

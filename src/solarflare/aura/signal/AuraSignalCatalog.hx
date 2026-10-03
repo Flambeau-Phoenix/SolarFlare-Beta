@@ -35,6 +35,13 @@ class AuraSignalCatalog {
 		add("skill.cooldownProgress", "Skill cooldown progress", "Skills", Percent, "skill");
 		// skill.specialReady (shouldHighlightSkill) kept in reader for legacy saves; not offered in picker.
 		add("skill.instantReady", "Instant cast ready (skill script)", "Instant cast", Boolean, "skill");
+		add("consumable.owned", "Item carried / equipped", "Consumables", Boolean, "consumable");
+		add("consumable.count", "Item count / charges", "Consumables", Count, "consumable");
+		add("consumable.usable", "Item usable now", "Consumables", Boolean, "consumable");
+		add("consumable.needsRefill", "Item needs refill", "Consumables", Boolean, "consumable");
+		add("consumable.active", "Item effect active", "Consumables", Boolean, "consumable");
+		add("consumable.durationLeft", "Item effect time left", "Consumables", Duration, "consumable");
+		add("consumable.durationProgress", "Item effect progress", "Consumables", Percent, "consumable");
 		add("status.present", "Buff/debuff on me", "Statuses", Boolean, "status");
 		// Parallel to present — not "Stacks on me" (that collided with aura names / home buttons).
 		add("status.stacks", "Buff/debuff stacks", "Statuses", Count, "status");

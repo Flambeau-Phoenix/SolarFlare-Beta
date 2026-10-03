@@ -8,6 +8,49 @@ import solarflare.aura.signal.AuraRuleDef;
  * Kill Counters, Low HP Alerts, Skill Ready Alerts, Combo Finishers, Buff Stack Trackers, Damage Spikes.
  */
 class AuraTemplates {
+	/** Item identity stays on the rule; its granted buff supplies the live timer. */
+	public static function createConsumableTracker(id:String, signal:String = "consumable.active"):AuraDef {
+		var entry = solarflare.cdb.ConsumableCatalog.find(id);
+		if (entry == null) return null;
+		if (signal == "consumable.active" && entry.statuses.length == 0) signal = "consumable.usable";
+		var label = switch (signal) {
+			case "consumable.count": "Count / charges";
+			case "consumable.usable": "Usable";
+			case "consumable.needsRefill": "Refill needed";
+			case "consumable.owned": "Owned";
+			default: "Effect active";
+		};
+		var a = new AuraDef("consumable_" + id, entry.name + " - " + label);
+		a.iconId = id; a.syncIconBuf();
+		a.announce = id == "SparkCube" && signal == "consumable.active" ? "SPARK SURGE" : entry.name;
+		a.syncAnnounceBuf();
+		a.region = "icon";
+		a.showIcon.set(true); a.showLabel.set(true);
+		if (signal == "consumable.count") { a.stackCounter.set(true); a.progressRing.set(false); }
+		a.rule = new AuraRuleDef();
+		var c = new AuraConditionDef();
+		c.signal = signal; c.subject = id; c.subjectLabel = entry.name;
+		c.op = signal == "consumable.count" ? "gte" : "is";
+		c.numberValue = 1; c.boolValue = true;
+		a.rule.conditions.push(c);
+		if (signal == "consumable.active") {
+			a.timerMode = AuraTimer.MODE_DOWN;
+			a.timerSource = AuraTimer.SRC_FOLLOW;
+			a.followBuffDuration.set(true);
+			a.showCountdown.set(true); a.showFuse.set(true); a.progressRing.set(true);
+			var span = solarflare.cdb.ConsumableCatalog.listedSpan(id);
+			if (span > 0) a.timerSeconds.set(span);
+		}
+		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
+		if (id == "SparkCube" && signal == "consumable.active") {
+			var glow = new AuraEffect("glow", AuraEffect.KIND_ICON, AuraEffect.WHEN_WHILE_TRUE);
+			glow.glow.set(true);
+			a.glowColor = 0xFFC49BFF;
+			a.effects.push(glow);
+		}
+		return a;
+	}
+
 	public static function createEmergencyLowHpAlert():AuraDef {
 		var a = new AuraDef("emergency_low_hp", "Emergency Low HP");
 		a.announce = "LOW HP! HEAL / DODGE!";

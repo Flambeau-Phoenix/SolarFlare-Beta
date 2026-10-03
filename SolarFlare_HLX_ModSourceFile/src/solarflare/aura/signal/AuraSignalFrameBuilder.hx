@@ -47,6 +47,14 @@ class AuraSignalFrameBuilder {
 		frame.riftRemain = GetRiftyCache.remainingTime;
 		frame.targetBossId = GetRiftyCache.targetBossId;
 		frame.encounterKnown = true;
+		solarflare.aura.ConsumableCache.sample(HealthCache.localHero, now);
+		frame.consumableCount = 0;
+		for (src in solarflare.aura.ConsumableCache.snaps) {
+			if (frame.consumableCount >= frame.consumables.length) break;
+			var dst = frame.consumables[frame.consumableCount++];
+			dst.id = src.id; dst.owned = src.owned; dst.count = src.count; dst.known = src.known;
+			dst.usable = src.usable; dst.usableKnown = src.usableKnown;
+		}
 		fillTarget(frame);
 		var kk = CombatLogCache.consumeKillKind();
 		frame.killKind = kk;
@@ -70,6 +78,7 @@ class AuraSignalFrameBuilder {
 		for (i in 0...n) {
 			var src = AuraStatusCache.snaps[i]; if (src == null || src.id == null || src.id.length == 0) continue;
 			var dst = frame.statuses[frame.statusCount++]; dst.rawId = src.id; dst.label = "";
+			dst.sourceItemId = src.sourceItemId; dst.sourceItemKnown = src.sourceItemKnown;
 			dst.ids = src.ids.copy(); dst.present = src.present; dst.durationKnown = src.durationKnown;
 			dst.stacks = src.stacks; dst.durationLeft = src.left; dst.durationProgress = clamp01(src.progress);
 			dst.infinite = src.infinite;

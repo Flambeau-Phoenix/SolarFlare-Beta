@@ -1,0 +1,1178 @@
+{
+  "sourceSha256": "96ca48ad164a9be5ec52e28474d4be8c5fb6972256682322cff98563d710b807",
+  "entries": [
+    {
+      "id": "Cook_13",
+      "name": "Beehive Lozenge",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_BeehiveLozenge_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_11",
+      "name": "Beggar's Garbure",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_BeggarsGarbure_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_3",
+      "name": "Crab Goulash",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_CrabGoulash_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_Demon_4",
+      "name": "Demonic Stew",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_Demon_04.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ElixirOfAbundance",
+      "name": "Elixir of Abundance",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ElixirOfAbundanceStatus",
+          "duration": 3600,
+          "shared": false
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Abundance.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ElixirOfArmor_Z2",
+      "name": "Elixir of Armor",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Armor_Z2.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ElixirOfDexterity_Z2",
+      "name": "Elixir of Dexterity",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Dexterity_Z2.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ElixirOfFaith_Z2",
+      "name": "Elixir of Faith",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Faith_Z2.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ElixirOfIntelligence_Z2",
+      "name": "Elixir of Intelligence",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Intelligence_Z2.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ElixirofMinorArmor",
+      "name": "Elixir of Minor Armor",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Armor.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ElixirOfMinorDexterity",
+      "name": "Elixir of Minor Dexterity",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Dexterity.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ElixirOfMinorFaith",
+      "name": "Elixir of Minor Faith",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Faith.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ElixirOfMinorIntelligence",
+      "name": "Elixir of Minor Intelligence",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Intelligence.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ElixirOfMinorStrength",
+      "name": "Elixir of Minor Strength",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Strength.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ElixirOfStrength_Z2",
+      "name": "Elixir of Strength",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Elixir_ElixirMinor_Strength_Z2.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_Demon_0",
+      "name": "Eye Salad",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_Demon_00.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "FastSwimPotion",
+      "name": "Fast Swim Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "FastSwimPotion",
+          "duration": 20,
+          "shared": false
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Swim.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_7",
+      "name": "Flavored Candies",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_FlavouredCandies_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_5",
+      "name": "Grilled Mackerel",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_GrilledMackerel_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_Demon_3",
+      "name": "Grilled Tail Skewers",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_Demon_03.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_2",
+      "name": "Grilled Wolf Chops",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_WolfGrilledChops_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "HealthPotion",
+      "name": "Health Potion",
+      "type": "HealthPotion",
+      "refillable": false,
+      "statuses": [],
+      "gfx": {
+        "file": "UI/Portraits/Items/HealthPotion/Items_Loot_Potion_PotionMinor_Health.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "RefillableFlask",
+      "name": "Hess'tuss Flask",
+      "type": "HealthPotion",
+      "refillable": true,
+      "statuses": [],
+      "gfx": {
+        "file": "UI/Portraits/Items/HealthPotion/Items_Loot_RefillableFlask_RefillableFlask_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_Demon_1",
+      "name": "Horn in Sauce",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_Demon_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_Demon_6",
+      "name": "Hot Wings",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_Demon_06.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "InvisibilityPotion",
+      "name": "Invisibility Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Invisibility.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "LongBreathPotion",
+      "name": "Long Breath Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "LongBreathPotion",
+          "duration": 600,
+          "shared": false
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Breath.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_4",
+      "name": "Melted Herbed Cheese",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_MeltedHerbedCheese_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "SmallAlchemistCauldron",
+      "name": "Minor Alchemist Cauldron",
+      "type": "Elixir",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Elixir/Items_Loot_Miscellaneous_SmallAlchemistCauldron_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "MinorDexterityPotion",
+      "name": "Minor Dexterity Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 20,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Dexterity.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "MinorFaithPotion",
+      "name": "Minor Faith Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 20,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Faith.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "MinorHealingPotion",
+      "name": "Minor Healing Potion",
+      "type": "HealthPotion",
+      "refillable": false,
+      "statuses": [],
+      "gfx": {
+        "file": "UI/Portraits/Items/HealthPotion/Items_Loot_Potion_PotionMinor_Healing.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "MinorIntelligencePotion",
+      "name": "Minor Intelligence Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 20,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Intelect.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "MinorShieldPotion",
+      "name": "Minor Shield Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "MinorShieldPotion_Status",
+          "duration": 20,
+          "shared": false
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Shield.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "MinorStrengthPotion",
+      "name": "Minor Strength Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 20,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Strength.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "MinorVelocityPotion",
+      "name": "Minor Velocity Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "MinorVelocityPotion_Status",
+          "duration": 10,
+          "shared": false
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Velocity.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_8",
+      "name": "Mixed Salad",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_MixedSalad_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_15",
+      "name": "Pike Cooked in Foil",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_PikeCookedinFoil_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Feast",
+      "name": "Plainswalker Feast",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 3600,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_PlainsWalkerFeast_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_12",
+      "name": "Pumpkin Pie",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_PumkinPie_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_14",
+      "name": "Ramburg Fondue",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_RamburgFondue_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "SacrificePotion",
+      "name": "Sacrifice Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "SacrificePotion_Status",
+          "duration": 20,
+          "shared": false
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_Potion_Sacrifice.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ScrollOfCorruptedDexterity",
+      "name": "Scroll Of Corrupted Dexterity",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Scrolls_Loot_ScrollOfDexterity_Corrupted.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ScrollOfCorruptedFaith",
+      "name": "Scroll Of Corrupted Faith",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Scrolls_Loot_ScrollOfFaith_Corrupted.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ScrollOfCorruptedIntellect",
+      "name": "Scroll Of Corrupted Intellect",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Scrolls_Loot_ScrollOfIntelligence_Corrupted.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ScrollOfCorruptedStrength",
+      "name": "Scroll Of Corrupted Strength",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Scrolls_Loot_ScrollOfStrength_Corrupted.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ScrollOfDexterity",
+      "name": "Scroll Of Dexterity I",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Scrolls_Loot_ScrollOfDexterity.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ScrollOfFaith",
+      "name": "Scroll Of Faith I",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Scrolls_Loot_ScrollOfFaith.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ScrollOfIntelligence",
+      "name": "Scroll Of Intelligence I",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Scrolls_Loot_ScrollOfIntelligence.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ScrollOfStrength",
+      "name": "Scroll Of Strength I",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Scrolls_Loot_ScrollOfStrength.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ScrollOfVitality",
+      "name": "Scroll Of Vitality I",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Scrolls_Loot_ScrollOfVitality.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_16",
+      "name": "Sea Omelette",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_SeeOmelette_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "ShieldPotion_Z2",
+      "name": "Shield Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ShieldPotion_Status",
+          "duration": 20,
+          "shared": false
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_PotionMinor_Shield_Z2.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_Demon_2",
+      "name": "Skinless Iodized Wings",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_Demon_02.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_10",
+      "name": "Skover Root Soup",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_SkoverRootSoup_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_6",
+      "name": "Skunk Stew",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_HoneyMarinatedSkunk_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_9",
+      "name": "Smoked Coyote",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_SmokedCoyotel_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "SparkCube",
+      "name": "Spark Cube",
+      "type": "Usable",
+      "refillable": true,
+      "statuses": [
+        {
+          "id": "SparkSurge_Status",
+          "duration": 20,
+          "shared": false
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Usable/Items_Loot_Spark_SparkCube_Full.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_Demon_5",
+      "name": "Surf and Murk",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_Demon_05.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "VesselPotion",
+      "name": "Vessel Potion",
+      "type": "Potion",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "VesselPotion_Status",
+          "duration": 20,
+          "shared": false
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Potion/Items_Loot_Potion_VesselPotion.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Weightstone",
+      "name": "Weightstone",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "Weighstone_Status",
+          "duration": 3600,
+          "shared": false
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Tools_WeightStone_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Whetstone",
+      "name": "Whetstone",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "Whetstone_Status",
+          "duration": 3600,
+          "shared": false
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Tools_WhetStone_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "Cook_1",
+      "name": "Wild Boar Stew",
+      "type": "Food",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 900,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_WildBoarStew_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    }
+  ]
+}

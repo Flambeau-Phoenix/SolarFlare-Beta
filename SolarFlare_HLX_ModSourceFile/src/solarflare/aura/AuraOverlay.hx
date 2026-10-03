@@ -53,6 +53,9 @@ class AuraOverlay {
 	public var openBuilder:Void->Void;
 	function drawOne(a:AuraDef):Void {
 		if (a == null || !a.enabled.get()) return;
+		// Typed alerts are independent of the ordinary face's visibility / layout lock.
+		if (a.alertShow) drawAlert(a);
+		if (!a.visual.get()) return;
 		// A window that is individually locked must hide when conditions are not met,
 		// regardless of the legacy global unlock flag.
 		var indivLocked = a.chrome != null && a.chrome.locked.get();
@@ -61,7 +64,6 @@ class AuraOverlay {
 		// Unlocked windows in layout mode stay visible as a ghost so the author can
 		// see and reposition them even when the condition is not active.
 		if (!a.show && !layout) return;
-		if (a.alertShow) drawAlert(a);
 		var sc:Single = Math.max(0.4, Math.min(2.5, a.scale.get()));
 		var w:Single = Math.max(24, a.w.get() * sc);
 		var h:Single = Math.max(24, a.h.get() * sc);

@@ -2,6 +2,7 @@
 -resource assets/cdb/aura-catalog.json@aura-catalog
 -resource assets/cdb/aura-quickstart.json@aura-quickstart
 -resource assets/cdb/status-durations.json@status-durations
+-resource assets/cdb/consumables.json@consumables
 -lib farever-gamelib
 -lib hlx-runtime
 -lib hl-imgui

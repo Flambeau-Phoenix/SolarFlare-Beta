@@ -60,6 +60,8 @@ class AuraSignalFrame {
 	public var damageTakenKnown:Bool = false;
 	public var skills:Array<SkillSignalSnap> = [];
 	public var skillCount:Int = 0;
+	public var consumables:Array<ConsumableSignalSnap> = [];
+	public var consumableCount:Int = 0;
 	public var statuses:Array<StatusSignalSnap> = [];
 	public var statusCount:Int = 0;
 	public var casts:Array<EnemyCastSignalSnap> = [];
@@ -78,12 +80,15 @@ class AuraSignalFrame {
 	}
 
 	public function new() {
+		for (entry in solarflare.cdb.ConsumableCatalog.entries) { var snap = new ConsumableSignalSnap(); snap.id = entry.id; consumables.push(snap); }
 		for (_ in 0...MAX_SKILLS) skills.push(new SkillSignalSnap());
 		for (_ in 0...MAX_STATUSES) statuses.push(new StatusSignalSnap());
 		for (_ in 0...MAX_CASTS) casts.push(new EnemyCastSignalSnap());
 		for (_ in 0...solarflare.aura.LocalCastHistory.MAX) playerCasts.push(new EnemyCastSignalSnap());
 	}
 	public function resetCollections():Void {
+		for (i in 0...consumableCount) consumables[i].reset();
+		consumableCount = 0;
 		for (i in 0...skillCount) skills[i].reset();
 		for (i in 0...statusCount) statuses[i].reset();
 		for (i in 0...castCount) casts[i].reset();
@@ -94,6 +99,11 @@ class AuraSignalFrame {
 		damageTakenRecent = 0;
 		damageTakenKnown = false;
 		setStatusContainerLength(-1);
+	}
+	public function findConsumable(id:String):ConsumableSignalSnap {
+		if (id == null || id.length == 0) return null;
+		for (i in 0...consumableCount) if (consumables[i].id.toLowerCase() == id.toLowerCase()) return consumables[i];
+		return null;
 	}
 	public function findSkill(id:String):SkillSignalSnap {
 		if (id == null || id.length == 0) return null;

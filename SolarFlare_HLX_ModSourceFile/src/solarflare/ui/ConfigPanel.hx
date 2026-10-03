@@ -45,6 +45,7 @@ class ConfigPanel {
 	static inline var TAB_LIGHTSABER:Int = 5;
 	static inline var TAB_COMBAT_LOG:Int = 6;
 	static inline var TAB_THEME:Int = 7;
+	static inline var TAB_EXTRABARS:Int = 8;
 	public var open:BoolRef;
 	public var vitals:VitalsConfig;
 	public var geaux:GeauxConfig;
@@ -62,6 +63,7 @@ class ConfigPanel {
 	public var resourceTracker:ResourceTrackerBuilder;
 	public var geauxBuilder:GeauxBuilder;
 	public var auraBuilder:solarflare.aura.AuraBuilder;
+	public var extraBarsPrototype:solarflare.extrabars.ExtraBars;
 	public var attackCombo:AttackComboConfig;
 	public var hubChrome:HudChrome;
 	public var hubW:FloatRef;
@@ -133,6 +135,7 @@ class ConfigPanel {
 		resourceTracker = new ResourceTrackerBuilder(this);
 		geauxBuilder = new GeauxBuilder(geaux, this);
 		auraBuilder = new solarflare.aura.AuraBuilder(auras, this);
+		extraBarsPrototype = new solarflare.extrabars.ExtraBars(this);
 		attackCombo = new AttackComboConfig();
 		hubChrome = new HudChrome(40, 80);
 		// Fresh installs start with only the F6 hub. Saved settings override these defaults.
@@ -185,6 +188,7 @@ class ConfigPanel {
 		if (resourceTracker != null) registerInteractive(resourceTracker.open);
 		if (geauxBuilder != null) registerInteractive(geauxBuilder.open);
 		if (auraBuilder != null) registerInteractive(auraBuilder.open);
+		if (extraBarsPrototype != null) registerInteractive(extraBarsPrototype.open);
 		if (notebook != null) registerInteractive(notebook.open);
 		if (vitals != null) registerInteractive(vitals.open);
 		if (geaux != null) registerInteractive(geaux.open);
@@ -235,6 +239,7 @@ class ConfigPanel {
 			geauxBuilder.clearTransientState();
 		if (auraBuilder != null)
 			auraBuilder.clearTransientState();
+		if (extraBarsPrototype != null) extraBarsPrototype.clearTransientState();
 		if (changed) SettingsStore.markDirty();
 	}
 
@@ -501,6 +506,9 @@ class ConfigPanel {
 		if (auraBuilder != null) {
 			try auraBuilder.draw() catch (_:Dynamic) {}
 		}
+		if (extraBarsPrototype != null) {
+			try extraBarsPrototype.draw() catch (_:Dynamic) {}
+		}
 		trackProfileWindowState();
 		if (target != null) {
 			try target.draw() catch (_:Dynamic) {}
@@ -531,6 +539,8 @@ class ConfigPanel {
 				auraBuilder.open.set(true);
 			if (ImGui.menuItem("Geaux Builder"))
 				geauxBuilder.open.set(true);
+			if (ImGui.menuItem("ExtraBars"))
+				extraBarsPrototype.open.set(true);
 			if (ImGui.menuItem("Resource Tracker"))
 				resourceTracker.open.set(true);
 			if (ImGui.menuItem("Player Cast Bar"))
@@ -601,8 +611,8 @@ class ConfigPanel {
 
 	/** Feature selection changes the option surface in-place; editors are secondary windows. */
 	function drawModuleTabs():Void {
-		var labels = ["Resources", "Geaux", "Attack Combo", "Auras", "Notebook", "Lightsaber", "Combat Log", "Theme"];
-		var ids = [TAB_RESOURCES, TAB_GEAUX, TAB_ATTACK, TAB_AURAS, TAB_NOTEBOOK, TAB_LIGHTSABER, TAB_COMBAT_LOG, TAB_THEME];
+		var labels = ["Resources", "Geaux", "Attack Combo", "Auras", "Notebook", "Lightsaber", "Combat Log", "Theme", "ExtraBars"];
+		var ids = [TAB_RESOURCES, TAB_GEAUX, TAB_ATTACK, TAB_AURAS, TAB_NOTEBOOK, TAB_LIGHTSABER, TAB_COMBAT_LOG, TAB_THEME, TAB_EXTRABARS];
 		var totalItems = labels.length + 1;
 		var available = ImGui.getContentRegionAvail().x;
 		var columns = UiLayout.columnCount(available, 120, 4, 8);
@@ -616,9 +626,10 @@ class ConfigPanel {
 				function(cell:Int, width:Single) {
 					var index = rowStart + cell;
 					if (index < labels.length) {
-						if (moduleTab(labels[index], ids[index], width)
-							&& ids[index] == TAB_NOTEBOOK)
-							notebook.open.set(true);
+						if (moduleTab(labels[index], ids[index], width)) {
+							if (ids[index] == TAB_NOTEBOOK) notebook.open.set(true);
+							if (ids[index] == TAB_EXTRABARS) extraBarsPrototype.open.set(true);
+						}
 					} else {
 						drawGetRiftySunButton(width);
 					}
@@ -724,6 +735,10 @@ class ConfigPanel {
 			case TAB_COMBAT_LOG:
 				ImGui.textWrapped("Skill casts and resolved combat events.");
 				combatLog.drawEditorContents();
+			case TAB_EXTRABARS:
+				ImGui.textWrapped("Configure consumable bars and the optional Spark Cube tracker. These settings are remembered across all characters and gear builds.");
+				ImGui.text(Std.string(extraBarsPrototype.model.bars.length) + " bar(s) configured");
+				if (UiChrome.accentButton("Open ExtraBars editor##extra_open", ImGui.vec2(-1, 40))) extraBarsPrototype.open.set(true);
 			case TAB_THEME:
 				ThemePalette.drawThemeEditorPane();
 			default:
@@ -803,7 +818,7 @@ class ConfigPanel {
 
 	public function profileUiTab():Int return activeHubTab;
 	public function applyProfileUiTab(value:Int):Void {
-		if (value >= TAB_RESOURCES && value <= TAB_THEME)
+		if (value >= TAB_RESOURCES && value <= TAB_EXTRABARS)
 			activeHubTab = value;
 	}
 

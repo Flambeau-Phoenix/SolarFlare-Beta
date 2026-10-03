@@ -21,6 +21,9 @@ class ObserveDemand {
 	public static var geauxBuilder:Bool = false;
 	public static var auras:Bool = false;
 	public static var aurasNeedStatus:Bool = false;
+	public static var aurasNeedConsumables:Bool = false;
+	public static var extraBarsNeedConsumables:Bool = false;
+	public static var consumableIds:Array<String> = [];
 	public static var statusIds:Array<String> = [];
 	public static var aurasNeedInstant:Bool = false;
 	public static var aurasNeedSpecial:Bool = false;
@@ -92,6 +95,8 @@ class ObserveDemand {
 		combatLog = cfg.combatLog != null && !cfg.combatLog.hidden.get();
 		geaux = cfg.geaux != null && cfg.geaux.enabled.get();
 		geauxBuilder = cfg.geauxBuilder != null && cfg.geauxBuilder.open.get();
+		extraBarsNeedConsumables = cfg.extraBarsPrototype != null
+			&& (cfg.extraBarsPrototype.model.demand() || cfg.extraBarsPrototype.open.get());
 		auras = cfg.auras != null && cfg.auras.enabled.get() && cfg.auras.auras != null && cfg.auras.auras.length > 0;
 		auraBuilderOpen = cfg.auraBuilder != null && cfg.auraBuilder.open.get();
 		if (statusDemandDirty) {
@@ -104,8 +109,20 @@ class ObserveDemand {
 				specialSkillIds.pop();
 			while (castSkillIds.length > 0)
 				castSkillIds.pop();
-			if (cfg.auras != null)
+			consumableIds.resize(0);
+			if (cfg.extraBarsPrototype != null && cfg.extraBarsPrototype.model.sparkEnabled) pushStatusId("SparkSurge_Status");
+			if (cfg.auras != null) {
+				for (a in cfg.auras.auras) if (a != null && a.enabled.get() && a.rule != null) {
+					for (c in a.rule.conditions) if (c != null && StringTools.startsWith(c.signal, "consumable.")) {
+						var entry = solarflare.cdb.ConsumableCatalog.find(c.subject);
+						if (entry != null && consumableIds.indexOf(entry.id) < 0) {
+							consumableIds.push(entry.id);
+							for (effect in entry.statuses) pushStatusId(effect.id);
+						}
+					}
+				}
 				auraRulesNeedStatus(cfg);
+			}
 			rawNeedInstant = auraRulesNeedInstant(cfg);
 			rawNeedSpecial = auraRulesNeedSpecial(cfg);
 			rawNeedEnemyCast = auraRulesNeedEnemyCast(cfg);
@@ -116,6 +133,7 @@ class ObserveDemand {
 					pushStatusId(id + "_Proc");
 			}
 		}
+		aurasNeedConsumables = (auras && consumableIds.length > 0) || auraBuilderOpen;
 		aurasNeedInstant = auras && rawNeedInstant;
 		aurasNeedSpecial = auras && rawNeedSpecial;
 		aurasNeedEnemyCast = (auras && rawNeedEnemyCast) || auraBuilderOpen;

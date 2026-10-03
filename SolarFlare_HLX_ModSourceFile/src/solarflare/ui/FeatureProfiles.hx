@@ -148,7 +148,7 @@ class FeatureProfiles {
 		var profsObj:Dynamic = {};
 		for (key in order) {
 			if (profiles.exists(key))
-				Reflect.setField(profsObj, key, profiles.get(key));
+				Reflect.setField(profsObj, key, solarflare.extrabars.ExtraBarsSettings.withoutBars(profiles.get(key)));
 		}
 		var bindings:Array<Dynamic> = [];
 		var uids:Array<String> = [];

@@ -119,12 +119,12 @@ class GameIcons {
 		var ordered = prioritizeAssetsIcons(dirs);
 		for (root in ordered) {
 			if (FileSystem.exists(Path.join([root, "atlas1.json"])) && FileSystem.exists(Path.join([root, "atlas1.png"])))
-				return [{root:root, stem:"atlas3"}, {root:root, stem:"atlas1"}, {root:root, stem:"atlas2"}];
+				return [{root:root, stem:"atlas3"}, {root:root, stem:"atlas1"}, {root:root, stem:"atlas2"}, {root:root, stem:"atlas_consumables"}];
 		}
 		// Compatibility with older installs that only have atlas.png.
 		var plan:Array<{root:String, stem:String}> = [];
 		for (root in ordered)
-			for (stem in ["atlas3", "atlas", "atlas2"])
+			for (stem in ["atlas3", "atlas", "atlas2", "atlas_consumables"])
 				plan.push({root:root, stem:stem});
 		return plan;
 	}

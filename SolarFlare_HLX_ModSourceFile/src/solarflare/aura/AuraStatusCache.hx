@@ -139,7 +139,7 @@ class AuraStatusCache {
 		while (i < count) {
 			var s = snaps[i];
 			if (s != null && s.id.length > 0 && matches(s, want))
-				stamps.remove(s.id.toLowerCase());
+				stamps.remove(s.id.toLowerCase() + (s.sourceItemId.length > 0 ? ":" + s.sourceItemId.toLowerCase() : ""));
 			i++;
 		}
 	}
@@ -242,6 +242,14 @@ class AuraStatusCache {
 		if (snap.ids.length == 0)
 			return null;
 		snap.id = snap.ids[0];
+		if (solarflare.ObserveDemand.aurasNeedConsumables || solarflare.ObserveDemand.auraBuilderOpen) {
+			try {
+				var base:st.skill.BaseSkill = item;
+				var source = base.getSourceItem();
+				snap.sourceItemId = source == null ? "" : solarflare.EngineText.cleanId(source.kind);
+				snap.sourceItemKnown = true;
+			} catch (_:Dynamic) {}
+		}
 		snap.stacks = readStacks(item);
 		applyRemain(snap, item);
 		if (!snap.present) {
@@ -276,6 +284,7 @@ class AuraStatusCache {
 		var i = 0;
 		while (i < count) {
 			var existing = snaps[i];
+			if (existing != null && existing.sourceItemId != incoming.sourceItemId) { i++; continue; }
 			if (existing != null && existing.id.length > 0 && existing.id == want)
 				return existing;
 			i++;
@@ -283,6 +292,7 @@ class AuraStatusCache {
 		i = 0;
 		while (i < count) {
 			var existing = snaps[i];
+			if (existing != null && existing.sourceItemId != incoming.sourceItemId) { i++; continue; }
 			if (existing != null && matches(existing, want))
 				return existing;
 			i++;
@@ -291,6 +301,7 @@ class AuraStatusCache {
 		i = 0;
 		while (i < count) {
 			var existing = snaps[i];
+			if (existing != null && existing.sourceItemId != incoming.sourceItemId) { i++; continue; }
 			if (existing == null)
 				{ i++; continue; }
 			var j = 0;
@@ -313,7 +324,7 @@ class AuraStatusCache {
 	 */
 	static function applyRemain(snap:AuraStatusSnap, item:Dynamic):Void {
 		var now = stamp();
-		var key = snap.id.toLowerCase();
+		var key = snap.id.toLowerCase() + (snap.sourceItemId.length > 0 ? ":" + snap.sourceItemId.toLowerCase() : "");
 		var st = stamps.get(key);
 		if (st != null && (st.infinite ? now < st.recheckAt : now < st.endsAt)) {
 			applyStamp(snap, st, now);
@@ -438,6 +449,7 @@ class AuraStatusCache {
 
 	static function copySnap(dst:AuraStatusSnap, src:AuraStatusSnap):Void {
 		dst.id = src.id;
+		dst.sourceItemId = src.sourceItemId; dst.sourceItemKnown = src.sourceItemKnown;
 		dst.ids.resize(0);
 		dst.idsLower.resize(0);
 		var j = 0;

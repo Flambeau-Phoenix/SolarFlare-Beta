@@ -396,6 +396,8 @@ class AuraDef {
 	static inline function iconKeyFor(id:String):String {
 		if (id == null || id.length == 0)
 			return "";
+		var itemKey = solarflare.cdb.ConsumableCatalog.iconKey(id);
+		if (itemKey.length > 0) return itemKey;
 		var stem = solarflare.cdb.CdbAuraTable.iconStem(id);
 		return stem.length > 0 ? stem : id;
 	}

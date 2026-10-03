@@ -32,6 +32,9 @@
     },
     "unit-names.json": {
       "sha256": "637eff44b20f531630884c2bbb4e55c9e4a43d1a4e77876ab8d55e0396c7d272"
+    },
+    "consumables.json": {
+      "sha256": "8dbd05940809295ff7e92ae0839c1739f6640880f3b0460290318f0d6288f10f"
     }
   }
 }

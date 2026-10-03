@@ -89,11 +89,12 @@ class GeauxBar {
 			(cfg.height.get() - basePad * 2 - gap * (rows - 1)) / rows));
 		var naturalW:Single = baseCell * cols + gap * (cols - 1) + basePad * 2;
 		var naturalH:Single = baseCell * rows + gap * (rows - 1) + basePad * 2;
-		var previewScale:Single = fit ? Math.max(0.01, Math.min(avail.x / (naturalW + 32), avail.y / (naturalH + 32))) : zoom;
-		var pad:Single = basePad * previewScale + 16 * previewScale;
+		var glowMargin:Single = Math.max(16, solarflare.aura.AuraGlowStyle.reach(cfg.style.glowStyle, cfg.style.glowOuter.get()));
+		var previewScale:Single = fit ? Math.max(0.01, Math.min((avail.x - glowMargin * 2) / naturalW, (avail.y - glowMargin * 2) / naturalH)) : zoom;
+		var pad:Single = basePad * previewScale + glowMargin;
 		gap *= previewScale;
-		var previewW:Single = (naturalW + 32) * previewScale;
-		var previewH:Single = (naturalH + 32) * previewScale;
+		var previewW:Single = naturalW * previewScale + glowMargin * 2;
+		var previewH:Single = naturalH * previewScale + glowMargin * 2;
 		var cell:Single = baseCell * previewScale;
 		var start = ImGui.getCursorScreenPos();
 		ImGui.dummy(ImGui.vec2(Math.max(avail.x, previewW), Math.max(avail.y, previewH)));
@@ -409,12 +410,12 @@ class GeauxBar {
 				procReady = snap.procReady == true
 			catch (_:Dynamic) {}
 			if (procReady) {
-				solarflare.ui.VectorGlow.procOverlay(dl, x, y, size, size, ImGui.getTime());
+				solarflare.aura.AuraGlowRenderer.drawStyle(glowDl, style.glowStyle, style.glowStrength.get(), style.glowOuter.get(),
+					style.glowInner.get(), solarflare.aura.AuraGlowStyle.fromImGuiColor(style.glowColor(1)), x, y, size, size, 1);
 			} else if (lit && affordable && flashAlpha > 0 && style.readyAttention.get() == GeauxStyle.ATTN_PROC) {
-				// Same effect as the aura Glow tile: bright core, sparks travelling the border.
-				// Drawn on dl (not glowDl) like the proc branch above - it stays within a few px
-				// of the cell, so it needs no background list to reach past the chrome.
-				solarflare.ui.VectorGlow.procTinted(dl, x, y, size, size, ImGui.getTime(), style.glowColor(1));
+				// Shared Aura renderer; live HUD bloom can extend beyond the window chrome.
+				solarflare.aura.AuraGlowRenderer.drawStyle(glowDl, style.glowStyle, style.glowStrength.get(), style.glowOuter.get(),
+					style.glowInner.get(), solarflare.aura.AuraGlowStyle.fromImGuiColor(style.glowColor(1)), x, y, size, size, flashAlpha);
 			} else if (lit && affordable && flashAlpha > 0 && style.readyAttention.get() == GeauxStyle.ATTN_PULSE) {
 				// Wide exponential neon bloom — travels into gap/chrome, not FringeScale fat stroke.
 				var bloomDist:Single = Math.min(24, size * 0.35);

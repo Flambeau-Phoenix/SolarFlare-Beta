@@ -21,11 +21,14 @@ class AuraCatalog {
 		}
 	}
 	public static function label(id:String):String {
+		var item = ConsumableCatalog.find(id);
+		if (item != null) return item.name;
 		var name = names.get(id);
 		return name == null ? "" : name;
 	}
 	/** Status instances use skill IDs; statustype is broad category. */
 	public static function matchesSubject(entryKind:String, subjectKind:String):Bool {
+		if (subjectKind == "consumable") return entryKind == "consumable";
 		if (subjectKind == "unit") return entryKind == "unit";
 		if (subjectKind.indexOf("skill") >= 0) return entryKind == "skill";
 		// status.* signals: applied IDs are skills (often *_Status).

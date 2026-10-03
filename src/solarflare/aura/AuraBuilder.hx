@@ -58,6 +58,8 @@ class AuraBuilder {
 
 	var undoManager = new UndoManager<String>(40);
 	var auraSearch = new SearchBar("Filter auras by name, signal, or target...", 128);
+	var consumableSearch = new SearchBar("Search potions, elixirs, and boons...", 128);
+	var consumableTrack:String = "consumable.active";
 
 	var opacityPercent = new FloatRef(100);
 	var volumePercent = new FloatRef(100);
@@ -68,6 +70,7 @@ class AuraBuilder {
 	var iconKindFilter:String = "All";
 
 	var advancedPreview = new solarflare.aura.preview.AdvancedAuraPreview();
+	var quickBuild = new solarflare.aura.ui.AuraQuickBuildPopup();
 
 	var boundEditorAura:AuraDef = null;
 	var creationHomeOpen:Bool = true;
@@ -154,6 +157,7 @@ class AuraBuilder {
 	}
 
 	public function clearTransientState():Void {
+		quickBuild.cancel();
 		advancedPreview.reset();
 		boundEditorAura = null;
 		canvasSel = -1;
@@ -218,6 +222,7 @@ class AuraBuilder {
 
 			drawIoModal();
 			drawWizardModal();
+			quickBuild.draw(cfg, commitQuickBuild);
 		}, false, true);
 	}
 
@@ -412,6 +417,13 @@ class AuraBuilder {
 			ImGui.popStyleVar(2);
 			ImGui.popStyleColor(2);
 			var previous = selectedAura();
+			var quickBuildAtCap = cfg.auras.length >= AuraEngine.MAX;
+			ImGui.beginDisabled(quickBuildAtCap);
+			if (UiChrome.accentButton("Quick Build##ab_creation_quick_build", ImGui.vec2(-1, 36)))
+				quickBuild.start();
+			ImGui.endDisabled();
+			if (quickBuildAtCap)
+				ImGui.textDisabled("Aura limit reached. Delete an aura before using Quick Build.");
 			if (previous != null) {
 				if (UiChrome.ghostButton("Back to " + previous.name + "##ab_creation_back", ImGui.vec2(-1, 30)))
 					creationHomeOpen = false;
@@ -469,11 +481,70 @@ class AuraBuilder {
 	}
 
 	function drawCreationLists(atCap:Bool):Void {
+		drawConsumableList();
+		ImGui.dummy(ImGui.vec2(0, 18));
 		drawUtilityList(0);
 		ImGui.dummy(ImGui.vec2(0, 18));
 		drawSkillList(0);
 		ImGui.dummy(ImGui.vec2(0, 18));
 		drawBlankList(0);
+	}
+
+	/** One library transaction shared by Create & Save and the Advanced handoff. */
+	function commitQuickBuild(draft:AuraQuickBuildDraft, advanced:Bool):String {
+		if (draft == null || cfg == null) return "Quick Build draft is unavailable.";
+		if (cfg.auras.length >= AuraEngine.MAX) return "Aura limit reached. Delete an aura before creating another.";
+		var issue = draft.issue(GameIcons.hasKey);
+		if (!advanced && issue.length > 0) return issue;
+		var a = draft.aura;
+		if (cfg.auras.indexOf(a) >= 0) return "This aura has already been created.";
+		snapshot("Create Aura (Quick Build)");
+		a.id = uniqueAuraId("aura_" + (cfg.auras.length + 1));
+		a.enabled.set(issue.length == 0);
+		cfg.auras.push(a);
+		selected = cfg.auras.length - 1;
+		selectedIds = new Map();
+		selectedIds.set(a.id, true);
+		rangeAnchorId = a.id;
+		deleteArmed = -1;
+		creationHomeOpen = !advanced;
+		SettingsStore.markDirty();
+		if (!advanced) UiActionQueue.save();
+		ToastManager.success(advanced ? "Aura opened in Advanced." : "Aura created; save queued.");
+		return "";
+	}
+
+	function drawConsumableList():Void {
+		UiChrome.sectionHeader("Consumables");
+		ImGui.textWrapped("Potions, elixirs, and boons. Choose what to track, then pick an item.");
+		drawHomeRow("Spark Cube - Spark Surge timer", "home_spark_surge",
+			function() acceptBossStarterAura(AuraTemplates.createConsumableTracker("SparkCube")));
+		drawHomeRow("Spark Cube - refill needed", "home_spark_refill",
+			function() acceptBossStarterAura(AuraTemplates.createConsumableTracker("SparkCube", "consumable.needsRefill")));
+		UiLayout.propertyGrid("##ab_consumable_properties", function() {
+			UiLayout.propertyRow("Track", function() {
+				var labels = ["Effect active / timer", "Usable now", "Count / charges", "Refill needed", "Owned"];
+				var signals = ["consumable.active", "consumable.usable", "consumable.count", "consumable.needsRefill", "consumable.owned"];
+				if (ImGui.beginCombo("##ab_consumable_track", labels[signals.indexOf(consumableTrack)])) {
+					for (i in 0...signals.length)
+						if (ImGui.selectable(labels[i], consumableTrack == signals[i])) consumableTrack = signals[i];
+					ImGui.endCombo();
+				}
+			});
+		});
+		var query = consumableSearch.draw("##ab_consumable_search");
+		UiScope.child("##ab_consumable_items", ImGui.vec2(0, 210), function() {
+			var matches = 0;
+			for (entry in solarflare.cdb.ConsumableCatalog.entries) {
+				if (query.length > 0 && (entry.name + " " + entry.id + " " + entry.type).toLowerCase().indexOf(query) < 0) continue;
+				if (consumableTrack == "consumable.needsRefill" && !entry.refillable) continue;
+				matches++;
+				var id = entry.id;
+				drawHomeRow(entry.name + (entry.statuses.length == 0 && consumableTrack == "consumable.active" ? " - usable (instant effect)" : ""),
+					"home_consumable_" + id, function() acceptBossStarterAura(AuraTemplates.createConsumableTracker(id, consumableTrack)));
+			}
+			if (matches == 0) ImGui.textDisabled("No matching consumables.");
+		}, ImGuiChildFlags.Borders);
 	}
 
 	function drawHomeRow(label:String, id:String, onPick:Void->Void):Void {
@@ -916,40 +987,33 @@ class AuraBuilder {
 		var selectionCount = countSelected();
 		if (selectionCount > 1) ImGui.textDisabled("Selection shortcuts — " + selectionCount + " auras");
 		var columns = UiLayout.columnCount(ImGui.getContentRegionAvail().x, 108, 2, 6);
-		ImGui.pushStyleVar(ImGuiStyleVar.CellPadding, ImGui.vec2(3, 3));
-		try {
-			UiScope.table("##ab_fx_tiles", columns, function() {
-				for (col in 0...columns)
-					ImGui.tableSetupColumn("##tile_" + col, imgui.Enums.ImGuiTableColumnFlags.WidthStretch, 1);
-				for (i in 0...6) {
-					if (i % columns == 0) ImGui.tableNextRow();
-					ImGui.tableSetColumnIndex(i % columns);
-					var w:Single = ImGui.getContentRegionAvail().x;
-					switch (i) {
-						case 0: drawFxTile("Glow", "ab_fx_glow", fxState(function(x) return AuraEffects.hasIconGlow(x)), w, 32,
-							function(v) applyFxToTargets(function(x) AuraEffects.setIconGlow(x, v)));
-						case 1: drawFxTile("Fuse", "ab_fx_fuse", fxState(function(x) return x.showFuse.get()), w, 32,
-							function(v) applyFxToTargets(function(x) x.showFuse.set(v)));
-						case 2: drawFxTile("CD Bar", "ab_fx_fbot", fxState(function(x) return x.fuseBottom.get()), w, 32,
-							function(v) applyFxToTargets(function(x) x.fuseBottom.set(v)));
-						case 3: drawFxTile("Label", "ab_fx_lbl", fxState(function(x) return x.showLabel.get()), w, 32,
-							function(v) applyFxToTargets(function(x) x.showLabel.set(v)));
-						case 4: drawFxTile("Ring", "ab_fx_ring", fxState(function(x) return x.progressRing.get()), w, 32,
-							function(v) applyFxToTargets(function(x) x.progressRing.set(v)));
-						case 5: drawFxTile("Stacks", "ab_fx_stk", fxState(function(x) return x.stackCounter.get()), w, 32,
-							function(v) applyFxToTargets(function(x) {
-								x.stackCounter.set(v);
-								if (v) x.isCounter.set(false);
-							}));
-					}
+		var rows = Std.int(Math.ceil(6 / columns));
+		for (row in 0...rows) {
+			UiLayout.inlineSplit("##ab_fx_tiles_" + row, columns, function(col:Int, w:Single) {
+				var i = row * columns + col;
+				if (i >= 6) return;
+				switch (i) {
+					case 0: drawFxTile("Glow", "ab_fx_glow", fxState(function(x) return AuraEffects.hasIconGlow(x)), w, 32,
+						function(v) applyFxToTargets(function(x) AuraEffects.setIconGlow(x, v)));
+					case 1: drawFxTile("Fuse", "ab_fx_fuse", fxState(function(x) return x.showFuse.get()), w, 32,
+						function(v) applyFxToTargets(function(x) x.showFuse.set(v)));
+					case 2: drawFxTile("CD Bar", "ab_fx_fbot", fxState(function(x) return x.fuseBottom.get()), w, 32,
+						function(v) applyFxToTargets(function(x) x.fuseBottom.set(v)));
+					case 3: drawFxTile("Label", "ab_fx_lbl", fxState(function(x) return x.showLabel.get()), w, 32,
+						function(v) applyFxToTargets(function(x) x.showLabel.set(v)));
+					case 4: drawFxTile("Ring", "ab_fx_ring", fxState(function(x) return x.progressRing.get()), w, 32,
+						function(v) applyFxToTargets(function(x) x.progressRing.set(v)));
+					case 5: drawFxTile("Stacks", "ab_fx_stk", fxState(function(x) return x.stackCounter.get()), w, 32,
+						function(v) applyFxToTargets(function(x) {
+							x.stackCounter.set(v);
+							if (v) x.isCounter.set(false);
+						}));
 				}
-			}, imgui.Enums.ImGuiTableFlags.SizingStretchProp | imgui.Enums.ImGuiTableFlags.NoSavedSettings);
-		} catch (e:Dynamic) { ImGui.popStyleVar(); throw e; }
-		ImGui.popStyleVar();
-		ImGui.setNextItemOpen(a.timerMode != AuraTimer.MODE_OFF || a.showCountdown.get(), ImGuiCond.Once);
-		if (ImGui.collapsingHeader("Timer##ab_timer_options")) {
-			UiLayout.propertyGrid("##ab_timer_options_grid", function() drawTimerRows(a));
+			}, 6);
+			if (row + 1 < rows) ImGui.dummy(ImGui.vec2(0, 6));
 		}
+		UiChrome.subHeader("Timer");
+		UiLayout.propertyGrid("##ab_timer_options_grid", function() drawTimerRows(a));
 		if (a.stackCounter.get() || a.isCounter.get()) {
 			UiLayout.propertyGrid("##ab_stack_display", function() {
 				UiLayout.propertyRow("Badge position", function() {
@@ -1039,55 +1103,54 @@ class AuraBuilder {
 				ImGui.endCombo();
 			}
 		});
-		if (a.timerMode != AuraTimer.MODE_OFF) {
-			UiLayout.propertyRow("Duration source", function() {
-				var fixed = a.timerSource == AuraTimer.SRC_FIXED;
-				if (ImGui.beginCombo("##ab_timer_source", fixed ? "Fixed seconds" : "Game time")) {
-					for (source in 0...2)
-						if (ImGui.selectable(source == 0 ? "Game time" : "Fixed seconds", a.timerSource == source)) {
-							a.timerSource = source;
-							a.followBuffDuration.set(source == AuraTimer.SRC_FOLLOW);
-							AuraTimer.reset(a);
-							if (source == AuraTimer.SRC_FIXED) primeTimerSeconds(a);
-							SettingsStore.markDirty();
-						}
-					ImGui.endCombo();
-				}
-			});
-			if (a.timerSource == AuraTimer.SRC_FIXED) {
-				UiLayout.propertyRow("Fixed seconds", function() {
-					var previous = a.timerSeconds.get();
-					if (ImGui.inputFloat("##ab_timer_secs", a.timerSeconds, 0, 0, "%.3f")) {
-						var value = a.timerSeconds.get();
-						a.timerSeconds.set(Math.isFinite(value) ? Math.max(1, Math.min(600, value)) : previous);
+		UiLayout.propertyRow("Duration source", function() {
+			var fixed = a.timerSource == AuraTimer.SRC_FIXED;
+			if (ImGui.beginCombo("##ab_timer_source", fixed ? "Fixed seconds" : "Game time")) {
+				for (source in 0...2)
+					if (ImGui.selectable(source == 0 ? "Game time" : "Fixed seconds", a.timerSource == source)) {
+						a.timerSource = source;
+						a.followBuffDuration.set(source == AuraTimer.SRC_FOLLOW);
 						AuraTimer.reset(a);
+						if (source == AuraTimer.SRC_FIXED) primeTimerSeconds(a);
 						SettingsStore.markDirty();
 					}
-					if (ImGui.isItemHovered()) ImGui.setTooltip("Enter 1–600 seconds. Decimal values are supported.");
-					var listed = listedTimerSpan(a);
-					if (listed > 0.05 && ImGui.smallButton("Use listed " + (Math.round(listed * 10) / 10) + "s##ab_timer_listed")) {
-						a.timerSeconds.set(listed);
-						AuraTimer.reset(a);
-						SettingsStore.markDirty();
-					}
-				});
+				ImGui.endCombo();
 			}
-			UiLayout.propertyRow("Start when", function() {
-				var labels = ["Conditions become true", "Conditions stop being true"];
-				if (ImGui.beginCombo("##ab_timer_edge", labels[a.timerStartEdge])) {
-					for (edge in 0...2)
-						if (ImGui.selectable(labels[edge] + "##ab_te_" + edge, a.timerStartEdge == edge)) {
-							a.timerStartEdge = edge;
-							AuraTimer.reset(a);
-							SettingsStore.markDirty();
-						}
-					ImGui.endCombo();
-				}
-			});
-		}
+		});
+		UiLayout.propertyRow("Fixed seconds", function() {
+			ImGui.beginDisabled(a.timerSource != AuraTimer.SRC_FIXED);
+			var previous = a.timerSeconds.get();
+			if (ImGui.inputFloat("##ab_timer_secs", a.timerSeconds, 0, 0, "%.3f")) {
+				var value = a.timerSeconds.get();
+				a.timerSeconds.set(Math.isFinite(value) ? Math.max(1, Math.min(600, value)) : previous);
+				AuraTimer.reset(a);
+				SettingsStore.markDirty();
+			}
+			if (ImGui.isItemHovered()) ImGui.setTooltip("Enter 1–600 seconds. Decimal values are supported.");
+			var listed = listedTimerSpan(a);
+			if (listed > 0.05 && ImGui.smallButton("Use listed " + (Math.round(listed * 10) / 10) + "s##ab_timer_listed")) {
+				a.timerSeconds.set(listed);
+				AuraTimer.reset(a);
+				SettingsStore.markDirty();
+			}
+			ImGui.endDisabled();
+		});
+		UiLayout.propertyRow("Start when", function() {
+			var labels = ["Conditions become true", "Conditions stop being true"];
+			if (ImGui.beginCombo("##ab_timer_edge", labels[a.timerStartEdge])) {
+				for (edge in 0...2)
+					if (ImGui.selectable(labels[edge] + "##ab_te_" + edge, a.timerStartEdge == edge)) {
+						a.timerStartEdge = edge;
+						AuraTimer.reset(a);
+						SettingsStore.markDirty();
+					}
+				ImGui.endCombo();
+			}
+		});
 		UiLayout.propertyRow("On aura", function() {
 			if (ImGui.checkbox("Show time##ab_cd_force", a.showCountdown)) SettingsStore.markDirty();
-			if (a.showCountdown.get() && ImGui.beginCombo("##ab_cd_place", countdownPlaceLabel(a.countdownPlace))) {
+			ImGui.beginDisabled(!a.showCountdown.get());
+			if (ImGui.beginCombo("##ab_cd_place", countdownPlaceLabel(a.countdownPlace))) {
 				for (place in 0...3)
 					if (ImGui.selectable(countdownPlaceLabel(place) + "##ab_cdp_" + place, a.countdownPlace == place)) {
 						a.countdownPlace = place;
@@ -1095,23 +1158,25 @@ class AuraBuilder {
 					}
 				ImGui.endCombo();
 			}
+			ImGui.endDisabled();
 		});
-		if (a.showCountdown.get())
-			UiLayout.propertyRow("Time size", function() {
-				if (BuilderSlider.draw("##ab_cd_scale", a.countdownScale, 0.5, 3, "%.2fx")) SettingsStore.markDirty();
-			});
-		if (a.timerMode != AuraTimer.MODE_OFF) {
-			UiLayout.propertyRow("Timers window", function() {
-				if (ImGui.checkbox("Show timer##ab_timer_board", a.timerBoard)) SettingsStore.markDirty();
-			});
-			if (a.timerBoard.get()) UiLayout.propertyRow("Finished row", function() {
-				if (ImGui.inputFloat("##ab_timer_linger", a.timerKeepExpired, 0, 0, "%.1f s")) {
-					var value = a.timerKeepExpired.get();
-					a.timerKeepExpired.set(Math.isFinite(value) ? Math.max(0, Math.min(30, value)) : 3);
-					SettingsStore.markDirty();
-				}
-			}, "Time the finished board row stays visible. This does not extend the aura's interval.");
-		}
+		UiLayout.propertyRow("Time size", function() {
+			ImGui.beginDisabled(!a.showCountdown.get());
+			if (BuilderSlider.draw("##ab_cd_scale", a.countdownScale, 0.5, 3, "%.2fx")) SettingsStore.markDirty();
+			ImGui.endDisabled();
+		});
+		UiLayout.propertyRow("Timers window", function() {
+			if (ImGui.checkbox("Show timer##ab_timer_board", a.timerBoard)) SettingsStore.markDirty();
+		});
+		UiLayout.propertyRow("Finished row", function() {
+			ImGui.beginDisabled(!a.timerBoard.get());
+			if (ImGui.inputFloat("##ab_timer_linger", a.timerKeepExpired, 0, 0, "%.1f s")) {
+				var value = a.timerKeepExpired.get();
+				a.timerKeepExpired.set(Math.isFinite(value) ? Math.max(0, Math.min(30, value)) : 3);
+				SettingsStore.markDirty();
+			}
+			ImGui.endDisabled();
+		}, "Time the finished board row stays visible. This does not extend the aura's interval.");
 	}
 
 	/** Exclusive: ticking both directions would need a second accumulator in AuraTimer. */

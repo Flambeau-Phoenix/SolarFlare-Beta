@@ -564,6 +564,10 @@ class GeauxStyle {
 
 	public var readyAttention = new IntRef(ATTN_PULSE);
 	public var readyGlowColor:hl.Bytes;
+	public var glowStyle:String = "proc";
+	public var glowStrength = new FloatRef(1);
+	public var glowOuter = new FloatRef(12);
+	public var glowInner = new FloatRef(0);
 	public var cooldownAttention = new IntRef(CD_ATTN_DIM);
 
 	public var showLabels = new BoolRef(false);
@@ -811,6 +815,8 @@ class GeauxStyle {
 			glyphScale: glyphScale.get(),
 			readyAttention: readyAttention.get(),
 			readyGlowColor: dumpV4(readyGlowColor),
+			glowStyle: glowStyle, glowStrength: glowStrength.get(),
+			glowOuter: glowOuter.get(), glowInner: glowInner.get(),
 			cooldownAttention: cooldownAttention.get(),
 			showLabels: showLabels.get(),
 			showGroupTags: showGroupTags.get(),
@@ -845,6 +851,12 @@ class GeauxStyle {
 		setInt(readyAttention, data.readyAttention);
 		setV4(readyGlowColor, 1, 0.752941, 0.25098, 1);
 		loadV4(readyGlowColor, data.readyGlowColor);
+		glowStyle = solarflare.aura.AuraGlowStyle.normalize(data.glowStyle);
+		glowStrength.set(1); glowOuter.set(12); glowInner.set(0);
+		setFloat(glowStrength, data.glowStrength); setFloat(glowOuter, data.glowOuter); setFloat(glowInner, data.glowInner);
+		glowStrength.set(solarflare.aura.AuraGlowStyle.strength(glowStrength.get()));
+		glowOuter.set(solarflare.aura.AuraGlowStyle.spread(glowOuter.get()));
+		glowInner.set(solarflare.aura.AuraGlowStyle.spread(glowInner.get()));
 		setInt(cooldownAttention, data.cooldownAttention);
 		setBool(showLabels, data.showLabels);
 		setBool(showGroupTags, data.showGroupTags);

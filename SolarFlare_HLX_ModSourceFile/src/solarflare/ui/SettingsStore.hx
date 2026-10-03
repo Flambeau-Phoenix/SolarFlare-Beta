@@ -15,7 +15,7 @@ import imgui.ImGui;
  * Persist SolarFlare layout + toggles next to the installed mod.
  */
 class SettingsStore {
-	static inline var VERSION:Int = 24;
+	static inline var VERSION:Int = 26;
 	static var dirty = false;
 	static var lastCfg:ConfigPanel = null;
 	static var lastSaveMs:Float = 0;
@@ -192,6 +192,8 @@ class SettingsStore {
 		assignDump(data, "customTheme", function() return ThemePalette.dumpCustom());
 		assignDump(data, "vitals", function() return vitalsDump(cfg.vitals));
 		assignDump(data, "geaux", function() return geauxDump(cfg.geaux));
+		assignDump(data, "extraBars", function() return cfg.extraBarsPrototype.model.dump());
+		assignDump(data, "extraBarsPlacement", function() return cfg.extraBarsPrototype.dumpPlacement());
 		assignDump(data, "rifty", function() return riftyDump(cfg.getRifty));
 		assignDump(data, "combo", function() return comboDump(cfg.combo));
 		assignDump(data, "chaincast", function() return chaincastDump(cfg.chaincast));
@@ -614,6 +616,9 @@ class SettingsStore {
 			applyChrome(cfg.vitals.chrome, data.hp);
 		}
 		applyGeauxProfile(cfg.geaux, data.geaux);
+		var barSettings = solarflare.extrabars.ExtraBarsSettings.fromSettings(data);
+		cfg.extraBarsPrototype.applyConfig(barSettings.config, barSettings.legacy);
+		cfg.extraBarsPrototype.applyPlacement(Reflect.field(data, "extraBarsPlacement"), Reflect.field(data, "extraBarsPrototypeChrome"));
 		applyRifty(cfg.getRifty, data.rifty);
 		// v5: Geaux uses Show (enabled) instead of Hide; force visible once on upgrade.
 		try {

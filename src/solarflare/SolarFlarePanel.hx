@@ -116,6 +116,10 @@ class SolarFlarePanel {
 	var prevCursorFree:Bool = true;
 
 	/** UI assets also load at the title screen, before GameApp exists. */
+	public function resetExtraBarsSession():Void {
+		if (config.extraBarsPrototype != null) config.extraBarsPrototype.clearSession();
+	}
+
 	public function observeAssets():Void {
 		solarflare.runtime.TelemetryKernel.observeAssets();
 	}
@@ -152,6 +156,10 @@ class SolarFlarePanel {
 		// A character/profile restore in this observation can restore open refs.
 		if (enteringCamera && config.anyInteractiveOpen()) {
 			try config.closeInteractiveWindows() catch (_:Dynamic) {}
+		}
+
+		if (config.extraBarsPrototype != null) {
+			try config.extraBarsPrototype.observe(app) catch (_:Dynamic) {}
 		}
 
 	}
@@ -193,6 +201,9 @@ class SolarFlarePanel {
 		try {
 			if (!suppressed && config.anyBarVisible())
 				vitalsTheme.wrap(drawVitals);
+		} catch (_:Dynamic) {}
+		try {
+			if (!suppressed && config.extraBarsPrototype != null) config.extraBarsPrototype.drawBar();
 		} catch (_:Dynamic) {}
 		// Each overlay isolated — a Geaux throw must not skip Lightsaber / Auras.
 		try {

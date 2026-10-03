@@ -90,6 +90,11 @@ class TelemetryKernel {
 			}
 		}
 
+		// Spark Cube shares status observation even when Aura is disabled or empty.
+		if (demand.status && !demand.auras && ObserveDemand.dueAuraStatus(now, false)) {
+			try solarflare.aura.AuraStatusCache.sample(HealthCache.localHero) catch (_:Dynamic) {}
+		}
+
 		// These consumers own an independent ObserveDemand cadence.
 		HookIngress.consume(DirtyDomains.OVERLAYS | DirtyDomains.ATTACK_COMBO);
 		try HealthHooks.reconcileOverlays() catch (_:Dynamic) {}

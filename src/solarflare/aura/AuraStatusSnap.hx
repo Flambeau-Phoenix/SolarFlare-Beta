@@ -2,6 +2,8 @@
 
 class AuraStatusSnap {
 	public var id:String = "";
+	public var sourceItemId:String = "";
+	public var sourceItemKnown:Bool = false;
 	public var ids:Array<String> = [];
 	public var idsLower:Array<String> = [];
 	public var stacks:Int = 1;
@@ -23,7 +25,7 @@ class AuraStatusSnap {
 	public function new() {}
 
 	public function clear():Void {
-		id = "";
+		id = ""; sourceItemId = ""; sourceItemKnown = false;
 		ids.resize(0);
 		idsLower.resize(0);
 		stacks = 0;

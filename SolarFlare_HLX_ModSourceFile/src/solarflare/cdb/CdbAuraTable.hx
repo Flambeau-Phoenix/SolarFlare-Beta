@@ -73,6 +73,8 @@ class CdbAuraTable {
 	 * is only the cast / animation window. Either falls back to the other.
 	 */
 	public static function listedSpan(id:String):Float {
+		var itemSpan = ConsumableCatalog.listedSpan(id);
+		if (itemSpan > 0) return itemSpan;
 		if (!isStatus(id)) {
 			var g = grantedStatusId(id);
 			if (g.length > 0 && g != id) {
@@ -121,6 +123,7 @@ class CdbAuraTable {
 
 	/** Which CDB field listedSpan came from, for builder tooltips. Empty when neither. */
 	public static function listedSpanSource(id:String):String {
+		if (ConsumableCatalog.listedSpan(id) > 0) return "item effect duration";
 		var g = grantedStatusId(id);
 		if (g.length > 0 && g != id && duration(g) > 0.05)
 			return "status duration";

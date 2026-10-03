@@ -439,6 +439,11 @@ class AuraConditionEditor {
 		var categories:Array<{id:String, name:String, kind:String}> = [];
 		var units:Array<{id:String, name:String, kind:String}> = [];
 
+		if (kind == "consumable") {
+			for (entry in solarflare.cdb.ConsumableCatalog.entries)
+				if (solarflare.cdb.AuraCatalog.matchesSearch(entry.id, entry.name, ui.search))
+					otherSkills.push({id:entry.id, name:entry.name, kind:"consumable"});
+		}
 		for (entry in solarflare.cdb.AuraCatalog.entries) {
 			if (!solarflare.cdb.AuraCatalog.matchesSubject(entry.kind, kind)) continue;
 			if (!solarflare.cdb.AuraCatalog.entryMatchesSearch(entry, ui.search)) continue;
@@ -483,7 +488,7 @@ class AuraConditionEditor {
 			shown += drawSubjectSection(c, ui, tag + "_recent", "Recent targets", recent, kind);
 			shown += drawSubjectSection(c, ui, tag, "Units", units, kind);
 		} else {
-			shown += drawSubjectSection(c, ui, tag, "Skills", otherSkills, kind);
+			shown += drawSubjectSection(c, ui, tag, kind == "consumable" ? "Consumables / usable items" : "Skills", otherSkills, kind);
 		}
 		ImGui.textDisabled(shown + " matching");
 	}
@@ -539,6 +544,8 @@ class AuraConditionEditor {
 	}
 
 	static function drawSubjectIcon(id:String, w:Single, h:Single):Void {
+		var itemKey = solarflare.cdb.ConsumableCatalog.iconKey(id);
+		if (itemKey.length > 0 && solarflare.ui.GameIcons.imageKey(itemKey, w, h)) return;
 		if (solarflare.ui.GameIcons.imageKey(id, w, h)) return;
 
 		var stem = solarflare.cdb.CdbAuraTable.iconStem(id);

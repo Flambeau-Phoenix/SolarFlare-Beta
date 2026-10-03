@@ -7,6 +7,7 @@ class AuraSignalReader {
 		if (d == null) { out.code = UNKNOWN_SIGNAL; return; }
 		out.kind = d.kind;
 		if (d.subjectKind.length > 0 && (subject == null || subject.length == 0)) { out.code = MISSING_SUBJECT; return; }
+		if (StringTools.startsWith(signal, "consumable.")) { ConsumableSignalReader.read(frame, signal, subject, out); return; }
 		switch (signal) {
 			case "resource.health.current": number(out, frame.healthKnown, frame.healthCurrent);
 			case "resource.health.ratio": percent(out, frame.healthKnown, frame.healthRatio);

@@ -2,6 +2,8 @@ package solarflare.aura.signal;
 
 class StatusSignalSnap {
 	public var rawId:String = "";
+	public var sourceItemId:String = "";
+	public var sourceItemKnown:Bool = false;
 	public var ids:Array<String> = [];
 	public var present:Bool = true;
 	public var durationKnown:Bool = false;
@@ -12,5 +14,5 @@ class StatusSignalSnap {
 	public var infinite:Bool = false;
 	public var known:Bool = false;
 	public function new() {}
-	public function reset():Void { rawId = ""; ids = []; present = true; durationKnown = false; label = ""; stacks = 0; durationLeft = 0; durationProgress = 0; infinite = false; known = false; }
+	public function reset():Void { rawId = ""; sourceItemId = ""; sourceItemKnown = false; ids = []; present = true; durationKnown = false; label = ""; stacks = 0; durationLeft = 0; durationProgress = 0; infinite = false; known = false; }
 }
