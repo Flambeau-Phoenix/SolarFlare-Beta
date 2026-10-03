@@ -2,7 +2,7 @@
 
 # SolarFlare — v3.0b (Beta)
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
-
+![SolarFlareMage](SolarFlareMage.png)
 ![Bee + Imp DPS](TrinketBee_Imp.png)
 
 ---
