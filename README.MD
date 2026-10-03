@@ -129,6 +129,7 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 
 
 # SolarFlare v3.0b — Patch Notes
+
 ## Added ExtraBars
 - Create customizable consumable bars with 1–10 visible cells per bar.
 - Adjust layouts, cell size, opacity, transparency, and position locking.
@@ -150,7 +151,7 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 - Expanded item catalog space and corrected thumbnail/text spacing.
 - The full Advanced Aura Builder remains available.
 
-
+# Make sure to copy the new sfcursor.hdll plugin, it has the new modifier keybinds
 
 ## Developer & Build Reference
 
