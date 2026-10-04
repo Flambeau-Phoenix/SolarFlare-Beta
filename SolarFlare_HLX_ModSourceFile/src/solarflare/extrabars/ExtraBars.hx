@@ -25,6 +25,9 @@ class ExtraBars {
 	public var views(default, null):Map<String, Array<ExtraBarsPrototypeSlot>> = new Map();
 	public var catalog(default, null):Array<{id:String, name:String, category:String, icon:String, count:Int, known:Bool, owned:Bool}> = [];
 	public var spark = new SparkCubeTracker();
+	var characters = new ExtraBarsCharacters();
+	public var characterLabel(default,null):String = "";
+	public var characterAvailable(default,null):Bool = false;
 	var host:ConfigPanel;
 	public function closeEditors():Void host.closeInteractiveWindows();
 	var bindings = new ExtraBarsNativeBindings();
@@ -56,10 +59,36 @@ class ExtraBars {
 		if (data == null) model.applyLegacy(legacy); else model.apply(data);
 		solarflare.ObserveDemand.markStatusDemandDirty();
 	}
+	public function loadCharacterSettings(data:Dynamic):Void {
+		var saved = characters.load(data);
+		if (saved != null) restoreCharacter(saved);
+	}
+	function characterSnapshot():solarflare.extrabars.ExtraBarsCharacters.ExtraBarsCharacterSettings
+		return {config:model.dump(),placement:dumpPlacement()};
+	public function dumpCharacterSettings():Dynamic return characters.dump(characterSnapshot());
+	function restoreCharacter(saved:solarflare.extrabars.ExtraBarsCharacters.ExtraBarsCharacterSettings):Void {
+		applyConfig(saved.config);
+		placements.clear(); applyPlacement(saved.placement);
+		views.clear(); countChecks=[]; signature=""; lastSample=-1;
+		builder.selectBar(model.bars.length > 0 ? model.bars[0].id : "");
+	}
+	/** Consumes telemetry's frozen heroID after observe; never scans native identity. */
+	function observeCharacter():Void {
+		var id=ExtraBarsCharacters.normalizeId(solarflare.HealthCache.characterId);
+		characterAvailable=id.length>0;
+		if (!characterAvailable) return;
+		characterLabel=solarflare.HealthCache.heroName==null ? "" : StringTools.trim(solarflare.HealthCache.heroName);
+		if (characterLabel.length==0) characterLabel="Current character";
+		if (id==characters.activeId) return;
+		var saved=characters.observe(id,characterSnapshot());
+		if (saved != null) { restoreCharacter(saved); SettingsStore.markDirty(); }
+	}
 	public function chromeFor(id:String):HudChrome {
 		if (!placements.exists(id)) {
 			var index = 0; for (bar in model.bars) { if (bar.id == id) break; index++; }
 			placements.set(id, new HudChrome(id=="spark" ? 620 : 80+(index%4)*140, id=="spark" ? 320 : 320+Std.int(index/4)*150));
+			// ImGui retains window IDs across characters: force this character's default anchor.
+			placements.get(id).posDirty = true;
 		}
 		return placements.get(id);
 	}
@@ -119,6 +148,7 @@ class ExtraBars {
 		clicks.push({barId:barId,index:index,kind:kind,generation:generation,click:true});
 	}
 	public function observe(app:GameApp):Void {
+		observeCharacter();
 		if (wasEditorOpen && !open.get()) clearTransientState(); wasEditorOpen=open.get();
 		var now = haxe.Timer.stamp(); ExtraBarsKeyMap.initialize(); bindings.refresh(now);
 		if (now-lastSuggestions >= 1) {

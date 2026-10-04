@@ -22,8 +22,44 @@ class AuraQuickBuildDraft {
 		aura.rule.conditions.push(condition);
 	}
 
+	/** Builds a new owned template; never adopts or mutates a library aura. */
+	public static function fromCombatLog(choice:CombatLogAuraChoices.CombatLogAuraChoice, label:String):AuraQuickBuildDraft {
+		var draft = new AuraQuickBuildDraft();
+		if (choice.preset == "enemy") draft.aura = AuraTemplates.createEnemySpellCastAlert();
+		else if (choice.preset == "damage") draft.aura = AuraTemplates.createDamageTakenSpike();
+		var a = draft.aura;
+		draft.condition = choice.condition.clone();
+		a.rule = new AuraRuleDef();
+		a.rule.conditions.push(draft.condition);
+		a.name = label + " - " + choice.title;
+		a.syncNameBuf();
+		a.announce = label; a.syncAnnounceBuf();
+		a.bannerText = label; a.syncBannerBuf();
+		a.showLabel.set(true);
+		if (choice.preset == "enemy") {
+			// Adopt the preset without setFace(), which would clear its independent banner.
+			draft.face = "Icon";
+			draft.behavior = AuraEffect.WHEN_ON_RISE_HOLD;
+			draft.setHold(2.5);
+		} else {
+			draft.setFace(choice.preset == "damage" ? "Banner" : choice.preset == "timer" ? "Bar" : "Icon");
+			if (choice.preset == "damage" || choice.preset == "flash") {
+				draft.setHold(2.5);
+				draft.setBehavior(AuraEffect.WHEN_ON_RISE_HOLD);
+			}
+			if (choice.preset == "timer") {
+				a.timerMode = AuraTimer.MODE_DOWN; a.timerSource = AuraTimer.SRC_FOLLOW;
+				a.showCountdown.set(true); a.showFuse.set(true);
+			}
+			if (choice.preset == "stacks") a.stackCounter.set(true);
+		}
+		draft.configuredHold = a.duration;
+		draft.briefHold = 1.5;
+		return draft;
+	}
+
 	public function setFace(value:String):Void {
-		if (["Icon", "Glow", "Bar", "Banner"].indexOf(value) < 0) return;
+		if (["Icon", "Glow", "Bar", "Banner"].indexOf(value) < 0 || face == value) return;
 		face = value;
 		aura.showBanner.set(value == "Banner");
 		aura.visual.set(value != "Banner");

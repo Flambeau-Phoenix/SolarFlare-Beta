@@ -194,6 +194,7 @@ class SettingsStore {
 		assignDump(data, "geaux", function() return geauxDump(cfg.geaux));
 		assignDump(data, "extraBars", function() return cfg.extraBarsPrototype.model.dump());
 		assignDump(data, "extraBarsPlacement", function() return cfg.extraBarsPrototype.dumpPlacement());
+		assignDump(data, "extraBarsCharacters", function() return cfg.extraBarsPrototype.dumpCharacterSettings());
 		assignDump(data, "rifty", function() return riftyDump(cfg.getRifty));
 		assignDump(data, "combo", function() return comboDump(cfg.combo));
 		assignDump(data, "chaincast", function() return chaincastDump(cfg.chaincast));
@@ -619,6 +620,7 @@ class SettingsStore {
 		var barSettings = solarflare.extrabars.ExtraBarsSettings.fromSettings(data);
 		cfg.extraBarsPrototype.applyConfig(barSettings.config, barSettings.legacy);
 		cfg.extraBarsPrototype.applyPlacement(Reflect.field(data, "extraBarsPlacement"), Reflect.field(data, "extraBarsPrototypeChrome"));
+		cfg.extraBarsPrototype.loadCharacterSettings(Reflect.field(data, "extraBarsCharacters"));
 		applyRifty(cfg.getRifty, data.rifty);
 		// v5: Geaux uses Show (enabled) instead of Hide; force visible once on upgrade.
 		try {

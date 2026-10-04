@@ -50,7 +50,7 @@ class ExtraBarsBarConfig {
 	}
 }
 
-/** Global remembered settings. Screen positions belong to the controller's placement map. */
+/** Character's remembered settings. Screen positions belong to the controller's placement map. */
 class ExtraBarsConfig {
 	public var enabled:Bool = true;
 	public var prefix:String = "mouse_back";

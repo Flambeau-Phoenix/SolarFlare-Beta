@@ -71,6 +71,9 @@ class ExtraBarsBuilder {
    history.drawButtons(owner.model.dump(),restore);
    ImGui.sameLine(); if (ImGui.button("Save")) solarflare.ui.UiActionQueue.save();
    ImGui.sameLine(); if (ImGui.button("Close editors and test")) owner.closeEditors();
+   ImGui.textWrapped(owner.characterAvailable
+    ? "Settings for " + owner.characterLabel + ". Bars, bindings, positions and Spark Cube settings are remembered automatically for this character."
+    : "Character unavailable. Keeping the last setup until a character is identified.");
    ImGui.spacing();
    drawPages();
   });

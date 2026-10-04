@@ -126,7 +126,18 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 * **Profiles & Themes:** Save, duplicate, and switch whole-HUD profiles across characters; choose curated color schemes or define your own.
 
 ---
+# SolarFlare v3.1b — Patch Notes
 
+## Aura Builder:
+- Combat Log Aura Builder: Browse saved fights through Enemies, Me, and Damage taken tabs. Explore enemies and skills, then select a supported aura from a compact list to open a prefilled Quick Build draft. Browsing never creates an aura automatically.
+- Builder navigation: Creation Home and Combat Logs are grouped in the left menu. Quick Build sits beneath Start with blank aura. Returning home preserves your recording and selection.
+
+## ExtraBars:
+- Teleport stones: Added Sparkstone, Death Stone, and consumable/reusable Rift Stones to ExtraBars, with official icons and inventory counts.
+- Character settings: ExtraBars automatically remembers bars, bindings, positions, and Spark Cube settings by character ID—no profile selector needed.
+
+
+---
 
 # SolarFlare v3.0b — Patch Notes
 

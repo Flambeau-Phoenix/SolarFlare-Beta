@@ -71,6 +71,8 @@ class AuraBuilder {
 
 	var advancedPreview = new solarflare.aura.preview.AdvancedAuraPreview();
 	var quickBuild = new solarflare.aura.ui.AuraQuickBuildPopup();
+	var combatLogBrowser = new solarflare.aura.ui.CombatLogBrowser();
+	var combatLogsOpen:Bool = false;
 
 	var boundEditorAura:AuraDef = null;
 	var creationHomeOpen:Bool = true;
@@ -157,6 +159,7 @@ class AuraBuilder {
 	}
 
 	public function clearTransientState():Void {
+		combatLogsOpen = false;
 		quickBuild.cancel();
 		advancedPreview.reset();
 		boundEditorAura = null;
@@ -257,7 +260,8 @@ class AuraBuilder {
 		}
 		if (ImGui.beginMenu("Aura")) {
 			if (ImGui.menuItem("Creation Home"))
-				creationHomeOpen = true;
+				openCreationHome();
+			if (ImGui.menuItem("Combat Logs")) openCombatLogs();
 			if (ImGui.menuItem("Create Blank Aura"))
 				createBlankFromHome();
 			if (ImGui.menuItem("Duplicate Selected", null, false, selectedAura() != null))
@@ -334,6 +338,7 @@ class AuraBuilder {
 	}
 
 	function drawStatusPill():Void {
+		if (combatLogsOpen) { ImGui.textColored(solarflare.ui.ThemePalette.current().accent, "COMBAT LOGS"); return; }
 		if (creationHomeOpen) { ImGui.textColored(solarflare.ui.ThemePalette.current().accent, "CREATION HOME"); return; }
 		if (selected < 0 || selected >= cfg.auras.length) { ImGui.textColored(ImGui.vec4(0.45, 0.78, 1, 1), "Create or select an Aura"); return; }
 		var a = cfg.auras[selected];
@@ -351,6 +356,12 @@ class AuraBuilder {
 	// ----------------------------------------------------------------
 
 	function drawWorkspace():Void {
+		if (combatLogsOpen) {
+			combatLogBrowser.draw(cfg.auras.length >= AuraEngine.MAX, function(choice, label) {
+				quickBuild.start(AuraQuickBuildDraft.fromCombatLog(choice, label));
+			});
+			return;
+		}
 		var a = selectedAura();
 		if (creationHomeOpen || a == null) {
 			drawCreationHome();
@@ -370,6 +381,7 @@ class AuraBuilder {
 	}
 
 	function openWorkspace():Void {
+		combatLogsOpen = false;
 		if (cfg == null || cfg.auras.length == 0) return;
 		if (selectedAura() == null) {
 			selected = 0;
@@ -417,19 +429,11 @@ class AuraBuilder {
 			ImGui.popStyleVar(2);
 			ImGui.popStyleColor(2);
 			var previous = selectedAura();
-			var quickBuildAtCap = cfg.auras.length >= AuraEngine.MAX;
-			ImGui.beginDisabled(quickBuildAtCap);
-			if (UiChrome.accentButton("Quick Build##ab_creation_quick_build", ImGui.vec2(-1, 36)))
-				quickBuild.start();
-			ImGui.endDisabled();
-			if (quickBuildAtCap)
-				ImGui.textDisabled("Aura limit reached. Delete an aura before using Quick Build.");
 			if (previous != null) {
 				if (UiChrome.ghostButton("Back to " + previous.name + "##ab_creation_back", ImGui.vec2(-1, 30)))
 					creationHomeOpen = false;
 			} else if (cfg.auras.length > 0) {
-				// "+ Create Aura" clears the selection, so the Back button above erases
-				// itself on the one path that reaches this screen. openWorkspace reselects.
+				// Recover an editor selection when the home screen has no current aura.
 				if (UiChrome.ghostButton("Edit My Auras (" + cfg.auras.length + ")##ab_creation_edit", ImGui.vec2(-1, 30)))
 					openWorkspace();
 			}
@@ -508,10 +512,21 @@ class AuraBuilder {
 		rangeAnchorId = a.id;
 		deleteArmed = -1;
 		creationHomeOpen = !advanced;
+		if (advanced) combatLogsOpen = false;
 		SettingsStore.markDirty();
 		if (!advanced) UiActionQueue.save();
 		ToastManager.success(advanced ? "Aura opened in Advanced." : "Aura created; save queued.");
 		return "";
+	}
+
+	function openCreationHome():Void {
+		combatLogsOpen = false;
+		creationHomeOpen = true;
+	}
+
+	function openCombatLogs():Void {
+		combatLogsOpen = true;
+		combatLogBrowser.enter();
 	}
 
 	function drawConsumableList():Void {
@@ -671,6 +686,7 @@ class AuraBuilder {
 		}
 		snapshot("Create Aura");
 		addBlankAura();
+		combatLogsOpen = false;
 		// addBlankAura already sets selected, selectedIds, creationHomeOpen=false,
 		// and marks dirty.
 		ToastManager.success("New blank aura created.");
@@ -1296,29 +1312,21 @@ class AuraBuilder {
 		ImGui.textDisabled(Std.string(cfg.auras.length) + " / " + AuraEngine.MAX);
 
 		var atCap = cfg.auras.length >= AuraEngine.MAX;
-		if (atCap) ImGui.beginDisabled();
-		if (creationHomeOpen) {
-			// Already on Creation Home — primary button becomes a direct blank-aura
-			// shortcut so it is never a silent no-op.
-			if (UiChrome.accentButton("+ Quick Blank Aura##ab_quick_blank", ImGui.vec2(-1, 42)))
-				createBlankFromHome();
-		} else {
-			if (UiChrome.accentButton("+ Create Aura##ab_open_creation_home", ImGui.vec2(-1, 42))) {
-				creationHomeOpen = true;
-				selected = -1;
-				selectedIds = new Map();
-				rangeAnchorId = "";
-				deleteArmed = -1;
-				canvasSel = -1;
-			}
-		}
-		if (atCap) ImGui.endDisabled();
-		if (creationHomeOpen) {
+		var atHome = !combatLogsOpen && (creationHomeOpen || selectedAura() == null);
+		if (UiChrome.navButton("Creation Home##ab_open_creation_home", atHome, ImGui.vec2(-1, 28))) openCreationHome();
+		if (UiChrome.navButton("Combat Logs##ab_library_combat_logs", combatLogsOpen, ImGui.vec2(-1, 28))) openCombatLogs();
+		ImGui.beginDisabled(atCap);
+		try {
+			if (UiChrome.accentButton("Start with blank aura##ab_quick_blank", ImGui.vec2(-1, 28))) createBlankFromHome();
+			if (UiChrome.ghostButton("Quick Build##ab_library_quick_build", ImGui.vec2(-1, 28))) quickBuild.start();
+		} catch (e:Dynamic) { ImGui.endDisabled(); throw e; }
+		ImGui.endDisabled();
+		if (atCap) ImGui.textWrapped("Aura limit reached. Delete an aura before creating another.");
+		if (atHome) {
 			// Outside the atCap guard on purpose: a full library is exactly when you
 			// need to edit rather than create.
 			if (cfg.auras.length > 0 && UiChrome.ghostButton("Edit My Auras##ab_lib_edit", ImGui.vec2(-1, 26)))
 				openWorkspace();
-			centeredText(atCap ? "Library full" : "Creation Home open", true);
 		}
 		ImGui.spacing();
 		ImGui.separator();
@@ -1760,6 +1768,7 @@ class AuraBuilder {
 			var displayName = a.name.length > 0 ? a.name : a.id;
 			var rowSelected = isAuraSelected(a.id) || selected == i;
 			if (ImGui.selectable(displayName + state + "##ab_item", rowSelected)) {
+				combatLogsOpen = false;
 				applyManagedSelect(a.id, visibleIds);
 				if (selected != i) { canvasSel = -1; lastGlowAuraId = ""; }
 				selected = i;
@@ -1767,6 +1776,7 @@ class AuraBuilder {
 				deleteArmed = -1;
 			}
 			if (ImGui.isItemClicked(1)) {
+				combatLogsOpen = false;
 				selected = i; creationHomeOpen = false; 
 				selectedIds = new Map(); selectedIds.set(a.id, true); rangeAnchorId = a.id; deleteArmed = -1;
 				ImGui.openPopup("ab_ctx_pop_" + a.id);

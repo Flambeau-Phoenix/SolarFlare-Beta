@@ -54,11 +54,12 @@ class AuraQuickBuildPopup {
 		ImGui.endDisabled();
 	}
 
-	public function start():Void {
-		draft = new AuraQuickBuildDraft();
+	public function start(seed:AuraQuickBuildDraft = null):Void {
+		draft = seed != null ? seed : new AuraQuickBuildDraft();
 		visible.set(true);
 		requested = true;
-		group = "";
+		var signal = AuraSignalCatalog.find(draft.condition.signal);
+		group = signal != null ? signal.group : "";
 		commitIssue = "";
 		previewExpanded = false;
 		preview.reset();
@@ -302,6 +303,8 @@ class AuraQuickBuildPopup {
 	}
 
 	function drawAppearance(cfg:AuraConfig):Void {
+		if (draft.face != "Banner" && draft.aura.showBanner.get())
+			ImGui.textWrapped("This preset also includes a banner alert. Choosing a different face replaces that presentation.");
 		var faces = ["Icon", "Glow", "Bar", "Banner"];
 		var columns = UiLayout.columnCount(ImGui.getContentRegionAvail().x, 108, 4);
 		for (row in 0...Std.int(Math.ceil(faces.length / columns))) {
