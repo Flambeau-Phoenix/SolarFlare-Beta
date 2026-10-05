@@ -88,6 +88,7 @@ class GameIcons {
 	public static inline var RESOURCE_MAX = "resource-max";
 	public static inline var CHROME_SUN = "chrome-sun";
 	public static inline var HUB_LOGO = "solarflarefulllogo";
+	public static inline var F6_MENU = "cfg_f6";
 
 	public static function prayerId(kind:String):String {
 		if (kind == "smite")

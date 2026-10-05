@@ -9,12 +9,14 @@ class AuraQuickBuildDraft {
 	public var aura(default, null):AuraDef;
 	public var condition(default, null):AuraConditionDef;
 	public var behavior(default, null):String = AuraEffect.WHEN_WHILE_TRUE;
-	public var face(default, null):String = "Bar";
+	public var face(default, null):String = "Icon";
+	public var cooldownReference(default, null):String = "CDB";
+	public var timerReferenceLabel(default, null):String = "Unknown";
 	var configuredHold:Float;
 	var briefHold:Float;
 
 	public function new() {
-		aura = new AuraDef("quick_build_draft", "New Aura");
+		aura = AuraPresentationDefaults.fresh(new AuraDef("quick_build_draft", "New Aura"));
 		configuredHold = aura.duration;
 		briefHold = aura.effects[0].hold;
 		aura.rule = new AuraRuleDef();
@@ -53,6 +55,9 @@ class AuraQuickBuildDraft {
 			}
 			if (choice.preset == "stacks") a.stackCounter.set(true);
 		}
+		// Combat-log intent supplies tracking and timing, not forced artwork.
+		AuraPresentationDefaults.fresh(a);
+		draft.face = "Icon";
 		draft.configuredHold = a.duration;
 		draft.briefHold = 1.5;
 		return draft;
@@ -118,16 +123,30 @@ class AuraQuickBuildDraft {
 
 	public function toggleOverlay(key:String):Void {
 		var ref = overlay(key);
-		if (AuraQuickBuildRules.overlayAllowed(key, !ref.get(), aura.stackCounter.get(), aura.isCounter.get()))
-			ref.set(!ref.get());
+		ref.set(!ref.get());
+	}
+
+	/** Copy a chosen numerical reference into this draft only. Artwork stays opt-in. */
+	public function setTimerReference(choice:String, seconds:Float, label:String):Void {
+		cooldownReference = choice == "Observed" ? "Observed" : "CDB";
+		timerReferenceLabel = label;
+		aura.timerSource = AuraTimer.SRC_FIXED;
+		aura.followBuffDuration.set(false);
+		aura.timerSeconds.set(Math.isFinite(seconds) && seconds > 0.001 && seconds <= 600 ? seconds : 0);
+	}
+	public function setTimerMode(mode:Int):Void {
+		aura.timerMode = mode < 0 || mode > 2 ? AuraTimer.MODE_OFF : mode;
+		aura.timerSource = AuraTimer.SRC_FIXED;
+		aura.followBuffDuration.set(false);
 	}
 
 	public function issue(hasIcon:String->Bool):String {
 		if (StringTools.trim(aura.name).length == 0) return "Give this aura a name.";
 		var problem = AuraQuickBuildRules.conditionIssue(condition);
 		if (problem.length > 0) return problem;
-		if ((face == "Icon" || face == "Glow") && !hasIcon(aura.preferredIconId())) return "Choose a usable icon.";
-		if (aura.stackCounter.get() && aura.isCounter.get()) return "Turn off either Stacks or Counter.";
+		if (aura.timerMode != AuraTimer.MODE_OFF && !(Math.isFinite(aura.timerSeconds.get()) && aura.timerSeconds.get() > 0.001))
+			return "Timer duration is unavailable. Turn the timer off or enter an aura-only duration in Advanced.";
+		if (aura.showIcon.get() && (face == "Icon" || face == "Glow") && !hasIcon(aura.preferredIconId())) return "Choose a usable icon.";
 		return "";
 	}
 
@@ -144,7 +163,10 @@ class AuraQuickBuildDraft {
 		var overlays = [];
 		if (face != "Banner")
 			for (key in ["Stacks", "Counter", "Countdown", "Fuse", "Label"]) if (overlay(key).get()) overlays.push(key.toLowerCase());
-		return result + (overlays.length > 0 ? ", with " + overlays.join(", ") : "") + "."
+		var timer = aura.timerMode == AuraTimer.MODE_OFF ? "" : aura.timerSeconds.get() > 0
+			? " Starts a " + aura.timerSeconds.get() + "s " + (aura.timerMode == AuraTimer.MODE_DOWN ? "countdown" : "countup") + " when conditions become true."
+			: " Timer duration is unavailable.";
+		return result + (overlays.length > 0 ? ", with " + overlays.join(", ") : "") + "." + timer
 			+ (face != "Banner" && !aura.chrome.locked.get() ? " The unlocked HUD face also stays visible for placement." : "");
 	}
 }

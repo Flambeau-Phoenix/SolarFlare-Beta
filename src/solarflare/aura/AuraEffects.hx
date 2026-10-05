@@ -141,7 +141,6 @@ class AuraEffects {
 				a.counterValue++;
 				solarflare.ui.SettingsStore.markDirty();
 			}
-			a.stacks = a.counterValue;
 		}
 
 		if (hit)

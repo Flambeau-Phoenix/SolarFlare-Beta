@@ -150,14 +150,15 @@ class UiChrome {
 	 * Flips `state` on click; returns true when the value changed.
 	 */
 	public static function toggleChip(label:String, state:imgui.ref.BoolRef,
-			size:ImVec2 = null):Bool {
+			size:ImVec2 = null, fillSelected:Bool = true):Bool {
 		if (state == null)
 			return false;
 		var on = state.get();
 		var chipSize = size != null ? size : ImGui.vec2(0, 28);
 		if (chipSize.y < 26)
 			chipSize.y = 26;
-		if (navButton(label, on, chipSize)) {
+		if (fillSelected ? navButton(label, on, chipSize)
+			: toggleTile(label, displayLabel(label), on, chipSize.x, chipSize.y, false, false)) {
 			state.set(!on);
 			return true;
 		}
@@ -211,7 +212,8 @@ class UiChrome {
 		checked:Bool,
 		width:Single = 108.0,
 		height:Single = 32.0,
-		mixed:Bool = false
+		mixed:Bool = false,
+		fillSelected:Bool = true
 	):Bool {
 		var clicked = false;
 		var p0 = ImGui.getCursorScreenPos();
@@ -231,6 +233,14 @@ class UiChrome {
 			: (hovered ? 0xFF2B2E33 : 0xFF1B1D21);
 		var borderColor = checked ? 0xFF4A90E2 : (hovered ? 0xFF555B66 : 0xFF353940);
 		var checkColor = checked ? 0xFF50E3C2 : (mixed ? 0xFFE5A93C : 0x00000000);
+		var textColor = 0xFFE0E0E0;
+		if (!fillSelected) {
+			var theme = ThemePalette.current();
+			bgColor = ImGui.colorConvertFloat4ToU32(theme.cellBg);
+			borderColor = ImGui.colorConvertFloat4ToU32(hovered ? theme.accent : theme.border);
+			checkColor = ImGui.colorConvertFloat4ToU32(theme.accent);
+			textColor = ImGui.colorConvertFloat4ToU32(theme.text);
+		}
 
 		var dl = ImGui.getWindowDrawList();
 
@@ -251,7 +261,7 @@ class UiChrome {
 
 		// Label
 		var textPos = ImGui.vec2(boxP1.x + 8.0, p0.y + (height * 0.5) - 7.0);
-		ImGui.ImDrawList_AddText_Vec2(dl, textPos, 0xFFE0E0E0, label);
+		ImGui.ImDrawList_AddText_Vec2(dl, textPos, textColor, label);
 
 		return clicked;
 	}

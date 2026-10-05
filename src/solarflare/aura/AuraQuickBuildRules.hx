@@ -33,7 +33,8 @@ class AuraQuickBuildRules {
 	}
 
 	public static function overlayAllowed(key:String, turnOn:Bool, stacks:Bool, counter:Bool):Bool {
-		return !turnOn || (key != "Stacks" || !counter) && (key != "Counter" || !stacks);
+		// Every decoration is independent, including the two count sources.
+		return true;
 	}
 
 	public static function subjectId(id:String, kind:String):String {

@@ -114,6 +114,7 @@ class SolarFlarePanel {
 	}
 
 	var prevCursorFree:Bool = true;
+	var castTimesShutdownFlushed:Bool = false;
 
 	/** UI assets also load at the title screen, before GameApp exists. */
 	public function resetExtraBarsSession():Void {
@@ -128,6 +129,7 @@ class SolarFlarePanel {
 	public function observe(app:GameApp):Void {
 		if (app == null)
 			return;
+		castTimesShutdownFlushed = false;
 
 		try
 			HealthCache.releaseStaleLocalHero(app)
@@ -285,6 +287,11 @@ class SolarFlarePanel {
 
 	/** Flush pending layout/toggles when GameApp is gone (logout / shutdown). */
 	public function flushPendingSettings():Void {
+		if (!castTimesShutdownFlushed) {
+			castTimesShutdownFlushed = true;
+			solarflare.castbar.CastCache.observe(null, null);
+			solarflare.castbar.LearnedCastTimes.tick(haxe.Timer.stamp(), true);
+		}
 		if (solarflare.ui.SettingsStore.isDirty())
 			solarflare.ui.SettingsStore.save(config);
 	}

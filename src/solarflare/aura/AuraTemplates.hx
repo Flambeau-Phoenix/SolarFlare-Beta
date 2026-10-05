@@ -48,7 +48,7 @@ class AuraTemplates {
 			a.glowColor = 0xFFC49BFF;
 			a.effects.push(glow);
 		}
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	public static function createEmergencyLowHpAlert():AuraDef {
@@ -71,7 +71,7 @@ class AuraTemplates {
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_ALERT, AuraEffect.WHEN_WHILE_TRUE)];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	public static function createBuffStackTracker():AuraDef {
@@ -97,7 +97,7 @@ class AuraTemplates {
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	/** Buff/debuff on local hero — pick any status ID (e.g. SuperEliteDemon_Bomb_Status). */
@@ -133,7 +133,7 @@ class AuraTemplates {
 		alert.hold = 1.5;
 		alert.holdRef.set(1.5);
 		a.effects = [win, alert];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	/**
@@ -183,7 +183,7 @@ class AuraTemplates {
 		var icon = new AuraEffect("glow", AuraEffect.KIND_ICON, AuraEffect.WHEN_WHILE_TRUE);
 		icon.glow.set(true);
 		a.effects = [win, icon];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	/**
@@ -224,7 +224,7 @@ class AuraTemplates {
 		alert.text = "PYROCLASM!";
 		alert.syncTextBuf();
 		a.effects = [win, alert];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	/** Universal enemy cast edge — pick any skill ID (Night Queen, trash casts, etc.). */
@@ -257,7 +257,7 @@ class AuraTemplates {
 		alert.hold = 2.5;
 		alert.holdRef.set(2.5);
 		a.effects = [win, alert];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	/** Channel-while-running example: Night Queen Deceitful Illusions (editable subject). */
@@ -292,7 +292,7 @@ class AuraTemplates {
 		alert.hold = 2.0;
 		alert.holdRef.set(2.0);
 		a.effects = [win, alert];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	/** Untimed stack persistence: Demonic Charge (`duration: 0` in CDB). */
@@ -322,7 +322,7 @@ class AuraTemplates {
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	public static function createConduitStacksAlert():AuraDef {
@@ -344,7 +344,7 @@ class AuraTemplates {
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	public static function createChaincastReadyAlert():AuraDef {
@@ -369,7 +369,7 @@ class AuraTemplates {
 		alert.hold = 1.5;
 		alert.holdRef.set(1.5);
 		a.effects = [win, alert];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	public static function createPrayerLifeReadyAlert():AuraDef {
@@ -390,7 +390,7 @@ class AuraTemplates {
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	public static function createRiftBossFightAlert():AuraDef {
@@ -411,7 +411,7 @@ class AuraTemplates {
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_ALERT, AuraEffect.WHEN_WHILE_TRUE)];
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	public static function createDamageTakenSpike():AuraDef {
@@ -437,6 +437,6 @@ class AuraTemplates {
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_ALERT, AuraEffect.WHEN_ON_RISE_HOLD)];
 		a.effects[0].hold = 2.5;
 		a.effects[0].holdRef.set(2.5);
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 }

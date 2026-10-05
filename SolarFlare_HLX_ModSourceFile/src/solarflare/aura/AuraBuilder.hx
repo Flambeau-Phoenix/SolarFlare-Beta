@@ -134,17 +134,25 @@ class AuraBuilder {
 		solarflare.ui.ByteUtil.clearBytes(wizardFightBuf, 32);
 	}
 
+	function snapshotJson():String {
+		var data = AuraPack.toObj("shared", "snapshot", "undo", cfg.auras);
+		Reflect.setField(data, "counterState", AuraCounterState.dump(cfg.auras));
+		return Json.stringify(data);
+	}
+
 	function snapshot(actionName:String):Void {
 		if (cfg == null) return;
 		try {
-			var state = Json.stringify(AuraPack.toObj("shared", "snapshot", "undo", cfg.auras));
+			var state = snapshotJson();
 			undoManager.push(actionName, state);
 		} catch (_:Dynamic) {}
 	}
 
 	function restoreSnapshot(jsonStr:String):Void {
 		try {
-			var imported = AuraPack.unpackAuras(AuraPack.decode(jsonStr));
+			var data = AuraPack.decode(jsonStr);
+			var imported = AuraPack.unpackAuras(data);
+			AuraCounterState.apply(imported, data.counterState);
 			cfg.auras = imported;
 			boundEditorAura = null;
 			canvasSel = -1;
@@ -278,13 +286,13 @@ class AuraBuilder {
 			var canUndo = undoManager.canUndo();
 			var canRedo = undoManager.canRedo();
 			if (ImGui.menuItem("Undo", "Ctrl+Z", false, canUndo)) {
-				var currentJson = try Json.stringify(AuraPack.toObj("shared", "current", "undo", cfg.auras)) catch (_) "";
+				var currentJson = try snapshotJson() catch (_) "";
 				var snap = undoManager.undo(currentJson);
 				if (snap != null)
 					restoreSnapshot(snap);
 			}
 			if (ImGui.menuItem("Redo", "Ctrl+Y", false, canRedo)) {
-				var currentJson = try Json.stringify(AuraPack.toObj("shared", "current", "undo", cfg.auras)) catch (_) "";
+				var currentJson = try snapshotJson() catch (_) "";
 				var snap = undoManager.redo(currentJson);
 				if (snap != null)
 					restoreSnapshot(snap);
@@ -316,14 +324,14 @@ class AuraBuilder {
 		ImGui.sameLine(0, 12);
 		drawStatusPill();
 		ImGui.sameLine(0, 12);
-		var currentJson = try Json.stringify(AuraPack.toObj("shared", "current", "undo", cfg.auras)) catch (_) "";
+		var currentJson = try snapshotJson() catch (_) "";
 		undoManager.drawButtons(currentJson, restoreSnapshot);
 		if (SettingsStore.isDirty()) { ImGui.sameLine(0, 12); ImGui.textColored(ImGui.vec4(0.95, 0.72, 0.25, 1), "* Unsaved"); }
 
 		// Resolve after profile and Undo/Redo actions, which may replace cfg.auras.
 		var a = selectedAura();
 		if (a != null) {
-			var toggleW:Single = 302;
+			var toggleW:Single = 418;
 			var remaining = ImGui.getContentRegionAvail().x;
 			if (remaining >= toggleW + 8) {
 				ImGui.sameLine(0, 8);
@@ -725,6 +733,7 @@ class AuraBuilder {
 		a.followBuffDuration.set(false);
 		a.showCountdown.set(true);
 		a.enabled.set(false);
+		AuraPresentationDefaults.fresh(a);
 		acceptBossStarterAura(a);
 	}
 	function centeredText(value:String, disabled:Bool):Void {
@@ -802,7 +811,7 @@ class AuraBuilder {
 			ImGui.tableSetupColumn("##scope", imgui.Enums.ImGuiTableColumnFlags.WidthStretch, 0.55);
 			ImGui.tableNextRow();
 			ImGui.tableSetColumnIndex(0);
-			if (UiChrome.ghostButton("Home##ab_home", ImGui.vec2(64, 28))) {
+			if (UiChrome.accentButton("Home##ab_home", ImGui.vec2(64, 28))) {
 				clearTransientState();
 				return;
 			}
@@ -992,7 +1001,7 @@ class AuraBuilder {
 	function drawFxTile(label:String, id:String, state:Int, w:Single, h:Single, onWrite:Bool->Void):Void {
 		var isChecked = state == FX_ON;
 		var isMixed = state == FX_MIXED;
-		if (solarflare.ui.UiChrome.toggleTile("##" + id, label, isChecked, w, h, isMixed)) {
+		if (solarflare.ui.UiChrome.toggleTile("##" + id, label, isChecked, w, h, isMixed, false)) {
 			onWrite(state != FX_ON);
 		}
 		if (ImGui.isItemHovered() && isMixed)
@@ -1020,10 +1029,7 @@ class AuraBuilder {
 					case 4: drawFxTile("Ring", "ab_fx_ring", fxState(function(x) return x.progressRing.get()), w, 32,
 						function(v) applyFxToTargets(function(x) x.progressRing.set(v)));
 					case 5: drawFxTile("Stacks", "ab_fx_stk", fxState(function(x) return x.stackCounter.get()), w, 32,
-						function(v) applyFxToTargets(function(x) {
-							x.stackCounter.set(v);
-							if (v) x.isCounter.set(false);
-						}));
+						function(v) applyFxToTargets(function(x) x.stackCounter.set(v)));
 				}
 			}, 6);
 			if (row + 1 < rows) ImGui.dummy(ImGui.vec2(0, 6));
@@ -1032,21 +1038,8 @@ class AuraBuilder {
 		UiLayout.propertyGrid("##ab_timer_options_grid", function() drawTimerRows(a));
 		if (a.stackCounter.get() || a.isCounter.get()) {
 			UiLayout.propertyGrid("##ab_stack_display", function() {
-				UiLayout.propertyRow("Badge position", function() {
-					ImGui.setNextItemWidth(-1);
-					if (ImGui.beginCombo("##ab_stack_place", stackPlaceLabel(a.stackPlace))) {
-						for (p in 0...3)
-							if (ImGui.selectable(stackPlaceLabel(p) + "##ab_stackp_" + p, a.stackPlace == p)) {
-								a.stackPlace = p;
-								SettingsStore.markDirty();
-							}
-						ImGui.endCombo();
-					}
-				}, "Places the tracked stack count above, over, or below the aura face.");
-				UiLayout.propertyRow("Badge size", function() {
-					if (BuilderSlider.draw("##ab_stack_scale", a.stackScale, 0.5, 3, "%.2fx"))
-						SettingsStore.markDirty();
-				});
+				if (a.stackCounter.get()) drawBadgeRows(a, false);
+				if (a.isCounter.get()) drawBadgeRows(a, true);
 			});
 		}
 		syncGlowColor(a);
@@ -1165,6 +1158,11 @@ class AuraBuilder {
 		});
 		UiLayout.propertyRow("On aura", function() {
 			if (ImGui.checkbox("Show time##ab_cd_force", a.showCountdown)) SettingsStore.markDirty();
+			var previousGlobal=a.useGlobalCountdown.get();
+			if (ImGui.checkbox("Use global countdown##ab_global_countdown", a.useGlobalCountdown)) {
+				var value=a.useGlobalCountdown.get(); a.useGlobalCountdown.set(previousGlobal);
+				snapshot("Global countdown"); a.useGlobalCountdown.set(value); SettingsStore.markDirty();
+			}
 			ImGui.beginDisabled(!a.showCountdown.get());
 			if (ImGui.beginCombo("##ab_cd_place", countdownPlaceLabel(a.countdownPlace))) {
 				for (place in 0...3)
@@ -1200,7 +1198,6 @@ class AuraBuilder {
 		a.timerMode = mode;
 		AuraTimer.reset(a);
 		if (mode != AuraTimer.MODE_OFF) {
-			a.showCountdown.set(true);
 			primeTimerSeconds(a);
 		}
 		SettingsStore.markDirty();
@@ -1214,11 +1211,30 @@ class AuraBuilder {
 	}
 
 	inline function listedTimerSpan(a:AuraDef):Float {
+		var signal = timingSignal(a);
+		if (AuraTimingReferencePolicy.isCast(signal)) return AuraTimingReferences.forSubject(a.timingSubjectId(), signal).castSeconds;
+		if (AuraTimingReferencePolicy.isCooldown(signal)) return AuraTimingReferences.forSubject(a.timingSubjectId(), signal).cdbSeconds;
 		return solarflare.cdb.CdbAuraTable.listedSpan(a.timingSubjectId());
+	}
+
+	function timingSignal(a:AuraDef):String {
+		if (a.rule != null && a.rule.hasConditions()) {
+			var index = a.rule.presentationSource;
+			if (index < 0 || index >= a.rule.conditions.length) index = 0;
+			var condition = a.rule.conditions[index];
+			if (condition != null) return condition.signal;
+		}
+		return a.trigger == "combatlog" ? "event.cast.recent" : a.trigger == "cooldown" ? "skill.ready" : "";
 	}
 
 	function timingReadout(a:AuraDef):String {
 		var subj = a.timingSubjectId();
+		var signal = timingSignal(a);
+		if (AuraTimingReferencePolicy.isCast(signal)) {
+			var ref = AuraTimingReferences.forSubject(subj, signal);
+			return ref.castLabel + (ref.castSeconds > 0 ? " · " + Math.round(ref.castSeconds * 1000) / 1000 + "s" : "")
+				+ " · Manual seconds apply to this aura only.";
+		}
 		var cdb = listedTimerSpan(a);
 		var grant = CdbAuraTable.grantedStatusId(subj);
 		var live = a.timerInfinite ? "inf" : (Math.isFinite(a.timeLeft) ? (Math.round(a.timeLeft * 10) / 10) + "s" : "unknown");
@@ -1230,25 +1246,54 @@ class AuraBuilder {
 		return "Live " + live + " · CastleDB " + baked + extra;
 	}
 
-	/** Kill / activation counter, kept beside the timer since users reach for both. */
-	function drawCounterRow(a:AuraDef):Void {
-		UiLayout.propertyRow("Counter", function() {
-			if (ImGui.checkbox("Count activations##ab_counter", a.isCounter)) {
-				if (a.isCounter.get())
-					a.stackCounter.set(false);
+	function drawBadgeRows(a:AuraDef, counter:Bool):Void {
+		var label = counter ? "Counter" : "Stacks";
+		var id = counter ? "counter" : "stack";
+		var place = counter ? a.counterPlace : a.stackPlace;
+		UiLayout.propertyRow(label + " position", function() {
+			if (ImGui.beginCombo("##ab_" + id + "_place", stackPlaceLabel(place))) {
+				try {
+					for (p in 0...3) {
+						if (ImGui.selectable(stackPlaceLabel(p) + "##ab_" + id + "p_" + p, place == p)) {
+							snapshot(label + " position");
+							if (counter) a.counterPlace = p; else a.stackPlace = p;
+							SettingsStore.markDirty();
+						}
+					}
+				} catch (e:Dynamic) { ImGui.endCombo(); throw e; }
+				ImGui.endCombo();
+			}
+		}, "Timer, Stacks and Counter sharing a position use separate lanes.");
+		UiLayout.propertyRow(label + " size", function() {
+			var ref = counter ? a.counterScale : a.stackScale;
+			var before = ref.get();
+			if (BuilderSlider.draw("##ab_" + id + "_scale", ref, 0.5, 3, "%.2fx")) {
+				var after = ref.get(); ref.set(before);
+				snapshot(label + " size"); ref.set(after);
 				SettingsStore.markDirty();
 			}
-			if (!a.isCounter.get())
-				return;
+		});
+	}
+
+	/** Activation total is independent of the live Stacks badge. */
+	function drawCounterRow(a:AuraDef):Void {
+		UiLayout.propertyRow("Counter", function() {
+			var before = a.isCounter.get();
+			if (ImGui.checkbox("Count activations##ab_counter", a.isCounter)) {
+				var after = a.isCounter.get(); a.isCounter.set(before);
+				snapshot("Count activations"); a.isCounter.set(after);
+				SettingsStore.markDirty();
+			}
+			if (!a.isCounter.get()) return;
 			ImGui.sameLine(0, 8);
 			ImGui.textDisabled("= " + a.counterValue);
 			ImGui.sameLine(0, 6);
 			if (ImGui.smallButton("Reset##ab_reset_count")) {
+				snapshot("Reset Counter");
 				a.counterValue = 0;
-				a.stacks = 1;
 				SettingsStore.markDirty();
 			}
-		}, "Increments every time the condition becomes true. Survives reloads. Mutually exclusive with the Stacks badge.");
+		}, "Increments every time the condition becomes true. Survives reloads. Independent of live Stacks.");
 	}
 
 	function drawThenPreview(a:AuraDef):Void {
@@ -1317,7 +1362,7 @@ class AuraBuilder {
 		if (UiChrome.navButton("Combat Logs##ab_library_combat_logs", combatLogsOpen, ImGui.vec2(-1, 28))) openCombatLogs();
 		ImGui.beginDisabled(atCap);
 		try {
-			if (UiChrome.accentButton("Start with blank aura##ab_quick_blank", ImGui.vec2(-1, 28))) createBlankFromHome();
+			if (UiChrome.ghostButton("Start with blank aura##ab_quick_blank", ImGui.vec2(-1, 28))) createBlankFromHome();
 			if (UiChrome.ghostButton("Quick Build##ab_library_quick_build", ImGui.vec2(-1, 28))) quickBuild.start();
 		} catch (e:Dynamic) { ImGui.endDisabled(); throw e; }
 		ImGui.endDisabled();
@@ -1376,7 +1421,7 @@ class AuraBuilder {
 				default: ImGui.textWrapped("Unknown mode.");
 			}
 			ImGui.separator();
-			if (ImGui.button("Close##ab_wiz_cancel", ImGui.vec2(100, 28))) ImGui.closeCurrentPopup();
+			if (UiChrome.ghostButton("Close##ab_wiz_cancel", ImGui.vec2(100, 28))) ImGui.closeCurrentPopup();
 		} catch (e:Dynamic) { ImGui.endPopup(); throw e; }
 		ImGui.endPopup();
 	}
@@ -1465,9 +1510,9 @@ class AuraBuilder {
 				ImGui.textDisabled("The selected display name is saved with the authoritative skill/status ID.");
 			}
 			ImGui.spacing();
-			if (ImGui.button("<- Back##wiz_boss_b1", ImGui.vec2(80, 28))) wizardStep = 0;
+			if (UiChrome.ghostButton("<- Back##wiz_boss_b1", ImGui.vec2(80, 28))) wizardStep = 0;
 			ImGui.sameLine();
-			if (ImGui.button("Next ->##wiz_boss_next", ImGui.vec2(100, 28))) wizardStep = 2;
+			if (UiChrome.ghostButton("Next ->##wiz_boss_next", ImGui.vec2(100, 28))) wizardStep = 2;
 		}
 		if (wizardStep == 2) {
 			formLabel("Show alert");
@@ -1478,7 +1523,7 @@ class AuraBuilder {
 				ImGui.endCombo();
 			}
 			ImGui.spacing();
-			if (ImGui.button("<- Back##wiz_boss_back", ImGui.vec2(80, 28))) {
+			if (UiChrome.ghostButton("<- Back##wiz_boss_back", ImGui.vec2(80, 28))) {
 				wizardStep = (wizardSignal == "target.isBoss" || wizardSignal == "target.hpRatio" || wizardSignal == "combat.damageTakenRecent") ? 0 : 1;
 			}
 			ImGui.sameLine();
@@ -1517,7 +1562,7 @@ class AuraBuilder {
 			if (wizardPreset == "skillReady") {
 				ImGui.textWrapped("Template behavior: show when the selected skill is ready.");
 				if (wizardSubject.length == 0) ImGui.beginDisabled();
-				if (UiChrome.accentButton("Continue##wiz_skill_template_next", ImGui.vec2(120, 28))) wizardStep = 1;
+				if (UiChrome.ghostButton("Continue##wiz_skill_template_next", ImGui.vec2(120, 28))) wizardStep = 1;
 				if (wizardSubject.length == 0) ImGui.endDisabled();
 			} else {
 				ImGui.textWrapped("What to track:");
@@ -1544,7 +1589,7 @@ class AuraBuilder {
 				ImGui.endCombo();
 			}
 			ImGui.spacing();
-			if (ImGui.button("<- Back##wiz_skill_back", ImGui.vec2(80, 28))) wizardStep = 0;
+			if (UiChrome.ghostButton("<- Back##wiz_skill_back", ImGui.vec2(80, 28))) wizardStep = 0;
 			ImGui.sameLine();
 			if (wizardSubject.length == 0) ImGui.beginDisabled();
 			if (UiChrome.accentButton("Create Aura##wiz_skill_create", ImGui.vec2(120, 28))) { finishWizard(); ImGui.closeCurrentPopup(); }
@@ -1589,7 +1634,7 @@ class AuraBuilder {
 				ImGui.endCombo();
 			}
 			ImGui.spacing();
-			if (ImGui.button("<- Back##wiz_util_back", ImGui.vec2(80, 28))) wizardStep = 0;
+			if (UiChrome.ghostButton("<- Back##wiz_util_back", ImGui.vec2(80, 28))) wizardStep = 0;
 			ImGui.sameLine();
 			if (UiChrome.accentButton("Create Aura##wiz_util_create", ImGui.vec2(120, 28))) { finishWizard(); ImGui.closeCurrentPopup(); }
 		}
@@ -1728,6 +1773,7 @@ class AuraBuilder {
 				a.isCounter.set(false);
 			}
 		}
+		AuraPresentationDefaults.fresh(a);
 		applyBehavior(a, wizardBehavior);
 		if (setupIssue(a).length == 0)
 			a.enabled.set(true);
@@ -1816,7 +1862,7 @@ class AuraBuilder {
 				var share = ShareCodec.wrapJson(Json.stringify(AuraEngine.toObj(a)));
 				UiActionQueue.copyText(share, 'Copied share key for ${a.name}');
 			}
-			if (a.isCounter.get() && ImGui.menuItem("Reset Counter")) { a.counterValue = 0; a.stacks = 1; SettingsStore.markDirty(); ToastManager.info('Counter reset for ${a.name}'); }
+			if (a.isCounter.get() && ImGui.menuItem("Reset Counter")) { snapshot("Reset Counter"); a.counterValue = 0; SettingsStore.markDirty(); ToastManager.info('Counter reset for ${a.name}'); }
 			ImGui.separator();
 			if (ImGui.menuItem("Delete Aura")) {
 				snapshot('Delete ${a.name}');
@@ -1894,7 +1940,7 @@ class AuraBuilder {
 	}
 
 	function drawCanvasElements(a:AuraDef):Void {
-		ImGui.textDisabled("Tokens: {time} {stacks} {name}");
+		ImGui.textDisabled("Tokens: {time} {stacks} {counter} {name}");
 		ImGui.textDisabled("Direct stage drag deferred - canvas locals are unscaled vs outer Scale.");
 		if (a.canvasElements == null) a.canvasElements = [];
 		if (ImGui.smallButton("+ Text##ab_cv_add_txt")) { snapshot("Canvas Add Text"); a.canvasElements.push(AuraCanvasElement.text("{name}", 8, 8, 16)); canvasSel = a.canvasElements.length - 1; SettingsStore.markDirty(); }
@@ -1932,6 +1978,8 @@ class AuraBuilder {
 			if (ImGui.smallButton("{time}##ab_tok_t")) { el.content += "{time}"; ByteUtil.fillBuf(canvasContentBuf, CANVAS_CONTENT_BUF, el.content); SettingsStore.markDirty(); }
 			ImGui.sameLine();
 			if (ImGui.smallButton("{stacks}##ab_tok_s")) { el.content += "{stacks}"; ByteUtil.fillBuf(canvasContentBuf, CANVAS_CONTENT_BUF, el.content); SettingsStore.markDirty(); }
+			ImGui.sameLine(0, 4);
+			if (ImGui.smallButton("{counter}##ab_tok_c")) { el.content += "{counter}"; ByteUtil.fillBuf(canvasContentBuf, CANVAS_CONTENT_BUF, el.content); SettingsStore.markDirty(); }
 			ImGui.sameLine();
 			if (ImGui.smallButton("{name}##ab_tok_n")) { el.content += "{name}"; ByteUtil.fillBuf(canvasContentBuf, CANVAS_CONTENT_BUF, el.content); SettingsStore.markDirty(); }
 		}
@@ -2033,15 +2081,15 @@ class AuraBuilder {
 			if (a != null) drawShare(a);
 			else {
 				ImGui.textWrapped("Select an aura to copy its share key, or import a pack into the library.");
-				if (ImGui.button("Paste & Import from Clipboard##ab_clip_import_empty", ImGui.vec2(260, 26))) { UiActionQueue.enqueue(UiActionKind.ImportAuraClipboard); setIoStatus("Aura import queued from clipboard.", false); }
+				if (UiChrome.ghostButton("Paste & Import from Clipboard##ab_clip_import_empty", ImGui.vec2(260, 26))) { UiActionQueue.enqueue(UiActionKind.ImportAuraClipboard); setIoStatus("Aura import queued from clipboard.", false); }
 				ImGui.sameLine();
-				if (ImGui.button("Copy Entire Library##ab_copy_all_empty", ImGui.vec2(180, 26))) { UiActionQueue.enqueue(UiActionKind.ExportAuraPack); setIoStatus("Aura pack export queued.", false); }
+				if (UiChrome.ghostButton("Copy Entire Library##ab_copy_all_empty", ImGui.vec2(180, 26))) { UiActionQueue.enqueue(UiActionKind.ExportAuraPack); setIoStatus("Aura pack export queued.", false); }
 				ImGui.inputTextMultiline("##ab_import_area_empty", importBuf, JSON_BUF, ImGui.vec2(520, 120));
-				if (ImGui.button("Import from Text Box##ab_do_import_empty", ImGui.vec2(180, 26))) importJson();
+				if (UiChrome.ghostButton("Import from Text Box##ab_do_import_empty", ImGui.vec2(180, 26))) importJson();
 				if (ioStatus.length > 0) ImGui.textColored(ioStatusError ? ImGui.vec4(1, 0.35, 0.35, 1) : ImGui.vec4(0.35, 0.9, 0.5, 1), ioStatus);
 			}
 			ImGui.separator();
-			if (ImGui.button("Close##ab_io_close", ImGui.vec2(120, 28))) ImGui.closeCurrentPopup();
+			if (UiChrome.ghostButton("Close##ab_io_close", ImGui.vec2(120, 28))) ImGui.closeCurrentPopup();
 			ImGui.endPopup();
 		}
 	}
@@ -2097,22 +2145,22 @@ class AuraBuilder {
 		if (a == null) return;
 		ImGui.pushID_Str("ab_window_controls_toolbar");
 		try {
-			if (UiChrome.toggleChip("Show##ab_visible", a.enabled, ImGui.vec2(52, 26))) {
+			if (UiChrome.toggleChip("Show##ab_visible", a.enabled, ImGui.vec2(72, 26), false)) {
 				if (a.enabled.get()) a.visual.set(true);
 				SettingsStore.markDirty();
 			}
 			ImGui.sameLine(0, 6);
-			if (UiChrome.toggleChip("Lock##ab_lock", a.chrome.locked, ImGui.vec2(52, 26))) {
+			if (UiChrome.toggleChip("Lock##ab_lock", a.chrome.locked, ImGui.vec2(72, 26), false)) {
 				cfg.unlockAll.set(false);
 				SettingsStore.markDirty();
 			}
 			ImGui.sameLine(0, 6);
-			if (UiChrome.toggleChip("Always On##ab_always", a.alwaysOn, ImGui.vec2(88, 26)))
+			if (UiChrome.toggleChip("Always On##ab_always", a.alwaysOn, ImGui.vec2(112, 26), false))
 				SettingsStore.markDirty();
 			if (ImGui.isItemHovered())
 				ImGui.setTooltip("Always On keeps display visible; conditions still drive counters and alerts.");
 			ImGui.sameLine(0, 6);
-			if (UiChrome.toggleChip("Transparent##ab_transparent", a.chrome.transparent, ImGui.vec2(92, 26)))
+			if (UiChrome.toggleChip("Transparent##ab_transparent", a.chrome.transparent, ImGui.vec2(128, 26), false))
 				SettingsStore.markDirty();
 		} catch (e:Dynamic) { ImGui.popID(); throw e; }
 		ImGui.popID();
@@ -2163,12 +2211,20 @@ class AuraBuilder {
 	}
 
 	function drawIconPicker(a:AuraDef):Void {
+		UiLayout.propertyGrid("##ab_icon_visibility", function() {
+			UiLayout.propertyRow("Icon visibility", function() {
+				var before=a.showIcon.get();
+				if (ImGui.checkbox("Show icon##ab_show_icon",a.showIcon)) {
+					var value=a.showIcon.get(); a.showIcon.set(before); snapshot("Icon visibility"); a.showIcon.set(value); SettingsStore.markDirty();
+				}
+			},"Tracking, text and enabled badges remain active when the icon is hidden.");
+		});
 		var key = a.preferredIconId();
 		if (!GameIcons.imageKey(key, 44, 44)) {
 			drawIconPlaceholder(key, 44, 44); ImGui.sameLine();
 			ImGui.textDisabled(key.length > 0 ? "Icon art is loading or unavailable." : "No automatic icon is available.");
 		} else { ImGui.sameLine(); ImGui.textWrapped((a.iconId.length > 0 ? "Custom: " : "Automatic: ") + key); }
-		if (a.iconId.length > 0 && ImGui.button("Use Automatic Icon##ab_icon_auto")) { a.iconId = ""; a.plate = ""; a.syncIconBuf(); SettingsStore.markDirty(); }
+		if (a.iconId.length > 0 && UiChrome.ghostButton("Use Automatic Icon##ab_icon_auto")) { a.iconId = ""; a.plate = ""; a.syncIconBuf(); SettingsStore.markDirty(); }
 		formLabel("Custom Icon ID"); ImGui.setNextItemWidth(-1);
 		if (ImGui.inputText("##ab_icon_custom", a.iconBuf, AuraDef.ICON_BUF)) { a.iconId = StringTools.trim(readBytes(a.iconBuf, AuraDef.ICON_BUF)); a.plate = ""; SettingsStore.markDirty(); }
 		formLabel("Search Icons"); ImGui.setNextItemWidth(-1);
@@ -2300,7 +2356,7 @@ class AuraBuilder {
 				el.content = StringTools.trim(readBytes(canvasQuickBuf, CANVAS_CONTENT_BUF));
 				SettingsStore.markDirty();
 			}
-		}, "Tokens: {time} {stacks} {name}. Full placement lives in Canvas Elements below.");
+		}, "Tokens: {time} {stacks} {counter} {name}. Full placement lives in Canvas Elements below.");
 	}
 
 	static function hasAlertEffect(a:AuraDef):Bool {
@@ -2342,14 +2398,14 @@ class AuraBuilder {
 
 	function drawShare(a:AuraDef):Void {
 		if (ImGui.collapsingHeader("Share or Back Up##ab_export_sec", imgui.Enums.ImGuiTreeNodeFlags.DefaultOpen)) {
-			if (ImGui.button("Copy Selected to Clipboard##ab_copy_sel", ImGui.vec2(190, 26))) {
+			if (UiChrome.ghostButton("Copy Selected to Clipboard##ab_copy_sel", ImGui.vec2(190, 26))) {
 				exportString = ShareCodec.wrapJson(Json.stringify(AuraEngine.toObj(a)));
 				fillBuf(exportBuf, JSON_BUF, exportString);
 				UiActionQueue.copyText(exportString, 'Aura "${a.name}" share key copied!');
 				setIoStatus('Aura "${a.name}" queued for clipboard copy.', false);
 			}
 			ImGui.sameLine();
-			if (ImGui.button("Copy Entire Library##ab_copy_all", ImGui.vec2(160, 26))) { UiActionQueue.enqueue(UiActionKind.ExportAuraPack); setIoStatus("Aura pack export queued.", false); }
+			if (UiChrome.ghostButton("Copy Entire Library##ab_copy_all", ImGui.vec2(160, 26))) { UiActionQueue.enqueue(UiActionKind.ExportAuraPack); setIoStatus("Aura pack export queued.", false); }
 			if (exportString.length > 0) {
 				ImGui.textDisabled("Share key preview (canonical string unchanged - use Copy):");
 				ImGui.beginChild("##ab_export_preview", ImGui.vec2(-1, 80), ImGuiChildFlags.Borders);
@@ -2358,9 +2414,9 @@ class AuraBuilder {
 			}
 		}
 		if (ImGui.collapsingHeader("Import Aura Share Key / JSON##ab_import_sec", imgui.Enums.ImGuiTreeNodeFlags.DefaultOpen)) {
-			if (ImGui.button("Paste & Import from Clipboard##ab_clip_import", ImGui.vec2(220, 26))) { UiActionQueue.enqueue(UiActionKind.ImportAuraClipboard); setIoStatus("Aura import queued from clipboard.", false); }
+			if (UiChrome.ghostButton("Paste & Import from Clipboard##ab_clip_import", ImGui.vec2(220, 26))) { UiActionQueue.enqueue(UiActionKind.ImportAuraClipboard); setIoStatus("Aura import queued from clipboard.", false); }
 			ImGui.sameLine();
-			if (ImGui.button("Import from Text Box##ab_do_import", ImGui.vec2(160, 26))) importJson();
+			if (UiChrome.ghostButton("Import from Text Box##ab_do_import", ImGui.vec2(160, 26))) importJson();
 			ImGui.inputTextMultiline("##ab_import_area", importBuf, JSON_BUF, ImGui.vec2(-1, 70));
 		}
 		if (ioStatus.length > 0) ImGui.textColored(ioStatusError ? ImGui.vec4(1, 0.35, 0.35, 1) : ImGui.vec4(0.35, 0.9, 0.5, 1), ioStatus);

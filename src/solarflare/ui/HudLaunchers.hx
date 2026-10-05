@@ -155,8 +155,8 @@ class HudLaunchers {
 		var chrome = f6.chrome;
 		var collapsed = chrome.isCollapsed();
 		var width:Single = clamp(f6.size.get(), F6_MIN, F6_MAX);
-		var tw = GameIcons.texW("menubutton");
-		var th = GameIcons.texH("menubutton");
+		var tw = GameIcons.texW(GameIcons.F6_MENU);
+		var th = GameIcons.texH(GameIcons.F6_MENU);
 		var ratio:Single = tw > 0 && th > 0 ? th / tw : 1;
 		var height:Single = Math.max(MENU_GRIP, width * ratio);
 		ImGui.setNextWindowBgAlpha(0);
@@ -175,7 +175,7 @@ class HudLaunchers {
 		var flags = chrome.windowFlagsKeepClicks(FLAGS) | ImGuiWindowFlags.NoMove;
 		if (collapsed) flags |= ImGuiWindowFlags.NoResize;
 		var shown = ImGui.begin("SolarFlare F6Btn", null, flags);
-		if (shown) {
+		try { if (shown) {
 			chrome.capturePos();
 			var win = ImGui.getWindowSize();
 			if (!collapsed) {
@@ -195,7 +195,6 @@ class HudLaunchers {
 							Math.max(MENU_GRIP, next * ratio)));
 						SettingsStore.markDirty();
 					});
-				chrome.pollTransparentSurfaceDrag("f6_launcher", !chrome.isLocked());
 			}
 			var origin = ImGui.getCursorScreenPos();
 			ImGui.dummy(win);
@@ -204,16 +203,24 @@ class HudLaunchers {
 			if (!collapsed) {
 				var x:Single = origin.x + MENU_GRIP;
 				var dl = ImGui.getWindowDrawList();
-				if (!GameIcons.drawRect(dl, GameIcons.get("menubutton"), x, origin.y, width, width * ratio))
-					ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, origin.y), ImGui.vec2(x + width, origin.y + height),
-						ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.9, 0.45, 0.12, 0.9)), 8);
 				ImGui.setCursorScreenPos(ImGui.vec2(x, origin.y));
-				if (ImGui.invisibleButton("##menu_open", ImGui.vec2(width - GRIP, Math.max(14, height - GRIP)))) {
+				var strip=hitStrip(f6);
+				if (ImGui.invisibleButton("##menu_open", ImGui.vec2(width - strip, Math.max(14, height - strip)))) {
 					hubOpen.set(!hubOpen.get());
 					SettingsStore.markDirty();
 				}
+				var hovered=ImGui.isItemHovered();
+				// The button owns input before the image. Keyed drawing retains the correct atlas UVs.
+				if (!GameIcons.drawKey(dl, GameIcons.F6_MENU, x, origin.y, width, width * ratio)) {
+					ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, origin.y), ImGui.vec2(x + width, origin.y + height),
+						ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.9, 0.45, 0.12, 0.9)), 8);
+					var label="MENU"; var textSize=ImGui.calcTextSize(label);
+					ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x+(width-textSize.x)/2,origin.y+(height-textSize.y)/2),0xFFFFFFFF,label);
+				}
+				if (hovered) ImGui.setTooltip("Open / close SolarFlare (F6)");
+				chrome.pollTransparentSurfaceDrag("f6_launcher", !chrome.isLocked());
 			}
-		}
+		} } catch(e:Dynamic) { ImGui.end(); throw e; }
 		ImGui.end();
 	}
 

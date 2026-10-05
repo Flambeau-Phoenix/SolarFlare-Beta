@@ -8,6 +8,10 @@ class CastSnap {
 	public var elapsed:Float = 0;
 	public var remaining:Float = 0;
 	public var duration:Float = 0;
+	public var observedRank:Null<Int> = null;
+	public var durationSource:String = "unknown";
+	public var durationEstimated:Bool = true;
+	public var rawDuration:Float = 0;
 	public var progress:Float = 0;
 	public var observedAt:Float = 0;
 
@@ -20,6 +24,10 @@ class CastSnap {
 		elapsed = 0;
 		remaining = 0;
 		duration = 0;
+		observedRank = null;
+		durationSource = "unknown";
+		durationEstimated = true;
+		rawDuration = 0;
 		progress = 0;
 		observedAt = 0;
 	}
@@ -35,6 +43,10 @@ class CastSnap {
 		elapsed = src.elapsed;
 		remaining = src.remaining;
 		duration = src.duration;
+		observedRank = src.observedRank;
+		durationSource = src.durationSource;
+		durationEstimated = src.durationEstimated;
+		rawDuration = src.rawDuration;
 		progress = src.progress;
 		observedAt = src.observedAt;
 	}

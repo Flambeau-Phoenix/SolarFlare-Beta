@@ -465,8 +465,8 @@ class GeauxBuilder {
 					for (i in 0...modes.length) if (ImGui.selectable(modes[i], current == i)) { snapshot("Ready glow"); style.readyAttention.set(i); SettingsStore.markDirty(); }
 					ImGui.endCombo();
 				}
-			}, "Cooldown completion flashes for 15 seconds. Proc alerts retain their own duration.");
-			// Procs use these settings even when the ready flash uses another attention mode.
+			}, "Cooldown completion flashes for 15 seconds.");
+			// Shared appearance settings for cooldown-completion flashes.
 			UiLayout.propertyRow("Glow style", function() {
 				if (ImGui.beginCombo("##gb_glow_style", style.glowStyle)) {
 					for (name in ["proc", "soft", "pulse"]) if (ImGui.selectable(name + "##gb_gs_" + name, style.glowStyle == name)) {

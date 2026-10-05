@@ -143,6 +143,7 @@ class TelemetryKernel {
 
 		if (now - lastBackground >= BACKGROUND_S) {
 			lastBackground = now;
+			try solarflare.castbar.LearnedCastTimes.tick(now) catch (_:Dynamic) {}
 			RuntimeMetrics.backgroundPasses++;
 			try if (restoreNativeChat != null) restoreNativeChat() catch (_:Dynamic) {}
 			try {

@@ -94,6 +94,9 @@ class AuraConfig {
 
 	public static function fromDyn(d:Dynamic):AuraDef {
 		var a = new AuraDef(Std.string(d.id), d.name != null ? Std.string(d.name) : Std.string(d.id));
+		// Preserve the original face for legacy records without a region.
+		a.region = d.region != null ? Std.string(d.region) : "bar";
+		a.useGlobalCountdown.set(AuraPresentationPolicy.flag(d,"useGlobalCountdown",true));
 		if (d.enabled == false)
 			a.enabled.set(false);
 		if (d.trigger != null)
@@ -154,10 +157,8 @@ class AuraConfig {
 		}
 		if (d.scale != null)
 			a.scale.set(d.scale);
-		if (d.showIcon == false)
-			a.showIcon.set(false);
-		if (d.progressRing == false)
-			a.progressRing.set(false);
+		a.showIcon.set(AuraPresentationPolicy.flag(d,"showIcon",a.showIcon.get()));
+		a.progressRing.set(AuraPresentationPolicy.flag(d,"progressRing",a.progressRing.get()));
 		if (d.showCountdown == true)
 			a.showCountdown.set(true);
 		if (d.countdownScale != null)
@@ -190,12 +191,11 @@ class AuraConfig {
 		if (d.textSize != null) a.textSize.set(AuraTextLayout.fontSize(d.textSize));
 		if (d.stackCounter == true)
 			a.stackCounter.set(true);
-		if (d.stackScale != null)
-			a.stackScale.set(d.stackScale);
-		if (d.stackPlace != null)
-			a.stackPlace = Std.int(d.stackPlace);
-		if (d.showLabel == false)
-			a.showLabel.set(false);
+		a.stackScale.set(AuraBadgePolicy.scale(d.stackScale));
+		a.stackPlace = AuraBadgePolicy.stackPlace(d);
+		a.counterPlace = AuraBadgePolicy.counterPlace(d);
+		a.counterScale.set(AuraBadgePolicy.counterScale(d));
+		a.showLabel.set(AuraPresentationPolicy.flag(d,"showLabel",a.showLabel.get()));
 		if (d.isCounter == true)
 			a.isCounter.set(true);
 		if (d.w != null)
@@ -234,8 +234,11 @@ class AuraConfig {
 				var carr:Array<Dynamic> = cast rawCanvas;
 				var ci = 0;
 				while (ci < carr.length) {
-					if (carr[ci] != null)
-						a.canvasElements.push(AuraCanvasElement.fromDyn(carr[ci]));
+					if (carr[ci] != null) {
+						var el = AuraCanvasElement.fromDyn(carr[ci]);
+						el.content = AuraBadgePolicy.migrateContent(d, el.kind, el.content);
+						a.canvasElements.push(el);
+					}
 					ci++;
 				}
 			}
@@ -313,7 +316,7 @@ class AuraConfig {
 		low.op = "below";
 		low.pct = 35;
 		low.pctRef.set(35);
-		low.region = "bar";
+		low.region = "icon";
 		low.chrome.x.set(220);
 		low.chrome.y.set(160);
 		auras.push(low);

@@ -78,7 +78,6 @@ class AuraOverlay {
 		}, openBuilder, function() { a.enabled.set(false); SettingsStore.markDirty(); }, false, function() {
 			if (a.isCounter.get() && ImGui.menuItem("Reset Counter")) {
 				a.counterValue = 0;
-				a.stacks = 1;
 				SettingsStore.markDirty();
 			}
 		}, function(newW:Single, newH:Single) {

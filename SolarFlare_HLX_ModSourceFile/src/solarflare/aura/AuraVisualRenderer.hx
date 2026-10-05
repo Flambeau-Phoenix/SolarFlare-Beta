@@ -23,6 +23,7 @@ class AuraVisualRenderer {
 	static var faceFx:Bool = true;
 	/** Maximum procOverlay reach: icon outset 2 + bloom 10 + stroke/AA 2. */
 	public static inline var GLOW_REACH:Float = 14;
+	static var badgeLayout = new AuraBadgeLayout();
 
 	/** Measure the same face and plates as draw(), before choosing the host/preview clip. */
 	public static function measureBounds(a:AuraDef, w:Single, h:Single, stacks:Int, counterValue:Int,
@@ -34,7 +35,7 @@ class AuraVisualRenderer {
 		var fy:Single = 0;
 		var fw:Single = w;
 		var fh:Single = h;
-		var icon = a.region == "icon" || (a.region == "canvas" && (a.canvasElements == null || a.canvasElements.length == 0));
+		var icon = a.region == "icon";
 		if (icon) {
 			var labelH:Single = a.showLabel.get() ? Math.min(22, h * 0.24) : 0;
 			fw = fh = Math.min(w, h - labelH);
@@ -47,8 +48,6 @@ class AuraVisualRenderer {
 		} else if (a.region == "text") {
 			var ts = measureTextFace(a, w, vectorScale);
 			out.include((w - ts.x) * 0.5, (h - ts.y) * 0.5, ts.x, ts.y);
-			fy = (h + ts.y) * 0.5;
-			fh = ts.y;
 		} else if (a.region != "canvas" && a.showLabel.get()) {
 			var ts = ImGui.calcTextSize(a.displayLabel());
 			out.include((w - ts.x) * 0.5, (h - ts.y) * 0.5, ts.x, ts.y);
@@ -60,32 +59,21 @@ class AuraVisualRenderer {
 			out.include(fx - reach, fy - reach, fw + reach * 2, fh + reach * 2);
 		}
 		if (a.region == "canvas" && !icon) {
-			for (el in a.canvasElements) {
+			for (el in (a.canvasElements != null ? a.canvasElements : [])) {
 				if (el == null) continue;
 				if (el.kind == AuraCanvasElement.KIND_ICON) {
+					if (!a.showIcon.get()) continue;
 					out.include(el.x * vectorScale, el.y * vectorScale,
 						el.w > 1 ? el.w * vectorScale : w, el.h > 1 ? el.h * vectorScale : h);
 				} else {
-					var ts = textSize(formatTokens(el.content, a, a.stackCounter.get() ? stacks : counterValue),
+					var ts = textSize(formatTokens(el.content, a, stacks, counterValue),
 						(el.fontSize > 4 ? el.fontSize : 16) * vectorScale);
 					out.include(el.x * vectorScale, el.y * vectorScale, ts.x, ts.y);
 				}
 			}
 		}
-		if (wantCountdown(a)) {
-			var side = Math.min(fw, fh);
-			var size = HUDVisualBounds.fontSize(side, 0.34, a.countdownScale.get() * countdownGlobalScale);
-			var text = faceInf ? "\u221E" : formatRemain(faceLeft);
-			var ts = textSize(text, size);
-			// Reserve a stable usual timer width so second-by-second changes don't resize the host.
-			var reserve = textSize("00:00", size);
-			out.includePlate(fx, fy, fw, fh, Math.max(ts.x, reserve.x), Math.max(ts.y, reserve.y), a.countdownPlace);
-		}
-		if (a.region != "text" && ((a.stackCounter.get() && stacks >= 1) || a.isCounter.get())) {
-			var count = a.stackCounter.get() && stacks >= 1 ? stacks : counterValue;
-			var ts = textSize(Std.string(count), HUDVisualBounds.fontSize(Math.min(fw, fh), 0.28, a.stackScale.get()));
-			out.includePlate(fx, fy, fw, fh, ts.x, ts.y, a.stackPlace);
-		}
+		prepareBadges(a, 0, 0, w, h, stacks, counterValue);
+		badgeLayout.includeBounds(out);
 		if (a.showKey.get()) {
 			var key = AuraDef.sanitizeKey(a.keyText);
 			if (key.length > 0) {
@@ -155,24 +143,15 @@ class AuraVisualRenderer {
 		alpha *= clamp01(effectAlpha);
 		if (ghost)
 			alpha *= 0.38;
-		var count = stacks;
-		var showCount = false;
-		// Prefer status/resource stacks over activation counter when both are armed —
-		// otherwise "Count activations" silently steals the corner badge from Demonic Charge etc.
-		if (a.stackCounter != null && a.stackCounter.get() && stacks >= 1) {
-			showCount = true;
-			count = stacks;
-		} else if (a.isCounter != null && a.isCounter.get()) {
-			showCount = true;
-			count = counterValue;
-		}
 		var label = a.region == "text" ? (a.announce != null ? a.announce : "") : a.displayLabel();
 		if (a.region == "canvas") {
-			drawCanvas(dl, a, x, y, w, h, p, count, showCount, ghost, alpha, vectorScale);
+			drawCanvas(dl, a, x, y, w, h, p, stacks, counterValue, alpha, vectorScale);
+			drawBadges(dl, a, x, y, w, h, stacks, counterValue, alpha);
 			return;
 		}
 		if (a.region == "icon") {
-			drawIcon(dl, a, x, y, w, h, p, count, showCount, ghost, alpha, vectorScale);
+			drawIcon(dl, a, x, y, w, h, p, alpha, vectorScale);
+			drawBadges(dl, a, x, y, w, h, stacks, counterValue, alpha);
 			return;
 		}
 		var visibleLabel = a.showLabel != null && a.showLabel.get() ? label : "";
@@ -181,10 +160,7 @@ class AuraVisualRenderer {
 			var rad:Single = (w < h ? w : h) * 0.42;
 			if (faceFx && faceGlow) drawGlowRect(dl, x, y, w, h, a, alpha);
 			RingGauge.draw(dl, ImGui.vec2(x + w * 0.5, y + h * 0.5), rad, p, col, visibleLabel, vectorScale);
-			if (faceFx && wantCountdown(a))
-				drawCountdown(dl, x, y, w, h, a, alpha);
-			if (showCount)
-				drawStackDisplay(dl, x, y, w, h, count, a, alpha);
+			drawBadges(dl, a, x, y, w, h, stacks, counterValue, alpha);
 			return;
 		}
 		if (a.region == "text") {
@@ -197,40 +173,71 @@ class AuraVisualRenderer {
 					ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, alpha)), wrapped);
 			} catch (e:Dynamic) { ImGui.popFont(); throw e; }
 			ImGui.popFont();
-			if (faceFx && wantCountdown(a))
-				drawCountdown(dl, x, y + (h + ts.y) * 0.5, w, ts.y, a, alpha);
+			drawBadges(dl, a, x, y, w, h, stacks, counterValue, alpha);
 			return;
 		}
 		if (faceFx && faceGlow) drawGlowRect(dl, x + 4, y + 4, w - 8, h - 8, a, alpha);
 		VerticalBarGauge.draw(dl, x + 4, y + 4, w - 8, h - 8, p, col, visibleLabel);
-		if (faceFx && wantCountdown(a))
-			drawCountdown(dl, x + 4, y + 4, w - 8, h - 8, a, alpha);
-		if (showCount)
-			drawStackDisplay(dl, x, y, w, h, count, a, alpha);
+		drawBadges(dl, a, x, y, w, h, stacks, counterValue, alpha);
 	}
 
-	/** Stack / counter plate with the same Top / Center / Bottom placement model as countdown text. */
-	static function drawStackDisplay(dl:Dynamic, x:Single, y:Single, w:Single, h:Single,
-			count:Int, a:AuraDef, alpha:Float):Void {
-		var st = Std.string(count);
-		var side:Single = w < h ? w : h;
-		var scale = a.stackScale != null ? a.stackScale.get() : 1;
-		var fontSize:Single = HUDVisualBounds.fontSize(side, 0.28, scale);
-		ImGui.pushFont(ImGui.getFont(), fontSize);
-		try {
-			var ts = ImGui.calcTextSize(st);
-			var tx = x + (w - ts.x) * 0.5;
-			var ty:Single = HUDVisualBounds.plateY(y, h, ts.y, a.stackPlace);
-			var pad:Single = 4;
-			ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(tx - pad, ty - 2),
-				ImGui.vec2(tx + ts.x + pad, ty + ts.y + 2),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.03, 0.05, 0.82 * alpha)), 6);
-			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + 1, ty + 1),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.95 * alpha)), st);
-			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, alpha)), st);
-		} catch (e:Dynamic) { ImGui.popFont(); throw e; }
-		ImGui.popFont();
+	/** Both measurement and draw prepare exactly the same plates and face anchor. */
+	static function prepareBadges(a:AuraDef, x:Single, y:Single, w:Single, h:Single, stacks:Int, counter:Int):Void {
+		if (a.region == "icon") {
+			var labelH:Single = a.showLabel.get() ? Math.min(22, h * 0.24) : 0;
+			var side:Single = Math.min(w, h - labelH);
+			x += (w - side) * 0.5;
+			y += (h - labelH - side) * 0.5;
+			w = h = side;
+		}
+		var side = Math.min(w, h);
+		var timerText = faceInf ? "\u221E" : formatRemain(faceLeft);
+		measureBadge(0, faceFx && wantCountdown(a) && timerText.length > 0 && w >= 8 && h >= 8,
+			a.countdownPlace, timerText, HUDVisualBounds.fontSize(side, 0.34, a.countdownScale.get() * countdownGlobalScale));
+		measureBadge(1, a.stackCounter.get() && stacks >= 1, a.stackPlace, Std.string(stacks),
+			HUDVisualBounds.fontSize(side, 0.28, a.stackScale.get()));
+		measureBadge(2, a.isCounter.get(), a.counterPlace, Std.string(counter),
+			HUDVisualBounds.fontSize(side, 0.28, a.counterScale.get()));
+		badgeLayout.resolve(x, y, w, h);
+	}
+
+	static function measureBadge(index:Int, enabled:Bool, place:Int, text:String, size:Single):Void {
+		var tw:Float = 0;
+		var th:Float = 0;
+		if (enabled) {
+			var ts = textSize(text, size);
+			tw = ts.x;
+			th = ts.y;
+			if (index == 0) {
+				// Stable usual timer width prevents second-by-second host resizing.
+				var reserve = textSize("00:00", size);
+				tw = Math.max(tw, reserve.x);
+				th = Math.max(th, reserve.y);
+			}
+		}
+		badgeLayout.set(index, enabled, place, text, size, tw, th);
+	}
+
+	static function drawBadges(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single,
+			stacks:Int, counter:Int, alpha:Float):Void {
+		prepareBadges(a, x, y, w, h, stacks, counter);
+		for (i in 0...3) {
+			var s = badgeLayout.slots[i];
+			if (!s.enabled) continue;
+			ImGui.pushFont(ImGui.getFont(), s.fontSize);
+			try {
+				var ts = ImGui.calcTextSize(s.text);
+				var tx = s.x + (s.w - ts.x) * 0.5;
+				var ty = s.y + AuraBadgeLayout.PAD_Y;
+				ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(s.x, s.y), ImGui.vec2(s.x + s.w, s.y + s.h),
+					ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.03, 0.05, (i == 0 ? 0.72 : 0.82) * alpha)), 6);
+				ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + 1, ty + 1),
+					ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.95 * alpha)), s.text);
+				ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty),
+					ImGui.colorConvertFloat4ToU32(i == 0 ? ImGui.vec4(1, 0.95, 0.75, alpha) : ImGui.vec4(1, 1, 1, alpha)), s.text);
+			} catch (e:Dynamic) { ImGui.popFont(); throw e; }
+			ImGui.popFont();
+		}
 	}
 
 	static function bindFace(a:AuraDef, ghost:Bool, previewLeft:Null<Float>, previewGlow:Null<Bool>):Void {
@@ -246,13 +253,9 @@ class AuraVisualRenderer {
 
 	/** Freeform element placements + optional glow / fuse / countdown overlays. */
 	static function drawCanvas(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single,
-			progress:Float, count:Int, showCount:Bool, ghost:Bool, alpha:Float, vectorScale:Float):Void {
-		var els = a.canvasElements;
-		if (els == null || els.length == 0) {
-			// Fallback: treat like icon region when no freeform layout yet.
-			drawIcon(dl, a, x, y, w, h, progress, count, showCount, ghost, alpha, vectorScale);
-			return;
-		}
+			progress:Float, stacks:Int, counter:Int, alpha:Float, vectorScale:Float):Void {
+		// Empty canvas has no portrait until an icon element is explicitly added.
+		var els = a.canvasElements != null ? a.canvasElements : [];
 		if (faceFx && faceGlow) drawGlowRect(dl, x, y, w, h, a, alpha);
 
 		var i = 0;
@@ -262,6 +265,7 @@ class AuraVisualRenderer {
 			if (el == null)
 				continue;
 			if (el.kind == AuraCanvasElement.KIND_ICON) {
+				if (!a.showIcon.get()) continue;
 				var iw:Single = el.w > 1 ? el.w * vectorScale : w;
 				var ih:Single = el.h > 1 ? el.h * vectorScale : h;
 				var ex:Single = x + el.x * vectorScale;
@@ -275,7 +279,7 @@ class AuraVisualRenderer {
 				}
 			} else {
 				var raw = el.content != null ? el.content : "";
-				var formatted = formatTokens(raw, a, count);
+				var formatted = formatTokens(raw, a, stacks, counter);
 				var fontSize:Single = (el.fontSize > 4 ? el.fontSize : 16) * vectorScale;
 				ImGui.pushFont(ImGui.getFont(), fontSize);
 				try {
@@ -292,20 +296,17 @@ class AuraVisualRenderer {
 			else
 				drawFuse(dl, x, y, Math.min(w, h), progress, alpha);
 		}
-		if (faceFx && wantCountdown(a))
-			drawCountdown(dl, x, y, w, h, a, alpha);
-		if (showCount) {
-			drawStackDisplay(dl, x, y, w, h, count, a, alpha);
-		}
+
 	}
 
 	static function drawIcon(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single,
-			progress:Float, count:Int, showCount:Bool, ghost:Bool, alpha:Float, vectorScale:Float):Void {
+			progress:Float, alpha:Float, vectorScale:Float):Void {
 		var labelH:Single = a.showLabel != null && a.showLabel.get() ? Math.min(22, h * 0.24) : 0;
 		var iconH:Single = h - labelH;
 		var side:Single = w < iconH ? w : iconH;
 		var ix = x + (w - side) * 0.5;
 		var iy = y + (iconH - side) * 0.5;
+		if (a.showIcon.get()) {
 		var stem = a.preferredIconId();
 		var tex = GameIcons.get(stem);
 		var tint = ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, alpha));
@@ -316,6 +317,7 @@ class AuraVisualRenderer {
 			var mts = ImGui.calcTextSize(missing);
 			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(ix + (side - mts.x) * 0.5, iy + (side - mts.y) * 0.5),
 				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.7, 0.75, 0.82, alpha)), missing);
+		}
 		}
 		if (faceFx && faceGlow) {
 			drawGlowRect(dl, ix - 2, iy - 2, side + 4, side + 4, a, alpha);
@@ -331,10 +333,7 @@ class AuraVisualRenderer {
 			else
 				drawFuse(dl, ix, iy, side, progress, alpha);
 		}
-		if (faceFx && wantCountdown(a))
-			drawCountdown(dl, ix, iy, side, side, a, alpha);
-		if (showCount)
-			drawStackDisplay(dl, ix, iy, side, side, count, a, alpha);
+
 		if (labelH > 0) {
 			var label = a.displayLabel();
 			var ts = ImGui.calcTextSize(label);
@@ -389,35 +388,6 @@ class AuraVisualRenderer {
 		}
 	}
 
-	/**
-	 * Countdown plate over the aura face. Size/empty guards run before pushFont so the
-	 * matching popFont can never be skipped by an early return.
-	 */
-	static function drawCountdown(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, a:AuraDef, alpha:Float):Void {
-		var text = faceInf ? "\u221E" : formatRemain(faceLeft);
-		if (text.length == 0 || w < 8 || h < 8)
-			return;
-		var side:Single = w < h ? w : h;
-		var scale = (a.countdownScale != null ? a.countdownScale.get() : 1) * countdownGlobalScale;
-		var fontSize:Single = HUDVisualBounds.fontSize(side, 0.34, scale);
-		ImGui.pushFont(ImGui.getFont(), fontSize);
-		try {
-			var ts = ImGui.calcTextSize(text);
-			var tx = x + (w - ts.x) * 0.5;
-			var ty:Single = HUDVisualBounds.plateY(y, h, ts.y, a.countdownPlace);
-			var pad:Single = 4;
-			ImGui.ImDrawList_AddRectFilled(dl,
-				ImGui.vec2(tx - pad, ty - 2),
-				ImGui.vec2(tx + ts.x + pad, ty + ts.y + 2),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.02, 0.03, 0.05, 0.72 * alpha)), 6);
-			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + 1, ty + 1),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.95 * alpha)), text);
-			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 0.95, 0.75, alpha)), text);
-		} catch (e:Dynamic) { ImGui.popFont(); throw e; }
-		ImGui.popFont();
-	}
-
 	/** mm:ss above 60s, whole seconds 10-60s, one decimal below 10s. Empty when unknown. */
 	public static function formatRemain(secs:Float):String {
 		if (!Math.isFinite(secs) || secs < 0)
@@ -441,18 +411,7 @@ class AuraVisualRenderer {
 	 * infinite span has no seconds to compare against it, so the ceiling suppresses the glyph.
 	 */
 	static function wantCountdown(a:AuraDef):Bool {
-		if (faceInf) {
-			if (a.showCountdown != null && a.showCountdown.get())
-				return true;
-			return countdownAll && countdownCeiling <= 0;
-		}
-		if (!(Math.isFinite(faceLeft) && faceLeft >= 0))
-			return false;
-		if (a.showCountdown != null && a.showCountdown.get())
-			return true;
-		if (!countdownAll)
-			return false;
-		return countdownCeiling <= 0 || faceLeft <= countdownCeiling;
+		return AuraPresentationPolicy.countdown(a.showCountdown.get(),a.useGlobalCountdown.get(),countdownAll,faceLeft,faceInf,countdownCeiling);
 	}
 
 	/** A fuse is artwork only when one of its explicit display options is enabled. */
@@ -460,8 +419,8 @@ class AuraVisualRenderer {
 		return (a.showFuse != null && a.showFuse.get()) || (a.fuseBottom != null && a.fuseBottom.get());
 	}
 
-	/** Substitute canvas tokens. `stacks` is the effective count already resolved by drawCanvas. */
-	static function formatTokens(content:String, a:AuraDef, stacks:Int = 0):String {
+	/** Substitute independent live stack and activation count values. */
+	static function formatTokens(content:String, a:AuraDef, stacks:Int = 0, counter:Int = 0):String {
 		if (content == null || content.length == 0)
 			return "";
 		var s = content;
@@ -475,9 +434,7 @@ class AuraVisualRenderer {
 				t = Std.string(Math.max(0, Math.round(faceLeft * 10) / 10));
 			s = s.split("{time}").join(t);
 		}
-		if (s.indexOf("{stacks}") >= 0)
-			s = s.split("{stacks}").join(Std.string(stacks));
-		return s;
+		return AuraBadgePolicy.countTokens(s, stacks, counter);
 	}
 
 	/** Apply opacity to 0xAARRGGBB packed color → ImGui U32. */

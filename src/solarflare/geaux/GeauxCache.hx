@@ -28,6 +28,12 @@ class GeauxSlotSnap {
 	public var procReady:Bool = false;
 	public var cdLeft:Float = 0;
 	public var cdMax:Float = 0;
+	/** Exact observer-provided native total; cdMax can instead be synthesized. */
+	public var nativeCdTotal:Float = 0;
+	public var nativeCdTotalValid:Bool = false;
+	public var observedRank:Null<Int> = null;
+	public var nativeCdTotalStatic:Float = 0;
+	public var nativeCdRankStatic:Null<Int> = null;
 	public var remaining:Float = 0;
 	/** Live remaining charges; 0 when skill has no charge pool. */
 	public var charges:Int = 0;
@@ -54,6 +60,7 @@ class GeauxSlotSnap {
 class GeauxCdPoll {
 	public var valid:Bool = false;
 	public var max:Float = 0;
+	public var nativeTotal:Float = 0;
 	public var left:Float = Math.NaN;
 	public var prog:Float = Math.NaN;
 	public var inCd:Bool = false;
@@ -63,6 +70,7 @@ class GeauxCdPoll {
 	public function reset():Void {
 		valid = false;
 		max = 0;
+		nativeTotal = 0;
 		left = Math.NaN;
 		prog = Math.NaN;
 		inCd = false;
@@ -1833,6 +1841,9 @@ class GeauxCache {
 		dest.procReady = src.procReady;
 		dest.cdLeft = src.cdLeft;
 		dest.cdMax = src.cdMax;
+		dest.nativeCdTotal = src.nativeCdTotal;
+		dest.nativeCdTotalValid = src.nativeCdTotalValid;
+		dest.observedRank = src.observedRank;
 		dest.remaining = src.remaining;
 		dest.iconCandidates = src.iconCandidates != null ? src.iconCandidates.copy() : [];
 	}
@@ -1875,6 +1886,10 @@ class GeauxCache {
 	}
 
 	static function clearSlot(snap:GeauxSlotSnap, index:Int):Void {
+		snap.nativeCdTotal = snap.nativeCdTotalStatic = 0;
+		snap.nativeCdTotalValid = false;
+		snap.observedRank = null;
+		snap.nativeCdRankStatic = null;
 		snap.index = index;
 		snap.id = "";
 		snap.iconId = "";
@@ -2349,9 +2364,13 @@ class GeauxCache {
 			return;
 		// Duration is static per equipped skill; only the live timer is re-polled here.
 		var cached:Float = snap.cdStaticGen == staticGen ? snap.cdMaxStatic : -1;
-		pollSkillCooldown(skill, cdPoll, cached);
+		snap.observedRank = solarflare.castbar.ObservedSkillRank.read(skill);
+		var cachedNative = snap.observedRank == snap.nativeCdRankStatic ? snap.nativeCdTotalStatic : 0;
+		pollSkillCooldown(skill, cdPoll, cached, cachedNative);
 		if (cdPoll.max > 0) {
 			snap.cdMaxStatic = cdPoll.max;
+			snap.nativeCdTotalStatic = cdPoll.nativeTotal;
+			snap.nativeCdRankStatic = snap.observedRank;
 			snap.cdStaticGen = staticGen;
 		}
 		commitCooldown(snap, cdPoll);
@@ -2372,7 +2391,7 @@ class GeauxCache {
 	 * `cachedMax` > 0 reuses a duration already sampled on the equip cadence and skips the
 	 * three static getters, leaving only the live timer calls on the telemetry tick.
 	 */
-	static function pollSkillCooldown(skill:Dynamic, out:GeauxCdPoll, cachedMax:Float = -1):Void {
+	static function pollSkillCooldown(skill:Dynamic, out:GeauxCdPoll, cachedMax:Float = -1, cachedNative:Float = 0):Void {
 		out.reset();
 		var haveMax = cachedMax > 0;
 		if (haveMax)
@@ -2418,6 +2437,9 @@ class GeauxCache {
 			out.left = callNamedFloat(skill, "getCooldownLeft", cdLeftMem);
 			out.prog = callNamedFloat(skill, "getCooldownProgress", cdProgMem);
 		}
+		// Capture native provenance before normalize/synthesis. Cached totals carry their own provenance.
+		var native = haveMax ? cachedNative : out.max;
+		out.nativeTotal = Math.isFinite(native) && native > 0.05 && native <= 600 ? native : 0;
 		out.max = normalizeSeconds(out.max, 0);
 		if (Math.isNaN(out.max) || out.max < 0)
 			out.max = 0;
@@ -2437,6 +2459,8 @@ class GeauxCache {
 	}
 
 	static function commitCooldown(snap:GeauxSlotSnap, p:GeauxCdPoll):Void {
+		snap.nativeCdTotal = p.nativeTotal;
+		snap.nativeCdTotalValid = p.valid && p.nativeTotal > 0.05;
 		snap.cooldownValid = p.valid;
 		var max = p.max;
 		var left = p.left;
@@ -2503,6 +2527,9 @@ class GeauxCache {
 		if (snap == null)
 			return;
 		snap.cooldownValid = false;
+		snap.nativeCdTotal = 0;
+		snap.nativeCdTotalValid = false;
+		snap.observedRank = null;
 		snap.readyFlashUntil = 0;
 		if (!snap.present || snap.id == null || snap.id.length == 0) {
 			snap.affordable = true;

@@ -102,7 +102,7 @@ class AuraConditionEditor {
 		}
 
 		if (r.conditions.length < AuraRuleDef.MAX_CONDITIONS) {
-			if (UiChrome.accentButton("+ Add Condition##add_cond_" + a.id, ImGui.vec2(-1, 32))) {
+			if (UiChrome.ghostButton("+ Add Condition##add_cond_" + a.id, ImGui.vec2(-1, 32))) {
 				if (onBatchSnapshot != null) onBatchSnapshot();
 				var newCond = new AuraConditionDef();
 				newCond.signal = "resource.health.ratio";
@@ -224,12 +224,10 @@ class AuraConditionEditor {
 		}
 		ImGui.sameLine();
 
-		// Danger-fill Remove button
+		// Destructive action stays outlined; its rim and caption communicate danger.
 		var theme = ThemePalette.current();
-		var dangerFill = ImGui.vec4(theme.cellBg.x * 0.55 + 0.45, theme.cellBg.y * 0.55, theme.cellBg.z * 0.55, 1.0);
-		var dangerHover = ImGui.vec4(theme.cellBg.x * 0.35 + 0.55, theme.cellBg.y * 0.35, theme.cellBg.z * 0.35, 1.0);
-		ImGui.pushStyleColor(ImGuiCol.Button, dangerFill);
-		ImGui.pushStyleColor(ImGuiCol.ButtonHovered, dangerHover);
+		ImGui.pushStyleColor(ImGuiCol.Button, theme.cellBg);
+		ImGui.pushStyleColor(ImGuiCol.ButtonHovered, theme.windowBg);
 		ImGui.pushStyleColor(ImGuiCol.ButtonActive, theme.windowBg);
 		ImGui.pushStyleColor(ImGuiCol.Border, ImGui.vec4(0.90, 0.35, 0.35, 1.0));
 		ImGui.pushStyleColor(ImGuiCol.Text, ImGui.vec4(0.95, 0.50, 0.50, 1.0));

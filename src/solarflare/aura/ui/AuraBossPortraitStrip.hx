@@ -267,7 +267,7 @@ class AuraBossPortraitStrip {
 				if (textW < 48) textW = 48;
 				if (textW > CELL_W) textW = CELL_W;
 				ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, 4.0);
-				var chipClicked = UiChrome.navButton(label + "##chip_" + boss.id + "_" + skill.id, already, ImGui.vec2(textW, btnH));
+				var chipClicked = UiChrome.ghostButton(label + "##chip_" + boss.id + "_" + skill.id, ImGui.vec2(textW, btnH));
 				ImGui.popStyleVar(1);
 				if (chipClicked) {
 					if (a == null) {
@@ -384,7 +384,7 @@ class AuraBossPortraitStrip {
 		a.effects[0].hold = 5.0;
 		a.effects[0].holdRef.set(5.0);
 		a.enabled.set(false);
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 
 	static function makeCastAlert(boss:{id:String, name:String}, skill:{id:String, name:String}):AuraDef {
@@ -402,6 +402,6 @@ class AuraBossPortraitStrip {
 		pushCondition(a, "event.cast.active", skill.id, label);
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_ALERT, AuraEffect.WHEN_WHILE_TRUE)];
 		a.enabled.set(false);
-		return a;
+		return solarflare.aura.AuraPresentationDefaults.fresh(a);
 	}
 }

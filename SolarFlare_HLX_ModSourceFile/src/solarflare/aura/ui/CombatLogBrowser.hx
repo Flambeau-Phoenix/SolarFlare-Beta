@@ -168,9 +168,9 @@ class CombatLogBrowser {
 	}
 	function drawNavigation():Void {
 		UiLayout.inlineSplit("##ab_cl_breadcrumb", state.page == "recording" ? 2 : state.page == "enemy" || state.enemy == null ? 3 : 4, function(i, w) {
-			if (i == 0) { if (UiChrome.ghostButton("Recordings##ab_cl_files_nav", ImGui.vec2(w, 28))) state.files(); }
-			else if (i == 1) { if (UiChrome.ghostButton("Fight##ab_cl_fight_nav", ImGui.vec2(w, 28))) state.recording(); }
-			else if (i == 2 && state.enemy != null) { if (UiChrome.ghostButton("Enemy##ab_cl_enemy_nav", ImGui.vec2(w, 28))) state.selectEnemy(state.enemy); }
+			if (i == 0) { if (UiChrome.navButton("Recordings##ab_cl_files_nav", state.page=="files", ImGui.vec2(w, 28))) state.files(); }
+			else if (i == 1) { if (UiChrome.navButton("Fight##ab_cl_fight_nav", state.page=="recording", ImGui.vec2(w, 28))) state.recording(); }
+			else if (i == 2 && state.enemy != null) { if (UiChrome.navButton("Enemy##ab_cl_enemy_nav", state.page=="enemy", ImGui.vec2(w, 28))) state.selectEnemy(state.enemy); }
 			else if (UiChrome.ghostButton("Back##ab_cl_back", ImGui.vec2(w, 28))) state.back();
 		});
 		ImGui.textWrapped(haxe.io.Path.withoutDirectory(state.path)

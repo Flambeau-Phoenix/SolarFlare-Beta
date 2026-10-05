@@ -59,6 +59,11 @@ class CdbAuraTable {
 		return cds.get(norm(id));
 	}
 
+	/** Exact skill-row cast/telegraph duration only; never a granted Status or cooldown. */
+	public static function castDuration(id:String):Float {
+		return isStatus(id) ? 0 : duration(id);
+	}
+
 	/** True when the CDB records this id with nature Status rather than a castable skill. */
 	public static function isStatus(id:String):Bool {
 		ensure();

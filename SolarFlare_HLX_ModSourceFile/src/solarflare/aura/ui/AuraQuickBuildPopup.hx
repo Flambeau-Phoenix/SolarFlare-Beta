@@ -14,6 +14,9 @@ import solarflare.aura.AuraDef;
 import solarflare.aura.AuraPack;
 import solarflare.aura.AuraQuickBuildDraft;
 import solarflare.aura.AuraQuickBuildRules;
+import solarflare.aura.AuraTimer;
+import solarflare.aura.AuraTimingReferences;
+import solarflare.aura.AuraTimingReferencePolicy;
 import solarflare.aura.AuraVisualRenderer;
 import solarflare.aura.preview.AdvancedAuraPreview;
 import solarflare.aura.signal.AuraConditionUiState;
@@ -45,6 +48,8 @@ class AuraQuickBuildPopup {
 	var preview = new AdvancedAuraPreview();
 	var previewExpanded = false;
 	var commitIssue = "";
+	var castRank:Null<Int> = null;
+	var castRankChosen:Bool = false;
 
 	public function new() {}
 
@@ -65,6 +70,8 @@ class AuraQuickBuildPopup {
 		preview.reset();
 		for (buf in [signalSearch, subjectSearch, iconSearch]) ByteUtil.clearBytes(buf, SEARCH_CAP);
 		inputs.sync(draft.condition);
+		castRank = null; castRankChosen = false;
+		applyTimingReference(draft.cooldownReference);
 		var color = draft.aura.glowColor;
 		glowColor.setF32(0, ((color >>> 16) & 255) / 255.0);
 		glowColor.setF32(4, ((color >>> 8) & 255) / 255.0);
@@ -156,6 +163,8 @@ class AuraQuickBuildPopup {
 			group = AuraSignalCatalog.find(id).group;
 			inputs.sync(draft.condition);
 			commitIssue = "";
+			castRank = null; castRankChosen = false;
+			applyTimingReference("CDB");
 		}
 	}
 
@@ -262,6 +271,8 @@ class AuraQuickBuildPopup {
 			draft.condition.subject == resolved)) {
 			draft.condition.subject = resolved;
 			draft.condition.subjectLabel = name;
+			castRank = null; castRankChosen = false;
+			applyTimingReference("CDB");
 			commitIssue = "";
 			ImGui.closeCurrentPopup();
 		}
@@ -334,8 +345,10 @@ class AuraQuickBuildPopup {
 				else UiLayout.propertyRow("Icon", function() ImGui.textDisabled("Automatic from the watched subject"));
 			}
 			UiLayout.propertyRow("Overlays", drawOverlays);
+			UiLayout.propertyRow("Show icon",function() ImGui.checkbox("##ab_quick_show_icon",draft.aura.showIcon));
+			UiLayout.propertyRow("Automatic timer text",function() ImGui.checkbox("Use global countdown##ab_quick_global_countdown",draft.aura.useGlobalCountdown));
 		});
-		if (cfg.countdownAll.get())
+		if (cfg.countdownAll.get() && draft.aura.useGlobalCountdown.get())
 			ImGui.textWrapped("Automatic countdown is enabled globally. Timer text may appear even when Countdown is off here.");
 		if (draft.face == "Banner") ImGui.textDisabled("Face overlays are retained for when you choose Icon, Glow, or Bar.");
 	}
@@ -349,16 +362,8 @@ class AuraQuickBuildPopup {
 				if (i >= keys.length) return;
 				var key = keys[i];
 				var ref = draft.overlay(key);
-				var blocked = !AuraQuickBuildRules.overlayAllowed(key, !ref.get(), draft.aura.stackCounter.get(), draft.aura.isCounter.get());
-				var hovered = false;
-				disabled(blocked, function() {
-					// The shared tile paints custom colors; blocked controls use native gray styling.
-					if (blocked) ImGui.button(key + "##ab_quick_overlay_" + key, ImGui.vec2(w, 32));
-					else if (UiChrome.toggleTile("##ab_quick_overlay_" + key, key, ref.get(), w, 32)) draft.toggleOverlay(key);
-					hovered = ImGui.isItemHovered(ImGuiHoveredFlags.AllowWhenDisabled);
-				});
-				if (hovered) ImGui.setTooltip(blocked ? "Turn off " + (key == "Stacks" ? "Counter" : "Stacks") + " to enable " + key + "."
-					: key == "Stacks" ? "Live buff/debuff (Status) stacks."
+				if (UiChrome.toggleTile("##ab_quick_overlay_" + key, key, ref.get(), w, 32, false, false)) draft.toggleOverlay(key);
+				if (ImGui.isItemHovered()) ImGui.setTooltip(key == "Stacks" ? "Live buff/debuff (Status) stacks."
 					: key == "Counter" ? "Persistent total of false-to-true condition transitions."
 					: key == "Countdown" ? "Show timer text when remaining or elapsed time is available. Configure timers in Advanced."
 					: key == "Fuse" ? "Show the existing remaining-time fuse." : "Show the aura label.");
@@ -400,10 +405,66 @@ class AuraQuickBuildPopup {
 					if (ImGui.radioButton(labels[i] + "##ab_quick_when_" + i, draft.behavior == whens[i])) draft.setBehavior(whens[i]);
 			});
 			if (draft.behavior == AuraEffect.WHEN_ON_RISE_HOLD) UiLayout.propertyRow("Hold seconds", function() drawHold("flash"));
+			UiLayout.propertyRow("Timer", function() {
+				var modes = ["Off", "Count down", "Count up"];
+				UiLayout.inlineSplit("##ab_quick_timer_modes", 3, function(i:Int, w:Single) {
+					if (UiChrome.navButton(modes[i] + "##ab_quick_timer_mode_" + i, draft.aura.timerMode == i, ImGui.vec2(w, 28))) {
+						draft.setTimerMode(i); applyTimingReference(draft.cooldownReference);
+					}
+				});
+			});
+			if (AuraTimingReferencePolicy.isCooldown(draft.condition.signal)) {
+				UiLayout.propertyRow("Cooldown reference", function() {
+					UiLayout.inlinePair("##ab_quick_cooldown_reference", function(w:Single) {
+						if (UiChrome.navButton("CDB##ab_quick_cd_cdb", draft.cooldownReference == "CDB", ImGui.vec2(w, 28))) applyTimingReference("CDB");
+					}, function(w:Single) {
+						if (UiChrome.navButton("Observed##ab_quick_cd_observed", draft.cooldownReference == "Observed", ImGui.vec2(w, 28))) applyTimingReference("Observed");
+					});
+				}, "Copies the selected cooldown total into fixed draft seconds. Observed requires a valid native total.");
+			}
+			if (AuraTimingReferencePolicy.isCast(draft.condition.signal)) UiLayout.propertyRow("Cast rank", function() {
+				var ranks = solarflare.castbar.LearnedCastTimes.ranks(draft.condition.subject);
+				if (ranks.indexOf(null) < 0) ranks.unshift(null);
+				if (ranks.indexOf(castRank) < 0) ranks.push(castRank);
+				if (ImGui.beginCombo("##ab_quick_cast_rank", castRank == null ? "Unknown" : "Rank " + castRank)) {
+					try {
+						for (rank in ranks) if (ImGui.selectable((rank == null ? "Unknown" : "Rank " + rank) + "##ab_quick_cast_rank_" + rank, castRank == rank)) {
+							castRank = rank; castRankChosen = true; applyTimingReference("CDB");
+						}
+					} catch (e:Dynamic) { ImGui.endCombo(); throw e; }
+					ImGui.endCombo();
+				}
+			}, "Defaults to the observed rank when available. Choose a recorded rank to use its matching cast time.");
+			if (AuraTimingReferencePolicy.isCooldown(draft.condition.signal) || AuraTimingReferencePolicy.isCast(draft.condition.signal)) {
+				UiLayout.propertyRow("Timer seconds", function() {
+					var seconds = draft.aura.timerSeconds.get();
+					ImGui.textWrapped(draft.timerReferenceLabel + (seconds > 0 ? " · " + Math.round(seconds * 1000) / 1000 + " s" : ""));
+					if (UiChrome.ghostButton("Apply current reference##ab_quick_timer_refresh")) applyTimingReference(draft.cooldownReference);
+				}, "Countdown and Fuse stay off until you enable them. Manual duration overrides are available in Advanced.");
+			} else if (draft.aura.timerMode != AuraTimer.MODE_OFF) {
+				UiLayout.propertyRow("Fixed seconds", function() {
+					if (ImGui.inputFloat("##ab_quick_timer_seconds", draft.aura.timerSeconds, 0, 0, "%.3f s")) {
+						var v = draft.aura.timerSeconds.get();
+						draft.aura.timerSeconds.set(Math.isFinite(v) ? Math.max(0.1, Math.min(600, v)) : 0);
+					}
+				});
+			}
 		});
 		ImGui.textWrapped("Unlocked HUD faces remain visible for placement. Lock their position in Advanced to follow the show rules.");
 		if (draft.behavior == AuraEffect.WHEN_ON_RISE)
 			ImGui.textWrapped("One brief alert per false-to-true transition; it can fire again after the condition stops being true.");
+	}
+
+	function applyTimingReference(choice:String):Void {
+		var c = draft.condition;
+		if (!AuraTimingReferencePolicy.isCooldown(c.signal) && !AuraTimingReferencePolicy.isCast(c.signal)) return;
+		var ref = AuraTimingReferences.forSubject(c.subject, c.signal, castRank, castRankChosen);
+		castRank = ref.rank;
+		if (AuraTimingReferencePolicy.isCast(c.signal)) draft.setTimerReference("CDB", ref.castSeconds, ref.castLabel);
+		else {
+			var seconds = AuraTimingReferencePolicy.seconds(choice, ref.cdbSeconds, ref.observedSeconds, ref.nativeValid);
+			draft.setTimerReference(choice, seconds, seconds > 0 ? choice : "Unavailable");
+		}
 	}
 
 	function drawHold(id:String):Void {

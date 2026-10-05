@@ -75,15 +75,6 @@ class SparkCubeTracker {
    var font=ImGui.getFont(); if (font!=null) ImGui.pushFont(font,Math.min(ImGui.getFontSize(),13*scale));
    try {
    var gold = 0xFF37AFD4; var blue = 0xFFFFBF00;
-   // The Cube owns its inner backing; transparent chrome only lightens it.
-   ImGui.ImDrawList_AddRectFilled(dl,p,ImGui.vec2(p.x+w,p.y+h),chrome.transparent.get()?0x55191414:0xDC191414,8);
-   ImGui.ImDrawList_AddRect(dl,p,ImGui.vec2(p.x+w,p.y+h),gold,8,1.5);
-   for (i in 0...4) {
-    var x:Single = i%2==0?p.x:p.x+w; var y:Single = i<2?p.y:p.y+h;
-    var dx:Single = i%2==0?8*scale:-8*scale; var dy:Single = i<2?12*scale:-12*scale;
-    ImGui.ImDrawList_AddLine(dl,ImGui.vec2(x+dx,y),ImGui.vec2(x+dx,y+dy),gold,2);
-    ImGui.ImDrawList_AddLine(dl,ImGui.vec2(x,y+dy),ImGui.vec2(x+dx,y+dy),gold,2);
-   }
    ExtraBarsPrototypeBar.drawLabel(dl,label,p.x+8*scale,p.y+9*scale,w-16*scale,charged?blue:0xFFEFEFEF);
    var iconSize:Single = 52*scale;
    var iconX:Single = p.x+(w-iconSize)/2; var iconY:Single = p.y+28*scale;
@@ -121,7 +112,7 @@ class SparkCubeTracker {
     ImGui.setTooltip(tip);
    }
    if (pressed && click != null) click();
-   if (flash > 0) ImGui.ImDrawList_AddRect(dl,ImGui.vec2(p.x+3,p.y+3),ImGui.vec2(p.x+w-3,p.y+h-3),(Std.int(flash*255)<<24)|0x00B8FFAA,5,2);
+   if (flash > 0) ImGui.ImDrawList_AddRect(dl,ImGui.vec2(iconX,iconY),ImGui.vec2(iconX+iconSize,iconY+iconSize),(Std.int(flash*255)<<24)|0x00B8FFAA,5,2);
    } catch(e:Dynamic) { if(font!=null) ImGui.popFont(); throw e; }
    if(font!=null) ImGui.popFont();
   },edit,hide,false,null,function(width:Single,height:Single) {

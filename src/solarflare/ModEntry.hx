@@ -48,6 +48,7 @@ class ModEntry {
 		solarflare.cdb.ConsumableCatalog.keep();
 		solarflare.cdb.AuraQuickStartCatalog.keep();
 		solarflare.cdb.CdbAuraTable.keep();
+		solarflare.castbar.LearnedCastTimes.keep();
 		solarflare.geaux.GeauxCdTable.keep();
 		solarflare.geaux.GeauxTalentTable.keep();
 		solarflare.HealthHooks.keep();

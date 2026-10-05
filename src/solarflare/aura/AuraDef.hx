@@ -46,6 +46,8 @@ class AuraDef {
 	public var progressRing:BoolRef;
 	/** Integer seconds (or ∞) overlaid on the icon. */
 	public var showCountdown:BoolRef;
+	/** Opt into automatic timer text; legacy loads default to true. */
+	public var useGlobalCountdown:BoolRef;
 	/** Countdown text size multiplier vs. the auto-fit base. */
 	public var countdownScale:FloatRef;
 	/** 0 = center, 1 = above the face, 2 = below the face. */
@@ -68,13 +70,15 @@ class AuraDef {
 	public var textSize = new FloatRef(24);
 	public var textWrapCache = new AuraTextCache();
 	public var stackCounter:BoolRef;
-	/** Stack / activation count text size multiplier vs. the auto-fit base. */
+	/** Live stack text size multiplier vs. the auto-fit base. */
 	public var stackScale:FloatRef;
 	/** Same placement contract as countdownPlace: 0 = center, 1 = above, 2 = below. */
 	public var stackPlace:Int;
 	public var showLabel:BoolRef;
 	public var isCounter:BoolRef;
 	public var counterValue:Int;
+	public var counterPlace:Int;
+	public var counterScale:FloatRef;
 	/** Optional Geaux-style key chip drawn on the aura (user text, not engine-bound). */
 	public var keyText:String;
 	public var showKey:BoolRef;
@@ -165,7 +169,7 @@ class AuraDef {
 		op = "below";
 		pct = 35;
 		duration = 3;
-		region = "bar";
+		region = "icon";
 		iconId = "";
 		invert = new BoolRef(false);
 		requireAfford = new BoolRef(true);
@@ -187,6 +191,7 @@ class AuraDef {
 		showIcon = new BoolRef(true);
 		progressRing = new BoolRef(false);
 		showCountdown = new BoolRef(false);
+		useGlobalCountdown = new BoolRef(false);
 		countdownScale = new FloatRef(1);
 		countdownPlace = 2;
 		showFuse = new BoolRef(false);
@@ -196,10 +201,12 @@ class AuraDef {
 		glowColor = 0xFFFF8800;
 		stackCounter = new BoolRef(false);
 		stackScale = new FloatRef(1);
-		stackPlace = 2;
+		stackPlace = 1;
 		showLabel = new BoolRef(false);
 		isCounter = new BoolRef(false);
 		counterValue = 0;
+		counterPlace = 2;
+		counterScale = new FloatRef(1);
 		effects = [AuraEffect.defaultWindow()];
 		rule = null;
 		ruleResult = new AuraRuleResult();

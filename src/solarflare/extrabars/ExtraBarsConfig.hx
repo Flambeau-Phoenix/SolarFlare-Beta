@@ -71,6 +71,21 @@ class ExtraBarsConfig {
 	}
 	public function find(id:String):ExtraBarsBarConfig { for (bar in bars) if (bar.id == id) return bar; return null; }
 	public function removeBar(id:String):Bool { var bar = find(id); return bar != null && bars.remove(bar); }
+	/** Remove only the visible cell's item assignment; its key stays attached to the cell. */
+	public function clearItem(barId:String, index:Int):Bool {
+		var bar = find(barId);
+		if (bar == null || index < 0 || index >= bar.slotCount || bar.slots[index].itemKind.length == 0) return false;
+		bar.slots[index].itemKind = "";
+		return true;
+	}
+	/** Clear this bar's saved items, including retained cells outside the visible layout. */
+	public function clearItems(barId:String):Int {
+		var bar = find(barId);
+		if (bar == null) return 0;
+		var removed = 0;
+		for (slot in bar.slots) if (slot.itemKind.length > 0) { slot.itemKind = ""; removed++; }
+		return removed;
+	}
 	public function swap(aId:String, a:Int, bId:String, b:Int):Bool {
 		var from = find(aId); var to = find(bId);
 		if (from == null || to == null || a < 0 || a >= from.slotCount || b < 0 || b >= to.slotCount) return false;

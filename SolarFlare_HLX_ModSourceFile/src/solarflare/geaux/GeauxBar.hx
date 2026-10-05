@@ -403,16 +403,9 @@ class GeauxBar {
 		if (pickable && previewFlashUntil > 0) deadline = previewFlashUntil;
 		var flashAlpha = ReadyFlashState.opacity(deadline, haxe.Timer.stamp());
 		var glowDl = pickable ? dl : ImGui.getBackgroundDrawList();
-		// SAO / usable attention after icon, before CD text & hotkeys.
+		// Cooldown-completion attention after icon, before CD text & hotkeys.
 		if (present) {
-			var procReady = false;
-			try
-				procReady = snap.procReady == true
-			catch (_:Dynamic) {}
-			if (procReady) {
-				solarflare.aura.AuraGlowRenderer.drawStyle(glowDl, style.glowStyle, style.glowStrength.get(), style.glowOuter.get(),
-					style.glowInner.get(), solarflare.aura.AuraGlowStyle.fromImGuiColor(style.glowColor(1)), x, y, size, size, 1);
-			} else if (lit && affordable && flashAlpha > 0 && style.readyAttention.get() == GeauxStyle.ATTN_PROC) {
+			if (lit && affordable && flashAlpha > 0 && style.readyAttention.get() == GeauxStyle.ATTN_PROC) {
 				// Shared Aura renderer; live HUD bloom can extend beyond the window chrome.
 				solarflare.aura.AuraGlowRenderer.drawStyle(glowDl, style.glowStyle, style.glowStrength.get(), style.glowOuter.get(),
 					style.glowInner.get(), solarflare.aura.AuraGlowStyle.fromImGuiColor(style.glowColor(1)), x, y, size, size, flashAlpha);
