@@ -126,44 +126,29 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 * **Profiles & Themes:** Save, duplicate, and switch whole-HUD profiles across characters; choose curated color schemes or define your own.
 
 ---
-# SolarFlare v3.1b — Patch Notes
+# Solar Flare v3.2b - New ExtraBars Builder
 
-## Aura Builder:
-- Combat Log Aura Builder: Browse saved fights through Enemies, Me, and Damage taken tabs. Explore enemies and skills, then select a supported aura from a compact list to open a prefilled Quick Build draft. Browsing never creates an aura automatically.
-- Builder navigation: Creation Home and Combat Logs are grouped in the left menu. Quick Build sits beneath Start with blank aura. Returning home preserves your recording and selection.
+## ExtraBars builder
+- Hold/Toggle takes priority: large mode choices for easier options navigation.
+- Dedicated keybind area: enlarged current key display, prominent Record Key button, and separate Clear Key action.
+- Improved readability: larger text, centered section headers, and plain rows replace the checkered styling.
+- Separate layout controls: linked row/column sliders, presets, and previews are grouped under “Layout & look.”
+- Added context menus
+- Clear Item and Clear All buttons: remove item assignments while preserving keybinds. Clear All includes hidden cells; Undo restores assignments.
+- Drag-and-drop assignments: drag catalog items onto cells without replacing their keybinds, or swap cells with their bindings.
+- Cleaner Spark Cube display: removed the permanent outer gold frame.
 
-## ExtraBars:
-- Teleport stones: Added Sparkstone, Death Stone, and consumable/reusable Rift Stones to ExtraBars, with official icons and inventory counts.
-- Character settings: ExtraBars automatically remembers bars, bindings, positions, and Spark Cube settings by character ID—no profile selector needed.
-
-
----
-
-# SolarFlare v3.0b — Patch Notes
-
-## Added ExtraBars
-- Create customizable consumable bars with 1–10 visible cells per bar.
-- Adjust layouts, cell size, opacity, transparency, and position locking.
-- Assign items and hotkeys, search your inventory or the full consumable catalog, and drag cells to swap assignments.
-- Choose Hold or Toggle activation, with Undo/Redo support.
-- ExtraBars settings are remembered independently of HUD profiles and gear builds.
-- Added an optional Spark Cube tracker showing Charged/Empty status, active-effect countdown, observed damage, and burst results.
-- Spark Cube can display a custom hotkey label entered in its settings.
-## Added Simple Aura Builder — Quick Build
-- Create basic auras through a guided popup available from Creation Home.
-- Start with quick picks: Skill ready, Instant cast, Low HP, Buff stacks, or Enemy cast.
-- Choose an Icon, Glow, Bar, or Banner appearance.
-- Add optional Stacks, Counter, Countdown, Fuse, and Label overlays.
-- Choose While true, Flash then hold, or Alert once behavior.
-- Review a live condition summary and mini preview before saving.
-- Open the draft in Advanced to continue with complex conditions, scripting, or timing.
-## UI Improvements
-- Distinct ExtraBars navigation tabs and always-visible layout controls.
-- Expanded item catalog space and corrected thumbnail/text spacing.
-- The full Advanced Aura Builder remains available.
-
-# Make sure to copy the new sfcursor.hdll plugin, it has the new modifier keybinds
-
+## Aura builders — Quick Build and Advanced
+- Clearer button styling: selected choices and final actions stand out; secondary actions use outlines, and independent options show checkbox indicators.
+- Cleaner starting appearance: new auras default to icon presentation, with optional decorations and countdown displays left off.
+- Show Icon control: hide an aura’s icon while keeping its text, counters, and tracking active.
+- Independent Stacks and Counter: display both together, with separate placement and scale controls.
+- Improved badge layout: timer, stack, and counter badges have spacing to prevent overlap. Advanced previews simulate each value independently.
+- Counter reset no longer removes stacks information.
+- Expanded timer choices: Quick Build offers Off, Count Down, and Count Up.
+- Cooldown references: use game database values or available observed cooldown values to populate a fixed timer.
+- Recorded cast-time references: cast timers prefer stable recorded durations, then database suggestions. Recorded ranks are selectable; Advanced retains manual timer overrides.
+- Existing setups preserved: saved, copied, and imported auras retain their chosen presentation settings.
 ## Developer & Build Reference
 
 ### Build from Source
