@@ -61,6 +61,8 @@ class AuraSignalFrameBuilder {
 		frame.killKnown = kk.length > 0;
 		frame.damageTakenRecent = CombatLogCache.maxDamageTakenRecent(5.0);
 		frame.damageTakenKnown = true;
+		// Demanded subjects are polled live even when absent from the visible Geaux strip.
+		addSkills(frame, GeauxCache.auraSkills);
 		addSkills(frame, GeauxCache.slots); addSkills(frame, GeauxCache.weapons); addSkills(frame, GeauxCache.signatures);
 		if (solarflare.ObserveDemand.aurasNeedInstant)
 			ensureSkillSubjects(frame, solarflare.ObserveDemand.instantSkillIds);
@@ -113,7 +115,9 @@ class AuraSignalFrameBuilder {
 			if (frame.findSkill(src.id) != null) continue;
 			var dst = frame.skills[frame.skillCount++]; dst.rawId = src.id; dst.aliasId = src.iconId; dst.label = src.label;
 			dst.ready = src.ready; dst.affordable = src.affordable; dst.cooldownLeft = src.cdLeft;
-			dst.cooldownProgress = clamp01(src.remaining); dst.inCooldown = !src.ready || src.cdLeft > 0.05;
+			dst.cooldownKnown = src.cooldownValid;
+			dst.cooldownTotal = src.nativeCdTotalValid ? src.nativeCdTotal : Math.NaN;
+			dst.cooldownProgress = clamp01(src.remaining); dst.inCooldown = !src.ready;
 			dst.charges = src.charges; dst.chargesMax = src.chargesMax; dst.known = true;
 		}
 	}

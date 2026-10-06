@@ -10,7 +10,69 @@ typedef AuraTimerState = {
 	var timerExpiredAt:Float;
 }
 
+typedef AuraCooldownState = {
+	> AuraTimerState,
+	var timerCooldownWas:Bool;
+}
+
 class AuraTimerClock {
+	/** Cooldowns start on native activity, never on a ready/affordable condition edge.
+	 * Live seconds override the optional estimate and are followed even when the
+	 * condition is false. Missing reads extrapolate the last deadline without rearming.
+	 */
+	public static function tickCooldown(a:AuraCooldownState, mode:Int, fallbackSpan:Float,
+			known:Bool, active:Bool, left:Float, total:Float, now:Float, linger:Float):Void {
+		if (mode == 0) { reset(a); a.timerCooldownWas = false; return; }
+		if (!known) {
+			advanceCooldown(a, mode, now, linger);
+			return;
+		}
+		var begin = active && !a.timerCooldownWas;
+		a.timerCooldownWas = active;
+		if (!active) {
+			if (running(a)) {
+				a.timerValue = mode == 1 ? 0 : Math.max(0, now - a.timerStartedAt);
+				a.timerExpiredAt = now;
+			}
+			advanceCooldown(a, mode, now, linger);
+			return;
+		}
+		if (Math.isFinite(left) && left > 0) {
+			// Native observation can attach halfway through a cooldown or correct an estimate.
+			var span = Math.isFinite(total) && total >= left ? total
+				: !begin && a.timerTotal > 0 ? Math.max(a.timerTotal, left) : left;
+			if (begin || !running(a)) a.timerStartedAt = now - Math.max(0, span - left);
+			a.timerTotal = span;
+			a.timerEndsAt = now + left;
+			a.timerValue = mode == 1 ? left : Math.max(0, span - left);
+			a.timerActive = true;
+			a.timerExpiredAt = 0;
+			return;
+		}
+		if (begin && Math.isFinite(fallbackSpan) && fallbackSpan > 0.02) {
+			a.timerStartedAt = now;
+			a.timerEndsAt = now + fallbackSpan;
+			a.timerTotal = fallbackSpan;
+			a.timerValue = mode == 1 ? fallbackSpan : 0;
+			a.timerActive = true;
+			a.timerExpiredAt = 0;
+			return;
+		}
+		advanceCooldown(a, mode, now, linger);
+	}
+
+	static function advanceCooldown(a:AuraTimerState, mode:Int, now:Float, linger:Float):Void {
+		if (!a.timerActive) return;
+		if (a.timerExpiredAt <= 0) {
+			a.timerValue = mode == 1 ? Math.max(0, a.timerEndsAt - now) : Math.max(0, now - a.timerStartedAt);
+			if (now >= a.timerEndsAt) {
+				if (mode == 2) a.timerValue = a.timerTotal;
+				a.timerExpiredAt = now;
+			}
+		}
+		if (a.timerExpiredAt > 0 && now - a.timerExpiredAt > Math.max(0, linger)) reset(a);
+	}
+
 	public static inline function trigger(known:Bool, hit:Bool, previous:Bool, edge:Int):Bool {
 		return known && (edge == 1 ? !hit && previous : hit && !previous);
 	}

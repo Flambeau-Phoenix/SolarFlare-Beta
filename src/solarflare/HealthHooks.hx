@@ -338,7 +338,7 @@ class HealthHooks {
 	}
 
 	static function onPrayerTrigger(self:Dynamic, skill:Dynamic):Void {
-		// Live dispatcher (proto 82 / findex 45208). Base script.SkillScript.onPrayerTrigger is empty Ret.
+		// Retired adapter helper. Resolve any future dispatcher hook by symbolic name in the current corpus.
 		if (!scriptOwnerIsLocalPriest(self))
 			return;
 		PrayerCache.spendAll();

@@ -10,7 +10,7 @@ class AuraQuickBuildDraft {
 	public var condition(default, null):AuraConditionDef;
 	public var behavior(default, null):String = AuraEffect.WHEN_WHILE_TRUE;
 	public var face(default, null):String = "Icon";
-	public var cooldownReference(default, null):String = "CDB";
+	public var cooldownReference(default, null):String = "Game time";
 	public var timerReferenceLabel(default, null):String = "Unknown";
 	var configuredHold:Float;
 	var briefHold:Float;
@@ -128,23 +128,23 @@ class AuraQuickBuildDraft {
 
 	/** Copy a chosen numerical reference into this draft only. Artwork stays opt-in. */
 	public function setTimerReference(choice:String, seconds:Float, label:String):Void {
-		cooldownReference = choice == "Observed" ? "Observed" : "CDB";
+		cooldownReference = choice == "Game time" ? "Game time" : choice == "Observed" ? "Observed" : "CDB";
 		timerReferenceLabel = label;
-		aura.timerSource = AuraTimer.SRC_FIXED;
-		aura.followBuffDuration.set(false);
+		aura.timerSource = cooldownReference == "Game time" ? AuraTimer.SRC_FOLLOW : AuraTimer.SRC_FIXED;
+		aura.followBuffDuration.set(aura.timerSource == AuraTimer.SRC_FOLLOW);
 		aura.timerSeconds.set(Math.isFinite(seconds) && seconds > 0.001 && seconds <= 600 ? seconds : 0);
 	}
 	public function setTimerMode(mode:Int):Void {
 		aura.timerMode = mode < 0 || mode > 2 ? AuraTimer.MODE_OFF : mode;
-		aura.timerSource = AuraTimer.SRC_FIXED;
-		aura.followBuffDuration.set(false);
+		aura.timerSource = AuraTimingReferencePolicy.isCooldown(condition.signal) && cooldownReference == "Game time" ? AuraTimer.SRC_FOLLOW : AuraTimer.SRC_FIXED;
+		aura.followBuffDuration.set(aura.timerSource == AuraTimer.SRC_FOLLOW);
 	}
 
 	public function issue(hasIcon:String->Bool):String {
 		if (StringTools.trim(aura.name).length == 0) return "Give this aura a name.";
 		var problem = AuraQuickBuildRules.conditionIssue(condition);
 		if (problem.length > 0) return problem;
-		if (aura.timerMode != AuraTimer.MODE_OFF && !(Math.isFinite(aura.timerSeconds.get()) && aura.timerSeconds.get() > 0.001))
+		if (aura.timerMode != AuraTimer.MODE_OFF && aura.timerSource == AuraTimer.SRC_FIXED && !(Math.isFinite(aura.timerSeconds.get()) && aura.timerSeconds.get() > 0.001))
 			return "Timer duration is unavailable. Turn the timer off or enter an aura-only duration in Advanced.";
 		if (aura.showIcon.get() && (face == "Icon" || face == "Glow") && !hasIcon(aura.preferredIconId())) return "Choose a usable icon.";
 		return "";
@@ -163,7 +163,8 @@ class AuraQuickBuildDraft {
 		var overlays = [];
 		if (face != "Banner")
 			for (key in ["Stacks", "Counter", "Countdown", "Fuse", "Label"]) if (overlay(key).get()) overlays.push(key.toLowerCase());
-		var timer = aura.timerMode == AuraTimer.MODE_OFF ? "" : aura.timerSeconds.get() > 0
+		var timer = aura.timerMode == AuraTimer.MODE_OFF ? "" : AuraTimingReferencePolicy.isCooldown(condition.signal)
+			? " Follows the skill's live cooldown after use." + (aura.timerSource == AuraTimer.SRC_FIXED ? " Uses the selected seconds only when live timing is unavailable." : "") : aura.timerSeconds.get() > 0
 			? " Starts a " + aura.timerSeconds.get() + "s " + (aura.timerMode == AuraTimer.MODE_DOWN ? "countdown" : "countup") + " when conditions become true."
 			: " Timer duration is unavailable.";
 		return result + (overlays.length > 0 ? ", with " + overlays.join(", ") : "") + "." + timer

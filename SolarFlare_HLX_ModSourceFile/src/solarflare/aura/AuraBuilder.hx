@@ -1035,7 +1035,7 @@ class AuraBuilder {
 			if (row + 1 < rows) ImGui.dummy(ImGui.vec2(0, 6));
 		}
 		UiChrome.subHeader("Timer");
-		UiLayout.propertyGrid("##ab_timer_options_grid", function() drawTimerRows(a));
+		drawTimerRows(a);
 		if (a.stackCounter.get() || a.isCounter.get()) {
 			UiLayout.propertyGrid("##ab_stack_display", function() {
 				if (a.stackCounter.get()) drawBadgeRows(a, false);
@@ -1104,93 +1104,97 @@ class AuraBuilder {
 	 * at once would need a second accumulator in AuraTimer.
 	 */
 	function drawTimerRows(a:AuraDef):Void {
-		UiLayout.propertyRow("Direction", function() {
-			var labels = ["Off", "Count down", "Count up"];
-			if (ImGui.beginCombo("##ab_timer_mode", labels[a.timerMode >= 0 && a.timerMode <= 2 ? a.timerMode : 0])) {
-				for (mode in 0...3)
-					if (ImGui.selectable(labels[mode] + "##ab_tm_" + mode, a.timerMode == mode)) setTimerMode(a, mode);
-				ImGui.endCombo();
-			}
+		UiLayout.propertyGrid("##ab_timer_options_grid", function() {
+			var cooldown = AuraTimingReferencePolicy.isCooldown(timingSignal(a));
+			UiLayout.propertyRow("Direction", function() {
+				var labels = ["Off", "Count down", "Count up"];
+				if (ImGui.beginCombo("##ab_timer_mode", labels[a.timerMode >= 0 && a.timerMode <= 2 ? a.timerMode : 0])) {
+					for (mode in 0...3)
+						if (ImGui.selectable(labels[mode] + "##ab_tm_" + mode, a.timerMode == mode)) setTimerMode(a, mode);
+					ImGui.endCombo();
+				}
+			});
+			UiLayout.propertyRow("Duration source", function() {
+				var fixed = a.timerSource == AuraTimer.SRC_FIXED;
+				if (ImGui.beginCombo("##ab_timer_source", fixed ? (cooldown ? "Game time + estimate" : "Fixed seconds") : "Game time")) {
+					for (source in 0...2)
+						if (ImGui.selectable(source == 0 ? "Game time" : (cooldown ? "Game time + estimate" : "Fixed seconds"), a.timerSource == source)) {
+							a.timerSource = source;
+							a.followBuffDuration.set(source == AuraTimer.SRC_FOLLOW);
+							AuraTimer.reset(a);
+							if (source == AuraTimer.SRC_FIXED) primeTimerSeconds(a);
+							SettingsStore.markDirty();
+						}
+					ImGui.endCombo();
+				}
+			});
+			UiLayout.propertyRow(cooldown ? "Estimate seconds" : "Fixed seconds", function() {
+				ImGui.beginDisabled(a.timerSource != AuraTimer.SRC_FIXED);
+				var previous = a.timerSeconds.get();
+				if (ImGui.inputFloat("##ab_timer_secs", a.timerSeconds, 0, 0, "%.3f")) {
+					var value = a.timerSeconds.get();
+					a.timerSeconds.set(Math.isFinite(value) ? Math.max(1, Math.min(600, value)) : previous);
+					AuraTimer.reset(a);
+					SettingsStore.markDirty();
+				}
+				if (ImGui.isItemHovered()) ImGui.setTooltip("Enter 1–600 seconds. Decimal values are supported.");
+				var listed = listedTimerSpan(a);
+				if (listed > 0.05 && ImGui.smallButton("Use listed " + (Math.round(listed * 10) / 10) + "s##ab_timer_listed")) {
+					a.timerSeconds.set(listed);
+					AuraTimer.reset(a);
+					SettingsStore.markDirty();
+				}
+				ImGui.endDisabled();
+			});
+			UiLayout.propertyRow("Start when", function() {
+				if (cooldown) { ImGui.textWrapped("Skill enters cooldown"); return; }
+				var labels = ["Conditions become true", "Conditions stop being true"];
+				if (ImGui.beginCombo("##ab_timer_edge", labels[a.timerStartEdge])) {
+					for (edge in 0...2)
+						if (ImGui.selectable(labels[edge] + "##ab_te_" + edge, a.timerStartEdge == edge)) {
+							a.timerStartEdge = edge;
+							AuraTimer.reset(a);
+							SettingsStore.markDirty();
+						}
+					ImGui.endCombo();
+				}
+			}, cooldown ? "Live cooldown seconds take precedence over the estimate. Readiness and affordability never start a cooldown timer." : null);
+			UiLayout.propertyRow("On aura", function() {
+				if (ImGui.checkbox("Show time##ab_cd_force", a.showCountdown)) SettingsStore.markDirty();
+				var previousGlobal=a.useGlobalCountdown.get();
+				if (ImGui.checkbox("Use global countdown##ab_global_countdown", a.useGlobalCountdown)) {
+					var value=a.useGlobalCountdown.get(); a.useGlobalCountdown.set(previousGlobal);
+					snapshot("Global countdown"); a.useGlobalCountdown.set(value); SettingsStore.markDirty();
+				}
+				ImGui.beginDisabled(!a.showCountdown.get());
+				if (ImGui.beginCombo("##ab_cd_place", countdownPlaceLabel(a.countdownPlace))) {
+					for (place in 0...3)
+						if (ImGui.selectable(countdownPlaceLabel(place) + "##ab_cdp_" + place, a.countdownPlace == place)) {
+							a.countdownPlace = place;
+							SettingsStore.markDirty();
+						}
+					ImGui.endCombo();
+				}
+				ImGui.endDisabled();
+			});
+			UiLayout.propertyRow("Time size", function() {
+				ImGui.beginDisabled(!a.showCountdown.get());
+				if (BuilderSlider.draw("##ab_cd_scale", a.countdownScale, 0.5, 3, "%.2fx")) SettingsStore.markDirty();
+				ImGui.endDisabled();
+			});
+			UiLayout.propertyRow("Timers window", function() {
+				if (ImGui.checkbox("Show timer##ab_timer_board", a.timerBoard)) SettingsStore.markDirty();
+			});
+			UiLayout.propertyRow("Finished row", function() {
+				ImGui.beginDisabled(!a.timerBoard.get());
+				if (ImGui.inputFloat("##ab_timer_linger", a.timerKeepExpired, 0, 0, "%.1f s")) {
+					var value = a.timerKeepExpired.get();
+					a.timerKeepExpired.set(Math.isFinite(value) ? Math.max(0, Math.min(30, value)) : 3);
+					SettingsStore.markDirty();
+				}
+				ImGui.endDisabled();
+			}, "Time the finished board row stays visible. This does not extend the aura's interval.");
 		});
-		UiLayout.propertyRow("Duration source", function() {
-			var fixed = a.timerSource == AuraTimer.SRC_FIXED;
-			if (ImGui.beginCombo("##ab_timer_source", fixed ? "Fixed seconds" : "Game time")) {
-				for (source in 0...2)
-					if (ImGui.selectable(source == 0 ? "Game time" : "Fixed seconds", a.timerSource == source)) {
-						a.timerSource = source;
-						a.followBuffDuration.set(source == AuraTimer.SRC_FOLLOW);
-						AuraTimer.reset(a);
-						if (source == AuraTimer.SRC_FIXED) primeTimerSeconds(a);
-						SettingsStore.markDirty();
-					}
-				ImGui.endCombo();
-			}
-		});
-		UiLayout.propertyRow("Fixed seconds", function() {
-			ImGui.beginDisabled(a.timerSource != AuraTimer.SRC_FIXED);
-			var previous = a.timerSeconds.get();
-			if (ImGui.inputFloat("##ab_timer_secs", a.timerSeconds, 0, 0, "%.3f")) {
-				var value = a.timerSeconds.get();
-				a.timerSeconds.set(Math.isFinite(value) ? Math.max(1, Math.min(600, value)) : previous);
-				AuraTimer.reset(a);
-				SettingsStore.markDirty();
-			}
-			if (ImGui.isItemHovered()) ImGui.setTooltip("Enter 1–600 seconds. Decimal values are supported.");
-			var listed = listedTimerSpan(a);
-			if (listed > 0.05 && ImGui.smallButton("Use listed " + (Math.round(listed * 10) / 10) + "s##ab_timer_listed")) {
-				a.timerSeconds.set(listed);
-				AuraTimer.reset(a);
-				SettingsStore.markDirty();
-			}
-			ImGui.endDisabled();
-		});
-		UiLayout.propertyRow("Start when", function() {
-			var labels = ["Conditions become true", "Conditions stop being true"];
-			if (ImGui.beginCombo("##ab_timer_edge", labels[a.timerStartEdge])) {
-				for (edge in 0...2)
-					if (ImGui.selectable(labels[edge] + "##ab_te_" + edge, a.timerStartEdge == edge)) {
-						a.timerStartEdge = edge;
-						AuraTimer.reset(a);
-						SettingsStore.markDirty();
-					}
-				ImGui.endCombo();
-			}
-		});
-		UiLayout.propertyRow("On aura", function() {
-			if (ImGui.checkbox("Show time##ab_cd_force", a.showCountdown)) SettingsStore.markDirty();
-			var previousGlobal=a.useGlobalCountdown.get();
-			if (ImGui.checkbox("Use global countdown##ab_global_countdown", a.useGlobalCountdown)) {
-				var value=a.useGlobalCountdown.get(); a.useGlobalCountdown.set(previousGlobal);
-				snapshot("Global countdown"); a.useGlobalCountdown.set(value); SettingsStore.markDirty();
-			}
-			ImGui.beginDisabled(!a.showCountdown.get());
-			if (ImGui.beginCombo("##ab_cd_place", countdownPlaceLabel(a.countdownPlace))) {
-				for (place in 0...3)
-					if (ImGui.selectable(countdownPlaceLabel(place) + "##ab_cdp_" + place, a.countdownPlace == place)) {
-						a.countdownPlace = place;
-						SettingsStore.markDirty();
-					}
-				ImGui.endCombo();
-			}
-			ImGui.endDisabled();
-		});
-		UiLayout.propertyRow("Time size", function() {
-			ImGui.beginDisabled(!a.showCountdown.get());
-			if (BuilderSlider.draw("##ab_cd_scale", a.countdownScale, 0.5, 3, "%.2fx")) SettingsStore.markDirty();
-			ImGui.endDisabled();
-		});
-		UiLayout.propertyRow("Timers window", function() {
-			if (ImGui.checkbox("Show timer##ab_timer_board", a.timerBoard)) SettingsStore.markDirty();
-		});
-		UiLayout.propertyRow("Finished row", function() {
-			ImGui.beginDisabled(!a.timerBoard.get());
-			if (ImGui.inputFloat("##ab_timer_linger", a.timerKeepExpired, 0, 0, "%.1f s")) {
-				var value = a.timerKeepExpired.get();
-				a.timerKeepExpired.set(Math.isFinite(value) ? Math.max(0, Math.min(30, value)) : 3);
-				SettingsStore.markDirty();
-			}
-			ImGui.endDisabled();
-		}, "Time the finished board row stays visible. This does not extend the aura's interval.");
 	}
 
 	/** Exclusive: ticking both directions would need a second accumulator in AuraTimer. */
@@ -1735,10 +1739,7 @@ class AuraBuilder {
 				c.subject = wizardSubject;
 				c.subjectLabel = wizardSubjectName(wizardSubject);
 				if (StringTools.startsWith(wizardSignal, "status.")) {
-					var grant = CdbAuraTable.grantedStatusId(wizardSubject);
-					if (grant.length > 0 && grant != wizardSubject) {
-						c.subject = grant;
-					}
+					c.subject = CdbAuraTable.statusSubjectId(wizardSubject);
 				}
 			}
 			var desc = AuraSignalCatalog.find(wizardSignal);

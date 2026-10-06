@@ -44,12 +44,6 @@ class PayloadProbe {
 		"getElapsedTime", "getDurationLeft", "getDurationProgress", "getBaseDuration", "evalDuration",
 		"stacks", "kind"
 	];
-	/** Conservative ChatBox.receiveMessage virtual pack — no Channel enum indexes. */
-	static var chatNames:Array<String> = [
-		"text", "message", "msg", "content", "name", "playerName", "author", "from", "sender",
-		"cid", "uid", "id", "channel", "chan", "channelName", "kind", "type", "whisper",
-		"player", "receiver", "target", "to"
-	];
 	static var unitNames:Array<String> = [
 		"health", "maxHealth", "name", "kind", "isMe", "player", "targetUnit",
 		"summonOwner", "summonSourceSkill", "get_networkPropSummonOwner"
@@ -61,7 +55,6 @@ class PayloadProbe {
 	static var writeAt:Int = 0;
 	static var count:Int = 0;
 	static var lastCombat:Float = 0;
-	static var lastChat:Float = 0;
 	static var lastSpine:Float = 0;
 	static var lastStatus:Float = 0;
 	static var jsonlPath:String = "";
@@ -75,26 +68,6 @@ class PayloadProbe {
 		ensure();
 	}
 
-	#if solarflare_telemetry
-	@:hlx.postfix(ui.hud.ChatBox.receiveMessage)
-	static function onChatBoxReceive(
-		self:ui.hud.ChatBox,
-		a0:{
-			args:Dynamic,
-			channel:st.Channel,
-			localStamp:Null<Float>,
-			localTextId:String,
-			notify:String,
-			sender:ent.Unit,
-			text:String
-		},
-		result:Void
-	):Void {
-		try
-			captureChat(a0)
-		catch (_:Dynamic) {}
-	}
-	#end
 
 	public static function armed():Bool {
 		return recording != null && recording.get();
@@ -239,33 +212,6 @@ class PayloadProbe {
 		lastInstantKnown = known;
 		lastInstantReady = ready;
 		lastInstantAt = stamp();
-	}
-
-	public static function captureChat(obj:Dynamic):Void {
-		if (!armed())
-			return;
-		var now = stamp();
-		if (now - lastChat < MIN_GAP)
-			return;
-		lastChat = now;
-		var rows = probeObj(obj, chatNames);
-		var nested:Array<String> = ["channel", "chan", "player", "sender", "from", "receiver", "target"];
-		var i = 0;
-		while (i < nested.length) {
-			var child = FieldWalk.extractObject(obj, nested[i]);
-			if (child != null) {
-				var extra = probeObj(child, ["name", "id", "uid", "cid", "text", "kind", "type"]);
-				var j = 0;
-				while (j < extra.length) {
-					var r = extra[j];
-					r.name = nested[i] + "." + r.name;
-					rows.push(r);
-					j++;
-				}
-			}
-			i++;
-		}
-		pushSnap("chat", "ChatMessage", rows, now);
 	}
 
 	public static function sampleApp(app:GameApp):Void {

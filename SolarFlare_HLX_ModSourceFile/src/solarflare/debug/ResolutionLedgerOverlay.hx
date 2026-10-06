@@ -43,7 +43,7 @@ class ResolutionLedgerOverlay {
 			var rows = ResolutionLedger.rowsForDraw();
 			if (rows.length == 0)
 				ImGui.text(ResolutionLedger.armed()
-					? "Recording. Play: vitals, Geaux CD, a hit/cast, chat, rift if available."
+					? "Recording. Play: vitals, Geaux CD, a hit/cast, rift if available."
 					: "Start recording to capture winners.");
 			else
 				drawRows(rows);

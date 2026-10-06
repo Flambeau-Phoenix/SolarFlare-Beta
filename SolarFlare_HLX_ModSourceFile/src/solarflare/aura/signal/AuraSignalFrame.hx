@@ -1,7 +1,8 @@
 package solarflare.aura.signal;
 
 class AuraSignalFrame {
-	public static inline var MAX_SKILLS:Int = 24;
+	/** 32 auras x 8 conditions plus the action-bar strips. */
+	public static inline var MAX_SKILLS:Int = 288;
 	public static inline var MAX_STATUSES:Int = 512;
 	public static inline var MAX_CASTS:Int = 32;
 	public var generation:Int = 0;
@@ -108,6 +109,8 @@ class AuraSignalFrame {
 	public function findSkill(id:String):SkillSignalSnap {
 		if (id == null || id.length == 0) return null;
 		for (i in 0...skillCount) { var s = skills[i]; if (s.rawId == id || s.aliasId == id) return s; }
+		var key = solarflare.geaux.GeauxCache.sanitizeSkillId(id).toLowerCase();
+		for (i in 0...skillCount) { var s = skills[i]; if (s.rawId.toLowerCase() == key || s.aliasId.toLowerCase() == key) return s; }
 		return null;
 	}
 	public function findCast(id:String):EnemyCastSignalSnap {

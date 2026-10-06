@@ -22,7 +22,7 @@ class AuraTimingReferences {
 		var out:AuraTimingReference = {cdbSeconds:0, observedSeconds:0, nativeValid:false, rank:null, castSeconds:0, castLabel:"Unknown"};
 		if (id == null || id.length == 0) return out;
 		var matched = false;
-		for (snaps in [GeauxCache.slots, GeauxCache.weapons, GeauxCache.signatures]) {
+		for (snaps in [GeauxCache.auraSkills, GeauxCache.slots, GeauxCache.weapons, GeauxCache.signatures]) {
 			if (snaps == null) continue;
 			for (snap in snaps) if (!matched && snap != null && snap.present && (snap.id == id || snap.iconId == id)) {
 				out.rank = snap.observedRank;

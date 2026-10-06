@@ -23,7 +23,8 @@ class AuraEffects {
 		}
 	}
 
-	public static function apply(a:AuraDef, hit:Bool, known:Bool, now:Float, prog:Float, buffLeft:Float, buffInfinite:Bool, timerRestart:Bool = false):Void {
+	public static function apply(a:AuraDef, hit:Bool, known:Bool, now:Float, prog:Float, buffLeft:Float, buffInfinite:Bool, timerRestart:Bool = false,
+			cooldownDriven:Bool = false, cooldown:solarflare.aura.signal.SkillSignalSnap = null):Void {
 		if (a == null)
 			return;
 		ensure(a);
@@ -119,7 +120,8 @@ class AuraEffects {
 		var rise = hit && !a.condWas;
 		// Must run while condWas still holds the previous frame's edge.
 		var timerEdge = AuraTimerClock.trigger(known, hit, a.condWas, a.timerStartEdge);
-		AuraTimer.tick(a, hit, timerEdge || (a.timerStartEdge == 0 && timerRestart), now);
+		if (cooldownDriven) AuraTimer.tickCooldown(a, cooldown, now);
+		else AuraTimer.tick(a, hit, timerEdge || (a.timerStartEdge == 0 && timerRestart), now);
 		if (AuraTimer.keepsAura(a)) {
 			var running = AuraTimerClock.running(a);
 			a.show = AuraTimerClock.visible(a.show, a.visual.get(), a);
@@ -129,7 +131,7 @@ class AuraEffects {
 		// knows buff spans, which procs and untimed statuses never publish, so without
 		// this a configured timer would only ever appear on the Timers board.
 		if (a.timerActive && a.timerMode != AuraTimer.MODE_OFF) {
-			a.timeLeft = a.timerValue;
+			a.timeLeft = cooldownDriven && !AuraTimerClock.running(a) ? Math.NaN : a.timerValue;
 			a.timerInfinite = false;
 			if (a.timerSource == AuraTimer.SRC_FIXED || !(Math.isFinite(drawProg) && drawProg > 0.001 && drawProg < 0.999)) {
 				var frac = AuraTimer.fraction(a);

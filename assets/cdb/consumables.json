@@ -1,5 +1,5 @@
 {
-  "sourceSha256": "96ca48ad164a9be5ec52e28474d4be8c5fb6972256682322cff98563d710b807",
+  "sourceSha256": "ec38ea1e555a17af53e399fe9cce09e2e52146f3f749137b874f53dcababd2ce",
   "entries": [
     {
       "id": "Cook_13",
@@ -53,6 +53,19 @@
       ],
       "gfx": {
         "file": "UI/Portraits/Items/Food/Items_Loot_Cook_Cook_CrabGoulash_01.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "TPDeathStone",
+      "name": "Death Stone",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Miscellaneous_TeleportationStone_02.prefab.png",
         "size": 256,
         "x": 0,
         "y": 0
@@ -757,6 +770,32 @@
       }
     },
     {
+      "id": "TPRiftStone",
+      "name": "Rift Stone",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Miscellaneous_TeleportationStone_03.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "TPRiftStone_Perma",
+      "name": "Rift Stone",
+      "type": "Usable",
+      "refillable": false,
+      "statuses": [],
+      "gfx": {
+        "file": "UI/Portraits/Items/Consumable/Items_Loot_Miscellaneous_TeleportationStone_03.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
       "id": "SacrificePotion",
       "name": "Sacrifice Potion",
       "type": "Potion",
@@ -1074,6 +1113,19 @@
       ],
       "gfx": {
         "file": "UI/Portraits/Items/Usable/Items_Loot_Spark_SparkCube_Full.prefab.png",
+        "size": 256,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "TeleportationStone",
+      "name": "Sparkstone",
+      "type": "Usable",
+      "refillable": false,
+      "statuses": [],
+      "gfx": {
+        "file": "UI/Portraits/Items/Usable/Items_Loot_Miscellaneous_TeleportationStone_01.prefab.png",
         "size": 256,
         "x": 0,
         "y": 0

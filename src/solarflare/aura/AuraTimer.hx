@@ -1,10 +1,10 @@
 package solarflare.aura;
 
 /**
- * Condition-driven countdown / countup state for a single aura.
+ * Countdown / countup state for a single aura.
  *
- * Armed on the selected condition edge or a new qualifying cast. `tick` runs
- * before AuraEffects.apply overwrites `condWas`; the caller passes the trigger.
+ * Cooldown subjects follow native cooldown episodes. Other timers arm on the
+ * selected condition edge or a new qualifying cast, before condWas is overwritten.
  */
 class AuraTimer {
 	public static inline var MODE_OFF:Int = 0;
@@ -18,6 +18,15 @@ class AuraTimer {
 		if (a == null) return;
 		AuraTimerClock.tick(a, a.timerMode, a.timerSource == SRC_FIXED, a.timerSeconds.get(),
 			a.timeLeft, hit, rise, now, a.timerKeepExpired.get());
+	}
+
+	public static function tickCooldown(a:AuraDef, snap:solarflare.aura.signal.SkillSignalSnap, now:Float):Void {
+		var known = snap != null && snap.known && snap.cooldownKnown;
+		var left = known ? snap.cooldownLeft : Math.NaN;
+		// A usable charge and an active recharge can coexist. Affordability is independent.
+		var active = known && (snap.inCooldown || Math.isFinite(left) && left > 0);
+		AuraTimerClock.tickCooldown(a, a.timerMode, a.timerSource == SRC_FIXED ? a.timerSeconds.get() : Math.NaN,
+			known, active, left, known ? snap.cooldownTotal : Math.NaN, now, a.timerKeepExpired.get());
 	}
 
 	/** Progress in 0..1 for bar draws; 0 when the span is unknown. */
@@ -38,7 +47,7 @@ class AuraTimer {
 	}
 
 	public static function reset(a:AuraDef):Void {
-		if (a != null) AuraTimerClock.reset(a);
+		if (a != null) { AuraTimerClock.reset(a); a.timerCooldownWas = false; }
 	}
 
 	/** Configured timers extend condition visibility automatically; board linger is separate. */

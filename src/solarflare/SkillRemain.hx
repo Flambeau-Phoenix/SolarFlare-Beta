@@ -12,11 +12,9 @@ import hlx.runtime.ResolvedMember;
 class SkillRemain {
 	/** Sentinel left value when Status.isInfinite is true. */
 	public static inline var INFINITE_LEFT:Float = -1;
-	/** Finite remain above this is treated as non-expiring (clone/residual residues). */
-	static inline var MAX_FINITE_LEFT:Float = 3600;
 
 	static var PACK:Array<String> = [
-		"remaining", "timeLeft", "durationLeft", "elapsed", "cdUntil", "progress"
+		"remaining", "timeLeft", "durationLeft"
 	];
 
 	static var extraNames:Array<String> = [];
@@ -172,16 +170,13 @@ class SkillRemain {
 			} catch (_:Dynamic) {}
 			var dur = 0.0;
 			try dur = st.duration catch (_:Dynamic) dur = 0;
-			if (dur <= 0.05) {
-				return lastResult.set(1, INFINITE_LEFT, true, true);
-			}
-			var left = 0.0;
+			var left = Math.NaN;
 			var gotLeft = false;
 			try {
 				left = st.getDurationLeft();
 				gotLeft = true;
 			} catch (_:Dynamic)
-				left = 0;
+				left = Math.NaN;
 			var prog = Math.NaN;
 			try
 				prog = st.getDurationProgress()
@@ -213,16 +208,13 @@ class SkillRemain {
 			var bs:st.skill.BaseSkill = item;
 			var dur = 0.0;
 			try dur = bs.duration catch (_:Dynamic) dur = 0;
-			if (dur <= 0.05) {
-				return lastResult.set(1, INFINITE_LEFT, true, true);
-			}
-			var left = 0.0;
+			var left = Math.NaN;
 			var gotLeft = false;
 			try {
 				left = bs.getDurationLeft();
 				gotLeft = true;
 			} catch (_:Dynamic)
-				left = 0;
+				left = Math.NaN;
 			var prog = Math.NaN;
 			try
 				prog = bs.getDurationProgress()
@@ -274,12 +266,6 @@ class SkillRemain {
 			if (!Math.isNaN(elapsed) && elapsed >= 0)
 				left = max - elapsed;
 		}
-		var until = FieldWalk.extractNumber(obj, "cdUntil", -1);
-		if (until > 100) {
-			var now = gameNow();
-			if (now > 0 && until > now)
-				left = until - now;
-		}
 		var prog = FieldWalk.extractNumber(obj, "progress", Math.NaN);
 		if (Math.isNaN(prog))
 			prog = FieldWalk.extractNumber(obj, "durationProgress", Math.NaN);
@@ -305,11 +291,12 @@ class SkillRemain {
 		if (infinite)
 			return lastResult.set(1, INFINITE_LEFT, true, true);
 		var l = left;
-		if (Math.isNaN(l) || l < 0)
-			l = 0;
-		// Residual / clone leftovers above one hour are treated as non-expiring.
-		if (l > MAX_FINITE_LEFT)
-			return lastResult.set(1, INFINITE_LEFT, true, true);
+		if (!Math.isFinite(l) || l < 0) {
+			if (Math.isFinite(prog) && prog >= 0 && prog <= 1 && Math.isFinite(max) && max > 0)
+				l = prog * max;
+			else
+				return miss();
+		}
 		var p = prog;
 		if (Math.isNaN(p) || p < 0 || p > 1.01) {
 			if (max > 0.05 && l >= 0)
@@ -436,3 +423,4 @@ class SkillRemainResult {
 		return this;
 	}
 }
+

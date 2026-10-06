@@ -42,8 +42,8 @@ class GeauxSlotSnap {
 	/** True while this snap occupies a visible bar cell; replaces an O(count) scan. */
 	public var onBar:Bool = false;
 	/**
-	 * Cooldown duration and charge capacity only move on gear / talent swap, so they are
-	 * sampled on the equip cadence and reused until GeauxCache.staticGen advances.
+	 * Charge capacity is cached on the equip cadence. Current cooldown duration is
+	 * sampled with its live timer to retain trigger-time modifiers; the legacy build caches it.
 	 * Separate stamps: the two are written by different callers in the same tick.
 	 */
 	public var cdStaticGen:Int = -1;
@@ -64,6 +64,7 @@ class GeauxCdPoll {
 	public var left:Float = Math.NaN;
 	public var prog:Float = Math.NaN;
 	public var inCd:Bool = false;
+	public var inCdKnown:Bool = false;
 
 	public function new() {}
 
@@ -74,6 +75,7 @@ class GeauxCdPoll {
 		left = Math.NaN;
 		prog = Math.NaN;
 		inCd = false;
+		inCdKnown = false;
 	}
 }
 
@@ -97,6 +99,8 @@ class GeauxCache {
 	static function clearReadyFlashes():Void { readyFlashes.clear(); readySkillRefs.clear(); }
 
 	public static var slots:Array<GeauxSlotSnap> = [];
+	/** Observe-only snapshots for aura subjects, including skills outside visible slots. */
+	public static var auraSkills:Array<GeauxSlotSnap> = [];
 	public static var count:Int = 0;
 	public static var bookIds:Array<String> = [];
 	/** Cached PNG stem parallel to bookIds; resolved during observation, never in a picker draw. */
@@ -285,6 +289,7 @@ class GeauxCache {
 		count = visibleCount;
 		markOnBar();
 		if (heroDyn == null) {
+			auraSkills = [];
 			clearReadyFlashes();
 			weapons = [];
 			classSkills = [];
@@ -318,6 +323,7 @@ class GeauxCache {
 			heroChanged = true;
 		if (heroChanged) {
 			cachedBarRoots = null;
+			auraSkills = [];
 			clearReadyFlashes();
 		}
 		var now = nowStamp();
@@ -347,6 +353,8 @@ class GeauxCache {
 	}
 
 	static function telemetryInterval():Float {
+		if (solarflare.ObserveDemand.auras && solarflare.ObserveDemand.auraSkillIds.length > 0)
+			return TELEMETRY_HOT_S;
 		if (solarflare.ObserveDemand.geauxBuilder || solarflare.ObserveDemand.geauxDirty || telemetryDirty)
 			return TELEMETRY_HOT_S;
 		// Hot while any visible slot has a live cooldown.
@@ -413,8 +421,10 @@ class GeauxCache {
 			staticGen++;
 		}
 		tickSlots(heroDyn);
+		tickAuraSkills(heroDyn);
 		var active = new Map<String, Bool>();
 		for (s in slots) if (s.present) active.set(s.id, true);
+		for (s in auraSkills) if (s.present) active.set(s.id, true);
 		for (key in readyFlashes.keys()) if (!active.exists(key)) { readyFlashes.remove(key); readySkillRefs.remove(key); }
 	}
 
@@ -2362,7 +2372,7 @@ class GeauxCache {
 	static function writeCooldownFromSkill(snap:GeauxSlotSnap, skill:Dynamic):Void {
 		if (snap == null || skill == null)
 			return;
-		// Duration is static per equipped skill; only the live timer is re-polled here.
+		// getCooldown reads the current recharge duration, including trigger-time modifiers.
 		var cached:Float = snap.cdStaticGen == staticGen ? snap.cdMaxStatic : -1;
 		snap.observedRank = solarflare.castbar.ObservedSkillRank.read(skill);
 		var cachedNative = snap.observedRank == snap.nativeCdRankStatic ? snap.nativeCdTotalStatic : 0;
@@ -2388,8 +2398,8 @@ class GeauxCache {
 	}
 
 	/**
-	 * `cachedMax` > 0 reuses a duration already sampled on the equip cadence and skips the
-	 * three static getters, leaving only the live timer calls on the telemetry tick.
+	 * Native remaining seconds stay authoritative. The revised route samples the current
+     * recharge duration too, including the stored result of trigger-time modifiers.
 	 */
 	static function pollSkillCooldown(skill:Dynamic, out:GeauxCdPoll, cachedMax:Float = -1, cachedNative:Float = 0):Void {
 		out.reset();
@@ -2401,7 +2411,8 @@ class GeauxCache {
 			var typed:st.skill.Skill = skill;
 			if (typed != null) {
 				typedOk = true;
-				if (!haveMax) {
+				try out.max = typed.getCooldown() catch (_:Dynamic) {}
+				if (!Math.isFinite(out.max) || out.max <= 0) {
 					try
 						out.max = typed.getEffectiveCooldown()
 					catch (_:Dynamic) {}
@@ -2416,8 +2427,10 @@ class GeauxCache {
 						catch (_:Dynamic) {}
 					}
 				}
-				try
-					out.inCd = typed.isInCooldown()
+				try {
+					out.inCd = typed.isInCooldown();
+					out.inCdKnown = true;
+				}
 				catch (_:Dynamic) {}
 				try
 					out.left = typed.getCooldownLeft()
@@ -2427,47 +2440,50 @@ class GeauxCache {
 				catch (_:Dynamic) {}
 			}
 		} catch (_:Dynamic) {}
-		if (!typedOk) {
+		if (!typedOk || !Math.isFinite(out.left) || !Math.isFinite(out.prog)) {
 			ensureCdMems();
-			if (!haveMax) {
-				out.max = callNamedFloat(skill, "getEffectiveCooldown", cdEffMem);
+			if (!Math.isFinite(out.max) || out.max <= 0) {
+				out.max = callNamedFloat(skill, "getCooldown", cdMem);
 				if (Math.isNaN(out.max) || out.max <= 0)
-					out.max = callNamedFloat(skill, "getCooldown", cdMem);
+					out.max = callNamedFloat(skill, "getEffectiveCooldown", cdEffMem);
 			}
-			out.left = callNamedFloat(skill, "getCooldownLeft", cdLeftMem);
-			out.prog = callNamedFloat(skill, "getCooldownProgress", cdProgMem);
+			if (!Math.isFinite(out.left)) out.left = callNamedFloat(skill, "getCooldownLeft", cdLeftMem);
+			if (!Math.isFinite(out.prog)) out.prog = callNamedFloat(skill, "getCooldownProgress", cdProgMem);
 		}
 		// Capture native provenance before normalize/synthesis. Cached totals carry their own provenance.
-		var native = haveMax ? cachedNative : out.max;
-		out.nativeTotal = Math.isFinite(native) && native > 0.05 && native <= 600 ? native : 0;
-		out.max = normalizeSeconds(out.max, 0);
+		var native = out.max;
+		out.nativeTotal = Math.isFinite(native) && native > 0.05 ? native : 0;
+		out.max = solarflare.EngineTimerMath.seconds(out.max);
 		if (Math.isNaN(out.max) || out.max < 0)
 			out.max = 0;
-		out.valid = Math.isFinite(out.left) && out.left >= 0 || Math.isFinite(out.prog) && out.prog >= 0;
+		out.valid = out.inCdKnown || Math.isFinite(out.left) && out.left >= 0
+			|| out.max > 0 && Math.isFinite(out.prog) && out.prog >= 0 && out.prog <= 1;
 		out.left = scaleCdLeft(out.left, out.max);
-		if (!Math.isNaN(out.prog) && out.prog < 0)
-			out.prog = Math.NaN;
+		out.prog = solarflare.EngineTimerMath.cooldownRemaining(out.prog);
 	}
 
 	static function scaleCdLeft(left:Float, max:Float):Float {
-		left = normalizeSeconds(left, max);
-		if (Math.isNaN(left) || left < 0)
-			return 0;
-		if (max > 2 && left > 0 && left <= 1.0001)
-			return left * max;
-		return left;
+		return solarflare.EngineTimerMath.seconds(left);
 	}
 
 	static function commitCooldown(snap:GeauxSlotSnap, p:GeauxCdPoll):Void {
 		snap.nativeCdTotal = p.nativeTotal;
 		snap.nativeCdTotalValid = p.valid && p.nativeTotal > 0.05;
 		snap.cooldownValid = p.valid;
+		if (!p.valid) {
+			snap.cdLeft = 0;
+			snap.remaining = 0;
+			snap.ready = false;
+			return;
+		}
 		var max = p.max;
 		var left = p.left;
 		var prog = p.prog;
+		if (!Math.isFinite(left) && Math.isFinite(prog) && max > 0)
+			left = prog * max;
 		var inCd = p.inCd;
 		var prevMax = snap.cdMax;
-		if (!inCd && left <= 0.05 && (Math.isNaN(prog) || prog <= 0.05)) {
+		if (!inCd && left <= 0 && (Math.isNaN(prog) || prog <= 0)) {
 			snap.cdLeft = 0;
 			snap.remaining = 0;
 			snap.cdMax = max;
@@ -2475,13 +2491,13 @@ class GeauxCache {
 			ledgerGeauxCd("typed", "writeCooldownFromSkill", "getCooldownLeft", "", snap);
 			return;
 		}
-		if (left > 0.05) {
+		if (left > 0) {
 			snap.cdLeft = left;
 			snap.cdMax = max > left ? max : left;
 			snap.remaining = snap.cdMax > 0.05 ? clamp01(left / snap.cdMax) : 1;
 			if (!Math.isNaN(prog) && prog > 0.02 && prog <= 1.0001)
 				snap.remaining = clamp01(prog);
-			snap.ready = false;
+			snap.ready = solarflare.EngineTimerMath.cooldownReady(p.inCdKnown, inCd, left);
 			ledgerGeauxCd("typed", "writeCooldownFromSkill", "getCooldownLeft", "", snap);
 			return;
 		}
@@ -2489,11 +2505,14 @@ class GeauxCache {
 			snap.remaining = clamp01(prog);
 			snap.cdMax = max > 0.05 ? max : prevMax;
 			snap.cdLeft = snap.cdMax > 0.05 ? snap.remaining * snap.cdMax : 0;
-			snap.ready = snap.cdLeft <= 0.05;
+			snap.ready = solarflare.EngineTimerMath.cooldownReady(p.inCdKnown, inCd, snap.cdLeft);
 			ledgerGeauxCd("typed", "writeCooldownFromSkill", "getCooldownProgress", "", snap);
 			return;
 		}
 		if (inCd) {
+			// An observed cooldown without a readable duration is not zero seconds.
+			snap.cdLeft = Math.isFinite(left) ? left : Math.NaN;
+			snap.remaining = Math.isFinite(prog) ? prog : Math.NaN;
 			if (max > 0.05)
 				snap.cdMax = max;
 			else if (prevMax > snap.cdMax)
@@ -2505,7 +2524,7 @@ class GeauxCache {
 		snap.cdLeft = 0;
 		snap.cdMax = max;
 		snap.remaining = 0;
-		snap.ready = true;
+		snap.ready = solarflare.EngineTimerMath.cooldownReady(p.inCdKnown, inCd, left);
 		ledgerGeauxCd("typed", "writeCooldownFromSkill", "getCooldownLeft", "", snap);
 	}
 
@@ -2520,6 +2539,24 @@ class GeauxCache {
 		while (i < count) {
 			tickSlot(hero, heroDyn, slots[i]);
 			i++;
+		}
+	}
+
+	static function tickAuraSkills(heroDyn:Dynamic):Void {
+		var previous = auraSkills;
+		auraSkills = [];
+		if (!solarflare.ObserveDemand.auras || heroDyn == null) return;
+		var hero:ent.Hero = cast heroDyn;
+		for (id in solarflare.ObserveDemand.auraSkillIds) {
+			var snap:GeauxSlotSnap = null;
+			for (s in previous) if (s.id == id) { snap = s; break; }
+			if (snap == null) {
+				snap = new GeauxSlotSnap();
+				snap.id = id; snap.iconId = id; snap.label = solarflare.cdb.AuraCatalog.label(id);
+				snap.present = true;
+			}
+			tickSlot(hero, heroDyn, snap);
+			auraSkills.push(snap);
 		}
 	}
 
@@ -2706,21 +2743,8 @@ class GeauxCache {
 	static function buttonCdLeft(btn:Dynamic):Float {
 		if (btn == null)
 			return Math.NaN;
-		try {
-			var typed:ui.hud.SkillButton = btn;
-			if (typed != null) {
-				if (typed.cdTimer != null) {
-					var t = parseCdText(typed.cdTimer.text);
-					if (!Math.isNaN(t) && t > 0)
-						return t;
-				}
-				if (typed.serverCdTimer != null) {
-					var t2 = parseCdText(typed.serverCdTimer.text);
-					if (!Math.isNaN(t2) && t2 > 0)
-						return t2;
-				}
-			}
-		} catch (_:Dynamic) {}
+		// Optional HUD text fields are absent from current typed bindings.
+		// Keep the existing FieldWalk path for builds that expose them at runtime.
 		var left = parseCdText(textOf(plainField(btn, "cdTimer")));
 		if (Math.isNaN(left) || left <= 0)
 			left = parseCdText(textOf(plainField(btn, "serverCdTimer")));

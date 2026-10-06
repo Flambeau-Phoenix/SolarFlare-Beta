@@ -7,6 +7,9 @@ class SkillSignalSnap {
 	public var ready:Bool = false;
 	public var affordable:Bool = false;
 	public var inCooldown:Bool = false;
+	/** Native cooldown observation succeeded; identity alone cannot establish readiness. */
+	public var cooldownKnown:Bool = false;
+	public var cooldownTotal:Float = Math.NaN;
 	public var cooldownLeft:Float = 0;
 	public var cooldownProgress:Float = 0;
 	/** script.SkillScript.shouldPlayInstantly() — proc / free-cast available. */
@@ -21,7 +24,7 @@ class SkillSignalSnap {
 	public function new() {}
 	public function reset():Void {
 		rawId = ""; aliasId = ""; label = ""; ready = false; affordable = false;
-		inCooldown = false; cooldownLeft = 0; cooldownProgress = 0;
+		inCooldown = false; cooldownKnown = false; cooldownTotal = Math.NaN; cooldownLeft = 0; cooldownProgress = 0;
 		instantReady = false; instantReadyKnown = false;
 		specialReady = false; specialReadyKnown = false;
 		charges = 0; chargesMax = 0; known = false;

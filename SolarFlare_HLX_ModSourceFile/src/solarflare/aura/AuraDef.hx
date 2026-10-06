@@ -104,13 +104,15 @@ class AuraDef {
 
 	/** 0 = off, 1 = count down, 2 = count up. */
 	public var timerMode:Int;
-	/** 0 = follow the condition's remaining time, 1 = fixed timerSeconds. */
+	/** 0 = live remaining time, 1 = fixed seconds (fallback only for cooldown subjects). */
 	public var timerSource:Int;
 	public var timerSeconds:FloatRef;
-	/** 0 = condition becomes true, 1 = confirmed condition becomes false. */
+	/** Non-cooldown timers: 0 = condition becomes true, 1 = confirmed condition becomes false. */
 	public var timerStartEdge:Int = 0;
 	/** Last accepted player-cast sequence; transient and never serialized. */
 	public var timerEventSerial:Int = 0;
+	/** Last confirmed cooldown activity; a failed poll cannot create another episode. */
+	public var timerCooldownWas:Bool = false;
 	/** Show this timer in the shared AuraTimerBoard window. */
 	public var timerBoard:BoolRef;
 	/** Seconds the finished timer lingers at 0 before it is dropped. */

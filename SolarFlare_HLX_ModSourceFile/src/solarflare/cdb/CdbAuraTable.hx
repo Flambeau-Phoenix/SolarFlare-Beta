@@ -4,7 +4,7 @@ import haxe.Json;
 
 /**
  * CastleDB timings for Auras, baked by `tools/refresh_cdb_assets.py` and embedded
- * as the `status-durations` resource. Duration / cooldown only — live getters still win
+ * as the `status-durations` resource. Identity, stack caps and timings; live getters still win
  * when present; this is the fallback when a status exposes no usable timer.
  *
  * Embedded so timing updates take effect with the rebuilt mod bytecode. Deployment
@@ -95,26 +95,24 @@ class CdbAuraTable {
 		return cd > 0.05 ? cd : d;
 	}
 
-	/** CastleDB status id this skill grants, else naming-convention `_Proc` / `_Status`. */
+	/** Validated CastleDB status relationship generated for this ability. */
 	public static function grantedStatusId(id:String):String {
 		ensure();
 		if (id == null || id.length == 0)
 			return "";
-		// Inner Demon references both its rank-3 shield and its always-on ready
-		// marker in script.  The generic CDB baker sees the shield first, but the
-		// status users actually mean when selecting the passive is the ready buff.
-		if (norm(id) == "staff_summondemon_passive")
-			return "Staff_SummonDemon_Passive_Buff";
+		// Explicit status selections must never redirect to a companion.
+		if (isStatus(id)) return "";
 		var g = granted.get(norm(id));
-		if (g != null && g.length > 0)
+		if (g != null && g.length > 0 && isStatus(g))
 			return g;
-		var proc = id + "_Proc";
-		if (statusKind.exists(norm(proc)) || durs.exists(norm(proc)))
-			return proc;
-		var st = id + "_Status";
-		if (statusKind.exists(norm(st)) || durs.exists(norm(st)))
-			return st;
 		return "";
+	}
+
+	/** Resolve status signals only; unknown observed IDs retain their exact identity. */
+	public static function statusSubjectId(id:String):String {
+		if (id == null || id.length == 0 || isStatus(id)) return id;
+		var grant = grantedStatusId(id);
+		return grant.length > 0 ? grant : id;
 	}
 
 	/** gear | rank | reset | vars when the baked span can move in play. Empty = clean. */
@@ -172,10 +170,8 @@ class CdbAuraTable {
 	}
 
 	/**
-	 * Timings only. `name` / `gfx` / `maxStacks` are absent from the baked rows: the CDB
-	 * skill sheet carries no maxStacks at all, and labels + icons already resolve through
-	 * AuraCatalog and GameIcons, so populating them here would silently change what the
-	 * builder displays.
+	 * Labels and icons remain owned by AuraCatalog and GameIcons. Stack caps are
+	 * authored props.status.maxStacks, independent of the observed live stack count.
 	 */
 	static function put(row:Dynamic):Void {
 		if (row == null)
@@ -194,6 +190,9 @@ class CdbAuraTable {
 			cds.set(key, cd);
 		if (Reflect.field(row, "isStatus") == true)
 			statusKind.set(key, true);
+		var maxStacks = dynFloat(Reflect.field(row, "maxStacks"));
+		if (Math.isFinite(maxStacks) && maxStacks != 0 && Reflect.field(row, "isStatus") == true)
+			stacks.set(key, Std.int(maxStacks));
 		var g = dynStr(Reflect.field(row, "grantedStatus"));
 		if (g.length == 0)
 			g = dynStr(Reflect.field(row, "granted"));

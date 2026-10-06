@@ -39,8 +39,7 @@ class AuraQuickBuildRules {
 
 	public static function subjectId(id:String, kind:String):String {
 		if (kind != "status") return id;
-		var granted = solarflare.cdb.CdbAuraTable.grantedStatusId(id);
-		return granted.length > 0 ? granted : id;
+		return solarflare.cdb.CdbAuraTable.statusSubjectId(id);
 	}
 
 	public static function conditionIssue(c:AuraConditionDef):String {

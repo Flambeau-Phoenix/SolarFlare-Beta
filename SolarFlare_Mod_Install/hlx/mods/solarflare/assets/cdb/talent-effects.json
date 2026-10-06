@@ -1,5 +1,5 @@
 {
-  "source": "E:\\Solar_Flare_2_Mod\\9-30_Patch_Stuff\\data.cdb",
+  "source": "E:\\Solar_Flare_2_Mod\\CDBTooley\\data.cdb",
   "notes": [
     "Generated from current CDB skill rows with props.talent.",
     "CooldownReduction affixes carry authored percentages and rank conditions.",

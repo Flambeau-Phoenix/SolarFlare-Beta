@@ -3,16 +3,15 @@ package solarflare.aura;
 import solarflare.EngineSkillId;
 import solarflare.FieldWalk;
 
-/** One-shot duration stamp for a status id, taken on its apply edge. */
+/** Duration stamp for an observed status. Candidate builds periodically refresh live timers. */
 class StatusStamp {
 	/** Wall-clock expiry. Meaningless when infinite. */
 	public var endsAt:Float = 0;
 	public var totalDur:Float = 0;
 	public var infinite:Bool = false;
 	/**
-	 * Wall-clock re-resolve deadline for infinite stamps. SkillRemain reports infinite for
-	 * anything over MAX_FINITE_LEFT, so "infinite" may just mean "long"; without a recheck
-	 * a 5-minute buff would stay infinite forever and never show a countdown.
+	 * Wall-clock re-resolve deadline. The candidate rechecks finite live timers at 10 Hz
+	 * and explicit infinite timers at 1 Hz; the default route retains its previous policy.
 	 */
 	public var recheckAt:Float = 0;
 	/** "live" or "cdb" — which resolver produced the span. */
@@ -44,7 +43,8 @@ class AuraStatusCache {
 	 *
 	 * Must live outside the snaps: reset() clears every snap on each pass, so a stamp
 	 * stored on the snap would be thrown away before it could save any work. Cleared on
-	 * hero change, and per-id by the lifecycle hooks that actually move a duration.
+	 * hero change and explicit invalidations. Candidate builds also resample timers and
+	 * prune absent IDs after complete container observations; status hooks are currently retired.
 	 */
 	static var stamps = new Map<String, StatusStamp>();
 
@@ -110,6 +110,7 @@ class AuraStatusCache {
 		for (id in solarflare.ObserveDemand.statusIds)
 			if (find(id) == null)
 				lookupTyped(id);
+		pruneAbsentStamps();
 	}
 
 	public static function find(want:String):AuraStatusSnap {
@@ -324,47 +325,28 @@ class AuraStatusCache {
 	 */
 	static function applyRemain(snap:AuraStatusSnap, item:Dynamic):Void {
 		var now = stamp();
-		var key = snap.id.toLowerCase() + (snap.sourceItemId.length > 0 ? ":" + snap.sourceItemId.toLowerCase() : "");
+		var key = stampKey(snap);
 		var st = stamps.get(key);
-		if (st != null && (st.infinite ? now < st.recheckAt : now < st.endsAt)) {
+		if (st != null && solarflare.EngineTimerMath.reuseDurationStamp(now, st.recheckAt, st.endsAt, st.infinite)) {
 			applyStamp(snap, st, now);
 			return;
 		}
-		if (st != null)
-			stamps.remove(key);
-
-		// Live first so haste / talent-modified spans are captured exactly.
+		// Re-read the actual Status timer to catch refreshes, extensions and modifiers.
 		var rp = solarflare.SkillRemain.read(item);
 		if (rp.valid) {
-			if (rp.infinite) {
-				stampInfinite(snap, key);
-				return;
-			}
-			var cdb = resolveCdbDuration(snap);
-			if (rp.left <= 0.02 && (cdb > 0.05 || snap.totalDur > 0.05)) {
-				// Genuinely expired timed status — do not stamp, the status is about to drop.
-				snap.durationKnown = true;
-				snap.infinite = false;
-				snap.present = false;
-				snap.progress = 0;
-				snap.left = rp.left < 0 ? 0 : rp.left;
-				snap.stacks = 0;
-				return;
-			}
-			if (rp.left > 0.02) {
-				stampFinite(snap, key, rp.left, rp.progress, now, "live");
-				return;
-			}
-		}
-
-		// No usable live timer: fall back to the baked CastleDB span, if the id has one.
-		var cdb = resolveCdbDuration(snap);
-		if (cdb > 0.05) {
-			stampFinite(snap, key, cdb, Math.NaN, now, "cdb");
+			if (rp.infinite) { stampInfinite(snap, key); return; }
+			stampFinite(snap, key, rp.left < 0 ? 0 : rp.left, rp.progress, now, "live");
 			return;
 		}
-
-		// Present but untimed — visible with no countdown.
+		// A failed read may retain an unexpired observation, but cannot renew its span.
+		if (st != null) {
+			st.recheckAt = now + 0.1;
+			if (st.infinite || now < st.endsAt) { applyStamp(snap, st, now); return; }
+		} else {
+			var cdb = resolveCdbDuration(snap);
+			if (cdb > 0.05) { stampFinite(snap, key, cdb, Math.NaN, now, "cdb"); return; }
+		}
+		// An expired estimate is not evidence of removal. Observed presence remains true.
 		snap.durationKnown = false;
 		snap.infinite = false;
 		snap.progress = 1;
@@ -373,6 +355,23 @@ class AuraStatusCache {
 		snap.totalDur = 0;
 		snap.stampSource = "";
 		snap.present = true;
+	}
+
+	static function stampKey(snap:AuraStatusSnap):String {
+		return snap.id.toLowerCase() + (snap.sourceItemId.length > 0 ? ":" + snap.sourceItemId.toLowerCase() : "");
+	}
+
+	static function pruneAbsentStamps():Void {
+		// Missing/truncated containers cannot prove absence or establish a new apply edge.
+		if (!domainKnown || containerLength < 0 || containerLength > MAX) return;
+		var seen = new Map<String, Bool>();
+		for (i in 0...count) {
+			var snap = snaps[i];
+			if (snap != null && snap.known && snap.present) seen.set(stampKey(snap), true);
+		}
+		var remove:Array<String> = [];
+		for (key in stamps.keys()) if (!seen.exists(key)) remove.push(key);
+		for (key in remove) stamps.remove(key);
 	}
 
 	/** Longest CDB span across the snap's alias set; ids vary by how the status was found. */
@@ -401,6 +400,7 @@ class AuraStatusCache {
 		st.endsAt = now + left;
 		st.totalDur = total;
 		st.infinite = false;
+		st.recheckAt = now + 0.1;
 		st.source = src;
 		stamps.set(key, st);
 		applyStamp(snap, st, now);

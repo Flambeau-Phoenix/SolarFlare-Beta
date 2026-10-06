@@ -1,6 +1,6 @@
 {
   "source": {
-    "sha256": "96ca48ad164a9be5ec52e28474d4be8c5fb6972256682322cff98563d710b807",
+    "sha256": "ec38ea1e555a17af53e399fe9cce09e2e52146f3f749137b874f53dcababd2ce",
     "toolVersion": "refresh_cdb_assets"
   },
   "bosses": [
@@ -48,7 +48,7 @@
         },
         {
           "id": "Gatsbee_Barrage",
-          "name": "Gatsbee_Barrage"
+          "name": "Barrage"
         },
         {
           "id": "Gatsbee_Tornado",

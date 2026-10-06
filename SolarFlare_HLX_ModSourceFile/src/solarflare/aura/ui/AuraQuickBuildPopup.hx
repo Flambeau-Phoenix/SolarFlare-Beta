@@ -414,13 +414,12 @@ class AuraQuickBuildPopup {
 				});
 			});
 			if (AuraTimingReferencePolicy.isCooldown(draft.condition.signal)) {
-				UiLayout.propertyRow("Cooldown reference", function() {
-					UiLayout.inlinePair("##ab_quick_cooldown_reference", function(w:Single) {
-						if (UiChrome.navButton("CDB##ab_quick_cd_cdb", draft.cooldownReference == "CDB", ImGui.vec2(w, 28))) applyTimingReference("CDB");
-					}, function(w:Single) {
-						if (UiChrome.navButton("Observed##ab_quick_cd_observed", draft.cooldownReference == "Observed", ImGui.vec2(w, 28))) applyTimingReference("Observed");
+				UiLayout.propertyRow("Cooldown timing", function() {
+					var choices = ["Game time", "CDB", "Observed"];
+					UiLayout.inlineSplit("##ab_quick_cooldown_reference", 3, function(i:Int, w:Single) {
+						if (UiChrome.navButton(choices[i] + "##ab_quick_cd_" + i, draft.cooldownReference == choices[i], ImGui.vec2(w, 28))) applyTimingReference(choices[i]);
 					});
-				}, "Copies the selected cooldown total into fixed draft seconds. Observed requires a valid native total.");
+				}, "Starts when the skill enters cooldown and follows live seconds, including modifiers. CDB and Observed supply an estimate only if live timing is unavailable.");
 			}
 			if (AuraTimingReferencePolicy.isCast(draft.condition.signal)) UiLayout.propertyRow("Cast rank", function() {
 				var ranks = solarflare.castbar.LearnedCastTimes.ranks(draft.condition.subject);
@@ -436,7 +435,7 @@ class AuraQuickBuildPopup {
 				}
 			}, "Defaults to the observed rank when available. Choose a recorded rank to use its matching cast time.");
 			if (AuraTimingReferencePolicy.isCooldown(draft.condition.signal) || AuraTimingReferencePolicy.isCast(draft.condition.signal)) {
-				UiLayout.propertyRow("Timer seconds", function() {
+				UiLayout.propertyRow(AuraTimingReferencePolicy.isCooldown(draft.condition.signal) ? "Cooldown estimate" : "Timer seconds", function() {
 					var seconds = draft.aura.timerSeconds.get();
 					ImGui.textWrapped(draft.timerReferenceLabel + (seconds > 0 ? " · " + Math.round(seconds * 1000) / 1000 + " s" : ""));
 					if (UiChrome.ghostButton("Apply current reference##ab_quick_timer_refresh")) applyTimingReference(draft.cooldownReference);
@@ -461,6 +460,7 @@ class AuraQuickBuildPopup {
 		var ref = AuraTimingReferences.forSubject(c.subject, c.signal, castRank, castRankChosen);
 		castRank = ref.rank;
 		if (AuraTimingReferencePolicy.isCast(c.signal)) draft.setTimerReference("CDB", ref.castSeconds, ref.castLabel);
+		else if (choice == "Game time") draft.setTimerReference("Game time", 0, "Live cooldown");
 		else {
 			var seconds = AuraTimingReferencePolicy.seconds(choice, ref.cdbSeconds, ref.observedSeconds, ref.nativeValid);
 			draft.setTimerReference(choice, seconds, seconds > 0 ? choice : "Unavailable");

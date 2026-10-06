@@ -40,6 +40,7 @@ class AuraCatalog {
 		if (kind == "statustype") return 3;
 		if (kind != "skill") return 4;
 		if (id == null) return 2;
+		if (CdbAuraTable.isStatus(id)) return 0;
 		var low = id.toLowerCase();
 		if (StringTools.endsWith(low, "_status") || StringTools.endsWith(low, "_proc")
 			|| StringTools.endsWith(low, "status") || StringTools.endsWith(low, "proc")

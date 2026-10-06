@@ -34,6 +34,8 @@ class ObserveDemand {
 	public static var instantSkillIds:Array<String> = [];
 	/** Skill subjects for skill.specialReady (sanitized IDs, rebuilt each publish). */
 	public static var specialSkillIds:Array<String> = [];
+	/** Every enabled aura skill subject, independent of visible overlay slots. */
+	public static var auraSkillIds:Array<String> = [];
 	/** Skill subjects for event.cast.* (sanitized IDs, rebuilt each publish). */
 	public static var castSkillIds:Array<String> = [];
 	public static var auraBuilderOpen:Bool = false;
@@ -101,6 +103,7 @@ class ObserveDemand {
 		auraBuilderOpen = cfg.auraBuilder != null && cfg.auraBuilder.open.get();
 		if (statusDemandDirty) {
 			statusDemandDirty = false;
+			auraSkillIds.resize(0);
 			while (statusIds.length > 0)
 				statusIds.pop();
 			while (instantSkillIds.length > 0)
@@ -112,6 +115,11 @@ class ObserveDemand {
 			consumableIds.resize(0);
 			if (cfg.extraBarsPrototype != null && cfg.extraBarsPrototype.model.sparkEnabled) pushStatusId("SparkSurge_Status");
 			if (cfg.auras != null) {
+				for (a in cfg.auras.auras) if (a != null && a.enabled.get()) {
+					if (a.rule != null && a.rule.conditions != null) {
+						for (c in a.rule.conditions) if (c != null && c.signal != null && StringTools.startsWith(c.signal, "skill.")) pushAuraSkillId(c.subject);
+					} else if (a.trigger == "cooldown") pushAuraSkillId(a.skillId);
+				}
 				for (a in cfg.auras.auras) if (a != null && a.enabled.get() && a.rule != null) {
 					for (c in a.rule.conditions) if (c != null && StringTools.startsWith(c.signal, "consumable.")) {
 						var entry = solarflare.cdb.ConsumableCatalog.find(c.subject);
@@ -149,6 +157,12 @@ class ObserveDemand {
 
 	public static function markStatusDemandDirty():Void {
 		statusDemandDirty = true;
+	}
+
+	static function pushAuraSkillId(id:String):Void {
+		if (id == null) return;
+		id = solarflare.geaux.GeauxCache.sanitizeSkillId(id);
+		if (id.length > 0 && auraSkillIds.indexOf(id) < 0 && auraSkillIds.length < 256) auraSkillIds.push(id);
 	}
 
 	static function auraRulesNeedStatus(cfg:ConfigPanel):Bool {

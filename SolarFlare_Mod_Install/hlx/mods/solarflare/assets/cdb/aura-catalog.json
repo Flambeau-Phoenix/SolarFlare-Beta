@@ -491,6 +491,16 @@
       "kind": "unit"
     },
     {
+      "id": "Gatsbee_Barrage",
+      "name": "Barrage",
+      "kind": "skill"
+    },
+    {
+      "id": "Gatsbee_Heroic_Barrage_Bounce",
+      "name": "Barrage",
+      "kind": "skill"
+    },
+    {
       "id": "Slime_Z1W_FS_2",
       "name": "Barrel-aged Invoked Slime",
       "kind": "unit"
@@ -1924,6 +1934,341 @@
       "id": "Crimson_SwordShield_Consecration",
       "name": "Consecration",
       "kind": "skill"
+    },
+    {
+      "id": "consumable_Cook_1",
+      "name": "consumable_Cook_1",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_10",
+      "name": "consumable_Cook_10",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_11",
+      "name": "consumable_Cook_11",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_12",
+      "name": "consumable_Cook_12",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_13",
+      "name": "consumable_Cook_13",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_14",
+      "name": "consumable_Cook_14",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_15",
+      "name": "consumable_Cook_15",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_16",
+      "name": "consumable_Cook_16",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_2",
+      "name": "consumable_Cook_2",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_3",
+      "name": "consumable_Cook_3",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_4",
+      "name": "consumable_Cook_4",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_5",
+      "name": "consumable_Cook_5",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_6",
+      "name": "consumable_Cook_6",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_7",
+      "name": "consumable_Cook_7",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_8",
+      "name": "consumable_Cook_8",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_9",
+      "name": "consumable_Cook_9",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_Demon_0",
+      "name": "consumable_Cook_Demon_0",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_Demon_1",
+      "name": "consumable_Cook_Demon_1",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_Demon_2",
+      "name": "consumable_Cook_Demon_2",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_Demon_3",
+      "name": "consumable_Cook_Demon_3",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_Demon_4",
+      "name": "consumable_Cook_Demon_4",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_Demon_5",
+      "name": "consumable_Cook_Demon_5",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Cook_Demon_6",
+      "name": "consumable_Cook_Demon_6",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ElixirOfAbundance",
+      "name": "consumable_ElixirOfAbundance",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ElixirOfArmor_Z2",
+      "name": "consumable_ElixirOfArmor_Z2",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ElixirOfDexterity_Z2",
+      "name": "consumable_ElixirOfDexterity_Z2",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ElixirOfFaith_Z2",
+      "name": "consumable_ElixirOfFaith_Z2",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ElixirOfIntelligence_Z2",
+      "name": "consumable_ElixirOfIntelligence_Z2",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ElixirofMinorArmor",
+      "name": "consumable_ElixirofMinorArmor",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ElixirOfMinorDexterity",
+      "name": "consumable_ElixirOfMinorDexterity",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ElixirOfMinorFaith",
+      "name": "consumable_ElixirOfMinorFaith",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ElixirOfMinorIntelligence",
+      "name": "consumable_ElixirOfMinorIntelligence",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ElixirOfMinorStrength",
+      "name": "consumable_ElixirOfMinorStrength",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ElixirOfStrength_Z2",
+      "name": "consumable_ElixirOfStrength_Z2",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_FastSwimPotion",
+      "name": "consumable_FastSwimPotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Feast",
+      "name": "consumable_Feast",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_HealthPotion",
+      "name": "consumable_HealthPotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_InvisibilityPotion",
+      "name": "consumable_InvisibilityPotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_LongBreathPotion",
+      "name": "consumable_LongBreathPotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_MinorDexterityPotion",
+      "name": "consumable_MinorDexterityPotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_MinorFaithPotion",
+      "name": "consumable_MinorFaithPotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_MinorHealingPotion",
+      "name": "consumable_MinorHealingPotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_MinorIntelligencePotion",
+      "name": "consumable_MinorIntelligencePotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_MinorShieldPotion",
+      "name": "consumable_MinorShieldPotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_MinorStrengthPotion",
+      "name": "consumable_MinorStrengthPotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_MinorVelocityPotion",
+      "name": "consumable_MinorVelocityPotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_RefillableFlask",
+      "name": "consumable_RefillableFlask",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_SacrificePotion",
+      "name": "consumable_SacrificePotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ScrollOfCorruptedDexterity",
+      "name": "consumable_ScrollOfCorruptedDexterity",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ScrollOfCorruptedFaith",
+      "name": "consumable_ScrollOfCorruptedFaith",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ScrollOfCorruptedIntellect",
+      "name": "consumable_ScrollOfCorruptedIntellect",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ScrollOfCorruptedStrength",
+      "name": "consumable_ScrollOfCorruptedStrength",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ScrollOfDexterity",
+      "name": "consumable_ScrollOfDexterity",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ScrollOfFaith",
+      "name": "consumable_ScrollOfFaith",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ScrollOfIntelligence",
+      "name": "consumable_ScrollOfIntelligence",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ScrollOfStrength",
+      "name": "consumable_ScrollOfStrength",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ScrollOfVitality",
+      "name": "consumable_ScrollOfVitality",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ShieldPotion_Z2",
+      "name": "consumable_ShieldPotion_Z2",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_SmallAlchemistCauldron",
+      "name": "consumable_SmallAlchemistCauldron",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_SparkCube",
+      "name": "consumable_SparkCube",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_TeleportationStone",
+      "name": "consumable_TeleportationStone",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_TPDeathStone",
+      "name": "consumable_TPDeathStone",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_TPRiftStone",
+      "name": "consumable_TPRiftStone",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_TPRiftStone_Perma",
+      "name": "consumable_TPRiftStone_Perma",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_VesselPotion",
+      "name": "consumable_VesselPotion",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Weightstone",
+      "name": "consumable_Weightstone",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_Whetstone",
+      "name": "consumable_Whetstone",
+      "kind": "icon"
     },
     {
       "id": "ConsumableStatus",
@@ -3766,16 +4111,6 @@
       "kind": "skill"
     },
     {
-      "id": "Gatsbee_Barrage",
-      "name": "Gatsbee_Barrage",
-      "kind": "skill"
-    },
-    {
-      "id": "Gatsbee_Heroic_Barrage_Bounce",
-      "name": "Gatsbee_Heroic_Barrage_Bounce",
-      "kind": "skill"
-    },
-    {
       "id": "Gatsbee_Heroic_Barrage_Puddle",
       "name": "Gatsbee_Heroic_Barrage_Puddle",
       "kind": "skill"
@@ -5388,6 +5723,11 @@
     {
       "id": "ManfishBoss_WaterBreathStun",
       "name": "ManfishBoss_WaterBreathStun",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_WaterVolley_Target",
+      "name": "ManfishBoss_WaterVolley_Target",
       "kind": "skill"
     },
     {

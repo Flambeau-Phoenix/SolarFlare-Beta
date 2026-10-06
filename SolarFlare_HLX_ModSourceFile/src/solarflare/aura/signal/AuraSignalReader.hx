@@ -74,16 +74,22 @@ class AuraSignalReader {
 	static function readSkill(frame:AuraSignalFrame, signal:String, subject:String, out:AuraResolvedValue):Void {
 		var s = frame.findSkill(subject); if (s == null || !s.known) { out.code = MISSING_SUBJECT; return; }
 		switch (signal) {
-			case "skill.ready": bool(out, true, s.ready);
+			case "skill.ready": bool(out, s.cooldownKnown, s.ready);
 			case "skill.affordable": bool(out, true, s.affordable);
-			case "skill.inCooldown": bool(out, true, s.inCooldown);
-			case "skill.cooldownLeft": duration(out, true, s.cooldownLeft, s.cooldownProgress);
-			case "skill.cooldownProgress": percent(out, true, s.cooldownProgress, s.cooldownLeft);
+			case "skill.inCooldown": bool(out, s.cooldownKnown, s.inCooldown);
+			case "skill.cooldownLeft": duration(out, s.cooldownKnown, s.cooldownLeft, s.cooldownProgress);
+			case "skill.cooldownProgress": percent(out, s.cooldownKnown, s.cooldownProgress, s.cooldownLeft);
 			case "skill.instantReady": bool(out, s.instantReadyKnown, s.instantReady);
 			case "skill.specialReady": bool(out, s.specialReadyKnown, s.specialReady);
 			case "skill.charges": count(out, s.chargesMax > 0, s.charges);
 			case "skill.chargesMax": count(out, s.chargesMax > 0, s.chargesMax);
 			default:
+		}
+		// Timing is presentation metadata even when ready/affordable evaluates false.
+		// Proc readiness has a different lifecycle and must keep its condition timer.
+		if (solarflare.aura.AuraTimingReferencePolicy.isCooldown(signal) && s.cooldownKnown) {
+			out.timeLeft = s.cooldownLeft;
+			out.progress = s.cooldownProgress;
 		}
 	}
 	static function readCast(frame:AuraSignalFrame, signal:String, subject:String, out:AuraResolvedValue):Void {

@@ -518,12 +518,7 @@ class AuraConditionEditor {
 		}
 		drawSubjectIcon(id, 28, 28);
 		ImGui.sameLine();
-		var resolvedId = id;
-		if (subjectKind == "status") {
-			var grant = solarflare.cdb.CdbAuraTable.grantedStatusId(id);
-			if (grant.length > 0 && grant != id)
-				resolvedId = grant;
-		}
+		var resolvedId = subjectKind == "status" ? solarflare.cdb.CdbAuraTable.statusSubjectId(id) : id;
 		var kindTag = entryKind == "statustype" ? "category" : entryKind;
 		if (ImGui.selectable(name + " [" + id + "] · " + kindTag + "##subject_" + tag + id, c.subject == resolvedId)) {
 			c.subject = resolvedId;
@@ -534,6 +529,7 @@ class AuraConditionEditor {
 			SettingsStore.markDirty();
 			ImGui.closeCurrentPopup();
 		}
+		if (ImGui.isItemHovered()) ImGui.setTooltip(name + " [" + resolvedId + "]");
 	}
 
 	static function adjustPresentation(r:AuraRuleDef, fromIdx:Int, toIdx:Int):Void {

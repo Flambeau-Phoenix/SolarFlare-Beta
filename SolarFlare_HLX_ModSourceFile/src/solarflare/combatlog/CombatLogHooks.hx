@@ -11,16 +11,16 @@ class CombatLogHooks {
 
 	@:hlx.postfix(st.skill.BaseSkill.doStart)
 	static function onBaseSkillStart(skill:Dynamic, result:Void):Void {
-		solarflare.castbar.CastCache.noteStart(skill);
-		CombatLogCache.noteCast(skill);
-		solarflare.attackcombo.AttackComboCache.onBaseSkillStart(skill);
+        try solarflare.castbar.CastCache.noteStart(skill) catch (_:Dynamic) {}
+        try CombatLogCache.noteCast(skill) catch (_:Dynamic) {}
+        try solarflare.attackcombo.AttackComboCache.onBaseSkillStart(skill) catch (_:Dynamic) {}
 	}
 
 	/** Native: fun(BaseSkill, SkillStopReason) -> void → postfix N+1 with middle reason. */
 	@:hlx.postfix(st.skill.BaseSkill.doStop)
 	static function onBaseSkillStop(skill:Dynamic, reason:Dynamic, result:Void):Void {
-		solarflare.castbar.CastCache.noteStop(skill);
-		solarflare.aura.EnemyCastCache.noteStop(skill);
+        try solarflare.castbar.CastCache.noteStop(skill) catch (_:Dynamic) {}
+        try solarflare.aura.EnemyCastCache.noteStop(skill) catch (_:Dynamic) {}
 	}
 
 }

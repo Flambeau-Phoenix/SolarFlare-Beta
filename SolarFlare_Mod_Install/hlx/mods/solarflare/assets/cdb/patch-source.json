@@ -1,40 +1,40 @@
 {
-  "source": "E:\\Solar_Flare_2_Mod\\9-30_Patch_Stuff\\data.cdb",
-  "sha256": "96ca48ad164a9be5ec52e28474d4be8c5fb6972256682322cff98563d710b807",
+  "source": "E:\\Solar_Flare_2_Mod\\CDBTooley\\data.cdb",
+  "sha256": "ec38ea1e555a17af53e399fe9cce09e2e52146f3f749137b874f53dcababd2ce",
   "generator": "tools/refresh_cdb_assets.py",
   "files": {
     "aura-catalog.json": {
-      "sha256": "45efef09ec93d1fbde0e3cc80c22e5eda690a848ec8e37f416919c2cf405dc6c"
+      "sha256": "978b545dd5945c1e6469e12206d0ee6d88957c59262dae975a21b6fa9655dfb7"
     },
     "aura-quickstart.json": {
-      "sha256": "3a4853f8c4907e3a9d4245764e2328233422a0350c0595cdf36ccce03df8d84e"
+      "sha256": "3efabaaf9b8b8f841e941d964e8af108189168387d44a50e984c16203468a28e"
     },
     "class-signatures.json": {
       "sha256": "55647312abace36b2a74eefebb828bd1ea1fd06271c77779fd21a347cb242adc"
     },
     "combat-catalog.json": {
-      "sha256": "3761cf0b49984c3ab55eddeb1c8d97908868f71fd977f63a55a9ff8a1d38ce90"
+      "sha256": "b09d102b03d0513ea642dd73c5a731efd40972c21843107ceccad5d91f90afdb"
+    },
+    "consumables.json": {
+      "sha256": "a6d86730928f35c549e7adba70470a699e33b59d385e0645f638a06e137d4b45"
     },
     "geaux-skill-feed.json": {
-      "sha256": "d5c07ae4d03b81bef69e0bd463f60fbc1543e0978438c559f9cd6c6c2ca84da0"
+      "sha256": "73d13291275ef273ebd40ca6df0ae56b97e2d5d9892fd0d16efa89dcdca209f1"
     },
     "skill-cooldowns.json": {
-      "sha256": "6f4588546c8f755b9c995511b1db629438c6aa62423c60e4590dbebee298ffb7"
+      "sha256": "08cebeae41d2f4632119982c9135e6095efd5d1421173492e30e54b7d27d67ac"
     },
     "status-durations.json": {
-      "sha256": "15343a5c7a1fe79dbc9daf7ce567085c0dee05bb0fe33544c7682c25768e88a1"
+      "sha256": "bb6d85bc48d9b431b17abffd73d0c0de7eff524e793fc19da3a8fcf598af1f43"
     },
     "summon-units.json": {
-      "sha256": "61c84cc8f3cec768ecab6ab7031bc74865e0ca61bda2468e7d425aa155f1d9f9"
+      "sha256": "36a4060aaf91e7cb2a3803837bc0ab099f6a5fe324bef7bf7607b81ea58ae34b"
     },
     "talent-effects.json": {
-      "sha256": "1af3a28004f48b683e309d1ad82936d4ac054074b8344f19ff88d1e1a9f5ea36"
+      "sha256": "e8c20c3ee72f5f48cb3a0c34b89a3a83597c037d1e20a5e2721093c221a9010d"
     },
     "unit-names.json": {
       "sha256": "637eff44b20f531630884c2bbb4e55c9e4a43d1a4e77876ab8d55e0396c7d272"
-    },
-    "consumables.json": {
-      "sha256": "8dbd05940809295ff7e92ae0839c1739f6640880f3b0460290318f0d6288f10f"
     }
   }
 }

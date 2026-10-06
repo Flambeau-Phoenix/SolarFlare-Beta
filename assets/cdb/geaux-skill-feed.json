@@ -1,6 +1,6 @@
 {
   "title": "Geaux skill feed",
-  "source": "E:\\Solar_Flare_2_Mod\\9-30_Patch_Stuff\\data.cdb",
+  "source": "E:\\Solar_Flare_2_Mod\\CDBTooley\\data.cdb",
   "observe": "TelemetryKernel.observe -> GeauxCache.sample -> GeauxBar.draw snapshots",
   "deployDir": "hlx/mods/solarflare/assets/cdb",
   "regen": "python tools/refresh_cdb_assets.py",

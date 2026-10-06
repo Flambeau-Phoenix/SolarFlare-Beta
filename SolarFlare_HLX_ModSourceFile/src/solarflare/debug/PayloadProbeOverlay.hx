@@ -32,7 +32,7 @@ class PayloadProbeOverlay {
 			ImGui.sameLine();
 			if (ImGui.button("Clear session##hm_pp_clear"))
 				PayloadProbe.clearSession();
-			ImGui.text(PayloadProbe.armed() ? "Recording ON — hit/cast/chat + spine samples write JSONL." : "Idle — open panel only; no log growth.");
+			ImGui.text(PayloadProbe.armed() ? "Recording ON — hit/cast + spine samples write JSONL." : "Idle — open panel only; no log growth.");
 			ImGui.separatorText("Instant cast (skill script)");
 			ImGui.textWrapped("demand=" + Std.string(solarflare.ObserveDemand.aurasNeedInstant)
 				+ " last=" + PayloadProbe.lastInstantSkillId
@@ -48,7 +48,7 @@ class PayloadProbeOverlay {
 			var snap = PayloadProbe.lastSnap();
 			if (snap == null || snap.rows.length == 0)
 				ImGui.text(PayloadProbe.armed()
-					? "Recording. Use a skill, take a hit, chat, or wait for a spine sample."
+					? "Recording. Use a skill, take a hit, or wait for a spine sample."
 					: "Start recording to capture payloads.");
 			else
 				drawRows(snap.rows);

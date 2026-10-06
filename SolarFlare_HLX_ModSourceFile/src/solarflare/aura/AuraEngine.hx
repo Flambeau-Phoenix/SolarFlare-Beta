@@ -220,7 +220,8 @@ class AuraEngine {
 		// Status-hold fallback keeps a countdown alive while the catalog hold drains.
 		if (!Math.isFinite(buffLeft) && hit && !a.dormant.get() && a.until > now)
 			buffLeft = a.until - now;
-		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf);
+		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf, false, t == "cooldown",
+			t == "cooldown" ? frame.findSkill(a.skillId) : null);
 		a.stacks = stacks < 1 ? 1 : stacks;
 		if (a.resolvedIcon.length == 0) {
 			if (a.iconId != null && a.iconId.length > 0)
@@ -244,7 +245,12 @@ class AuraEngine {
 		var serial = a.ruleResult.eventSerial;
 		var restart = hit && serial > 0 && serial != a.timerEventSerial;
 		if (serial > 0) a.timerEventSerial = serial;
-		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf, restart);
+		var pi = a.rule.presentationSource;
+		if (pi < 0 || pi >= a.rule.conditions.length) pi = 0;
+		var presentation = a.rule.conditions.length > 0 ? a.rule.conditions[pi] : null;
+		var cooldownDriven = presentation != null && AuraTimingReferencePolicy.isCooldown(presentation.signal);
+		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf, restart, cooldownDriven,
+			cooldownDriven ? frame.findSkill(presentation.subject) : null);
 		a.stacks = stacks;
 		if (a.iconId != null && a.iconId.length > 0) {
 			a.resolvedIcon = a.iconId;
@@ -309,30 +315,14 @@ class AuraEngine {
 	}
 
 	static function cooldownState(a:AuraDef, now:Float):{ok:Bool, ready:Bool, progress:Float, icon:String, left:Float} {
-		var snap = GeauxCache.findSnap(a.skillId);
-		if (snap != null) {
+		var snap = frame.findSkill(a.skillId);
+		if (snap != null && snap.known && snap.cooldownKnown) {
 			var ready = snap.ready;
 			if (a.requireAfford.get() && ready && !snap.affordable)
 				ready = false;
-			var prog = ready ? 1.0 : snap.remaining;
-			var icon = snap.iconId.length > 0 ? snap.iconId : snap.id;
-			return {ok: true, ready: ready, progress: clamp01(prog), icon: icon, left: ready ? 0 : snap.cdLeft};
-		}
-		var until = trackedUntil(a.skillId);
-		if (!Math.isNaN(until)) {
-			var left = until - now;
-			var max = 0.0;
-			if (a.skillId != null && GeauxCache.cdMaxById.exists(a.skillId))
-				max = GeauxCache.cdMaxById.get(a.skillId);
-			if (max < 0.05)
-				max = CdbAuraTable.cooldown(a.skillId);
-			if (max < 0.05)
-				max = solarflare.geaux.GeauxCdTable.baseFor(a.skillId);
-			if (left > 0.05) {
-				var rem = max > 0.05 ? clamp01(left / max) : 1;
-				return {ok: true, ready: false, progress: rem, icon: a.skillId, left: left};
-			}
-			return {ok: true, ready: true, progress: 1, icon: a.skillId, left: 0};
+			var prog = snap.cooldownProgress;
+			var icon = snap.aliasId.length > 0 ? snap.aliasId : snap.rawId;
+			return {ok: true, ready: ready, progress: clamp01(prog), icon: icon, left: snap.cooldownLeft};
 		}
 		return {ok: false, ready: false, progress: 0, icon: "", left: Math.NaN};
 	}

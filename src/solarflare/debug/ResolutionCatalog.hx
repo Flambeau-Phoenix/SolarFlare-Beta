@@ -90,9 +90,6 @@ class ResolutionCatalog {
 		add("combat.hit.kill", "CombatLog", "hitFlags", "Kill flag on a hit line", "P2");
 		add("combat.cast.skillId", "CombatLog", "castLine", "Skill id on a cast line", "P2");
 		add("combat.target", "CombatLog", "currentTarget", "Hero target pointer for involvement filter", "P2");
-		add("chat.text", "Chat", "messageBody", "Incoming chat text", "P2");
-		add("chat.sender", "Chat", "senderName", "Incoming chat sender", "P2");
-		add("chat.channel", "Chat", "channelLabel", "Incoming chat channel", "P2");
 		add("status.remain", "Aura", "statusRemain", "Status / BaseSkill remaining duration", "P2");
 		add("status.present", "Aura", "statusPresent", "Typed getStatusCount / list match for aura status.present", "P2");
 		add("status.stacks", "Aura", "statusStacks", "Typed getStatusCount / Status.stacks for aura status.stacks", "P2");
