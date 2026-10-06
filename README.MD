@@ -2,7 +2,7 @@
 
 # SolarFlare — v3.2b (Beta)
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
-![SolarFlareMage](SolarFlareMage.png)
+![CallToGlory](WarCallToGlory.png)
 ![Bee + Imp DPS](TrinketBee_Imp.png)
 
 ---
@@ -125,6 +125,8 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 * **Notebook:** In-game scratchpad with full search, page duplication, and automatic persistence.
 * **Profiles & Themes:** Save, duplicate, and switch whole-HUD profiles across characters; choose curated color schemes or define your own.
 
+---
+![SolarFlareMage](SolarFlareMage.png)
 ---
 
 # Solar Flare v3.3b - Cooldown Resolution Corrections
