@@ -126,29 +126,23 @@ A personal skill-monitoring grid designed to keep critical abilities in your fie
 * **Profiles & Themes:** Save, duplicate, and switch whole-HUD profiles across characters; choose curated color schemes or define your own.
 
 ---
-# Solar Flare v3.2b - New ExtraBars Builder
 
-## ExtraBars builder
-- Hold/Toggle takes priority: large mode choices for easier options navigation.
-- Dedicated keybind area: enlarged current key display, prominent Record Key button, and separate Clear Key action.
-- Improved readability: larger text, centered section headers, and plain rows replace the checkered styling.
-- Separate layout controls: linked row/column sliders, presets, and previews are grouped under “Layout & look.”
-- Added context menus
-- Clear Item and Clear All buttons: remove item assignments while preserving keybinds. Clear All includes hidden cells; Undo restores assignments.
-- Drag-and-drop assignments: drag catalog items onto cells without replacing their keybinds, or swap cells with their bindings.
-- Cleaner Spark Cube display: removed the permanent outer gold frame.
+# Solar Flare v3.3b - Cooldown Resolution Corrections
 
-## Aura builders — Quick Build and Advanced
-- Clearer button styling: selected choices and final actions stand out; secondary actions use outlines, and independent options show checkbox indicators.
-- Cleaner starting appearance: new auras default to icon presentation, with optional decorations and countdown displays left off.
-- Show Icon control: hide an aura’s icon while keeping its text, counters, and tracking active.
-- Independent Stacks and Counter: display both together, with separate placement and scale controls.
-- Improved badge layout: timer, stack, and counter badges have spacing to prevent overlap. Advanced previews simulate each value independently.
-- Counter reset no longer removes stacks information.
-- Expanded timer choices: Quick Build offers Off, Count Down, and Count Up.
-- Cooldown references: use game database values or available observed cooldown values to populate a fixed timer.
-- Recorded cast-time references: cast timers prefer stable recorded durations, then database suggestions. Recorded ranks are selectable; Advanced retains manual timer overrides.
-- Existing setups preserved: saved, copied, and imported auras retain their chosen presentation settings.
+- Updated CDB data: Switched to the verified current game database and regenerated all 11 canonical tables. Added source and output fingerprints plus a deployment check for stale or inconsistent data.
+- Repaired status mappings: Restored omitted ability-to-status relationships, including timerless abilities and zero-duration statuses. Removed relationships targeting non-status skills and added authored stack limits.
+- Fixed Nectar Balls configuration: Corrected the saved aura and profile copies to watch the six-second pickup buff. Kept the eight-pickup counter separate and removed the empty second condition.
+- Unified status selection: Quick Build, wizard, manual selection, and saved rules now share status resolution. Explicit status IDs, unknown observed IDs, and selected display labels are preserved.
+- Fixed reversed cooldown triggering: Cooldown countdowns now start when the skill enters cooldown. Becoming ready or affordable no longer starts a countdown.
+- Repaired Game time: Ready and affordable conditions now retain live cooldown seconds, allowing their timers to follow the actual skill.
+- Improved modifier accuracy: Live remaining seconds take precedence over CDB estimates. Removed incorrect fraction and millisecond guesses from native timer readings.
+- Fixed stale skill observations: Enabled aura skill subjects are sampled independently of visible Geaux slots.
+- Improved charge handling: Available charges remain usable while another charge refills. Proc timers such as Pyroclasm retain their separate behavior.
+- Improved status timers: Active finite durations are rechecked for refreshes and extensions. Infinite statuses use explicit engine information; failed reads cannot repeatedly renew an estimate.
+- Removed chat telemetry: Removed unused chat payload capture, storage, ledger entries, and recording prompts.
+- Hardened hooks: Audited six active hook declarations against current API signatures and isolated cast observer failures.
+- Preserved rollback options: Previous implementations, bytecode, and settings were backed up. One timer implementation is active.
+
 ## Developer & Build Reference
 
 ### Build from Source
