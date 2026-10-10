@@ -3,7 +3,7 @@
 # SolarFlare — v3.4b (Beta)
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
 ![CallToGlory](WarCallToGlory.png)
-![Bee + Imp DPS](TrinketBee_Imp.png)
+![HiddenUI](HiddenUI.png)
 
 ---
 
