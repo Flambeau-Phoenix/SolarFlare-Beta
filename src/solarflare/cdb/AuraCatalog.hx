@@ -23,6 +23,8 @@ class AuraCatalog {
 	public static function label(id:String):String {
 		var item = ConsumableCatalog.find(id);
 		if (item != null) return item.name;
+		var cByStatus = ConsumableCatalog.findByStatus(id);
+		if (cByStatus != null) return cByStatus.name;
 		var name = names.get(id);
 		return name == null ? "" : name;
 	}

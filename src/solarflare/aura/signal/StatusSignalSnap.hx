@@ -9,10 +9,11 @@ class StatusSignalSnap {
 	public var durationKnown:Bool = false;
 	public var label:String = "";
 	public var stacks:Int = 0;
+	public var stacksKnown:Bool = false;
 	public var durationLeft:Float = 0;
 	public var durationProgress:Float = 0;
 	public var infinite:Bool = false;
 	public var known:Bool = false;
 	public function new() {}
-	public function reset():Void { rawId = ""; sourceItemId = ""; sourceItemKnown = false; ids = []; present = true; durationKnown = false; label = ""; stacks = 0; durationLeft = 0; durationProgress = 0; infinite = false; known = false; }
+	public function reset():Void { rawId = ""; sourceItemId = ""; sourceItemKnown = false; ids = []; present = true; durationKnown = false; label = ""; stacks = 0; stacksKnown = false; durationLeft = 0; durationProgress = 0; infinite = false; known = false; }
 }

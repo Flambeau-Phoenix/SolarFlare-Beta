@@ -38,8 +38,8 @@ class TargetConfig {
 	/** Low-HP pulse threshold as percent of max (5–50). */
 	public var lowHpPercent = new FloatRef(25);
 	public var barRounding = new FloatRef(3);
-	public var width = new FloatRef(280);
-	public var height = new FloatRef(72);
+	public var width = new FloatRef(320);
+	public var height = new FloatRef(96);
 	public var sizeDirty = true;
 	public var chrome:HudChrome;
 

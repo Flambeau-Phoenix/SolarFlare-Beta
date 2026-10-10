@@ -576,6 +576,8 @@ class GeauxStyle {
 	public var showPinwheel = new BoolRef(true);
 	public var showHotkeys = new BoolRef(true);
 	public var showCharges = new BoolRef(true);
+	/** SkillScript stacks badge (when stacks > 1). Independent of charge pools. */
+	public var showStacks = new BoolRef(true);
 	public var dimOnCd = new BoolRef(true);
 	public var cdDisplay = new IntRef(CD_SHOW_DIM);
 	public var dimOnNoResource = new BoolRef(true);
@@ -671,6 +673,8 @@ class GeauxStyle {
 			if (ImGui.checkbox("Show key overlays", showHotkeys))
 				dirty = true;
 			if (ImGui.checkbox("Show remaining charges", showCharges))
+				dirty = true;
+			if (ImGui.checkbox("Show stack amount", showStacks))
 				dirty = true;
 			if (showHotkeys.get())
 				ImGui.textWrapped("Type a Key next to each slot (e.g. 1, Q, F) - drawn as a high-contrast chip on the icon.");
@@ -824,6 +828,7 @@ class GeauxStyle {
 			showPinwheel: showPinwheel.get(),
 			showHotkeys: showHotkeys.get(),
 			showCharges: showCharges.get(),
+			showStacks: showStacks.get(),
 			dimOnCd: dimOnCd.get(),
 			cdDisplay: cdDisplay.get(),
 			dimOnNoResource: dimOnNoResource.get(),
@@ -864,6 +869,7 @@ class GeauxStyle {
 		setBool(showPinwheel, data.showPinwheel);
 		setBool(showHotkeys, data.showHotkeys);
 		setBool(showCharges, data.showCharges);
+		setBool(showStacks, data.showStacks);
 		setBool(dimOnCd, data.dimOnCd);
 		setBool(dimOnNoResource, data.dimOnNoResource);
 		if (data.cdDisplay != null) {

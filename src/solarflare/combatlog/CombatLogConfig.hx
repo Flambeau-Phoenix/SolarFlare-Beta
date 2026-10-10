@@ -64,6 +64,8 @@ class CombatLogConfig {
 	public function shouldRecord(line:CombatLogLine):Bool {
 		if (line == null)
 			return false;
+		if (line.kind == CombatLogCache.KIND_ENCOUNTER)
+			return true;
 		if (line.sourceRole == CombatLogCache.ROLE_YOU || line.targetRole == CombatLogCache.ROLE_YOU)
 			return true;
 		if (!recordWorld.get())

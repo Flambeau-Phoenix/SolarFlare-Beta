@@ -19,6 +19,8 @@ class DemandSnapshot {
 		vitals = d.resourceBars || d.auras || d.auraBuilderOpen || d.prayers
 			|| d.comboPoints || d.chaincast || d.conduit;
 		overlays = d.prayers || d.comboPoints || d.chaincast || d.conduit || d.attackCombo;
+		// BarTer uses its own lighter GeauxCache.sampleBarTer cadence — do not pull
+		// full Geaux layout / HUD walk into the 50 ms ActivePassGate solely for bars.
 		skills = d.geaux || d.geauxBuilder || d.auras || d.aurasNeedInstant
 			|| d.aurasNeedSpecial || d.auraBuilderOpen;
 		target = d.targetHud || d.castBars || d.combatLog || d.aurasNeedTarget || d.auraBuilderOpen;

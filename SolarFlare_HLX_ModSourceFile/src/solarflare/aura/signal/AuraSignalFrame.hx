@@ -125,19 +125,7 @@ class AuraSignalFrame {
 	}
 	public function findStatus(id:String):StatusSignalSnap {
 		if (id == null || id.length == 0) return null;
-		var key = StringTools.trim(id).toLowerCase();
-		var hit = findStatusExact(key);
-		if (hit != null) return hit;
-		// Plain skill subjects often refer to companion proc/status IDs.
-		if (!(StringTools.endsWith(key, "_status") || StringTools.endsWith(key, "_proc")
-			|| StringTools.endsWith(key, "status") || key.indexOf("_status_") >= 0
-			|| key.indexOf("status_") >= 0 || key.indexOf("_proc_") >= 0)) {
-			hit = findStatusExact(key + "_proc");
-			if (hit != null) return hit;
-			hit = findStatusExact(key + "_status");
-			if (hit != null) return hit;
-		}
-		return null;
+		return findStatusExact(StringTools.trim(id).toLowerCase());
 	}
 
 	/** A live row always outranks a known-absent row carrying the same id. */

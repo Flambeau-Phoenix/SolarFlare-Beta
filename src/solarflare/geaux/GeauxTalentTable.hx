@@ -27,14 +27,6 @@ class GeauxTalentEffect {
 
 	public function new() {}
 
-	public function touchesCooldown():Bool {
-		for (k in kinds) {
-			if (k == "cooldownReductionPct" || k == "reduceWeaponSkills" || k == "reduceNamedSkill"
-				|| k == "selfCooldown")
-				return true;
-		}
-		return false;
-	}
 }
 
 class GeauxTalentTable {
@@ -47,10 +39,6 @@ class GeauxTalentTable {
 		ensure();
 	}
 
-	public static function allTalents():Array<GeauxTalentEffect> {
-		ensure();
-		return all;
-	}
 
 	public static function of(id:String):GeauxTalentEffect {
 		ensure();
@@ -62,29 +50,7 @@ class GeauxTalentTable {
 		return byId.get(id.toLowerCase());
 	}
 
-	/** Talents that name this skill in refs / reduceCooldown(Skill.Id). */
-	public static function affecting(skillId:String):Array<GeauxTalentEffect> {
-		ensure();
-		if (skillId == null || skillId.length == 0)
-			return [];
-		var list = bySkill.get(skillId);
-		if (list != null)
-			return list;
-		list = bySkill.get(skillId.toLowerCase());
-		return list != null ? list : [];
-	}
 
-	/** Global % CooldownReduction from a talent at the given invested points. */
-	public static function cdrPctFor(id:String, points:Int):Float {
-		var row = of(id);
-		if (row == null)
-			return 0;
-		if (points >= 2 && row.cdrPctRank2 > 0)
-			return row.cdrPctRank2;
-		if (points >= 1 && row.cdrPctRank1 > 0)
-			return row.cdrPctRank1;
-		return 0;
-	}
 
 	static function ensure():Void {
 		if (ready)

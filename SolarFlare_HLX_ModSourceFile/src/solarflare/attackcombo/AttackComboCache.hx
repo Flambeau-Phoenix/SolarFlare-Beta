@@ -1,16 +1,23 @@
 package solarflare.attackcombo;
 
-import solarflare.FieldWalk;
 import solarflare.HealthCache;
+import solarflare.ui.ByteUtil;
 #if solarflare_telemetry
 import solarflare.debug.ResolutionLedger;
 #end
 
-/** Live weapon attack-chain state. This is separate from Rogue ComboPoints. */
+/**
+ * Live weapon attack-chain state (separate from Rogue ComboPoints).
+ *
+ * Engine facts (hlboot 5f288029, ent.Hero): `attack` stores the used skill's index in
+ * `attackSkills` into attackComboCount (0 again after the finisher, so the count alone is
+ * ambiguous); `getNextAttackSkill` picks the next link from the most recent basic use and falls
+ * back to attackSkills[0] once the combo window lapses. This cache mirrors that function directly.
+ */
 class AttackComboCache {
 	public static inline var ROUTE_UNRESOLVED:String = "unresolved";
 	public static inline var ROUTE_DIRECT:String = "direct";
-	public static inline var FLASH_SEC:Float = 0.35;
+	public static inline var FLASH_SEC:Float = AttackComboState.FLASH_SEC;
 	public static var route:String = ROUTE_UNRESOLVED;
 	public static var step:Int = 0;
 	public static var comboLength:Int = 4;
@@ -18,20 +25,34 @@ class AttackComboCache {
 	public static var withinCombo:Bool = false;
 	public static var flashFinal:Bool = false;
 	public static var visible:Bool = false;
+	public static var known:Bool = false;
 	public static var debugLine:String = "attack-combo idle";
-	static var expectedStep:Int = 0;
-	static var flashUntil:Float = 0;
-	static var lastRawCount:Int = -1;
-	static var lastWithin:Bool = false;
+	static var state = new AttackComboState();
 
 	public static function keep():Void {}
 
 	public static function clear(reason:String):Void {
-		expectedStep = 0; step = 0; withinCombo = false; flashFinal = false; flashUntil = 0; visible = false;
+		state.clear();
+		publishSnap(-1);
 		debugLine = "reset:" + reason;
 	}
 
-	/** Forwarded from the existing BaseSkill.doStart postfix. */
+	/**
+	 * Native: fun(ent.Hero, i32) -> i32 → postfix N+1 = 3, return result unaltered.
+	 * Wake-up only: the written count is ambiguous (finisher writes 0), so the chain is read
+	 * from the engine's own skill list instead of reconstructed from this value.
+	 */
+	@:keep
+	@:hlx.postfix(ent.Hero.set_attackComboCount)
+	static function onSetAttackComboCount(self:Dynamic, value:Int, result:Int):Int {
+		try {
+			if (self != null && HealthCache.isLocalHero(self))
+				solarflare.ObserveDemand.markAttackComboDirty();
+		} catch (_:Dynamic) {}
+		return result;
+	}
+
+	/** Forwarded from BaseSkill.doStart: exact chain position for basics, flash for the finisher. */
 	public static function onBaseSkillStart(skill:Dynamic):Void {
 		if (skill == null) return;
 		try {
@@ -41,107 +62,97 @@ class AttackComboCache {
 			if (unit == null || !HealthCache.isLocalHero(unit)) return;
 			var isBase = false;
 			var isFinal = false;
-			try isBase = bs.isBaseAttack() catch (_:Dynamic) {}
+			try isBase = bs.isBasicAttack() catch (_:Dynamic) {}
 			try isFinal = bs.isFinalAttack() catch (_:Dynamic) {}
 			if (!isBase && !isFinal) return;
-			var hero = HealthCache.localHero;
-			var raw = readComboCount(hero);
-			var length = readComboLength(hero);
-			if (length > 0) comboLength = length;
-			moveSetId = readMoveSetId(hero);
-			var nextExpected = expectedStep + 1;
-			var isFinalStep = isFinal || (comboLength > 0 && nextExpected >= comboLength);
-			if (isFinalStep) {
-				expectedStep = comboLength > 0 ? comboLength : nextExpected;
-				flashUntil = now() + FLASH_SEC;
-				noteEdge("final", expectedStep, raw);
-			} else {
-				expectedStep = nextExpected;
-				noteEdge("base", expectedStep, raw);
+			var hero:ent.Hero = HealthCache.localHero;
+			if (hero == null) return;
+			var chain = readChain(hero, skill);
+			var metadata = readMoveSet(hero);
+			var length = chain.length > 0 ? chain.length : metadata.length;
+			if (isFinal) {
+				state.finisher(now(), HealthCache.identityGen, length, metadata.id);
+				noteEdge("final", state.step, chain.index);
+			} else if (chain.index >= 0) {
+				state.basic(HealthCache.identityGen, chain.index, length, metadata.id);
+				noteEdge("base", state.step, chain.index);
 			}
-			// A base/final attack start is authoritative combo state; observe()
-			// may not have caught up yet, and publishSnap gates route mapping on it.
-			withinCombo = true;
 			solarflare.ObserveDemand.markAttackComboDirty();
-			publishSnap(hero, true);
+			publishSnap(chain.index);
 		} catch (_:Dynamic) {}
 	}
 
 	public static function observe():Void {
-		var hero = HealthCache.localHero;
+		var hero:ent.Hero = HealthCache.localHero;
 		if (hero == null) { clear("no_hero"); return; }
-		var within = readWithinCombo(hero);
-		var raw = readComboCount(hero);
-		var length = readComboLength(hero);
-		if (length > 0) comboLength = length;
-		var id = readMoveSetId(hero);
-		if (id.length > 0) moveSetId = id;
-		if (lastWithin && !within) {
-			clear("engine_break");
-			noteTarget(raw, within, "engine_break");
-			lastWithin = within; lastRawCount = raw;
-			return;
-		}
-		lastWithin = within;
-		withinCombo = within;
-		if (raw != lastRawCount) { noteTarget(raw, within, "count_change"); lastRawCount = raw; }
-		flashFinal = now() < flashUntil;
-		if (!flashFinal) flashUntil = 0;
-		publishSnap(hero, false);
+		var chain = readChain(hero, null);
+		var metadata = readMoveSet(hero);
+		var length = chain.length > 0 ? chain.length : metadata.length;
+		state.observe(now(), HealthCache.identityGen, chain.next, length, metadata.id);
+		publishSnap(chain.next);
 	}
 
-	/** Freeze one display step. Hook edges lead engine count briefly; observe polls use direct count. */
-	static function publishSnap(hero:Dynamic, preferExpected:Bool):Void {
-		var raw = readComboCount(hero);
-		var display = 0;
-		if (raw >= 0)
-			route = ROUTE_DIRECT;
-
-		if (flashFinal && comboLength > 0)
-			display = comboLength;
-		else if (withinCombo) {
-			if (preferExpected && expectedStep > 0)
-				display = expectedStep;
-			else if (raw > 0)
-				display = raw;
-			else
-				display = expectedStep;
-		}
-
-		if (display < 0)
-			display = 0;
-		if (comboLength > 0 && display > comboLength)
-			display = comboLength;
-
-		step = display;
-		visible = withinCombo || flashFinal || step > 0;
-		debugLine = route + " step=" + step + "/" + comboLength + " raw=" + raw + " within=" + withinCombo + (moveSetId.length > 0 ? " ms=" + moveSetId : "");
+	/** Freeze primitive presentation state; draw never reads the engine. */
+	static function publishSnap(raw:Int):Void {
+		route = state.direct ? ROUTE_DIRECT : ROUTE_UNRESOLVED;
+		step = state.step;
+		comboLength = state.comboLength;
+		moveSetId = state.moveSetId;
+		withinCombo = state.withinCombo;
+		flashFinal = state.flashFinal;
+		visible = state.visible;
+		known = state.known;
+		debugLine = route + " step=" + step + "/" + comboLength + " next=" + raw + " within=" + withinCombo + " known=" + known + (moveSetId.length > 0 ? " ms=" + moveSetId : "");
 	}
 
 	static inline function noteEdge(kind:String, expected:Int, raw:Int):Void {
 		#if solarflare_telemetry
-		if (ResolutionLedger.armed()) ResolutionLedger.touch("ATTACK_COMBO_EDGE", "hook", "AttackComboCache.onBaseSkillStart", kind, "string", "exp=" + expected + " raw=" + raw);
+		if (ResolutionLedger.armed()) ResolutionLedger.touch("ATTACK_COMBO_EDGE", "hook", "AttackComboCache.onBaseSkillStart", kind, "string", "step=" + expected + " idx=" + raw);
 		#end
 	}
-	static inline function noteTarget(raw:Int, within:Bool, why:String):Void {
-		#if solarflare_telemetry
-		if (ResolutionLedger.armed()) ResolutionLedger.touch("ATTACK_COMBO_TARGET", "poll", "AttackComboCache.observe", why, "string", "raw=" + raw + " within=" + within + " route=" + route);
-		#end
+
+	/**
+	 * length: basic attacks + finisher. index: position of `skill` in attackSkills (-1 unknown).
+	 * next: engine's next link as an index (attackSkills.length = finisher primed; 0 = idle).
+	 */
+	static function readChain(hero:ent.Hero, skill:Dynamic):{length:Int, index:Int, next:Int} {
+		var length = 0;
+		var index = -1;
+		var next = -1;
+		try {
+			var list = hero.attackSkills;
+			if (list != null) {
+				var n:Int = list.length;
+				var finisher = hero.attackComboSkill;
+				length = n + (finisher != null ? 1 : 0);
+				if (skill != null) {
+					for (i in 0...n)
+						if (list.getDyn(i) == skill) { index = i; break; }
+				}
+				var upcoming = hero.getNextAttackSkill();
+				if (upcoming == null) {
+					next = 0;
+				} else if (finisher != null && upcoming == finisher) {
+					next = n;
+				} else {
+					for (i in 0...n)
+						if (list.getDyn(i) == upcoming) { next = i; break; }
+				}
+			}
+		} catch (_:Dynamic) {}
+		return {length: length, index: index, next: next};
 	}
-	static function readComboCount(hero:Dynamic):Int {
-		if (hero == null) return -1;
-		try { var h:ent.Hero = cast hero; return Std.int(h.attackComboCount); } catch (_:Dynamic) {}
-		var v = FieldWalk.extractObject(hero, "attackComboCount");
-		var n = v == null ? Math.NaN : Std.parseFloat(Std.string(v));
-		return Math.isNaN(n) ? -1 : Std.int(n);
+
+	static function readMoveSet(hero:ent.Hero):{length:Int, id:Null<String>} {
+		try {
+			var ms = hero.getMoveSet();
+			// A successful null moveset means no active weapon; a thrown read stays unknown.
+			if (ms == null) return {length:0, id:""};
+			var id = ms.id == null ? null : ByteUtil.materialize(ms.id);
+			return {length:ms.comboLength, id:id != null && id.length > 0 ? id : null};
+		} catch (_:Dynamic) {}
+		return {length:0, id:null};
 	}
-	static function readWithinCombo(hero:Dynamic):Bool { try { var h:ent.Hero = cast hero; return h.isWithinAttackCombo(); } catch (_:Dynamic) {} return false; }
-	static function readComboLength(hero:Dynamic):Int {
-		if (hero == null) return 0;
-		try { var h:ent.Hero = cast hero; var ms:Dynamic = h.getMoveSet(); var n = ms == null ? Math.NaN : Std.parseFloat(Std.string(FieldWalk.extractObject(ms, "comboLength"))); if (!Math.isNaN(n) && n > 0) return Std.int(n); } catch (_:Dynamic) {}
-		try { var ms:Dynamic = FieldWalk.extractObject(hero, "moveSet"); var n = Std.parseFloat(Std.string(FieldWalk.extractObject(ms, "comboLength"))); return Math.isNaN(n) ? 0 : Std.int(n); } catch (_:Dynamic) {}
-		return 0;
-	}
-	static function readMoveSetId(hero:Dynamic):String { try { var h:ent.Hero = cast hero; var ms:Dynamic = h.getMoveSet(); var id = ms == null ? null : FieldWalk.extractObject(ms, "id"); return id == null ? "" : Std.string(id); } catch (_:Dynamic) {} return ""; }
+
 	static function now():Float { try return haxe.Timer.stamp() catch (_:Dynamic) return Date.now().getTime() / 1000.0; }
 }

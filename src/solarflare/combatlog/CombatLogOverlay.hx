@@ -242,6 +242,8 @@ class CombatLogOverlay {
 			return "cast";
 		if (kind == CombatLogCache.KIND_HIT)
 			return "hit";
+		if (kind == CombatLogCache.KIND_ENCOUNTER)
+			return "rift";
 		return "?";
 	}
 

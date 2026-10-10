@@ -419,6 +419,9 @@ class GeauxBar {
 			}
 		}
 
+		if (present && snap.procReady == true)
+			solarflare.ui.VectorGlow.glimmer(dl, x, y, size, size, (haxe.Timer.stamp() - snap.procStart) % 2.6);
+
 		if (present && style.showPinwheel.get() && showCdFx && snap.remaining > 0.02
 			&& (snap.cdLeft > 0.05 || snap.remaining < 0.98))
 			drawPinwheel(dl, x, y, size, snap.remaining);
@@ -438,9 +441,18 @@ class GeauxBar {
 			var cx:Single = x + size - cs.x - 3;
 			var cy:Single = y + size - cs.y - 2;
 			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(cx + 1, cy + 1),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.85)), ch);
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 1)), ch);
 			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(cx, cy),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.95, 0.98, 1.0, lit ? 1 : 0.75)), ch);
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.95, 0.98, 1.0, 1)), ch);
+		} else if (present && style.showStacks.get() && snap.stacks > 1) {
+			var st = Std.string(snap.stacks);
+			var ss = ImGui.calcTextSize(st);
+			var sx:Single = x + size - ss.x - 3;
+			var sy:Single = y + size - ss.y - 2;
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(sx + 1, sy + 1),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 1)), st);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(sx, sy),
+				ImGui.colorConvertFloat4ToU32(ImGui.vec4(1.0, 0.92, 0.55, 1)), st);
 		}
 
 		// User-defined keybind reminder (Key##hk fields) — not the skill name.

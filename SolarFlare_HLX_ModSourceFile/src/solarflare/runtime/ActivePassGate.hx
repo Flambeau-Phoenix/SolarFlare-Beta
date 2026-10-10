@@ -7,7 +7,7 @@ class ActivePassGate {
 	var lastRun:Float = -1;
 	public function new() {}
 	public function due(now:Float, wanted:Int, active:Bool):Bool {
-		var pending = HookIngress.consumeMask(DOMAINS) & wanted;
+		var pending = HookIngress.consumeMask(DOMAINS & wanted);
 		if (!active) {
 			lastRun = -1;
 			return false;

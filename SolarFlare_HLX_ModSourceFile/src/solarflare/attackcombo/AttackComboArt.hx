@@ -14,8 +14,9 @@ class AttackComboArt {
 	public static function hasPending():Bool return reloadRequested;
 
 	/** Zero-allocation lookup used by both preload and presentation. */
-	public static function candidate(artSet:Int, count:Int):String {
-		var n = count;
+	public static function candidate(artSet:Int, count:Int, flashFinal:Bool = false):String {
+		// Both art sets reserve stage four for the completed chain, including short weapons.
+		var n = flashFinal ? 4 : count;
 		if (n < 0) n = 0;
 		if (n > 4) n = 4;
 		if (artSet == 1) {

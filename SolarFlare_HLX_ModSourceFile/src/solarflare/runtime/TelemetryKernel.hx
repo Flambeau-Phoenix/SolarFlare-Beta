@@ -32,6 +32,8 @@ class TelemetryKernel {
 	static var lastAsset:Float = -1;
 	static var brandingRequested:Bool = false;
 	static var settingsInitialized:Bool = false;
+	static var statusHeroGeneration:Int = -1;
+	static var statusProfileGeneration:Int = -1;
 
 	public static function observeAssets():Void {
 		var pending = !brandingRequested || GameIcons.hasPending()
@@ -68,7 +70,7 @@ class TelemetryKernel {
 		}
 		ObserveDemand.publish(cfg);
 		demand.capture(cfg);
-		EventRing.drain(solarflare.combatlog.CombatLogCache.consumeHookEvent);
+		EventRing.drain(solarflare.combatlog.CombatLogCache.consumeHookEvent, 128, 0.0005);
 
 		try solarflare.ui.HideAllBind.ensureCodes() catch (_:Dynamic) {}
 
@@ -90,9 +92,18 @@ class TelemetryKernel {
 			}
 		}
 
-		// Spark Cube shares status observation even when Aura is disabled or empty.
-		if (demand.status && !demand.auras && ObserveDemand.dueAuraStatus(now, false)) {
-			try solarflare.aura.AuraStatusCache.sample(HealthCache.localHero) catch (_:Dynamic) {}
+		// One status owner for Aura, Board, Spark Cube and BarTer. Consumers never resample.
+		if (statusHeroGeneration != HealthCache.statusOwnerGen
+			|| statusProfileGeneration != solarflare.ui.FeatureProfiles.statusOwnerGen) {
+			statusHeroGeneration = HealthCache.statusOwnerGen;
+			statusProfileGeneration = solarflare.ui.FeatureProfiles.statusOwnerGen;
+			solarflare.aura.AuraStatusCache.invalidateOwner();
+		}
+		if (demand.status && ObserveDemand.dueAuraStatus(now, false)) {
+			try {
+				solarflare.aura.AuraStatusCache.sample(HealthCache.localHero, now);
+				RuntimeMetrics.statusPolls++;
+			} catch (_:Dynamic) {}
 		}
 
 		// These consumers own an independent ObserveDemand cadence.
@@ -127,8 +138,6 @@ class TelemetryKernel {
 				try {
 					solarflare.aura.AuraEngine.tick(cfg.auras);
 					RuntimeMetrics.auraTicks++;
-					if (demand.status)
-						RuntimeMetrics.statusPolls++;
 				} catch (_:Dynamic) {}
 			}
 			if (demand.lightsaber) {
@@ -139,6 +148,15 @@ class TelemetryKernel {
 						SaberJsonlArchive.tick();
 				} catch (_:Dynamic) {}
 			}
+		}
+
+		// BarTer: own cadence, offset from ActivePassGate / full Geaux sample.
+		if (ObserveDemand.barter && ObserveDemand.dueBarTer(now, GeauxCache.barTerHot())) {
+			try {
+				var needSeed = cfg.barter != null && cfg.barter.needsActionBarSeed();
+				GeauxCache.sampleBarTer(HealthCache.localHero, needSeed);
+				RuntimeMetrics.skillPolls++;
+			} catch (_:Dynamic) {}
 		}
 
 		if (now - lastBackground >= BACKGROUND_S) {
@@ -161,6 +179,7 @@ class TelemetryKernel {
 						GetRiftyCache.observeApp(app);
 						RuntimeMetrics.encounterPolls++;
 						HookIngress.consume(DirtyDomains.ENCOUNTER);
+						try solarflare.combatlog.CombatLogCache.noteRiftState() catch (_:Dynamic) {}
 						if (ObserveDemand.getRifty)
 							GetRiftyCache.tick();
 					}
@@ -188,6 +207,8 @@ class TelemetryKernel {
 	}
 
 	public static function reset():Void {
+		solarflare.aura.AuraStatusCache.invalidateOwner();
+		statusHeroGeneration = statusProfileGeneration = -1;
 		lastVitals = lastIdentity = lastBackground = lastSettings = 0;
 		activeGate.reset();
 		settingsInitialized = false;

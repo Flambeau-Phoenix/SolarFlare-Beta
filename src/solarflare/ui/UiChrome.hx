@@ -10,10 +10,49 @@ import imgui.Structs.ImVec2;
  * Shared visual language for SolarFlare tool windows: section headers and cel-shaded borders.
  */
 class UiChrome {
-	/** Structured section bands shared by builders. */
-	public static function sectionHeader(label:String):Void sectionBand(label, 34, true);
-	public static function subHeader(label:String):Void sectionBand(label, 28, false);
-	public static function premiumHeader(label:String):Void sectionBand(label, 38, true);
+	/**
+	 * Header ladder: heading = H1 (window purpose / object name), centeredHeader = H2 (zone),
+	 * sectionHeader = H3 (group), subHeader = H4 (flat label inside a group). textDisabled is the caption.
+	 * Spacing steps are 4 / 8 / 12 so cards line up across builders.
+	 */
+	public static inline var SP_S:Int = 4;
+	public static inline var SP_M:Int = 8;
+	public static inline var SP_L:Int = 12;
+
+	/** Vertical gap on the spacing scale. */
+	public static function gap(px:Int = SP_M):Void ImGui.dummy(ImGui.vec2(0, px));
+
+	/**
+	 * Collapsible group (progressive disclosure). ImGui remembers open state per window and id,
+	 * so keep the `##id` suffix stable. Pair the body with `if (...) { }`; no Pop call is needed.
+	 */
+	public static function groupHeader(label:String, openByDefault:Bool = false):Bool {
+		return ImGui.collapsingHeader(label, openByDefault ? imgui.Enums.ImGuiTreeNodeFlags.DefaultOpen : 0);
+	}
+
+	/** H3: banded group header. */
+	public static function sectionHeader(label:String):Void sectionBand(label, 32, true);
+	public static function premiumHeader(label:String):Void sectionBand(label, 32, true);
+
+	/** H4: flat label with a hairline rule, so nested groups do not look like sibling bands. */
+	public static function subHeader(label:String):Void {
+		var theme = ThemePalette.current();
+		var caption = displayLabel(label);
+		var pos = ImGui.getCursorScreenPos();
+		var width = Math.max(1, ImGui.getContentRegionAvail().x);
+		var height:Single = 24;
+		ImGui.dummy(ImGui.vec2(width, height));
+		var dl = ImGui.getWindowDrawList();
+		var ts = ImGui.calcTextSize(caption);
+		var y = pos.y + (height - ts.y) * 0.5;
+		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(pos.x + 4, y),
+			ImGui.colorConvertFloat4ToU32(theme.text), caption);
+		var lineY = pos.y + height - 3;
+		ImGui.ImDrawList_AddLine(dl, ImGui.vec2(pos.x + 4, lineY), ImGui.vec2(pos.x + width - 4, lineY),
+			ImGui.colorConvertFloat4ToU32(ImGui.vec4(theme.border.x, theme.border.y, theme.border.z, 0.8)), 1);
+		ImGui.ImDrawList_AddLine(dl, ImGui.vec2(pos.x + 4, lineY), ImGui.vec2(pos.x + 4 + ts.x, lineY),
+			ImGui.colorConvertFloat4ToU32(theme.accent), 2);
+	}
 
 	/** ImGui ID stays after ## / ###; visible caption is the prefix only. */
 	public static function displayLabel(label:String):String {
@@ -54,7 +93,9 @@ class UiChrome {
 			ImGui.colorConvertFloat4ToU32(theme.text), caption);
 	}
 
+	/** H1. Scale snaps to three steps (1.15 small, 1.35 standard, 1.6 display). */
 	public static function heading(label:String, scale:Single = 1.35):Void {
+		scale = scale < 1.2 ? 1.15 : (scale <= 1.45 ? 1.35 : 1.6);
 		var caption = displayLabel(label);
 		var font = ImGui.getFont();
 		if (font != null) ImGui.pushFont(font, ImGui.getFontSize() * scale);
@@ -139,10 +180,69 @@ class UiChrome {
 		return r;
 	}
 
-	/** Shared selected/unselected navigation control. */
+	/**
+	 * Shared selected/unselected navigation control. Selection is a flat accent-tinted chip with an
+	 * accent underline, so the gradient accentButton stays reserved for the one primary action.
+	 */
 	public static function navButton(label:String, selected:Bool,
 			size:ImVec2 = null):Bool {
-		return selected ? accentButton(label, size) : ghostButton(label, size);
+		return selected ? selectedChip(label, size) : ghostButton(label, size);
+	}
+
+	/** Flat selected state shared by hub tabs, segmented choices and toggle chips. */
+	static function selectedChip(label:String, size:ImVec2 = null):Bool {
+		var theme = ThemePalette.current();
+		var caption = displayLabel(label);
+		var textSize = ImGui.calcTextSize(caption);
+		var actual = size != null ? size : ImGui.vec2(textSize.x + 28, 28);
+		if (actual.x <= 0)
+			actual.x = ImGui.getContentRegionAvail().x;
+		if (actual.y < 24)
+			actual.y = 24;
+		var clicked = ImGui.invisibleButton(label, actual);
+		var hovered = ImGui.isItemHovered();
+		var min = ImGui.getItemRectMin();
+		var max = ImGui.getItemRectMax();
+		var dl = ImGui.getWindowDrawList();
+		var rounding:Single = Math.min(12, actual.y * 0.35);
+		var fill = ImGui.colorConvertFloat4ToU32(ImGui.vec4(
+			theme.cellBg.x * 0.6 + theme.accent.x * 0.4,
+			theme.cellBg.y * 0.6 + theme.accent.y * 0.4,
+			theme.cellBg.z * 0.6 + theme.accent.z * 0.4, hovered ? 1.0 : 0.92));
+		var accent = ImGui.colorConvertFloat4ToU32(theme.accent);
+		ImGui.ImDrawList_AddRectFilled(dl, min, max, fill, rounding);
+		ImGui.ImDrawList_AddRect(dl, min, max, accent, rounding, 1.25, 0);
+		ImGui.ImDrawList_AddLine(dl, ImGui.vec2(min.x + rounding, max.y - 3),
+			ImGui.vec2(max.x - rounding, max.y - 3), accent, 2.5);
+		ImGui.ImDrawList_AddText_Vec2(dl,
+			ImGui.vec2(min.x + (actual.x - textSize.x) * 0.5, min.y + (actual.y - textSize.y) * 0.5 - 1),
+			ImGui.colorConvertFloat4ToU32(theme.text), caption);
+		return clicked;
+	}
+
+	/**
+	 * Native tab item with the shared selected look (flat tab, accent overline). Pair with
+	 * ImGui.endTabItem() when it returns true.
+	 */
+	public static function beginTabItem(label:String):Bool {
+		var theme = ThemePalette.current();
+		ImGui.pushStyleVar(ImGuiStyleVar.TabRounding, 3);
+		ImGui.pushStyleVar(ImGuiStyleVar.FramePadding, ImGui.vec2(14, 8));
+		ImGui.pushStyleColor(ImGuiCol.Tab, theme.windowBg);
+		ImGui.pushStyleColor(ImGuiCol.TabSelected, theme.cellBg);
+		ImGui.pushStyleColor(ImGuiCol.TabHovered, theme.border);
+		ImGui.pushStyleColor(ImGuiCol.TabSelectedOverline, theme.accent);
+		var shown = false;
+		try {
+			shown = ImGui.beginTabItem(label);
+		} catch (e:Dynamic) {
+			ImGui.popStyleColor(4);
+			ImGui.popStyleVar(2);
+			throw e;
+		}
+		ImGui.popStyleColor(4);
+		ImGui.popStyleVar(2);
+		return shown;
 	}
 
 	/**
@@ -291,6 +391,7 @@ class UiChrome {
 
 	/** Centered section band for structural hierarchy (builders / hub panes). */
 	public static function centeredHeader(label:String, height:Single = 36):Void {
+		height = height <= 32 ? 30 : 38;
 		var theme = ThemePalette.current();
 		var pos = ImGui.getCursorScreenPos();
 		var width = Math.max(1, ImGui.getContentRegionAvail().x);

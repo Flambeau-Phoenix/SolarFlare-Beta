@@ -93,6 +93,7 @@ class SolarFlarePanel {
 		conduitOverlay.openBuilder = function() { config.resourceTracker.open.set(true); };
 		chaincastOverlay.openBuilder = function() { config.resourceTracker.open.set(true); };
 		attackComboOverlay.openBuilder = function() { config.resourceTracker.open.set(true); };
+		if (config.statusBoard != null) config.statusBoard.openSettings = function() { config.showHubTab("status"); };
 
 		targetOverlay.openBuilder = function() { config.target.open.set(true); };
 		playerCastOverlay.openBuilder = function() { config.castBar.open.set(true); };
@@ -163,6 +164,16 @@ class SolarFlarePanel {
 		if (config.extraBarsPrototype != null) {
 			try config.extraBarsPrototype.observe(app) catch (_:Dynamic) {}
 		}
+		if (config.barter != null) {
+			try config.barter.observe() catch (_:Dynamic) {}
+		}
+		if (config.statusBoard != null) {
+			try config.statusBoard.observe() catch (_:Dynamic) {}
+		}
+		solarflare.ui.NativeHideCache.apply(app, config.nativeHide);
+		try
+			solarflare.ui.HideMoveCache.apply(config.hideMove)
+		catch (_:Dynamic) {}
 
 	}
 
@@ -206,6 +217,15 @@ class SolarFlarePanel {
 		} catch (_:Dynamic) {}
 		try {
 			if (!suppressed && config.extraBarsPrototype != null) config.extraBarsPrototype.drawBar();
+		} catch (_:Dynamic) {}
+		try {
+			if (!suppressed && config.barter != null) {
+				config.barter.draw();
+				config.barter.drawBuilder();
+			}
+			if (!suppressed && config.statusBoard != null) {
+				config.statusBoard.draw();
+			}
 		} catch (_:Dynamic) {}
 		// Each overlay isolated — a Geaux throw must not skip Lightsaber / Auras.
 		try {
@@ -287,6 +307,13 @@ class SolarFlarePanel {
 
 	/** Flush pending layout/toggles when GameApp is gone (logout / shutdown). */
 	public function flushPendingSettings():Void {
+		solarflare.ui.NativeHideCache.clearSession();
+		try
+			solarflare.ui.HideMoveCache.clearSession()
+		catch (_:Dynamic) {}
+		config.nativeHide.bottomBarAccepted.set(false);
+		config.nativeHide.status = "Waiting for native HUD";
+		nativeChatRestored = false;
 		if (!castTimesShutdownFlushed) {
 			castTimesShutdownFlushed = true;
 			solarflare.castbar.CastCache.observe(null, null);
@@ -299,6 +326,9 @@ class SolarFlarePanel {
 	/** Typed GameLib `ui.Hud.chat` — not FieldWalk. FieldWalk stays on the probe/ledger path. */
 	function restoreNativeChat():Void {
 		if (nativeChatRestored)
+			return;
+		// Enhanced Chat owns its native ChatBox visibility after initialization/update.
+		if (hlx.runtime.Registry.get("mods", "enhanced-chat") != null)
 			return;
 		var hud = ui.GameUI.getHud();
 		if (hud == null)

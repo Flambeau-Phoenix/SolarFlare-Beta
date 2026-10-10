@@ -117,6 +117,18 @@ class PerformanceMonitor {
 				UiLayout.propertyRow("Event ring", function() {
 					ImGui.text('${solarflare.runtime.EventRing.depth()}/512  max ${m.maxQueueDepth}  dropped ${m.eventDropped}');
 				});
+				UiLayout.propertyRow("Status discovery", function() {
+					var s = solarflare.runtime.StatusWorkMetrics;
+					ImGui.text('${s.lastSliceEntries}/16 entries  ${roundMs(s.lastSliceSeconds * 1000)} ms  max ${roundMs(s.maxSliceSeconds * 1000)} ms');
+					ImGui.text('${s.discoverySlices} slices  ${s.discoveryCompletions} complete scans  ${s.discoveryEntries} entries total');
+				});
+				UiLayout.propertyRow("Demanded statuses", function() {
+					var s = solarflare.runtime.StatusWorkMetrics;
+					ImGui.text('${s.lastTypedSubjects}/16 subjects  ${roundMs(s.lastTypedSeconds * 1000)} ms  max ${roundMs(s.maxTypedSeconds * 1000)} ms');
+				});
+				UiLayout.propertyRow("Native bar discovery", function() {
+					ImGui.text('${m.barHudNodes} unique nodes  ${roundMs(m.barHudMs)} ms  max ${roundMs(m.barHudMaxMs)} ms');
+				});
 			});
 			UiLayout.inlinePair("##sf_runtime_metric_actions",
 				function(w:Single) {

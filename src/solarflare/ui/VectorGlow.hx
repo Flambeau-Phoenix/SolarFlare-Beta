@@ -104,6 +104,52 @@ class VectorGlow {
 		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), coreCol, rounding, 2.6, 0);
 	}
 
+	/** Seconds one glimmer sweep takes. */
+	public static inline var GLIMMER_SEC:Float = 0.75;
+
+	/**
+	 * One diagonal-free "glimmer": a soft white band sweeping across the cell plus three
+	 * twinkling stars. `t` is seconds since the sweep began; nothing is drawn outside 0..GLIMMER_SEC.
+	 * Draws only inside the cell rect.
+	 */
+	public static function glimmer(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, t:Float, rgb:Int = 0xFFFFFF):Void {
+		if (dl == null || w < 6 || h < 6 || t < 0 || t >= GLIMMER_SEC)
+			return;
+		var p:Float = t / GLIMMER_SEC;
+		var rgbOnly = rgb & 0x00FFFFFF;
+		var band:Float = w * 0.55;
+		var cx:Float = x - band * 0.5 + (w + band) * p;
+		var peak = Std.int(170 * Math.sin(p * Math.PI));
+		if (peak > 0) {
+			var clear = rgbOnly;
+			var lit = (peak << 24) | rgbOnly;
+			var xr:Float = x + w;
+			var l0 = Math.max(x, Math.min(xr, cx - band * 0.5));
+			var mid = Math.max(x, Math.min(xr, cx));
+			var r1 = Math.max(x, Math.min(xr, cx + band * 0.5));
+			if (mid > l0)
+				ImGui.ImDrawList_AddRectFilledMultiColor(dl, ImGui.vec2(l0, y), ImGui.vec2(mid, y + h), clear, lit, lit, clear);
+			if (r1 > mid)
+				ImGui.ImDrawList_AddRectFilledMultiColor(dl, ImGui.vec2(mid, y), ImGui.vec2(r1, y + h), lit, clear, clear, lit);
+		}
+		// Twinkles trail the sweep; each star rises and fades once.
+		var i = 0;
+		while (i < 3) {
+			var phase:Float = 0.12 + i * 0.2;
+			var k:Float = (p - phase) / 0.45;
+			if (k > 0 && k < 1) {
+				var a = Std.int(255 * Math.sin(k * Math.PI));
+				var sx:Float = x + w * (i == 0 ? 0.28 : (i == 1 ? 0.72 : 0.5));
+				var sy:Float = y + h * (i == 0 ? 0.3 : (i == 1 ? 0.22 : 0.74));
+				var len:Float = Math.max(3, w * 0.13) * Math.sin(k * Math.PI);
+				var col = (a << 24) | rgbOnly;
+				ImGui.ImDrawList_AddLine(dl, ImGui.vec2(sx - len, sy), ImGui.vec2(sx + len, sy), col, 1.5);
+				ImGui.ImDrawList_AddLine(dl, ImGui.vec2(sx, sy - len), ImGui.vec2(sx, sy + len), col, 1.5);
+			}
+			i++;
+		}
+	}
+
 	/**
 	 * Blizzard-style Spell Activation Overlay: soft gold bloom, bright core border, perimeter sparks.
 	 * @param coreRgb 0xRRGGBB (alpha ignored / computed from pulse)

@@ -1,4 +1,4 @@
-﻿package solarflare.ui;
+package solarflare.ui;
 
 import solarflare.attackcombo.AttackComboConfig;
 import solarflare.chaincast.Chaincast;
@@ -46,8 +46,17 @@ class ConfigPanel {
 	static inline var TAB_COMBAT_LOG:Int = 6;
 	static inline var TAB_THEME:Int = 7;
 	static inline var TAB_EXTRABARS:Int = 8;
+	static inline var TAB_BARTER:Int = 9;
+	static inline var TAB_NATIVE:Int = 10;
+	static inline var TAB_STATUS:Int = 11;
+	static inline var TAB_GETRIFTY:Int = 12;
 	public var open:BoolRef;
 	public var vitals:VitalsConfig;
+	public var uiPack:UiPackConfig;
+	public var nativeHide:NativeHideConfig;
+	public var hideMove:HideMoveConfig;
+	public var barter:solarflare.barter.BarTer;
+	public var statusBoard:solarflare.statusboard.StatusBoard;
 	public var geaux:GeauxConfig;
 	public var getRifty:GetRiftyConfig;
 	public var combo:ComboConfig;
@@ -91,6 +100,13 @@ class ConfigPanel {
 	var showF6Btn:BoolRef;
 	var toggleCooldownUntil:Float = 0;
 	var activeHubTab:Int = TAB_RESOURCES;
+	/** Session-only: hub collapsed to a narrow module rail while builders are in use. */
+	var railed:Bool = false;
+	var railExpandedW:Float = 0;
+	var railExpandedH:Float = 0;
+	var hubWinH:Float = 0;
+	static inline var HUB_TITLE:String = "SolarFlare###SolarFlare.Hub";
+	static inline var RAIL_W:Float = 340;
 	var savedHubOpen:Bool = false;
 	var savedResourceBuilderOpen:Bool = false;
 	var savedGeauxBuilderOpen:Bool = false;
@@ -120,6 +136,12 @@ class ConfigPanel {
 		showF6Btn = new BoolRef(false);
 		ThemePalette.init();
 		vitals = new VitalsConfig();
+		uiPack = new UiPackConfig();
+		nativeHide = new NativeHideConfig();
+		hideMove = new HideMoveConfig();
+		barter = new solarflare.barter.BarTer();
+		barter.host = this;
+		statusBoard = new solarflare.statusboard.StatusBoard();
 		geaux = new GeauxConfig();
 		getRifty = new GetRiftyConfig();
 		combo = new ComboConfig();
@@ -189,10 +211,11 @@ class ConfigPanel {
 		if (geauxBuilder != null) registerInteractive(geauxBuilder.open);
 		if (auraBuilder != null) registerInteractive(auraBuilder.open);
 		if (extraBarsPrototype != null) registerInteractive(extraBarsPrototype.open);
+		if (barter != null && barter.config != null) registerInteractive(barter.config.open);
+		if (uiPack != null) registerInteractive(uiPack.open);
 		if (notebook != null) registerInteractive(notebook.open);
 		if (vitals != null) registerInteractive(vitals.open);
 		if (geaux != null) registerInteractive(geaux.open);
-		if (getRifty != null) registerInteractive(getRifty.open);
 		if (combo != null) registerInteractive(combo.open);
 		if (chaincast != null) registerInteractive(chaincast.open);
 		if (conduit != null) registerInteractive(conduit.open);
@@ -240,6 +263,7 @@ class ConfigPanel {
 		if (auraBuilder != null)
 			auraBuilder.clearTransientState();
 		if (extraBarsPrototype != null) extraBarsPrototype.clearTransientState();
+		if (barter != null) barter.clearTransientState();
 		if (changed) SettingsStore.markDirty();
 	}
 
@@ -371,7 +395,8 @@ class ConfigPanel {
 				Math.max(720, hubW.get()), Math.max(820, hubH.get()), function() {
 				var pos = ImGui.getWindowPos();
 				var size = ImGui.getWindowSize();
-				if (rememberHubLayout.get() && (pos.x != lastHubX || pos.y != lastHubY
+				hubWinH = size.y;
+				if (!railed && rememberHubLayout.get() && (pos.x != lastHubX || pos.y != lastHubY
 					|| size.x != hubW.get() || size.y != hubH.get())) {
 					lastHubX = pos.x;
 					lastHubY = pos.y;
@@ -380,39 +405,21 @@ class ConfigPanel {
 					SettingsStore.markDirty();
 				}
 				drawHubMenuBar();
+				if (railed) {
+					drawHubRail();
+					return;
+				}
 				drawHubLogo();
+				// One profile strip for every module tab; builders show the same strip.
+				FeatureProfiles.drawToolbar(this, "hub", "hub");
 				ImGui.separator();
 				drawModuleTabs();
 				ImGui.separator();
 				HudChrome.safeChild("##hub_active_settings", ImGui.vec2(0, 0), 0, drawActiveModule,
 					imgui.Enums.ImGuiChildFlags.Borders | imgui.Enums.ImGuiChildFlags.AutoResizeY | imgui.Enums.ImGuiChildFlags.AlwaysUseWindowPadding);
 				ImGui.separator();
-				if (ImGui.collapsingHeader("Show")) {
+				if (ImGui.collapsingHeader("MENU launcher")) {
 					UiLayout.propertyGrid("##hub_show_props", function() {
-						UiLayout.propertyRow("Overlays", function() {
-							if (ImGui.checkbox("Geaux##hub_geaux_on", geaux.enabled)) {
-								if (geaux.enabled.get()) {
-									geaux.sizeDirty = true;
-									if (geaux.chrome != null)
-										geaux.chrome.posDirty = true;
-								}
-								SettingsStore.markDirty();
-							}
-							if (lightsaber != null)
-								visCheck("Lightsaber##hub_saber_show", lightsaber.hidden, showSaber);
-							if (getRifty != null)
-								visCheck("GetRifty##hub_rifty_show", getRifty.hidden, showGetRifty);
-							if (auras != null && ImGui.checkbox("Auras##hub_aura_show", auras.enabled))
-								SettingsStore.markDirty();
-						});
-						UiLayout.propertyRow("Target Frame", function() {
-							if (target != null)
-								visCheck("Enabled##hub_target_show", target.hidden, showTarget);
-						});
-						UiLayout.propertyRow("Cast Bar", function() {
-							if (castBar != null)
-								visCheck("Enabled##hub_castbar_show", castBar.hidden, showCastBar);
-						});
 						if (launchers != null) {
 							UiLayout.propertyRow("MENU button", function() {
 								visCheck("Show##hub_f6b", launchers.f6.hidden, showF6Btn);
@@ -465,7 +472,7 @@ class ConfigPanel {
 					);
 				}
 
-				if (ImGui.collapsingHeader("ImGui debug")) {
+				if (ImGui.collapsingHeader("Advanced diagnostics")) {
 					ImGui.textWrapped("Font/style stacks are global with other HLX mods. Latin/Greek/Cyrillic is bundled.");
 					UiLayout.propertyGrid("##hub_debug_props", function() {
 						UiLayout.propertyRow("Windows", function() {
@@ -509,6 +516,9 @@ class ConfigPanel {
 		if (extraBarsPrototype != null) {
 			try extraBarsPrototype.draw() catch (_:Dynamic) {}
 		}
+		if (uiPack != null) {
+			try uiPack.drawMenu(this) catch (_:Dynamic) {}
+		}
 		trackProfileWindowState();
 		if (target != null) {
 			try target.draw() catch (_:Dynamic) {}
@@ -524,11 +534,6 @@ class ConfigPanel {
 				lightsaber.draw()
 			catch (_:Dynamic) {}
 		}
-		if (getRifty != null) {
-			try
-				getRifty.draw()
-			catch (_:Dynamic) {}
-		}
 	}
 
 	function drawHubMenuBar():Void {
@@ -541,6 +546,12 @@ class ConfigPanel {
 				geauxBuilder.open.set(true);
 			if (ImGui.menuItem("ExtraBars"))
 				extraBarsPrototype.open.set(true);
+			if (ImGui.menuItem("BarTer"))
+				if (barter != null) barter.config.open.set(true);
+			if (ImGui.menuItem("Native UI"))
+				if (uiPack != null) uiPack.open.set(true);
+			if (ImGui.menuItem("Status Board"))
+				showHubTab("status");
 			if (ImGui.menuItem("Resource Tracker"))
 				resourceTracker.open.set(true);
 			if (ImGui.menuItem("Player Cast Bar"))
@@ -550,7 +561,7 @@ class ConfigPanel {
 			if (ImGui.menuItem("Lightsaber"))
 				lightsaber.open.set(true);
 			if (ImGui.menuItem("GetRifty"))
-				getRifty.open.set(true);
+				showHubTab("getrifty");
 			ImGui.endMenu();
 		}
 		if (ImGui.beginMenu("File")) {
@@ -574,7 +585,7 @@ class ConfigPanel {
 		} catch (_:Dynamic) {}
 	}
 
-	/** Close hub on Escape only — never letter keys (typing must not dismiss). */
+	/** Close hub on Escape only â€” never letter keys (typing must not dismiss). */
 	function pollHubDismissKeys():Void {
 		if (!open.get())
 			return;
@@ -609,64 +620,117 @@ class ConfigPanel {
 
 	}
 
-	/** Feature selection changes the option surface in-place; editors are secondary windows. */
-	function drawModuleTabs():Void {
-		var labels = ["Resources", "Geaux", "Attack Combo", "Auras", "Notebook", "Lightsaber", "Combat Log", "Theme", "ExtraBars"];
-		var ids = [TAB_RESOURCES, TAB_GEAUX, TAB_ATTACK, TAB_AURAS, TAB_NOTEBOOK, TAB_LIGHTSABER, TAB_COMBAT_LOG, TAB_THEME, TAB_EXTRABARS];
-		var totalItems = labels.length + 1;
-		var available = ImGui.getContentRegionAvail().x;
-		var columns = UiLayout.columnCount(available, 120, 4, 8);
-		var start = 0;
-		var row = 0;
-		while (start < totalItems) {
-			var remaining = totalItems - start;
-			var rowCount = remaining < columns ? remaining : columns;
-			var rowStart = start;
-			UiLayout.inlineSplit("##hub_module_row_" + row, rowCount,
-				function(cell:Int, width:Single) {
-					var index = rowStart + cell;
-					if (index < labels.length) {
-						if (moduleTab(labels[index], ids[index], width)) {
-							if (ids[index] == TAB_NOTEBOOK) notebook.open.set(true);
-							if (ids[index] == TAB_EXTRABARS) extraBarsPrototype.open.set(true);
-						}
-					} else {
-						drawGetRiftySunButton(width);
-					}
-				}, 8);
-			start += rowCount;
-			row++;
+	static var NAV_GROUP_NAMES:Array<String> = ["Display", "Automation", "Tools"];
+	static var NAV_GROUPS:Array<Array<Int>> = [
+		[TAB_RESOURCES, TAB_GEAUX, TAB_BARTER, TAB_EXTRABARS, TAB_ATTACK, TAB_STATUS],
+		[TAB_AURAS, TAB_COMBAT_LOG],
+		[TAB_NOTEBOOK, TAB_LIGHTSABER, TAB_NATIVE, TAB_THEME, TAB_GETRIFTY]
+	];
+
+	static function tabLabel(id:Int):String {
+		return switch (id) {
+			case TAB_RESOURCES: "Resources";
+			case TAB_GEAUX: "Geaux";
+			case TAB_ATTACK: "Attack Combo";
+			case TAB_AURAS: "Auras";
+			case TAB_NOTEBOOK: "Notebook";
+			case TAB_LIGHTSABER: "Lightsaber";
+			case TAB_COMBAT_LOG: "Combat Log";
+			case TAB_THEME: "Theme";
+			case TAB_EXTRABARS: "ExtraBars";
+			case TAB_BARTER: "BarTer";
+			case TAB_NATIVE: "Native UI";
+			case TAB_GETRIFTY: "GetRifty";
+			default: "Status Board";
 		}
 	}
 
-	/** Sun icon after Theme — opens GetRifty settings only; does not unhide the overlay. */
-	function drawGetRiftySunButton(cellWidth:Single):Void {
-		var side:Single = 38;
-		var startX = ImGui.getCursorPosX();
-		if (cellWidth > side)
-			ImGui.setCursorPosX(startX + (cellWidth - side) * 0.5);
-		var p = ImGui.getCursorScreenPos();
-		var clicked = ImGui.invisibleButton("##hub_getrifty_sun", ImGui.vec2(side, side));
-		var dl = ImGui.getWindowDrawList();
-		var tex = GameIcons.get(GameIcons.RIFT_SUN);
-		if (tex == 0)
-			tex = GameIcons.get(GameIcons.CHROME_SUN);
-		var tint = ImGui.isItemHovered()
-			? ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 0.92, 0.55, 1))
-			: ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.95, 0.82, 0.35, 1));
-		if (tex == 0 || !GameIcons.draw(dl, tex, p.x + 3, p.y + 3, side - 6, tint)) {
-			ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(p.x + side * 0.5, p.y + side * 0.5), side * 0.32, tint, 16);
+	/** 1 = module overlay on, 0 = off, -1 = no simple on/off flag. */
+	function tabState(id:Int):Int {
+		switch (id) {
+			case TAB_GEAUX:
+				return geaux != null ? (geaux.enabled.get() ? 1 : 0) : -1;
+			case TAB_ATTACK:
+				return attackCombo != null ? (attackCombo.hidden.get() ? 0 : 1) : -1;
+			case TAB_AURAS:
+				return auras != null ? (auras.enabled.get() ? 1 : 0) : -1;
+			case TAB_LIGHTSABER:
+				return lightsaber != null ? (lightsaber.hidden.get() ? 0 : 1) : -1;
+			case TAB_STATUS:
+				return statusBoard != null ? (statusBoard.config.hidden.get() ? 0 : 1) : -1;
+			case TAB_GETRIFTY:
+				return getRifty != null ? (getRifty.hidden.get() ? 0 : 1) : -1;
+			default:
+				return -1;
 		}
-		if (ImGui.isItemHovered())
-			ImGui.setTooltip("GetRifty settings (off until you enable Show)");
-		if (clicked && getRifty != null)
-			getRifty.open.set(true);
+	}
+
+	/** Grouped module navigation: Display / Automation / Tools, with an on-dot per module. */
+	function drawModuleTabs():Void {
+		var available = ImGui.getContentRegionAvail().x;
+		var columns = UiLayout.columnCount(available, 120, 4, 8);
+		for (g in 0...NAV_GROUPS.length) {
+			var ids = NAV_GROUPS[g];
+			var total = ids.length;
+			ImGui.textDisabled(NAV_GROUP_NAMES[g]);
+			if (g == 0) {
+				ImGui.sameLine(0, 0);
+				ImGui.setCursorPosX(ImGui.getCursorPosX() + Math.max(0, available - 190));
+				if (UiChrome.ghostButton("Collapse##hub_rail_toggle", ImGui.vec2(80, 22)))
+					setRail(true);
+			}
+			var start = 0;
+			var row = 0;
+			while (start < total) {
+				var rowCount = (total - start) < columns ? (total - start) : columns;
+				var rowStart = start;
+				UiLayout.inlineSplit("##hub_nav_" + g + "_" + row, columns, function(cell:Int, width:Single) {
+					var index = rowStart + cell;
+					if (index >= total) return;
+					var id = ids[index];
+					if (moduleTab(tabLabel(id), id, width))
+						onModuleChosen(id);
+				}, 8);
+				start += rowCount;
+				row++;
+			}
+			UiChrome.gap(UiChrome.SP_S);
+		}
+	}
+
+	/** Selecting a module also opens the editors that are their own window. */
+	function onModuleChosen(id:Int):Void {
+		if (id == TAB_NOTEBOOK) notebook.open.set(true);
+		if (id == TAB_EXTRABARS) extraBarsPrototype.open.set(true);
+		if (id == TAB_BARTER && barter != null) barter.config.open.set(true);
+	}
+
+	/** Open the hub on a module's settings page (used by overlay context menus and the Open menu). */
+	public function showHubTab(which:String):Void {
+		var id = which == "status" ? TAB_STATUS : (which == "getrifty" ? TAB_GETRIFTY : -1);
+		if (id < 0) return;
+		open.set(true);
+		activeHubTab = id;
+		if (railed) setRail(false);
+		SettingsStore.markDirty();
 	}
 
 	function moduleTab(label:String, id:Int, width:Single):Bool {
 		var selected = activeHubTab == id;
-		var clicked = UiChrome.navButton(label + "##hub_tab_" + id, selected,
-			ImGui.vec2(width, 38));
+		var clicked = UiChrome.navButton(label + "##hub_tab_" + id, selected, ImGui.vec2(width, 32));
+		var state = tabState(id);
+		if (state >= 0) {
+			// Status dot (theme accent when on, hollow when off) in the chip's top-right corner.
+			var max = ImGui.getItemRectMax();
+			var min = ImGui.getItemRectMin();
+			var dl = ImGui.getWindowDrawList();
+			var theme = ThemePalette.current();
+			var center = ImGui.vec2(max.x - 9, min.y + 9);
+			if (state == 1)
+				ImGui.ImDrawList_AddCircleFilled(dl, center, 3.5, ImGui.colorConvertFloat4ToU32(theme.accent), 12);
+			else
+				ImGui.ImDrawList_AddCircle(dl, center, 3.5, ImGui.colorConvertFloat4ToU32(theme.border), 12, 1.25);
+		}
 		if (clicked) {
 			activeHubTab = id;
 			SettingsStore.markDirty();
@@ -675,21 +739,85 @@ class ConfigPanel {
 		return false;
 	}
 
+	/** Narrow window: profile strip plus one button per module; editors open as their own windows. */
+	function setRail(on:Bool):Void {
+		if (on == railed) return;
+		if (on) {
+			railExpandedW = Math.max(720, hubW.get());
+			railExpandedH = Math.max(820, hubH.get());
+			ToolWindow.requestSize(HUB_TITLE, RAIL_W, Math.max(420, Math.min(hubWinH, 760)), true);
+		} else {
+			ToolWindow.requestSize(HUB_TITLE, railExpandedW, railExpandedH, false);
+		}
+		railed = on;
+	}
+
+	function drawHubRail():Void {
+		if (UiChrome.ghostButton("Expand hub##hub_rail_toggle", ImGui.vec2(-1, 28)))
+			setRail(false);
+		FeatureProfiles.drawInlineBar(this, "hub_rail");
+		ImGui.separator();
+		for (g in 0...NAV_GROUPS.length) {
+			ImGui.textDisabled(NAV_GROUP_NAMES[g]);
+			var ids = NAV_GROUPS[g];
+			for (i in 0...ids.length) {
+				var id = ids[i];
+				if (moduleTab(tabLabel(id), id, ImGui.getContentRegionAvail().x)) {
+					onModuleChosen(id);
+					openModuleWindow(id);
+				}
+			}
+			UiChrome.gap(UiChrome.SP_S);
+		}
+	}
+
+	/** Rail click: open the module's own window if it has one, otherwise bring the hub back. */
+	function openModuleWindow(id:Int):Void {
+		switch (id) {
+			case TAB_RESOURCES: if (resourceTracker != null) resourceTracker.open.set(true);
+			case TAB_GEAUX: if (geauxBuilder != null) geauxBuilder.open.set(true);
+			case TAB_AURAS: if (auraBuilder != null) auraBuilder.open.set(true);
+			case TAB_LIGHTSABER: if (lightsaber != null) lightsaber.open.set(true);
+			case TAB_NATIVE: if (uiPack != null) uiPack.open.set(true);
+			case TAB_ATTACK: if (resourceTracker != null) resourceTracker.openFor("attack");
+			case TAB_NOTEBOOK | TAB_EXTRABARS | TAB_BARTER:
+			default: setRail(false);
+		}
+	}
+
+	/** Module card header: title band, status line and one right-aligned primary action. */
+	function drawModuleHeader(title:String, status:String, openLabel:String, id:String):Bool {
+		UiChrome.sectionHeader(title);
+		var startX = ImGui.getCursorPosX();
+		var avail = ImGui.getContentRegionAvail().x;
+		var btnW:Single = 168;
+		var y = ImGui.getCursorPosY();
+		ImGui.setCursorPosY(y + 5);
+		ImGui.textDisabled(status);
+		ImGui.sameLine(0, 0);
+		var x = Math.max(ImGui.getCursorPosX() + 8, startX + avail - btnW);
+		ImGui.setCursorPosY(y);
+		ImGui.setCursorPosX(x);
+		var clicked = UiChrome.accentButton(openLabel + "##" + id, ImGui.vec2(btnW, 30));
+		UiChrome.gap(UiChrome.SP_S);
+		return clicked;
+	}
+
 	function drawActiveModule():Void {
 		switch (activeHubTab) {
 			case TAB_GEAUX:
 				drawGeauxHubSummary();
 			case TAB_ATTACK:
+				if (drawModuleHeader("Attack Combo", attackCombo.hidden.get() ? "Overlay hidden" : "Overlay shown", "Open settings", "tab_attack_open"))
+					resourceTracker.openFor("attack");
 				ImGui.textWrapped("Weapon attack-chain overlay.");
 				visCheck("Show Attack Combo##tab_attack_show", attackCombo.hidden, showAttack);
-				if (UiChrome.accentButton("Open Attack Combo settings##tab_attack_open", ImGui.vec2(-1, 40)))
-					resourceTracker.openFor("attack");
 			case TAB_AURAS:
-				FeatureProfiles.drawToolbar(this, "auras", "hub_auras");
+				if (drawModuleHeader("Auras", Std.string(auras.auras.length) + " aura(s) / " + (auras.enabled.get() ? "enabled" : "disabled"), "Open builder", "tab_aura_open"))
+					auraBuilder.open.set(true);
 				ImGui.textWrapped("Enable the aura system, then open the builder.");
 				if (ImGui.checkbox("Enable aura system##tab_aura_show", auras.enabled))
 					SettingsStore.markDirty();
-				ImGui.text(Std.string(auras.auras.length) + " aura(s) configured");
 				ImGui.separator();
 				UiChrome.heading("Status countdowns");
 				UiLayout.propertyGrid("##tab_aura_countdown", function() {
@@ -722,33 +850,41 @@ class ConfigPanel {
 							SettingsStore.markDirty();
 					});
 				});
-				ImGui.separator();
-				if (UiChrome.accentButton("Open Aura Builder##tab_aura_open", ImGui.vec2(-1, 40)))
-					auraBuilder.open.set(true);
 			case TAB_NOTEBOOK:
 				ImGui.textWrapped("The Notebook opens when you select this tab. Pages auto-save while you type and are stored separately in notebook.json.");
 			case TAB_LIGHTSABER:
+				if (drawModuleHeader("Lightsaber", lightsaber.hidden.get() ? "Meter hidden" : "Meter shown", "Open options", "tab_saber_open"))
+					lightsaber.open.set(true);
 				ImGui.textWrapped("Local combat-log DPS meter settings.");
 				visCheck("Show Lightsaber##tab_saber_show", lightsaber.hidden, showSaber);
-				if (UiChrome.accentButton("Lightsaber options##tab_saber_open", ImGui.vec2(-1, 40)))
-					lightsaber.open.set(true);
 			case TAB_COMBAT_LOG:
 				ImGui.textWrapped("Skill casts and resolved combat events.");
 				combatLog.drawEditorContents();
 			case TAB_EXTRABARS:
+				if (drawModuleHeader("ExtraBars", Std.string(extraBarsPrototype.model.bars.length) + " bar(s) configured", "Open editor", "extra_open"))
+					extraBarsPrototype.open.set(true);
 				ImGui.textWrapped("Configure consumable bars and the optional Spark Cube tracker. These settings are remembered across all characters and gear builds.");
-				ImGui.text(Std.string(extraBarsPrototype.model.bars.length) + " bar(s) configured");
-				if (UiChrome.accentButton("Open ExtraBars editor##extra_open", ImGui.vec2(-1, 40))) extraBarsPrototype.open.set(true);
+			case TAB_NATIVE:
+                if (uiPack != null) {
+                    uiPack.drawHubPackBlurb();
+                    if (UiChrome.accentButton("Open Native UI settings##native_settings", ImGui.vec2(-1,32))) uiPack.open.set(true);
+                }
+            case TAB_STATUS:
+                if (statusBoard != null) statusBoard.config.drawContents();
+            case TAB_BARTER:
+				if (barter != null)
+					barter.config.drawHubSummary();
 			case TAB_THEME:
 				ThemePalette.drawThemeEditorPane();
+			case TAB_GETRIFTY:
+				if (getRifty != null) {
+					UiChrome.sectionHeader("GetRifty");
+					getRifty.drawContents();
+				}
 			default:
-				FeatureProfiles.drawToolbar(this, "resources", "hub_resources");
-				ImGui.textWrapped("Toggle tracking bars and overlay flags, or open the builder for in-depth settings.");
-				ImGui.spacing();
-				drawResourceToggleGrid();
-				ImGui.spacing();
-				if (UiChrome.accentButton("Open Resource Tracker Builder##tab_rt_open", ImGui.vec2(-1, 40)))
+				if (drawModuleHeader("Resources", "Tracking bars and overlay flags", "Open builder", "tab_rt_open"))
 					resourceTracker.open.set(true);
+				drawResourceToggleGrid();
 		}
 	}
 
@@ -766,7 +902,7 @@ class ConfigPanel {
 		if (conduit != null) items.push({id: "conduit", label: "Conduits", hidden: conduit.hidden});
 		if (target != null) items.push({id: "target", label: "Target Frame", hidden: target.hidden});
 		if (castBar != null) items.push({id: "castbar", label: "Player Cast Bar", hidden: castBar.hidden});
-		
+		if (statusBoard != null) items.push({id: "statuses", label: "Status Board", hidden: statusBoard.config.hidden});
 
 		var avail = ImGui.getContentRegionAvail().x;
 		var cols = UiLayout.columnCount(avail, 120, 3, 4);
@@ -778,8 +914,11 @@ class ConfigPanel {
 			UiLayout.inlineSplit("##hub_res_row_" + Std.int(start / cols), rowCount, function(col:Int, w:Single) {
 				var item = items[rowStart + col];
 				if (item != null && item.hidden != null) {
-					if (UiChrome.showingTile("##res_" + item.id, item.label, item.hidden, w, 32))
+					if (UiChrome.showingTile("##res_" + item.id, item.label, item.hidden, w, 32)) {
 						SettingsStore.markDirty();
+						if (item.id == "statuses")
+							solarflare.ObserveDemand.markAuraStatusDirty();
+					}
 				}
 			}, 6);
 			start += rowCount;
@@ -787,8 +926,9 @@ class ConfigPanel {
 	}
 
 	function drawGeauxHubSummary():Void {
-		FeatureProfiles.drawToolbar(this, "geaux", "hub_geaux");
-		ImGui.textWrapped("Configure the shared Geaux grid in the Geaux Builder.");
+		if (drawModuleHeader("Geaux", geaux.enabled.get() ? "Grid visible" : "Grid hidden", "Open builder", "tab_geaux_open"))
+			geauxBuilder.open.set(true);
+		ImGui.textWrapped("TellMeWhen-style floating CD grid (not the skill action bar â€” use BarTer for that).");
 		UiLayout.propertyGrid("##hub_geaux_properties", function() {
 			UiLayout.propertyRow("Visible", function() {
 				if (UiChrome.toggleTileRef("##tab_geaux_show", "Visible", geaux.enabled, 108, 28)) {
@@ -812,13 +952,12 @@ class ConfigPanel {
 				});
 			}
 		});
-		if (UiChrome.accentButton("Open Geaux Builder##tab_geaux_open", ImGui.vec2(-1, 40)))
-			geauxBuilder.open.set(true);
 	}
 
 	public function profileUiTab():Int return activeHubTab;
+	public function statusSettingsOpen():Bool return open.get() && activeHubTab == TAB_STATUS;
 	public function applyProfileUiTab(value:Int):Void {
-		if (value >= TAB_RESOURCES && value <= TAB_EXTRABARS)
+		if (value >= TAB_RESOURCES && value <= TAB_GETRIFTY)
 			activeHubTab = value;
 	}
 

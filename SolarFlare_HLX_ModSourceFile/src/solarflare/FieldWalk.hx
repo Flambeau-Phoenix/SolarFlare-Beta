@@ -199,25 +199,6 @@ class FieldWalk {
 		return null;
 	}
 
-	/** Read-only Map.get via callResolved / untyped. Never Reflect.callMethod. */
-	public static function mapGet(map:Dynamic, key:Dynamic):Dynamic {
-		if (map == null)
-			return null;
-		try {
-			var v:Dynamic = untyped map.get(key);
-			if (v != null)
-				return v;
-		} catch (_:Dynamic) {}
-		ensureMapGetMems();
-		for (mem in mapGetMems) {
-			try {
-				var v:Dynamic = HlxRuntime.callResolved(mem, [map, key]);
-				if (v != null)
-					return v;
-			} catch (_:Dynamic) {}
-		}
-		return null;
-	}
 
 	static function ladder(obj:Dynamic, name:String, remember:Bool):ProbeHit {
 		var hit = new ProbeHit();
@@ -421,16 +402,6 @@ class FieldWalk {
 		return false;
 	}
 
-	static function ensureMapGetMems():Void {
-		if (mapGetMems != null)
-			return;
-		mapGetMems = [];
-		for (t in mapTypes) {
-			var mem = resolveMem(t, "get");
-			if (mem != null)
-				mapGetMems.push(mem);
-		}
-	}
 
 	static function resolveMem(typeName:String, name:String):ResolvedMember {
 		try {

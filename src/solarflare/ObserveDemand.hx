@@ -19,8 +19,18 @@ class ObserveDemand {
 	public static var combatLog:Bool = false;
 	public static var geaux:Bool = false;
 	public static var geauxBuilder:Bool = false;
+	/** BarTer skill bars — light sampleBarTer path, not full Geaux skills demand. */
+	public static var barter:Bool = false;
+	/** Assigned BarTer skill ids (rebuilt each publish when barter demanded). */
+	public static var barterSkillIds:Array<String> = [];
+	public static var barterStatusIds:Array<String> = [];
+	public static var barterBuilderOpen:Bool = false;
 	public static var auras:Bool = false;
 	public static var aurasNeedStatus:Bool = false;
+	/** status.count / status.overflow need length only, never per-entry ingestion. */
+	public static var needsStatusContainer:Bool = false;
+	/** Movable StatusBoard requests budgeted discovery of hero.statuses. */
+	public static var statusBoard:Bool = false;
 	public static var aurasNeedConsumables:Bool = false;
 	public static var extraBarsNeedConsumables:Bool = false;
 	public static var consumableIds:Array<String> = [];
@@ -47,8 +57,10 @@ class ObserveDemand {
 	public static var geauxDirty:Bool = true;
 	public static var attackComboDirty:Bool = true;
 	public static var targetPtrDirty:Bool = true;
-	/** Local Status lifecycle / net status sync — StatusObserveHooks. */
+	/** Local skill-use/configuration requests; lifecycle hooks remain retired. */
 	public static var auraStatusDirty:Bool = true;
+	/** Coalesced discovery request; status scheduler must not consume it before the cache. */
+	public static var statusDiscoveryDirty:Bool = true;
 	/** Rebuild statusIds / instant/special/cast subject lists when aura config mutates. */
 	public static var statusDemandDirty:Bool = true;
 	static var rawNeedInstant:Bool = false;
@@ -62,6 +74,7 @@ class ObserveDemand {
 	static var lastAuraStatus:Float = 0;
 	static var lastGetRifty:Float = 0;
 	static var lastAttackCombo:Float = 0;
+	static var lastBarTer:Float = 0;
 
 	/** Continuous class state authority after removal of class-specific trampolines. */
 	public static inline var OVERLAY_IDLE_S:Float = 0.05; // 20 Hz demanded sample
@@ -81,6 +94,9 @@ class ObserveDemand {
 	public static inline var GETRIFTY_IN_S:Float = 0.25;
 	public static inline var ATTACK_IDLE_S:Float = 0.25;
 	public static inline var ATTACK_HOT_S:Float = 0.055;
+	/** Staggered vs ActivePassGate 50 ms / Geaux telemetry 50–120 ms. */
+	public static inline var BARTER_IDLE_S:Float = 0.11;
+	public static inline var BARTER_HOT_S:Float = 0.06;
 
 	public static function publish(cfg:ConfigPanel):Void {
 		if (cfg == null)
@@ -97,12 +113,18 @@ class ObserveDemand {
 		combatLog = cfg.combatLog != null && !cfg.combatLog.hidden.get();
 		geaux = cfg.geaux != null && cfg.geaux.enabled.get();
 		geauxBuilder = cfg.geauxBuilder != null && cfg.geauxBuilder.open.get();
-		extraBarsNeedConsumables = cfg.extraBarsPrototype != null
-			&& (cfg.extraBarsPrototype.model.demand() || cfg.extraBarsPrototype.open.get());
+		barter = cfg.barter != null && (cfg.barter.demand() || (cfg.barter.config != null && cfg.barter.config.open.get()));
+		barterBuilderOpen = cfg.barter != null && cfg.barter.config.open.get();
+		var barterNeedsItems = barter && cfg.barter != null && cfg.barter.config != null
+			&& (cfg.barter.config.open.get() || solarflare.barter.BarTerCache.hasAnyItem(cfg.barter.config));
+		extraBarsNeedConsumables = (cfg.extraBarsPrototype != null
+			&& (cfg.extraBarsPrototype.model.demand() || cfg.extraBarsPrototype.open.get()))
+			|| barterNeedsItems;
 		auras = cfg.auras != null && cfg.auras.enabled.get() && cfg.auras.auras != null && cfg.auras.auras.length > 0;
 		auraBuilderOpen = cfg.auraBuilder != null && cfg.auraBuilder.open.get();
 		if (statusDemandDirty) {
 			statusDemandDirty = false;
+			needsStatusContainer = false;
 			auraSkillIds.resize(0);
 			while (statusIds.length > 0)
 				statusIds.pop();
@@ -141,15 +163,35 @@ class ObserveDemand {
 					pushStatusId(id + "_Proc");
 			}
 		}
+		// BarTer subjects: bounded rebuild (three active bars × 64 cells), own poll path.
+		barterSkillIds.resize(0);
+		barterStatusIds.resize(0);
+		if (barter && cfg.barter != null && cfg.barter.config != null) {
+			for (b in cfg.barter.config.bars) {
+				if (b == null || !cfg.barter.config.isActive(b.id)) continue;
+				for (i in 0...b.slotCount) {
+					var slot = b.slots[i];
+					if (slot == null) continue;
+					if (slot.hasSkill()) pushBarTerSkillId(slot.skillId);
+					if (slot.hasStatus() && barterStatusIds.indexOf(slot.statusId) < 0) barterStatusIds.push(slot.statusId);
+				}
+			}
+		}
+		statusBoard = cfg.statusBoard != null && (cfg.statusBoard.demand() || cfg.statusSettingsOpen());
 		aurasNeedConsumables = (auras && consumableIds.length > 0) || auraBuilderOpen;
 		aurasNeedInstant = auras && rawNeedInstant;
 		aurasNeedSpecial = auras && rawNeedSpecial;
 		aurasNeedEnemyCast = (auras && rawNeedEnemyCast) || auraBuilderOpen;
 		aurasNeedTarget = (auras && rawNeedTarget) || auraBuilderOpen;
-		aurasNeedStatus = statusIds.length > 0 || auraBuilderOpen;
+		aurasNeedStatus = statusIds.length > 0 || barterStatusIds.length > 0 || needsStatusContainer || auraBuilderOpen || barterBuilderOpen || statusBoard;
 		getRifty = cfg.getRifty != null && !cfg.getRifty.hidden.get();
 		var saberRift = cfg.lightsaber != null && !cfg.lightsaber.hidden.get() && cfg.lightsaber.showRiftMeter.get();
-		riftFlag = getRifty || combatLog || saberRift || auras || auraBuilderOpen;
+		var recording = false;
+		try
+			recording = solarflare.combatlog.CombatLogRecorder.enabled.get()
+		catch (_:Dynamic)
+			recording = false;
+		riftFlag = getRifty || combatLog || saberRift || auras || auraBuilderOpen || recording;
 		#if solarflare_telemetry
 		riftFlag = riftFlag || solarflare.debug.ResolutionLedger.armed();
 		#end
@@ -157,12 +199,31 @@ class ObserveDemand {
 
 	public static function markStatusDemandDirty():Void {
 		statusDemandDirty = true;
+		statusDiscoveryDirty = true;
 	}
 
 	static function pushAuraSkillId(id:String):Void {
 		if (id == null) return;
 		id = solarflare.geaux.GeauxCache.sanitizeSkillId(id);
 		if (id.length > 0 && auraSkillIds.indexOf(id) < 0 && auraSkillIds.length < 256) auraSkillIds.push(id);
+	}
+
+	static function pushBarTerSkillId(id:String):Void {
+		if (id == null) return;
+		id = solarflare.geaux.GeauxCache.sanitizeSkillId(id);
+		if (id.length > 0 && barterSkillIds.indexOf(id) < 0 && barterSkillIds.length < 192)
+			barterSkillIds.push(id);
+	}
+
+	/** Staggered BarTer skill poll — idle ~9 Hz, hot ~16 Hz while any assigned CD. */
+	public static function dueBarTer(now:Float, hot:Bool):Bool {
+		if (!barter)
+			return false;
+		var need = hot ? BARTER_HOT_S : BARTER_IDLE_S;
+		if (now - lastBarTer < need)
+			return false;
+		lastBarTer = now;
+		return true;
 	}
 
 	static function auraRulesNeedStatus(cfg:ConfigPanel):Bool {
@@ -176,13 +237,17 @@ class ObserveDemand {
 					for (c in a.rule.conditions) {
 						if (c == null || c.signal == null)
 							continue;
+						if (c.signal == "status.count" || c.signal == "status.overflow") {
+							needsStatusContainer = true;
+							continue;
+						}
 						if (StringTools.startsWith(c.signal, "status."))
 							addStatusId(c.subject);
 					}
 				}
 			}
 		} catch (_:Dynamic) {}
-		return statusIds.length > 0;
+		return statusIds.length > 0 || needsStatusContainer;
 	}
 
 	static function addStatusId(id:String):Void {
@@ -342,15 +407,11 @@ class ObserveDemand {
 		solarflare.runtime.HookIngress.mark(solarflare.runtime.DirtyDomains.ATTACK_COMBO);
 	}
 
-	public static inline function markTargetPtrDirty():Void
-	{
-		targetPtrDirty = true;
-		solarflare.runtime.HookIngress.mark(solarflare.runtime.DirtyDomains.TARGET);
-	}
 
 	public static inline function markAuraStatusDirty():Void
 	{
 		auraStatusDirty = true;
+		statusDiscoveryDirty = true;
 		solarflare.runtime.HookIngress.mark(solarflare.runtime.DirtyDomains.STATUS);
 	}
 

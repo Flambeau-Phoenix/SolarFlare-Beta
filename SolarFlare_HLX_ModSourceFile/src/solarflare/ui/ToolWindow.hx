@@ -14,6 +14,16 @@ import imgui.ref.BoolRef;
 class ToolWindow {
 	static var lastOpen:Map<String, Bool> = new Map();
 	static var forceLayoutIds:Map<String, Bool> = new Map();
+	static var compactTitles:Map<String, Bool> = new Map();
+	static var pendingW:Map<String, Float> = new Map();
+	static var pendingH:Map<String, Float> = new Map();
+
+	/** Resize a tool window once (applied next frame) and lower its minimum size while compact. */
+	public static function requestSize(title:String, w:Float, h:Float, compact:Bool):Void {
+		compactTitles.set(title, compact);
+		pendingW.set(title, w);
+		pendingH.set(title, h);
+	}
 
 	static function beginWithMenuBar(title:String, open:BoolRef, defaultW:Single = 520,
 			defaultH:Single = 640, dockable:Bool = false, rememberLayout:Bool = true):Bool {
@@ -33,6 +43,17 @@ class ToolWindow {
 		ImGui.setNextWindowSize(ImGui.vec2(defaultW, defaultH), sizeCond);
 		var minW:Single = defaultW >= 1000 ? 960 : 520;
 		var minH:Single = defaultH >= 700 ? 640 : 400;
+		if (compactTitles.exists(title) && compactTitles.get(title)) {
+			minW = 300;
+			minH = 360;
+		}
+		if (pendingW.exists(title)) {
+			var pw:Float = pendingW.get(title);
+			var ph:Float = pendingH.get(title);
+			ImGui.setNextWindowSize(ImGui.vec2(pw, ph), ImGuiCond.Always);
+			pendingW.remove(title);
+			pendingH.remove(title);
+		}
 		ImGui.setNextWindowSizeConstraints(ImGui.vec2(minW, minH), ImGui.vec2(2400, 1600));
 		{
 			try {

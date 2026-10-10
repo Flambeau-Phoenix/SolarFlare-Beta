@@ -40,7 +40,7 @@ class AuraSignalFrameBuilder {
 		frame.chaincastRemaining = ChaincastCache.readyLeft; frame.chaincastProgress = ChaincastCache.readyProgress;
 		frame.conduitKnown = ConduitCache.valid; frame.conduitFilled = ConduitCache.filledCount;
 		frame.conduitPowerStacks = ConduitCache.powerStacks; frame.conduitPowerLeft = ConduitCache.powerLeft;
-		frame.attackComboKnown = frame.heroKnown; frame.attackComboStep = AttackComboCache.step;
+		frame.attackComboKnown = frame.heroKnown && AttackComboCache.known; frame.attackComboStep = AttackComboCache.step;
 		frame.attackComboWithin = AttackComboCache.withinCombo; frame.attackComboFinal = AttackComboCache.flashFinal;
 		frame.inRift = GetRiftyCache.inInstance;
 		frame.inBossFight = GetRiftyCache.inBossFight;
@@ -82,7 +82,7 @@ class AuraSignalFrameBuilder {
 			var dst = frame.statuses[frame.statusCount++]; dst.rawId = src.id; dst.label = "";
 			dst.sourceItemId = src.sourceItemId; dst.sourceItemKnown = src.sourceItemKnown;
 			dst.ids = src.ids.copy(); dst.present = src.present; dst.durationKnown = src.durationKnown;
-			dst.stacks = src.stacks; dst.durationLeft = src.left; dst.durationProgress = clamp01(src.progress);
+			dst.stacks = src.stacks; dst.stacksKnown = src.stacksKnown; dst.durationLeft = src.left; dst.durationProgress = clamp01(src.progress);
 			dst.infinite = src.infinite;
 			dst.known = src.known && AuraStatusCache.isCurrent(HealthCache.localHero);
 		}
@@ -184,10 +184,10 @@ class AuraSignalFrameBuilder {
 		try {
 			var skill = GeauxCache.liveSkill(skillId);
 			if (skill != null) {
-				var bs:st.skill.BaseSkill = skill;
-				var sc:script.SkillScript = bs.script;
-				if (sc != null) {
-					ready = instant ? sc.shouldPlayInstantly() : sc.shouldHighlightSkill();
+				// Resolved on the script's live type so the skill's own override runs.
+				var r = instant ? GeauxCache.scriptProc(skill, skillId) : GeauxCache.scriptHighlight(skill, skillId);
+				if (r != null) {
+					ready = r;
 					known = true;
 				}
 			}

@@ -50,6 +50,8 @@ class HudChrome {
 	public var expandSizeDirty = false;
 	/** When false, collapse still resizes; x/y are not forced each frame (config panels). */
 	public var bindPos:Bool = true;
+	/** Cell menus take precedence over this window's background menu. */
+	public var itemContextMenus:Bool = false;
 	public var winW:Single = 0;
 	public var winH:Single = 0;
 	/** Draw-only expansion around an Aura face; persisted x/y keep their legacy anchor. */
@@ -450,7 +452,8 @@ class HudChrome {
 
 	public function drawContextMenu(?onClose:Void->Void, ?caption:String):Void {
 		if (!CursorCaptureFix.cursorFree) return;
-		if (ImGui.beginPopupContextWindow(null, 1)) {
+		var popupFlags=1 | (itemContextMenus ? imgui.Enums.ImGuiPopupFlags.NoOpenOverItems : 0);
+		if (ImGui.beginPopupContextWindow(null, popupFlags)) {
 			var title = caption != null ? caption : "Window Controls";
 			ImGui.separatorText('$title');
 

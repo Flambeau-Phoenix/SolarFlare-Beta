@@ -57,11 +57,14 @@ class EventRing {
 	}
 
 	/** Callback must consume synchronously; the row is reused after return. */
-	public static function drain(consume:HookEvent->Void, budget:Int = CAPACITY):Int {
+	public static function drain(consume:HookEvent->Void, budget:Int = CAPACITY, maxSeconds:Float = 0):Int {
 		if (consume == null || used <= 0 || budget <= 0)
 			return 0;
 		var n = 0;
+		var started = maxSeconds > 0 ? haxe.Timer.stamp() : 0.0;
 		while (used > 0 && n < budget) {
+			if (maxSeconds > 0 && n > 0 && (n & 7) == 0 && haxe.Timer.stamp() - started >= maxSeconds)
+				break;
 			var row = rows[readAt];
 			try consume(row) catch (_:Dynamic) {}
 			row.set(0, "", 0, 0, 0);

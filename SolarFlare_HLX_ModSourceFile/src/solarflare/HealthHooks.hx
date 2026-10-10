@@ -93,18 +93,6 @@ class HealthHooks {
 		}
 	}
 
-	static function sampleFull(heroDyn:Dynamic, src:String, hook:String, role:String):Void {
-		sampleResources(heroDyn, src, hook, role);
-		if (ObserveDemand.prayers)
-			samplePrayers(heroDyn);
-		if (ObserveDemand.comboPoints)
-			sampleComboPoints(heroDyn);
-		if (ObserveDemand.chaincast)
-			sampleChaincast(heroDyn);
-		if (ObserveDemand.conduit)
-			sampleConduit(heroDyn);
-		sampleIdentity(heroDyn);
-	}
 
 	/**
 	 * Bounded overlay reconcile from observe(). Hooks mark ObserveDemand.overlayDirty;
@@ -301,27 +289,14 @@ class HealthHooks {
 			casts.bindHero(self);
 			casts.note(EngineSkillId.ofSkill(skill), haxe.Timer.stamp(), solarflare.aura.AuraStatusCache.capturePresentIds(self),
 				solarflare.aura.AuraStatusCache.isCurrent(self) && solarflare.aura.AuraStatusCache.domainKnown);
-			solarflare.runtime.HookIngress.mark(solarflare.runtime.DirtyDomains.STATUS);
 		}
+		// Reuse the existing local skill-use edge; broad work stays sliced/coalesced.
+		if (ObserveDemand.aurasNeedStatus) ObserveDemand.markAuraStatusDirty();
 		if (!ensureLocalPriest(self))
 			return;
 		PrayerCache.applySkill(skill);
 	}
 
-	static function onScriptChargePrayer(self:Dynamic):Void {
-		try {
-			var script:script.SkillScript = self;
-			var hero = script.get_ownerHero();
-			if (hero != null && !HealthCache.isLocalHero(hero))
-				return;
-			if (hero != null && !ensureLocalPriest(hero))
-				return;
-			var skill:Dynamic = script.skill;
-			if (skill == null)
-				skill = script.get_activeSkill();
-			PrayerCache.applySkill(skill);
-		} catch (_:Dynamic) {}
-	}
 
 	static function ensureLocalPriest(heroDyn:Dynamic):Bool {
 		if (PrayerCache.active)
@@ -337,45 +312,10 @@ class HealthHooks {
 		}
 	}
 
-	static function onPrayerTrigger(self:Dynamic, skill:Dynamic):Void {
-		// Retired adapter helper. Resolve any future dispatcher hook by symbolic name in the current corpus.
-		if (!scriptOwnerIsLocalPriest(self))
-			return;
-		PrayerCache.spendAll();
-	}
 
-	static function onJudgmentProc(self:Dynamic, ctx:Dynamic):Void {
-		if (!scriptOwnerIsLocalPriest(self))
-			return;
-		PrayerCache.spendAll();
-	}
 
-	static function onJudgmentStep(self:Dynamic, step:Dynamic):Void {
-		if (!scriptOwnerIsLocalPriest(self))
-			return;
-		PrayerCache.spendAll();
-	}
 
-	static function scriptOwnerIsLocalPriest(self:Dynamic):Bool {
-		try {
-			var script:script.SkillScript = self;
-			var hero = script.get_ownerHero();
-			if (hero == null || !HealthCache.isLocalHero(hero))
-				return false;
-			return ensureLocalPriest(hero);
-		} catch (_:Dynamic) {
-			return PrayerCache.active;
-		}
-	}
 
-	static function onChargePrayer(self:Dynamic, prayerId:String):Void {
-		try {
-			var hero = FieldWalk.extractObject(self, "hero");
-			if (hero != null && !HealthCache.isLocalHero(hero))
-				return;
-			PrayerCache.chargeById(prayerId);
-		} catch (_:Dynamic) {}
-	}
 
 	static function heroAttr(heroDyn:Dynamic):Dynamic {
 		try {
@@ -417,15 +357,37 @@ class HealthHooks {
 		// v6 exposes no `mana` field on ent.UnitAttributes; the generic class resource is
 		// `specialEnergy` (cdb attribute `SpecialEnergyRegen`). Legacy mana names stay as a
 		// last-ditch fallback so this still resolves if a build renames the field.
-		var m = FieldWalk.extractNumberAny(attr, ["specialEnergy", "mana", "mp"], -1);
+		var m = Math.NaN;
+		var method = "typed";
+		try {
+			var ua:ent.UnitAttributes = attr;
+			if (ua != null)
+				m = ua.specialEnergy;
+		} catch (_:Dynamic) {}
+		if (Math.isNaN(m)) {
+			m = FieldWalk.extractNumberAny(attr, ["specialEnergy", "mana", "mp"], -1);
+			method = "fieldwalk";
+		}
 		if (m < 0) {
 			HealthCache.clearMana();
 			return;
 		}
-		var mx = FieldWalk.extractNumberAny(attr, ["specialEnergyMax", "maxSpecialEnergy", "maxMana", "manaMax"], 100);
-		HealthCache.setMana(m, mx > 0 ? mx : 100);
-		ledgerNum("health.specialEnergy", "fieldwalk", "HealthHooks.sampleMana", "specialEnergy", m, "ent.UnitAttributes", "hero.attr");
+		// The engine keeps maxima as CDB attributes (MaxSpecialEnergy), not as fields on the
+		// attribute class, so these names never resolve on v6. Probe once, then stop.
+		var mx = 100.0;
+		if (!manaMaxMissing) {
+			var found = FieldWalk.extractNumberAny(attr, ["specialEnergyMax", "maxSpecialEnergy", "maxMana", "manaMax"], -1);
+			if (found > 0)
+				mx = found;
+			else if (found < 0)
+				manaMaxMissing = true;
+		}
+		HealthCache.setMana(m, mx);
+		ledgerNum("health.specialEnergy", method, "HealthHooks.sampleMana", "specialEnergy", m, "ent.UnitAttributes", "hero.attr");
 	}
+
+	static var manaMaxMissing:Bool = false;
+	static var sparkMaxMissing:Bool = false;
 
 	static function sampleSpark(heroDyn:Dynamic):Void {
 		var isMage = false;
@@ -439,14 +401,32 @@ class HealthHooks {
 			HealthCache.clearSpark();
 			return;
 		}
-		var s = FieldWalk.extractNumber(attr, "spark", -1);
+		var s = Math.NaN;
+		var method = "typed";
+		try {
+			var ha:ent.HeroAttributes = attr;
+			if (ha != null)
+				s = ha.spark;
+		} catch (_:Dynamic) {}
+		if (Math.isNaN(s)) {
+			s = FieldWalk.extractNumber(attr, "spark", -1);
+			method = "fieldwalk";
+		}
 		if (s < 0 || (!isMage && s <= 0)) {
 			HealthCache.clearSpark();
 			return;
 		}
-		var mx = FieldWalk.extractNumberAny(attr, ["maxSpark", "sparkMax"], 100);
-		HealthCache.setSpark(s, mx > 0 ? mx : 100);
-		ledgerNum("health.spark", "fieldwalk", "HealthHooks.sampleSpark", "spark", s, "ent.HeroAttributes", "attr");
+		// MaxSpark is a CDB attribute, not a field; the probed names do not exist on v6.
+		var mx = 100.0;
+		if (!sparkMaxMissing) {
+			var found = FieldWalk.extractNumberAny(attr, ["maxSpark", "sparkMax"], -1);
+			if (found > 0)
+				mx = found;
+			else if (found < 0)
+				sparkMaxMissing = true;
+		}
+		HealthCache.setSpark(s, mx);
+		ledgerNum("health.spark", method, "HealthHooks.sampleSpark", "spark", s, "ent.HeroAttributes", "attr");
 	}
 
 	static function sampleShield(heroDyn:Dynamic):Void {

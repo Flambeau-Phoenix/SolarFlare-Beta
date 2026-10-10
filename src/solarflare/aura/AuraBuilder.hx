@@ -76,6 +76,8 @@ class AuraBuilder {
 
 	var boundEditorAura:AuraDef = null;
 	var creationHomeOpen:Bool = true;
+	/** Creation Home category card currently expanded: consumable | utility | skill | blank. */
+	var homeCategory:String = "utility";
 	var creationScrollToGallery:Bool = false;
 
 	var canvasSel:Int = -1;
@@ -437,14 +439,21 @@ class AuraBuilder {
 			ImGui.popStyleVar(2);
 			ImGui.popStyleColor(2);
 			var previous = selectedAura();
-			if (previous != null) {
-				if (UiChrome.ghostButton("Back to " + previous.name + "##ab_creation_back", ImGui.vec2(-1, 30)))
-					creationHomeOpen = false;
-			} else if (cfg.auras.length > 0) {
-				// Recover an editor selection when the home screen has no current aura.
-				if (UiChrome.ghostButton("Edit My Auras (" + cfg.auras.length + ")##ab_creation_edit", ImGui.vec2(-1, 30)))
-					openWorkspace();
-			}
+			UiLayout.inlinePair("##ab_creation_nav", function(w:Single) {
+				if (previous != null) {
+					if (UiChrome.ghostButton("Back to " + previous.name + "##ab_creation_back", ImGui.vec2(w, 28)))
+						creationHomeOpen = false;
+				} else if (cfg.auras.length > 0) {
+					// Recover an editor selection when the home screen has no current aura.
+					if (UiChrome.ghostButton("Edit My Auras (" + cfg.auras.length + ")##ab_creation_edit", ImGui.vec2(w, 28)))
+						openWorkspace();
+				} else {
+					ImGui.dummy(ImGui.vec2(w, 28));
+				}
+			}, function(w:Single) {
+				if (UiChrome.ghostButton("Replay tutorial##ab_creation_tut", ImGui.vec2(w, 28)))
+					openWizard("tutorial");
+			}, 8);
 
 			ImGui.dummy(ImGui.vec2(0, 4));
 			UiChrome.subHeader("Encounter starters");
@@ -464,18 +473,8 @@ class AuraBuilder {
 				true
 			);
 
-			ImGui.dummy(ImGui.vec2(0, 4));
-			UiLayout.inlinePair("##ab_creation_start_hdr", function(w:Single) {
-				UiChrome.sectionHeader("How would you like to start?");
-			}, function(w:Single) {
-				if (previous == null && cfg.auras.length > 0) {
-					if (UiChrome.ghostButton("Edit Auras (" + cfg.auras.length + ")##ab_creation_edit_hdr", ImGui.vec2(w, 26)))
-						openWorkspace();
-				} else if (UiChrome.ghostButton("Replay tutorial##ab_creation_tut", ImGui.vec2(w, 26)))
-					openWizard("tutorial");
-			}, 12);
-			ImGui.textDisabled("Pick a row. Lists use the full width — they are not packed into cards.");
-			ImGui.spacing();
+			ImGui.dummy(ImGui.vec2(0, 8));
+			UiChrome.subHeader("Or start from a signal");
 
 			var atCap = cfg.auras.length >= AuraEngine.MAX;
 			if (atCap) {
@@ -492,14 +491,54 @@ class AuraBuilder {
 		});
 	}
 
+	static var HOME_CATEGORY_IDS:Array<String> = ["utility", "skill", "consumable", "blank"];
+	static var HOME_CATEGORY_TITLES:Array<String> = ["Utilities", "Skills", "Consumables", "Blank"];
+	static var HOME_CATEGORY_HINTS:Array<String> = ["Everyday signals", "Cooldowns and casts", "Potions and boons", "Empty rule"];
+
 	function drawCreationLists(atCap:Bool):Void {
-		drawConsumableList();
-		ImGui.dummy(ImGui.vec2(0, 18));
-		drawUtilityList(0);
-		ImGui.dummy(ImGui.vec2(0, 18));
-		drawSkillList(0);
-		ImGui.dummy(ImGui.vec2(0, 18));
-		drawBlankList(0);
+		UiLayout.inlineSplit("##ab_home_categories", HOME_CATEGORY_IDS.length, function(i:Int, cellW:Single) {
+			if (drawHomeCategoryCard(i, cellW))
+				homeCategory = HOME_CATEGORY_IDS[i];
+		}, 8);
+		ImGui.dummy(ImGui.vec2(0, 8));
+		switch (homeCategory) {
+			case "consumable": drawConsumableList();
+			case "skill": drawSkillList(0);
+			case "blank": drawBlankList(0);
+			default: drawUtilityList(0);
+		}
+	}
+
+	/** Selectable category card: title and one-line hint, accent only on the selected one. */
+	function drawHomeCategoryCard(index:Int, width:Single):Bool {
+		var theme = solarflare.ui.ThemePalette.current();
+		var selected = homeCategory == HOME_CATEGORY_IDS[index];
+		var height:Single = 54;
+		var clicked = ImGui.invisibleButton("##ab_home_cat_" + HOME_CATEGORY_IDS[index], ImGui.vec2(width, height));
+		var hovered = ImGui.isItemHovered();
+		var min = ImGui.getItemRectMin();
+		var max = ImGui.getItemRectMax();
+		var dl = ImGui.getWindowDrawList();
+		var tint:Single = selected ? 0.22 : (hovered ? 0.1 : 0);
+		ImGui.ImDrawList_AddRectFilled(dl, min, max, ImGui.colorConvertFloat4ToU32(ImGui.vec4(
+			theme.cellBg.x * (1 - tint) + theme.accent.x * tint,
+			theme.cellBg.y * (1 - tint) + theme.accent.y * tint,
+			theme.cellBg.z * (1 - tint) + theme.accent.z * tint, 1)), 8);
+		ImGui.ImDrawList_AddRect(dl, min, max, ImGui.colorConvertFloat4ToU32(selected || hovered ? theme.accent : theme.border), 8, selected ? 2 : 1, 0);
+		if (selected)
+			ImGui.ImDrawList_AddLine(dl, ImGui.vec2(min.x + 10, max.y - 4), ImGui.vec2(max.x - 10, max.y - 4),
+				ImGui.colorConvertFloat4ToU32(theme.accent), 2.5);
+		ImGui.ImDrawList_PushClipRect(dl, ImGui.vec2(min.x + 4, min.y), ImGui.vec2(max.x - 4, max.y), true);
+		var title = HOME_CATEGORY_TITLES[index];
+		var ts = ImGui.calcTextSize(title);
+		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(min.x + (width - ts.x) * 0.5, min.y + 9),
+			ImGui.colorConvertFloat4ToU32(theme.text), title);
+		var hint = HOME_CATEGORY_HINTS[index];
+		var hs = ImGui.calcTextSize(hint);
+		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(min.x + Math.max(6, (width - hs.x) * 0.5), min.y + 9 + ts.y + 4),
+			ImGui.colorConvertFloat4ToU32(theme.textDisabled), hint);
+		ImGui.ImDrawList_PopClipRect(dl);
+		return clicked;
 	}
 
 	/** One library transaction shared by Create & Save and the Advanced handoff. */
@@ -811,7 +850,7 @@ class AuraBuilder {
 			ImGui.tableSetupColumn("##scope", imgui.Enums.ImGuiTableColumnFlags.WidthStretch, 0.55);
 			ImGui.tableNextRow();
 			ImGui.tableSetColumnIndex(0);
-			if (UiChrome.accentButton("Home##ab_home", ImGui.vec2(64, 28))) {
+			if (UiChrome.ghostButton("Home##ab_home", ImGui.vec2(64, 28))) {
 				clearTransientState();
 				return;
 			}
@@ -1433,7 +1472,7 @@ class AuraBuilder {
 	function drawTutorial():Void {
 		UiChrome.heading("Aura tutorial", 1.28);
 		ImGui.spacing();
-		ImGui.textWrapped("1. Creation Home lists Utilities, Skills, and Blank Aura as rows. Click one to make an Aura — there is no extra modal for that.");
+		ImGui.textWrapped("1. Creation Home groups starting points into Utilities, Skills, Consumables and Blank cards. Pick a card, then click a row to make an Aura — there is no extra modal for that.");
 		ImGui.spacing();
 		ImGui.textWrapped("2. WHEN is the condition (buff present, skill ready, HP below a percent). Pick a specific status or skill id when the row asks for a subject.");
 		ImGui.spacing();

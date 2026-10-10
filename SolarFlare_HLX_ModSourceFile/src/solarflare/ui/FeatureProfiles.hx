@@ -15,6 +15,7 @@ class FeatureProfiles {
 	public static inline var DEFAULT_KEY:String = "Default";
 
 	public static var activeProfile:String = DEFAULT_KEY;
+	public static var statusOwnerGen:Int = 0;
 	public static var profiles:Map<String, Dynamic> = new Map();
 	public static var order:Array<String> = [DEFAULT_KEY];
 	/** One universal profile per observed GameApp.connectionInfo.heroID. */
@@ -167,167 +168,140 @@ class FeatureProfiles {
 		};
 	}
 
-	public static function drawToolbar(cfg:ConfigPanel, domain:String = "", id:String = "main"):Void {
-		if (cfg == null) return;
-		ensureBuffer();
-
-		UiChrome.subHeader("Universal Profile");
-		ImGui.spacing();
-
-		// One compact row: combo + actions. Leaves ~half the window free on wide hubs.
-		drawProfileRow(cfg, id);
-		ImGui.spacing();
-		drawCharacterDefault(cfg, id);
-
-		if (ImGui.beginPopupModal("New Universal Profile##fp_new_popup_" + id, null, imgui.Enums.ImGuiWindowFlags.AlwaysAutoResize)) {
-			UiChrome.heading("New Profile", 1.15);
-			ImGui.spacing();
-			ImGui.text("Enter profile name:");
-			ImGui.inputText("##fp_name_" + id, nameBuf, 49);
-			ImGui.spacing();
-			UiLayout.inlinePair("##fp_modal_btns_" + id, function(w:Single) {
-				if (UiChrome.accentButton("Create##fp_create_" + id, ImGui.vec2(w, 30))) {
-					var requested = ByteUtil.readBytes(nameBuf, 49);
-					if (create(cfg, requested))
-						ImGui.closeCurrentPopup();
-				}
-			}, function(w:Single) {
-				if (UiChrome.ghostButton("Cancel##fp_cancel_" + id, ImGui.vec2(w, 30)))
-					ImGui.closeCurrentPopup();
-			}, 8);
-			ImGui.endPopup();
-		}
-	}
-
 	/**
-	 * Inline variant — draws only the combo + action buttons, no subHeader or spacing.
-	 * Use inside a SameLine row where the header preamble would waste vertical space.
-	 * The caller is responsible for opening the new-profile popup via drawToolbar or
-	 * by calling this from within the same frame before endMenuBar / end of window.
+	 * Profile Strip shared by the hub and every builder: selector, Save, and a More menu holding
+	 * New / Copy / Delete and character assignment. A one-line status chip replaces the old
+	 * Character Default table and its full-width action.
 	 */
-	public static function drawInlineBar(cfg:ConfigPanel, id:String = "ab"):Void {
-		if (cfg == null) return;
-		ensureBuffer();
-		drawProfileRow(cfg, id);
-		// Popup modal must live at root window scope — open it here if requested.
-		if (ImGui.beginPopupModal("New Universal Profile##fp_new_popup_" + id, null, imgui.Enums.ImGuiWindowFlags.AlwaysAutoResize)) {
-			UiChrome.heading("New Profile", 1.15);
-			ImGui.spacing();
-			ImGui.text("Enter profile name:");
-			ImGui.inputText("##fp_name_" + id, nameBuf, 49);
-			ImGui.spacing();
-			UiLayout.inlinePair("##fp_modal_btns_" + id, function(w:Single) {
-				if (UiChrome.accentButton("Create##fp_create_" + id, ImGui.vec2(w, 30))) {
-					var requested = ByteUtil.readBytes(nameBuf, 49);
-					if (create(cfg, requested))
-						ImGui.closeCurrentPopup();
-				}
-			}, function(w:Single) {
-				if (UiChrome.ghostButton("Cancel##fp_cancel_" + id, ImGui.vec2(w, 30)))
-					ImGui.closeCurrentPopup();
-			}, 8);
-			ImGui.endPopup();
-		}
+	public static function drawToolbar(cfg:ConfigPanel, domain:String = "", id:String = "main"):Void {
+		drawStrip(cfg, id, false);
 	}
 
-	/** Shared combo + action row used by both drawToolbar and drawInlineBar. */
-	static function drawProfileRow(cfg:ConfigPanel, id:String):Void {
-		var rowH:Single = 30;
-		var comboW:Single = 168;
-		var btnW:Single = 64;
+	/** Same strip for builder title rows; fixed-width selector, no chip line. */
+	public static function drawInlineBar(cfg:ConfigPanel, id:String = "ab"):Void {
+		drawStrip(cfg, id, true);
+	}
+
+	/** Set from the More menu, consumed outside the popup scope so the modal's ID stack matches. */
+	static var openNewFor:String = "";
+
+	static function drawStrip(cfg:ConfigPanel, id:String, compact:Bool):Void {
+		if (cfg == null) return;
+		ensureBuffer();
+		var rowH:Single = 26;
 		var gap:Single = 6;
-		var avail = ImGui.getContentRegionAvail().x;
-		if (avail > 420) comboW = 180;
+		var saveW:Single = 56;
+		var moreW:Single = 60;
+		var uid = currentCharacterUid();
+		var assigned = uid.length > 0 ? characterProfiles.get(uid) : null;
+		var follows = assigned != null && assigned == activeProfile;
 
-		var currentUid = currentCharacterUid();
-		var assignedProfile = currentUid.length > 0 ? characterProfiles.get(currentUid) : null;
-		var preview = activeProfile + (assignedProfile == activeProfile ? "  [Character default]" : "");
-
+		var comboW:Single = 160;
+		if (!compact) {
+			ImGui.textDisabled("Profile");
+			ImGui.sameLine(0, 8);
+			comboW = ImGui.getContentRegionAvail().x - saveW - moreW - gap * 2;
+			if (comboW > 280) comboW = 280;
+			if (comboW < 120) comboW = 120;
+		}
 		ImGui.setNextItemWidth(comboW);
-		if (ImGui.beginCombo("##fp_select_" + id, preview)) {
+		if (ImGui.beginCombo("##fp_select_" + id, activeProfile)) {
 			for (key in order) {
-				var label = key + (key == assignedProfile ? "  [Current character]" : "");
+				var label = key + (key == assigned ? "  (this character)" : "");
 				if (ImGui.selectable(label + "##fp_opt_" + id + "_" + key, key == activeProfile)) {
 					if (key != activeProfile)
 						switchTo(cfg, key);
 				}
 			}
-			ImGui.separator();
-			if (currentUid.length == 0) {
-				ImGui.textDisabled("Character unavailable");
-			} else {
-				ImGui.textDisabled(currentCharacterLabel());
-				if (assignedProfile == activeProfile) {
-					if (ImGui.selectable("Unassign current character##fp_unassign_" + id))
-						unassignCurrentCharacter(cfg);
-				} else {
-					if (ImGui.selectable('Assign "$activeProfile" to current character##fp_assign_' + id))
-						assignCurrentCharacter(cfg);
-				}
-				if (ImGui.isItemHovered())
-					ImGui.setTooltip("Automatically loads this profile when this character becomes active.");
-			}
 			ImGui.endCombo();
 		}
 		ImGui.sameLine(0, gap);
-		if (UiChrome.accentButton("Save##fp_save_" + id, ImGui.vec2(btnW, rowH)))
+		if (UiChrome.ghostButton("Save##fp_save_" + id, ImGui.vec2(saveW, rowH)))
 			save(cfg);
 		ImGui.sameLine(0, gap);
-		if (UiChrome.ghostButton("New##fp_new_" + id, ImGui.vec2(btnW, rowH))) {
-			ByteUtil.clearBytes(nameBuf, 49);
-			ImGui.openPopup("New Universal Profile##fp_new_popup_" + id);
-		}
-		ImGui.sameLine(0, gap);
-		if (UiChrome.ghostButton("Copy##fp_copy_" + id, ImGui.vec2(btnW, rowH)))
-			duplicateCurrent(cfg);
-		if (activeProfile != DEFAULT_KEY) {
-			ImGui.sameLine(0, gap);
-			if (UiChrome.ghostButton("Delete##fp_del_" + id, ImGui.vec2(btnW + 8, rowH)))
-				delete(cfg, activeProfile);
-		}
-		if (statusMsg.length > 0) {
+		if (UiChrome.ghostButton("More##fp_more_" + id, ImGui.vec2(moreW, rowH)))
+			ImGui.openPopup("##fp_more_pop_" + id);
+		drawMoreMenu(cfg, id, uid, follows);
+		if (compact && statusMsg.length > 0) {
 			ImGui.sameLine(0, 10);
 			ImGui.textColored(ImGui.vec4(0.45, 0.88, 0.55, 1.0), statusMsg);
 		}
+		if (!compact) {
+			if (statusMsg.length > 0)
+				ImGui.textColored(ImGui.vec4(0.45, 0.88, 0.55, 1.0), statusMsg);
+			else if (uid.length == 0)
+				ImGui.textDisabled("Enter the world to link a profile to your character.");
+			else if (follows)
+				ImGui.textColored(ImGui.vec4(0.45, 0.88, 0.55, 1.0), "Auto-loads for " + currentCharacterLabel());
+			else
+				ImGui.textDisabled("Not auto-loading for " + currentCharacterLabel());
+			if (ImGui.isItemHovered())
+				ImGui.setTooltip("More > Use this profile for your character loads it automatically when you log in.");
+		}
+		if (openNewFor == id) {
+			openNewFor = "";
+			ByteUtil.clearBytes(nameBuf, 49);
+			ImGui.openPopup("New Universal Profile##fp_new_popup_" + id);
+		}
+		drawNewProfileModal(cfg, id);
 	}
 
-	/**
-	 * Keeps per-character auto-loading visible instead of hiding it in the
-	 * profile selector. This appears in full profile toolbars; compact builder
-	 * bars retain the dropdown actions so they do not grow vertically.
-	 */
-	static function drawCharacterDefault(cfg:ConfigPanel, id:String):Void {
-		var uid = currentCharacterUid();
-		var assignedProfile = uid.length > 0 ? characterProfiles.get(uid) : null;
-		var validAssignment = assignedProfile != null && profiles.exists(assignedProfile);
+	static function drawMoreMenu(cfg:ConfigPanel, id:String, uid:String, follows:Bool):Void {
+		if (!ImGui.beginPopup("##fp_more_pop_" + id))
+			return;
+		try {
+			if (ImGui.menuItem("New profile...##fp_new_" + id)) {
+				openNewFor = id;
+				ImGui.closeCurrentPopup();
+			}
+			if (ImGui.menuItem("Copy this profile##fp_copy_" + id))
+				duplicateCurrent(cfg);
+			ImGui.beginDisabled(activeProfile == DEFAULT_KEY);
+			var deleteClicked = ImGui.menuItem("Delete this profile##fp_del_" + id);
+			ImGui.endDisabled();
+			if (deleteClicked)
+				delete(cfg, activeProfile);
+			ImGui.separator();
+			if (uid.length == 0) {
+				ImGui.textDisabled("Character unavailable");
+			} else if (follows) {
+				if (ImGui.menuItem("Stop auto-loading for " + currentCharacterLabel() + "##fp_unassign_" + id))
+					unassignCurrentCharacter(cfg);
+			} else {
+				if (ImGui.menuItem("Use this profile for " + currentCharacterLabel() + "##fp_assign_" + id))
+					assignCurrentCharacter(cfg);
+			}
+		} catch (e:Dynamic) {
+			ImGui.endPopup();
+			throw e;
+		}
+		ImGui.endPopup();
+	}
 
-		UiChrome.subHeader("Character Default");
-		UiLayout.propertyGrid("##fp_character_default_" + id, function() {
-			UiLayout.propertyRow("Current character", function() {
-				ImGui.textUnformatted(uid.length > 0 ? currentCharacterLabel() : "Unavailable");
-			});
-			UiLayout.propertyRow("Assigned profile", function() {
-				ImGui.textUnformatted(validAssignment ? assignedProfile : "Not assigned");
-			});
-			UiLayout.propertyRow("Auto-load", function() {
-				if (uid.length == 0) {
-					ImGui.textDisabled("Enter the world to assign a profile.");
-				} else if (validAssignment && assignedProfile == activeProfile) {
-					UiLayout.inlinePair("##fp_character_actions_" + id, function(_:Single) {
-						ImGui.textColored(ImGui.vec4(0.45, 0.88, 0.55, 1.0), 'Using "$activeProfile"');
-					}, function(w:Single) {
-						if (UiChrome.ghostButton("Unassign##fp_character_unassign_" + id, ImGui.vec2(w, 28)))
-							unassignCurrentCharacter(cfg);
-					}, 8);
-				} else {
-					var action = validAssignment
-						? 'Replace "$assignedProfile" with "$activeProfile"'
-						: 'Use "$activeProfile" for this character';
-					if (UiChrome.accentButton(action + "##fp_character_assign_" + id, ImGui.vec2(-1, 28)))
-						assignCurrentCharacter(cfg);
+	static function drawNewProfileModal(cfg:ConfigPanel, id:String):Void {
+		if (!ImGui.beginPopupModal("New Universal Profile##fp_new_popup_" + id, null, imgui.Enums.ImGuiWindowFlags.AlwaysAutoResize))
+			return;
+		try {
+			UiChrome.heading("New Profile", 1.15);
+			ImGui.spacing();
+			ImGui.text("Enter profile name:");
+			ImGui.inputText("##fp_name_" + id, nameBuf, 49);
+			ImGui.spacing();
+			UiLayout.inlinePair("##fp_modal_btns_" + id, function(w:Single) {
+				if (UiChrome.accentButton("Create##fp_create_" + id, ImGui.vec2(w, 28))) {
+					var requested = ByteUtil.readBytes(nameBuf, 49);
+					if (create(cfg, requested))
+						ImGui.closeCurrentPopup();
 				}
-			}, "The assigned profile loads automatically when this character becomes active.");
-		}, 0, 132, 28);
+			}, function(w:Single) {
+				if (UiChrome.ghostButton("Cancel##fp_cancel_" + id, ImGui.vec2(w, 28)))
+					ImGui.closeCurrentPopup();
+			}, 8);
+		} catch (e:Dynamic) {
+			ImGui.endPopup();
+			throw e;
+		}
+		ImGui.endPopup();
 	}
 
 	public static function save(cfg:ConfigPanel):Void {
@@ -459,6 +433,8 @@ class FeatureProfiles {
 		if (cfg == null) return {};
 		return {
 			geaux: {layout: SettingsStore.geauxDump(cfg.geaux)},
+			barter: cfg.barter != null ? cfg.barter.dump() : {},
+			statusBoard: cfg.statusBoard != null ? cfg.statusBoard.dump() : {},
 			auras: {config: SettingsStore.aurasDump(cfg.auras)},
 			resources: captureResources(cfg),
 			theme: SettingsStore.currentTheme()
@@ -478,9 +454,11 @@ class FeatureProfiles {
 	}
 
 	static function applyUniversal(cfg:ConfigPanel, key:String):Void {
+		statusOwnerGen++;
 		if (cfg == null) return;
 		var snap = profiles.get(key);
 		if (snap == null) return;
+		if (cfg.barter != null) { cfg.barter.clearTransientState(); cfg.barter.builder.history.clear(); }
 
 		// 1. Geaux Layout
 		var geauxSnap = Reflect.field(snap, "geaux");
@@ -496,7 +474,15 @@ class FeatureProfiles {
 			}
 		}
 
-		// 2. Auras
+		// 1b. BarTer (bars + chrome positions — per profile)
+		var barterSnap = Reflect.field(snap, "barter");
+		if (barterSnap != null && cfg.barter != null)
+			cfg.barter.apply(barterSnap);
+
+		var statusBoardSnap = Reflect.field(snap, "statusBoard");
+        if (statusBoardSnap != null && cfg.statusBoard != null) cfg.statusBoard.apply(statusBoardSnap);
+
+        // 2. Auras
 		var aurasSnap = Reflect.field(snap, "auras");
 		if (aurasSnap != null) {
 			SettingsStore.applyAurasProfile(cfg.auras, Reflect.field(aurasSnap, "config"));

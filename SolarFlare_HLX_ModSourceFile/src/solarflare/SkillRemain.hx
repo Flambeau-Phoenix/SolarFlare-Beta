@@ -3,8 +3,10 @@ package solarflare;
 import hlx.runtime.ResolvedMember;
 
 /**
- * Observe remaining duration on Status / BaseSkill. Typed getters first, then
- * FieldWalk, then resolveMember. Draw must never call this.
+ * Observe remaining duration on Status / BaseSkill.
+ * Hot path: exact Status/BaseSkill getters (REA: getDurationLeft/Progress/ElapsedTime).
+ * FieldWalk / resolveMember only under solarflare_telemetry investigation.
+ * Draw must never call this.
  *
  * Returns a reused SkillRemainResult — copy fields immediately; do not stash the reference
  * across another read().
@@ -13,11 +15,12 @@ class SkillRemain {
 	/** Sentinel left value when Status.isInfinite is true. */
 	public static inline var INFINITE_LEFT:Float = -1;
 
+	#if solarflare_telemetry
 	static var PACK:Array<String> = [
 		"remaining", "timeLeft", "durationLeft"
 	];
-
 	static var extraNames:Array<String> = [];
+	#end
 	static var leftMem:ResolvedMember;
 	static var progMem:ResolvedMember;
 	static var elapsedMem:ResolvedMember;
@@ -26,120 +29,54 @@ class SkillRemain {
 	static var memReady:Bool = false;
 	static var lastResult:SkillRemainResult = new SkillRemainResult();
 
-	static inline var RUNG_STATUS:Int = 0;
-	static inline var RUNG_TYPED:Int = 1;
-	static inline var RUNG_ELAPSED:Int = 2;
-	static inline var RUNG_INFO:Int = 3;
-	static inline var RUNG_WALK:Int = 4;
-	static inline var RUNG_INF:Int = 5;
-	static inline var RUNG_RESOLVED:Int = 6;
-	static inline var RUNG_COUNT:Int = 7;
-	static inline var RUNG_MEMO_CAP:Int = 48;
-
-	/**
-	 * Lowest ladder rung ever observed to win, per HL type name. Items whose typed path
-	 * fails used to re-walk the whole ladder at sample rate; now they start at the winner.
-	 * Storing the minimum (never the latest) means a rung that has previously produced a
-	 * result for this type can never be skipped, so the memo cannot change an outcome.
-	 */
-	static var rungByType:Map<String, Int> = new Map();
-
 	public static function read(item:Dynamic):SkillRemainResult {
 		if (item == null)
 			return miss();
-		var typeName:String = null;
-		try
-			typeName = FieldWalk.liveTypeName(item)
-		catch (_:Dynamic)
-			typeName = null;
-		var keyed = typeName != null && typeName.length > 0;
-		var start = -1;
-		if (keyed) {
-			var memo = rungByType.get(typeName);
-			if (memo != null)
-				start = memo;
+		var r = statusRemain(item);
+		if (usable(r)) {
+			ledgerRemain("typed", r.infinite ? "isInfinite" : "Status.getDurationLeft", r, item);
+			return r;
 		}
-		if (start > 0) {
-			var hit = tryRung(item, start);
-			if (hit != null)
-				return hit;
+		r = typedRemain(item);
+		if (usable(r)) {
+			ledgerRemain("typed", "getDurationLeft", r, item);
+			return r;
 		}
-		var i = 0;
-		while (i < RUNG_COUNT) {
-			if (i != start) {
-				var hit = tryRung(item, i);
-				if (hit != null) {
-					if (keyed && (start < 0 || i < start) && countKeys() < RUNG_MEMO_CAP)
-						rungByType.set(typeName, i);
-					return hit;
-				}
+		r = elapsedRemain(item);
+		if (usable(r)) {
+			ledgerRemain("callResolved", "getElapsedTime", r, item);
+			return r;
+		}
+		#if solarflare_telemetry
+		r = infoRemain(item);
+		if (usable(r)) {
+			ledgerRemain("typed", "getStatusInfo", r, item);
+			return r;
+		}
+		r = walkRemain(item);
+		if (usable(r)) {
+			ledgerRemain("fieldwalk", "remaining", r, item);
+			return r;
+		}
+		var inf = FieldWalk.extractObject(item, "inf");
+		if (inf != null) {
+			r = walkRemain(inf);
+			if (usable(r)) {
+				ledgerRemain("fieldwalk", "inf.remaining", r, item);
+				return r;
 			}
-			i++;
 		}
+		r = resolvedRemain(item);
+		if (usable(r)) {
+			ledgerRemain("callResolved", "getDurationLeft", r, item);
+			return r;
+		}
+		#end
 		return miss();
 	}
 
-	/** One ladder step. Returns null when the rung has nothing usable. */
-	static function tryRung(item:Dynamic, rung:Int):SkillRemainResult {
-		switch (rung) {
-			case RUNG_STATUS:
-				var r = statusRemain(item);
-				if (usable(r)) {
-					ledgerRemain("typed", r.infinite ? "isInfinite" : "Status.getDurationLeft", r, item);
-					return r;
-				}
-			case RUNG_TYPED:
-				var r = typedRemain(item);
-				if (usable(r)) {
-					ledgerRemain("typed", "getDurationLeft", r, item);
-					return r;
-				}
-			case RUNG_ELAPSED:
-				var r = elapsedRemain(item);
-				if (usable(r)) {
-					ledgerRemain("callResolved", "getElapsedTime", r, item);
-					return r;
-				}
-			case RUNG_INFO:
-				var r = infoRemain(item);
-				if (usable(r)) {
-					ledgerRemain("typed", "getStatusInfo", r, item);
-					return r;
-				}
-			case RUNG_WALK:
-				var r = walkRemain(item);
-				if (usable(r)) {
-					ledgerRemain("fieldwalk", "remaining", r, item);
-					return r;
-				}
-			case RUNG_INF:
-				var inf = FieldWalk.extractObject(item, "inf");
-				if (inf != null) {
-					var r = walkRemain(inf);
-					if (usable(r)) {
-						ledgerRemain("fieldwalk", "inf.remaining", r, item);
-						return r;
-					}
-				}
-			case RUNG_RESOLVED:
-				var r = resolvedRemain(item);
-				if (usable(r)) {
-					ledgerRemain("callResolved", "getDurationLeft", r, item);
-					return r;
-				}
-			default:
-		}
-		return null;
-	}
-
-	static function countKeys():Int {
-		var n = 0;
-		for (_ in rungByType.keys())
-			n++;
-		return n;
-	}
-
 	public static function noteExtraName(name:String):Void {
+		#if solarflare_telemetry
 		if (name == null)
 			return;
 		var s = StringTools.trim(name);
@@ -158,6 +95,7 @@ class SkillRemain {
 		if (extraNames.length >= 12)
 			return;
 		extraNames.push(s);
+		#end
 	}
 
 	/** Status-first path matching EventHorizon AuraTracker candidates. */
@@ -240,6 +178,7 @@ class SkillRemain {
 		return finish(left, left / max, max, false);
 	}
 
+	#if solarflare_telemetry
 	static function infoRemain(item:Dynamic):SkillRemainResult {
 		try {
 			var st:st.skill.Status = item;
@@ -260,7 +199,6 @@ class SkillRemain {
 		var max = FieldWalk.extractNumber(obj, "duration", 0);
 		if (!(max > 0.05))
 			max = FieldWalk.extractNumber(obj, "baseDuration", 0);
-		// Prefer remaining-named fields; treat bare "duration" as max, not left.
 		if (!(left > 0) && max > 0.05) {
 			var elapsed = FieldWalk.extractNumber(obj, "elapsed", Math.NaN);
 			if (!Math.isNaN(elapsed) && elapsed >= 0)
@@ -286,6 +224,7 @@ class SkillRemain {
 		}
 		return finish(left, prog, max, false);
 	}
+	#end
 
 	static function finish(left:Float, prog:Float, max:Float, infinite:Bool):SkillRemainResult {
 		if (infinite)
@@ -366,8 +305,11 @@ class SkillRemain {
 				}
 			} catch (_:Dynamic) {}
 		}
-		var n = FieldWalk.extractNumber(item, method, Math.NaN);
-		return n;
+		#if solarflare_telemetry
+		return FieldWalk.extractNumber(item, method, Math.NaN);
+		#else
+		return Math.NaN;
+		#end
 	}
 
 	static function ensureMems():Void {

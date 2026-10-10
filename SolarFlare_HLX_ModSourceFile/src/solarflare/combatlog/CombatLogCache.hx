@@ -5,6 +5,7 @@ import solarflare.FieldWalk;
 import solarflare.cdb.CdbUnitNames;
 import solarflare.cdb.CdbSummonUnits;
 import solarflare.geaux.GeauxCache;
+import solarflare.getrifty.GetRifty;
 import solarflare.target.TargetSnap;
 import solarflare.target.RecentTargetCache;
 import solarflare.ui.GameIcons;
@@ -17,6 +18,8 @@ class CombatLogCache {
 	public static inline var HOOK_EVENT_LINE:Int = 1;
 	public static inline var KIND_CAST:Int = 0;
 	public static inline var KIND_HIT:Int = 1;
+	/** Rift enter/leave / boss-fight edge — recorder-only convict, not overlay spam. */
+	public static inline var KIND_ENCOUNTER:Int = 2;
 
 	public static inline var ROLE_UNKNOWN:Int = 0;
 	public static inline var ROLE_YOU:Int = 1;
@@ -152,6 +155,7 @@ class CombatLogCache {
 	 * ent.Hero.getTarget (f7689) — lockedTarget, else Unit.getTarget, else autoTarget.
 	 * Unit.getTarget alone (f4785) only resolves this.target and misses locked/auto.
 	 * Do not layer raw target fields / FieldWalk proxies over this.
+	 * Hard lock (GameCamera.isLocked) is optional chrome only — never gate bar validity.
 	 */
 	static function resolveCurrentTarget(localHero:Dynamic):Dynamic {
 		if (localHero == null)
@@ -489,16 +493,33 @@ class CombatLogCache {
 	}
 
 	static function fillDamage(line:CombatLogLine, dmg:Dynamic, hook:String = ""):Void {
+		// Exact DamageResult getters own the hot path. Valid 0/false must not trigger FieldWalk.
+		var gotAmount = false;
+		var gotBlock = false;
+		var gotCrit = false;
+		var gotKill = false;
 		try {
 			var dr:st.skill.DamageResult = dmg;
 			if (dr != null) {
-				line.amount = dr.get_amount();
-				line.blockAmt = dr.get_block();
-				line.crit = dr.get_critical();
-				line.kill = dr.get_kill();
-				line.physical = dr.get_isPhysical();
-				line.magic = dr.get_isMagic();
-				line.auto = dr.get_isBaseAttack();
+				try {
+					line.amount = dr.get_amount();
+					gotAmount = true;
+				} catch (_:Dynamic) {}
+				try {
+					line.blockAmt = dr.get_block();
+					gotBlock = true;
+				} catch (_:Dynamic) {}
+				try {
+					line.crit = dr.get_critical();
+					gotCrit = true;
+				} catch (_:Dynamic) {}
+				try {
+					line.kill = dr.get_kill();
+					gotKill = true;
+				} catch (_:Dynamic) {}
+				try line.physical = dr.get_isPhysical() catch (_:Dynamic) {}
+				try line.magic = dr.get_isMagic() catch (_:Dynamic) {}
+				try line.auto = dr.get_isBaseAttack() catch (_:Dynamic) {}
 				var aff = dr.affinity;
 				if (aff != null && isPlainName(aff))
 					line.affinity = aff;
@@ -510,8 +531,7 @@ class CombatLogCache {
 						.withName("get_amount")
 						.withPayload("st.skill.DamageResult", "hook.dmgObj")
 						.withArgs(["self", "dmgObj", "result"])
-						.tryRoute("typed", "get_amount")
-						.tryRoute("fieldwalk", "amount");
+						.tryRoute("typed", "get_amount");
 					if (hook != null && hook.length > 0)
 						note.withHook(hook);
 					note.num(line.amount).emit();
@@ -533,28 +553,15 @@ class CombatLogCache {
 				#end
 			}
 		} catch (_:Dynamic) {}
-		if (line.amount == 0) {
+		if (!gotAmount)
 			line.amount = extractNumber(dmg, "amount", 0);
-			#if solarflare_telemetry
-			if (solarflare.debug.ResolutionLedger.armed() && line.amount != 0)
-				solarflare.debug.ResolutionLedger.note("combat.hit.amount")
-					.withMethod("fieldwalk")
-					.withSrc("CombatLogCache.fillDamage")
-					.withName("amount")
-					.withPayload("st.skill.DamageResult", "hook.dmgObj")
-					.tryRoute("typed", "get_amount")
-					.tryRoute("fieldwalk", "amount")
-					.num(line.amount)
-					.emit();
-			#end
-		}
-		if (line.blockAmt == 0)
+		if (!gotBlock)
 			line.blockAmt = extractNumber(dmg, "block", 0);
-		if (!line.crit)
+		if (!gotCrit)
 			line.crit = extractBool(dmg, "critical", false);
-		if (!line.kill)
+		if (!gotKill)
 			line.kill = extractBool(dmg, "kill", false);
-		line.blocked = line.blockAmt > 0 || extractBool(dmg, "blocked", false);
+		line.blocked = line.blockAmt > 0 || (!gotBlock && extractBool(dmg, "blocked", false));
 		if (line.affinity.length == 0)
 			line.affinity = cleanString(extractObject(dmg, "affinity"));
 	}
@@ -575,21 +582,70 @@ class CombatLogCache {
 		} catch (_:Dynamic) {}
 	}
 
+	static var lastLoggedInRift:Bool = false;
+	static var lastLoggedBossFight:Bool = false;
+	static var riftEdgeSeeded:Bool = false;
+
+	static function stampRift(line:CombatLogLine):Void {
+		if (line == null)
+			return;
+		try {
+			line.inRift = GetRiftyCache.inInstance;
+			line.inBossFight = GetRiftyCache.inBossFight;
+			line.riftRemain = GetRiftyCache.remainingTime;
+		} catch (_:Dynamic) {}
+	}
+
+	/**
+	 * After GetRiftyCache.observeApp: when inRift / inBossFight flips, write an
+	 * encounter row to JSONL so Wave B exact readers are convictable without telemetry.
+	 */
+	public static function noteRiftState():Void {
+		try {
+			if (!CombatLogRecorder.enabled.get())
+				return;
+			var inR = GetRiftyCache.inInstance;
+			var boss = GetRiftyCache.inBossFight;
+			if (riftEdgeSeeded && inR == lastLoggedInRift && boss == lastLoggedBossFight)
+				return;
+			riftEdgeSeeded = true;
+			lastLoggedInRift = inR;
+			lastLoggedBossFight = boss;
+			var line = new CombatLogLine();
+			line.kind = KIND_ENCOUNTER;
+			line.t = haxe.Timer.stamp();
+			try
+				line.wallMs = Date.now().getTime()
+			catch (_:Dynamic)
+				line.wallMs = line.t * 1000;
+			line.sourceRole = ROLE_YOU;
+			line.heroInvolved = true;
+			line.skillId = inR ? (boss ? "rift.boss" : "rift.in") : "rift.out";
+			line.skillName = line.skillId;
+			line.skillLabel = line.skillId;
+			stampRift(line);
+			CombatLogRecorder.queue(line);
+		} catch (_:Dynamic) {}
+	}
+
 	static function commitNow(line:CombatLogLine):Void {
+		stampRift(line);
 		line.sequence = ++latestSequence;
-		if (lines.length < CAP) {
-			lines.push(line);
-			writeAt = lines.length % CAP;
-			count++;
-		} else {
-			lines[writeAt] = line;
-			writeAt = (writeAt + 1) % CAP;
-			if (count < CAP)
+		if (line.kind != KIND_ENCOUNTER) {
+			if (lines.length < CAP) {
+				lines.push(line);
+				writeAt = lines.length % CAP;
 				count++;
+			} else {
+				lines[writeAt] = line;
+				writeAt = (writeAt + 1) % CAP;
+				if (count < CAP)
+					count++;
+			}
 		}
 		try {
 			var cfg = CombatLogConfig.live;
-			if (cfg == null || cfg.shouldRecord(line))
+			if (line.kind == KIND_ENCOUNTER || cfg == null || cfg.shouldRecord(line))
 				CombatLogRecorder.queue(line);
 		} catch (_:Dynamic) {}
 	}
@@ -752,20 +808,23 @@ class CombatLogCache {
 		try {
 			var dr:st.skill.DamageResult = dmg;
 			if (dr != null) {
-				var typed = solarflare.EngineSkillId.display(dr.get_skillId());
-				if (typed.length > 0)
-					return typed;
+				// Exact BaseSkillAccess.get_skillId first (REA); aliases only on miss/null skill.
+				try {
+					var typed = solarflare.EngineSkillId.display(dr.get_skillId());
+					if (typed.length > 0)
+						return typed;
+				} catch (_:Dynamic) {}
 				var skill = (dr.ctx != null) ? dr.ctx.skill : null;
-                var viaSkill = skillIdOf(skill);
-                if (viaSkill.length > 0)
-                    return viaSkill;
-
-                var activeSkill = (dr.ctx != null) ? (cast dr.ctx : Dynamic).activeSkill : null;
-                var viaActiveSkill = skillIdOf(activeSkill);
-                if (viaActiveSkill.length > 0)
-                    return viaActiveSkill;
+				var viaSkill = skillIdOf(skill);
+				if (viaSkill.length > 0)
+					return viaSkill;
+				var activeSkill = (dr.ctx != null) ? (cast dr.ctx : Dynamic).activeSkill : null;
+				var viaActiveSkill = skillIdOf(activeSkill);
+				if (viaActiveSkill.length > 0)
+					return viaActiveSkill;
 			}
 		} catch (_:Dynamic) {}
+		#if solarflare_telemetry
 		var base = extractObject(dmg, "baseSkill");
 		var id = skillIdOf(base);
 		if (id.length > 0)
@@ -777,6 +836,7 @@ class CombatLogCache {
 		id = skillIdOf(extractObject(ctx, "skill"));
 		if (id.length > 0)
 			return id;
+		#end
 		return "";
 	}
 
@@ -898,17 +958,17 @@ class CombatLogCache {
 	}
 
 	static function targetOfDamage(dmg:Dynamic, victim:Dynamic):Dynamic {
-		var t = extractObject(dmg, "target");
-		if (t != null)
-			return t;
-		if (victim != null)
-			return victim;
 		try {
 			var dr:st.skill.DamageResult = dmg;
-			return dr.get_targetUnit();
-		} catch (_:Dynamic) {
-			return null;
-		}
+			if (dr != null) {
+				var u = dr.get_targetUnit();
+				if (u != null)
+					return u;
+			}
+		} catch (_:Dynamic) {}
+		if (victim != null)
+			return victim;
+		return extractObject(dmg, "target");
 	}
 
 	static function sameUnit(a:Dynamic, b:Dynamic):Bool {

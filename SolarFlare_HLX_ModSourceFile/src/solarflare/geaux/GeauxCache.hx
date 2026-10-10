@@ -18,6 +18,8 @@ class GeauxSlotSnap {
 	public var iconId:String = "";
 	public var label:String = "";
 	public var group:String = "";
+	/** Frozen input action from the actual HUD cell, never inferred from position. */
+	public var nativeActionId:String = "";
 	public var present:Bool = false;
 	public var ready:Bool = false;
 	public var cooldownValid:Bool = false;
@@ -26,6 +28,8 @@ class GeauxSlotSnap {
 	public var affordable:Bool = true;
 	/** SkillScript.shouldPlayInstantly — frozen observe; draw must not query scripts. */
 	public var procReady:Bool = false;
+	/** Monotonic stamp when procReady last turned on; drives the glimmer. */
+	public var procStart:Float = 0;
 	public var cdLeft:Float = 0;
 	public var cdMax:Float = 0;
 	/** Exact observer-provided native total; cdMax can instead be synthesized. */
@@ -39,6 +43,8 @@ class GeauxSlotSnap {
 	public var charges:Int = 0;
 	/** Live max charges; 0 = not a charged skill (draw skips). */
 	public var chargesMax:Int = 0;
+	/** SkillScript stacks (Status-backed); draw when showStacks && stacks > 1. */
+	public var stacks:Int = 0;
 	/** True while this snap occupies a visible bar cell; replaces an O(count) scan. */
 	public var onBar:Bool = false;
 	/**
@@ -94,6 +100,12 @@ class GeauxCdBinds {
 #end
 
 class GeauxCache {
+	public static var actionBarLoadoutKey:String = "";
+	public static var actionBarCharacterId:String = "";
+	public static var actionBarGeneration:Int = 0;
+	/** Exact primitive HUD action/skill pairs, including a skill used by multiple actions. */
+	public static var nativeActionPairs:Array<{id:String,action:String}> = [];
+	static var hudWalkVisited = new haxe.ds.ObjectMap<Dynamic, Bool>();
 	static var readyFlashes = new Map<String, ReadyFlashState>();
 	static var readySkillRefs = new Map<String, Dynamic>();
 	static function clearReadyFlashes():Void { readyFlashes.clear(); readySkillRefs.clear(); }
@@ -101,6 +113,10 @@ class GeauxCache {
 	public static var slots:Array<GeauxSlotSnap> = [];
 	/** Observe-only snapshots for aura subjects, including skills outside visible slots. */
 	public static var auraSkills:Array<GeauxSlotSnap> = [];
+	/** BarTer-assigned skills — light poll, not full Geaux layout. */
+	public static var barTerSkills:Array<GeauxSlotSnap> = [];
+	static var barTerSeedAt:Float = 0;
+	static inline var BARTER_SEED_S:Float = 1.0;
 	public static var count:Int = 0;
 	public static var bookIds:Array<String> = [];
 	/** Cached PNG stem parallel to bookIds; resolved during observation, never in a picker draw. */
@@ -353,8 +369,8 @@ class GeauxCache {
 	}
 
 	static function telemetryInterval():Float {
-		if (solarflare.ObserveDemand.auras && solarflare.ObserveDemand.auraSkillIds.length > 0)
-			return TELEMETRY_HOT_S;
+		// Aura skill subjects ride the same sampler; do NOT force 20 Hz solely because
+		// auras exist — that doubled combat cost with Geaux slot polls. Idle unless CD/hot.
 		if (solarflare.ObserveDemand.geauxBuilder || solarflare.ObserveDemand.geauxDirty || telemetryDirty)
 			return TELEMETRY_HOT_S;
 		// Hot while any visible slot has a live cooldown.
@@ -626,6 +642,114 @@ class GeauxCache {
 		return weapons;
 	}
 
+	/** True while any BarTer-polled skill is on cooldown (drives ObserveDemand.dueBarTer hot). */
+	public static function barTerHot():Bool {
+		for (s in barTerSkills) {
+			if (s != null && (s.cdLeft > 0.05 || s.remaining > 0.02))
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Light BarTer path: tick assigned skill ids only.
+	 * Action-bar HUD walk at most ~1 Hz when needSeed (seed / builder).
+	 */
+	public static function sampleBarTer(heroDyn:Dynamic, needSeed:Bool):Void {
+		var now = nowStamp();
+		if (needSeed && (barTerSeedAt <= 0 || now >= barTerSeedAt)) {
+			barTerSeedAt = now + BARTER_SEED_S;
+			try
+				sampleActionBar(heroDyn)
+			catch (_:Dynamic) {}
+		}
+		var previous = barTerSkills;
+		barTerSkills = [];
+		if (heroDyn == null)
+			return;
+		var hero:ent.Hero = null;
+		try
+			hero = cast heroDyn
+		catch (_:Dynamic) {}
+		for (id in solarflare.ObserveDemand.barterSkillIds) {
+			if (id == null || id.length == 0) continue;
+			// Large grids may contain the entire catalog. Only observed native actions
+			// are available in BarTer, so inactive assignments never pay native CD polls.
+			var available = false;
+			for (native in weapons) if (native.present && (native.id == id || skillMatches(cachedSkill(native.id),id))) {
+				available = true; break;
+			}
+			if (!available) continue;
+			var snap:GeauxSlotSnap = null;
+			for (s in previous) {
+				if (s != null && s.id == id) {
+					snap = s;
+					break;
+				}
+			}
+			if (snap == null) {
+				snap = new GeauxSlotSnap();
+				snap.id = id;
+				snap.iconId = id;
+				snap.label = id;
+				snap.present = true;
+			}
+			tickSlot(hero, heroDyn, snap);
+			barTerSkills.push(snap);
+		}
+	}
+
+	/** Copy tickSlot results onto every matching snap (slots + weapons + aura + barTer). */
+	static function distributeLiveSkill(src:GeauxSlotSnap):Void {
+		if (src == null || src.id == null || src.id.length == 0)
+			return;
+		var i = 0;
+		while (i < count) {
+			var s = slots[i];
+			if (s != null && s.present && s.id == src.id)
+				copyLiveSkillFields(s, src);
+			i++;
+		}
+		if (weapons != null) {
+			for (s in weapons) {
+				if (s != null && s.present && s.id == src.id)
+					copyLiveSkillFields(s, src);
+			}
+		}
+		if (auraSkills != null) {
+			for (s in auraSkills) {
+				if (s != null && s.present && s.id == src.id)
+					copyLiveSkillFields(s, src);
+			}
+		}
+		if (barTerSkills != null) {
+			for (s in barTerSkills) {
+				if (s != null && s.present && s.id == src.id)
+					copyLiveSkillFields(s, src);
+			}
+		}
+	}
+
+	static function copyLiveSkillFields(dest:GeauxSlotSnap, src:GeauxSlotSnap):Void {
+		if (dest == null || src == null || dest == src)
+			return;
+		dest.ready = src.ready;
+		dest.cooldownValid = src.cooldownValid;
+		dest.readyFlashUntil = src.readyFlashUntil;
+		dest.affordable = src.affordable;
+		dest.procReady = src.procReady;
+		dest.procStart = src.procStart;
+		dest.cdLeft = src.cdLeft;
+		dest.cdMax = src.cdMax;
+		dest.nativeCdTotal = src.nativeCdTotal;
+		dest.nativeCdTotalValid = src.nativeCdTotalValid;
+		dest.observedRank = src.observedRank;
+		dest.remaining = src.remaining;
+		dest.charges = src.charges;
+		dest.chargesMax = src.chargesMax;
+		dest.stacks = src.stacks;
+	}
+
 	/**
 	 * Resolve every skill live on the vanilla action bar (3 strips):
 	 *   left  = main-hand + off-hand + arsenal weapon skills
@@ -634,6 +758,8 @@ class GeauxCache {
 	 * HUD widgets first (WeaponSkillSlotButton / SkillSlotButton), then inputs / live arrays.
 	 */
 	public static function sampleActionBar(hero:Dynamic):Void {
+		actionBarLoadoutKey = "";
+		nativeActionPairs.resize(0);
 		weapons = [];
 		if (hero == null)
 			return;
@@ -676,6 +802,8 @@ class GeauxCache {
 
 		trustHudSkills = true;
 		hudWalkNodes = 0;
+		hudWalkVisited.clear();
+		var hudWalkStart = nowStamp();
 		hudHero = hero;
 		try {
 			ensureBarRoots();
@@ -693,38 +821,24 @@ class GeauxCache {
 				}
 			}
 		} catch (_:Dynamic) {}
+		hudWalkVisited.clear();
+		solarflare.runtime.RuntimeMetrics.barHudNodes = hudWalkNodes;
+		solarflare.runtime.RuntimeMetrics.barHudMs = (nowStamp() - hudWalkStart) * 1000;
+		if (solarflare.runtime.RuntimeMetrics.barHudMs > solarflare.runtime.RuntimeMetrics.barHudMaxMs)
+			solarflare.runtime.RuntimeMetrics.barHudMaxMs = solarflare.runtime.RuntimeMetrics.barHudMs;
 		hudHero = null;
 
-		var inputs = [
-			"Skill1", "Skill2", "Skill3", "Skill4", "Skill5", "Skill6", "Skill7", "Skill8",
-			"ClassSkill1", "ClassSkill2", "ClassSkill3", "ClassSkill4",
-			"ClassSkill5", "ClassSkill6", "ClassSkill7", "ClassSkill8",
-			"WeaponSkill1", "WeaponSkill2", "WeaponSkill3", "WeaponSkill4",
-			"MainHandSkill1", "MainHandSkill2", "MainHandSkill3", "MainHandSkill4",
-			"OffhandSkill", "OffhandSkill1", "OffhandSkill2", "OffHandSkill",
-			"ArsenalSkill1", "ArsenalSkill2", "ArsenalSkill3", "ArsenalSkill4",
-			"ArsenalSkill5", "ArsenalSkill6",
-			"SecondaryWeaponSkill1", "SecondaryWeaponSkill2", "SecondaryWeaponSkill3", "SecondaryWeaponSkill4",
-			"SecondarySkill1", "SecondarySkill2", "SecondarySkill3", "SecondarySkill4",
-			"SignatureSkill", "Signature", "SigSkill", "ClassSignature",
-			"Ultimate", "UltimateSkill"
-		];
-		var typedInputsOk = false;
-		try {
-			var h:ent.Hero = cast hero;
-			for (inp in inputs) {
-				var sk = h.getSkillByInput(inp);
-				if (sk != null)
-					pushBarSkill(hero, sk, getSkillId(sk));
-			}
-			typedInputsOk = true;
-		} catch (_:Dynamic) {}
-		if (!typedInputsOk) {
-			for (inp in inputs) {
-				var sk2 = callResolved(byInputMem, [hero, inp]);
-				if (sk2 != null)
-					pushBarSkill(hero, sk2, getSkillId(sk2));
-			}
+		// Installed HLB v6, Hero.getSkillByInput (findex 7814): these are its
+		// complete accepted actions. Class/arsenal identities come from HUD nodes.
+		var inputs = ["Attack", "Secondary", "WeaponSkill1", "WeaponSkill2", "WeaponSkill3", "WeaponSkill4"];
+		for (inp in inputs) {
+			var sk:Dynamic = null;
+			try {
+				var h:ent.Hero = cast hero;
+				sk = h.getSkillByInput(inp);
+			} catch (_:Dynamic) {}
+			if (sk == null) sk = callResolved(byInputMem, [hero, inp]);
+			if (sk != null) pushBarSkill(hero, sk, getSkillId(sk), inp);
 		}
 
 		// Fallbacks when HUD / input names miss sheathed arsenal or class slots.
@@ -736,6 +850,9 @@ class GeauxCache {
 		pushBarSkill(hero, callResolved(offSkillMem, [hero]), "");
 
 		trustHudSkills = false;
+		actionBarLoadoutKey = solarflare.barter.BarTerCache.weaponLoadoutKey(hero);
+		actionBarCharacterId = solarflare.HealthCache.characterId;
+		actionBarGeneration++;
 	}
 
 	static function sampleClassSkills(hero:Dynamic):Void {
@@ -1050,7 +1167,7 @@ class GeauxCache {
 		out.push(key);
 	}
 
-	static function pushBarSkill(hero:Dynamic, skill:Dynamic, id:String):Void {
+	static function pushBarSkill(hero:Dynamic, skill:Dynamic, id:String, action:String = ""):Void {
 		var iconHint = preferScriptId(id, skill);
 		id = sanitizeSkillId(iconHint.length > 0 ? iconHint : (id.length > 0 ? id : getSkillId(skill)));
 		if (id.length == 0)
@@ -1064,6 +1181,11 @@ class GeauxCache {
 				return;
 		}
 		pushSkillSnap(hero, weapons, skill, id, "BAR");
+		if (action.length > 0) for (s in weapons) if (s.id == id) s.nativeActionId = action;
+		if (action.length > 0) {
+			for (pair in nativeActionPairs) if (pair.action == action) { pair.id=id; return; }
+			nativeActionPairs.push({id:id,action:action});
+		}
 	}
 
 	static function resolveHud():Dynamic {
@@ -1122,6 +1244,9 @@ class GeauxCache {
 	static function walkActionBarAll(node:Dynamic, depth:Int):Void {
 		if (node == null || depth > 18 || hudWalkNodes > 1800)
 			return;
+		// Roots, named fields and children overlap. Never ingest an object twice.
+		if (hudWalkVisited.exists(node)) return;
+		hudWalkVisited.set(node, true);
 		hudWalkNodes++;
 		ingestAnyBarSlot(node);
 		var follow = [
@@ -1167,13 +1292,13 @@ class GeauxCache {
 					wId = skillIdFromButton(wslot.button);
 				if (wId.length == 0 || !isScriptStyleId(wId))
 					wId = preferScriptId(wId, wSkill);
-				var wInput = dynString(plainField(node, "input"));
+				var wInput = nativeInputOf(node,wslot.button);
 				if ((wSkill == null || wId.length == 0) && wInput.length > 0)
 					wSkill = callResolved(byInputMem, [hudHero, wInput]);
 				if (wId.length == 0 || !isScriptStyleId(wId))
 					wId = preferScriptId(wId, wSkill);
 				if (wId.length > 0 || wSkill != null) {
-					pushBarSkill(hudHero, wSkill, wId);
+					pushBarSkill(hudHero, wSkill, wId, wInput);
 					return;
 				}
 			}
@@ -1200,13 +1325,13 @@ class GeauxCache {
 					sId = skillIdFromButton(slot.button);
 				if (sId.length == 0 || !isScriptStyleId(sId))
 					sId = preferScriptId(sId, sSkill);
-				var sInput = dynString(plainField(node, "input"));
+				var sInput = nativeInputOf(node,slot.button);
 				if ((sSkill == null || sId.length == 0) && sInput.length > 0)
 					sSkill = callResolved(byInputMem, [hudHero, sInput]);
 				if (sId.length == 0 || !isScriptStyleId(sId))
 					sId = preferScriptId(sId, sSkill);
 				if (sId.length > 0 || sSkill != null) {
-					pushBarSkill(hudHero, sSkill, sId);
+					pushBarSkill(hudHero, sSkill, sId, sInput);
 					return;
 				}
 			}
@@ -1256,9 +1381,7 @@ class GeauxCache {
 		if (skill == null)
 			skill = callOverrideSkill(node);
 
-		var input = dynString(plainField(node, "input"));
-		if (input.length == 0)
-			input = dynString(plainField(target, "input"));
+		var input = nativeInputOf(node,target);
 		if ((skill == null || getSkillId(skill).length == 0) && input.length > 0)
 			skill = callResolved(byInputMem, [hudHero, input]);
 
@@ -1268,18 +1391,17 @@ class GeauxCache {
 			id = preferScriptId(id, skill);
 		if (id.length == 0 && skill == null)
 			return;
-		pushBarSkill(hudHero, skill, id);
+		pushBarSkill(hudHero, skill, id, input);
+	}
+	/** Actual HUD input identity, including the retained InputKey wrapper. */
+	static function nativeInputOf(node:Dynamic,button:Dynamic):String {
+		var input=solarflare.EngineText.cleanId(plainField(node,"input"));
+		if (input.length == 0) input=solarflare.EngineText.cleanId(plainField(button,"input"));
+		if (input.length == 0) input=solarflare.EngineText.cleanId(plainField(plainField(node,"inputKey"),"input"));
+		if (input.length == 0) input=solarflare.EngineText.cleanId(plainField(plainField(button,"inputKey"),"input"));
+		return input;
 	}
 
-	static function alreadyInGroup(id:String, group:Array<GeauxSlotSnap>):Bool {
-		if (id == null || id.length == 0 || group == null)
-			return false;
-		for (s in group) {
-			if (s != null && s.present && s.id == id)
-				return true;
-		}
-		return false;
-	}
 
 	public static function skillFromArsenal(skill:Dynamic):Bool {
 		if (skill == null)
@@ -1474,6 +1596,8 @@ class GeauxCache {
 			pushSkillSnap(hero, dest, callResolved(byInputMem, [hero, inp]), "", group);
 	}
 
+	public static function isBarSkillId(id:String):Bool return !skipWeaponId(id);
+
 	static function skipWeaponId(id:String):Bool {
 		if (id == null || id.length == 0)
 			return true;
@@ -1627,14 +1751,6 @@ class GeauxCache {
 		return false;
 	}
 
-	static function callSkillBool1(mem:ResolvedMember, skill:Dynamic, arg:String):Bool {
-		if (mem == null || skill == null || arg == null || arg.length == 0)
-			return false;
-		try
-			return HlxRuntime.callResolved(mem, [skill, arg])
-		catch (_:Dynamic) {}
-		return false;
-	}
 
 	public static function refreshBook(heroDyn:Dynamic):Void {
 		bookIds = [];
@@ -1849,12 +1965,16 @@ class GeauxCache {
 		dest.readyFlashUntil = src.readyFlashUntil;
 		dest.affordable = src.affordable;
 		dest.procReady = src.procReady;
+		dest.procStart = src.procStart;
 		dest.cdLeft = src.cdLeft;
 		dest.cdMax = src.cdMax;
 		dest.nativeCdTotal = src.nativeCdTotal;
 		dest.nativeCdTotalValid = src.nativeCdTotalValid;
 		dest.observedRank = src.observedRank;
 		dest.remaining = src.remaining;
+		dest.charges = src.charges;
+		dest.chargesMax = src.chargesMax;
+		dest.stacks = src.stacks;
 		dest.iconCandidates = src.iconCandidates != null ? src.iconCandidates.copy() : [];
 	}
 
@@ -1905,6 +2025,7 @@ class GeauxCache {
 		snap.iconId = "";
 		snap.label = "";
 		snap.group = "";
+		snap.nativeActionId = "";
 		snap.present = false;
 		snap.cooldownValid = false;
 		snap.readyFlashUntil = 0;
@@ -1915,6 +2036,7 @@ class GeauxCache {
 		snap.remaining = 0;
 		snap.charges = 0;
 		snap.chargesMax = 0;
+		snap.stacks = 0;
 		snap.iconCandidates = [];
 	}
 
@@ -2088,8 +2210,11 @@ class GeauxCache {
 		// while still being backed by hl.Bytes. Decode that representation first
 		// so it cannot leak into config arrays and JSON as {bytes,length}.
 		var decoded = bytesAsCleanString(value);
-		if (decoded.length > 0)
-			return isCleanLabel(decoded) ? decoded : "";
+		if (decoded.length > 0) {
+			if (!isCleanLabel(decoded) || solarflare.ui.ByteUtil.isDumpShape(decoded))
+				return "";
+			return solarflare.ui.ByteUtil.materialize(decoded);
+		}
 		var id = "";
 		try {
 			if (Std.isOfType(value, String))
@@ -2097,7 +2222,8 @@ class GeauxCache {
 		} catch (_:Dynamic) {}
 		if (id.length == 0)
 			return "";
-		if (!isCleanLabel(id))
+		id = solarflare.ui.ByteUtil.materialize(id);
+		if (id.length == 0 || !isCleanLabel(id) || solarflare.ui.ByteUtil.isDumpShape(id))
 			return "";
 		return id;
 	}
@@ -2255,27 +2381,7 @@ class GeauxCache {
 			lastUseAt.set(id, now);
 	}
 
-	/**
-	 * Constant-time cooldown hook ingress. Native callbacks do not expand aliases,
-	 * query cooldown getters, consult CDB, or walk equipment; the demanded sampler
-	 * reconciles the authoritative continuous values within its 50 ms ceiling.
-	 */
-	public static function noteCooldownEdge():Void {
-		equipDirty = true;
-		telemetryAt = 0;
-		telemetryDirty = true;
-		solarflare.ObserveDemand.markGeauxDirty();
-	}
 
-	static function addSkillId(ids:Array<String>, id:String):Void {
-		if (id == null || id.length == 0)
-			return;
-		for (e in ids) {
-			if (e == id)
-				return;
-		}
-		ids.push(id);
-	}
 
 	static function callOverrideSkill(obj:Dynamic):Dynamic {
 		if (obj == null)
@@ -2331,38 +2437,7 @@ class GeauxCache {
 		return null;
 	}
 
-	static function textOf(el:Dynamic):String {
-		var t = dynString(field(el, "text"));
-		if (t.length == 0)
-			t = dynString(field(el, "prevUnformatted"));
-		return t;
-	}
 
-	static function parseCdText(s:String):Float {
-		if (s == null || s.length == 0)
-			return Math.NaN;
-		var buf = new StringBuf();
-		var i = 0;
-		while (i < s.length) {
-			var ch = s.charAt(i);
-			if (ch == "<") {
-				var j = s.indexOf(">", i);
-				if (j < 0)
-					break;
-				i = j + 1;
-				continue;
-			}
-			buf.add(ch);
-			i++;
-		}
-		var cleaned = StringTools.trim(buf.toString());
-		cleaned = StringTools.replace(cleaned, "s", "");
-		cleaned = StringTools.replace(cleaned, "S", "");
-		var f = Std.parseFloat(cleaned);
-		if (Math.isNaN(f) || f < 0)
-			return Math.NaN;
-		return f;
-	}
 
 	static function applyCooldown(hero:Dynamic, snap:GeauxSlotSnap, skill:Dynamic):Void {
 		writeCooldownFromSkill(snap, skill);
@@ -2440,6 +2515,7 @@ class GeauxCache {
 				catch (_:Dynamic) {}
 			}
 		} catch (_:Dynamic) {}
+		var leftExact = typedOk && Math.isFinite(out.left);
 		if (!typedOk || !Math.isFinite(out.left) || !Math.isFinite(out.prog)) {
 			ensureCdMems();
 			if (!Math.isFinite(out.max) || out.max <= 0) {
@@ -2449,6 +2525,14 @@ class GeauxCache {
 			}
 			if (!Math.isFinite(out.left)) out.left = callNamedFloat(skill, "getCooldownLeft", cdLeftMem);
 			if (!Math.isFinite(out.prog)) out.prog = callNamedFloat(skill, "getCooldownProgress", cdProgMem);
+		}
+		// Exact left already won: never use FieldWalk max aliases on this poll.
+		if (leftExact && (!Math.isFinite(out.max) || out.max <= 0)) {
+			// typed.cooldownDuration already tried above; leave max 0 → commit synthesizes from left.
+		} else if (!leftExact && (!Math.isFinite(out.max) || out.max <= 0)) {
+			var fw = readMaxCdField(skill);
+			if (fw > 0)
+				out.max = fw;
 		}
 		// Capture native provenance before normalize/synthesis. Cached totals carry their own provenance.
 		var native = out.max;
@@ -2573,6 +2657,8 @@ class GeauxCache {
 			snap.procReady = false;
 			snap.charges = 0;
 			snap.chargesMax = 0;
+			snap.stacks = 0;
+			distributeLiveSkill(snap);
 			return;
 		}
 		if (solarflare.PrayerCache.isPrayerId(snap.id)) {
@@ -2580,15 +2666,20 @@ class GeauxCache {
 			snap.procReady = false;
 			snap.charges = 0;
 			snap.chargesMax = 0;
+			snap.stacks = 0;
+			distributeLiveSkill(snap);
 			return;
 		}
 		var skill:Dynamic = bindSlotSkill(hero, snap);
 		if (skill != null) {
 			applyCooldown(heroDyn, snap, skill);
 			applySkillCharges(snap, skill);
+			applySkillStacks(snap, skill);
 		} else {
 			snap.charges = 0;
 			snap.chargesMax = 0;
+			// Still pull Status stacks from AuraStatusCache when Skill bind misses.
+			applySkillStacks(snap, null);
 		}
 		// Charge pools: regenerating a charge is not "unusable" while ammo remains.
 		if (snap.chargesMax > 0)
@@ -2602,18 +2693,96 @@ class GeauxCache {
 		}
 		snap.readyFlashUntil = readyFlashes.get(key).observe(skill != null && snap.cooldownValid,
 			snap.cdLeft > 0.05 || snap.remaining > 0.02, haxe.Timer.stamp());
+		// Mirror live CD/charges/stacks onto every twin (Geaux slots, weapons, BarTer, aura).
+		distributeLiveSkill(snap);
 	}
 
 	/** Observe-only: freeze Spell Activation Overlay flag from typed SkillScript. */
 	static function applyProcReady(snap:GeauxSlotSnap, skill:Dynamic):Void {
+		var was = snap.procReady;
 		snap.procReady = false;
 		if (skill == null || snap == null)
 			return;
+		// Instant-play proc, or the script asking the HUD to highlight the skill.
+		if (scriptProc(skill, snap.id) == true || scriptHighlight(skill, snap.id) == true)
+			snap.procReady = true;
+		if (snap.procReady && !was)
+			snap.procStart = haxe.Timer.stamp();
+	}
+
+	static var scriptMems:Map<String, ResolvedMember> = new Map();
+	static var scriptMemMiss:Map<String, Bool> = new Map();
+	static var procMems:Map<String, ResolvedMember> = new Map();
+	static var procMemMiss:Map<String, Bool> = new Map();
+	static var highlightMems:Map<String, ResolvedMember> = new Map();
+	static var highlightMemMiss:Map<String, Bool> = new Map();
+
+	/**
+	 * SkillScript.shouldPlayInstantly on the skill's own script. A typed `SkillScript` call binds
+	 * the base body (`return false`); the per-skill overrides only run when the member is
+	 * resolved on the script object's live type, as the engine's own virtual call does.
+	 */
+	public static function scriptProc(skill:Dynamic, id:String):Null<Bool> {
+		return scriptBool(skill, id, "shouldPlayInstantly", procMems, procMemMiss);
+	}
+
+	public static function scriptHighlight(skill:Dynamic, id:String):Null<Bool> {
+		return scriptBool(skill, id, "shouldHighlightSkill", highlightMems, highlightMemMiss);
+	}
+
+	/** SkillScript.get_stacks: Status.stacks when the script belongs to a Status, else 0. */
+	public static function scriptStacks(skill:Dynamic, id:String):Int {
+		var v = scriptCall(skill, id, "get_stacks", scriptMems, scriptMemMiss);
+		if (v == null)
+			return 0;
 		try {
-			var sc:script.SkillScript = skill;
-			if (sc != null)
-				snap.procReady = sc.shouldPlayInstantly();
+			var f:Float = v;
+			return Math.isFinite(f) && f > 0 ? Std.int(f) : 0;
 		} catch (_:Dynamic) {}
+		return 0;
+	}
+
+	static function scriptBool(skill:Dynamic, id:String, method:String, mems:Map<String, ResolvedMember>, miss:Map<String, Bool>):Null<Bool> {
+		var v = scriptCall(skill, id, method, mems, miss);
+		if (v == null)
+			return null;
+		try {
+			return (v : Bool);
+		} catch (_:Dynamic) {}
+		return null;
+	}
+
+	/** One member per skill id, bound once on the script's live type; per call only [script]. */
+	static function scriptCall(skill:Dynamic, id:String, method:String, mems:Map<String, ResolvedMember>, miss:Map<String, Bool>):Dynamic {
+		if (skill == null || id == null || id.length == 0 || miss.exists(id))
+			return null;
+		var sc:Dynamic = null;
+		try {
+			var bs:st.skill.BaseSkill = skill;
+			sc = bs.script;
+		} catch (_:Dynamic) {}
+		if (sc == null)
+			return null;
+		var mem = mems.get(id);
+		if (mem == null) {
+			try {
+				var typeName = FieldWalk.liveTypeName(sc);
+				if (typeName.length > 0) {
+					var rt = HlxRuntime.resolveType(typeName);
+					if (rt != null)
+						mem = HlxRuntime.resolveMember(rt, method);
+				}
+			} catch (_:Dynamic) {}
+			if (mem == null) {
+				miss.set(id, true);
+				return null;
+			}
+			mems.set(id, mem);
+		}
+		try {
+			return HlxRuntime.callResolved(mem, [sc]);
+		} catch (_:Dynamic) {}
+		return null;
 	}
 
 	static function bindSlotSkill(hero:ent.Hero, snap:GeauxSlotSnap):Dynamic {
@@ -2676,43 +2845,7 @@ class GeauxCache {
 		return null;
 	}
 
-	static function pinnedBtn(id:String):Dynamic {
-		if (id == null || id.length == 0)
-			return null;
-		if (barBtnById.exists(id))
-			return barBtnById.get(id);
-		var script = classSignatureScriptId(id);
-		if (script.length > 0 && barBtnById.exists(script))
-			return barBtnById.get(script);
-		for (a in iconIdCandidates(id, null)) {
-			if (barBtnById.exists(a))
-				return barBtnById.get(a);
-		}
-		return null;
-	}
 
-	/** Floor from vanilla cdTimer only if that button still shows this skill. Never shorten. */
-	static function overlayVanillaCd(snap:GeauxSlotSnap):Void {
-		if (snap == null || solarflare.PrayerCache.isPrayerId(snap.id))
-			return;
-		var btn = pinnedBtn(snap.id);
-		if (btn == null && snap.iconId != snap.id)
-			btn = pinnedBtn(snap.iconId);
-		if (btn == null)
-			return;
-		if (!buttonShowsId(btn, snap.id) && (snap.iconId == null || !buttonShowsId(btn, snap.iconId)))
-			return;
-		var left = buttonCdLeft(btn);
-		if (Math.isNaN(left) || left <= 0.05)
-			return;
-		snap.ready = false;
-		if (snap.cdLeft + 0.05 >= left)
-			return;
-		snap.cdLeft = left;
-		if (snap.cdMax < left)
-			snap.cdMax = left;
-		snap.remaining = snap.cdMax > 0.05 ? clamp01(left / snap.cdMax) : 1;
-	}
 
 	static function buttonShowsId(btn:Dynamic, id:String):Bool {
 		if (btn == null || id == null || id.length == 0)
@@ -2740,70 +2873,9 @@ class GeauxCache {
 		return a.length > 0 && a == b;
 	}
 
-	static function buttonCdLeft(btn:Dynamic):Float {
-		if (btn == null)
-			return Math.NaN;
-		// Optional HUD text fields are absent from current typed bindings.
-		// Keep the existing FieldWalk path for builds that expose them at runtime.
-		var left = parseCdText(textOf(plainField(btn, "cdTimer")));
-		if (Math.isNaN(left) || left <= 0)
-			left = parseCdText(textOf(plainField(btn, "serverCdTimer")));
-		return left;
-	}
 
-	static function eachCdSnap(fn:GeauxSlotSnap->Void):Void {
-		if (fn == null)
-			return;
-		var i = 0;
-		while (i < count) {
-			if (slots[i] != null)
-				fn(slots[i]);
-			i++;
-		}
-		if (weapons != null) {
-			for (s in weapons) {
-				if (s != null)
-					fn(s);
-			}
-		}
-		if (classSkills != null) {
-			for (s in classSkills) {
-				if (s != null)
-					fn(s);
-			}
-		}
-		if (signatures != null) {
-			for (s in signatures) {
-				if (s != null)
-					fn(s);
-			}
-		}
-	}
 
-	static function eachSlotSnap(fn:GeauxSlotSnap->Void):Void {
-		if (fn == null)
-			return;
-		var i = 0;
-		while (i < count) {
-			if (slots[i] != null)
-				fn(slots[i]);
-			i++;
-		}
-	}
 
-	static function signatureMatchesSnap(skill:st.skill.Skill, snapId:String):Bool {
-		if (skill == null || snapId == null || snapId.length == 0)
-			return false;
-		if (skillMatches(skill, snapId))
-			return true;
-		var want = classSignatureScriptId(snapId);
-		if (want.length == 0)
-			want = snapId;
-		var have = classSignatureScriptId(getSkillId(skill));
-		if (have.length == 0)
-			have = getSkillId(skill);
-		return want.length > 0 && have.length > 0 && want == have;
-	}
 
 	static function isDashSkill(skill:Dynamic, id:String):Bool {
 		if (id != null && (id == "Dash_Base" || StringTools.startsWith(id, "Dash_")))
@@ -2901,7 +2973,7 @@ class GeauxCache {
 		return null;
 	}
 
-	static function skillMatches(skill:st.skill.Skill, id:String):Bool {
+	public static function skillMatches(skill:st.skill.Skill, id:String):Bool {
 		if (skill == null || id == null || id.length == 0)
 			return false;
 		var idScript = classSignatureScriptId(id);
@@ -2988,7 +3060,7 @@ class GeauxCache {
 				snap.chargesMaxStatic = max < 0 ? 0 : max;
 				snap.chargeStaticGen = staticGen;
 			}
-			if (max <= 0)
+			if (max <= 1)
 				return;
 			var current = typed.getCurrentCharges();
 			if (current < 0)
@@ -3004,6 +3076,51 @@ class GeauxCache {
 			}
 			#end
 		} catch (_:Dynamic) {}
+	}
+
+	/**
+	 * Freeze stacks for Geaux + BarTer.
+	 * 1) script.SkillScript.get_stacks → skill.stacks (Farever IL fn 6670)
+	 * 2) AuraStatusCache (Status.set_stacks hooks) for skill id / granted status
+	 * Take the max so either path lights the corner badge.
+	 */
+	static function applySkillStacks(snap:GeauxSlotSnap, skill:Dynamic):Void {
+		if (snap == null)
+			return;
+		snap.stacks = 0;
+		if (skill != null)
+			snap.stacks = scriptStacks(skill, snap.id);
+		var auraN = auraStacksForSkill(snap.id);
+		if (auraN > snap.stacks)
+			snap.stacks = auraN;
+	}
+
+	/** Status stacks from AuraStatusCache for a skill (and its granted status companion). */
+	static function auraStacksForSkill(skillId:String):Int {
+		if (skillId == null || skillId.length == 0)
+			return 0;
+		var best = 0;
+		try {
+			best = auraStacksLookup(skillId, best);
+			var grant = solarflare.cdb.CdbAuraTable.grantedStatusId(skillId);
+			if (grant != null && grant.length > 0)
+				best = auraStacksLookup(grant, best);
+			var subject = solarflare.cdb.CdbAuraTable.statusSubjectId(skillId);
+			if (subject != null && subject.length > 0 && subject != skillId && subject != grant)
+				best = auraStacksLookup(subject, best);
+			if (skillId.indexOf("_Status") < 0 && skillId.indexOf("_status") < 0)
+				best = auraStacksLookup(skillId + "_Status", best);
+		} catch (_:Dynamic) {}
+		return best;
+	}
+
+	static function auraStacksLookup(id:String, best:Int):Int {
+		if (id == null || id.length < 2)
+			return best;
+		var a = solarflare.aura.AuraStatusCache.find(id);
+		if (a != null && a.present && a.stacks > best)
+			return a.stacks;
+		return best;
 	}
 
 	/**
@@ -3056,13 +3173,6 @@ class GeauxCache {
 		ledgerGeauxCd("engine", "applyTrackedToSnap", "cdUntil", "st.skill.Skill.onTriggerCD", snap);
 	}
 
-	static function rememberCdMax(snap:GeauxSlotSnap):Void {
-		if (snap == null || snap.cdMax <= 0.05 || snap.id == null)
-			return;
-		cdMaxById.set(snap.id, snap.cdMax);
-		for (a in iconIdCandidates(snap.id, null))
-			cdMaxById.set(a, snap.cdMax);
-	}
 
 	static function skillRank(skill:Dynamic):Int {
 		if (skill == null)
@@ -3081,21 +3191,6 @@ class GeauxCache {
 		return 1;
 	}
 
-	static function skillIdKeys(id:String):Array<String> {
-		var out:Array<String> = [];
-		if (id != null && id.length > 0)
-			out.push(id);
-		try {
-			for (a in iconIdCandidates(id, null)) {
-				if (a != null && a.length > 0)
-					out.push(a);
-			}
-		} catch (_:Dynamic) {}
-		var script = classSignatureScriptId(id);
-		if (script.length > 0)
-			out.push(script);
-		return out;
-	}
 
 	/**
 	 * Off-cooldown skills that the hero cannot afford / enable are marked unaffordable
@@ -3199,13 +3294,23 @@ class GeauxCache {
 		var costs:Dynamic = null;
 		try {
 			if (typed != null && typed.inf != null) {
-				var props = FieldWalk.extractObject(typed.inf, "props");
-				if (props != null)
-					costs = FieldWalk.extractObject(props, "costs");
+				var props:Dynamic = null;
+				try
+					props = Reflect.field(typed.inf, "props")
+				catch (_:Dynamic)
+					props = null;
+				if (props != null) {
+					try
+						costs = Reflect.field(props, "costs")
+					catch (_:Dynamic)
+						costs = null;
+				}
 			}
 		} catch (_:Dynamic) {}
+		#if solarflare_telemetry
 		if (costs == null)
 			costs = FieldWalk.extractPath(skill, ["inf", "props", "costs"]);
+		#end
 		if (key.length > 0) {
 			costsKnown.set(key, true);
 			if (costs != null)
@@ -3325,23 +3430,7 @@ class GeauxCache {
 			cdUntil.remove(script);
 	}
 
-	static function trackedLeft(id:String):Float {
-		var until = trackedUntil(id);
-		if (Math.isNaN(until))
-			return 0;
-		var left = until - nowStamp();
-		return left > 0 ? left : 0;
-	}
 
-	static function typedLeftCd(skill:Dynamic, max:Float):Float {
-		try {
-			var typed:st.skill.Skill = skill;
-			if (typed == null)
-				return Math.NaN;
-			return scaleCdLeft(typed.getCooldownLeft(), max);
-		} catch (_:Dynamic) {}
-		return Math.NaN;
-	}
 
 	static function typedMaxCd(skill:Dynamic):Float {
 		try {
@@ -3373,15 +3462,6 @@ class GeauxCache {
 		return 0;
 	}
 
-	static function typedProgress(skill:Dynamic):Float {
-		try {
-			var typed:st.skill.Skill = skill;
-			if (typed == null)
-				return Math.NaN;
-			return typed.getCooldownProgress();
-		} catch (_:Dynamic) {}
-		return Math.NaN;
-	}
 
 	static function gameNow():Float {
 		try {
@@ -3397,21 +3477,6 @@ class GeauxCache {
 		return 0;
 	}
 
-	static function readMaxCd(skill:Dynamic):Float {
-		var max = callNamedFloat(skill, "getEffectiveCooldown", cdEffMem);
-		if (Math.isNaN(max) || max <= 0)
-			max = callNamedFloat(skill, "getCooldown", cdMem);
-		if (Math.isNaN(max) || max <= 0)
-			max = readMaxCdField(skill);
-		max = normalizeSeconds(max, 0);
-		if (max <= 0) {
-			try {
-				var id = parseSkillish(skill).id;
-				max = GeauxCdTable.resolveMax(id, skillIdAliases(skill), skillRank(skill), max);
-			} catch (_:Dynamic) {}
-		}
-		return max;
-	}
 
 	static function readMaxCdField(skill:Dynamic):Float {
 		if (cdMaxFieldWin.length > 0) {
@@ -3448,29 +3513,7 @@ class GeauxCache {
 		return 0;
 	}
 
-	static function readLeftCd(skill:Dynamic, hero:Dynamic, id:String, max:Float):Float {
-		return scaleCdLeft(callNamedFloat(skill, "getCooldownLeft", cdLeftMem), max);
-	}
 
-	static function lastUseTime(hero:Dynamic, id:String):Float {
-		if (id != null && lastUseAt.exists(id))
-			return lastUseAt.get(id);
-		try {
-			var map = field(hero, "skillLastUse");
-			if (map != null) {
-				var v:Dynamic = FieldWalk.mapGet(map, id);
-				if (v != null)
-					return (v : Float);
-			}
-		} catch (_:Dynamic) {}
-		try {
-			var map = field(hero, "skillLastUse");
-			var v:Dynamic = untyped map.get(id);
-			if (v != null)
-				return (v : Float);
-		} catch (_:Dynamic) {}
-		return 0;
-	}
 
 	static function nowStamp():Float {
 		var t = gameNow();

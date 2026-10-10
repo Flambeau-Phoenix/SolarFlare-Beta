@@ -6,7 +6,10 @@ class AuraStatusSnap {
 	public var sourceItemKnown:Bool = false;
 	public var ids:Array<String> = [];
 	public var idsLower:Array<String> = [];
-	public var stacks:Int = 1;
+	public var stacks:Int = 0;
+	public var stacksKnown:Bool = false;
+	public var label:String = "";
+	public var iconKey:String = "";
 	public var known:Bool = true;
 	public var present:Bool = true;
 	public var durationKnown:Bool = false;
@@ -29,6 +32,7 @@ class AuraStatusSnap {
 		ids.resize(0);
 		idsLower.resize(0);
 		stacks = 0;
+		stacksKnown = false; label = ""; iconKey = "";
 		known = true;
 		present = false;
 		durationKnown = false;

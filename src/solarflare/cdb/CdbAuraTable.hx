@@ -124,18 +124,6 @@ class CdbAuraTable {
 		return m != null ? m : "";
 	}
 
-	/** Which CDB field listedSpan came from, for builder tooltips. Empty when neither. */
-	public static function listedSpanSource(id:String):String {
-		if (ConsumableCatalog.listedSpan(id) > 0) return "item effect duration";
-		var g = grantedStatusId(id);
-		if (g.length > 0 && g != id && duration(g) > 0.05)
-			return "status duration";
-		var d = duration(id);
-		var cd = cooldown(id);
-		if (isStatus(id))
-			return d > 0.05 ? "duration" : (cd > 0.05 ? "cooldown" : "");
-		return cd > 0.05 ? "cooldown" : (d > 0.05 ? "duration" : "");
-	}
 
 	public static function maxStacks(id:String):Int {
 		ensure();

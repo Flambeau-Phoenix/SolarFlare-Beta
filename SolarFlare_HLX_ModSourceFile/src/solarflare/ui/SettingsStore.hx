@@ -15,7 +15,7 @@ import imgui.ImGui;
  * Persist SolarFlare layout + toggles next to the installed mod.
  */
 class SettingsStore {
-	static inline var VERSION:Int = 26;
+	static inline var VERSION:Int = 29;
 	static var dirty = false;
 	static var lastCfg:ConfigPanel = null;
 	static var lastSaveMs:Float = 0;
@@ -92,6 +92,7 @@ class SettingsStore {
 				backupBeforeMigration(path, raw, oldVersion);
 			apply(cfg, data);
 			FeatureProfiles.load(cfg, data);
+			if (oldVersion < 27) dirty = true;
 			// v24: the first cast-bar build persisted the new overlay as hidden,
 			// including in the active universal profile, so no telemetry was demanded.
 			if (oldVersion < 24) {
@@ -177,8 +178,8 @@ class SettingsStore {
 	}
 
 	static function dump(cfg:ConfigPanel):Dynamic {
-		var data = dumpCore(cfg);
 		FeatureProfiles.storeAll(cfg);
+		var data = dumpCore(cfg);
 		Reflect.setField(data, "geaux", geauxDump(cfg.geaux));
 		Reflect.setField(data, "auras", aurasDump(cfg.auras));
 		Reflect.setField(data, "featureProfiles", FeatureProfiles.dump());
@@ -190,6 +191,11 @@ class SettingsStore {
 		lastCaptureWarning = "";
 		var data:Dynamic = {v: VERSION, activeTheme: activeTheme};
 		assignDump(data, "customTheme", function() return ThemePalette.dumpCustom());
+		assignDump(data, "uiPack", function() return cfg.uiPack != null ? cfg.uiPack.dump() : {id: "custom"});
+		assignDump(data, "nativeHide", function() return cfg.nativeHide.dump());
+		assignDump(data, "hideMove", function() return cfg.hideMove != null ? cfg.hideMove.dump() : {});
+		assignDump(data, "barter", function() return cfg.barter != null ? cfg.barter.dump() : {});
+		assignDump(data, "statusBoard", function() return cfg.statusBoard != null ? cfg.statusBoard.dump() : {});
 		assignDump(data, "vitals", function() return vitalsDump(cfg.vitals));
 		assignDump(data, "geaux", function() return geauxDump(cfg.geaux));
 		assignDump(data, "extraBars", function() return cfg.extraBarsPrototype.model.dump());
@@ -603,6 +609,15 @@ class SettingsStore {
 	static function apply(cfg:ConfigPanel, data:Dynamic):Void {
 		if (data == null)
 			return;
+		if (cfg.uiPack != null)
+			cfg.uiPack.apply(Reflect.field(data, "uiPack"));
+		cfg.nativeHide.apply(Reflect.field(data, "nativeHide"));
+		if (cfg.hideMove != null)
+			cfg.hideMove.apply(Reflect.field(data, "hideMove"));
+		if (cfg.barter != null)
+			cfg.barter.apply(Reflect.field(data, "barter"));
+		if (cfg.statusBoard != null)
+			cfg.statusBoard.apply(Reflect.field(data, "statusBoard"));
 		try if (data.activeTheme != null) activeTheme = Std.string(data.activeTheme) catch (_:Dynamic) {}
 		try if (data.customTheme != null) ThemePalette.applyCustomDump(data.customTheme) catch (_:Dynamic) {}
 		applyVitals(cfg.vitals, data.vitals);

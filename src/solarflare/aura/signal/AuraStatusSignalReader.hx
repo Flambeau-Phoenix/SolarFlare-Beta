@@ -29,6 +29,7 @@ class AuraStatusSignalReader {
 			return;
 		}
 		if (signal == "status.stacks") {
+			if (present && !s.stacksKnown) { out.code = UNKNOWN_DOMAIN; return; }
 			out.intValue = present ? s.stacks : 0;
 			attachDurationMeta(present, s, out);
 			out.numberValue = out.intValue; out.known = true; out.code = OK;

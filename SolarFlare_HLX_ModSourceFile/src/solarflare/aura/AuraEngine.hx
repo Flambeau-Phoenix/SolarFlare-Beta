@@ -46,12 +46,6 @@ class AuraEngine {
 			timerHero = HealthCache.localHero;
 			clearAllPresentation(cfg);
 		}
-		var hot = frame != null && frame.statusCount > 0;
-		if (!AuraStatusCache.isCurrent(HealthCache.localHero) || solarflare.ObserveDemand.dueAuraStatus(now, hot)) {
-			try
-				AuraStatusCache.sample(HealthCache.localHero)
-			catch (_:Dynamic) {}
-		}
 		initialize();
 		if (solarflare.ObserveDemand.aurasNeedEnemyCast)
 			EnemyCastCache.tick(now);

@@ -31,6 +31,10 @@ class CombatLogLine {
 	public var wallMs:Float = 0;
 	public var targetHp:Float = 0;
 	public var targetMaxHp:Float = 0;
+	/** Snapshotted from GetRiftyCache at commit — convict for Wave B exact rift readers. */
+	public var inRift:Bool = false;
+	public var inBossFight:Bool = false;
+	public var riftRemain:Float = -1;
 	var cachedTimeMs:Float = -1;
 	var cachedTimeText:String = "";
 
@@ -79,6 +83,9 @@ class CombatLogLine {
 			targetHp: round1(targetHp),
 			targetMaxHp: round1(targetMaxHp),
 			targetHpPct: targetMaxHp > 0 ? round2(targetHp / targetMaxHp) : 0,
+			inRift: inRift,
+			inBossFight: inBossFight,
+			riftRemain: round2(riftRemain),
 			t: round2(t),
 			ms: wallMs
 		};
@@ -90,6 +97,8 @@ class CombatLogLine {
 			return "cast";
 		if (k == CombatLogCache.KIND_HIT)
 			return "hit";
+		if (k == CombatLogCache.KIND_ENCOUNTER)
+			return "encounter";
 		return "?";
 	}
 

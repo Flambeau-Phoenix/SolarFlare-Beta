@@ -43,6 +43,8 @@ class HealthCache {
 
 	/** Bumped on every identity change; invalidates the isLocalHero negative ring. */
 	public static var identityGen:Int = 0;
+	/** Observer generation also changes when a character changes on a reused hero. */
+	public static var statusOwnerGen:Int = 0;
 
 	public static function setLocalHero(hero:Dynamic):Void {
 		if (hero == null) {
@@ -60,6 +62,7 @@ class HealthCache {
 
 	/** Drop pinned hero on zone unload / null Player.hero so HL can collect the prior stage. */
 	public static function clearLocalHero():Void {
+		statusOwnerGen++;
 		localHero = null;
 		heroName = "";
 		serverRegion = "";
@@ -112,8 +115,10 @@ class HealthCache {
 	}
 
 	public static function setCharacterId(id:String):Void {
-		if (id != null && id.length > 0 && id != "0")
+		if (id != null && id.length > 0 && id != "0") {
+			if (id != characterId) statusOwnerGen++;
 			characterId = id;
+		}
 	}
 
 	/**
@@ -190,15 +195,7 @@ class HealthCache {
 		valid = Math.isFinite(current) && Math.isFinite(max) && current >= 0 && max > 0;
 	}
 
-	public static function setCurrent(currentHp:Float):Void {
-		current = currentHp;
-		valid = Math.isFinite(current) && Math.isFinite(max) && current >= 0 && max > 0;
-	}
 
-	public static function setMax(maxHp:Float):Void {
-		max = maxHp;
-		valid = Math.isFinite(current) && Math.isFinite(max) && current >= 0 && max > 0;
-	}
 
 	public static function ratio():Float {
 		return clampRatio(current, max);
@@ -492,27 +489,6 @@ class PrayerCache {
 		return false;
 	}
 
-	public static function chargeById(id:String):Void {
-		if (id == null)
-			return;
-		ensureHashes();
-		if (isJudgementKind(id)) {
-			spendAll();
-			return;
-		}
-		var kind = prayerKind(id);
-		if (kind == "life" || id == "life" || id == "heal" || id == "Life" || id == "Heal") {
-			active = true;
-			lifeReady = true;
-		} else if (kind == "shield" || id == "shield" || id == "Shield"
-			|| id.indexOf("virtue") >= 0 || id.indexOf("Virtue") >= 0) {
-			active = true;
-			shieldReady = true;
-		} else if (kind == "smite" || id == "smite" || id == "Smite") {
-			active = true;
-			smiteReady = true;
-		}
-	}
 
 	public static function isJudgementId(id:String):Bool {
 		return isJudgementKind(id);

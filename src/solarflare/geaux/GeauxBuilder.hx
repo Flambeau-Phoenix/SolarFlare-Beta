@@ -266,12 +266,12 @@ class GeauxBuilder {
 		];
 		UiLayout.inlineSplit("##gb_presets_r0", 3, function(index:Int, cellW:Single) {
 			var item = presets[index];
-			if (UiChrome.accentButton(item.label + "##gb_preset_" + index, ImGui.vec2(cellW, 28)))
+			if (UiChrome.ghostButton(item.label + "##gb_preset_" + index, ImGui.vec2(cellW, 28)))
 				applyPreset(item.label, item.r, item.c);
 		});
 		UiLayout.inlineSplit("##gb_presets_r1", 3, function(index:Int, cellW:Single) {
 			var item = presets[index + 3];
-			if (UiChrome.accentButton(item.label + "##gb_preset_" + (index + 3), ImGui.vec2(cellW, 28)))
+			if (UiChrome.ghostButton(item.label + "##gb_preset_" + (index + 3), ImGui.vec2(cellW, 28)))
 				applyPreset(item.label, item.r, item.c);
 		});
 
@@ -292,8 +292,9 @@ class GeauxBuilder {
 							}
 						},
 						function(w:Single) {
-							if (UiChrome.accentButton(
+							if (UiChrome.navButton(
 								swapMode ? "Cancel Swap##gb_swap" : "Swap Mode##gb_swap",
+								swapMode,
 								ImGui.vec2(w, 0)
 							)) {
 								swapMode = !swapMode;
@@ -317,177 +318,188 @@ class GeauxBuilder {
 		UiChrome.sectionHeader("Looks");
 		var style = cfg.style != null ? cfg.style : (cfg.style = new GeauxStyle());
 
-		UiChrome.subHeader("Layout");
-		UiLayout.propertyGrid("##gb_look_layout", function() {
-			UiLayout.propertyRow("Outer pad", function() {
-				if (BuilderSlider.draw("##gb_st_pad", style.padding, 0, 32, "%.0f px")) {
-					cfg.sizeDirty = true;
-					SettingsStore.markDirty();
-				}
-			});
-			UiLayout.propertyRow("Cell gap", function() {
-				if (BuilderSlider.draw("##gb_st_gap", style.gap, 0, 24, "%.0f px"))
-					SettingsStore.markDirty();
-			});
-			UiLayout.propertyRow("Border", function() {
-				if (BuilderSlider.draw("##gb_st_border", style.border, 0, 6, "%.1f px"))
-					SettingsStore.markDirty();
-			});
-			UiLayout.propertyRow("Rounding", function() {
-				if (BuilderSlider.draw("##gb_st_round", style.rounding, 0, 16, "%.0f px"))
-					SettingsStore.markDirty();
-			});
-			UiLayout.propertyRow("Icon scale", function() {
-				if (BuilderSlider.draw("##gb_st_glyph", style.glyphScale, 0.5, 1.4, "%.2f"))
-					SettingsStore.markDirty();
-			});
-			UiLayout.propertyRow("Window alpha", function() {
-				if (BuilderSlider.draw("##gb_st_alpha", style.bgAlpha, 0, 1, "%.2f"))
-					SettingsStore.markDirty();
-			});
-		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
-
-		UiChrome.subHeader("Bar Size");
-		UiLayout.propertyGrid("##gb_bar_size", function() {
-			UiLayout.propertyRow("Width", function() {
-				if (ImGui.sliderFloat("##gb_st_w", cfg.width, GeauxConfig.MIN_W, GeauxConfig.MAX_W, "%.0f px")) { cfg.sizeDirty = true; SettingsStore.markDirty(); }
-			});
-			UiLayout.propertyRow("Height", function() {
-				if (ImGui.sliderFloat("##gb_st_h", cfg.height, GeauxConfig.MIN_H, GeauxConfig.MAX_H, "%.0f px")) { cfg.sizeDirty = true; SettingsStore.markDirty(); }
-			});
-		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
-		ImGui.textDisabled('Grid ${cfg.rows.get()}x${cfg.cols.get()} · cells grow to fill the bar.');
-
-		UiChrome.subHeader("Overlays");
-		UiLayout.propertyGrid("##gb_overlays", function() {
-			UiLayout.propertyRow("Pinwheel", function() { if (ImGui.checkbox("##gb_st_pin", style.showPinwheel)) SettingsStore.markDirty(); });
-			UiLayout.propertyRow("Seconds", function() { if (ImGui.checkbox("##gb_st_cd", style.showCdText)) SettingsStore.markDirty(); });
-			UiLayout.propertyRow("Keybind chips", function() { if (ImGui.checkbox("##gb_st_hk", style.showHotkeys)) SettingsStore.markDirty(); });
-			UiLayout.propertyRow("Charges", function() { if (ImGui.checkbox("##gb_st_ch", style.showCharges)) SettingsStore.markDirty(); });
-			UiLayout.propertyRow("Group tags", function() { if (ImGui.checkbox("##gb_st_tags", style.showGroupTags)) SettingsStore.markDirty(); });
-		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
-
-		UiChrome.subHeader("On Cooldown");
-		UiLayout.propertyGrid("##gb_cd_props", function() {
-			UiLayout.propertyRow("Display", function() {
-				var cdMode = style.effectiveCdDisplay();
-				var cdLabel = switch (cdMode) {
-					case GeauxStyle.CD_HIDE: "Hide while on cooldown";
-					case GeauxStyle.CD_SHOW_FULL: "Always show (no dim)";
-					default: "Show + dim on cooldown";
-				};
-				if (ImGui.beginCombo("##gb_cd_display", cdLabel)) {
-					if (ImGui.selectable("Show + dim on cooldown##gb_cd_dim", cdMode == GeauxStyle.CD_SHOW_DIM)) {
-						style.cdDisplay.set(GeauxStyle.CD_SHOW_DIM);
-						style.dimOnCd.set(true);
+		if (UiChrome.groupHeader("Layout##gb_grp_layout", true)) {
+			UiLayout.propertyGrid("##gb_look_layout", function() {
+				UiLayout.propertyRow("Outer pad", function() {
+					if (BuilderSlider.draw("##gb_st_pad", style.padding, 0, 32, "%.0f px")) {
+						cfg.sizeDirty = true;
 						SettingsStore.markDirty();
 					}
-					if (ImGui.selectable("Hide while on cooldown##gb_cd_hide", cdMode == GeauxStyle.CD_HIDE)) {
-						style.cdDisplay.set(GeauxStyle.CD_HIDE);
-						style.dimOnCd.set(false);
+				});
+				UiLayout.propertyRow("Cell gap", function() {
+					if (BuilderSlider.draw("##gb_st_gap", style.gap, 0, 24, "%.0f px"))
 						SettingsStore.markDirty();
-					}
-					if (ImGui.selectable("Always show (no dim)##gb_cd_full", cdMode == GeauxStyle.CD_SHOW_FULL)) {
-						style.cdDisplay.set(GeauxStyle.CD_SHOW_FULL);
-						style.dimOnCd.set(false);
+				});
+				UiLayout.propertyRow("Border", function() {
+					if (BuilderSlider.draw("##gb_st_border", style.border, 0, 6, "%.1f px"))
 						SettingsStore.markDirty();
-					}
-					ImGui.endCombo();
-				}
-			});
-			UiLayout.propertyRow("Resources", function() {
-				if (ImGui.checkbox("##gb_st_dimnores", style.dimOnNoResource))
-					SettingsStore.markDirty();
-			});
-			UiLayout.propertyRow("Lock bar", function() {
-				if (ImGui.checkbox("##gb_st_lock", cfg.chrome.locked)) SettingsStore.markDirty();
-			});
-		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
+				});
+				UiLayout.propertyRow("Rounding", function() {
+					if (BuilderSlider.draw("##gb_st_round", style.rounding, 0, 16, "%.0f px"))
+						SettingsStore.markDirty();
+				});
+				UiLayout.propertyRow("Icon scale", function() {
+					if (BuilderSlider.draw("##gb_st_glyph", style.glyphScale, 0.5, 1.4, "%.2f"))
+						SettingsStore.markDirty();
+				});
+				UiLayout.propertyRow("Window alpha", function() {
+					if (BuilderSlider.draw("##gb_st_alpha", style.bgAlpha, 0, 1, "%.2f"))
+						SettingsStore.markDirty();
+				});
+			}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
 
-		UiChrome.subHeader("Colors");
-		UiLayout.propertyGrid("##gb_colors", function() {
-			var flags = imgui.Enums.ImGuiColorEditFlags.AlphaBar | imgui.Enums.ImGuiColorEditFlags.NoInputs;
-			UiLayout.propertyRow("Window bg", function() {
-				if (ImGui.colorEdit4("##gb_col_win", style.windowBg, flags))
-					SettingsStore.markDirty();
-			});
-			UiLayout.propertyRow("Empty slot", function() {
-				if (ImGui.colorEdit4("##gb_col_empty", style.emptyFill, flags))
-					SettingsStore.markDirty();
-			});
-			UiLayout.propertyRow("Grid squares", function() {
-				if (ImGui.colorEdit4("##gb_col_ready", style.readyDefault, flags)) {
-					style.syncReadyFillsFromDefault();
-					SettingsStore.markDirty();
-				}
-			});
-			UiLayout.propertyRow("Border ready", function() {
-				if (ImGui.colorEdit4("##gb_col_bready", style.borderReady, flags))
-					SettingsStore.markDirty();
-			});
-			UiLayout.propertyRow("Border idle", function() {
-				if (ImGui.colorEdit4("##gb_col_bidle", style.borderIdle, flags))
-					SettingsStore.markDirty();
-			});
-			UiLayout.propertyRow("CD text", function() {
-				if (ImGui.colorEdit4("##gb_col_cd", style.cdText, flags))
-					SettingsStore.markDirty();
-			});
-		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
-		if (UiChrome.ghostButton("Reset colors##gb_col_reset", ImGui.vec2(-1, 28))) {
-			style.resetColors();
-			SettingsStore.markDirty();
 		}
 
-		UiChrome.subHeader("Vector Glow");
-		UiLayout.propertyGrid("##gb_glow", function() {
-			UiLayout.propertyRow("Glow preset", function() {
-				if (ImGui.beginCombo("##gb_glow_preset", "Choose color")) {
-					for (i in 0...glowNames.length) if (ImGui.selectable(glowNames[i])) {
-						snapshot("Glow preset"); style.setGlowRgb(glowRgb[i]); SettingsStore.markDirty();
-					}
-					ImGui.endCombo();
-				}
-			});
-			UiLayout.propertyRow("Custom hex", function() {
-				var before = cfg.dumpLayout();
-				var changed = ImGui.colorEdit4("##gb_glow_hex", style.readyGlowColor, imgui.Enums.ImGuiColorEditFlags.DisplayHex);
-				if (ImGui.isItemActivated()) glowEditBefore = before;
-				if (changed) SettingsStore.markDirty();
-				if (ImGui.isItemDeactivatedAfterEdit() && glowEditBefore != null) {
-					undoMgr.push("Glow color", glowEditBefore); glowEditBefore = null;
-				}
-			});
-			UiLayout.propertyRow("Ready glow", function() {
-				var modes = ["None", "Pulse", "Bright", "Aura glow"];
-				var current = style.readyAttention.get();
-				if (ImGui.beginCombo("##gb_ready_attention", modes[current >= 0 && current < modes.length ? current : 0])) {
-					for (i in 0...modes.length) if (ImGui.selectable(modes[i], current == i)) { snapshot("Ready glow"); style.readyAttention.set(i); SettingsStore.markDirty(); }
-					ImGui.endCombo();
-				}
-			}, "Cooldown completion flashes for 15 seconds.");
-			// Shared appearance settings for cooldown-completion flashes.
-			UiLayout.propertyRow("Glow style", function() {
-				if (ImGui.beginCombo("##gb_glow_style", style.glowStyle)) {
-					for (name in ["proc", "soft", "pulse"]) if (ImGui.selectable(name + "##gb_gs_" + name, style.glowStyle == name)) {
-						snapshot("Glow style"); style.glowStyle = name; SettingsStore.markDirty();
-					}
-					ImGui.endCombo();
-				}
-			});
-			UiLayout.propertyRow("Strength", function() drawGlowNumber("##gb_glow_strength", style.glowStrength, false));
-			UiLayout.propertyRow("Outside spread", function() drawGlowNumber("##gb_glow_outer", style.glowOuter, true));
-			UiLayout.propertyRow("Inside spread", function() drawGlowNumber("##gb_glow_inner", style.glowInner, true));
-			UiLayout.propertyRow("Cooldown glow", function() {
-				var modes = ["None", "Dim", "Outline"];
-				var current = style.cooldownAttention.get();
-				if (ImGui.beginCombo("##gb_cd_attention", modes[current >= 0 && current < 3 ? current : 0])) {
-					for (i in 0...3) if (ImGui.selectable(modes[i], current == i)) { snapshot("Cooldown glow"); style.cooldownAttention.set(i); SettingsStore.markDirty(); }
-					ImGui.endCombo();
-				}
-			});
-		}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
+		if (UiChrome.groupHeader("Bar Size##gb_grp_size", false)) {
+			UiLayout.propertyGrid("##gb_bar_size", function() {
+				UiLayout.propertyRow("Width", function() {
+					if (ImGui.sliderFloat("##gb_st_w", cfg.width, GeauxConfig.MIN_W, GeauxConfig.MAX_W, "%.0f px")) { cfg.sizeDirty = true; SettingsStore.markDirty(); }
+				});
+				UiLayout.propertyRow("Height", function() {
+					if (ImGui.sliderFloat("##gb_st_h", cfg.height, GeauxConfig.MIN_H, GeauxConfig.MAX_H, "%.0f px")) { cfg.sizeDirty = true; SettingsStore.markDirty(); }
+				});
+			}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
+			ImGui.textDisabled('Grid ${cfg.rows.get()}x${cfg.cols.get()} · cells grow to fill the bar.');
 
+		}
+
+		if (UiChrome.groupHeader("Overlays##gb_grp_overlays", false)) {
+			UiLayout.propertyGrid("##gb_overlays", function() {
+				UiLayout.propertyRow("Pinwheel", function() { if (ImGui.checkbox("##gb_st_pin", style.showPinwheel)) SettingsStore.markDirty(); });
+				UiLayout.propertyRow("Seconds", function() { if (ImGui.checkbox("##gb_st_cd", style.showCdText)) SettingsStore.markDirty(); });
+				UiLayout.propertyRow("Keybind chips", function() { if (ImGui.checkbox("##gb_st_hk", style.showHotkeys)) SettingsStore.markDirty(); });
+				UiLayout.propertyRow("Charges", function() { if (ImGui.checkbox("##gb_st_ch", style.showCharges)) SettingsStore.markDirty(); });
+				UiLayout.propertyRow("Stacks", function() { if (ImGui.checkbox("##gb_st_stacks", style.showStacks)) SettingsStore.markDirty(); }, "SkillScript stack count when > 1 (corner badge).");
+				UiLayout.propertyRow("Group tags", function() { if (ImGui.checkbox("##gb_st_tags", style.showGroupTags)) SettingsStore.markDirty(); });
+			}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
+
+		}
+
+		if (UiChrome.groupHeader("On Cooldown##gb_grp_cd", false)) {
+			UiLayout.propertyGrid("##gb_cd_props", function() {
+				UiLayout.propertyRow("Display", function() {
+					var cdMode = style.effectiveCdDisplay();
+					var cdLabel = switch (cdMode) {
+						case GeauxStyle.CD_HIDE: "Hide while on cooldown";
+						case GeauxStyle.CD_SHOW_FULL: "Always show (no dim)";
+						default: "Show + dim on cooldown";
+					};
+					if (ImGui.beginCombo("##gb_cd_display", cdLabel)) {
+						if (ImGui.selectable("Show + dim on cooldown##gb_cd_dim", cdMode == GeauxStyle.CD_SHOW_DIM)) {
+							style.cdDisplay.set(GeauxStyle.CD_SHOW_DIM);
+							style.dimOnCd.set(true);
+							SettingsStore.markDirty();
+						}
+						if (ImGui.selectable("Hide while on cooldown##gb_cd_hide", cdMode == GeauxStyle.CD_HIDE)) {
+							style.cdDisplay.set(GeauxStyle.CD_HIDE);
+							style.dimOnCd.set(false);
+							SettingsStore.markDirty();
+						}
+						if (ImGui.selectable("Always show (no dim)##gb_cd_full", cdMode == GeauxStyle.CD_SHOW_FULL)) {
+							style.cdDisplay.set(GeauxStyle.CD_SHOW_FULL);
+							style.dimOnCd.set(false);
+							SettingsStore.markDirty();
+						}
+						ImGui.endCombo();
+					}
+				});
+				UiLayout.propertyRow("Resources", function() {
+					if (ImGui.checkbox("##gb_st_dimnores", style.dimOnNoResource))
+						SettingsStore.markDirty();
+				});
+				UiLayout.propertyRow("Lock bar", function() {
+					if (ImGui.checkbox("##gb_st_lock", cfg.chrome.locked)) SettingsStore.markDirty();
+				});
+			}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
+
+		}
+
+		if (UiChrome.groupHeader("Colors##gb_grp_colors", false)) {
+			UiLayout.propertyGrid("##gb_colors", function() {
+				var flags = imgui.Enums.ImGuiColorEditFlags.AlphaBar | imgui.Enums.ImGuiColorEditFlags.NoInputs;
+				UiLayout.propertyRow("Window bg", function() {
+					if (ImGui.colorEdit4("##gb_col_win", style.windowBg, flags))
+						SettingsStore.markDirty();
+				});
+				UiLayout.propertyRow("Empty slot", function() {
+					if (ImGui.colorEdit4("##gb_col_empty", style.emptyFill, flags))
+						SettingsStore.markDirty();
+				});
+				UiLayout.propertyRow("Grid squares", function() {
+					if (ImGui.colorEdit4("##gb_col_ready", style.readyDefault, flags)) {
+						style.syncReadyFillsFromDefault();
+						SettingsStore.markDirty();
+					}
+				});
+				UiLayout.propertyRow("Border ready", function() {
+					if (ImGui.colorEdit4("##gb_col_bready", style.borderReady, flags))
+						SettingsStore.markDirty();
+				});
+				UiLayout.propertyRow("Border idle", function() {
+					if (ImGui.colorEdit4("##gb_col_bidle", style.borderIdle, flags))
+						SettingsStore.markDirty();
+				});
+				UiLayout.propertyRow("CD text", function() {
+					if (ImGui.colorEdit4("##gb_col_cd", style.cdText, flags))
+						SettingsStore.markDirty();
+				});
+			}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
+			if (UiChrome.ghostButton("Reset colors##gb_col_reset", ImGui.vec2(-1, 28))) {
+				style.resetColors();
+				SettingsStore.markDirty();
+			}
+
+		}
+
+		if (UiChrome.groupHeader("Vector Glow##gb_grp_glow", false)) {
+			UiLayout.propertyGrid("##gb_glow", function() {
+				UiLayout.propertyRow("Glow preset", function() {
+					if (ImGui.beginCombo("##gb_glow_preset", "Choose color")) {
+						for (i in 0...glowNames.length) if (ImGui.selectable(glowNames[i])) {
+							snapshot("Glow preset"); style.setGlowRgb(glowRgb[i]); SettingsStore.markDirty();
+						}
+						ImGui.endCombo();
+					}
+				});
+				UiLayout.propertyRow("Custom hex", function() {
+					var before = cfg.dumpLayout();
+					var changed = ImGui.colorEdit4("##gb_glow_hex", style.readyGlowColor, imgui.Enums.ImGuiColorEditFlags.DisplayHex);
+					if (ImGui.isItemActivated()) glowEditBefore = before;
+					if (changed) SettingsStore.markDirty();
+					if (ImGui.isItemDeactivatedAfterEdit() && glowEditBefore != null) {
+						undoMgr.push("Glow color", glowEditBefore); glowEditBefore = null;
+					}
+				});
+				UiLayout.propertyRow("Ready glow", function() {
+					var modes = ["None", "Pulse", "Bright", "Aura glow"];
+					var current = style.readyAttention.get();
+					if (ImGui.beginCombo("##gb_ready_attention", modes[current >= 0 && current < modes.length ? current : 0])) {
+						for (i in 0...modes.length) if (ImGui.selectable(modes[i], current == i)) { snapshot("Ready glow"); style.readyAttention.set(i); SettingsStore.markDirty(); }
+						ImGui.endCombo();
+					}
+				}, "Cooldown completion flashes for 15 seconds.");
+				// Shared appearance settings for cooldown-completion flashes.
+				UiLayout.propertyRow("Glow style", function() {
+					if (ImGui.beginCombo("##gb_glow_style", style.glowStyle)) {
+						for (name in ["proc", "soft", "pulse"]) if (ImGui.selectable(name + "##gb_gs_" + name, style.glowStyle == name)) {
+							snapshot("Glow style"); style.glowStyle = name; SettingsStore.markDirty();
+						}
+						ImGui.endCombo();
+					}
+				});
+				UiLayout.propertyRow("Strength", function() drawGlowNumber("##gb_glow_strength", style.glowStrength, false));
+				UiLayout.propertyRow("Outside spread", function() drawGlowNumber("##gb_glow_outer", style.glowOuter, true));
+				UiLayout.propertyRow("Inside spread", function() drawGlowNumber("##gb_glow_inner", style.glowInner, true));
+				UiLayout.propertyRow("Cooldown glow", function() {
+					var modes = ["None", "Dim", "Outline"];
+					var current = style.cooldownAttention.get();
+					if (ImGui.beginCombo("##gb_cd_attention", modes[current >= 0 && current < 3 ? current : 0])) {
+						for (i in 0...3) if (ImGui.selectable(modes[i], current == i)) { snapshot("Cooldown glow"); style.cooldownAttention.set(i); SettingsStore.markDirty(); }
+						ImGui.endCombo();
+					}
+				});
+			}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
+		}
 		if (showDiag) {
 			UiChrome.sectionHeader("Diagnostics");
 			if (diagRevision != layoutRevision) {
@@ -681,7 +693,7 @@ class GeauxBuilder {
 
 			ImGui.sameLine(0, 6);
 			ImGui.setCursorPosY(ImGui.getCursorPosY() + (rowH - 28) * 0.5);
-			if (UiChrome.accentButton("Assign##asn", ImGui.vec2(78, 28)))
+			if (UiChrome.ghostButton("Assign##asn", ImGui.vec2(78, 28)))
 				assignSkill(skill.id);
 
 			ImGui.popID();

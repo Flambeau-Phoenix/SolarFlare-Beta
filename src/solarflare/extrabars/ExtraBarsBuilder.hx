@@ -58,6 +58,7 @@ class ExtraBarsBuilder {
  // A drag or typed slider edit is one undo step, even when it spans many frames.
  function slider(label:String,value:Int,min:Int,max:Int,set:Int->Void):Void {
   intRef.set(value); var before = owner.model.dump();
+  ImGui.setNextItemWidth(Math.min(260,ImGui.getContentRegionAvail().x));
   if (ImGui.sliderInt(label,intRef,min,max)) {
    if (gestureBefore == null) { gestureBefore = before; gestureAction = label; }
    set(intRef.get()); SettingsStore.markDirty();
@@ -206,21 +207,7 @@ class ExtraBarsBuilder {
    ImGui.endTabBar();
   }
  }
- function beginPageTab(label:String):Bool {
-  var theme = solarflare.ui.ThemePalette.current();
-  // Flat native tabs with an accent overline distinguish navigation from actions.
-  ImGui.pushStyleVar(ImGuiStyleVar.TabRounding,3);
-  ImGui.pushStyleVar(ImGuiStyleVar.FramePadding,ImGui.vec2(14,8));
-  ImGui.pushStyleColor(ImGuiCol.Tab,theme.windowBg);
-  ImGui.pushStyleColor(ImGuiCol.TabSelected,theme.cellBg);
-  ImGui.pushStyleColor(ImGuiCol.TabHovered,theme.border);
-  ImGui.pushStyleColor(ImGuiCol.TabSelectedOverline,theme.accent);
-  var shown=false;
-  try { shown=ImGui.beginTabItem(label); }
-  catch(e:Dynamic) { ImGui.popStyleColor(4); ImGui.popStyleVar(2); throw e; }
-  ImGui.popStyleColor(4); ImGui.popStyleVar(2);
-  return shown;
- }
+ function beginPageTab(label:String):Bool return UiChrome.beginTabItem(label);
  function drawDiagnostics():Void {
   UiChrome.subHeader("Runtime status");
   ImGui.textWrapped(owner.gate.length>0?owner.gate:"Gameplay eligible.");
@@ -296,17 +283,19 @@ class ExtraBarsBuilder {
    // Navigation can select another bar in this frame.
    bar = owner.model.find(selectedBar);
    if (bar!=null && selectedCell>=bar.slotCount) selectedCell=bar.slotCount-1;
-   if (ImGui.getContentRegionAvail().x>=720) {
-    UiLayout.inlinePair("##extra_primary_setup",function(_:Single) {
+   if (UiChrome.groupHeader("Activation and cell keybind##extra_setup_group",true)) {
+    if (ImGui.getContentRegionAvail().x>=720) {
+     UiLayout.inlinePair("##extra_primary_setup",function(_:Single) {
+      focusPanel("##extra_activation_focus","Activation / all bars",drawActivation);
+     },function(_:Single) {
+      focusPanel("##extra_keybind_focus","Cell keybind",function() drawKeybind(bar));
+     },12);
+    } else {
      focusPanel("##extra_activation_focus","Activation / all bars",drawActivation);
-    },function(_:Single) {
      focusPanel("##extra_keybind_focus","Cell keybind",function() drawKeybind(bar));
-    },12);
-   } else {
-    focusPanel("##extra_activation_focus","Activation / all bars",drawActivation);
-    focusPanel("##extra_keybind_focus","Cell keybind",function() drawKeybind(bar));
+    }
    }
-   ImGui.spacing(); ImGui.separator(); ImGui.spacing();
+   ImGui.spacing();
    if (bar != null) {
     if (selectedCell >= bar.slotCount) selectedCell = bar.slotCount-1;
     var available=ImGui.getContentRegionAvail();
@@ -371,14 +360,19 @@ class ExtraBarsBuilder {
       change("Spark hotkey label",function() owner.model.sparkHotkeyLabel=pendingSparkHotkey);
     },"Display only. Type your in-game hotkey, such as Q or Ctrl+Q (up to 32 characters).");
    });
-   ImGui.textWrapped("Charged or empty. Click to use; refill at the Obelisks' waters. During Spark surge, see the countdown and damage dealt; afterward, see the burst result. Hover for details.");
-   UiChrome.subHeader("Current observation");
-   UiLayout.propertyGrid("##extra_spark_observation",function() {
-    UiLayout.propertyRow("Cube",function() ImGui.text(owner.spark.label));
-    UiLayout.propertyRow("Damage dealt",function() ImGui.text(owner.spark.state.started>=0 ? Std.string(owner.spark.state.observedDamage)+(owner.spark.state.partial?" *":"") : "Waiting for a Spark surge."));
-    UiLayout.propertyRow("Last burst",function() ImGui.text(owner.spark.state.burstAt>=0 ? Std.string(owner.spark.state.burstDamage) : "Waiting for a burst."));
-   });
-   ImGui.textWrapped("These are observed game values. * indicates a partial observation. The tracker can stay enabled when the consumable bars are off.");
+   ImGui.spacing();
+   UiLayout.inlinePair("##extra_spark_cols",function(_:Single) {
+    UiChrome.subHeader("Current observation");
+    UiLayout.propertyGrid("##extra_spark_observation",function() {
+     UiLayout.propertyRow("Cube",function() ImGui.text(owner.spark.label));
+     UiLayout.propertyRow("Damage dealt",function() ImGui.text(owner.spark.state.started>=0 ? Std.string(owner.spark.state.observedDamage)+(owner.spark.state.partial?" *":"") : "Waiting for a Spark surge."));
+     UiLayout.propertyRow("Last burst",function() ImGui.text(owner.spark.state.burstAt>=0 ? Std.string(owner.spark.state.burstDamage) : "Waiting for a burst."));
+    });
+   },function(_:Single) {
+    UiChrome.subHeader("How it works");
+    ImGui.textWrapped("Charged or empty. Click to use; refill at the Obelisks' waters. During Spark surge, see the countdown and damage dealt; afterward, see the burst result. Hover for details.");
+    ImGui.textDisabled("These are observed game values. * indicates a partial observation. The tracker can stay enabled when the consumable bars are off.");
+   },16);
  }
  function drawProperties(bar:ExtraBarsBarConfig):Void {
   if (nameOwner != bar.id) { ByteUtil.fillBuf(nameBuf,192,bar.name); pendingName=bar.name; nameOwner=bar.id; }
@@ -393,6 +387,7 @@ class ExtraBarsBuilder {
    UiLayout.propertyRow("Transparent",function() check("##bar_trans",bar.transparent,function(v) bar.transparent=v));
    UiLayout.propertyRow("Opacity",function() {
     floatRef.set(bar.opacity); var before=owner.model.dump();
+    ImGui.setNextItemWidth(Math.min(260,ImGui.getContentRegionAvail().x));
     if (ImGui.sliderFloat("##bar_opacity",floatRef,0.15,1,"%.2f")) {
      if (gestureBefore==null) { gestureBefore=before; gestureAction="Opacity"; }
      bar.opacity=floatRef.get(); SettingsStore.markDirty();

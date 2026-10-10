@@ -16,7 +16,7 @@ class AttackComboRenderer {
 	public static function draw(step:Int, length:Int, flashFinal:Bool, withinCombo:Bool, cfg:AttackComboConfig, rowW:Single, rowH:Single):Void {
 		if (cfg == null)
 			return;
-		if (cfg.comboType.get() == 1 && drawCustom(cfg, step, rowW, rowH))
+		if (cfg.comboType.get() == 1 && drawCustom(cfg, step, rowW, rowH, flashFinal))
 			return;
 
 		tracker.displayMode = cfg.displayMode != null ? cfg.displayMode.get() : 0;
@@ -29,11 +29,11 @@ class AttackComboRenderer {
 		tracker.draw(step, length, flashFinal, withinCombo, rowW, rowH);
 	}
 
-	public static function drawCustom(cfg:AttackComboConfig, step:Int, rowW:Single, rowH:Single):Bool {
+	public static function drawCustom(cfg:AttackComboConfig, step:Int, rowW:Single, rowH:Single, flashFinal:Bool = false):Bool {
 		if (!AttackComboArt.isLoaded())
 			return false;
 		var customStyle = cfg.customStyle.get();
-		var chosen = AttackComboArt.candidate(customStyle, step);
+		var chosen = AttackComboArt.candidate(customStyle, step, flashFinal);
 		if (chosen.length == 0 || GameIcons.cachedW(chosen) <= 0)
 			return false;
 		var tw = GameIcons.cachedW(chosen);

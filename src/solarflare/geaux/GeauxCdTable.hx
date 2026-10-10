@@ -119,23 +119,7 @@ class GeauxCdTable {
 		return row != null && row.cdEnabledOnly;
 	}
 
-	public static function chargesFor(id:String):Int {
-		var row = rowOf(id);
-		if (row == null || row.charges < 1)
-			return 0;
-		return row.charges;
-	}
 
-	public static function chargesForAliases(ids:Array<String>):Int {
-		if (ids == null)
-			return 0;
-		for (id in ids) {
-			var n = chargesFor(id);
-			if (n > 0)
-				return n;
-		}
-		return 0;
-	}
 
 	/**
 	 * Prefer live effective max. If it is missing or still the CDB base while a rank
