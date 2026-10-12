@@ -309,6 +309,13 @@ class ConduitConfig {
  * Movable pip gauge for mage conduits. Reads ConduitCache only.
  */
 class ConduitOverlay {
+	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
+	var hudCfg:ConduitConfig;
+	var hudBodyFn:imgui.Structs.ImVec2->Void;
+	var hudHideFn:Void->Void;
+	var hudResizeFn:Single->Single->Void;
+	var hudWindowFn:Void->Void;
+
 	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
 		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
 	static inline var PAD:Single = 4;
@@ -316,6 +323,11 @@ class ConduitOverlay {
 	var theme:Theme;
 
 	public function new() {
+		hudBodyFn = hudBody;
+		hudHideFn = hudHide;
+		hudResizeFn = hudResize;
+		hudWindowFn = hudWindow;
+
 		theme = new Theme()
 			.varV(ImGuiStyleVar.WindowPadding, ImGui.vec2(PAD, PAD))
 			.varF(ImGuiStyleVar.WindowRounding, 4)
@@ -330,23 +342,17 @@ class ConduitOverlay {
 			return;
 		if (!ConduitCache.active)
 			return;
-		theme.wrap(() -> drawWindow(cfg));
+		hudCfg = cfg;
+		theme.wrap(hudWindowFn);
 	}
 
 	public var openBuilder:Void->Void;
 	function drawWindow(cfg:ConduitConfig):Void {
 		var w:Single = Math.max(ConduitConfig.MIN_W, Math.min(ConduitConfig.MAX_W, cfg.width.get()));
 		var h:Single = Math.max(38, cfg.height.get());
-		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Conduits", "Conduits", cfg.chrome, w, h, function(size) {
-			var p = ImGui.getCursorScreenPos();
-			ImGui.dummy(size);
-			ImGui.setCursorScreenPos(ImGui.vec2(p.x+4, p.y+4));
-			drawSlots(size.x-8, size.y-8, cfg);
-		}, openBuilder, function() { cfg.hidden.set(true); SettingsStore.markDirty(); }, false, null, function(newW:Single, newH:Single) {
-			cfg.width.set(Math.max(ConduitConfig.MIN_W, Math.min(ConduitConfig.MAX_W, newW)));
-			cfg.height.set(Math.max(38, newH));
-			SettingsStore.markDirty();
-		});
+		hudCfg = cfg;
+		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Conduits", "Conduits", cfg.chrome, w, h, hudBodyFn, openBuilder, hudHideFn, false, null, hudResizeFn);
+		hudCfg = null;
 	}
 
 	static function drawSlots(rowW:Single, rowH:Single, cfg:ConduitConfig):Void {
@@ -518,4 +524,26 @@ class ConduitOverlay {
 				ImGui.colorConvertFloat4ToU32(ImGui.vec4(1, 1, 1, 0.95)), stackText);
 		}
 	}
+
+	function hudBody(size:imgui.Structs.ImVec2):Void {
+		var cfg = hudCfg;
+		var p = ImGui.getCursorScreenPos();
+		ImGui.dummy(size);
+		ImGui.setCursorScreenPos(ImGui.vec2(p.x+4, p.y+4));
+		drawSlots(size.x-8, size.y-8, cfg);
+	}
+
+	function hudHide():Void {
+		var cfg = hudCfg;
+		cfg.hidden.set(true); SettingsStore.markDirty();
+	}
+
+	function hudResize(newW:Single, newH:Single):Void {
+		var cfg = hudCfg;
+		cfg.width.set(Math.max(ConduitConfig.MIN_W, Math.min(ConduitConfig.MAX_W, newW)));
+		cfg.height.set(Math.max(38, newH));
+		SettingsStore.markDirty();
+	}
+
+	function hudWindow():Void { drawWindow(hudCfg); }
 }

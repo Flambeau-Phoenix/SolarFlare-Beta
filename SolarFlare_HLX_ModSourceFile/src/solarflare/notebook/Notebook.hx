@@ -8,6 +8,9 @@ import solarflare.ui.ByteUtil;
 import solarflare.ui.ToastManager;
 import solarflare.ui.VectorGlow;
 import solarflare.ui.SearchBar;
+import solarflare.ui.ThemePalette;
+import solarflare.ui.UiLayout;
+import solarflare.ui.UiScope;
 import imgui.ImGui;
 import imgui.Enums.ImGuiCol;
 import imgui.Enums.ImGuiChildFlags;
@@ -56,6 +59,9 @@ class Notebook {
 	var searchBar = new SearchBar("Filter pages...", 64);
 	var searchText:String = "";
 	var searchActive:Bool = false;
+	var wordCount:Int = 0;
+	var deleteArmedPage:String = "";
+	var deleteArmedUntil:Float = 0;
 	var pageColors:Array<Int> = [
 		0xFF3344AA, 0xFF44AA33, 0xFFAA4433,
 		0xFF8844AA, 0xFF33AAAA, 0xFFAA8833
@@ -69,6 +75,10 @@ class Notebook {
 			addPage(false);
 		selectIndex(0);
 	}
+
+	public function pageCount():Int return pages.length;
+
+	public function hasUnsavedChanges():Bool return dirty;
 
 	public function draw():Void {
 		if (!open.get()) {
@@ -92,11 +102,11 @@ class Notebook {
 			ImGui.separator();
 
 			var avail = ImGui.getContentRegionAvail();
-			var leftW:Single = 230;
+			var leftW:Single = 240;
 			if (leftW > avail.x * 0.35)
 				leftW = avail.x * 0.35;
-			if (leftW < 140)
-				leftW = 140;
+			if (leftW < 150)
+				leftW = 150;
 
 			drawPageList(leftW, avail.y - 4);
 			ImGui.sameLine();
@@ -107,116 +117,183 @@ class Notebook {
 	}
 
 	function drawToolbar():Void {
-		ImGui.text('${pages.length} pages');
-		ImGui.sameLine(ImGui.getWindowWidth() - 150);
-
-		if (dirty) {
-			ImGui.textColored(ImGui.vec4(1.0, 0.8, 0.2, 1.0), "Saving...");
-		} else {
-			ImGui.textColored(ImGui.vec4(0.4, 0.85, 0.4, 1.0), "Saved to disk");
-		}
+		ImGui.text(Std.string(pages.length) + " / " + Std.string(MAX_PAGES) + " pages");
+		var label = dirty ? "Saving..." : "Saved to disk";
+		var width = ImGui.calcTextSize(label).x;
+		ImGui.sameLine(0, 0);
+		ImGui.setCursorPosX(Math.max(ImGui.getCursorPosX() + 12, ImGui.getWindowWidth() - width - 20));
+		ImGui.textColored(ThemePalette.status(dirty ? ThemePalette.STATUS_WARN : ThemePalette.STATUS_SUCCESS), label);
 	}
 
 	function drawPageList(width:Float, height:Float):Void {
-		if (ImGui.beginChild("##nb_list", ImGui.vec2(width, height), 0)) {
+		UiScope.child("##nb_list", ImGui.vec2(width, height), function() {
 			// Search bar
 			searchText = searchBar.draw("##nb_search");
 			searchActive = searchText.length > 0;
 
-			ImGui.separator();
-
-			// Action buttons with icons
-			if (ImGui.button("New##nb_add", ImGui.vec2(54, 22))) {
-				addPage(true);
-				ToastManager.success("New page created!");
-			}
-			ImGui.sameLine();
-
-			if (ImGui.button("Delete##nb_del", ImGui.vec2(64, 22))) {
-				if (pages.length > 1) {
-					deleteSelected();
-					ToastManager.info("Page deleted.");
-				} else {
-					ToastManager.warn("Cannot delete the last page.");
+			// Page actions: equal thirds, delete needs a second click.
+			var armed = deleteArmedPage != "" && nowMs() < deleteArmedUntil;
+			UiLayout.inlineSplit("##nb_actions", 3, function(i:Int, w:Single) {
+				switch (i) {
+					case 0:
+						if (ImGui.button("New##nb_add", ImGui.vec2(w, 24))) {
+							addPage(true);
+							ToastManager.success("New page created!");
+						}
+					case 1:
+						if (ImGui.button("Duplicate##nb_dup", ImGui.vec2(w, 24))) {
+							duplicateSelected();
+							ToastManager.success("Page duplicated!");
+						}
+					default:
+						var cur = current();
+						var armedHere = armed && cur != null && cur.id == deleteArmedPage;
+						if (armedHere)
+							ImGui.pushStyleColor(ImGuiCol.Button, ThemePalette.status(ThemePalette.STATUS_DANGER));
+						var clicked = ImGui.button((armedHere ? "Confirm?" : "Delete") + "##nb_del", ImGui.vec2(w, 24));
+						if (armedHere)
+							ImGui.popStyleColor();
+						if (clicked)
+							requestDelete(cur, armedHere);
 				}
-			}
-			ImGui.sameLine();
-
-			if (ImGui.button("Copy##nb_dup", ImGui.vec2(58, 22))) {
-				duplicateSelected();
-				ToastManager.success("Page duplicated!");
-			}
-
+			}, 4);
 			ImGui.separator();
 
 			// Page list
-			ImGui.beginChild("##nb_scroll", ImGui.vec2(width - 4, height - 90));
+			UiScope.child("##nb_scroll", ImGui.vec2(0, 0), function() {
+				var filteredPages = getFilteredPages();
+				if (filteredPages.length == 0 && searchActive)
+					ImGui.textDisabled("No matches found.");
 
-			var filteredPages = getFilteredPages();
-			if (filteredPages.length == 0 && searchActive) {
-				ImGui.textColored(ImGui.vec4(0.6, 0.6, 0.6, 1.0), "No matches found.");
-			}
+				var textW = ImGui.getContentRegionAvail().x - 8;
+				var now = nowMs();
+				for (i in 0...filteredPages.length) {
+					var p = filteredPages[i];
+					var realIdx = pages.indexOf(p);
+					if (realIdx < 0)
+						continue;
 
-			for (i in 0...filteredPages.length) {
-				var p = filteredPages[i];
-				var realIdx = pages.indexOf(p);
-				if (realIdx < 0)
-					continue;
-
-				var isSelected = selected.get() == realIdx;
-
-				var label = (p.title != null && p.title.length > 0) ? p.title : ("Page " + Std.string(realIdx + 1));
-				var truncated = label.length > 20 ? label.substr(0, 18) + "…" : label;
-
-				if (ImGui.selectable(truncated + "##nb" + p.id, isSelected)) {
-					if (!isSelected) {
-						selectIndex(realIdx);
+					var isSelected = selected.get() == realIdx;
+					var label = (p.title != null && p.title.length > 0) ? p.title : ("Page " + Std.string(realIdx + 1));
+					if (ImGui.selectable(fitText(label, textW) + "##nb" + p.id, isSelected)) {
+						if (!isSelected)
+							selectIndex(realIdx);
 					}
+					ImGui.textDisabled("  " + fitText(ago(now, p.modified) + "  " + preview(p.body), textW - 8));
 				}
-
-			}
-
-			ImGui.endChild();
-		}
-		ImGui.endChild();
+			});
+		});
 	}
 
 	function drawEditor(width:Float, height:Float):Void {
-		if (ImGui.beginChild("##nb_edit", ImGui.vec2(width, height), 0)) {
+		UiScope.child("##nb_edit", ImGui.vec2(width, height), function() {
 			ensureSelection();
 			var page = current();
-			if (page != null) {
-				// Title input
-				ImGui.setNextItemWidth(width - 120);
-				if (ImGui.inputText("##nb_title", titleBuf, TITLE_BUF)) {
-					page.title = bytesToString(titleBuf, TITLE_BUF);
-					if (page.title.length == 0)
-						page.title = "Untitled";
-					page.modified = Date.now().getTime();
+			if (page == null) {
+				ImGui.textDisabled("No pages available.");
+				ImGui.text("Click 'New' to create your first page.");
+				return;
+			}
+
+			// Title input leaves room for the word count on the same row.
+			var counter = Std.string(wordCount) + " words";
+			var reserve = ImGui.calcTextSize(counter).x + 24;
+			ImGui.setNextItemWidth(Math.max(80, width - reserve));
+			if (ImGui.inputText("##nb_title", titleBuf, TITLE_BUF)) {
+				page.title = bytesToString(titleBuf, TITLE_BUF);
+				if (page.title.length == 0)
+					page.title = "Untitled";
+				page.modified = nowMs();
+				markDirty();
+			}
+			ImGui.sameLine();
+			ImGui.textDisabled(counter);
+			ImGui.separator();
+
+			var editAvail = ImGui.getContentRegionAvail();
+			if (editAvail.y > 40) {
+				if (ImGui.inputTextMultiline("##nb_body", bodyBuf, BODY_BUF, ImGui.vec2(editAvail.x, editAvail.y - 4))) {
+					page.body = bytesToString(bodyBuf, BODY_BUF);
+					page.modified = nowMs();
+					wordCount = countWords(page.body);
 					markDirty();
 				}
-
-				ImGui.sameLine();
-				var wordCount = page.body.length > 0 ? page.body.split(" ").length : 0;
-				ImGui.textDisabled(Std.string(wordCount) + " words");
-
-				ImGui.separator();
-
-				// Body editor
-				var editAvail = ImGui.getContentRegionAvail();
-				if (editAvail.y > 40) {
-					if (ImGui.inputTextMultiline("##nb_body", bodyBuf, BODY_BUF, ImGui.vec2(editAvail.x, editAvail.y - 4))) {
-						page.body = bytesToString(bodyBuf, BODY_BUF);
-						page.modified = Date.now().getTime();
-						markDirty();
-					}
-				}
-			} else {
-				ImGui.textColored(ImGui.vec4(0.6, 0.6, 0.6, 1.0), "No pages available.");
-				ImGui.text("Click 'New' to create your first page.");
 			}
+		});
+	}
+
+	/** First click arms the page; a second click on the same page within 4s removes it. */
+	function requestDelete(page:NotebookPage, confirmed:Bool):Void {
+		if (page == null)
+			return;
+		if (pages.length <= 1) {
+			ToastManager.warn("Cannot delete the last page.");
+			return;
 		}
-		ImGui.endChild();
+		if (confirmed) {
+			deleteArmedPage = "";
+			deleteSelected();
+			ToastManager.info("Page deleted.");
+			return;
+		}
+		deleteArmedPage = page.id;
+		deleteArmedUntil = nowMs() + 4000;
+		ToastManager.info("Click Confirm? to delete \"" + fitText(page.title, 240) + "\".");
+	}
+
+	/** Trims with an ellipsis so the rendered text fits the given pixel width. */
+	static function fitText(s:String, maxW:Float):String {
+		if (s == null || s.length == 0 || maxW <= 0)
+			return "";
+		if (ImGui.calcTextSize(s).x <= maxW)
+			return s;
+		var n = s.length;
+		var guess = Std.int(n * (maxW / ImGui.calcTextSize(s).x));
+		if (guess >= n)
+			guess = n - 1;
+		while (guess > 1 && ImGui.calcTextSize(s.substr(0, guess) + "...").x > maxW)
+			guess--;
+		return s.substr(0, guess) + "...";
+	}
+
+	/** First non-empty line of a body, collapsed to a single short run. */
+	static function preview(body:String):String {
+		if (body == null || body.length == 0)
+			return "(empty)";
+		var lines = body.split("\n");
+		for (l in lines) {
+			var t = StringTools.trim(l);
+			if (t.length > 0)
+				return t.length > 80 ? t.substr(0, 80) : t;
+		}
+		return "(empty)";
+	}
+
+	static function ago(now:Float, then:Float):String {
+		var s = (now - then) / 1000;
+		if (s < 60)
+			return "just now";
+		if (s < 3600)
+			return Std.string(Std.int(s / 60)) + "m ago";
+		if (s < 86400)
+			return Std.string(Std.int(s / 3600)) + "h ago";
+		return Std.string(Std.int(s / 86400)) + "d ago";
+	}
+
+	/** Allocation-free word count (whitespace-delimited, counts across newlines). */
+	static function countWords(s:String):Int {
+		if (s == null)
+			return 0;
+		var count = 0;
+		var inWord = false;
+		for (i in 0...s.length) {
+			var c = s.charCodeAt(i);
+			var space = c == 32 || c == 10 || c == 13 || c == 9;
+			if (!space && !inWord)
+				count++;
+			inWord = !space;
+		}
+		return count;
 	}
 
 	function getFilteredPages():Array<NotebookPage> {
@@ -258,6 +335,7 @@ class Notebook {
 		var p = pages[i];
 		writeString(titleBuf, TITLE_BUF, p.title);
 		writeString(bodyBuf, BODY_BUF, p.body);
+		wordCount = countWords(p.body);
 	}
 
 	function addPage(select:Bool):Void {
@@ -415,21 +493,7 @@ class Notebook {
 	static function writeString(buf:hl.Bytes, cap:Int, s:String):Void {
 		if (buf == null || cap < 1)
 			return;
-		var i = 0;
-		if (s != null) {
-			var n = s.length;
-			while (i < n && i < cap - 1) {
-				var c = s.charCodeAt(i);
-				if (c == null || c > 255)
-					c = "?".code;
-				buf.setUI8(i, c);
-				i++;
-			}
-		}
-		while (i < cap) {
-			buf.setUI8(i, 0);
-			i++;
-		}
+		ByteUtil.fillBuf(buf, cap, s != null ? s : "");
 	}
 
 	static function bytesToString(buf:hl.Bytes, cap:Int):String {

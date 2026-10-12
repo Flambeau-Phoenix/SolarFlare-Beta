@@ -5,6 +5,7 @@ import imgui.Enums.ImGuiCol;
 import imgui.Enums.ImGuiStyleVar;
 import imgui.Enums.ImGuiChildFlags;
 import imgui.Structs.ImVec2;
+import imgui.Structs.ImVec4;
 
 /**
  * Shared visual language for SolarFlare tool windows: section headers and cel-shaded borders.
@@ -302,6 +303,12 @@ class UiChrome {
 		return false;
 	}
 
+	/** Linear blend of two theme colours packed for the draw list (alpha forced opaque). */
+	static function mixU32(a:ImVec4, b:ImVec4, t:Single):Int {
+		return ImGui.colorConvertFloat4ToU32(ImGui.vec4(
+			a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t, 1));
+	}
+
 	/**
 	 * Standardized toggle tile for boolean on/off states (card background, 1px border, 12x12 checkbox indicator).
 	 * Strictly for boolean state toggles, never action buttons.
@@ -327,20 +334,20 @@ class UiChrome {
 		var hovered = ImGui.isItemHovered();
 		var active = ImGui.isItemActive();
 
-		// Theme colors: Accent tint when ON, neutral when OFF
-		var bgColor = checked 
-			? (hovered ? 0xFF2A5070 : 0xFF1E3A52) 
-			: (hovered ? 0xFF2B2E33 : 0xFF1B1D21);
-		var borderColor = checked ? 0xFF4A90E2 : (hovered ? 0xFF555B66 : 0xFF353940);
-		var checkColor = checked ? 0xFF50E3C2 : (mixed ? 0xFFE5A93C : 0x00000000);
-		var textColor = 0xFFE0E0E0;
-		if (!fillSelected) {
-			var theme = ThemePalette.current();
-			bgColor = ImGui.colorConvertFloat4ToU32(theme.cellBg);
-			borderColor = ImGui.colorConvertFloat4ToU32(hovered ? theme.accent : theme.border);
-			checkColor = ImGui.colorConvertFloat4ToU32(theme.accent);
-			textColor = ImGui.colorConvertFloat4ToU32(theme.text);
-		}
+		// Theme-derived colours so tiles follow every preset, including Custom and High Contrast.
+		// fillSelected tints the whole tile with the accent when checked; otherwise only the
+		// indicator and border react.
+		var theme = ThemePalette.current();
+		var tinted = checked && fillSelected;
+		var bgColor = tinted
+			? mixU32(theme.cellBg, theme.accent, hovered ? 0.42 : 0.30)
+			: (hovered ? mixU32(theme.cellBg, theme.text, 0.10) : ImGui.colorConvertFloat4ToU32(theme.cellBg));
+		var borderColor = ImGui.colorConvertFloat4ToU32(tinted || hovered ? theme.accent : theme.border);
+		var checkColor = checked
+			? ImGui.colorConvertFloat4ToU32(theme.accent)
+			: (mixed ? ImGui.colorConvertFloat4ToU32(ThemePalette.status(ThemePalette.STATUS_WARN)) : 0x00000000);
+		var textColor = ImGui.colorConvertFloat4ToU32(theme.text);
+		var boxColor = mixU32(theme.border, theme.text, 0.55);
 
 		var dl = ImGui.getWindowDrawList();
 
@@ -351,7 +358,7 @@ class UiChrome {
 		// Explicit 12x12 checkbox indicator box
 		var boxP0 = ImGui.vec2(p0.x + 8.0, p0.y + (height * 0.5) - 6.0);
 		var boxP1 = ImGui.vec2(boxP0.x + 12.0, boxP0.y + 12.0);
-		ImGui.ImDrawList_AddRect(dl, boxP0, boxP1, 0xFF888E99, 2.0, 1.0);
+		ImGui.ImDrawList_AddRect(dl, boxP0, boxP1, boxColor, 2.0, 1.0);
 
 		if (checked) {
 			ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(boxP0.x + 2.0, boxP0.y + 2.0), ImGui.vec2(boxP1.x - 2.0, boxP1.y - 2.0), checkColor, 1.0);

@@ -15,7 +15,15 @@ import solarflare.ui.ImGuiLists;
 import solarflare.ui.SettingsStore;
 import solarflare.ui.UiScope;
 
-/** Reads module snapshots only. Floating labels use a draw list, never an input window. */
+/**
+ * Reads module snapshots only. Floating labels use a draw list, never an input window.
+ *
+ * STAGED FEATURE — not wired in (2026-10-11). Nothing in ModEntry/SolarFlarePanel/ConfigPanel
+ * constructs this package, so DCE strips it from solarflare.hl; only HemorrhageReplayTest
+ * exercises HemorrhageCache/HemorrhageFloatLayout. Wiring it in needs a panel draw call,
+ * config + SettingsStore persistence, and a HemorrhageCache feed from CombatLogCache lines
+ * (which also means adding it to ObserveDemand.combatLines).
+ */
 class HemorrhageOverlay {
 	static inline var MIN_W:Single = 360;
 	static inline var MIN_H:Single = 180;

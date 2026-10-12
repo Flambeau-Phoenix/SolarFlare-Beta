@@ -22,9 +22,33 @@ class BarTerNativeKeys {
   var seen=lastSeen.get(action);
   return seen == null || now-seen > 1.5;
  }
+ /** Seconds a previously reported action survives a sample that no longer reports it (engine skill-array rebuilds). */
+ public static inline var HOLD_S:Float = 1.5;
+ /**
+  * Actions reported by the previous sample, missing from this one, and last seen within `hold` seconds.
+  * `refreshSkills` empties and refills the hero's skill lists in one engine call, so a sample can briefly miss
+  * skills that are still equipped; a real swap replaces the action's skill or lets it expire after the hold.
+  */
+ public static function carryForward(previous:Array<BarTerNativeSkill>,current:Array<BarTerNativeSkill>,
+   seen:Map<String,Float>,now:Float,hold:Float):Array<BarTerNativeSkill> {
+  var kept:Array<BarTerNativeSkill>=[];
+  for (p in previous) {
+   if (p.action.length == 0) continue;
+   var present=false;
+   for (c in current) if (c.action == p.action) { present=true; break; }
+   if (present) continue;
+   var at=seen.get(p.action);
+   if (at != null && now-at <= hold) kept.push(p);
+  }
+  return kept;
+ }
  public static function sample(now:Float,force:Bool=false):Void {
   if (!force && now-lastRead < 0.5) return;
-  lastRead=now; skills.resize(0); aliases.clear(); known=false;
+  lastRead=now;
+  var previous=skills.copy(); var previousAliases=aliases.copy(); var seenBefore=lastSeen.copy();
+  // Actions the bar policy deliberately rejected this sample (a basic combo attack): a decision, never a gap to hold.
+  var declined:Map<String,Bool>=new Map();
+  skills.resize(0); aliases.clear(); known=false;
   var hero:Dynamic=solarflare.HealthCache.localHero;
   if (hero == null) return;
   if (!mouseKeys.keys().hasNext()) {
@@ -52,7 +76,7 @@ class BarTerNativeKeys {
     var id=GeauxCache.getSkillId(skill);
     if (id == null || id.length == 0) id=solarflare.EngineText.cleanId(skill.kind);
     if (id == null || id.length == 0) continue;
-    if (!GeauxCache.isBarSkillId(id)) continue;
+    if (!GeauxCache.isBarSkillId(id)) { declined.set(actionName,true); continue; }
     var existing=action(actionName);
     if (existing != null) { existing.id=id; existing.icon=id; existing.label=label(id); }
     else append(actionName,id,label(id),id);
@@ -66,12 +90,24 @@ class BarTerNativeKeys {
    var hc:ent.Hero=cast hero;
    var slots=hc.skillSlots;
    var count=slots == null ? 0 : slots.length;
-   for (n in 0...(count < 4 ? count : 4)) {
-    var slotId=GeauxCache.sanitizeSkillId(slots.getDyn(n));
+   // refreshSkills empties this local mirror before refilling it. Geaux also reads the replicated
+   // specialization.skillSlots (authoritative, never cleared); do the same when the mirror has a gap.
+   var fallback:Dynamic=null; var fallbackLen=0;
+   try {
+    var spec:Dynamic=HlxRuntime.resolveField(hero,"specialization");
+    var proxy:Dynamic=spec == null ? null : HlxRuntime.resolveField(spec,"skillSlots");
+    fallback=proxy == null ? null : HlxRuntime.resolveField(proxy,"array");
+    fallbackLen=fallback == null ? 0 : fallback.length;
+   } catch(_:Dynamic) { fallback=null; fallbackLen=0; }
+   var wanted=count < fallbackLen ? fallbackLen : count;
+   for (n in 0...(wanted < 4 ? wanted : 4)) {
+    var slotId=n < count ? GeauxCache.sanitizeSkillId(slots.getDyn(n)) : "";
+    if (slotId.length == 0 && n < fallbackLen) slotId=GeauxCache.sanitizeSkillId(fallback.getDyn(n));
     if (slotId.length == 0) continue;
     var skill:Dynamic=GeauxCache.findSkillById(hero,slotId);
     var id=skill != null ? GeauxCache.preferScriptId(slotId,skill) : slotId;
     id=GeauxCache.sanitizeSkillId(id);
+    if (id.length > 0 && !GeauxCache.isBarSkillId(id)) declined.set("Skill"+(n+1),true);
     if (id.length == 0 || !GeauxCache.isBarSkillId(id)) continue;
     var actionName="Skill"+(n+1);
     var existing=action(actionName);
@@ -86,6 +122,14 @@ class BarTerNativeKeys {
   for (s in skills) {
    rememberAliases(s.id,GeauxCache.liveSkill(s.id));
    if (s.action.length > 0) { known=true; lastSeen.set(s.action,now); }
+  }
+  // Hold actions a rebuild momentarily hid. Only a partial gap qualifies: a sample with no action identity at
+  // all stays uncertified and unpadded (BarTerNativeObservationTest). Held entries do not refresh lastSeen, so
+  // they expire on their own.
+  if (known) for (p in carryForward(previous,skills,seenBefore,now,HOLD_S)) {
+   if (declined.exists(p.action)) continue;
+   skills.push(p);
+   for (kind => id in previousAliases) if (id == p.id && !aliases.exists(kind)) aliases.set(kind,id);
   }
   skills=BarTerWeaponLayouts.populationOrder(skills);
  }

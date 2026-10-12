@@ -13,7 +13,8 @@ class LearnedCastTimes {
 			var path = ModPaths.findCdbFile("patch-source.json");
 			if (path != null) fingerprint = haxe.Json.parse(sys.io.File.getContent(path)).sha256;
 		} catch (_:Dynamic) {}
-		store = new CastTimeStore(ModPaths.child("assets/cdb/skill-cast-times.json"), fingerprint);
+		// v4.1b: session-only. Learned times stay in memory; the legacy cache files are deleted. Removed in v4.2b.
+		store = new CastTimeStore(ModPaths.child("assets/cdb/skill-cast-times.json"), fingerprint, false);
 	}
 	public static function resolve(id:String, rank:Null<Int>):CastDuration {
 		return CastDurationResolver.resolve(store == null ? null : store.book, id, rank, solarflare.cdb.CdbAuraTable.castDuration(id));

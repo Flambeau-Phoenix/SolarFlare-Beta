@@ -16,6 +16,7 @@ import imgui.Enums.ImGuiWindowFlags;
 import imgui.Theme;
 import imgui.ref.BoolRef;
 import imgui.ref.FloatRef;
+import imgui.ref.IntRef;
 
 /**
  * Mage Chaincast snapshot. Accumul is Mage_Talent_Chaincast_Accum_Status
@@ -130,6 +131,12 @@ class ChaincastCache {
 		return statusKey;
 	}
 
+	/** Accumulating (pre-ready) status id; non-allocating twin of lookupAccumIds(). */
+	public static function accumId():String {
+		ensureHashes();
+		return accumKey;
+	}
+
 	public static function lookupReadyIds():Array<String> {
 		ensureHashes();
 		return [statusKey];
@@ -218,6 +225,7 @@ class ChaincastConfig {
 	public var title:String = "Chaincast";
 	public var rotation:Array<String> = [];
 	public var spendId:String = "";
+	public var style = new IntRef(ChaincastRenderer.STYLE_RAIL);
 	/** Left stack badge (N/4 or READY). Hide to use pip rail only. */
 	public var showStackBadge = new BoolRef(true);
 	public var titleBuf:hl.Bytes;
@@ -258,9 +266,39 @@ class ChaincastConfig {
 					);
 				});
 			});
+			drawAppearanceSettings();
 			drawSettings();
 		}
 		HudChrome.endPanel();
+	}
+
+	public function drawAppearanceSettings():Void {
+		UiLayout.propertyGrid("##chain_appearance", function() {
+			UiLayout.propertyRow("Graphic", function() {
+				var selected = style.get();
+				if (selected < 0 || selected >= ChaincastRenderer.STYLE_COUNT) selected = 0;
+				if (ImGui.beginCombo("##chain_style", ChaincastRenderer.STYLE_NAMES[selected])) {
+					for (i in 0...ChaincastRenderer.STYLE_COUNT) {
+						if (ImGui.selectable(ChaincastRenderer.STYLE_NAMES[i], selected == i)) {
+							style.set(i);
+							sizeDirty = true;
+							SettingsStore.markDirty();
+						}
+					}
+					ImGui.endCombo();
+				}
+			});
+		});
+		if (ChaincastRenderer.isFlagship(style.get()))
+			ImGui.textWrapped("Four illuminated segments track Chaincast. The center checks the linked skill: check = off cooldown; X = cooldown with seconds remaining. ? = no current data. The ring fills as cooldown recovers. This does not check resource cost or range.");
+	}
+
+	/** Stable link: explicit spend selection, otherwise the first weapon in the list. */
+	public function linkedSkillId():String {
+		if (spendId != null && spendId.length > 0) return spendId;
+		if (rotation != null) for (id in rotation)
+			if (isWeaponSnap(GeauxCache.findSnap(id))) return id;
+		return "";
 	}
 
 	public function drawSettings():Void {
@@ -321,7 +359,7 @@ class ChaincastConfig {
 			}
 		}
 		var spendPrev = spendId.length > 0 ? snapLabel(GeauxCache.findSnap(spendId), spendId) : "(first weapon in list)";
-		if (ImGui.beginCombo("Spend Chaincast on##chain_spend", spendPrev)) {
+		if (ImGui.beginCombo("Linked skill / spend on##chain_spend", spendPrev)) {
 			if (ImGui.selectable("(first weapon in list)", spendId.length == 0)) {
 				spendId = "";
 				SettingsStore.markDirty();
@@ -400,6 +438,13 @@ class ChaincastConfig {
  * Reads ChaincastCache only — never live status objects from the draw loop.
  */
 class ChaincastOverlay {
+	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
+	var hudCfg:ChaincastConfig;
+	var hudBodyFn:imgui.Structs.ImVec2->Void;
+	var hudHideFn:Void->Void;
+	var hudResizeFn:Single->Single->Void;
+	var hudWindowFn:Void->Void;
+
 	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
 		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
 	static inline var PAD:Single = 6;
@@ -411,8 +456,14 @@ class ChaincastOverlay {
 	static inline var LABEL_FONT:Single = 17;
 
 	var theme:Theme;
+	var skillState = new ChaincastSkillState();
 
 	public function new() {
+		hudBodyFn = hudBody;
+		hudHideFn = hudHide;
+		hudResizeFn = hudResize;
+		hudWindowFn = hudWindow;
+
 		theme = new Theme()
 			.varV(ImGuiStyleVar.WindowPadding, ImGui.vec2(PAD, PAD))
 			.varF(ImGuiStyleVar.WindowRounding, 8)
@@ -427,7 +478,8 @@ class ChaincastOverlay {
 			return;
 		if (!ChaincastCache.active)
 			return;
-		theme.wrap(() -> drawWindow(cfg));
+		hudCfg = cfg;
+		theme.wrap(hudWindowFn);
 	}
 
 	public var openBuilder:Void->Void;
@@ -435,32 +487,27 @@ class ChaincastOverlay {
 		var w:Single = Math.max(ChaincastConfig.MIN_W, Math.min(ChaincastConfig.MAX_W, cfg.width.get()));
 		var rows:Int = cfg.rotation != null ? cfg.rotation.length : 0;
 		// Must match the draw order below, or the last row clips off the bottom.
-		var contentH:Single = 8 + HEAD_H
+		var contentH:Single = 8 + ChaincastRenderer.headHeight(cfg.style.get(), w - 8)
 			+ (ChaincastCache.remainValid ? TIMER_H + GAP : 0)
 			+ (rows > 0 ? rows * (HINT_H + GAP) : 0);
 		var h:Single = Math.max(contentH, cfg.height.get());
-		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Chaincast", "Chaincast", cfg.chrome, w, h, function(size) {
-			var p = ImGui.getCursorScreenPos();
-			ImGui.dummy(size);
-			ImGui.setCursorScreenPos(ImGui.vec2(p.x+4, p.y+4));
-			var rowW:Single = size.x - 8;
-			// Chain time sits above the blocks: underneath it was the first thing clipped.
-			if (ChaincastCache.remainValid) drawTimer(rowW, TIMER_H);
-			drawHead(cfg, rowW, HEAD_H);
-			if (rows > 0) drawHints(cfg, rowW);
-		}, openBuilder, function() { cfg.hidden.set(true); SettingsStore.markDirty(); }, false, null, function(newW:Single, newH:Single) {
-			cfg.width.set(Math.max(ChaincastConfig.MIN_W, Math.min(ChaincastConfig.MAX_W, newW)));
-			cfg.height.set(Math.max(contentH, newH));
-			SettingsStore.markDirty();
-		});
+		hudCfg = cfg;
+		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Chaincast", "Chaincast", cfg.chrome, w, h, hudBodyFn, openBuilder, hudHideFn, false, null, hudResizeFn);
+		hudCfg = null;
 	}
 
-	static function drawHead(cfg:ChaincastConfig, rowW:Single, rowH:Single):Void {
+	function drawHead(cfg:ChaincastConfig, rowW:Single, rowH:Single):Void {
 		var showBadge = cfg == null || cfg.showStackBadge == null || cfg.showStackBadge.get();
 		var stacks = ChaincastCache.valid ? ChaincastCache.current : 0;
 		var ready = ChaincastCache.ready;
 		var pulse = ready || ChaincastCache.pulseActive();
-		ChaincastRenderer.drawHead(rowW, rowH, stacks, ready, showBadge, pulse);
+		if (ChaincastRenderer.isFlagship(cfg.style.get())) {
+			var id = cfg.linkedSkillId();
+			var snap = GeauxCache.findSnap(id);
+			skillState.update(id.length > 0, snap != null && snap.present, snap != null && snap.cooldownValid,
+				snap != null && snap.ready, snap != null ? snap.cdLeft : 0, snap != null ? snap.cdMax : 0);
+		}
+		ChaincastRenderer.drawHead(rowW, rowH, stacks, ready, showBadge, pulse, cfg.style.get(), skillState);
 	}
 
 	static function drawTimer(rowW:Single, rowH:Single):Void {
@@ -584,4 +631,33 @@ class ChaincastOverlay {
 	static function u32(r:Float, g:Float, b:Float, a:Float):Int {
 		return ImGui.colorConvertFloat4ToU32(ImGui.vec4(r, g, b, a));
 	}
+
+	function hudBody(size:imgui.Structs.ImVec2):Void {
+		var cfg = hudCfg;
+		var rows:Int = cfg.rotation != null ? cfg.rotation.length : 0;
+		var p = ImGui.getCursorScreenPos();
+		ImGui.dummy(size);
+		ImGui.setCursorScreenPos(ImGui.vec2(p.x+4, p.y+4));
+		var rowW:Single = size.x - 8;
+		// Chain time sits above the blocks: underneath it was the first thing clipped.
+		if (ChaincastCache.remainValid) drawTimer(rowW, TIMER_H);
+		drawHead(cfg, rowW, ChaincastRenderer.headHeight(cfg.style.get(), rowW));
+		if (rows > 0) drawHints(cfg, rowW);
+	}
+
+	function hudHide():Void {
+		var cfg = hudCfg;
+		cfg.hidden.set(true); SettingsStore.markDirty();
+	}
+
+	function hudResize(newW:Single, newH:Single):Void {
+		var cfg = hudCfg;
+		var rows:Int = cfg.rotation != null ? cfg.rotation.length : 0;
+		var contentH:Single = 8 + ChaincastRenderer.headHeight(cfg.style.get(), newW - 8) + (ChaincastCache.remainValid ? TIMER_H + GAP : 0) + (rows > 0 ? rows * (HINT_H + GAP) : 0);
+		cfg.width.set(Math.max(ChaincastConfig.MIN_W, Math.min(ChaincastConfig.MAX_W, newW)));
+		cfg.height.set(Math.max(contentH, newH));
+		SettingsStore.markDirty();
+	}
+
+	function hudWindow():Void { drawWindow(hudCfg); }
 }

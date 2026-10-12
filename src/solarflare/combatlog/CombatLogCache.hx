@@ -63,17 +63,16 @@ class CombatLogCache {
 			windowSec = 0.05;
 		var now = haxe.Timer.stamp();
 		var best:Float = 0;
-		var n = count < CAP ? count : CAP;
-		var i = 0;
-		while (i < n) {
-			var idx = count < CAP ? i : (writeAt + i) % CAP;
-			var line = lines[idx];
-			i++;
-			if (line == null || line.kind != KIND_HIT)
-				continue;
-			if (line.targetRole != ROLE_YOU)
+		// Newest first; the ring is chronological, so stop at the first line outside the window.
+		var i = lineCount() - 1;
+		while (i >= 0) {
+			var line = lineAt(i);
+			i--;
+			if (line == null)
 				continue;
 			if (now - line.t > windowSec)
+				break;
+			if (line.kind != KIND_HIT || line.targetRole != ROLE_YOU)
 				continue;
 			if (line.amount > best)
 				best = line.amount;
@@ -319,19 +318,29 @@ class CombatLogCache {
 			solarflare.debug.PayloadProbe.capture("cast", skill)
 		catch (_:Dynamic) {}
 		#end
+		solarflare.runtime.RuntimeMetrics.castSeen++;
+		// Runs inside the engine call for every unit in the world; skip attribution nobody reads.
+		if (!solarflare.ObserveDemand.combatLines)
+			return;
 		try {
 			var bs:st.skill.BaseSkill = skill;
 			if (bs.isPassive())
 				return;
 		} catch (_:Dynamic) {}
+		solarflare.runtime.RuntimeMetrics.castLive++;
 		var owner = CombatOwnership.resolve(ownerOfSkill(skill), extractObject, ownerOfSkill);
 		var aim = aimOfSkill(skill);
-		if (!shouldCapture(owner, aim))
+		if (!shouldCapture(owner, aim)) {
+			noteWantedEnemyCast(skill, owner);
 			return;
+		}
+		solarflare.runtime.RuntimeMetrics.castCaptured++;
 		var sid = skillIdOf(skill);
 		pushCast(sid, owner, aim);
-		if (classify(owner) == ROLE_ENEMY)
+		if (classify(owner) == ROLE_ENEMY) {
+			solarflare.runtime.RuntimeMetrics.castEnemy++;
 			solarflare.aura.EnemyCastCache.noteStart(skill, sid);
+		}
 		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed())
 			solarflare.debug.ResolutionLedger.note("combat.cast.skillId")
@@ -345,6 +354,24 @@ class CombatLogCache {
 		#end
 	}
 
+	/**
+	 * A cast that is not about you (not yours, not your target, not in combat with you) is normally not logged. An aura
+	 * that asked for this skill id (`event.cast.active`) still needs it: otherwise a boss self-cast while you target
+	 * something else is invisible. Only the enemy-cast cache is told; the combat log stays free of uninvolved casts.
+	 * Before the Hero-type guard in HealthCache this happened by accident (isMyHero read on monsters).
+	 */
+	static function noteWantedEnemyCast(skill:Dynamic, owner:Dynamic):Void {
+		if (!solarflare.ObserveDemand.aurasNeedEnemyCast || solarflare.ObserveDemand.castSkillIds.length == 0)
+			return;
+		if (classify(owner) != ROLE_ENEMY)
+			return;
+		var sid = skillIdOf(skill);
+		if (sid.length == 0 || solarflare.ObserveDemand.castSkillIds.indexOf(sid) < 0)
+			return;
+		solarflare.runtime.RuntimeMetrics.castWanted++;
+		solarflare.aura.EnemyCastCache.noteStart(skill, sid);
+	}
+
 	public static function noteHit(victim:Dynamic, dmg:Dynamic, hook:String = ""):Void {
 		if (dmg == null)
 			return;
@@ -353,6 +380,8 @@ class CombatLogCache {
 			solarflare.debug.PayloadProbe.capture("hit", dmg)
 		catch (_:Dynamic) {}
 		#end
+		if (!solarflare.ObserveDemand.combatLines)
+			return;
 		var rawSource = sourceCandidateOfDamage(dmg);
 		var source = CombatOwnership.resolve(rawSource, extractObject, ownerOfSkill);
 		var minion = minionNameOf(rawSource, source);
@@ -378,6 +407,8 @@ class CombatLogCache {
 			solarflare.debug.PayloadProbe.capture("hit", dmg)
 		catch (_:Dynamic) {}
 		#end
+		if (!solarflare.ObserveDemand.combatLines)
+			return;
 		// v6 may expose the hero in DamageResult even when hook self or the runtime
 		// skill owner is the summoned foe. Prefer whichever candidate proves it has
 		// summon ownership, then resolve that leaf back to its credited hero.
@@ -417,19 +448,30 @@ class CombatLogCache {
 		return drawLinesBuf;
 	}
 
-	public static function recentAll():Array<CombatLogLine> {
-		var out:Array<CombatLogLine> = [];
-		var n = count < CAP ? count : CAP;
-		var start = count < CAP ? 0 : writeAt;
-		var i = 0;
-		while (i < n) {
-			var idx = (start + i) % CAP;
-			var line = lines[idx];
-			if (line != null)
-				out.push(line);
-			i++;
+	/*
+	 * Zero-copy reads of the ring, index 0 = oldest. Lines are committed FIFO from the hook
+	 * mailbox, so `sequence` and `t` never decrease with the index: readers can walk back from
+	 * the newest line and stop early. (Replaces recentAll(), which copied up to CAP lines for
+	 * every caller on every pass: Lightsaber, Spark Cube, and each log-triggered aura per tick.)
+	 */
+	public static inline function lineCount():Int {
+		return count < CAP ? count : CAP;
+	}
+
+	public static inline function lineAt(i:Int):CombatLogLine {
+		return lines[count < CAP ? i : (writeAt + i) % CAP];
+	}
+
+	/** Index of the first line with `sequence > after` (lineCount() when none is newer). */
+	public static function firstIndexAfter(after:Float):Int {
+		var i = lineCount();
+		while (i > 0) {
+			var line = lineAt(i - 1);
+			if (line != null && line.sequence <= after)
+				break;
+			i--;
 		}
-		return out;
+		return i;
 	}
 
 	static function pushCast(skillId:String, source:Dynamic, target:Dynamic):Void {
@@ -723,11 +765,14 @@ class CombatLogCache {
 			return ROLE_UNKNOWN;
 		if (HealthCache.isLocalHero(unit))
 			return ROLE_YOU;
-		try {
-			var hero:ent.Hero = cast unit;
-			if (hero.getPlayer() != null)
-				return ROLE_PLAYER;
-		} catch (_:Dynamic) {}
+		// getPlayer is Hero-only; on a monster it would read the object at Hero offsets.
+		if (HealthCache.isHeroObject(unit)) {
+			try {
+				var hero:ent.Hero = cast unit;
+				if (hero.getPlayer() != null)
+					return ROLE_PLAYER;
+			} catch (_:Dynamic) {}
+		}
 		if (extractObject(unit, "player") != null)
 			return ROLE_PLAYER;
 		if (extractObject(unit, "foeState") != null)

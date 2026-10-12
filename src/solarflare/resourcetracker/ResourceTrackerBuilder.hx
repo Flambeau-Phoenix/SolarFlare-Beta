@@ -114,27 +114,10 @@ class ResourceTrackerBuilder {
 		drawHideAll();
 	}
 
-	/** Blanks every HUD draw on a keypress; saved window state is untouched. */
+	/** Blanks every HUD draw on a keypress; saved window state is untouched. Shared with Utilities. */
 	function drawHideAll():Void {
 		section("Hide All");
-		UiLayout.propertyGrid("##rt_hide_all", function() {
-			UiLayout.propertyRow("Hidden", function() {
-				if (ImGui.checkbox("##rt_ha_state", HudSuppress.hideAll))
-					SettingsStore.markDirty();
-			}, "Blanks every SolarFlare window so the game underneath is clickable.");
-			UiLayout.propertyRow("Hotkey", function() {
-				if (ImGui.combo("##rt_ha_key", HideAllBind.choice, HideAllBind.ITEMS))
-					SettingsStore.markDirty();
-			});
-			UiLayout.propertyRow("Middle mouse", function() {
-				if (ImGui.checkbox("##rt_ha_mmb", HideAllBind.middleMouse))
-					SettingsStore.markDirty();
-			}, "Also toggle on middle click, but only while the cursor is free.");
-		});
-		if (HudSuppress.active())
-			ImGui.textColored(ImGui.vec4(0.95, 0.72, 0.25, 1), "Hidden now — press the hotkey to bring the HUD back.");
-		else
-			ImGui.textDisabled("Never saved as hidden; every launch starts visible.");
+		solarflare.ui.UtilitiesPanel.drawHideAll();
 	}
 
 	static function section(label:String):Void {
@@ -184,6 +167,16 @@ class ResourceTrackerBuilder {
 					ImGui.endCombo();
 				}
 			});
+			if (selected == "chaincast" || previewScope.get() == 1) {
+				UiLayout.propertyRow("Skill preview", function() {
+					if (ImGui.beginCombo("##rt_chain_skill_preview", ResourcePreviewRenderer.CHAIN_SKILL_PREVIEWS[previewRenderer.chainSkillPreview])) {
+						for (i in 0...ResourcePreviewRenderer.CHAIN_SKILL_PREVIEWS.length)
+							if (ImGui.selectable(ResourcePreviewRenderer.CHAIN_SKILL_PREVIEWS[i], previewRenderer.chainSkillPreview == i))
+								previewRenderer.chainSkillPreview = i;
+						ImGui.endCombo();
+					}
+				}, "Synthetic linked-skill state; independent of the Chaincast preview and live game.");
+			}
 		});
 		ImGui.spacing();
 		var previewH:Single = previewScope.get() == 1 ? previewRenderer.measureAll(host) : previewRenderer.elementHeight(selected, host) + 8;
@@ -234,7 +227,7 @@ class ResourceTrackerBuilder {
 					host.castBar.drawSettings("rt_castbar");
 			case "chaincast":
 				drawWindow(host.chaincast.hidden, host.chaincast.chrome, host.chaincast.width, host.chaincast.height, "chaincast");
-				section("Appearance"); ImGui.textDisabled("Chaincast uses its fixed rail and ready-gem presentation.");
+				section("Appearance"); host.chaincast.drawAppearanceSettings();
 				section("Behavior"); host.chaincast.drawSettings();
 			case "conduit":
 				drawWindow(host.conduit.hidden, host.conduit.chrome, host.conduit.width, host.conduit.height, "conduit");

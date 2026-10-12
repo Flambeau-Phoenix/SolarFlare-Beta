@@ -23,6 +23,13 @@ import imgui.Theme;
  * window under the chrome — never grows the HP widget.
  */
 class TargetOverlay {
+	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
+	var hudCfg:TargetConfig;
+	var hudBodyFn:imgui.Structs.ImVec2->Void;
+	var hudHideFn:Void->Void;
+	var hudResizeFn:Single->Single->Void;
+	var hudWindowFn:Void->Void;
+
 	static inline var EMPTY_LABEL:String = "No target";
 	static inline var PORTRAIT_GAP:Single = 6;
 	static inline var PAD:Single = 4;
@@ -52,6 +59,11 @@ class TargetOverlay {
 	var lastBodyH:Single = 0;
 
 	public function new() {
+		hudBodyFn = hudBody;
+		hudHideFn = hudHide;
+		hudResizeFn = hudResize;
+		hudWindowFn = hudWindow;
+
 		snap = new TargetSnap();
 		castSnap = new CastSnap();
 		theme = new Theme()
@@ -77,7 +89,8 @@ class TargetOverlay {
 			touchDraw("empty", "", "", false, 0, 0);
 			return;
 		}
-		theme.wrap(() -> drawWindow(cfg));
+		hudCfg = cfg;
+		theme.wrap(hudWindowFn);
 	}
 
 	public function drawPreview(cfg:TargetConfig, sample:TargetSnap, w:Single, h:Single):Void {
@@ -93,17 +106,9 @@ class TargetOverlay {
 	function drawWindow(cfg:TargetConfig):Void {
 		var w:Single = Math.max(TargetConfig.MIN_W, Math.min(TargetConfig.MAX_W, cfg.width.get()));
 		var h:Single = Math.max(TargetConfig.MIN_H, Math.min(TargetConfig.MAX_H, cfg.height.get()));
-		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Target", "Target", cfg.chrome, w, h, function(size) {
-			lastBodyW = size.x;
-			lastBodyH = size.y;
-			drawBody(cfg, size.x, size.y);
-			var hasIcon = snap.valid && snap.kind.length > 0 && GameIcons.hasKey(snap.kind);
-			touchDraw(snap.valid ? "shown" : "empty", snap.name, snap.kind, hasIcon, size.x, size.y);
-		}, openBuilder, function() { cfg.hidden.set(true); SettingsStore.markDirty(); }, false, null, function(newW:Single, newH:Single) {
-			cfg.width.set(Math.max(TargetConfig.MIN_W, Math.min(TargetConfig.MAX_W, newW)));
-			cfg.height.set(Math.max(TargetConfig.MIN_H, Math.min(TargetConfig.MAX_H, newH)));
-			SettingsStore.markDirty();
-		});
+		hudCfg = cfg;
+		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Target", "Target", cfg.chrome, w, h, hudBodyFn, openBuilder, hudHideFn, false, null, hudResizeFn);
+		hudCfg = null;
 		// chrome.winH is set inside HUDWidgetWindow while the window is open.
 		if (cfg.chrome != null && cfg.chrome.winH > 0) {
 			lastHpWinH = cfg.chrome.winH;
@@ -417,4 +422,27 @@ class TargetOverlay {
 			return Std.string(Math.ffloor(v / 100) / 10) + "k";
 		return Std.string(Std.int(v));
 	}
+
+	function hudBody(size:imgui.Structs.ImVec2):Void {
+		var cfg = hudCfg;
+		lastBodyW = size.x;
+		lastBodyH = size.y;
+		drawBody(cfg, size.x, size.y);
+		var hasIcon = snap.valid && snap.kind.length > 0 && GameIcons.hasKey(snap.kind);
+		touchDraw(snap.valid ? "shown" : "empty", snap.name, snap.kind, hasIcon, size.x, size.y);
+	}
+
+	function hudHide():Void {
+		var cfg = hudCfg;
+		cfg.hidden.set(true); SettingsStore.markDirty();
+	}
+
+	function hudResize(newW:Single, newH:Single):Void {
+		var cfg = hudCfg;
+		cfg.width.set(Math.max(TargetConfig.MIN_W, Math.min(TargetConfig.MAX_W, newW)));
+		cfg.height.set(Math.max(TargetConfig.MIN_H, Math.min(TargetConfig.MAX_H, newH)));
+		SettingsStore.markDirty();
+	}
+
+	function hudWindow():Void { drawWindow(hudCfg); }
 }

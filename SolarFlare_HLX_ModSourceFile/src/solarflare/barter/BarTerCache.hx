@@ -11,6 +11,8 @@ typedef BarTerClick = {
 	var skillId:String;
 	var itemKind:String;
 	var gen:Int;
+	/** Queue time; drainClicks drops clicks older than CLICK_TTL_S. */
+	var at:Float;
 }
 
 /**
@@ -19,6 +21,8 @@ typedef BarTerClick = {
 class BarTerCache {
 	public static var pendingClicks:Array<BarTerClick> = [];
 	static var clickGen:Int = 0;
+	/** A click that waited longer than this (stall, loading screen) is not replayed as a native use. */
+	static inline var CLICK_TTL_S:Float = 0.25;
 
 	public static function keep():Void {}
 
@@ -35,20 +39,44 @@ class BarTerCache {
 		var item = itemKind != null ? itemKind : "";
 		if (item.length == 0 && skill.length == 0) return;
 		clickGen++;
-		pendingClicks.push({barId: barId, slot: slot, skillId: skill, itemKind: item, gen: clickGen});
+		pendingClicks.push({barId: barId, slot: slot, skillId: skill, itemKind: item, gen: clickGen, at: haxe.Timer.stamp()});
 		if (pendingClicks.length > 32)
 			pendingClicks.shift();
 	}
 
-	public static function drainClicks(handler:BarTerClick->Void):Void {
+	/** Expired clicks are dropped, never replayed; `blocked` drops everything without dispatch. */
+	public static function drainClicks(handler:BarTerClick->Void, blocked:Bool = false):Void {
 		if (handler == null) return;
+		var now = haxe.Timer.stamp();
 		while (pendingClicks.length > 0) {
 			var c = pendingClicks.shift();
-			if (c == null) continue;
+			if (c == null || blocked || now - c.at > CLICK_TTL_S) continue;
 			try
 				handler(c)
 			catch (_:Dynamic) {}
 		}
+	}
+
+	/**
+	 * Gameplay eligibility for native use requests (mirrors ExtraBars.blockReason, minus the
+	 * editor check: BarTer cells are clicked with the cursor free). Empty string = allowed.
+	 */
+	public static function gameplayBlockReason(hero:Dynamic):String {
+		if (hero == null) return "No local hero.";
+		try {
+			var app = GameApp.get();
+			var controller = client.PlayerController.inst;
+			if (app == null || controller == null) return "No local hero.";
+			if (!hxd.Window.getInstance().get_isFocused()) return "Game is not focused.";
+			if (app.get_isLoading()) return "Loading.";
+			if (app.isInCutscene() || lib.Input.cinematicCapturesKbd()) return "Cutscene input is blocked.";
+			var h:ent.Hero = cast hero;
+			if (h.isDead()) return "Hero is dead.";
+			if (controller.isInputBlocked()) return "Chat or a native window owns input.";
+		} catch (_:Dynamic) {
+			return "Gameplay eligibility unavailable.";
+		}
+		return "";
 	}
 
 	/** Fill live snaps for one bar from GeauxCache / ConsumableCache by slot assignment. */
@@ -153,9 +181,12 @@ class BarTerCache {
 
 	static function findGeaux(id:String):Dynamic {
 		if (id == null || id.length == 0) return null;
+		// The id's live record is the freshest poll from any list (Geaux, aura or BarTer).
+		var live = GeauxCache.liveSnap(id);
+		if (live != null) return live;
 		// The dedicated bounded BarTer poll is fresher than dormant Geaux slots.
 		for (s in GeauxCache.barTerSkills) if (s != null && s.present && s.id == id) return s;
-		// Any matching snap is fine — sampleBarTer distributes live fields to all twins.
+		// Any matching snap is fine — twins refresh from the live record each pass.
 		var i = 0;
 		while (i < GeauxCache.count) {
 			var s = GeauxCache.slots[i];
@@ -179,7 +210,11 @@ class BarTerCache {
 	}
 
 
-	/** Submit consumable use through the audited ExtraBars path. */
+	/**
+	 * Submit consumable use through the audited ExtraBars path. Like ExtraBars.dispatch, the caller
+	 * validates first (BarTer.observe: click TTL, gameplayBlockReason, slot-content match), so the
+	 * policy's generation and `allowed` gates are passed as already satisfied.
+	 */
 	public static function useItem(kind:String, gen:Int, hero:Dynamic):{submitted:Bool, message:String, countBefore:Int} {
 		var outcome = ExtraBarsUsePolicy.request(kind, ConsumableCatalog.find(kind) != null, gen, gen, true,
 			function(k) return collect(hero, k),

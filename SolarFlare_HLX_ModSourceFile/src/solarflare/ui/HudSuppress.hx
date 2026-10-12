@@ -8,11 +8,10 @@ import imgui.ref.BoolRef;
  * Draw gating only — the hidden refs on each widget are never written, so the HUD
  * returns exactly as the player left it once it is unhidden.
  *
- * This used to also detect open game menus (bank, vendor, map) and hide for them.
- * That was removed: resolving the type of every open game window each poll cost
- * frame time, recognised only the windows it knew by name, and a merely-undrawn
- * window was still one the player could not act through. A single explicit key is
- * both cheaper and predictable.
+ * The old menu detection (bank, vendor, map) was removed because it resolved the type of
+ * every open game window on every poll. It is back as an opt-in, off by default:
+ * WindowAutoHide classifies each window once and freezes a bool from the observe phase,
+ * so this stays a pair of cheap reads. The explicit key remains the reliable escape hatch.
  */
 class HudSuppress {
 	/**
@@ -22,6 +21,6 @@ class HudSuppress {
 	public static var hideAll = new BoolRef(false);
 
 	public static function active():Bool {
-		return hideAll.get();
+		return hideAll.get() || WindowAutoHide.active();
 	}
 }

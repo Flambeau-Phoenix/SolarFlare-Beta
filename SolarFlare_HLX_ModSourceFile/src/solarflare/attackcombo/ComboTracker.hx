@@ -29,6 +29,10 @@ class ComboTracker {
 	var pulsePhase:Float = 0;
 	var lastStep:Int = -1;
 	var stepChangeTime:Float = 0;
+	var lastStamp:Float = -1;
+
+	/** Longest frame gap animated; a hidden/stalled tracker resumes instead of jumping. */
+	static inline var MAX_DT:Float = 0.1;
 
 	static inline var SIZE_COMPACT:Float = 32;
 	static inline var SIZE_DETAILED:Float = 44;
@@ -37,7 +41,10 @@ class ComboTracker {
 	public function new() {}
 
 	public function draw(step:Int, count:Int, isFinal:Bool, withinCombo:Bool, rowW:Single, rowH:Single):Void {
-		var dt = 0.016;
+		// Wall-clock delta: a fixed 1/60 step ran animations 2.4x fast at 144 FPS.
+		var now = haxe.Timer.stamp();
+		var dt = lastStamp < 0 ? 0.0 : Math.min(MAX_DT, Math.max(0.0, now - lastStamp));
+		lastStamp = now;
 		animTime += dt * animationSpeed;
 		pulsePhase = Math.sin(animTime * 2.5) * 0.5 + 0.5;
 

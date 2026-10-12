@@ -138,7 +138,8 @@ class AttackComboConfig {
 		HudChrome.safeChild("##act_prev_box", ImGui.vec2(0, 56), HudChrome.CHILD_NO_SCROLL, function() {
 			var avail = ImGui.getContentRegionAvail();
 			var st = previewStep.get();
-			AttackComboRenderer.draw(st, 4, st == 4, st > 0, this, avail.x > 20 ? avail.x : 20, avail.y > 20 ? avail.y : 20);
+			AttackComboRenderer.draw(st, 4, st == 4, st > 0, this, avail.x > 20 ? avail.x : 20, avail.y > 20 ? avail.y : 20,
+				AttackComboRenderer.BUILDER_PREVIEW);
 		});
 	}
 

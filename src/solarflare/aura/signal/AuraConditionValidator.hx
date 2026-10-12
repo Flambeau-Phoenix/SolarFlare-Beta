@@ -33,7 +33,7 @@ class AuraConditionValidator {
 	public static function isValidOperator(op:String, d:AuraSignalDescriptor):Bool {
 		if (d == null || op == null) return false;
 		if (d.id == "status.present") return op == "present" || op == "absent";
-		if (d.id == "event.cast.recent" && op == "within") return true;
+		if ((d.id == "event.cast.recent" || isCombatEvent(d.id)) && op == "within") return true;
 		return switch (d.kind) {
 			case Number | Percent | Count | Duration: op == "lt" || op == "lte" || op == "eq" || op == "neq" || op == "gte" || op == "gt" || (d.kind == Duration && op == "within");
 			case Boolean: op == "is" || op == "isNot";
@@ -43,9 +43,11 @@ class AuraConditionValidator {
 	public static function defaultOperator(d:AuraSignalDescriptor):String {
 		if (d == null) return "";
 		if (d.id == "status.present") return "present";
-		if (d.id == "event.cast.recent" || d.id == "event.playerCast.recent") return "within";
+		if (d.id == "event.cast.recent" || d.id == "event.playerCast.recent" || isCombatEvent(d.id)) return "within";
 		return switch (d.kind) { case Boolean: "is"; case Identity: "eq"; default: "gte"; };
 	}
+	/** Enter/leave combat triggers: elapsed-seconds events evaluated with the `within` window like enemy casts. */
+	public static function isCombatEvent(id:String):Bool return id == "event.combat.entered" || id == "event.combat.left";
 	public static function isEventOperator(op:String):Bool {
 		return op == "within";
 	}

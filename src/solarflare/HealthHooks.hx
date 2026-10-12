@@ -486,9 +486,11 @@ class HealthHooks {
 				ComboPointsCache.noteRogue();
 				return true;
 			}
-			var sig = hero.getSkillByInput("SignatureSkill");
+			// Guarded lookup: these names are not accepted by the installed Hero.getSkillByInput and
+			// used to throw on every call (and skip the Rogue-signature check below).
+			var sig = solarflare.geaux.GeauxCache.skillByInput(hero, "SignatureSkill");
 			if (sig == null)
-				sig = hero.getSkillByInput("Signature");
+				sig = solarflare.geaux.GeauxCache.skillByInput(hero, "Signature");
 			if (ComboPointsCache.isFinisherSkill(sig) || ComboPointsCache.isRogueSkillId(skillIdOf(sig))) {
 				ComboPointsCache.noteRogue();
 				return true;
@@ -595,13 +597,22 @@ class HealthHooks {
 	}
 
 	/** The connection hero ID is stable per character; st.Player.uid is account-wide. */
+	static var lastHeroId:haxe.Int64 = 0;
+	static var lastHeroIdText:String = "";
+
 	static function sampleCharacterId(app:GameApp):Void {
 		if (app == null)
 			return;
 		var id = "";
-		try
-			id = haxe.Int64.toStr(app.connectionInfo.heroID)
-		catch (_:Dynamic) {}
+		try {
+			// Runs every identity/vitals pass: stringify only when the raw id changes.
+			var raw = app.connectionInfo.heroID;
+			if (lastHeroIdText.length == 0 || raw != lastHeroId) {
+				lastHeroId = raw;
+				lastHeroIdText = haxe.Int64.toStr(raw);
+			}
+			id = lastHeroIdText;
+		} catch (_:Dynamic) {}
 		if (id == null || id.length == 0 || id == "0")
 			return;
 		HealthCache.setCharacterId(id);
@@ -633,20 +644,18 @@ class HealthHooks {
 			ChaincastCache.clear();
 			return;
 		}
+		// Statuses come from the one owner (AuraStatusCache); wait until it has sampled this hero.
+		if (!solarflare.aura.AuraStatusCache.isCurrent(heroDyn))
+			return;
 		try {
-			var hero:ent.Hero = cast heroDyn;
-			var readySt = findHeroStatusAny(hero, ChaincastCache.lookupReadyIds());
-			if (readySt == null)
-				readySt = findStatusByKind(heroDyn, true, false);
+			var readySt = chaincastStatus(true);
 			if (readySt != null) {
 				ChaincastCache.noteMage();
 				applyChainRemain(readySt);
 				ChaincastCache.setReady();
 				return;
 			}
-			var st = findHeroStatusAny(hero, ChaincastCache.lookupAccumIds());
-			if (st == null)
-				st = findStatusByKind(heroDyn, false, true);
+			var st = chaincastStatus(false);
 			if (st == null) {
 				if (ChaincastCache.active)
 					ChaincastCache.setAccum(0);
@@ -655,11 +664,31 @@ class HealthHooks {
 			}
 			ChaincastCache.noteMage();
 			applyChainRemain(st);
-			ChaincastCache.setAccum(readStatusStacks(st));
+			ChaincastCache.setAccum(st.stacks > 0 ? st.stacks : 0);
 		} catch (_:Dynamic) {
 			if (!ChaincastCache.active)
 				ChaincastCache.clear();
 		}
+	}
+
+	/** Local hero has a MageComponent; gates the mage overlays' status demand (ObserveDemand). */
+	public static var localIsMage(default, null):Bool = false;
+	static var mageGen:Int = -1;
+
+	static function refreshLocalMage(heroDyn:Dynamic):Bool {
+		// A confirmed mage stays one for the identity; a non-mage is rechecked (component can arrive late).
+		if (localIsMage && mageGen == HealthCache.identityGen)
+			return true;
+		var was = localIsMage;
+		localIsMage = false;
+		try {
+			var hero:ent.Hero = cast heroDyn;
+			localIsMage = heroDyn != null && hero.get_mage() != null;
+		} catch (_:Dynamic) {}
+		mageGen = HealthCache.identityGen;
+		if (was != localIsMage)
+			ObserveDemand.markStatusDemandDirty();
+		return localIsMage;
 	}
 
 	static function detectMageChaincast(heroDyn:Dynamic):Bool {
@@ -667,7 +696,7 @@ class HealthHooks {
 			return false;
 		try {
 			var hero:ent.Hero = cast heroDyn;
-			if (hero.get_mage() == null)
+			if (!refreshLocalMage(heroDyn))
 				return false;
 			if (hero.getSkillOverride(ChaincastCache.talentId()) != null) {
 				ChaincastCache.noteMage();
@@ -678,7 +707,8 @@ class HealthHooks {
 				ChaincastCache.noteMage();
 				return true;
 			}
-			if (findChaincastStatus(hero) != null) {
+			if (solarflare.aura.AuraStatusCache.isCurrent(heroDyn)
+					&& (chaincastStatus(true) != null || chaincastStatus(false) != null)) {
 				ChaincastCache.noteMage();
 				return true;
 			}
@@ -692,74 +722,24 @@ class HealthHooks {
 		return ChaincastCache.active;
 	}
 
-	static function findChaincastStatus(hero:ent.Hero):st.skill.Status {
-		var ready = findHeroStatusAny(hero, ChaincastCache.lookupReadyIds());
-		if (ready != null)
-			return ready;
-		return findHeroStatusAny(hero, ChaincastCache.lookupAccumIds());
-	}
-
-	static function findHeroStatus(hero:ent.Hero, id:String):st.skill.Status {
-		if (hero == null || id == null || id.length == 0)
-			return null;
-		try {
-			var st = hero.getStatus(id, null);
-			if (st != null)
-				return st;
-		} catch (_:Dynamic) {}
-		try {
-			var asGo:ent.GameObject = cast hero;
-			var st = hero.getStatus(id, asGo);
-			if (st != null)
-				return st;
-		} catch (_:Dynamic) {}
-		return null;
-	}
-
-	static function findHeroStatusAny(hero:ent.Hero, ids:Array<String>):st.skill.Status {
-		if (hero == null || ids == null)
-			return null;
-		for (id in ids) {
-			var st = findHeroStatus(hero, id);
-			if (st != null)
-				return st;
-		}
-		return null;
-	}
-
-	static function findStatusByKind(heroDyn:Dynamic, wantReady:Bool, wantAccum:Bool):st.skill.Status {
-		var item = findListItemByKind(heroDyn, "statuses", wantReady, wantAccum);
-		if (item != null)
-			return item;
-		return findListItemByKind(heroDyn, "statusList", wantReady, wantAccum);
-	}
-
-	static function findListItemByKind(owner:Dynamic, name:String, wantReady:Bool, wantAccum:Bool):st.skill.Status {
-		var arr = FieldWalk.extractObject(owner, name);
-		if (arr == null)
-			return null;
-		var len = FieldWalk.arrayLen(arr);
-		if (len > 64)
-			len = 64;
+	/*
+	 * Status reads for the mage overlays. AuraStatusCache is the single status owner: these ids
+	 * are in ObserveDemand.statusIds while an overlay is visible on a mage, so the cache samples
+	 * them on its targeted path. These readers never touch the engine.
+	 */
+	static function chaincastStatus(ready:Bool):solarflare.aura.AuraStatusSnap {
+		var snap = solarflare.aura.AuraStatusCache.find(ready ? ChaincastCache.statusId() : ChaincastCache.accumId());
+		if (snap != null && snap.present)
+			return snap;
+		// Variant ids (talent/rank suffixes) only appear here when discovery published them.
 		var i = 0;
-		while (i < len) {
-			var item = FieldWalk.arrayAt(arr, i);
+		while (i < solarflare.aura.AuraStatusCache.count) {
+			var row = solarflare.aura.AuraStatusCache.snaps[i];
 			i++;
-			if (item == null)
+			if (row == null || !row.present)
 				continue;
-			var id = skillIdOf(item);
-			if (wantReady && ChaincastCache.isReadyKind(id)) {
-				try {
-					var st:st.skill.Status = item;
-					return st;
-				} catch (_:Dynamic) {}
-			}
-			if (wantAccum && ChaincastCache.isAccumKind(id)) {
-				try {
-					var st:st.skill.Status = item;
-					return st;
-				} catch (_:Dynamic) {}
-			}
+			if (ready ? ChaincastCache.isReadyKind(row.id) : ChaincastCache.isAccumKind(row.id))
+				return row;
 		}
 		return null;
 	}
@@ -834,7 +814,10 @@ class HealthHooks {
 			}
 			var power = 0;
 			var left = 0.0;
-			collectConduitProcs(heroDyn, hero);
+			// Proc statuses from the one status owner; skip until it has sampled this hero.
+			if (!solarflare.aura.AuraStatusCache.isCurrent(heroDyn))
+				return;
+			collectConduitProcs();
 			var pi = 0;
 			while (pi < conduitProcCount) {
 				var p = conduitProcScratch[pi];
@@ -893,42 +876,20 @@ class HealthHooks {
 		return null;
 	}
 
-	static function collectConduitProcs(heroDyn:Dynamic, hero:ent.Hero):Void {
+	static function collectConduitProcs():Void {
 		conduitProcCount = 0;
 		conduitSeen.clear();
-		ingestConduitList(heroDyn, "statuses");
-		if (conduitProcCount < 1)
-			ingestConduitList(heroDyn, "statusList");
-		if (hero != null) {
-			for (id in ConduitCache.lookupIds()) {
-				if (conduitSeen.exists(id) || conduitSeen.exists(ConduitCache.canonical(id)))
-					continue;
-				var st = findHeroStatus(hero, id);
-				if (st == null)
-					continue;
-				ingestConduitItem(st);
-			}
-		}
-	}
-
-	static function ingestConduitList(owner:Dynamic, name:String):Void {
-		var arr = FieldWalk.extractObject(owner, name);
-		if (arr == null)
-			return;
-		var len = FieldWalk.arrayLen(arr);
-		if (len > 64)
-			len = 64;
 		var i = 0;
-		while (i < len) {
-			ingestConduitItem(FieldWalk.arrayAt(arr, i));
+		while (i < solarflare.aura.AuraStatusCache.count) {
+			var row = solarflare.aura.AuraStatusCache.snaps[i];
 			i++;
+			if (row != null && row.present)
+				ingestConduitStatus(row);
 		}
 	}
 
-	static function ingestConduitItem(item:Dynamic):Void {
-		if (item == null)
-			return;
-		var id = skillIdOf(item);
+	static function ingestConduitStatus(row:solarflare.aura.AuraStatusSnap):Void {
+		var id = row.id;
 		if (!ConduitCache.isConduitKind(id))
 			return;
 		var key = ConduitCache.canonical(id);
@@ -937,7 +898,6 @@ class HealthHooks {
 		if (conduitSeen.exists(key))
 			return;
 		conduitSeen.set(key, true);
-		conduitSeen.set(id, true);
 		var snap:ConduitProcSnap;
 		if (conduitProcCount < conduitProcScratch.length)
 			snap = conduitProcScratch[conduitProcCount];
@@ -947,51 +907,22 @@ class HealthHooks {
 		}
 		conduitProcCount++;
 		snap.id = key;
-		snap.stacks = readStatusStacks(item);
-		if (snap.stacks < 1)
-			snap.stacks = 1;
-		var dur = solarflare.SkillRemain.read(item);
-		snap.left = dur.left;
+		snap.stacks = row.stacks < 1 ? 1 : row.stacks;
+		snap.left = row.left;
 		snap.power = ConduitCache.isPowerKind(key);
 	}
 
-	static function readStatusStacks(item:Dynamic):Int {
-		var n = 0;
-		try {
-			var st:st.skill.Status = item;
-			n = st.stacks;
-			try {
-				var info = st.getStatusInfo();
-				if (info != null && info.stacks > 0)
-					n = info.stacks;
-			} catch (_:Dynamic) {}
-		} catch (_:Dynamic) {
-			n = Std.int(FieldWalk.extractNumber(item, "stacks", 0));
-		}
-		if (n < 0)
-			n = 0;
-		return n;
-	}
-
-	static function applyChainRemain(item:Dynamic):Void {
-		var dur = solarflare.SkillRemain.read(item);
-		ChaincastCache.setRemain(dur.left, dur.progress, dur.valid);
-		#if solarflare_telemetry
-		if (!dur.valid)
-			solarflare.debug.PayloadProbe.captureStatus(item);
-		#end
+	static function applyChainRemain(row:solarflare.aura.AuraStatusSnap):Void {
+		ChaincastCache.setRemain(row.left, row.progress, row.durationKnown);
 	}
 
 	static function detectMageConduit(heroDyn:Dynamic):Bool {
 		if (heroDyn == null)
 			return false;
-		try {
-			var hero:ent.Hero = cast heroDyn;
-			if (hero.get_mage() == null)
-				return false;
-			ConduitCache.noteMage();
-			return true;
-		} catch (_:Dynamic) {}
+		if (!refreshLocalMage(heroDyn))
+			return false;
+		ConduitCache.noteMage();
+		return true;
 		for (id in solarflare.geaux.GeauxCache.bookIds) {
 			if (ConduitCache.isConduitKind(id)) {
 				ConduitCache.noteMage();

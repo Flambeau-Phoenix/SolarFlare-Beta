@@ -48,20 +48,12 @@ class UniqueHeroName {
 		return s;
 	}
 
+	/**
+	 * ent.Hero is a GameLib abstract: `cast` never fails, so it cannot test the type, and
+	 * of() calls Hero-only getPlayer. Use the runtime type check instead.
+	 */
 	static function isHero(unit:Dynamic):Bool {
-		try {
-			var hero:ent.Hero = cast unit;
-			if (hero != null)
-				return true;
-		} catch (_:Dynamic) {}
-		try {
-			var hero:ent.Hero = cast unit;
-			if (hero != null && hero.getPlayer() != null)
-				return true;
-		} catch (_:Dynamic) {}
-		if (FieldWalk.extractObject(unit, "player") != null)
-			return true;
-		return false;
+		return solarflare.HealthCache.isHeroObject(unit);
 	}
 
 	static function consider(best:String, cand:String):String {

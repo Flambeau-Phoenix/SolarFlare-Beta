@@ -7,8 +7,11 @@ import imgui.ref.FloatRef;
 class HideMoveElement {
 	public var id:String;
 	public var label:String;
-	/** DomKit Comp* type name, e.g. domkit.CompChatBox */
+	/** Engine class of the live widget (display only), e.g. ui.hud.ChatBox */
 	public var typePath:String;
+	/** Field path from ui.Hud to the live widget, e.g. bottomBar.heroBar. Empty = not locatable. */
+	public var path:String;
+	public var pathParts:Array<String>;
 	public var visible:BoolRef;
 	public var locked:BoolRef;
 	public var x:FloatRef;
@@ -19,10 +22,12 @@ class HideMoveElement {
 	public var applyScale:BoolRef;
 	public var applyAlpha:BoolRef;
 
-	public function new(id:String, label:String, typePath:String) {
+	public function new(id:String, label:String, typePath:String, path:String = "") {
 		this.id = id;
 		this.label = label;
 		this.typePath = typePath;
+		this.path = path;
+		pathParts = path.length == 0 ? [] : path.split(".");
 		visible = new BoolRef(true);
 		locked = new BoolRef(false);
 		x = new FloatRef(0);

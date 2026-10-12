@@ -61,6 +61,22 @@ class AuraSignalFrameBuilder {
 		frame.killKnown = kk.length > 0;
 		frame.damageTakenRecent = CombatLogCache.maxDamageTakenRecent(5.0);
 		frame.damageTakenKnown = true;
+		var combatState:Null<Bool> = null;
+		var combatHero = HealthCache.localHero;
+		if (combatHero != null && HealthCache.isHeroObject(combatHero))
+			try {
+				// Same native isInCombat field as the GameLib getter, preserving a missing
+				// field as unknown rather than coercing a null Dynamic into false.
+				var raw = solarflare.FieldWalk.resolveNamed(combatHero, "isInCombat");
+				if (Std.isOfType(raw, Bool)) combatState = cast raw;
+			} catch (_:Dynamic) {}
+		CombatStateTracker.observe(combatState, now, HealthCache.identityGen, HealthCache.statusOwnerGen);
+		frame.combatKnown = CombatStateTracker.known;
+		frame.inCombat = CombatStateTracker.inCombat;
+		frame.combatEnteredAge = CombatStateTracker.enteredAge(now);
+		frame.combatLeftAge = CombatStateTracker.leftAge(now);
+		frame.combatEnteredSerial = CombatStateTracker.enteredSerial;
+		frame.combatLeftSerial = CombatStateTracker.leftSerial;
 		// Demanded subjects are polled live even when absent from the visible Geaux strip.
 		addSkills(frame, GeauxCache.auraSkills);
 		addSkills(frame, GeauxCache.slots); addSkills(frame, GeauxCache.weapons); addSkills(frame, GeauxCache.signatures);
@@ -197,10 +213,12 @@ class AuraSignalFrameBuilder {
 		if (instant && !ready) {
 			try {
 				var hero = HealthCache.localHero;
+				// The game's data names the _Proc row (if the skill has one); no typed probe for a row that cannot exist.
+				var procId = solarflare.EngineSkillId.procOf(skillId);
 				if (hero != null) {
 					var h:ent.GameObject = cast hero;
-					var procId = skillId + "_Proc";
-					var n = h.getStatusCount(procId, null);
+					// No such row means a count of exactly 0 (what the probe returned), without calling the engine.
+					var n = procId.length > 0 ? h.getStatusCount(procId, null) : 0;
 					if (n > 0) {
 						ready = true;
 						known = true;

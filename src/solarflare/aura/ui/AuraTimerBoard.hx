@@ -12,6 +12,12 @@ import solarflare.ui.SettingsStore;
 
 /** Movable HUD window that stacks every active condition-driven timer. */
 class AuraTimerBoard {
+	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
+	static var hudCfg:AuraConfig;
+	static var hudBodyFn:imgui.Structs.ImVec2->Void = hudBody;
+	static var hudHideFn:Void->Void = hudHide;
+	static var hudResizeFn:Single->Single->Void = hudResize;
+
 	/** Reused per frame; the board never allocates inside the draw loop. */
 	static var scratch:Array<AuraDef> = [];
 
@@ -39,16 +45,10 @@ class AuraTimerBoard {
 		var rowH:Single = Math.max(16, cfg.timerBoardRowH.get());
 		var w:Single = Math.max(96, cfg.timerBoardW.get());
 		var h:Single = rowH * scratch.length + 4;
+		hudCfg = cfg;
 		HUDWidgetWindow.draw("SolarFlare Timers##sf_timer_board", "Timers", cfg.timerBoardChrome, w, h,
-			function(size:ImVec2) {
-				body(size, rowH);
-			}, openBuilder, function() {
-				cfg.timerBoardHidden.set(true);
-				SettingsStore.markDirty();
-			}, false, null, function(newW:Single, _:Single) {
-				cfg.timerBoardW.set(Math.max(96, newW));
-				SettingsStore.markDirty();
-			});
+			hudBodyFn, openBuilder, hudHideFn, false, null, hudResizeFn);
+		hudCfg = null;
 	}
 
 	static function body(size:ImVec2, rowH:Single):Void {
@@ -113,5 +113,22 @@ class AuraTimerBoard {
 		if (lv < rv)
 			return -1;
 		return lv > rv ? 1 : 0;
+	}
+
+	static function hudBody(size:imgui.Structs.ImVec2):Void {
+		var rowH:Single = Math.max(16, hudCfg.timerBoardRowH.get());
+		body(size, rowH);
+	}
+
+	static function hudHide():Void {
+		var cfg = hudCfg;
+		cfg.timerBoardHidden.set(true);
+		SettingsStore.markDirty();
+	}
+
+	static function hudResize(newW:Single, _:Single):Void {
+		var cfg = hudCfg;
+		cfg.timerBoardW.set(Math.max(96, newW));
+		SettingsStore.markDirty();
 	}
 }

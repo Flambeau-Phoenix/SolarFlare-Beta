@@ -17,6 +17,13 @@ class ObserveDemand {
 	public static var targetHud:Bool = false;
 	public static var castBars:Bool = false;
 	public static var combatLog:Bool = false;
+	/** Chaincast/conduit status ids are in statusIds (visible overlay and a mage hero). */
+	static var mageStatusDemanded:Bool = false;
+	/**
+	 * Any reader of CombatLogCache lines (log window, recorder, Lightsaber, auras, Spark Cube).
+	 * The damage/cast hooks return before attribution when false.
+	 */
+	public static var combatLines:Bool = false;
 	public static var geaux:Bool = false;
 	public static var geauxBuilder:Bool = false;
 	/** BarTer skill bars — light sampleBarTer path, not full Geaux skills demand. */
@@ -121,6 +128,12 @@ class ObserveDemand {
 			&& (cfg.extraBarsPrototype.model.demand() || cfg.extraBarsPrototype.open.get()))
 			|| barterNeedsItems;
 		auras = cfg.auras != null && cfg.auras.enabled.get() && cfg.auras.auras != null && cfg.auras.auras.length > 0;
+		// Mage overlays read statuses from the one status owner; their ids join the demand set.
+		var mageStatus = (chaincast || conduit) && solarflare.HealthHooks.localIsMage;
+		if (mageStatus != mageStatusDemanded) {
+			mageStatusDemanded = mageStatus;
+			statusDemandDirty = true;
+		}
 		auraBuilderOpen = cfg.auraBuilder != null && cfg.auraBuilder.open.get();
 		if (statusDemandDirty) {
 			statusDemandDirty = false;
@@ -136,6 +149,14 @@ class ObserveDemand {
 				castSkillIds.pop();
 			consumableIds.resize(0);
 			if (cfg.extraBarsPrototype != null && cfg.extraBarsPrototype.model.sparkEnabled) pushStatusId("SparkSurge_Status");
+			if (mageStatusDemanded) {
+				if (chaincast) {
+					pushStatusId(solarflare.chaincast.Chaincast.ChaincastCache.statusId());
+					pushStatusId(solarflare.chaincast.Chaincast.ChaincastCache.accumId());
+				}
+				if (conduit)
+					for (id in solarflare.conduit.Conduit.ConduitCache.lookupIds()) pushStatusId(id);
+			}
 			if (cfg.auras != null) {
 				for (a in cfg.auras.auras) if (a != null && a.enabled.get()) {
 					if (a.rule != null && a.rule.conditions != null) {
@@ -159,8 +180,11 @@ class ObserveDemand {
 			rawNeedTarget = auraRulesNeedTarget(cfg);
 			// Instant-ready scripts gate on owner *_Proc only (not bare skill / *_Status).
 			if (rawNeedInstant) {
-				for (id in instantSkillIds)
-					pushStatusId(id + "_Proc");
+				for (id in instantSkillIds) {
+					var proc = EngineSkillId.procOf(id);
+					if (proc.length > 0)
+						pushStatusId(proc);
+				}
 			}
 		}
 		// BarTer subjects: bounded rebuild (three active bars × 64 cells), own poll path.
@@ -192,6 +216,9 @@ class ObserveDemand {
 		catch (_:Dynamic)
 			recording = false;
 		riftFlag = getRifty || combatLog || saberRift || auras || auraBuilderOpen || recording;
+		var saber = cfg.lightsaber != null && (!cfg.lightsaber.hidden.get() || cfg.lightsaber.showLog.get());
+		var sparkCube = cfg.extraBarsPrototype != null && cfg.extraBarsPrototype.model.sparkEnabled;
+		combatLines = combatLog || recording || saber || auras || auraBuilderOpen || sparkCube;
 		#if solarflare_telemetry
 		riftFlag = riftFlag || solarflare.debug.ResolutionLedger.armed();
 		#end
@@ -259,8 +286,12 @@ class ObserveDemand {
 		// Status alerts: plain skill ids expand to common companions on the hero.
 		// Instant Cast subjects do not go through here (Proc-only above).
 		if (!looksLikeStatusId(id)) {
-			pushStatusId(id + "_Proc");
-			pushStatusId(id + "_Status");
+			// From the game's data (EngineSkillId.procOf/statusesOf): only rows that exist; unknown ids keep the guess.
+			var proc = EngineSkillId.procOf(id);
+			if (proc.length > 0)
+				pushStatusId(proc);
+			for (st in EngineSkillId.statusesOf(id))
+				pushStatusId(st);
 		}
 	}
 

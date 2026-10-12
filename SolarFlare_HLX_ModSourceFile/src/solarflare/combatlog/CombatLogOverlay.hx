@@ -65,31 +65,36 @@ class CombatLogOverlay {
 		}
 		var flags = cfg.chrome != null ? cfg.chrome.windowFlagsKeepClicks(FLAGS) : FLAGS;
 		var began = ImGui.begin("SolarFlare Combat Log", null, flags);
-		if (began) {
-			if (cfg.chrome == null || !cfg.chrome.isLocked()) {
-				if (cfg.chrome != null)
-					cfg.chrome.capturePos();
+		var failure:Dynamic = null;
+		try {
+			if (began) {
+				if (cfg.chrome == null || !cfg.chrome.isLocked()) {
+					if (cfg.chrome != null)
+						cfg.chrome.capturePos();
+				}
+				if (cfg.chrome == null || cfg.chrome.beginBody(function() {
+					cfg.hidden.set(true);
+					solarflare.ui.SettingsStore.markDirty();
+				}, null, "Combat Log", false, ImGuiWindowFlags.NoScrollWithMouse, 0, RESIZE_FOOTER)) {
+					var rows = CombatLogCache.linesForDraw(cfg);
+					var avail = ImGui.getContentRegionAvail();
+					drawRows(rows, avail.x, avail.y);
+				}
+				if (cfg.chrome != null) {
+					cfg.chrome.closeBodyChild();
+					cfg.chrome.drawResizeCorner("combat_log", !cfg.chrome.isLocked(),
+						MIN_W, MIN_H, MAX_W, MAX_H, function(nextW:Single, nextH:Single) {
+							cfg.width.set(nextW);
+							cfg.height.set(nextH);
+							solarflare.ui.SettingsStore.markDirty();
+						}, RESIZE_INSET);
+					cfg.chrome.pollTransparentSurfaceDrag("combat_log", !cfg.chrome.isLocked());
+				}
 			}
-			if (cfg.chrome == null || cfg.chrome.beginBody(function() {
-				cfg.hidden.set(true);
-				solarflare.ui.SettingsStore.markDirty();
-			}, null, "Combat Log", false, ImGuiWindowFlags.NoScrollWithMouse, 0, RESIZE_FOOTER)) {
-				var rows = CombatLogCache.linesForDraw(cfg);
-				var avail = ImGui.getContentRegionAvail();
-				drawRows(rows, avail.x, avail.y);
-			}
-			if (cfg.chrome != null) {
-				cfg.chrome.closeBodyChild();
-				cfg.chrome.drawResizeCorner("combat_log", !cfg.chrome.isLocked(),
-					MIN_W, MIN_H, MAX_W, MAX_H, function(nextW:Single, nextH:Single) {
-						cfg.width.set(nextW);
-						cfg.height.set(nextH);
-						solarflare.ui.SettingsStore.markDirty();
-					}, RESIZE_INSET);
-				cfg.chrome.pollTransparentSurfaceDrag("combat_log", !cfg.chrome.isLocked());
-			}
-		}
+		} catch (e:Dynamic) failure = e;
+		// End must run on every path or later overlays submit into this window.
 		HudChrome.endOverlayWindow(began, cfg.chrome);
+		if (failure != null) solarflare.ui.UiScope.reportOnce("window", "combat_log", failure);
 	}
 
 	var sortCol:Int = -1;
@@ -101,6 +106,18 @@ class CombatLogOverlay {
 			| ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable;
 		if (!ImGui.beginTable("clog_rows", 12, tbl, ImGui.vec2(width, height)))
 			return;
+		// ScrollY gives the table its own child window; EndTable must close it before the body child.
+		var failure:Dynamic = null;
+		try
+			drawRowsBody(rows)
+		catch (e:Dynamic)
+			failure = e;
+		ImGui.endTable();
+		if (failure != null)
+			throw failure;
+	}
+
+	function drawRowsBody(rows:Array<CombatLogLine>):Void {
 		ImGui.tableSetupColumn("Time", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.DefaultSort, 62);
 		ImGui.tableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed, 44);
 		ImGui.tableSetupColumn("Source", ImGuiTableColumnFlags.WidthStretch, 0.18);
@@ -166,7 +183,6 @@ class CombatLogOverlay {
 		ImGuiLists.forVisible(displayRows.length, function(i:Int) drawLine(displayRows[i]));
 		if (sortCol <= 0 && ImGui.getScrollY() >= ImGui.getScrollMaxY() - 8)
 			ImGui.setScrollHereY(1);
-		ImGui.endTable();
 	}
 
 	function drawLine(line:CombatLogLine):Void {

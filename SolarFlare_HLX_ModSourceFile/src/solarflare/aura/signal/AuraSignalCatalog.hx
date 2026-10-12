@@ -73,6 +73,9 @@ class AuraSignalCatalog {
 		add("target.hpRatio", "Target HP percent", "Target", Percent);
 		add("combat.killKindMatches", "Kill of unit kind", "Combat", Boolean, "unit");
 		add("combat.damageTakenRecent", "Recent damage taken (max hit)", "Combat", Number);
+		add("combat.inCombat", "In combat", "Combat", Boolean);
+		add("event.combat.entered", "Entered combat (seconds ago)", "Combat", Duration);
+		add("event.combat.left", "Left combat (seconds ago)", "Combat", Duration);
 		add("event.cast.recent", "Enemy cast age (seconds)", "Enemy casts", Duration, "skill");
 		add("event.cast.active", "Enemy cast/channel active", "Enemy casts", Boolean, "skill");
 		add("skill.charges", "Skill charges remaining", "Skills", Count, "skill");

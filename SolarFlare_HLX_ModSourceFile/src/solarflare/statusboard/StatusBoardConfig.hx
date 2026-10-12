@@ -49,7 +49,11 @@ class StatusBoardConfig {
    active=stabilizer.shown;
   }
   exclusions.pack(stabilizer.shown,stabilizer.shown.length,visible,maxIcons);
+  lastActive=active.length; lastVisible=visible.length;
  }
+ /** Primitive mirror of the board's own lists for the Dev Log (what is actually drawn, not what the cache holds). */
+ public static var lastActive:Int=0;
+ public static var lastVisible:Int=0;
  /** Label, icon and source item for a board-owned copy; the cache row is never written. */
  function describe(s:AuraStatusSnap):Void {
   var entry=solarflare.cdb.ConsumableCatalog.find(s.sourceItemId);
@@ -123,6 +127,9 @@ class StatusBoardConfig {
    });
   });
   ImGui.textDisabled(active.length+" active / "+visible.length+" visible / "+exclusions.hiddenIds.length+" hidden");
+  if (ImGui.smallButton("Check statuses##sb_audit")) AuraStatusCache.auditRequested=true;
+  if (ImGui.isItemHovered()) ImGui.setTooltip("Compares the game's own status list with what SolarFlare read and what this board shows.");
+  if (AuraStatusCache.lastAudit.length > 0) ImGui.textWrapped(AuraStatusCache.lastAudit);
   if (!AuraStatusCache.domainKnown) ImGui.textWrapped("Status observation is incomplete; unavailable values are not treated as absence.");
   var q=search.draw("##sb_search");
   UiChrome.centeredHeader("Active statuses",30);

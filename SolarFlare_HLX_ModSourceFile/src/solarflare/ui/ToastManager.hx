@@ -29,9 +29,8 @@ class ToastManager {
 	static var lastTime:Float = 0.0;
 
 	/**
-	 * Viewport width, refreshed when a toast is queued rather than per frame.
-	 * hxd.Window.getInstance() is a GameLib proxy call and the width read is a
-	 * Reflect.field on a Dynamic; neither belongs in a draw loop.
+	 * Viewport width from ImGui's own main viewport, read in draw() (inside a frame:
+	 * getMainViewport faults before the first present). No engine object is touched.
 	 */
 	static var screenW:Single = 1920.0;
 
@@ -39,17 +38,16 @@ class ToastManager {
 		toasts.push(new ToastItem(message, type, duration));
 		if (toasts.length > MAX_TOASTS)
 			toasts.shift();
-		refreshViewport();
 	}
 
 	static function refreshViewport():Void {
 		try {
-			var win:Dynamic = hxd.Window.getInstance();
-			if (win == null)
-				return;
-			var w:Dynamic = Reflect.field(win, "width");
-			if (w != null)
-				screenW = w;
+			var vp = ImGui.getMainViewport();
+			if (vp != null) {
+				var c = ImGui.ImGuiViewport_GetCenter(vp);
+				if (c != null && c.x > 160)
+					screenW = c.x * 2;
+			}
 		} catch (_:Dynamic) {}
 	}
 
@@ -72,6 +70,7 @@ class ToastManager {
 	public static function draw():Void {
 		if (toasts.length == 0)
 			return;
+		refreshViewport();
 
 		var now = Date.now().getTime() / 1000.0;
 		var dt:Single = (lastTime > 0.0) ? (now - lastTime) : 0.016;

@@ -10,10 +10,12 @@ class HideMoveConfig {
 
 	public function new() {
 		elements = [
-			new HideMoveElement("chat", "Chat box", "domkit.CompChatBox"),
-			new HideMoveElement("bottomBar", "Bottom bar (hero)", "domkit.CompHeroBar"),
-			new HideMoveElement("heroBarPad", "Hero bar pad", "domkit.CompHeroBarPad"),
-			new HideMoveElement("castingBar", "Casting bar", "domkit.CompCastingBar")
+			// Live widgets, reached from ui.Hud. The domkit.Comp* statics are component descriptors, not widgets.
+			new HideMoveElement("chat", "Chat box", "ui.hud.ChatBox", "chat"),
+			new HideMoveElement("bottomBar", "Bottom bar (hero)", "ui.hud.HeroBar", "bottomBar.heroBar"),
+			new HideMoveElement("heroBarPad", "Hero bar pad", "ui.hud.HeroBarPad", "bottomBar.heroBarPad"),
+			// The casting bar belongs to a per-unit CastingInfo widget with no stable owner on the Hud yet.
+			new HideMoveElement("castingBar", "Casting bar", "ui.comp.CastingBar", "")
 		];
 	}
 
@@ -60,6 +62,10 @@ class HideMoveConfig {
 		for (e in elements) {
 			ImGui.separator();
 			ImGui.text(e.label + " (" + e.typePath + ")");
+			if (e.path.length == 0) {
+				ImGui.textDisabled("Not available yet: the live widget cannot be located safely.");
+				continue;
+			}
 			var eid = "##hm_" + e.id;
 			UiLayout.propertyGrid(eid, function() {
 				UiLayout.propertyRow("Visible", function() {
@@ -79,7 +85,7 @@ class HideMoveConfig {
 						if (ImGui.sliderFloat("Y##y" + eid, e.y, -2000, 2000))
 							SettingsStore.markDirty();
 					}
-				});
+				}, "Pixels from where the game places it. 0 / 0 leaves it where it is.");
 				UiLayout.propertyRow("Scale", function() {
 					if (ImGui.checkbox("Apply scale##sc" + eid, e.applyScale))
 						SettingsStore.markDirty();

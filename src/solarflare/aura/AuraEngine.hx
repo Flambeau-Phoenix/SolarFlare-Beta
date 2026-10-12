@@ -24,6 +24,7 @@ class AuraEngine {
 	static inline var STATUS_HOLD:Float = 0.18;
 	static var frame:AuraSignalFrame;
 	static var timerHero:Dynamic;
+	static var timerOwnerGeneration:Int = -1;
 
 	/** Explicit runtime initialization; called by AuraConfig construction. */
 	public static function initialize():Void {
@@ -38,12 +39,14 @@ class AuraEngine {
 		if (cfg == null || cfg.auras == null)
 			return;
 		if (!cfg.enabled.get() && !solarflare.ObserveDemand.auraBuilderOpen) {
+			solarflare.aura.signal.CombatStateTracker.reset();
 			clearAllPresentation(cfg);
 			return;
 		}
 		var now = stamp();
-		if (timerHero != HealthCache.localHero) {
+		if (timerHero != HealthCache.localHero || timerOwnerGeneration != HealthCache.statusOwnerGen) {
 			timerHero = HealthCache.localHero;
+			timerOwnerGeneration = HealthCache.statusOwnerGen;
 			clearAllPresentation(cfg);
 		}
 		initialize();
@@ -337,16 +340,24 @@ class AuraEngine {
 		if (want.length < 2)
 			return {hit: false, progress: 0, left: Math.NaN};
 		var hold = catalogHold(a, 3);
-		var lines = CombatLogCache.recentAll();
+		// Per call, not per line: the aura's id lowered and display-mapped once.
+		var wantLow = want.toLowerCase();
+		var wantDisp = EngineSkillId.display(want).toLowerCase();
 		var bestT = -1.0;
-		var i = lines.length - 1;
+		var i = CombatLogCache.lineCount() - 1;
 		while (i >= 0) {
-			var line:CombatLogLine = lines[i];
-			if (line != null && line.t + hold >= now && logLineMatch(want, line)) {
-				if (line.t > bestT)
-					bestT = line.t;
-			}
+			var line:CombatLogLine = CombatLogCache.lineAt(i);
 			i--;
+			if (line == null)
+				continue;
+			// Chronological ring: everything older is outside the hold window too.
+			if (line.t + hold < now)
+				break;
+			// Newest match first, i.e. the latest hit the old max-t scan was looking for.
+			if (logLineMatch(wantLow, wantDisp, line)) {
+				bestT = line.t;
+				break;
+			}
 		}
 		if (bestT < 0)
 			return {hit: false, progress: 0, left: Math.NaN};
@@ -356,25 +367,24 @@ class AuraEngine {
 		return {hit: true, progress: hold > 0.05 ? clamp01(left / hold) : 1, left: left};
 	}
 
-	static function logLineMatch(want:String, line:CombatLogLine):Bool {
+	/** `wantLow` / `wantDisp`: the aura id lowered, and its display name lowered (precomputed). */
+	static function logLineMatch(wantLow:String, wantDisp:String, line:CombatLogLine):Bool {
 		if (line.sourceRole != CombatLogCache.ROLE_YOU && line.targetRole != CombatLogCache.ROLE_YOU)
 			return false;
-		if (idEq(want, line.skillId) || idEq(want, line.skillLabel) || idEq(want, line.skillName))
+		if (idEq(wantLow, wantDisp, line.skillId) || idEq(wantLow, wantDisp, line.skillLabel)
+				|| idEq(wantLow, wantDisp, line.skillName))
 			return true;
-		var w = want.toLowerCase();
-		if (w.length < 3)
+		if (wantLow.length < 3)
 			return false;
-		return contains(line.skillId, w) || contains(line.skillLabel, w) || contains(line.skillName, w);
+		return contains(line.skillId, wantLow) || contains(line.skillLabel, wantLow) || contains(line.skillName, wantLow);
 	}
 
-	static function idEq(want:String, have:String):Bool {
-		if (want == null || have == null || have.length == 0)
+	static function idEq(w:String, wd:String, have:String):Bool {
+		if (w == null || have == null || have.length == 0)
 			return false;
-		var w = want.toLowerCase();
 		var h = have.toLowerCase();
 		if (w == h)
 			return true;
-		var wd = EngineSkillId.display(want).toLowerCase();
 		var hd = EngineSkillId.display(have).toLowerCase();
 		if (wd.length > 0 && hd.length > 0 && wd == hd)
 			return true;

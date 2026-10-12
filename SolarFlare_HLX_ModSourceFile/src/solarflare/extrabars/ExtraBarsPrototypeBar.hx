@@ -8,50 +8,33 @@ import solarflare.ui.ThemePalette;
 
 /** Configurable grid shell; only its first cell owns the runtime-gated test item. */
 class ExtraBarsPrototypeBar {
+	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
+	var hudSlot:ExtraBarsPrototypeSlot;
+	var hudRows:Int;
+	var hudColumns:Int;
+	var hudPixels:Int;
+	var hudOnResize:Int->Void;
+	var hudBodyFn:imgui.Structs.ImVec2->Void;
+	var hudResizeFn:Single->Single->Void;
+
  static inline var ACTIVE_OUTLINE:Int = 0xFF75D855;
- public function new() {}
+ public function new() {
+		hudBodyFn = hudBody;
+		hudResizeFn = hudResize;
+	}
  public function draw(slot:ExtraBarsPrototypeSlot, chrome:HudChrome, edit:Void->Void,
    rows:Int = 2, columns:Int = 4, pixels:Int = 48, onResize:Int->Void = null):Void {
   if (!slot.enabled || !ExtraBarsGrid.valid(rows, columns)) return;
   pixels = ExtraBarsGrid.size(pixels);
   var contentW:Single = ExtraBarsGrid.width(columns, pixels);
   var contentH:Single = ExtraBarsGrid.height(rows, pixels);
-  HUDWidgetWindow.draw("SolarFlare.ExtraBarsPrototypeSlot", "ExtraBars", chrome, contentW, contentH, function(size) {
-   var theme = ThemePalette.current();
-   var origin = ImGui.getCursorScreenPos();
-   var dl = ImGui.getWindowDrawList();
-   for (index in 0...rows * columns) {
-    var x:Single = origin.x + (index % columns) * (pixels + ExtraBarsGrid.GAP);
-    var y:Single = origin.y + Std.int(index / columns) * (pixels + ExtraBarsGrid.GAP);
-    ImGui.setCursorScreenPos(ImGui.vec2(x, y));
-    ImGui.dummy(ImGui.vec2(pixels, pixels));
-    var hovered = ImGui.isItemHovered();
-    if (index == 0) {
-     drawItem(dl, slot, x, y, pixels);
-     if (hovered) ImGui.setTooltip(slot.inputLabel + " / " + slot.inputDetail + "\n" + slot.name + "\n" + slot.binding + "\n"
-       + (slot.reason.length > 0 ? slot.reason : "Press the bar key to test native use."));
-    } else {
-     ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + pixels, y + pixels),
-       ImGui.colorConvertFloat4ToU32(theme.cellBg), 4);
-     ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + pixels, y + pixels),
-       slot.inputActive ? ACTIVE_OUTLINE : ImGui.colorConvertFloat4ToU32(theme.border), 4, 1);
-     var label = "" + (index + 1);
-     var measured = ImGui.calcTextSize(label);
-     ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + (pixels - measured.x) * 0.5, y + (pixels - measured.y) * 0.5),
-       ImGui.colorConvertFloat4ToU32(theme.textDisabled), label);
-     if (hovered) ImGui.setTooltip("Empty cell " + (index + 1) + ". Additional assignments follow input acceptance.");
-    }
-   }
-   var captionsY:Single = origin.y + contentH - ExtraBarsGrid.CAPTION + 3;
-   var stateLabel = contentW >= 88 ? slot.inputLabel : (slot.inputActive ? "ON" : "OFF");
-   drawKeyBadge(dl, stateLabel, origin.x + 2, captionsY,
-     ImGui.colorConvertFloat4ToU32(slot.inputActive ? theme.accent : theme.border), contentW - 4, true);
-   drawLabel(dl, slot.name, origin.x, captionsY + 16, contentW, ImGui.colorConvertFloat4ToU32(theme.textDisabled));
-   ImGui.setCursorScreenPos(origin);
-   ImGui.dummy(ImGui.vec2(contentW, contentH));
-  }, edit, null, false, null, function(width:Single, height:Single) {
-   if (onResize != null) onResize(ExtraBarsGrid.resized(rows, columns, width, height));
-  });
+  hudSlot = slot;
+  hudRows = rows;
+  hudColumns = columns;
+  hudPixels = pixels;
+  hudOnResize = onResize;
+  HUDWidgetWindow.draw("SolarFlare.ExtraBarsPrototypeSlot", "ExtraBars", chrome, contentW, contentH, hudBodyFn, edit, null, false, null, hudResizeFn);
+  hudSlot = null; hudOnResize = null;
  }
  public static function drawItem(dl:Dynamic, slot:ExtraBarsPrototypeSlot, x:Single, y:Single, pixels:Int):Void {
   var theme = ThemePalette.current();
@@ -115,5 +98,48 @@ class ExtraBarsPrototypeBar {
 		if (visible.length < label.length && visible.length > 3) visible = visible.substr(0, visible.length - 3) + "...";
 		var w = ImGui.calcTextSize(visible).x;
 		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + Math.max(0, (width - w) * 0.5), y), color, visible);
+	}
+
+	function hudBody(size:imgui.Structs.ImVec2):Void {
+		var slot = hudSlot; var rows = hudRows; var columns = hudColumns; var pixels = hudPixels;
+		var contentW:Single = ExtraBarsGrid.width(columns, pixels);
+		var contentH:Single = ExtraBarsGrid.height(rows, pixels);
+		var theme = ThemePalette.current();
+		var origin = ImGui.getCursorScreenPos();
+		var dl = ImGui.getWindowDrawList();
+		for (index in 0...rows * columns) {
+		 var x:Single = origin.x + (index % columns) * (pixels + ExtraBarsGrid.GAP);
+		 var y:Single = origin.y + Std.int(index / columns) * (pixels + ExtraBarsGrid.GAP);
+		 ImGui.setCursorScreenPos(ImGui.vec2(x, y));
+		 ImGui.dummy(ImGui.vec2(pixels, pixels));
+		 var hovered = ImGui.isItemHovered();
+		 if (index == 0) {
+		  drawItem(dl, slot, x, y, pixels);
+		  if (hovered) ImGui.setTooltip(slot.inputLabel + " / " + slot.inputDetail + "\n" + slot.name + "\n" + slot.binding + "\n"
+		    + (slot.reason.length > 0 ? slot.reason : "Press the bar key to test native use."));
+		 } else {
+		  ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + pixels, y + pixels),
+		    ImGui.colorConvertFloat4ToU32(theme.cellBg), 4);
+		  ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + pixels, y + pixels),
+		    slot.inputActive ? ACTIVE_OUTLINE : ImGui.colorConvertFloat4ToU32(theme.border), 4, 1);
+		  var label = "" + (index + 1);
+		  var measured = ImGui.calcTextSize(label);
+		  ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + (pixels - measured.x) * 0.5, y + (pixels - measured.y) * 0.5),
+		    ImGui.colorConvertFloat4ToU32(theme.textDisabled), label);
+		  if (hovered) ImGui.setTooltip("Empty cell " + (index + 1) + ". Additional assignments follow input acceptance.");
+		 }
+		}
+		var captionsY:Single = origin.y + contentH - ExtraBarsGrid.CAPTION + 3;
+		var stateLabel = contentW >= 88 ? slot.inputLabel : (slot.inputActive ? "ON" : "OFF");
+		drawKeyBadge(dl, stateLabel, origin.x + 2, captionsY,
+		  ImGui.colorConvertFloat4ToU32(slot.inputActive ? theme.accent : theme.border), contentW - 4, true);
+		drawLabel(dl, slot.name, origin.x, captionsY + 16, contentW, ImGui.colorConvertFloat4ToU32(theme.textDisabled));
+		ImGui.setCursorScreenPos(origin);
+		ImGui.dummy(ImGui.vec2(contentW, contentH));
+	}
+
+	function hudResize(width:Single, height:Single):Void {
+		var rows = hudRows; var columns = hudColumns; var onResize = hudOnResize;
+		if (onResize != null) onResize(ExtraBarsGrid.resized(rows, columns, width, height));
 	}
 }

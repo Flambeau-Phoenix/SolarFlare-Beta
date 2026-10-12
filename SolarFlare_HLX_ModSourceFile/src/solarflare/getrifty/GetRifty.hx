@@ -40,6 +40,10 @@ class GetRiftyCache {
 	public static var remainingTime:Float = 0.0;
 	public static var inWaitPhase:Bool = false;
 	public static var nbPlayerDeaths:Int = 0;
+	/** True when the replicated RiftContext was found through the local player (Activity.globalCtx is server-only). */
+	public static var ctxKnown:Bool = false;
+	/** ActivityContext.step (replicated). */
+	public static var ctxStep:String = "";
 	/** Alert animation frame (observe). */
 	public static var animFrame:Int = 0;
 
@@ -94,6 +98,8 @@ class GetRiftyCache {
 		remainingTime = 0.0;
 		inWaitPhase = false;
 		nbPlayerDeaths = 0;
+		ctxKnown = false;
+		ctxStep = "";
 		if (app == null)
 			return;
 		try {
@@ -126,14 +132,12 @@ class GetRiftyCache {
 					if (rift != null)
 						bossId = rift.targetBossId;
 				} catch (_:Dynamic) {}
-				try {
-					var act:st.Activity = cast activity;
-					if (act != null && act.globalCtx != null)
-						riftCtx = cast act.globalCtx;
-				} catch (_:Dynamic) {}
+				riftCtx = riftContextOf(app, activity);
 			}
 
 			if (riftCtx != null) {
+				ctxKnown = true;
+				try ctxStep = riftCtx.step catch (_:Dynamic) {}
 				try left = riftCtx.getRemainingTime() catch (_:Dynamic) left = Math.NaN;
 				try inBossFight = riftCtx.inBossFight catch (_:Dynamic) {}
 				try inWaitPhase = riftCtx.isInWaitPhase() catch (_:Dynamic) {}
@@ -199,6 +203,36 @@ class GetRiftyCache {
 					inBossFight ? "true" : "false");
 			#end
 		} catch (_:Dynamic) {}
+	}
+
+	/**
+	 * The rift's RiftContext as the client sees it. `Activity.globalCtx` is a server-only field (Activity replicates
+	 * only `kind`), so on the client the context is the entry of the local player's replicated `activityCtx` list whose
+	 * `.activity` is this rift. Only ever cast when the engine itself says the activity is a rift.
+	 */
+	static function riftContextOf(app:Dynamic, activity:Dynamic):st.activity.RiftContext {
+		var act:st.Activity = null;
+		try {
+			act = cast activity;
+			if (act == null || !act.isRift())
+				return null;
+		} catch (_:Dynamic) {
+			return null;
+		}
+		try {
+			var gApp:GameApp = cast app;
+			if (gApp != null && gApp.me != null) {
+				var c:st.ActivityContext = gApp.me.getActivityContext(act);
+				if (c != null)
+					return cast c;
+			}
+		} catch (_:Dynamic) {}
+		try {
+			// Pre-replication path (listen-server / older builds): harmless when the field is null.
+			if (act.globalCtx != null)
+				return cast act.globalCtx;
+		} catch (_:Dynamic) {}
+		return null;
 	}
 
 	static function resolveLayer(app:Dynamic):Dynamic {
@@ -414,28 +448,28 @@ class GetRiftyConfig {
 			);
 			if (ImGui.collapsingHeader("ASCII / text hole")) {
 				UiLayout.propertyGrid("##rifty_uv_props", function() {
-					UiLayout.propertyRow("Left / Top", function() {
+					UiLayout.propertyRow("Top-left corner", function() {
 						UiLayout.inlinePair(
 							"##rifty_uv0",
 							function(_:Single) {
-								if (ImGui.sliderFloat("L##rifty_u0", textU0, 0, 1, "%.2f"))
+								if (ImGui.sliderFloat("Left##rifty_u0", textU0, 0, 1, "%.2f"))
 									SettingsStore.markDirty();
 							},
 							function(_:Single) {
-								if (ImGui.sliderFloat("T##rifty_v0", textV0, 0, 1, "%.2f"))
+								if (ImGui.sliderFloat("Top##rifty_v0", textV0, 0, 1, "%.2f"))
 									SettingsStore.markDirty();
 							}
 						);
 					});
-					UiLayout.propertyRow("Right / Bottom", function() {
+					UiLayout.propertyRow("Bottom-right corner", function() {
 						UiLayout.inlinePair(
 							"##rifty_uv1",
 							function(_:Single) {
-								if (ImGui.sliderFloat("R##rifty_u1", textU1, 0, 1, "%.2f"))
+								if (ImGui.sliderFloat("Right##rifty_u1", textU1, 0, 1, "%.2f"))
 									SettingsStore.markDirty();
 							},
 							function(_:Single) {
-								if (ImGui.sliderFloat("B##rifty_v1", textV1, 0, 1, "%.2f"))
+								if (ImGui.sliderFloat("Bottom##rifty_v1", textV1, 0, 1, "%.2f"))
 									SettingsStore.markDirty();
 							}
 						);
@@ -613,63 +647,68 @@ class GetRiftyOverlay {
 		var flags = cfg.chrome != null ? cfg.chrome.windowFlagsKeepClicks(FLAGS) : FLAGS;
 		flags |= ImGuiWindowFlags.NoSavedSettings;
 		var began = ImGui.begin("SolarFlare GetRifty", null, flags);
-		if (began) {
-			if (cfg.chrome == null || !cfg.chrome.isLocked()) {
-				if (cfg.chrome != null)
-					cfg.chrome.capturePos();
-			}
-			if (cfg.chrome == null || cfg.chrome.beginBody(function() {
-				cfg.hidden.set(true);
-				SettingsStore.markDirty();
-			}, null, "GetRifty", false, ImGuiWindowFlags.NoScrollWithMouse, 0, footerH)) {
-			var origin = ImGui.getCursorScreenPos();
-			// Reserve body size with a real item first — GameIcons.draw uses SetCursorScreenPos.
-			ImGui.dummy(ImGui.vec2(winW, winH));
-			var settle = ImGui.getCursorScreenPos();
-			var dl = ImGui.getWindowDrawList();
-			var sunY:Single = origin.y + bannerH;
-			if (GetRiftyCache.alertKind != GetRiftyCache.ALERT_NONE)
-				drawBanner(dl, origin.x, origin.y, winW, bannerH);
-			var style = cfg.clockStyle.get();
-			var usedAnim = drawAlertAnim(dl, origin.x, sunY, size);
-			if (!usedAnim) {
-				if (style == GetRiftyConfig.STYLE_PLAIN)
-					drawPlain(dl, origin.x, sunY, size);
-				else if (style == GetRiftyConfig.STYLE_BLANK)
-					drawBlank(dl, origin.x, sunY, size);
-				else if (GetRiftyConfig.isClockTemplate(style))
-					drawClockTemplate(dl, origin.x, sunY, size, style);
-				else if (GetRiftyConfig.isAsciiStyle(style))
-					drawAscii(dl, origin.x, sunY, size, GetRiftyConfig.asciiStem(style), 0);
+		var failure:Dynamic = null;
+		try {
+			if (began) {
+				if (cfg.chrome == null || !cfg.chrome.isLocked()) {
+					if (cfg.chrome != null)
+						cfg.chrome.capturePos();
+				}
+				if (cfg.chrome == null || cfg.chrome.beginBody(function() {
+					cfg.hidden.set(true);
+					SettingsStore.markDirty();
+				}, null, "GetRifty", false, ImGuiWindowFlags.NoScrollWithMouse, 0, footerH)) {
+				var origin = ImGui.getCursorScreenPos();
+				// Reserve body size with a real item first — GameIcons.draw uses SetCursorScreenPos.
+				ImGui.dummy(ImGui.vec2(winW, winH));
+				var settle = ImGui.getCursorScreenPos();
+				var dl = ImGui.getWindowDrawList();
+				var sunY:Single = origin.y + bannerH;
+				if (GetRiftyCache.alertKind != GetRiftyCache.ALERT_NONE)
+					drawBanner(dl, origin.x, origin.y, winW, bannerH);
+				var style = cfg.clockStyle.get();
+				var usedAnim = drawAlertAnim(dl, origin.x, sunY, size);
+				if (!usedAnim) {
+					if (style == GetRiftyConfig.STYLE_PLAIN)
+						drawPlain(dl, origin.x, sunY, size);
+					else if (style == GetRiftyConfig.STYLE_BLANK)
+						drawBlank(dl, origin.x, sunY, size);
+					else if (GetRiftyConfig.isClockTemplate(style))
+						drawClockTemplate(dl, origin.x, sunY, size, style);
+					else if (GetRiftyConfig.isAsciiStyle(style))
+						drawAscii(dl, origin.x, sunY, size, GetRiftyConfig.asciiStem(style), 0);
+					else
+						drawSun(dl, origin.x, sunY, size, GetRiftyCache.alertKind);
+				}
+				var light = style != GetRiftyConfig.STYLE_SUN || usedAnim || GetRiftyConfig.isAsciiStyle(style)
+					|| GetRiftyConfig.isClockTemplate(style);
+				if (GetRiftyConfig.isClockTemplate(style) && !usedAnim)
+					drawTemplateText(dl, origin.x, sunY, size, style);
 				else
-					drawSun(dl, origin.x, sunY, size, GetRiftyCache.alertKind);
+					drawHoleText(dl, origin.x, sunY, size, cfg, light);
+				// Settle cursor with an item so EndChild does not see a bare SetCursorScreenPos extend.
+				ImGui.setCursorScreenPos(settle);
+				ImGui.dummy(ImGui.vec2(1, 1));
+				}
+				if (cfg.chrome != null) {
+					cfg.chrome.closeBodyChild();
+					cfg.chrome.drawResizeCorner("getrifty", !cfg.chrome.isLocked(),
+						GetRiftyConfig.MIN_SIZE, GetRiftyConfig.MIN_SIZE + stripH + footerH,
+						GetRiftyConfig.MAX_SIZE, GetRiftyConfig.MAX_SIZE + 60 + stripH + footerH,
+						function(outerW:Single, _:Single) {
+							var next:Single = Math.max(GetRiftyConfig.MIN_SIZE,
+								Math.min(GetRiftyConfig.MAX_SIZE, outerW));
+							cfg.size.set(next);
+							ImGui.setWindowSize(ImGui.vec2(next, next + bannerH + stripH + footerH));
+							SettingsStore.markDirty();
+						});
+					cfg.chrome.pollTransparentSurfaceDrag("getrifty", !cfg.chrome.isLocked());
+				}
 			}
-			var light = style != GetRiftyConfig.STYLE_SUN || usedAnim || GetRiftyConfig.isAsciiStyle(style)
-				|| GetRiftyConfig.isClockTemplate(style);
-			if (GetRiftyConfig.isClockTemplate(style) && !usedAnim)
-				drawTemplateText(dl, origin.x, sunY, size, style);
-			else
-				drawHoleText(dl, origin.x, sunY, size, cfg, light);
-			// Settle cursor with an item so EndChild does not see a bare SetCursorScreenPos extend.
-			ImGui.setCursorScreenPos(settle);
-			ImGui.dummy(ImGui.vec2(1, 1));
-			}
-			if (cfg.chrome != null) {
-				cfg.chrome.closeBodyChild();
-				cfg.chrome.drawResizeCorner("getrifty", !cfg.chrome.isLocked(),
-					GetRiftyConfig.MIN_SIZE, GetRiftyConfig.MIN_SIZE + stripH + footerH,
-					GetRiftyConfig.MAX_SIZE, GetRiftyConfig.MAX_SIZE + 60 + stripH + footerH,
-					function(outerW:Single, _:Single) {
-						var next:Single = Math.max(GetRiftyConfig.MIN_SIZE,
-							Math.min(GetRiftyConfig.MAX_SIZE, outerW));
-						cfg.size.set(next);
-						ImGui.setWindowSize(ImGui.vec2(next, next + bannerH + stripH + footerH));
-						SettingsStore.markDirty();
-					});
-				cfg.chrome.pollTransparentSurfaceDrag("getrifty", !cfg.chrome.isLocked());
-			}
-		}
+		} catch (e:Dynamic) failure = e;
+		// End must run on every path or later overlays submit into this window.
 		solarflare.ui.HudChrome.endOverlayWindow(began, cfg.chrome);
+		if (failure != null) solarflare.ui.UiScope.reportOnce("window", "getrifty", failure);
 	}
 
 	function drawBanner(dl:Dynamic, x:Single, y:Single, w:Single, h:Single):Void {

@@ -135,6 +135,9 @@ class HealthCache {
 			return false;
 		if (localHero != null && (cast unit : Dynamic) == (cast localHero : Dynamic))
 			return true;
+		// Most callers pass monsters/summons; reject them before the ring so it only holds heroes.
+		if (!isHeroObject(unit))
+			return false;
 		if (missKnown(unit))
 			return false;
 		// condensed_signatures: ent.Hero.isMyHero() — leaf identity when localHero unset / remapped
@@ -144,6 +147,36 @@ class HealthCache {
 				return true;
 		} catch (_:Dynamic) {}
 		rememberMiss(unit);
+		return false;
+	}
+
+	static inline var HERO_TYPE_NAME:String = "ent.Hero";
+	/** Engine hl_type of ent.Hero, learned once by name; later checks are a native subtype test. */
+	static var heroType:hl.Type = null;
+
+	/**
+	 * GameLib's ent.Hero is an abstract, so `cast` never fails and hl_dyn_call does not type-check
+	 * the receiver: a Hero method called on a monster reads it at Hero field offsets. Gate on the
+	 * runtime type before any Hero-only call.
+	 */
+	public static function isHeroObject(unit:Dynamic):Bool {
+		if (unit == null)
+			return false;
+		try {
+			var t = hl.Type.getDynamic(unit);
+			if (heroType != null)
+				return t.safeCast(heroType);
+			// Until the first hero is seen: walk the class chain by name (allocates; runs rarely).
+			var depth = 0;
+			while (t.kind == hl.Type.TypeKind.HObj && depth < 16) {
+				if (t.getTypeName() == HERO_TYPE_NAME) {
+					heroType = t;
+					return true;
+				}
+				t = t.getSuper();
+				depth++;
+			}
+		} catch (_:Dynamic) {}
 		return false;
 	}
 

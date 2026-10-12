@@ -16,7 +16,13 @@ import imgui.ImGui;
  */
 class SettingsStore {
 	static inline var VERSION:Int = 29;
+	static inline var TMP_SUFFIX:String = ".tmp";
+	static inline var PREV_SUFFIX:String = ".prev";
 	static var dirty = false;
+	static var saveBlocked = false;
+	/** Consecutive failed saves; automatic retries back off (1s doubling to 30s) instead of hammering the disk. */
+	static var failCount = 0;
+	static var retryAtMs:Float = 0;
 	static var lastCfg:ConfigPanel = null;
 	static var lastSaveMs:Float = 0;
 	static var lastEditMs:Float = 0;
@@ -36,8 +42,10 @@ class SettingsStore {
 
 	public static function saveNow():Void {
 		if (lastCfg != null) {
-			save(lastCfg);
-			ToastManager.success("Solar Flare layout saved!");
+			if (save(lastCfg))
+				ToastManager.success("Solar Flare layout saved!");
+			else
+				ToastManager.error("Solar Flare layout could not be saved.");
 		}
 	}
 
@@ -79,14 +87,34 @@ class SettingsStore {
 		if (cfg == null)
 			return;
 		lastCfg = cfg;
+		var path = jsonPath();
+		if (path == null)
+			return;
+		// Newest first: a crash mid-save leaves the verified .tmp, or only .prev if it hit between renames.
+		var raw:String = null;
+		var data:Dynamic = null;
+		var source:String = null;
+		for (candidate in [path, path + TMP_SUFFIX, path + PREV_SUFFIX]) {
+			var text = readText(candidate);
+			if (text == null || text.length == 0)
+				continue;
+			try {
+				data = haxe.Json.parse(text);
+				raw = text;
+				source = candidate;
+				break;
+			} catch (_:Dynamic) {
+				if (candidate == path)
+					preserveUnreadable(path, text);
+			}
+		}
+		if (data == null)
+			return;
+		if (source != path) {
+			dirty = true;
+			ToastManager.info("SolarFlare settings restored from " + haxe.io.Path.withoutDirectory(source) + ".", 4.0);
+		}
 		try {
-			var path = jsonPath();
-			if (path == null || !sys.FileSystem.exists(path))
-				return;
-			var raw = sys.io.File.getContent(path);
-			if (raw == null || raw.length == 0)
-				return;
-			var data:Dynamic = haxe.Json.parse(raw);
 			var oldVersion = readVersion(data);
 			if (oldVersion < VERSION)
 				backupBeforeMigration(path, raw, oldVersion);
@@ -103,7 +131,36 @@ class SettingsStore {
 			try
 				solarflare.ObserveDemand.markStatusDemandDirty()
 			catch (_:Dynamic) {}
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) {
+			// A partial apply would be saved over the user's file on the next edit; keep the original.
+			preserveUnreadable(source, raw);
+		}
+	}
+
+	static function readText(path:String):String {
+		try {
+			if (!sys.FileSystem.exists(path))
+				return null;
+			return sys.io.File.getContent(path);
+		} catch (_:Dynamic) {
+			return null;
+		}
+	}
+
+	/** Copy a settings file that could not be loaded before any save is allowed to replace it. */
+	static function preserveUnreadable(path:String, raw:String):Void {
+		if (path == null || raw == null || raw.length == 0)
+			return;
+		var copy = path + ".unreadable-" + DateTools.format(Date.now(), "%Y%m%d-%H%M%S") + ".bak";
+		try {
+			sys.io.File.saveContent(copy, raw);
+			ToastManager.error("SolarFlare settings could not be loaded. A copy was kept as "
+				+ haxe.io.Path.withoutDirectory(copy) + ".", 6.0);
+		} catch (_:Dynamic) {
+			// No copy exists, so this session must not overwrite the only one.
+			saveBlocked = true;
+			ToastManager.error("SolarFlare settings could not be loaded or backed up; saving is off until restart.", 8.0);
+		}
 	}
 
 	static function readVersion(data:Dynamic):Int {
@@ -133,9 +190,15 @@ class SettingsStore {
 		if (!dirty || target == null)
 			return;
 		var now = haxe.Timer.stamp() * 1000;
-		if (now - lastEditMs < 500 || now - lastSaveMs < 300)
+		if (now - lastEditMs < 500 || now - lastSaveMs < 300 || now < retryAtMs)
 			return;
 		save(target);
+	}
+
+	/** Dirty flush for per-frame callers (title screen / logout) that must respect the failure backoff. */
+	public static function saveIfDue(cfg:ConfigPanel):Void {
+		if (dirty && haxe.Timer.stamp() * 1000 >= retryAtMs)
+			save(cfg);
 	}
 
 	public static function flushDirty():Void {
@@ -144,26 +207,53 @@ class SettingsStore {
 		}
 	}
 
-	public static function save(cfg:ConfigPanel):Void {
-		if (cfg == null)
-			return;
+	/** Explicit saves always attempt; returns whether the file was replaced. */
+	public static function save(cfg:ConfigPanel):Bool {
+		if (cfg == null || saveBlocked)
+			return false;
 		try {
 			var path = jsonPath();
 			if (path == null)
-				return;
+				return false;
 			ensureDir(haxe.io.Path.directory(path));
 			var jsonText = haxe.Json.stringify(dump(cfg), null, "  ");
-			sys.io.File.saveContent(path, jsonText);
-			// Do not clear dirty until the persisted replacement parses successfully.
-			haxe.Json.parse(sys.io.File.getContent(path));
+			// Never write the live file in place: a crash mid-write would truncate it.
+			var tmp = path + TMP_SUFFIX;
+			sys.io.File.saveContent(tmp, jsonText);
+			// Do not replace anything until the bytes on disk parse.
+			haxe.Json.parse(sys.io.File.getContent(tmp));
+			replaceWith(tmp, path);
 			dirty = false;
 			lastSaveMs = haxe.Timer.stamp() * 1000;
+			failCount = 0;
+			retryAtMs = 0;
 			try {
 				var ini = iniPath();
 				if (ini != null)
 					ImGui.saveIniSettingsToDisk(ini);
 			} catch (_:Dynamic) {}
-		} catch (_:Dynamic) {}
+			return true;
+		} catch (_:Dynamic) {
+			failCount++;
+			retryAtMs = haxe.Timer.stamp() * 1000 + Math.min(30000.0, 1000.0 * Math.pow(2, failCount - 1));
+			if (failCount == 1)
+				ToastManager.error("SolarFlare could not save settings; retrying.", 4.0);
+			return false;
+		}
+	}
+
+	/**
+	 * Rename can't overwrite on Windows, so the old file steps aside to .prev first.
+	 * Every crash point leaves the old file, the verified .tmp, or both; load() checks all three.
+	 */
+	static function replaceWith(tmp:String, path:String):Void {
+		if (sys.FileSystem.exists(path)) {
+			var prev = path + PREV_SUFFIX;
+			if (sys.FileSystem.exists(prev))
+				sys.FileSystem.deleteFile(prev);
+			sys.FileSystem.rename(path, prev);
+		}
+		sys.FileSystem.rename(tmp, path);
 	}
 
 	static function tryLoadIni():Void {
@@ -195,6 +285,7 @@ class SettingsStore {
 		assignDump(data, "nativeHide", function() return cfg.nativeHide.dump());
 		assignDump(data, "hideMove", function() return cfg.hideMove != null ? cfg.hideMove.dump() : {});
 		assignDump(data, "barter", function() return cfg.barter != null ? cfg.barter.dump() : {});
+		assignDump(data, "aimInstant", function() return cfg.aimInstant != null ? cfg.aimInstant.dump() : {});
 		assignDump(data, "statusBoard", function() return cfg.statusBoard != null ? cfg.statusBoard.dump() : {});
 		assignDump(data, "vitals", function() return vitalsDump(cfg.vitals));
 		assignDump(data, "geaux", function() return geauxDump(cfg.geaux));
@@ -461,6 +552,7 @@ class SettingsStore {
 			title: c.title,
 			rot: rotOut,
 			spend: spend,
+			style: c.style.get(),
 			showStackBadge: c.showStackBadge.get(),
 			chrome: chromeDump(c.chrome)
 		};
@@ -581,7 +673,8 @@ class SettingsStore {
 		// left in an existing save are inert.
 		return {
 			hideAllKey: HideAllBind.choice.get(),
-			hideAllMmb: HideAllBind.middleMouse.get()
+			hideAllMmb: HideAllBind.middleMouse.get(),
+			autoHideWindows: WindowAutoHide.enabled.get()
 		};
 	}
 
@@ -590,6 +683,7 @@ class SettingsStore {
 			return;
 		setInt(HideAllBind.choice, data.hideAllKey);
 		setBool(HideAllBind.middleMouse, data.hideAllMmb);
+		setBool(WindowAutoHide.enabled, data.autoHideWindows);
 	}
 
 	static function chromeDump(c:HudChrome):Dynamic {
@@ -616,6 +710,8 @@ class SettingsStore {
 			cfg.hideMove.apply(Reflect.field(data, "hideMove"));
 		if (cfg.barter != null)
 			cfg.barter.apply(Reflect.field(data, "barter"));
+		if (cfg.aimInstant != null)
+			cfg.aimInstant.apply(Reflect.field(data, "aimInstant"));
 		if (cfg.statusBoard != null)
 			cfg.statusBoard.apply(Reflect.field(data, "statusBoard"));
 		try if (data.activeTheme != null) activeTheme = Std.string(data.activeTheme) catch (_:Dynamic) {}
@@ -816,6 +912,11 @@ class SettingsStore {
 			}
 		} catch (_:Dynamic) {}
 		setBool(c.showStackBadge, data.showStackBadge);
+		// Old profiles retain the original rail; invalid future IDs safely fall back.
+		c.style.set(0);
+		setInt(c.style, data.style);
+		if (c.style.get() < 0 || c.style.get() >= solarflare.chaincast.ChaincastRenderer.STYLE_COUNT)
+			c.style.set(0);
 		c.sizeDirty = true;
 		applyChrome(c.chrome, data.chrome);
 	}

@@ -11,7 +11,6 @@ import solarflare.combatlog.CombatLogOverlay;
 import solarflare.castbar.PlayerCastOverlay;
 import solarflare.geaux.GeauxBar;
 import solarflare.geaux.GeauxCache;
-import solarflare.geaux.GeauxHooks;
 import solarflare.getrifty.GetRifty;
 import solarflare.lightsaber.Lightsaber;
 import solarflare.preview.VitalsRenderer;
@@ -19,6 +18,7 @@ import solarflare.target.TargetOverlay;
 import solarflare.ui.ConfigPanel;
 import solarflare.ui.CursorCaptureFix;
 import solarflare.ui.GameIcons;
+import solarflare.ui.HudChrome;
 import solarflare.ui.VitalsConfig;
 import imgui.ImGui;
 import imgui.Enums.ImGuiCol;
@@ -70,11 +70,27 @@ class SolarFlarePanel {
 	var snapRage:VitalSnap;
 	var snapMana:VitalSnap;
 	var nativeChatRestored = false;
+	/** Per-kind vitals callbacks and bound draw methods, created once (zero per-frame closures). */
+	var resourceBodyFns:Array<imgui.Structs.ImVec2->Void> = [];
+	var resourceHideFns:Array<Void->Void> = [];
+	var resourceResizeFns:Array<Single->Single->Void> = [];
+	var openResourceTrackerFn:Void->Void;
+	var drawVitalsFn:Void->Void;
+	var drawOverlaysFn:Void->Void;
 
 	public function new() {
 		snapHp = new VitalSnap();
 		snapRage = new VitalSnap();
 		snapMana = new VitalSnap();
+		for (kind in 0...4) {
+			var k = kind;
+			resourceBodyFns.push(function(size) drawResourceBody(k, size));
+			resourceHideFns.push(function() hideResource(k));
+			resourceResizeFns.push(function(newW:Single, newH:Single) resizeResource(k, newW, newH));
+		}
+		openResourceTrackerFn = function() { config.resourceTracker.open.set(true); };
+		drawVitalsFn = drawVitals;
+		drawOverlaysFn = drawOverlays;
 		config = new ConfigPanel();
 		solarflare.ui.UiActionQueue.bind(config);
 		geauxBar = new GeauxBar();
@@ -185,16 +201,20 @@ class SolarFlarePanel {
 		CursorCaptureFix.beginFrameCapture(interactive);
 		solarflare.ui.ThemePalette.init();
 		try
-			solarflare.ui.ThemePalette.wrap(drawOverlays)
+			solarflare.ui.ThemePalette.wrap(drawOverlaysFn)
 		catch (_:Dynamic) {}
+		// Safety net: no panel may stay open into the next frame. Empty on healthy frames.
+		HudChrome.unwindPanels(0);
 		config.pollToggle();
 		CursorCaptureFix.finishFrame(config.anyInteractiveOpen());
 	}
 
 	function drawOverlays():Void {
+		// Overlays are siblings: each must leave the panel stack where it found it.
+		var panelBase = HudChrome.panelDepth();
 		try {
 			solarflare.ui.DockingHelper.setupMainDockSpace();
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 
 		try
 			config.draw()
@@ -213,11 +233,11 @@ class SolarFlarePanel {
 		catch (_:Dynamic) {}
 		try {
 			if (!suppressed && config.anyBarVisible())
-				vitalsTheme.wrap(drawVitals);
-		} catch (_:Dynamic) {}
+				vitalsTheme.wrap(drawVitalsFn);
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed && config.extraBarsPrototype != null) config.extraBarsPrototype.drawBar();
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed && config.barter != null) {
 				config.barter.draw();
@@ -226,83 +246,75 @@ class SolarFlarePanel {
 			if (!suppressed && config.statusBoard != null) {
 				config.statusBoard.draw();
 			}
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		// Each overlay isolated — a Geaux throw must not skip Lightsaber / Auras.
 		try {
 			if (!suppressed)
 				geauxBar.draw(config.geaux);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed)
 				comboOverlay.draw(config.combo);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed)
 				chaincastOverlay.draw(config.chaincast);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed)
 				conduitOverlay.draw(config.conduit);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed)
 				attackComboOverlay.draw(config.attackCombo);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed)
 				combatLogOverlay.draw(config.combatLog);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed)
 				targetOverlay.draw(config.target);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed)
 				playerCastOverlay.draw(config.castBar);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (launchers != null && !suppressed)
 				launchers.draw(config.open);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (auraOverlay != null && !suppressed)
 				auraOverlay.draw();
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed)
 				lightsaber.draw(config.lightsaber);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (getRiftyOverlay != null && !suppressed)
 				getRiftyOverlay.draw(config.getRifty);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		#if solarflare_telemetry
 		try {
 			if (payloadProbe != null)
 				payloadProbe.draw(CursorCaptureFix.cursorFree);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (resolutionLedger != null)
 				resolutionLedger.draw(CursorCaptureFix.cursorFree);
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		#end
 		try {
 			solarflare.ui.PerformanceMonitor.draw();
-		} catch (_:Dynamic) {}
-		try {
-			var dt:Float = 0.016;
-			solarflare.ui.effects.VectorEffectSystem.update(dt);
-			var fgDrawList = ImGui.getForegroundDrawList();
-			if (fgDrawList != null) {
-				solarflare.ui.effects.VectorEffectSystem.draw(fgDrawList);
-			}
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			solarflare.debug.DebugSystem.draw();
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			solarflare.ui.ToastManager.draw();
-		} catch (_:Dynamic) {}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 	}
 
 	/** Flush pending layout/toggles when GameApp is gone (logout / shutdown). */
@@ -319,8 +331,7 @@ class SolarFlarePanel {
 			solarflare.castbar.CastCache.observe(null, null);
 			solarflare.castbar.LearnedCastTimes.tick(haxe.Timer.stamp(), true);
 		}
-		if (solarflare.ui.SettingsStore.isDirty())
-			solarflare.ui.SettingsStore.save(config);
+		solarflare.ui.SettingsStore.saveIfDue(config);
 	}
 
 	/** Typed GameLib `ui.Hud.chat` — not FieldWalk. FieldWalk stays on the probe/ledger path. */
@@ -347,40 +358,78 @@ class SolarFlarePanel {
 		// HP position is set once at startup (fresh-install default via ConfigPanel.new)
 		// or restored from save. Never re-anchor per-frame — that would overwrite user drags.
 		if (!v.hpHidden.get())
-			drawResourceWindow(v, 0, "HP", v.hpHidden, v.chrome, v.hpWidth, v.hpHeight);
+			drawResourceWindow(v, 0, "SolarFlare HP", "HP", v.chrome, v.hpWidth, v.hpHeight);
 		if (!v.rageHidden.get())
-			drawResourceWindow(v, 1, "Rage", v.rageHidden, v.rageChrome, v.rageWidth, v.rageHeight);
-		if (!v.manaHidden.get() && HealthCache.resourceValid())
-			drawResourceWindow(v, 2, HealthCache.sparkValid ? "Spark" : "Mana", v.manaHidden, v.manaChrome, v.manaWidth, v.manaHeight);
+			drawResourceWindow(v, 1, "SolarFlare Rage", "Rage", v.rageChrome, v.rageWidth, v.rageHeight);
+		if (!v.manaHidden.get() && HealthCache.resourceValid()) {
+			if (HealthCache.sparkValid)
+				drawResourceWindow(v, 2, "SolarFlare Spark", "Spark", v.manaChrome, v.manaWidth, v.manaHeight);
+			else
+				drawResourceWindow(v, 2, "SolarFlare Mana", "Mana", v.manaChrome, v.manaWidth, v.manaHeight);
+		}
 		if (!v.prayersHidden.get() && PrayerCache.active)
-			drawResourceWindow(v, 3, "Prayers", v.prayersHidden, v.prayersChrome, v.prayersWidth, v.prayersHeight);
+			drawResourceWindow(v, 3, "SolarFlare Prayers", "Prayers", v.prayersChrome, v.prayersWidth, v.prayersHeight);
 	}
 
-	function drawResourceWindow(v:VitalsConfig, kind:Int, caption:String, hidden:imgui.ref.BoolRef,
+	/** Literal ids/captions plus per-kind callbacks built once: no strings or closures per frame. */
+	function drawResourceWindow(v:VitalsConfig, kind:Int, id:String, caption:String,
 			chrome:solarflare.ui.HudChrome, width:imgui.ref.FloatRef, height:imgui.ref.FloatRef):Void {
-		var style = switch (kind) { case 0: v.hpStyle.get(); case 1: v.rageStyle.get(); case 2: v.manaStyle.get(); default: 0; };
-		var vertical = switch (kind) { case 0: v.hpVertical.get(); case 1: v.rageVertical.get(); case 2: v.manaVertical.get(); default: false; };
-		var compact = VitalsConfig.compactRow(style, vertical);
+		var compact = VitalsConfig.compactRow(resourceStyle(v, kind), resourceVertical(v, kind));
 		var h:Single = Math.max(compact ? 38 : 28, height.get());
 		var w:Single = Math.max(80, width.get());
-		solarflare.ui.HUDWidgetWindow.draw("SolarFlare " + caption, caption, chrome, w, h, function(size) {
-			var p = ImGui.getCursorScreenPos();
-			ImGui.dummy(ImGui.vec2(size.x, size.y));
-			ImGui.setCursorScreenPos(ImGui.vec2(p.x + 4, p.y + 4));
-			var rowW:Single = size.x - 8;
-			var rowH:Single = size.y - 8;
-			switch (kind) {
-				case 0: drawVital(true, false, false, VitalsConfig.normalizeStyle(style, true, true), rowW, rowH, vertical);
-				case 1: drawVital(false, true, false, VitalsConfig.normalizeStyle(style, true, false), rowW, rowH, vertical);
-				case 2: drawVital(false, false, true, VitalsConfig.normalizeStyle(style, true, !HealthCache.sparkValid), rowW, rowH, vertical);
-				default: drawPrayerIcons(rowW, false);
-			}
-		}, function() { config.resourceTracker.open.set(true); }, function() { hidden.set(true); solarflare.ui.SettingsStore.markDirty(); }, false, null,
-			function(newW:Single, newH:Single) {
-				width.set(Math.max(80, newW));
-				height.set(Math.max(compact ? 38 : 28, newH));
-				solarflare.ui.SettingsStore.markDirty();
-			});
+		solarflare.ui.HUDWidgetWindow.draw(id, caption, chrome, w, h, resourceBodyFns[kind], openResourceTrackerFn,
+			resourceHideFns[kind], false, null, resourceResizeFns[kind]);
+	}
+
+	static function resourceStyle(v:VitalsConfig, kind:Int):Int {
+		return switch (kind) { case 0: v.hpStyle.get(); case 1: v.rageStyle.get(); case 2: v.manaStyle.get(); default: 0; };
+	}
+
+	static function resourceVertical(v:VitalsConfig, kind:Int):Bool {
+		return switch (kind) { case 0: v.hpVertical.get(); case 1: v.rageVertical.get(); case 2: v.manaVertical.get(); default: false; };
+	}
+
+	static function resourceHidden(v:VitalsConfig, kind:Int):imgui.ref.BoolRef {
+		return switch (kind) { case 0: v.hpHidden; case 1: v.rageHidden; case 2: v.manaHidden; default: v.prayersHidden; };
+	}
+
+	function drawResourceBody(kind:Int, size:imgui.Structs.ImVec2):Void {
+		var v = config.vitals;
+		if (v == null)
+			return;
+		var style = resourceStyle(v, kind);
+		var vertical = resourceVertical(v, kind);
+		var p = ImGui.getCursorScreenPos();
+		ImGui.dummy(ImGui.vec2(size.x, size.y));
+		ImGui.setCursorScreenPos(ImGui.vec2(p.x + 4, p.y + 4));
+		var rowW:Single = size.x - 8;
+		var rowH:Single = size.y - 8;
+		switch (kind) {
+			case 0: drawVital(true, false, false, VitalsConfig.normalizeStyle(style, true, true), rowW, rowH, vertical);
+			case 1: drawVital(false, true, false, VitalsConfig.normalizeStyle(style, true, false), rowW, rowH, vertical);
+			case 2: drawVital(false, false, true, VitalsConfig.normalizeStyle(style, true, !HealthCache.sparkValid), rowW, rowH, vertical);
+			default: drawPrayerIcons(rowW, false);
+		}
+	}
+
+	function hideResource(kind:Int):Void {
+		var v = config.vitals;
+		if (v == null)
+			return;
+		resourceHidden(v, kind).set(true);
+		solarflare.ui.SettingsStore.markDirty();
+	}
+
+	function resizeResource(kind:Int, newW:Single, newH:Single):Void {
+		var v = config.vitals;
+		if (v == null)
+			return;
+		var compact = VitalsConfig.compactRow(resourceStyle(v, kind), resourceVertical(v, kind));
+		var width = switch (kind) { case 0: v.hpWidth; case 1: v.rageWidth; case 2: v.manaWidth; default: v.prayersWidth; };
+		var height = switch (kind) { case 0: v.hpHeight; case 1: v.rageHeight; case 2: v.manaHeight; default: v.prayersHeight; };
+		width.set(Math.max(80, newW));
+		height.set(Math.max(compact ? 38 : 28, newH));
+		solarflare.ui.SettingsStore.markDirty();
 	}
 
 	function drawVital(isHp:Bool, isRage:Bool, isMana:Bool, style:Int, w:Single, h:Single, vertical:Bool,

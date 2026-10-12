@@ -171,6 +171,23 @@ class UiLayout {
 			UiScope.report("inline split", id, failure);
 	}
 
+	/**
+	 * Combo over string option ids with a display-label function. Fills its cell (use inside a
+	 * propertyRow). Returns the picked option id, or null when nothing changed this frame.
+	 */
+	public static function stringCombo(id:String, current:String, options:Array<String>,
+			label:String->String):String {
+		var picked:String = null;
+		if (ImGui.beginCombo("##" + id, label(current))) {
+			for (option in options) {
+				if (ImGui.selectable(label(option) + "##" + id + "_" + option, current == option))
+					picked = option;
+			}
+			ImGui.endCombo();
+		}
+		return picked;
+	}
+
 	public static function inlinePair(id:String, drawLeft:Single->Void,
 			drawRight:Single->Void, gap:Single = DENSE_GAP):Void {
 		inlineSplit(id, 2, function(index:Int, width:Single) {

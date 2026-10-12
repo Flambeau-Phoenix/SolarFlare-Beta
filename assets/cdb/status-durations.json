@@ -358,6 +358,32 @@
     {
       "id": "Book_WaterOrbs_Skill2",
       "cooldown": 15.0,
+      "grantedStatus": "Book_WaterOrbs_Skill2_Recast_Proc",
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 8,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_WaterOrbs_Skill2_Recast",
+      "grantedStatus": "Book_WaterOrbs_Skill2_Recast_Proc",
+      "gfx": {
+        "file": "UI/icons/atlas_Book_96PX.png",
+        "size": 96,
+        "x": 8,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "id": "Book_WaterOrbs_Skill2_Recast_Proc",
+      "duration": 5.0,
+      "isStatus": true,
       "gfx": {
         "file": "UI/icons/atlas_Book_96PX.png",
         "size": 96,
@@ -515,7 +541,6 @@
     {
       "id": "Bow_Craft_Passive",
       "grantedStatus": "Bow_Craft_Passive_Status",
-      "spanMod": "reset",
       "gfx": {
         "file": "UI/icons/atlas_weapon_Bow_96PX.png",
         "size": 48,
@@ -529,6 +554,7 @@
       "id": "Bow_Craft_Passive_Status",
       "duration": 15.0,
       "isStatus": true,
+      "spanMod": "reset",
       "gfx": {
         "file": "UI/icons/atlas_weapon_Bow_96PX.png",
         "size": 48,
@@ -2952,7 +2978,7 @@
     {
       "id": "Golcano_ShieldApply_Status",
       "isStatus": true,
-      "maxStacks": 15,
+      "maxStacks": 100,
       "gfx": {
         "file": "UI/Placeholder/Icons_Resources.png",
         "size": 48,
@@ -3534,6 +3560,7 @@
     },
     {
       "id": "Infusion_Crimson_Tank_Skill_Proc",
+      "duration": 15.0,
       "isStatus": true,
       "gfx": {
         "file": "UI/icons/atlas_Infusion_96px_.png",
@@ -7637,7 +7664,6 @@
     },
     {
       "id": "Spongeblob_Skill1",
-      "duration": 7.5,
       "cooldown": 20.0
     },
     {

@@ -193,6 +193,31 @@ class GeauxCache {
 	static var skillMainWepMem:ResolvedMember;
 	/** One getSkillByInput pass per observe — matching snaps does not re-hit Hero. */
 	static var barInputSkills:Array<Dynamic> = [];
+
+	/**
+	 * Inputs the installed build's Hero.getSkillByInput accepts (HLB v6, 5f288029: a string switch over exactly
+	 * these; every other name throws, and each throw captures a stack). Names outside this list are still tried
+	 * once so a future build that accepts more keeps working; a throwing name is remembered and skipped.
+	 */
+	static var inputMiss:Map<String, Bool> = new Map();
+	static inline function heroInputKnown(input:String):Bool {
+		return input == "Attack" || input == "Secondary" || input == "WeaponSkill1" || input == "WeaponSkill2"
+			|| input == "WeaponSkill3" || input == "WeaponSkill4";
+	}
+
+	/** Guarded Hero.getSkillByInput: never throws, throws internally at most once per unsupported name. */
+	public static function skillByInput(hero:Dynamic, input:String):Dynamic {
+		if (hero == null || input == null || input.length == 0 || inputMiss.exists(input))
+			return null;
+		try {
+			var h:ent.Hero = cast hero;
+			return h.getSkillByInput(input);
+		} catch (_:Dynamic) {
+			if (!heroInputKnown(input))
+				inputMiss.set(input, true);
+		}
+		return null;
+	}
 	static var hudWalkNodes:Int = 0;
 	static var hudHero:Dynamic = null;
 	/** When true, pushSkillSnap trusts the vanilla action bar (skip isActiveSkill gate). */
@@ -298,6 +323,9 @@ class GeauxCache {
 		cachedBarRoots = null;
 	}
 
+	/** The no-hero reset has run; cleared again once a hero is sampled. */
+	static var noHeroCleared:Bool = false;
+
 	public static function sample(heroDyn:Dynamic, visibleCount:Int, overrides:Array<String> = null):Void {
 		if (visibleCount < 0)
 			visibleCount = 0;
@@ -305,6 +333,17 @@ class GeauxCache {
 		count = visibleCount;
 		markOnBar();
 		if (heroDyn == null) {
+			for (i in 0...visibleCount)
+				clearSlot(slots[i], i);
+			// Loading screens run this every heavy pass: reset the containers once, not per call.
+			if (noHeroCleared)
+				return;
+			noHeroCleared = true;
+			clearLiveRecords();
+			auraSnapPool.clear();
+			barTerPool.clear();
+			availMemo.clear();
+			availWeapons = null;
 			auraSkills = [];
 			clearReadyFlashes();
 			weapons = [];
@@ -327,10 +366,9 @@ class GeauxCache {
 			layoutOverrideKey = "";
 			telemetryAt = 0;
 			telemetryDirty = true;
-			for (i in 0...visibleCount)
-				clearSlot(slots[i], i);
 			return;
 		}
+		noHeroCleared = false;
 		var okey = overrideKey(overrides, visibleCount);
 		var heroChanged = false;
 		try
@@ -341,6 +379,12 @@ class GeauxCache {
 			cachedBarRoots = null;
 			auraSkills = [];
 			clearReadyFlashes();
+			// Live records and pools hold the previous hero's snaps.
+			clearLiveRecords();
+			auraSnapPool.clear();
+			barTerPool.clear();
+			availMemo.clear();
+			availWeapons = null;
 		}
 		var now = nowStamp();
 		// Layout only on dirty / identity / slot-count change; rare time fallback for missed dirty edges.
@@ -438,21 +482,46 @@ class GeauxCache {
 		}
 		tickSlots(heroDyn);
 		tickAuraSkills(heroDyn);
-		var active = new Map<String, Bool>();
+		refreshFromLive(weapons);
+		var active = activeIdsBuf;
+		active.clear();
 		for (s in slots) if (s.present) active.set(s.id, true);
 		for (s in auraSkills) if (s.present) active.set(s.id, true);
-		for (key in readyFlashes.keys()) if (!active.exists(key)) { readyFlashes.remove(key); readySkillRefs.remove(key); }
+		staleKeysBuf.resize(0);
+		for (key in readyFlashes.keys()) if (!active.exists(key)) staleKeysBuf.push(key);
+		for (key in staleKeysBuf) { readyFlashes.remove(key); readySkillRefs.remove(key); }
+		staleKeysBuf.resize(0);
 	}
 
+	/** Reused every telemetry tick (was a new Map per tick at up to 20 Hz). */
+	static var activeIdsBuf:Map<String, Bool> = new Map();
+	static var staleKeysBuf:Array<String> = [];
+
 	/** Keep liveById pointed at whatever is currently equipped so CD polls hit the real Skill. */
+	/** Reused by rememberEquipped (runs on the equip timer; was a new array of arrays each time). */
+	static var equipListsBuf:Array<Dynamic> = [];
+
 	static function rememberEquipped(heroDyn:Dynamic):Void {
 		if (heroDyn == null)
 			return;
-		var lists = [
-			field(heroDyn, "skillSlots"),
-			field(heroDyn, "weaponSkills"),
-			field(heroDyn, "attackSkills")
-		];
+		var lists = equipListsBuf;
+		lists.resize(0);
+		// Typed GameLib reads first; the generic field walk only when a typed read yields nothing.
+		var hero:ent.Hero = null;
+		try
+			hero = cast heroDyn
+		catch (_:Dynamic) {}
+		var slotsList:Dynamic = null;
+		var weaponList:Dynamic = null;
+		var attackList:Dynamic = null;
+		try {
+			slotsList = hero.skillSlots;
+			weaponList = hero.weaponSkills;
+			attackList = hero.attackSkills;
+		} catch (_:Dynamic) {}
+		lists.push(slotsList != null ? slotsList : field(heroDyn, "skillSlots"));
+		lists.push(weaponList != null ? weaponList : field(heroDyn, "weaponSkills"));
+		lists.push(attackList != null ? attackList : field(heroDyn, "attackSkills"));
 		try {
 			var spec = field(heroDyn, "specialization");
 			lists.push(field(spec, "skillSlots"));
@@ -475,14 +544,14 @@ class GeauxCache {
 			byInputMem = resolveMem("ent.Hero", "getSkillByInput");
 		barInputSkills = [];
 		for (inp in classBarInputNames())
-			stashEquippedInput(callResolved(byInputMem, [heroDyn, inp]));
+			stashEquippedInput(skillByInput(heroDyn, inp));
 		var extra = [
 			"ArsenalSkill1", "ArsenalSkill2", "ArsenalSkill3", "ArsenalSkill4",
 			"WeaponSkill1", "WeaponSkill2", "OffhandSkill", "OffhandSkill1",
 			"SignatureSkill", "Signature"
 		];
 		for (inp in extra)
-			stashEquippedInput(callResolved(byInputMem, [heroDyn, inp]));
+			stashEquippedInput(skillByInput(heroDyn, inp));
 		stashEquippedInput(field(heroDyn, "dashSkill"));
 		stashEquippedInput(field(heroDyn, "secondarySkill"));
 		stashEquippedInput(field(heroDyn, "attackComboSkill"));
@@ -633,6 +702,14 @@ class GeauxCache {
 		return cachedSkill(k);
 	}
 
+	/** Most recently polled snap for a skill id, from whichever list polled it; O(1). */
+	public static function liveSnap(id:String):GeauxSlotSnap {
+		if (id == null || id.length == 0)
+			return null;
+		var rec = liveRecords.get(id);
+		return rec != null && rec.present && rec.id == id ? rec : null;
+	}
+
 	public static function weaponSnaps():Array<GeauxSlotSnap> {
 		return weapons;
 	}
@@ -663,70 +740,87 @@ class GeauxCache {
 				sampleActionBar(heroDyn)
 			catch (_:Dynamic) {}
 		}
-		var previous = barTerSkills;
-		barTerSkills = [];
-		if (heroDyn == null)
+		barTerSkills.resize(0);
+		if (heroDyn == null) {
+			barTerPool.clear();
 			return;
+		}
 		var hero:ent.Hero = null;
 		try
 			hero = cast heroDyn
 		catch (_:Dynamic) {}
+		// Availability only changes with the native action bar (new weapons array) or gear/talents.
+		if (weapons != availWeapons || weapons.length != availWeaponsLen || staticGen != availStaticGen) {
+			availMemo.clear();
+			availWeapons = weapons;
+			availWeaponsLen = weapons.length;
+			availStaticGen = staticGen;
+		}
 		for (id in solarflare.ObserveDemand.barterSkillIds) {
 			if (id == null || id.length == 0) continue;
 			// Large grids may contain the entire catalog. Only observed native actions
 			// are available in BarTer, so inactive assignments never pay native CD polls.
+			var known = availMemo.get(id);
 			var available = false;
-			for (native in weapons) if (native.present && (native.id == id || skillMatches(cachedSkill(native.id),id))) {
-				available = true; break;
+			if (known != null)
+				available = known;
+			else {
+				for (native in weapons) if (native.present && (native.id == id || skillMatches(cachedSkill(native.id),id))) {
+					available = true; break;
+				}
+				availMemo.set(id, available);
 			}
 			if (!available) continue;
-			var snap:GeauxSlotSnap = null;
-			for (s in previous) {
-				if (s != null && s.id == id) {
-					snap = s;
-					break;
-				}
-			}
+			var snap = barTerPool.get(id);
 			if (snap == null) {
 				snap = new GeauxSlotSnap();
 				snap.id = id;
 				snap.iconId = id;
 				snap.label = id;
 				snap.present = true;
+				barTerPool.set(id, snap);
 			}
 			tickSlot(hero, heroDyn, snap);
 			barTerSkills.push(snap);
 		}
+		prunePool(barTerPool, barTerSkills);
+		refreshFromLive(weapons);
 	}
 
-	/** Copy tickSlot results onto every matching snap (slots + weapons + aura + barTer). */
-	static function distributeLiveSkill(src:GeauxSlotSnap):Void {
-		if (src == null || src.id == null || src.id.length == 0)
+	/** BarTer cell snaps by id; barTerSkills is rebuilt in place from it each poll. */
+	static var barTerPool:Map<String, GeauxSlotSnap> = new Map();
+	/** id -> on the native action bar; valid for availWeapons / availWeaponsLen / availStaticGen. */
+	static var availMemo:Map<String, Bool> = new Map();
+	static var availWeapons:Array<GeauxSlotSnap> = null;
+	static var availWeaponsLen:Int = -1;
+	static var availStaticGen:Int = -1;
+
+	/*
+	 * One live record per skill id: the snap whose native poll is current. Geaux slots, aura
+	 * subjects and BarTer cells ticking the same id within LIVE_REUSE_S copy from it instead of
+	 * polling the engine again; never-ticked lists (weapons) refresh from it once per pass.
+	 * (Replaced distributeLiveSkill, which scanned every list after every single poll.)
+	 */
+	static var liveRecords:Map<String, GeauxSlotSnap> = new Map();
+	static var liveAt:Map<String, Float> = new Map();
+	/** Just under the 20 Hz sample interval: one native poll per skill per interval. */
+	static inline var LIVE_REUSE_S:Float = 0.05;
+
+	static function clearLiveRecords():Void {
+		liveRecords.clear();
+		liveAt.clear();
+	}
+
+	/** O(n) refresh for lists that are never ticked themselves. */
+	static function refreshFromLive(list:Array<GeauxSlotSnap>):Void {
+		if (list == null)
 			return;
-		var i = 0;
-		while (i < count) {
-			var s = slots[i];
-			if (s != null && s.present && s.id == src.id)
-				copyLiveSkillFields(s, src);
-			i++;
-		}
-		if (weapons != null) {
-			for (s in weapons) {
-				if (s != null && s.present && s.id == src.id)
-					copyLiveSkillFields(s, src);
-			}
-		}
-		if (auraSkills != null) {
-			for (s in auraSkills) {
-				if (s != null && s.present && s.id == src.id)
-					copyLiveSkillFields(s, src);
-			}
-		}
-		if (barTerSkills != null) {
-			for (s in barTerSkills) {
-				if (s != null && s.present && s.id == src.id)
-					copyLiveSkillFields(s, src);
-			}
+		for (s in list) {
+			if (s == null || !s.present || s.id == null || s.id.length == 0)
+				continue;
+			var rec = liveRecords.get(s.id);
+			if (rec != null && rec != s && rec.id == s.id)
+				copyLiveSkillFields(s, rec);
 		}
 	}
 
@@ -832,12 +926,7 @@ class GeauxCache {
 		// complete accepted actions. Class/arsenal identities come from HUD nodes.
 		var inputs = ["Attack", "Secondary", "WeaponSkill1", "WeaponSkill2", "WeaponSkill3", "WeaponSkill4"];
 		for (inp in inputs) {
-			var sk:Dynamic = null;
-			try {
-				var h:ent.Hero = cast hero;
-				sk = h.getSkillByInput(inp);
-			} catch (_:Dynamic) {}
-			if (sk == null) sk = callResolved(byInputMem, [hero, inp]);
+			var sk:Dynamic = skillByInput(hero, inp);
 			if (sk != null) pushBarSkill(hero, sk, getSkillId(sk), inp);
 		}
 
@@ -870,22 +959,10 @@ class GeauxCache {
 		var prevTrust = trustHudSkills;
 		trustHudSkills = true;
 		var inputs = classBarInputNames();
-		var typedInputsOk = false;
-		try {
-			var h:ent.Hero = cast hero;
-			for (inp in inputs) {
-				var sk = h.getSkillByInput(inp);
-				if (sk != null && looksLikeClass(sk, getSkillId(sk)))
-					pushSkillSnap(hero, classSkills, sk, getSkillId(sk), "CLS");
-			}
-			typedInputsOk = true;
-		} catch (_:Dynamic) {}
-		if (!typedInputsOk) {
-			for (inp in inputs) {
-				var sk2 = callResolved(byInputMem, [hero, inp]);
-				if (sk2 != null && looksLikeClass(sk2, getSkillId(sk2)))
-					pushSkillSnap(hero, classSkills, sk2, getSkillId(sk2), "CLS");
-			}
+		for (inp in inputs) {
+			var sk = skillByInput(hero, inp);
+			if (sk != null && looksLikeClass(sk, getSkillId(sk)))
+				pushSkillSnap(hero, classSkills, sk, getSkillId(sk), "CLS");
 		}
 		if (weapons != null) {
 			for (s in weapons) {
@@ -1294,7 +1371,7 @@ class GeauxCache {
 					wId = preferScriptId(wId, wSkill);
 				var wInput = nativeInputOf(node,wslot.button);
 				if ((wSkill == null || wId.length == 0) && wInput.length > 0)
-					wSkill = callResolved(byInputMem, [hudHero, wInput]);
+					wSkill = skillByInput(hudHero, wInput);
 				if (wId.length == 0 || !isScriptStyleId(wId))
 					wId = preferScriptId(wId, wSkill);
 				if (wId.length > 0 || wSkill != null) {
@@ -1327,7 +1404,7 @@ class GeauxCache {
 					sId = preferScriptId(sId, sSkill);
 				var sInput = nativeInputOf(node,slot.button);
 				if ((sSkill == null || sId.length == 0) && sInput.length > 0)
-					sSkill = callResolved(byInputMem, [hudHero, sInput]);
+					sSkill = skillByInput(hudHero, sInput);
 				if (sId.length == 0 || !isScriptStyleId(sId))
 					sId = preferScriptId(sId, sSkill);
 				if (sId.length > 0 || sSkill != null) {
@@ -1383,7 +1460,7 @@ class GeauxCache {
 
 		var input = nativeInputOf(node,target);
 		if ((skill == null || getSkillId(skill).length == 0) && input.length > 0)
-			skill = callResolved(byInputMem, [hudHero, input]);
+			skill = skillByInput(hudHero, input);
 
 		if (id.length == 0)
 			id = sanitizeSkillId(skillIdFromButton(target));
@@ -1430,22 +1507,20 @@ class GeauxCache {
 		if (byInputMem == null)
 			byInputMem = resolveMem("ent.Hero", "getSkillByInput");
 
-		// Typed path first - same as HealthHooks (Priest_Sig_DivineIntervention, etc.).
-		try {
-			var h:ent.Hero = cast hero;
-			var typed = h.getSkillByInput("SignatureSkill");
-			if (typed == null)
-				typed = h.getSkillByInput("Signature");
-			typed = stableSignatureInput(hero, typed);
-			if (typed != null)
-				pushSkillSnap(hero, signatures, typed, getSkillId(typed), "SIG");
-		} catch (_:Dynamic) {}
+		// Signature inputs are not accepted by the installed Hero.getSkillByInput (see skillByInput); the
+		// guarded lookup keeps this working on a build that accepts them without a throw per call.
+		var typed = skillByInput(hero, "SignatureSkill");
+		if (typed == null)
+			typed = skillByInput(hero, "Signature");
+		typed = stableSignatureInput(hero, typed);
+		if (typed != null)
+			pushSkillSnap(hero, signatures, typed, getSkillId(typed), "SIG");
 
 		for (input in [
 			"SignatureSkill", "Signature", "SigSkill", "ClassSignature",
 			"Ultimate", "UltimateSkill", "HeroSignature"
 		]) {
-			var skill = stableSignatureInput(hero, callResolved(byInputMem, [hero, input]));
+			var skill = stableSignatureInput(hero, skillByInput(hero, input));
 			if (skill != null)
 				pushSkillSnap(hero, signatures, skill, getSkillId(skill), "SIG");
 		}
@@ -1589,11 +1664,6 @@ class GeauxCache {
 				storeId = id;
 		}
 		pushSkillSnap(hero, signatures, skill, storeId, "SIG");
-	}
-
-	static function tryInputs(hero:Dynamic, dest:Array<GeauxSlotSnap>, group:String, inputs:Array<String>):Void {
-		for (inp in inputs)
-			pushSkillSnap(hero, dest, callResolved(byInputMem, [hero, inp]), "", group);
 	}
 
 	public static function isBarSkillId(id:String):Bool return !skipWeaponId(id);
@@ -2163,7 +2233,7 @@ class GeauxCache {
 	/** True for `Class_Skill_Name` style ids used by DPS-meter PNGs. */
 	public static function isScriptStyleId(id:String):Bool {
 		id = sanitizeSkillId(id);
-		return id.length >= 3 && id.indexOf("_") >= 0;
+		return id.length >= 3 && (id.indexOf("_") >= 0 || solarflare.EngineSkillId.isKnownSkillId(id));
 	}
 
 	/**
@@ -2626,27 +2696,54 @@ class GeauxCache {
 		}
 	}
 
+	/** Aura subject snaps by id; auraSkills is rebuilt in place from it each tick. */
+	static var auraSnapPool:Map<String, GeauxSlotSnap> = new Map();
+
 	static function tickAuraSkills(heroDyn:Dynamic):Void {
-		var previous = auraSkills;
-		auraSkills = [];
-		if (!solarflare.ObserveDemand.auras || heroDyn == null) return;
+		auraSkills.resize(0);
+		if (!solarflare.ObserveDemand.auras || heroDyn == null) {
+			auraSnapPool.clear();
+			return;
+		}
 		var hero:ent.Hero = cast heroDyn;
 		for (id in solarflare.ObserveDemand.auraSkillIds) {
-			var snap:GeauxSlotSnap = null;
-			for (s in previous) if (s.id == id) { snap = s; break; }
+			var snap = auraSnapPool.get(id);
 			if (snap == null) {
 				snap = new GeauxSlotSnap();
 				snap.id = id; snap.iconId = id; snap.label = solarflare.cdb.AuraCatalog.label(id);
 				snap.present = true;
+				auraSnapPool.set(id, snap);
 			}
 			tickSlot(hero, heroDyn, snap);
 			auraSkills.push(snap);
 		}
+		prunePool(auraSnapPool, auraSkills);
+	}
+
+	/** Drop pooled snaps whose id left the demand list (only when the pool outgrew it). */
+	static function prunePool(pool:Map<String, GeauxSlotSnap>, live:Array<GeauxSlotSnap>):Void {
+		var n = 0;
+		for (_ in pool) n++;
+		if (n <= live.length)
+			return;
+		staleKeysBuf.resize(0);
+		for (key => snap in pool) if (live.indexOf(snap) < 0) staleKeysBuf.push(key);
+		for (key in staleKeysBuf) pool.remove(key);
+		staleKeysBuf.resize(0);
 	}
 
 	static function tickSlot(hero:ent.Hero, heroDyn:Dynamic, snap:GeauxSlotSnap):Void {
 		if (snap == null)
 			return;
+		var tickAt = haxe.Timer.stamp();
+		if (snap.present && snap.id != null && snap.id.length > 0) {
+			var rec = liveRecords.get(snap.id);
+			if (rec != null && rec != snap && rec.present && rec.id == snap.id
+					&& tickAt - liveAt.get(snap.id) < LIVE_REUSE_S) {
+				copyLiveSkillFields(snap, rec);
+				return;
+			}
+		}
 		snap.cooldownValid = false;
 		snap.nativeCdTotal = 0;
 		snap.nativeCdTotalValid = false;
@@ -2658,7 +2755,6 @@ class GeauxCache {
 			snap.charges = 0;
 			snap.chargesMax = 0;
 			snap.stacks = 0;
-			distributeLiveSkill(snap);
 			return;
 		}
 		if (solarflare.PrayerCache.isPrayerId(snap.id)) {
@@ -2667,7 +2763,6 @@ class GeauxCache {
 			snap.charges = 0;
 			snap.chargesMax = 0;
 			snap.stacks = 0;
-			distributeLiveSkill(snap);
 			return;
 		}
 		var skill:Dynamic = bindSlotSkill(hero, snap);
@@ -2693,8 +2788,9 @@ class GeauxCache {
 		}
 		snap.readyFlashUntil = readyFlashes.get(key).observe(skill != null && snap.cooldownValid,
 			snap.cdLeft > 0.05 || snap.remaining > 0.02, haxe.Timer.stamp());
-		// Mirror live CD/charges/stacks onto every twin (Geaux slots, weapons, BarTer, aura).
-		distributeLiveSkill(snap);
+		// This snap is now the id's live record for LIVE_REUSE_S.
+		liveRecords.set(snap.id, snap);
+		liveAt.set(snap.id, tickAt);
 	}
 
 	/** Observe-only: freeze Spell Activation Overlay flag from typed SkillScript. */
@@ -3109,7 +3205,8 @@ class GeauxCache {
 			if (subject != null && subject.length > 0 && subject != skillId && subject != grant)
 				best = auraStacksLookup(subject, best);
 			if (skillId.indexOf("_Status") < 0 && skillId.indexOf("_status") < 0)
-				best = auraStacksLookup(skillId + "_Status", best);
+				for (linked in solarflare.EngineSkillId.statusesOf(skillId))
+					best = auraStacksLookup(linked, best);
 		} catch (_:Dynamic) {}
 		return best;
 	}
@@ -3294,14 +3391,15 @@ class GeauxCache {
 		var costs:Dynamic = null;
 		try {
 			if (typed != null && typed.inf != null) {
+				// Sanctioned engine-field route (skill §3): HlxRuntime.resolveField, never Reflect.field.
 				var props:Dynamic = null;
 				try
-					props = Reflect.field(typed.inf, "props")
+					props = HlxRuntime.resolveField(typed.inf, "props")
 				catch (_:Dynamic)
 					props = null;
 				if (props != null) {
 					try
-						costs = Reflect.field(props, "costs")
+						costs = HlxRuntime.resolveField(props, "costs")
 					catch (_:Dynamic)
 						costs = null;
 				}

@@ -30,7 +30,8 @@ class StatusBoardStabilizer {
  public static inline var GRACE_PASSES:Int = 3;
  public var shown:Array<AuraStatusSnap> = [];
  var entries:Array<StatusBoardEntry> = [];
- var byKey:Map<String,StatusBoardEntry> = new Map();
+ /** Entries per `id|sourceItem` key: distinct statuses can share one (generic ids such as `ItemStatus`). */
+ var byKey:Map<String,Array<StatusBoardEntry>> = new Map();
  var scratch = new AuraStatusSnap();
  public function new() {}
  public function reset():Void { entries.resize(0); byKey.clear(); shown.resize(0); }
@@ -38,6 +39,7 @@ class StatusBoardStabilizer {
  /** `describe` fills label, icon and source item on a board-owned copy, never on the cache row. */
  public function update(source:Array<AuraStatusSnap>, count:Int, describe:AuraStatusSnap->Void, limit:Int):Void {
   for (e in entries) e.seen = false;
+  var now = haxe.Timer.stamp();
   var n = Std.int(Math.min(count, source.length));
   for (i in 0...n) {
    var s = source[i];
@@ -45,22 +47,30 @@ class StatusBoardStabilizer {
    copy(scratch, s);
    describe(scratch);
    var key = scratch.id.toLowerCase() + "|" + scratch.sourceItemId.toLowerCase();
-   var e = byKey.get(key);
-   if (e == null) {
+   var list = byKey.get(key);
+   var match:StatusBoardEntry = null;
+   var dup:StatusBoardEntry = null;
+   if (list != null) for (c in list) {
+    if (!sameStatus(c.snap, scratch, now)) continue;
+    if (!c.seen) { match = c; break; }
+    dup = c;
+   }
+   if (match == null) {
+    if (dup != null) {
+     // The same applied status twice in one pass (two cache lanes): keep whichever row carries timing.
+     if (scratch.durationKnown && !dup.snap.durationKnown) copy(dup.snap, scratch);
+     continue;
+    }
     if (entries.length >= limit) continue;
-    e = new StatusBoardEntry(); e.key = key;
-    byKey.set(key, e); entries.push(e);
+    var e = new StatusBoardEntry(); e.key = key;
+    if (list == null) { list = []; byKey.set(key, list); }
+    list.push(e); entries.push(e);
     copy(e.snap, scratch);
     e.seen = true; e.streak = 1; e.missed = 0;
     continue;
    }
-   if (e.seen) {
-    // The same applied identity twice in one pass: keep whichever row carries timing.
-    if (scratch.durationKnown && !e.snap.durationKnown) copy(e.snap, scratch);
-    continue;
-   }
-   copy(e.snap, scratch);
-   e.seen = true; e.streak++; e.missed = 0;
+   copy(match.snap, scratch);
+   match.seen = true; match.streak++; match.missed = 0;
   }
   var k = entries.length;
   while (k-- > 0) {
@@ -70,11 +80,30 @@ class StatusBoardStabilizer {
     continue;
    }
    e.streak = 0; e.missed++;
-   if (e.missed >= GRACE_PASSES) { entries.splice(k, 1); byKey.remove(e.key); }
+   if (e.missed >= GRACE_PASSES) {
+    entries.splice(k, 1);
+    var l = byKey.get(e.key);
+    if (l != null) { l.remove(e); if (l.length == 0) byKey.remove(e.key); }
+   }
   }
   // Entries are appended in first-seen order and removed in place, so the order is already stable.
   shown.resize(0);
   for (e in entries) if (e.shown) shown.push(e.snap);
+ }
+
+ /**
+  * Two rows with one `id|source` key are the same applied status only if their timing agrees. A generic id such as
+  * `ItemStatus` is shared by several equipped-item buffs that differ by remaining time (or by being permanent);
+  * rows without timing on either side keep the old behaviour and merge.
+  */
+ static function sameStatus(a:AuraStatusSnap, b:AuraStatusSnap, now:Float):Bool {
+  if (!a.durationKnown || !b.durationKnown) return true;
+  if (a.infinite != b.infinite) return false;
+  if (a.infinite) return true;
+  var la = StatusBoardState.seconds(a, now);
+  var lb = StatusBoardState.seconds(b, now);
+  if (!Math.isFinite(la) || !Math.isFinite(lb)) return true;
+  return Math.abs(la - lb) <= 0.75;
  }
 
  static function copy(dst:AuraStatusSnap, src:AuraStatusSnap):Void {

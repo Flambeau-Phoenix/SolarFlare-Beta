@@ -73,6 +73,7 @@ class TelemetryKernel {
 		EventRing.drain(solarflare.combatlog.CombatLogCache.consumeHookEvent, 128, 0.0005);
 
 		try solarflare.ui.HideAllBind.ensureCodes() catch (_:Dynamic) {}
+		try solarflare.ui.WindowAutoHide.observe(app, now) catch (_:Dynamic) {}
 
 		var identityDirty = HookIngress.consume(DirtyDomains.IDENTITY);
 		var identityDue = identityDirty || now - lastIdentity >= IDENTITY_S;
@@ -113,6 +114,8 @@ class TelemetryKernel {
 			if (ObserveDemand.dueAttackCombo(now,
 					AttackComboCache.withinCombo || AttackComboCache.flashFinal))
 				AttackComboCache.observe();
+			else
+				AttackComboCache.tick(); // Hook-led state: expire a finisher flash without a poll.
 		} catch (_:Dynamic) {}
 
 		var wanted = (demand.skills ? DirtyDomains.SKILLS : 0)

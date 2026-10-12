@@ -59,6 +59,13 @@ class AuraSignalFrame {
 	/** Max amount on YOU-target hits within recent window (seconds). */
 	public var damageTakenRecent:Float = 0;
 	public var damageTakenKnown:Bool = false;
+	public var combatKnown:Bool = false;
+	public var inCombat:Bool = false;
+	/** Seconds since the local hero entered / left combat; CombatStateTracker.NEVER when it has not happened. */
+	public var combatEnteredAge:Float = 1e9;
+	public var combatLeftAge:Float = 1e9;
+	public var combatEnteredSerial:Int = 0;
+	public var combatLeftSerial:Int = 0;
 	public var skills:Array<SkillSignalSnap> = [];
 	public var skillCount:Int = 0;
 	public var consumables:Array<ConsumableSignalSnap> = [];
@@ -99,6 +106,7 @@ class AuraSignalFrame {
 		statusDomainKnown = false;
 		damageTakenRecent = 0;
 		damageTakenKnown = false;
+		combatKnown = false; inCombat = false; combatEnteredAge = 1e9; combatLeftAge = 1e9;
 		setStatusContainerLength(-1);
 	}
 	public function findConsumable(id:String):ConsumableSignalSnap {
@@ -128,24 +136,33 @@ class AuraSignalFrame {
 		return findStatusExact(StringTools.trim(id).toLowerCase());
 	}
 
-	/** A live row always outranks a known-absent row carrying the same id. */
+	/**
+	 * Same precedence as AuraStatusCache.findByWant: a row whose applied id IS the demanded id outranks shared-alias
+	 * rows (present over absent within each tier). A live alias row never hides the exact applied identity.
+	 */
 	function findStatusExact(key:String):StatusSignalSnap {
-		var absent:StatusSignalSnap = null;
+		var exactAbsent:StatusSignalSnap = null;
+		var aliasPresent:StatusSignalSnap = null;
+		var aliasAbsent:StatusSignalSnap = null;
 		for (i in 0...statusCount) {
 			var s = statuses[i];
-			var match = s.rawId.toLowerCase() == key;
-			if (!match) {
-				for (alias in s.ids) {
-					if (alias.toLowerCase() == key) {
-						match = true;
-						break;
-					}
+			if (s.rawId.toLowerCase() == key) {
+				if (s.present) return s;
+				if (exactAbsent == null) exactAbsent = s;
+				continue;
+			}
+			var viaAlias = false;
+			for (alias in s.ids) {
+				if (alias.toLowerCase() == key) {
+					viaAlias = true;
+					break;
 				}
 			}
-			if (!match) continue;
-			if (s.present) return s;
-			if (absent == null) absent = s;
+			if (!viaAlias) continue;
+			if (s.present) { if (aliasPresent == null) aliasPresent = s; }
+			else if (aliasAbsent == null) aliasAbsent = s;
 		}
-		return absent;
+		if (exactAbsent != null) return exactAbsent;
+		return aliasPresent != null ? aliasPresent : aliasAbsent;
 	}
 }

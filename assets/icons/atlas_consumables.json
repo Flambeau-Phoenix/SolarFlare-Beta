@@ -1,4 +1,9 @@
 {
+  "meta": {
+    "width": 1024,
+    "height": 1152,
+    "total_packed": 67
+  },
   "frames": {
     "consumable_Cook_13.png": {
       "x": 0,
@@ -536,9 +541,5 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     }
-  },
-  "meta": {
-    "width": 1024,
-    "height": 1152
   }
 }

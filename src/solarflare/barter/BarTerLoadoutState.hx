@@ -16,7 +16,7 @@ class BarTerLoadoutState {
  public function resetCandidate():Void { candidate=""; candidateGeneration=-1; }
  public function changed(bars:Array<BarTerBarConfig>,layouts:BarTerWeaponLayouts):Void {
   var key=observedKey.length > 0 ? observedKey : currentKey;
-  if (key.length > 0) layouts.capture(key,bars); else editsBeforeIdentity=true;
+  if (key.length > 0) layouts.capture(key,bars,true); else editsBeforeIdentity=true;
  }
  /** A stable action set must appear in two distinct native observation generations. */
  public function reconcile(key:String,source:Array<BarTerNativeSkill>,generation:Int,now:Float,
@@ -25,7 +25,7 @@ class BarTerLoadoutState {
   if (observedKey != key) {
    if (currentKey.length > 0 && currentKey == observedKey) layouts.capture(currentKey,bars);
    observedKey=key; staged=true; resetCandidate();
-   if (editsBeforeIdentity) { layouts.capture(key,bars); editsBeforeIdentity=false; }
+   if (editsBeforeIdentity) { layouts.capture(key,bars,true); editsBeforeIdentity=false; }
   }
   var fingerprint=key;
   for (s in source) fingerprint+="|"+s.action+":"+s.id;

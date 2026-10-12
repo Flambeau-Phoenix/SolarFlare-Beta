@@ -27,6 +27,9 @@ class ResourcePreviewRenderer {
 	var targetRenderer = new solarflare.target.TargetOverlay();
 	var targetSample = new solarflare.target.TargetSnap();
 	var castSample = new CastSnap();
+	var chainSkill = new solarflare.chaincast.ChaincastSkillState();
+	public var chainSkillPreview:Int = 0;
+	public static final CHAIN_SKILL_PREVIEWS = ["Cooldown (3.7s)", "Off cooldown", "No data", "No skill linked"];
 
 	public function new() {
 		hp.kind = VitalSnap.HP;
@@ -55,6 +58,8 @@ class ResourcePreviewRenderer {
 	}
 
 	public function elementHeight(id:String, cfg:ConfigPanel):Single {
+		if (id == "chaincast" && cfg != null && cfg.chaincast != null)
+			return ChaincastRenderer.headHeight(cfg.chaincast.style.get(), cfg.chaincast.width.get());
 		if (id == "target") return 64;
 		if (id == "castbar" && cfg != null && cfg.castBar != null)
 			return Math.max(solarflare.castbar.CastBarConfig.MIN_H,
@@ -101,7 +106,8 @@ class ResourcePreviewRenderer {
 				PipShapes.drawCount(width, height, s.comboMax, s.comboCurrent, cfg.combo.vertical.get(), cfg.combo.shape.get(),
 					s.comboAlert ? "MAX" : Std.string(s.comboCurrent), null);
 			case "attack":
-				AttackComboRenderer.draw(s.attackStep, s.attackLength, s.attackFlashFinal, s.attackWithinCombo, cfg.attackCombo, width, height);
+				AttackComboRenderer.draw(s.attackStep, s.attackLength, s.attackFlashFinal, s.attackWithinCombo, cfg.attackCombo, width, height,
+					AttackComboRenderer.RESOURCE_PREVIEW);
 			case "target":
 				targetSample.valid = true;
 				targetSample.name = "Nightspawn";
@@ -121,7 +127,10 @@ class ResourcePreviewRenderer {
 			case "chaincast":
 				var showBadge = cfg.chaincast == null || cfg.chaincast.showStackBadge == null
 					|| cfg.chaincast.showStackBadge.get();
-				ChaincastRenderer.drawHead(width, height, s.chainShownCount(), s.chainReady, showBadge, s.chainPulse);
+				chainSkill.update(chainSkillPreview != 3, chainSkillPreview != 2, chainSkillPreview != 2,
+					chainSkillPreview == 1, 3.7, 10);
+				ChaincastRenderer.drawHead(width, height, s.chainShownCount(), s.chainReady, showBadge, s.chainPulse,
+					cfg.chaincast != null ? cfg.chaincast.style.get() : 0, chainSkill);
 			case "conduit":
 				drawConduitPreview(s, cfg, width, height);
 			default:

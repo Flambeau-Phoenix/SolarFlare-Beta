@@ -17,7 +17,7 @@ class BarTerSkillActivation {
     return {success:false,message:"Local skill controller unavailable."};
    var skill:st.skill.Skill=null;
    if (action.length > 0) {
-    try skill=h.getSkillByInput(action) catch (_:Dynamic) {}
+    skill=GeauxCache.skillByInput(h,action);
     if (skill == null && isCoreAction(action))
      return {success:false,message:"Skill binding unavailable: "+label};
     if (skill != null && skillId.length > 0 && !GeauxCache.skillMatches(skill,skillId))

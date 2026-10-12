@@ -986,6 +986,11 @@
       "kind": "skill"
     },
     {
+      "id": "Book_WaterOrbs_Skill2_Recast_Proc",
+      "name": "Book_WaterOrbs_Skill2_Recast_Proc",
+      "kind": "skill"
+    },
+    {
       "id": "Bow_Craft_Skill2",
       "name": "Bouncing Shot",
       "kind": "skill"
@@ -8873,6 +8878,11 @@
     {
       "id": "Spongeblob_Dance_Low",
       "name": "Spongeblob_Dance_Low",
+      "kind": "skill"
+    },
+    {
+      "id": "Spongeblob_Skill1_Projectiles",
+      "name": "Spongeblob_Skill1_Projectiles",
       "kind": "skill"
     },
     {

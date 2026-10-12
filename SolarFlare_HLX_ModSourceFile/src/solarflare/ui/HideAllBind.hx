@@ -25,12 +25,20 @@ class HideAllBind {
 	/** Opt-in: middle click is a camera control for some players, so it is never assumed. */
 	public static var middleMouse = new BoolRef(false);
 
-	/** Combo item list; order must match `resolve()`. */
-	public static inline var ITEMS:String = "Numpad 0\x00Numpad 1\x00Numpad 2\x00Numpad 3\x00Numpad 4\x00Numpad 5"
-		+ "\x00Numpad 6\x00Numpad 7\x00Numpad 8\x00Numpad 9\x00Numpad .\x00Numpad *\x00Numpad -\x00Numpad +"
-		+ "\x00Pause / Break\x00Scroll Lock\x00Insert\x00End\x00No key\x00";
+	/**
+	 * Dropdown labels; order must match `resolve()`. Drawn one entry at a time (beginCombo/selectable).
+	 * Never pass them to ImGui.combo as one NUL-separated string: HashLink's String.toUtf8 stops at
+	 * the first NUL, so the list collapsed to its first entry and the selection preview went blank.
+	 */
+	public static var LABELS:Array<String> = [
+		"Numpad 0", "Numpad 1", "Numpad 2", "Numpad 3", "Numpad 4", "Numpad 5", "Numpad 6", "Numpad 7", "Numpad 8",
+		"Numpad 9", "Numpad .", "Numpad *", "Numpad -", "Numpad +", "Pause / Break", "Scroll Lock", "Insert", "End",
+		"No key"
+	];
+	/** Selectable ids for LABELS, built once so the open dropdown does no string work. */
+	public static var LABEL_IDS:Array<String> = [for (i in 0...LABELS.length) LABELS[i] + "##ha_key_" + i];
 
-	static inline var COUNT:Int = 19;
+	public static inline var COUNT:Int = 19;
 	static inline var NONE:Int = 18;
 
 	static var codes:Array<Int> = null;

@@ -116,7 +116,7 @@ class NativeHideCache {
 				cfg.status = "Waiting for native HUD";
 				return;
 			}
-			if (cfg.hideAll.get() && cfg.bottomBarAccepted.get() && rootAvailable) {
+			if (NativeHideConfig.FULL_ROOT_ENABLED && cfg.hideAll.get() && cfg.bottomBarAccepted.get() && rootAvailable) {
 				var current = field(gui, "hideMode");
 				var wantIdx = Type.enumIndex(cast rootHideMode);
 				if (current != null && Type.enumIndex(cast current) != wantIdx) {
@@ -137,9 +137,7 @@ class NativeHideCache {
 				hideBars();
 			} else releaseBottom(true);
 			var modeName = rootHideMode != null ? Type.enumConstructor(cast rootHideMode) : "?";
-			cfg.status = cfg.hideAll.get() && cfg.bottomBarAccepted.get() && !rootAvailable
-				? "Bottom-bar control ready; symbolic full-root resolution unavailable"
-				: rootOwned ? "Full-root " + modeName + " active; F6 restores native UI"
+			cfg.status = rootOwned ? "Full-root " + modeName + " active; F6 restores native UI"
 				: suppress ? "Native bottom bar hidden; custom HUD unchanged" : "Native visibility restored";
 		} catch (_:Dynamic) {
 			suppress = false;

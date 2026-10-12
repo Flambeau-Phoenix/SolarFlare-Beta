@@ -335,103 +335,6 @@ class AuraConfig {
 		HudChrome.endPanel();
 	}
 
-	/** Reusable field editor consumed by AuraBuilder; AuraDef remains authoritative. */
-	public function drawBuilderFields(a:AuraDef):Void {
-		if (a == null)
-			return;
-		ImGui.separatorText("Window");
-		if (ImGui.checkbox("Enabled##aben" + a.id, a.enabled)) SettingsStore.markDirty();
-		a.chrome.drawToggles("aura_builder_" + a.id);
-		if (solarflare.ui.BuilderSlider.draw("Width##abw" + a.id, a.w, 32, 720, "%.0f px")) { a.sizeDirty = true; SettingsStore.markDirty(); }
-		if (solarflare.ui.BuilderSlider.draw("Height##abh" + a.id, a.h, 24, 480, "%.0f px")) { a.sizeDirty = true; SettingsStore.markDirty(); }
-		ImGui.separatorText("Identity");
-		if (a.rule == null && ImGui.checkbox("Invert##abinv" + a.id, a.invert)) SettingsStore.markDirty();
-		if (ImGui.inputText("Name##abnm" + a.id, a.nameBuf, AuraDef.NAME_BUF)) {
-			a.name = bytesToString(a.nameBuf, AuraDef.NAME_BUF);
-			SettingsStore.markDirty();
-		}
-		ImGui.separatorText("Condition");
-		if (a.rule == null) drawTrigger(a);
-		AuraConditionEditor.draw(a);
-		ImGui.separatorText("Region");
-		drawRegion(a);
-		drawEffects(a);
-		drawDrmStyle(a);
-	}
-
-	static var lastExport:String = "";
-	static var lastDrmIni:String = "";
-
-	function drawDrmStyle(a:AuraDef):Void {
-		if (!ImGui.collapsingHeader("Alert style / DRM##drm" + a.id))
-			return;
-		AuraEffects.ensure(a);
-		if (ImGui.checkbox("Dormant (rise+hold window)##dor" + a.id, a.dormant)) {
-			if (a.dormant.get())
-				AuraEffects.applyPresetDormant(a);
-			else
-				AuraEffects.applyPresetContinuous(a);
-			SettingsStore.markDirty();
-		}
-		ImGui.sameLine();
-		if (ImGui.checkbox("Visual##vis" + a.id, a.visual))
-			SettingsStore.markDirty();
-		ImGui.sameLine();
-		if (ImGui.checkbox("Audio (DRM)##aud" + a.id, a.audio))
-			SettingsStore.markDirty();
-		if (solarflare.ui.BuilderSlider.draw("Hold (s, 0=CDB)##hold" + a.id, a.durRef, 0, 12, "%.1f")) {
-			a.duration = a.durRef.get();
-			SettingsStore.markDirty();
-		}
-		if (solarflare.ui.BuilderSlider.draw("Scale##sc" + a.id, a.scale, 0.5, 2.5, "%.2f")) {
-			a.sizeDirty = true;
-			SettingsStore.markDirty();
-		}
-		if (solarflare.ui.BuilderSlider.draw("Volume (DRM)##vol" + a.id, a.volume, 0, 1, "%.2f"))
-			SettingsStore.markDirty();
-		if (ImGui.inputText("Announce##ann" + a.id, a.announceBuf, AuraDef.ANN_BUF)) {
-			a.announce = bytesToString(a.announceBuf, AuraDef.ANN_BUF);
-			SettingsStore.markDirty();
-		}
-		if (ImGui.inputText("Icon ID##pl" + a.id, a.iconBuf, AuraDef.ICON_BUF)) {
-			a.iconId = bytesToString(a.iconBuf, AuraDef.ICON_BUF);
-			a.plate = "";
-			SettingsStore.markDirty();
-		}
-		var cuePrev = a.cue.length > 0 ? a.cue : "(silent)";
-		if (ImGui.beginCombo("Cue (DRM)##cue" + a.id, cuePrev)) {
-			if (ImGui.selectable("(silent)##cuesil" + a.id, a.cue.length == 0)) {
-				a.cue = "";
-				a.syncCueBuf();
-				SettingsStore.markDirty();
-			}
-			for (c in AuraPack.CUE_IDS) {
-				if (ImGui.selectable(c + "##cue" + a.id + c, a.cue == c)) {
-					a.cue = c;
-					a.syncCueBuf();
-					SettingsStore.markDirty();
-				}
-			}
-			ImGui.endCombo();
-		}
-		var fightPrev = a.fight.length > 0 ? a.fight : "(pack default)";
-		if (ImGui.beginCombo("Fight##fg" + a.id, fightPrev)) {
-			if (ImGui.selectable("(pack default)##fgdef" + a.id, a.fight.length == 0)) {
-				a.fight = "";
-				a.syncFightBuf();
-				SettingsStore.markDirty();
-			}
-			for (f in AuraPack.FIGHTS) {
-				if (ImGui.selectable(f + "##fg" + a.id + f, a.fight == f)) {
-					a.fight = f;
-					a.syncFightBuf();
-					SettingsStore.markDirty();
-				}
-			}
-			ImGui.endCombo();
-		}
-	}
-
 	/** One-click reaction presets, spread across the full card width instead of stacked. */
 	function drawEffectPresets(a:AuraDef):Void {
 		UiLayout.inlineSplit("##fx_presets_" + a.id, 4, function(index:Int, cellW:Single) {
@@ -482,53 +385,66 @@ class AuraConfig {
 				ei++;
 				continue;
 			}
-			if (ImGui.treeNode("fxn" + tag, effectKindLabel(e.kind) + " · " + effectWhenLabel(e.when))) {
-				if (ImGui.checkbox("On##fxen" + tag, e.enabled))
-					SettingsStore.markDirty();
-				if (ImGui.beginCombo("Reaction##fxk" + tag, effectKindLabel(e.kind))) {
-					for (k in AuraEffect.KINDS) {
-						if (ImGui.selectable(effectKindLabel(k) + "##fxks" + tag + k, e.kind == k)) {
-							e.kind = k;
+			var removeThis = false;
+			if (ImGui.treeNode("fxn" + tag, (e.enabled.get() ? "" : "(off) ") + effectKindLabel(e.kind) + " - " + effectWhenLabel(e.when))) {
+				UiLayout.propertyGrid("##fx_grid_" + tag, function() {
+					UiLayout.propertyRow("Enabled", function() {
+						if (ImGui.checkbox("##fxen" + tag, e.enabled))
+							SettingsStore.markDirty();
+					});
+					UiLayout.propertyRow("Reaction", function() {
+						var picked = UiLayout.stringCombo("fxk" + tag, e.kind, AuraEffect.KINDS, effectKindLabel);
+						if (picked != null) {
+							e.kind = picked;
 							SettingsStore.markDirty();
 						}
-					}
-					ImGui.endCombo();
-				}
-				if (ImGui.beginCombo("Timing##fxw" + tag, effectWhenLabel(e.when))) {
-					for (w in AuraEffect.WHENS) {
-						if (ImGui.selectable(effectWhenLabel(w) + "##fxws" + tag + w, e.when == w)) {
-							e.when = w;
+					});
+					UiLayout.propertyRow("Timing", function() {
+						var picked = UiLayout.stringCombo("fxw" + tag, e.when, AuraEffect.WHENS, effectWhenLabel);
+						if (picked != null) {
+							e.when = picked;
 							AuraEffects.syncDormantFlag(a);
 							SettingsStore.markDirty();
 						}
+					});
+					UiLayout.propertyRow("Hold", function() {
+						if (solarflare.ui.BuilderSlider.draw("##fxh" + tag, e.holdRef, 0.1, 12, "%.1f s")) {
+							e.hold = e.holdRef.get();
+							SettingsStore.markDirty();
+						}
+					});
+					if (e.kind == AuraEffect.KIND_ALERT || e.kind == AuraEffect.KIND_AUDIO) {
+						UiLayout.propertyRow("Text", function() {
+							if (ImGui.inputText("##fxt" + tag, e.textBuf, AuraEffect.TEXT_BUF)) {
+								e.text = bytesToString(e.textBuf, AuraEffect.TEXT_BUF);
+								SettingsStore.markDirty();
+							}
+						});
 					}
-					ImGui.endCombo();
-				}
-				if (solarflare.ui.BuilderSlider.draw("Hold (s)##fxh" + tag, e.holdRef, 0.1, 12, "%.1f")) {
-					e.hold = e.holdRef.get();
-					SettingsStore.markDirty();
-				}
-				if (e.kind == AuraEffect.KIND_ALERT || e.kind == AuraEffect.KIND_AUDIO) {
-					if (ImGui.inputText("Text##fxt" + tag, e.textBuf, AuraEffect.TEXT_BUF)) {
-						e.text = bytesToString(e.textBuf, AuraEffect.TEXT_BUF);
-						SettingsStore.markDirty();
+					if (e.kind == AuraEffect.KIND_ICON) {
+						UiLayout.propertyRow("Icon", function() {
+							UiLayout.inlinePair("##fx_icon_" + tag,
+								function(w:Single) {
+									if (UiChrome.toggleTileRef("##fxg" + tag, "Glow", e.glow, w, 24))
+										SettingsStore.markDirty();
+								},
+								function(w:Single) {
+									if (solarflare.ui.BuilderSlider.draw("##fxa" + tag, e.alpha, 0.1, 1, "%.2f"))
+										SettingsStore.markDirty();
+								});
+						}, "Glow adds a halo; the slider sets icon opacity.");
 					}
-				}
-				if (e.kind == AuraEffect.KIND_ICON) {
-					if (ImGui.checkbox("Glow##fxg" + tag, e.glow))
-						SettingsStore.markDirty();
-					if (solarflare.ui.BuilderSlider.draw("Alpha##fxa" + tag, e.alpha, 0.1, 1, "%.2f"))
-						SettingsStore.markDirty();
-				}
-				if (ImGui.button("Remove effect##fxrm" + tag)) {
-					ImGui.treePop();
-					a.effects.splice(ei, 1);
-					AuraEffects.ensure(a);
-					AuraEffects.syncDormantFlag(a);
-					SettingsStore.markDirty();
-					continue;
-				}
+				});
+				if (ImGui.button("Remove effect##fxrm" + tag, ImGui.vec2(-1, 24)))
+					removeThis = true;
 				ImGui.treePop();
+			}
+			if (removeThis) {
+				a.effects.splice(ei, 1);
+				AuraEffects.ensure(a);
+				AuraEffects.syncDormantFlag(a);
+				SettingsStore.markDirty();
+				continue;
 			}
 			ei++;
 		}
@@ -617,123 +533,6 @@ class AuraConfig {
 		while (find(id) != null)
 			id = base + "_" + suffix++;
 		return id;
-	}
-
-	function drawTrigger(a:AuraDef):Void {
-		var preview = a.trigger;
-		if (ImGui.beginCombo("Trigger##tr" + a.id, preview)) {
-			for (t in ["resource", "cooldown", "combatlog", "prayer", "status", "combo", "chaincast", "conduit"]) {
-				if (ImGui.selectable(t, a.trigger == t)) {
-					a.trigger = t;
-					if (t == "status" && a.pct > 16) {
-						a.op = "above";
-						a.pct = 1;
-						a.pctRef.set(1);
-					}
-					SettingsStore.markDirty();
-				}
-			}
-			ImGui.endCombo();
-		}
-		if (a.trigger == "resource") {
-			if (ImGui.beginCombo("Resource##rs" + a.id, a.resource)) {
-				for (t in ["hp", "rage", "mana", "spark", "shield"]) {
-					if (ImGui.selectable(t, a.resource == t)) {
-						a.resource = t;
-						SettingsStore.markDirty();
-					}
-				}
-				ImGui.endCombo();
-			}
-			if (ImGui.beginCombo("When##op" + a.id, a.op)) {
-				for (t in ["below", "above"]) {
-					if (ImGui.selectable(t, a.op == t)) {
-						a.op = t;
-						SettingsStore.markDirty();
-					}
-				}
-				ImGui.endCombo();
-			}
-			if (solarflare.ui.BuilderSlider.draw("Percent##pct" + a.id, a.pctRef, 1, 99, "%.0f")) {
-				a.pct = a.pctRef.get();
-				SettingsStore.markDirty();
-			}
-		} else if (a.trigger == "combo" || a.trigger == "chaincast" || a.trigger == "conduit") {
-			if (solarflare.ui.BuilderSlider.draw("At least##th" + a.id, a.pctRef, 1, 6, "%.0f")) {
-				a.pct = a.pctRef.get();
-				SettingsStore.markDirty();
-			}
-			if (a.trigger == "chaincast") {
-				if (ImGui.inputText("Skill id (ready = proc)##sk" + a.id, a.skillBuf, AuraDef.SKILL_BUF)) {
-					a.skillId = bytesToString(a.skillBuf, AuraDef.SKILL_BUF);
-					SettingsStore.markDirty();
-				}
-			}
-		} else {
-			if (ImGui.inputText("Skill id##sk" + a.id, a.skillBuf, AuraDef.SKILL_BUF)) {
-				a.skillId = bytesToString(a.skillBuf, AuraDef.SKILL_BUF);
-				SettingsStore.markDirty();
-			}
-			var cdbName = CdbAuraTable.name(a.skillId);
-			if (cdbName.length > 0)
-				ImGui.text("CDB: " + cdbName);
-			if (a.trigger == "cooldown") {
-				if (ImGui.checkbox("Require affordable##af" + a.id, a.requireAfford))
-					SettingsStore.markDirty();
-			}
-			if (a.trigger == "status") {
-				if (ImGui.beginCombo("When##sop" + a.id, a.op)) {
-					for (t in ["above", "below"]) {
-						if (ImGui.selectable(t, a.op == t)) {
-							a.op = t;
-							SettingsStore.markDirty();
-						}
-					}
-					ImGui.endCombo();
-				}
-				if (a.pct < 1 || a.pct > 16) {
-					a.pct = 1;
-					a.pctRef.set(1);
-				}
-				if (solarflare.ui.BuilderSlider.draw("At least N stacks##st" + a.id, a.pctRef, 1, 15, "%.0f")) {
-					a.pct = a.pctRef.get();
-					SettingsStore.markDirty();
-				}
-			}
-			if ((a.trigger == "combatlog" || a.trigger == "status") && !a.dormant.get()) {
-				if (solarflare.ui.BuilderSlider.draw("Hold (s, 0=CDB)##dur" + a.id, a.durRef, 0, 12, "%.1f")) {
-					a.duration = a.durRef.get();
-					SettingsStore.markDirty();
-				}
-			}
-		}
-	}
-
-	function drawRegion(a:AuraDef):Void {
-		if (ImGui.beginCombo("Region##rg" + a.id, a.region)) {
-			for (t in ["bar", "icon", "text", "ring", "canvas"]) {
-				if (ImGui.selectable(t, a.region == t)) {
-					a.region = t;
-					SettingsStore.markDirty();
-				}
-			}
-			ImGui.endCombo();
-		}
-		if (a.region == "icon" || a.region == "canvas") {
-			if (ImGui.inputText("Icon id##ic" + a.id, a.iconBuf, AuraDef.ICON_BUF)) {
-				a.iconId = bytesToString(a.iconBuf, AuraDef.ICON_BUF);
-				SettingsStore.markDirty();
-			}
-		}
-		if (ImGui.checkbox("Show key chip##sk" + a.id, a.showKey))
-			SettingsStore.markDirty();
-		ImGui.sameLine();
-		ImGui.setNextItemWidth(72);
-		if (ImGui.inputText("Key##hk" + a.id, a.keyBuf, AuraDef.KEY_BUF)) {
-			a.keyText = AuraDef.sanitizeKey(bytesToString(a.keyBuf, AuraDef.KEY_BUF));
-			a.syncKeyBuf();
-			SettingsStore.markDirty();
-		}
 	}
 
 	static function fillBuf(buf:hl.Bytes, cap:Int, s:String):Void ByteUtil.fillBuf(buf, cap, s);

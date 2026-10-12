@@ -11,13 +11,22 @@ import solarflare.ui.ThemePalette;
  * Does not modify live caches, persisted geometry, or window dimensions.
  */
 class AttackComboRenderer {
-	static var tracker = new ComboTracker();
+	public static inline var LIVE:Int = 0;
+	public static inline var BUILDER_PREVIEW:Int = 1;
+	public static inline var RESOURCE_PREVIEW:Int = 2;
+	/**
+	 * One tracker per caller: previews cycle `step` on their own, which would otherwise keep
+	 * resetting the live overlay's step-change animation (and vice versa).
+	 */
+	static var trackers:Array<ComboTracker> = [new ComboTracker(), new ComboTracker(), new ComboTracker()];
 
-	public static function draw(step:Int, length:Int, flashFinal:Bool, withinCombo:Bool, cfg:AttackComboConfig, rowW:Single, rowH:Single):Void {
+	public static function draw(step:Int, length:Int, flashFinal:Bool, withinCombo:Bool, cfg:AttackComboConfig, rowW:Single, rowH:Single,
+			slot:Int = LIVE):Void {
 		if (cfg == null)
 			return;
 		if (cfg.comboType.get() == 1 && drawCustom(cfg, step, rowW, rowH, flashFinal))
 			return;
+		var tracker = trackers[slot >= 0 && slot < trackers.length ? slot : LIVE];
 
 		tracker.displayMode = cfg.displayMode != null ? cfg.displayMode.get() : 0;
 		tracker.orientation = cfg.vertical != null && cfg.vertical.get() ? 1 : 0;

@@ -20,6 +20,13 @@ import solarflare.geaux.GeauxCache.GeauxSlotSnap;
  * Always draws empty cells when enabled — does not wait for skill data.
  */
 class GeauxBar {
+	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
+	var hudCfg:GeauxConfig;
+	var hudBodyFn:imgui.Structs.ImVec2->Void;
+	var hudHideFn:Void->Void;
+	var hudResizeFn:Single->Single->Void;
+	var hudWindowFn:Void->Void;
+
 	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
 		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
 
@@ -32,6 +39,11 @@ class GeauxBar {
 	public var previewFlashUntil:Float = 0;
 
 	public function new() {
+		hudBodyFn = hudBody;
+		hudHideFn = hudHide;
+		hudResizeFn = hudResize;
+		hudWindowFn = hudWindow;
+
 		theme = new Theme()
 			.varF(ImGuiStyleVar.WindowRounding, 6)
 			.varF(ImGuiStyleVar.FrameRounding, 3)
@@ -57,7 +69,8 @@ class GeauxBar {
 			cfg.ensureSlots();
 			if (cfg.style == null)
 				cfg.style = new GeauxStyle();
-			theme.wrap(() -> drawWindow(cfg));
+			hudCfg = cfg;
+		theme.wrap(hudWindowFn);
 			lastStatus = "geaux: drawing "
 				+ Std.string(cfg.rows.get()) + "x" + Std.string(cfg.cols.get())
 				+ " bar=" + Std.string(GeauxCache.weapons.length)
@@ -204,57 +217,9 @@ class GeauxBar {
 
 	public var openBuilder:Void->Void;
 	function drawWindow(cfg:GeauxConfig):Void {
-		var style = cfg.style;
-		var gap:Single = Math.max(0, style.gap.get());
-		var rounding:Single = Math.max(0, style.rounding.get());
-		var borderW:Single = Math.max(0, style.border.get());
-		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Geaux", "Geaux", cfg.chrome, cfg.width.get(), cfg.height.get(), function(size) {
-				var rows = cfg.rows.get();
-				var cols = cfg.cols.get();
-				if (rows < 1)
-					rows = 1;
-				if (cols < 1)
-					cols = 1;
-				var avail = size;
-				var cellW:Single = (avail.x - gap * (cols - 1)) / cols;
-				var cellH:Single = (avail.y - gap * (rows - 1)) / rows;
-				if (cellW < 20)
-					cellW = 20;
-				if (cellH < 20)
-					cellH = 20;
-				var cell:Single = cellW < cellH ? cellW : cellH;
-
-				var origin = ImGui.getCursorScreenPos();
-				var idx = 0;
-				for (r in 0...rows) {
-					for (c in 0...cols) {
-						var x:Single = origin.x + c * (cell + gap);
-						var y:Single = origin.y + r * (cell + gap);
-						var id = (cfg.slotIds != null && idx < cfg.slotIds.length) ? cfg.slotIds[idx] : "";
-						var snap = (idx >= 0 && idx < GeauxCache.count && GeauxCache.slots[idx].present) ? GeauxCache.slots[idx] : null;
-						if (snap == null && id.length > 0) {
-							var fallback = new GeauxSlotSnap();
-							fallback.index = idx;
-							fallback.id = id;
-							fallback.iconId = id;
-							fallback.label = GeauxCache.shortLabel(id);
-							fallback.present = true;
-							fallback.ready = true;
-							fallback.group = GeauxCache.groupForId(id);
-							snap = fallback;
-						}
-						var glyph = (cfg.slotGlyphs != null && idx < cfg.slotGlyphs.length) ? cfg.slotGlyphs[idx] : "";
-						var hotkey = (cfg.slotHotkeys != null && idx < cfg.slotHotkeys.length) ? cfg.slotHotkeys[idx] : "";
-						drawSnap(style, x, y, cell, rounding, borderW, snap, "geaux_cell_" + idx, false, glyph, hotkey);
-						idx++;
-					}
-				}
-				ImGui.dummy(ImGui.vec2(avail.x > 1 ? avail.x : cell * cols, cell * rows + gap * (rows - 1)));
-		}, openBuilder, function() { cfg.enabled.set(false); solarflare.ui.SettingsStore.markDirty(); }, false, null, function(newW:Single, newH:Single) {
-			cfg.width.set(Math.max(24, newW));
-			cfg.height.set(Math.max(24, newH));
-			solarflare.ui.SettingsStore.markDirty();
-		});
+		hudCfg = cfg;
+		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Geaux", "Geaux", cfg.chrome, cfg.width.get(), cfg.height.get(), hudBodyFn, openBuilder, hudHideFn, false, null, hudResizeFn);
+		hudCfg = null;
 	}
 
 	/**
@@ -533,4 +498,67 @@ class GeauxBar {
 		ImGui.ImDrawList_PathFillConvex(dl, ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 0.62)));
 	}
 
+
+	function hudBody(size:imgui.Structs.ImVec2):Void {
+		var cfg = hudCfg;
+		var style = cfg.style;
+		var gap:Single = Math.max(0, style.gap.get());
+		var rounding:Single = Math.max(0, style.rounding.get());
+		var borderW:Single = Math.max(0, style.border.get());
+		var rows = cfg.rows.get();
+		var cols = cfg.cols.get();
+		if (rows < 1)
+			rows = 1;
+		if (cols < 1)
+			cols = 1;
+		var avail = size;
+		var cellW:Single = (avail.x - gap * (cols - 1)) / cols;
+		var cellH:Single = (avail.y - gap * (rows - 1)) / rows;
+		if (cellW < 20)
+			cellW = 20;
+		if (cellH < 20)
+			cellH = 20;
+		var cell:Single = cellW < cellH ? cellW : cellH;
+
+		var origin = ImGui.getCursorScreenPos();
+		var idx = 0;
+		for (r in 0...rows) {
+			for (c in 0...cols) {
+				var x:Single = origin.x + c * (cell + gap);
+				var y:Single = origin.y + r * (cell + gap);
+				var id = (cfg.slotIds != null && idx < cfg.slotIds.length) ? cfg.slotIds[idx] : "";
+				var snap = (idx >= 0 && idx < GeauxCache.count && GeauxCache.slots[idx].present) ? GeauxCache.slots[idx] : null;
+				if (snap == null && id.length > 0) {
+					var fallback = new GeauxSlotSnap();
+					fallback.index = idx;
+					fallback.id = id;
+					fallback.iconId = id;
+					fallback.label = GeauxCache.shortLabel(id);
+					fallback.present = true;
+					fallback.ready = true;
+					fallback.group = GeauxCache.groupForId(id);
+					snap = fallback;
+				}
+				var glyph = (cfg.slotGlyphs != null && idx < cfg.slotGlyphs.length) ? cfg.slotGlyphs[idx] : "";
+				var hotkey = (cfg.slotHotkeys != null && idx < cfg.slotHotkeys.length) ? cfg.slotHotkeys[idx] : "";
+				drawSnap(style, x, y, cell, rounding, borderW, snap, "geaux_cell_" + idx, false, glyph, hotkey);
+				idx++;
+			}
+		}
+		ImGui.dummy(ImGui.vec2(avail.x > 1 ? avail.x : cell * cols, cell * rows + gap * (rows - 1)));
+	}
+
+	function hudHide():Void {
+		var cfg = hudCfg;
+		cfg.enabled.set(false); solarflare.ui.SettingsStore.markDirty();
+	}
+
+	function hudResize(newW:Single, newH:Single):Void {
+		var cfg = hudCfg;
+		cfg.width.set(Math.max(24, newW));
+		cfg.height.set(Math.max(24, newH));
+		solarflare.ui.SettingsStore.markDirty();
+	}
+
+	function hudWindow():Void { drawWindow(hudCfg); }
 }

@@ -18,6 +18,11 @@ import imgui.Structs.ImVec2;
  * try/catch block alongside the existing auraOverlay.draw() call.
  */
 class AuraStatusPanel {
+	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
+	var hudBodyFn:imgui.Structs.ImVec2->Void;
+	var hudHideFn:Void->Void;
+	var hudResizeFn:Single->Single->Void;
+
 	/** Max badges rendered regardless of active aura count. */
 	static inline var MAX_BADGES:Int = 8;
 	/** Gap in px between badge cells. */
@@ -30,6 +35,10 @@ class AuraStatusPanel {
 	var auraCfg:AuraConfig;
 
 	public function new(cfg:AuraStatusPanelConfig, auraCfg:AuraConfig) {
+		hudBodyFn = hudBody;
+		hudHideFn = hudHide;
+		hudResizeFn = hudResize;
+
 		this.cfg = cfg;
 		this.auraCfg = auraCfg;
 	}
@@ -57,18 +66,12 @@ class AuraStatusPanel {
 		HUDWidgetWindow.draw(
 			"SFAuraStatusPanel", "Auras", cfg.chrome,
 			panelW, panelH,
-			function(size:ImVec2) drawContent(size, cols, cell),
+			hudBodyFn,
 			null,
-			function() {
-				cfg.hidden.set(true);
-				SettingsStore.markDirty();
-			},
+			hudHideFn,
 			false,
 			null,
-			function(nw:Single, nh:Single) {
-				cfg.panelW.set(Math.max(contentW, nw));
-				SettingsStore.markDirty();
-			}
+			hudResizeFn
 		);
 	}
 
@@ -180,5 +183,24 @@ class AuraStatusPanel {
 		ImGui.ImDrawList_AddText_Vec2(dl,
 			ImGui.vec2(p.x + 5, p.y + (h - ts.y) * 0.5),
 			0xCCFFFFFF, label);
+	}
+
+	function hudBody(size:imgui.Structs.ImVec2):Void {
+		var cols:Int = Std.int(Math.max(1, Math.min(4, cfg.columns.get())));
+		var cell:Single = Math.max(24, cfg.cellSize.get());
+		drawContent(size, cols, cell);
+	}
+
+	function hudHide():Void {
+		cfg.hidden.set(true);
+		SettingsStore.markDirty();
+	}
+
+	function hudResize(nw:Single, nh:Single):Void {
+		var cols:Int = Std.int(Math.max(1, Math.min(4, cfg.columns.get())));
+		var cell:Single = Math.max(24, cfg.cellSize.get());
+		var contentW:Single = cols * (cell + BADGE_GAP) - BADGE_GAP;
+		cfg.panelW.set(Math.max(contentW, nw));
+		SettingsStore.markDirty();
 	}
 }

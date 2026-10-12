@@ -8,6 +8,100 @@ class EngineSkillId {
 	static var ready:Bool = false;
 	static var hashToScript:Map<String, String> = new Map();
 	static var displayCache:Map<String, String> = new Map();
+	/** Every id in the CastleDB `skill` sheet (assets/cdb/skill-ids.json, built by tools/build_skill_ids.py). */
+	static var known:Map<String, Bool> = null;
+
+	/** Every skill id in the shipped CDB table, sorted (loads the resource on first use). */
+	public static function allIds():Array<String> {
+		isKnownSkillId("load_the_table");
+		var out:Array<String> = [];
+		if (known != null)
+			for (k in known.keys())
+				out.push(k);
+		out.sort(function(a, b) return a < b ? -1 : (a > b ? 1 : 0));
+		return out;
+	}
+
+	/** Per-skill relations from assets/cdb/skill-links.json (tools/build_skill_ids.py): `_Proc` partner + status rows. */
+	static var links:Map<String, SkillLink> = null;
+	static var linksReady:Bool = false;
+	static var noStatuses:Array<String> = [];
+
+	static function loadLinks():Void {
+		links = new Map();
+		try {
+			var raw = haxe.Resource.getString("skill-links");
+			if (raw == null)
+				return;
+			var doc:Dynamic = haxe.Json.parse(raw);
+			var table:Dynamic = doc.links;
+			if (table == null)
+				return;
+			for (k in Reflect.fields(table)) {
+				var e:Dynamic = Reflect.field(table, k);
+				var l = new SkillLink();
+				if (Std.isOfType(e.p, String))
+					l.proc = e.p;
+				if (Std.isOfType(e.s, Array))
+					for (x in (e.s : Array<Dynamic>))
+						if (Std.isOfType(x, String))
+							l.statuses.push(x);
+				links.set(k, l);
+			}
+			linksReady = true;
+		} catch (_:Dynamic) {}
+	}
+
+	/**
+	 * The `<id>_Proc` row of a skill ("" when the game's data has none). Ids the table does not know (content added
+	 * by a later patch, or no resource shipped) keep the old convention guess so new skills still resolve.
+	 */
+	public static function procOf(id:String):String {
+		if (id == null || id.length == 0)
+			return "";
+		if (links == null)
+			loadLinks();
+		if (linksReady && isKnownSkillId(id)) {
+			var l = links.get(id);
+			return l == null ? "" : l.proc;
+		}
+		return id + "_Proc";
+	}
+
+	/** Status rows the skill is linked to in the game's data (suffix partners and script references). */
+	public static function statusesOf(id:String):Array<String> {
+		if (id == null || id.length == 0)
+			return noStatuses;
+		if (links == null)
+			loadLinks();
+		if (linksReady && isKnownSkillId(id)) {
+			var l = links.get(id);
+			return l == null ? noStatuses : l.statuses;
+		}
+		return [id + "_Status"];
+	}
+
+	/**
+	 * True for an id the game's own data defines. Confirms single-word skills (Mount, PhysicalBlock, Gather...) that
+	 * the `Class_Name` shape test cannot; ids are exact and case-sensitive, so menu names and stubs stay rejected.
+	 */
+	public static function isKnownSkillId(id:String):Bool {
+		if (id == null || id.length < 3)
+			return false;
+		if (known == null) {
+			known = new Map();
+			try {
+				var raw = haxe.Resource.getString("skill-ids");
+				if (raw != null) {
+					var rows:Array<Dynamic> = haxe.Json.parse(raw);
+					for (r in rows)
+						if (Std.isOfType(r, String))
+							known.set(r, true);
+				}
+			} catch (_:Dynamic) {}
+		}
+		return known.exists(id);
+	}
 
 	public static function keep():Void {
 		ensure();
@@ -27,7 +121,7 @@ class EngineSkillId {
 			var mapped = hashToScript.get(s);
 			if (mapped != null && mapped.length > 0)
 				result = mapped;
-			else if (isScriptStyle(s))
+			else if (isScriptStyle(s) || isKnownSkillId(s))
 				result = s;
 		}
 		displayCache.set(id, result);
@@ -177,4 +271,10 @@ class EngineSkillId {
 			return "";
 		return FieldWalk.extractString(obj, name, "");
 	}
+}
+
+private class SkillLink {
+	public var proc:String = "";
+	public var statuses:Array<String> = [];
+	public function new() {}
 }

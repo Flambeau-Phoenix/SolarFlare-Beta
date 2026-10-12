@@ -139,6 +139,10 @@ class AuraStatusCache {
 	 * wait for a pass, it lands immediately through markAbsent.
 	 */
 	public static function sample(hero:Dynamic, observedAt:Null<Float> = null):Void {
+		if (auditRequested) {
+			auditRequested = false;
+			lastAudit = hero == null ? "Check: no character has been sampled yet." : auditEngine(hero);
+		}
 		var now = observedAt == null ? stamp() : observedAt;
 		var heroChanged = hero != sampledHero;
 		var mode = (identityCacheEnabled ? 1 : 0) | (stateRefreshEnabled ? 2 : 0);
@@ -184,7 +188,9 @@ class AuraStatusCache {
 			if (fast) publishTargeted();
 			domainKnown = domainKnown && !scanActive && scanComplete;
 			var rebuildStarted = stamp(); var rebuildRows = 0;
-			for (key => cached in discovered) if (publishDiscovery && findByWant(cached.id) == null && count < MAX) {
+			// Publication deduplicates by applied status AND source item, like discovery/ingest.
+			// A kind lookup collapses distinct ItemStatus buffs between sweeps (food, cauldron, etc.).
+			for (key => cached in discovered) if (publishDiscovery && !rowsApplied.exists(key) && count < MAX) {
 				var out = allocSnap(); copySnap(out, cached);
 				var span = stamps.get(key);
 				if (span != null) applyStamp(out, span, now);
@@ -261,6 +267,17 @@ class AuraStatusCache {
 		for (want in wantedBuf) {
 			if (findByWant(want) != null || count >= MAX) continue;
 			var cached = targeted.get(want.toLowerCase());
+			// A typed miss or an unknown placeholder must not hide a live observation discovery still retains
+			// (the demanded id can be an alias of the applied kind). Removal stays certified by complete sweeps.
+			var live = (cached == null || !cached.present) ? liveDiscovered(want) : null;
+			if (live != null) {
+				var shown = allocSnap(); copySnap(shown, live);
+				var liveSpan = stamps.get(stampKey(shown));
+				if (liveSpan != null) applyStamp(shown, liveSpan, stamp());
+				count++;
+				indexRow(shown);
+				continue;
+			}
 			var out = allocSnap();
 			if (cached == null) { out.id = want; pushId(out, want); out.known = false; }
 			else {
@@ -272,7 +289,107 @@ class AuraStatusCache {
 			indexRow(out);
 		}
 	}
+	/**
+	 * A retained live discovery row that carries the demanded id only as an ALIAS (its applied id differs). A native
+	 * lookup by kind misses such a row by construction, so the miss says nothing about it. A row whose applied id IS
+	 * the demanded id is excluded: for it the typed miss is authoritative and complete sweeps certify removal.
+	 */
+	static function liveDiscovered(want:String):AuraStatusSnap {
+		var key = StatusIdentity.key(want);
+		if (key.length == 0) return null;
+		for (d in discovered) {
+			if (!d.present || d.id.toLowerCase() == key) continue;
+			if (d.idsLower.indexOf(key) >= 0) return d;
+		}
+		return null;
+	}
 	public static function resetWorkMetrics():Void work.reset();
+
+	/** Status Board "Check statuses": raised by the settings page, serviced from sample() (observe), never from draw. */
+	public static var auditRequested:Bool = false;
+	public static var lastAudit:String = "";
+
+	/**
+	 * One-shot ground truth: the engine's own status container (`GameObject.statuses.array`, the list
+	 * `getStatus` walks) against what the cache and the board hold. Names the kinds the cache lacks.
+	 */
+	static function auditEngine(hero:Dynamic):String {
+		#if hl
+		try {
+			var owner:ent.GameObject = hero;
+			var proxy = owner.statuses;
+			if (proxy == null)
+				return "Check: the character has no status container.";
+			var list:hl.types.ArrayBase = cast proxy.array;
+			if (list == null)
+				return "Check: the status container has no list.";
+			var total = list.length;
+			var scan = total > 512 ? 512 : total;
+			var order:Array<String> = [];
+			var seen = new Map<String, Bool>();
+			var removedCount = 0;
+			var unreadable = 0;
+			for (i in 0...scan) {
+				var el:Dynamic = list.getDyn(i);
+				if (el == null) {
+					unreadable++;
+					continue;
+				}
+				var status:st.skill.Status = el;
+				var removed = false;
+				try removed = status.removed catch (_:Dynamic) {}
+				if (removed) {
+					removedCount++;
+					continue;
+				}
+				var kind = "";
+				try kind = status.kind catch (_:Dynamic) {}
+				var clean = kind == null ? "" : solarflare.EngineText.cleanId(kind);
+				if (clean.length == 0) {
+					unreadable++;
+					continue;
+				}
+				var key = clean.toLowerCase();
+				if (!seen.exists(key)) {
+					seen.set(key, true);
+					order.push(clean);
+				}
+			}
+			var cacheLive = 0;
+			for (i in 0...count) {
+				var row = snaps[i];
+				if (row != null && row.known && row.present)
+					cacheLive++;
+			}
+			var missing:Array<String> = [];
+			for (kind in order) {
+				var key = kind.toLowerCase();
+				var found = false;
+				for (i in 0...count) {
+					var row = snaps[i];
+					if (row != null && row.known && row.present && row.idsLower.indexOf(key) >= 0) {
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					missing.push(kind);
+			}
+			var text = "Check: engine " + total + " statuses (" + order.length + " kinds"
+				+ (removedCount > 0 ? ", " + removedCount + " removed" : "")
+				+ (unreadable > 0 ? ", " + unreadable + " unreadable" : "")
+				+ ") | cache " + cacheLive + " | board " + solarflare.statusboard.StatusBoardConfig.lastVisible
+				+ " | observation " + (domainKnown ? "complete" : "incomplete");
+			if (missing.length > 0)
+				text += " | not in cache (" + missing.length + "): " + missing.slice(0, 10).join(", ") + (missing.length > 10 ? ", ..." : "");
+			return text;
+		} catch (e:Dynamic) {
+			return "Check failed: " + Std.string(e);
+		}
+		#else
+		return "Check statuses requires the running HashLink game.";
+		#end
+	}
 
 	/** A slice pays at most 16 ingests and stops after 1 ms between entries. */
 	static function discoverSlice(hero:Dynamic, now:Float):Void {
@@ -761,6 +878,16 @@ class AuraStatusCache {
 			if (snap == null) {
 				// Merge into any walked row that already aliases this demand id.
 				var existing = findByWant(want);
+				if (existing == null) {
+					// A native miss for this kind must not erase a live observation discovery still retains (the
+					// demanded id can be an alias of the applied kind). Publish a copy; discovery stays untouched.
+					var retained = liveDiscovered(want);
+					if (retained != null) {
+						existing = allocSnap();
+						copySnap(existing, retained);
+						count++;
+					}
+				}
 				if (existing != null) {
 					pushId(existing, want);
 					snap = existing;

@@ -15,6 +15,16 @@ typedef ExtraBarsRequest = {var barId:String; var index:Int; var kind:String; va
 
 /** Runtime coordinator: live state is observed here; renderers only consume frozen slots. */
 class ExtraBars {
+	/** Stable HUD actions; callbacks read current model/configuration at invocation. */
+	var hudBar:ExtraBarsBarConfig;
+	var hudEditFn:Void->Void;
+	var hudHideFn:Void->Void;
+	var hudClickFn:Int->Void;
+	var sparkEditFn:Void->Void;
+	var sparkClickFn:Void->Void;
+	var sparkHideFn:Void->Void;
+	var sparkResizeFn:Int->Void;
+
 	public var model = new ExtraBarsConfig();
 	public var open = new BoolRef(false);
 	public var builder:ExtraBarsBuilder;
@@ -51,6 +61,14 @@ class ExtraBars {
 	var lastSample:Float = -1;
 	var countChecks:Array<{kind:String, before:Int, at:Float}> = [];
 	public function new(host:ConfigPanel) {
+		hudEditFn = hudEdit;
+		hudHideFn = hudHide;
+		hudClickFn = hudClick;
+		sparkEditFn = sparkEdit;
+		sparkClickFn = sparkClick;
+		sparkHideFn = sparkHide;
+		sparkResizeFn = sparkResize;
+
 		this.host = host; builder = new ExtraBarsBuilder(this);
 		for (entry in ConsumableCatalog.entries) catalog.push({id:entry.id, name:entry.name, category:entry.type, icon:ConsumableCatalog.iconKey(entry.id), count:0, known:false, owned:false});
 	}
@@ -267,12 +285,42 @@ class ExtraBars {
 	public function drawBar():Void {
 		for (bar in model.bars) if (model.enabled && model.prefix != "off" && bar.enabled && !bar.hidden && views.exists(bar.id)) {
 			var chrome = chromeFor(bar.id); chrome.locked.set(bar.locked); chrome.transparent.set(bar.transparent);
-			overlay.draw(bar,views.get(bar.id),chrome,function() { builder.selectBar(bar.id); open.set(true); },function() { bar.hidden = true; SettingsStore.markDirty(); },function(index) queueClick(bar.id,index));
+			hudBar = bar;
+			overlay.draw(bar,views.get(bar.id),chrome,hudEditFn,hudHideFn,hudClickFn);
+			hudBar = null;
 			bar.locked = chrome.locked.get(); bar.transparent = chrome.transparent.get();
 		}
 		if (model.sparkEnabled) { var chrome = chromeFor("spark"); chrome.locked.set(model.sparkLocked); chrome.transparent.set(model.sparkTransparent);
-			spark.draw(chrome,model.sparkSize,function() open.set(true),function() queueClick("spark",0),function() { model.sparkEnabled = false; SettingsStore.markDirty(); solarflare.ObserveDemand.markStatusDemandDirty(); },function(size) { model.sparkSize=size; SettingsStore.markDirty(); },model.sparkShowHotkey,model.sparkHotkeyLabel);
+			spark.draw(chrome,model.sparkSize,sparkEditFn,sparkClickFn,sparkHideFn,sparkResizeFn,model.sparkShowHotkey,model.sparkHotkeyLabel);
 			model.sparkLocked = chrome.locked.get(); model.sparkTransparent = chrome.transparent.get();
 		}
+	}
+
+	function hudEdit():Void {
+		builder.selectBar(hudBar.id); open.set(true);
+	}
+
+	function hudHide():Void {
+		hudBar.hidden = true; SettingsStore.markDirty();
+	}
+
+	function hudClick(index:Int):Void {
+		queueClick(hudBar.id,index);
+	}
+
+	function sparkEdit():Void {
+		open.set(true);
+	}
+
+	function sparkClick():Void {
+		queueClick("spark",0);
+	}
+
+	function sparkHide():Void {
+		model.sparkEnabled = false; SettingsStore.markDirty(); solarflare.ObserveDemand.markStatusDemandDirty();
+	}
+
+	function sparkResize(size:Int):Void {
+		model.sparkSize = size; SettingsStore.markDirty();
 	}
 }

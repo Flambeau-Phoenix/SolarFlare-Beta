@@ -164,6 +164,24 @@ class HudChrome {
 		ImGui.end();
 	}
 
+	public static inline function panelDepth():Int {
+		return endStack.length;
+	}
+
+	/**
+	 * Draw guards call this after a throw: closes every panel opened since `depth`
+	 * so a failing module cannot leave its window open for the next one to draw into.
+	 */
+	public static function unwindPanels(depth:Int):Void {
+		if (depth < 0)
+			depth = 0;
+		while (endStack.length > depth) {
+			try
+				endPanel()
+			catch (_:Dynamic) {}
+		}
+	}
+
 	public static function endPanel():Void {
 		if (endStack.length == 0)
 			return;

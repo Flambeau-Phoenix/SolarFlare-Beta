@@ -6,7 +6,6 @@ class LocalCastHistory {
 	public static var shared = new LocalCastHistory();
 	public var records(default, null):Array<LocalCastRecord> = [];
 	var hero:Dynamic;
-	var sequence:Int = 0;
 	public function new() {}
 	public function bindHero(value:Dynamic):Void {
 		if (hero == value) return;
@@ -23,7 +22,7 @@ class LocalCastHistory {
 			records.push(record);
 		}
 		record.at = now;
-		record.serial = ++sequence;
+		record.serial = solarflare.aura.signal.AuraEventSequence.next();
 		record.statusIds = statusIds != null ? statusIds.copy() : [];
 		record.statusKnown = statusKnown;
 	}

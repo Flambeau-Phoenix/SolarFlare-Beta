@@ -194,7 +194,40 @@ class ThemePalette {
 		customBufTextDisabled = makeBytes(CUSTOM.textDisabled);
 		customBufDimOverlay = makeBytes(CUSTOM.dimOverlay);
 
+		statusDark = [
+			ImGui.vec4(0.35, 0.80, 0.47, 1),
+			ImGui.vec4(0.97, 0.72, 0.30, 1),
+			ImGui.vec4(0.92, 0.40, 0.40, 1),
+			ImGui.vec4(0.55, 0.80, 1.00, 1)
+		];
+		statusLight = [
+			ImGui.vec4(0.10, 0.50, 0.22, 1),
+			ImGui.vec4(0.62, 0.40, 0.00, 1),
+			ImGui.vec4(0.72, 0.14, 0.14, 1),
+			ImGui.vec4(0.08, 0.38, 0.70, 1)
+		];
+
 		initialized = true;
+	}
+
+	public static inline var STATUS_SUCCESS:Int = 0;
+	public static inline var STATUS_WARN:Int = 1;
+	public static inline var STATUS_DANGER:Int = 2;
+	public static inline var STATUS_INFO:Int = 3;
+	static var statusDark:Array<ImVec4>;
+	static var statusLight:Array<ImVec4>;
+
+	/**
+	 * Semantic status colour for editor chrome (saved/warning/error/hint). Picks the light-theme
+	 * variant when the active window background is bright, so Custom themes stay legible.
+	 * Game-visual renderers keep their own fixed colours and should not call this.
+	 */
+	public static function status(kind:Int):ImVec4 {
+		init();
+		var bg = current().windowBg;
+		var light = bg.x * 0.299 + bg.y * 0.587 + bg.z * 0.114 > 0.55;
+		var set = light ? statusLight : statusDark;
+		return set[kind < 0 || kind > 3 ? STATUS_INFO : kind];
 	}
 
 	static function makeBytes(c:ImVec4):Bytes {

@@ -7,7 +7,9 @@ class ActivePassGate {
 	var lastRun:Float = -1;
 	public function new() {}
 	public function due(now:Float, wanted:Int, active:Bool):Bool {
-		var pending = HookIngress.consumeMask(DOMAINS & wanted);
+		// Retire every gate-owned edge, wanted or not: an edge for a disabled domain is stale by the
+		// time it is enabled again (re-enable reconciles on its own), and must not linger.
+		var pending = HookIngress.consumeMask(DOMAINS) & wanted;
 		if (!active) {
 			lastRun = -1;
 			return false;

@@ -13,7 +13,19 @@ import solarflare.geaux.ReadyFlashState;
 
 /** One renderer for the HUD and bounded builder preview. No engine or icon discovery. */
 class BarTerOverlay {
- public function new() {}
+	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
+	var hudBar:BarTerBarConfig;
+	var hudSnaps:Array<BarTerSnap>;
+	var hudClick:Int->Void;
+	var hudContext:Int->Void;
+	var hudShowHotkeys:Bool;
+	var hudBodyFn:imgui.Structs.ImVec2->Void;
+	var hudResizeFn:Single->Single->Void;
+
+ public function new() {
+		hudBodyFn = hudBody;
+		hudResizeFn = hudResize;
+	}
  public function draw(bar:BarTerBarConfig,snaps:Array<BarTerSnap>,chrome:HudChrome,
   edit:Void->Void,hide:Void->Void,click:Int->Void,showHotkeys:Bool=true,context:Int->Void=null,barMenu:Void->Void=null):Void {
   var w:Single=BarTerLayout.width(bar.columns,bar.slotSize);
@@ -21,26 +33,13 @@ class BarTerOverlay {
   var hasContent=false;
   for (i in 0...bar.slotCount) if (i < snaps.length && !BarTerCellState.empty(snaps[i])) { hasContent=true; break; }
   if (!hasContent && !bar.showEmptyCells) return;
-  HUDWidgetWindow.draw("SolarFlare.BarTer."+bar.id,bar.name,chrome,w,h,function(_) {
-   var origin=ImGui.getCursorScreenPos(); var dl=ImGui.getWindowDrawList();
-   var now=haxe.Timer.stamp(); var time=ImGui.getTime();
-   for (i in 0...bar.slotCount) {
-    var snap=i < snaps.length ? snaps[i] : null;
-    if (BarTerCellState.empty(snap) && !bar.showEmptyCells) continue;
-    var x:Single=origin.x+(i%bar.columns)*(bar.slotSize+BarTerLayout.GAP);
-    var y:Single=origin.y+Std.int(i/bar.columns)*(bar.slotSize+BarTerLayout.GAP);
-    ImGui.setCursorScreenPos(ImGui.vec2(x,y));
-    var pressed=ImGui.invisibleButton("##bt_use_"+bar.id+"_"+i,ImGui.vec2(bar.slotSize,bar.slotSize));
-    var hovered=ImGui.isItemHovered();
-    if (context != null) context(i);
-    drawCell(dl,snap,x,y,bar.slotSize,now,time,hovered,showHotkeys,bar);
-    if (hovered && snap != null && snap.kind != "empty") ImGui.setTooltip(tooltip(snap));
-    if (pressed && snap != null && snap.kind != "empty" && snap.kind != "status" && click != null) click(i);
-   }
-   ImGui.setCursorScreenPos(origin); ImGui.dummy(ImGui.vec2(w,h));
-  },edit,hide,false,barMenu,function(nw:Single,nh:Single) {
-   bar.slotSize=BarTerLayout.resized(bar.slotCount,bar.columns,nw,nh); SettingsStore.markDirty();
-  });
+  hudBar = bar;
+  hudSnaps = snaps;
+  hudClick = click;
+  hudContext = context;
+  hudShowHotkeys = showHotkeys;
+  HUDWidgetWindow.draw("SolarFlare.BarTer."+bar.id,bar.name,chrome,w,h,hudBodyFn,edit,hide,false,barMenu,hudResizeFn);
+  hudBar = null; hudSnaps = null; hudClick = null; hudContext = null;
  }
  public static function tooltip(s:BarTerSnap):String {
   if (s.kind == "status") {
@@ -117,4 +116,31 @@ class BarTerOverlay {
   ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(tx-2,ty-1),ImGui.vec2(tx+ts.x+2,ty+ts.y+1),0xDD000000,3);
   ImGui.ImDrawList_AddText_Vec2(dl,ImGui.vec2(tx,ty),ImGui.colorConvertFloat4ToU32(ThemePalette.current().text),value);
  }
+
+	function hudBody(size:imgui.Structs.ImVec2):Void {
+		var bar = hudBar; var snaps = hudSnaps; var click = hudClick; var context = hudContext; var showHotkeys = hudShowHotkeys;
+		var w:Single = BarTerLayout.width(bar.columns, bar.slotSize);
+		var h:Single = BarTerLayout.height(bar.slotCount, bar.columns, bar.slotSize);
+		var origin=ImGui.getCursorScreenPos(); var dl=ImGui.getWindowDrawList();
+		var now=haxe.Timer.stamp(); var time=ImGui.getTime();
+		for (i in 0...bar.slotCount) {
+		 var snap=i < snaps.length ? snaps[i] : null;
+		 if (BarTerCellState.empty(snap) && !bar.showEmptyCells) continue;
+		 var x:Single=origin.x+(i%bar.columns)*(bar.slotSize+BarTerLayout.GAP);
+		 var y:Single=origin.y+Std.int(i/bar.columns)*(bar.slotSize+BarTerLayout.GAP);
+		 ImGui.setCursorScreenPos(ImGui.vec2(x,y));
+		 var pressed=ImGui.invisibleButton("##bt_use_"+bar.id+"_"+i,ImGui.vec2(bar.slotSize,bar.slotSize));
+		 var hovered=ImGui.isItemHovered();
+		 if (context != null) context(i);
+		 drawCell(dl,snap,x,y,bar.slotSize,now,time,hovered,showHotkeys,bar);
+		 if (hovered && snap != null && snap.kind != "empty") ImGui.setTooltip(tooltip(snap));
+		 if (pressed && snap != null && snap.kind != "empty" && snap.kind != "status" && click != null) click(i);
+		}
+		ImGui.setCursorScreenPos(origin); ImGui.dummy(ImGui.vec2(w,h));
+	}
+
+	function hudResize(nw:Single,nh:Single):Void {
+		var bar = hudBar;
+		bar.slotSize=BarTerLayout.resized(bar.slotCount,bar.columns,nw,nh); SettingsStore.markDirty();
+	}
 }

@@ -13,17 +13,37 @@ typedef BarTerPlacement = { var bar:String; var cell:Int; var action:String; var
 /** Persist primitive action placements; fixed cells remain shared across loadouts. */
 class BarTerWeaponLayouts {
  public var layouts:Map<String,Array<BarTerPlacement>> = new Map();
+ /**
+  * Loadouts whose layout is empty because the user emptied it. Any other empty layout means "never seeded"
+  * (nothing was captured, or it was captured mid-transition): it must not wipe the bar and must not stop
+  * BarTer auto-assigning that loadout's native skills.
+  */
+ public var cleared:Map<String,Bool> = new Map();
  public function new() {}
- public function capture(key:String,bars:Array<BarTerBarConfig>):Void {
+ /** `explicit` marks a user edit (builder, clear, move); automatic captures never decide that a bar is meant to be empty. */
+ public function capture(key:String,bars:Array<BarTerBarConfig>,explicit:Bool=false):Void {
   if (key.length == 0) return;
   var placements:Array<BarTerPlacement>=[];
   for (b in bars) for (i in 0...b.slots.length) if (b.slots[i].hasSkill() && b.slots[i].nativeActionId.length > 0)
    placements.push({bar:b.id,cell:i,action:b.slots[i].nativeActionId,id:b.slots[i].skillId});
   layouts.set(key,placements);
+  if (placements.length > 0) cleared.remove(key);
+  else if (explicit) cleared.set(key,true);
+ }
+ /** The layout to apply for `key`, or null when it should be seeded from the native skills. */
+ function usable(key:String):Array<BarTerPlacement> {
+  var rows=layouts.get(key);
+  if (rows == null || (rows.length == 0 && !cleared.exists(key))) return null;
+  return rows;
  }
  public function restore(key:String,previous:String,bars:Array<BarTerBarConfig>,source:Array<BarTerNativeSkill>,complete:Bool):Bool {
   if (!complete || key.length == 0 || source.length == 0) return false;
-  var template=layouts.get(key); if (template == null) template=layouts.get(previous);
+  var template=usable(key);
+  if (template == null) {
+   template=usable(previous);
+   // Inheriting a bar the user emptied keeps this loadout empty on purpose too (and across relaunches).
+   if (template != null && template.length == 0) cleared.set(key,true);
+  }
   if (template == null) {
    if (bars.length > 0 && source.length > 0) {
     populate(bars[0],source,bars);
@@ -76,9 +96,17 @@ class BarTerWeaponLayouts {
   for (i in 0...bar.slotCount) if (bar.slots[i].hasSkill()) bar.slots[i].clearContent();
   return populate(bar,source,bars);
  }
- public function dump():Dynamic return [for (key in layouts.keys()) {key:key,placements:[for (p in layouts.get(key)) {bar:p.bar,cell:p.cell,action:p.action,id:p.id}]}];
+ public function dump():Dynamic {
+  var rows:Array<Dynamic>=[];
+  for (key in layouts.keys()) {
+   var row:Dynamic={key:key,placements:[for (p in layouts.get(key)) {bar:p.bar,cell:p.cell,action:p.action,id:p.id}]};
+   if (cleared.exists(key)) Reflect.setField(row,"cleared",true);   // absent otherwise: older builds read the same shape
+   rows.push(row);
+  }
+  return rows;
+ }
  public function apply(data:Dynamic):Void {
-  layouts.clear();
+  layouts.clear(); cleared.clear();
   if (!Std.isOfType(data,Array)) return;
   var rows:Array<Dynamic>=cast data;
   for (row in rows) {
@@ -87,6 +115,7 @@ class BarTerWeaponLayouts {
    for (p in saved) if (p != null && Std.isOfType(p.bar,String) && Std.isOfType(p.action,String) && Std.isOfType(p.cell,Int) && p.cell >= 0 && p.cell < 64)
     placements.push({bar:p.bar,cell:p.cell,action:p.action,id:Std.isOfType(p.id,String) ? p.id : ""});
    layouts.set(row.key,placements);
+   if (placements.length == 0 && row.cleared == true) cleared.set(row.key,true);
   }
  }
 }

@@ -11,6 +11,14 @@ import solarflare.combatlog.CombatLogCache;
 
 /** Optional separate presentation, sharing inventory/status/combat observations with SolarFlare. */
 class SparkCubeTracker {
+	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
+	var hudPixels:Int;
+	var hudHotkey:String;
+	var hudClick:Void->Void;
+	var hudOnResize:Int->Void;
+	var hudBodyFn:imgui.Structs.ImVec2->Void;
+	var hudResizeFn:Single->Single->Void;
+
  public static inline var ITEM_ID:String = "SparkCube";
  static inline var CONTENT_W:Single = 104;
  static inline var CONTENT_H:Single = 112;
@@ -35,7 +43,10 @@ class SparkCubeTracker {
  var burstText = "Last burst: —";
  var damageReadout = "";
  var readoutBurst = false;
- public function new() { icon = ConsumableCatalog.iconKey(ITEM_ID); }
+ public function new() {
+		hudBodyFn = hudBody;
+		hudResizeFn = hudResize;
+ icon = ConsumableCatalog.iconKey(ITEM_ID); }
  public function trigger(now:Float):Void { flashUntil=now+0.30; flash=1; }
  public function reset():Void { state.reset(); enabled = false; owner = null; sequence = 0; known = false; owned = false; charged = false; damageReadout = ""; readoutBurst = false; seconds = 0; progress = 0; flash = 0; label = "—"; flashUntil = 0; nativeSeen = false; nativeEnded = false; castStarted = -1; }
  public function observe(hero:Dynamic, on:Bool, now:Float):Void {
@@ -44,8 +55,8 @@ class SparkCubeTracker {
    reset(); enabled = true; owner = hero; sequence = CombatLogCache.latestSequence; state.lastSequence = sequence;
   }
   if (CombatLogCache.latestSequence != sequence) {
-   for (line in CombatLogCache.recentAll()) if (line.sequence > sequence)
-    state.accept(line.sequence,line.kind,line.skillId,line.sourceRole == CombatLogCache.ROLE_YOU,line.amount,line.t,line.minionName.length > 0);
+   for (i in CombatLogCache.firstIndexAfter(sequence)...CombatLogCache.lineCount()) { var line = CombatLogCache.lineAt(i); if (line != null && line.sequence > sequence)
+    state.accept(line.sequence,line.kind,line.skillId,line.sourceRole == CombatLogCache.ROLE_YOU,line.amount,line.t,line.minionName.length > 0); }
    sequence = CombatLogCache.latestSequence;
   }
   var inv = ConsumableCache.find(ITEM_ID); known = inv != null && inv.known;
@@ -70,54 +81,67 @@ class SparkCubeTracker {
   var hotkey=showHotkey?ExtraBarsConfig.cleanHotkeyLabel(hotkeyLabel):"";
   var contentH:Single=CONTENT_H+(hotkey.length>0?22:0);
   var scale:Single = pixels/64; var w:Single = CONTENT_W*scale; var h:Single = contentH*scale;
-  HUDWidgetWindow.draw("SolarFlare.ExtraBars.SparkCube","Spark Cube",chrome,w,h,function(_) {
-   var p = ImGui.getCursorScreenPos(); var dl = ImGui.getWindowDrawList();
-   var font=ImGui.getFont(); if (font!=null) ImGui.pushFont(font,Math.min(ImGui.getFontSize(),13*scale));
-   try {
-   var gold = 0xFF37AFD4; var blue = 0xFFFFBF00;
-   ExtraBarsPrototypeBar.drawLabel(dl,label,p.x+8*scale,p.y+9*scale,w-16*scale,charged?blue:0xFFEFEFEF);
-   var iconSize:Single = 52*scale;
-   var iconX:Single = p.x+(w-iconSize)/2; var iconY:Single = p.y+28*scale;
-   ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(iconX,iconY),ImGui.vec2(iconX+iconSize,iconY+iconSize),0xAA090909,5);
-   if (!GameIcons.drawKey(dl,icon,iconX,iconY,iconSize,iconSize,charged?0xFFFFFFFF:0xAAFFFFFF)) ExtraBarsPrototypeBar.drawLabel(dl,"CUBE",iconX,iconY+18*scale,iconSize,0xFFFFFFFF);
-   // Only an observed active effect adds a countdown and remaining-time rail.
-   if (seconds > 0) {
-    ExtraBarsPrototypeBar.drawKeyBadge(dl,Std.string(Math.ceil(seconds*10)/10)+" s",p.x+8*scale,p.y+66*scale,blue,w-16*scale,true);
-    var left:Single = p.x+10*scale; var right:Single = p.x+w-10*scale;
-    var railTop:Single = p.y+102*scale; var railBottom:Single = railTop+4*scale;
-    var edge:Single = left+(right-left)*progress;
-    ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(left,railTop),ImGui.vec2(right,railBottom),0xAA090909,2);
-    ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(left,railTop),ImGui.vec2(edge,railBottom),0xBFFF9A00,2);
-    ImGui.ImDrawList_AddLine(dl,ImGui.vec2(left,railTop),ImGui.vec2(edge,railTop),0xEFFFFFFF,1);
-   }
-   // Readout belongs to the widget face, so transparency cannot hide it.
-   if (damageReadout.length > 0) {
-    ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(p.x+6*scale,p.y+84*scale),ImGui.vec2(p.x+w-6*scale,p.y+100*scale),0xA0000000,3);
-    ExtraBarsPrototypeBar.drawLabel(dl,damageReadout,p.x+8*scale,p.y+86*scale,w-16*scale,readoutBurst?gold:0xFFEFEFEF);
-   }
-   // A separate footer keeps the typed hotkey clear of portrait, timer and damage.
-   if (hotkey.length>0) {
-    ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(p.x+6*scale,p.y+112*scale),ImGui.vec2(p.x+w-6*scale,p.y+132*scale),0xA0000000,3);
-    ExtraBarsPrototypeBar.drawLabel(dl,hotkey,p.x+8*scale,p.y+116*scale,w-16*scale,0xFFEFEFEF);
-   }
-   ImGui.setCursorScreenPos(p);
-   var pressed = ImGui.invisibleButton("##spark_use",ImGui.vec2(w,h));
-   if (ImGui.isItemHovered()) {
-    var tip = !known ? "Waiting for inventory data." : !owned ? "Spark Cube is not carried." : charged ? "Charged. Click to use." : "Empty. Refill at the Obelisks' waters.";
-    if (seconds > 0) tip += "\nSpark surge: "+Std.string(Math.ceil(seconds*10)/10)+" s ("+source+").";
-    if (state.started >= 0) tip += "\n"+damageText+(state.linked?" (includes credited summon hits)":"")+"\nObserved damage is not stored Cube damage.";
-    if (state.burstAt >= 0) tip += "\n"+burstText;
-    if (state.partial) tip += "\n* Partial observation: some combat events were missed.";
-    if (hotkey.length>0) tip += "\nHotkey label: "+hotkey+" (display only).";
-    ImGui.setTooltip(tip);
-   }
-   if (pressed && click != null) click();
-   if (flash > 0) ImGui.ImDrawList_AddRect(dl,ImGui.vec2(iconX,iconY),ImGui.vec2(iconX+iconSize,iconY+iconSize),(Std.int(flash*255)<<24)|0x00B8FFAA,5,2);
-   } catch(e:Dynamic) { if(font!=null) ImGui.popFont(); throw e; }
-   if(font!=null) ImGui.popFont();
-  },edit,hide,false,null,function(width:Single,height:Single) {
-   var size=Std.int(Math.max(40,Math.min(120,Math.min(width/CONTENT_W,height/contentH)*64)));
-   if (onResize!=null) onResize(size);
-  });
+  hudPixels = pixels;
+  hudHotkey = hotkey;
+  hudClick = click;
+  hudOnResize = onResize;
+  HUDWidgetWindow.draw("SolarFlare.ExtraBars.SparkCube","Spark Cube",chrome,w,h,hudBodyFn,edit,hide,false,null,hudResizeFn);
+  hudClick = null; hudOnResize = null;
  }
+
+	function hudBody(size:imgui.Structs.ImVec2):Void {
+		var hotkey = hudHotkey; var click = hudClick;
+		var contentH:Single = CONTENT_H + (hotkey.length > 0 ? 22 : 0);
+		var scale:Single = hudPixels / 64; var w:Single = CONTENT_W * scale; var h:Single = contentH * scale;
+		var p = ImGui.getCursorScreenPos(); var dl = ImGui.getWindowDrawList();
+		var font=ImGui.getFont(); if (font!=null) ImGui.pushFont(font,Math.min(ImGui.getFontSize(),13*scale));
+		try {
+		var gold = 0xFF37AFD4; var blue = 0xFFFFBF00;
+		ExtraBarsPrototypeBar.drawLabel(dl,label,p.x+8*scale,p.y+9*scale,w-16*scale,charged?blue:0xFFEFEFEF);
+		var iconSize:Single = 52*scale;
+		var iconX:Single = p.x+(w-iconSize)/2; var iconY:Single = p.y+28*scale;
+		ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(iconX,iconY),ImGui.vec2(iconX+iconSize,iconY+iconSize),0xAA090909,5);
+		if (!GameIcons.drawKey(dl,icon,iconX,iconY,iconSize,iconSize,charged?0xFFFFFFFF:0xAAFFFFFF)) ExtraBarsPrototypeBar.drawLabel(dl,"CUBE",iconX,iconY+18*scale,iconSize,0xFFFFFFFF);
+		// Only an observed active effect adds a countdown and remaining-time rail.
+		if (seconds > 0) {
+		 ExtraBarsPrototypeBar.drawKeyBadge(dl,Std.string(Math.ceil(seconds*10)/10)+" s",p.x+8*scale,p.y+66*scale,blue,w-16*scale,true);
+		 var left:Single = p.x+10*scale; var right:Single = p.x+w-10*scale;
+		 var railTop:Single = p.y+102*scale; var railBottom:Single = railTop+4*scale;
+		 var edge:Single = left+(right-left)*progress;
+		 ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(left,railTop),ImGui.vec2(right,railBottom),0xAA090909,2);
+		 ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(left,railTop),ImGui.vec2(edge,railBottom),0xBFFF9A00,2);
+		 ImGui.ImDrawList_AddLine(dl,ImGui.vec2(left,railTop),ImGui.vec2(edge,railTop),0xEFFFFFFF,1);
+		}
+		// Readout belongs to the widget face, so transparency cannot hide it.
+		if (damageReadout.length > 0) {
+		 ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(p.x+6*scale,p.y+84*scale),ImGui.vec2(p.x+w-6*scale,p.y+100*scale),0xA0000000,3);
+		 ExtraBarsPrototypeBar.drawLabel(dl,damageReadout,p.x+8*scale,p.y+86*scale,w-16*scale,readoutBurst?gold:0xFFEFEFEF);
+		}
+		// A separate footer keeps the typed hotkey clear of portrait, timer and damage.
+		if (hotkey.length>0) {
+		 ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(p.x+6*scale,p.y+112*scale),ImGui.vec2(p.x+w-6*scale,p.y+132*scale),0xA0000000,3);
+		 ExtraBarsPrototypeBar.drawLabel(dl,hotkey,p.x+8*scale,p.y+116*scale,w-16*scale,0xFFEFEFEF);
+		}
+		ImGui.setCursorScreenPos(p);
+		var pressed = ImGui.invisibleButton("##spark_use",ImGui.vec2(w,h));
+		if (ImGui.isItemHovered()) {
+		 var tip = !known ? "Waiting for inventory data." : !owned ? "Spark Cube is not carried." : charged ? "Charged. Click to use." : "Empty. Refill at the Obelisks' waters.";
+		 if (seconds > 0) tip += "\nSpark surge: "+Std.string(Math.ceil(seconds*10)/10)+" s ("+source+").";
+		 if (state.started >= 0) tip += "\n"+damageText+(state.linked?" (includes credited summon hits)":"")+"\nObserved damage is not stored Cube damage.";
+		 if (state.burstAt >= 0) tip += "\n"+burstText;
+		 if (state.partial) tip += "\n* Partial observation: some combat events were missed.";
+		 if (hotkey.length>0) tip += "\nHotkey label: "+hotkey+" (display only).";
+		 ImGui.setTooltip(tip);
+		}
+		if (pressed && click != null) click();
+		if (flash > 0) ImGui.ImDrawList_AddRect(dl,ImGui.vec2(iconX,iconY),ImGui.vec2(iconX+iconSize,iconY+iconSize),(Std.int(flash*255)<<24)|0x00B8FFAA,5,2);
+		} catch(e:Dynamic) { if(font!=null) ImGui.popFont(); throw e; }
+		if(font!=null) ImGui.popFont();
+	}
+
+	function hudResize(width:Single,height:Single):Void {
+		var contentH:Single = CONTENT_H + (hudHotkey.length > 0 ? 22 : 0); var onResize = hudOnResize;
+		var size=Std.int(Math.max(40,Math.min(120,Math.min(width/CONTENT_W,height/contentH)*64)));
+		if (onResize!=null) onResize(size);
+	}
 }

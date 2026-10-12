@@ -8,6 +8,14 @@ import solarflare.ui.SettingsStore;
 
 /** Observe owns native reads and population; draw consumes prepared cells only. */
 class BarTer {
+	/** Stable HUD actions; callbacks read current model/configuration at invocation. */
+	var hudBar:BarTerBarConfig;
+	var hudEditFn:Void->Void;
+	var hudHideFn:Void->Void;
+	var hudClickFn:Int->Void;
+	var hudContextFn:Int->Void;
+	var hudMenuFn:Void->Void;
+
  public var config:BarTerConfig;
  public var builder:BarTerBuilder;
  var overlay:BarTerOverlay;
@@ -27,7 +35,13 @@ class BarTer {
  var replacePopulation = false;
  public var host:solarflare.ui.ConfigPanel = null;
 
- public function new() { config=new BarTerConfig(); builder=new BarTerBuilder(this); overlay=new BarTerOverlay(); }
+ public function new() {
+		hudEditFn = hudEdit;
+		hudHideFn = hudHide;
+		hudClickFn = hudClick;
+		hudContextFn = hudContext;
+		hudMenuFn = hudMenu;
+ config=new BarTerConfig(); builder=new BarTerBuilder(this); overlay=new BarTerOverlay(); }
  public function demand():Bool return config != null && config.demand();
  public function snapsFor(id:String):Array<BarTerSnap> {
   var a=snapMap.get(id); if (a == null) { a=[]; snapMap.set(id,a); } return a;
@@ -89,6 +103,9 @@ class BarTer {
    populateRequestedBar();
   }
   if (snapshotsDirty || now-lastSnapAt >= 0.05) { refreshSnaps(); snapshotsDirty=false; lastSnapAt=now; }
+  // Same eligibility the ExtraBars policy enforces before any native use request.
+  var block=BarTerCache.pendingClicks.length > 0 ? BarTerCache.gameplayBlockReason(hero) : "";
+  if (block.length > 0) lastStatus=block;
   BarTerCache.drainClicks(function(c) {
    var b=config.find(c.barId);
    if (hero == null || !config.enabled.get() || !config.isActive(c.barId) || b == null || !b.enabled || b.hidden || config.hidden.get()
@@ -96,12 +113,12 @@ class BarTer {
    var slot = b.slots[c.slot];
    if (c.itemKind.length > 0 && slot.hasItem() && slot.itemKind == c.itemKind) {
     var outcome=BarTerCache.useItem(c.itemKind,c.gen,hero); lastStatus=outcome.message;
-    var snaps=snapsFor(c.barId); if (c.slot < snaps.length) snaps[c.slot].flashUntil=now+0.3;
+    var snaps=snapsFor(c.barId); if (outcome.submitted && c.slot < snaps.length) snaps[c.slot].flashUntil=now+0.3;
     } else if (c.skillId.length > 0 && slot.hasSkill() && slot.skillId == c.skillId) {
     var outcome=BarTerCache.useSkill(c.skillId,slot.nativeActionId,hero); lastStatus=outcome.message;
      var snaps=snapsFor(c.barId); if (outcome.success && c.slot < snaps.length) snaps[c.slot].flashUntil=now+0.3;
    }
-  });
+  },block.length > 0);
  }
  function reconcileLoadout(key:String,now:Float):Void {
   if (!BarTerNativeKeys.known) return;
@@ -178,10 +195,9 @@ class BarTer {
    var b=config.bars[i]; if (!b.enabled || b.hidden) continue;
    var chrome=config.chromeFor(b.id); chrome.locked.set(b.locked); chrome.transparent.set(b.transparent);
    chrome.itemContextMenus=true;
-   overlay.draw(b,snapsFor(b.id),chrome,function() { config.open.set(true); builder.selectBar(b); },
-    function() { b.hidden=true; changed(); },function(index) {
-     var s=b.slots[index]; if (s.hasItem()) BarTerCache.queueClick(b.id,index,"",s.itemKind); else if (s.hasSkill()) BarTerCache.queueClick(b.id,index,s.skillId,"");
-    },config.showHotkeys.get(),function(index) { builder.drawCellContext(b,index,"hud"); },function() { builder.drawBarMenu(b); });
+   hudBar = b;
+   overlay.draw(b,snapsFor(b.id),chrome,hudEditFn,hudHideFn,hudClickFn,config.showHotkeys.get(),hudContextFn,hudMenuFn);
+   hudBar = null;
    if (chrome.locked.get() != b.locked || chrome.transparent.get() != b.transparent) {
     b.locked=chrome.locked.get(); b.transparent=chrome.transparent.get(); changed();
    }
@@ -197,4 +213,25 @@ class BarTer {
   loadout.reset(); character=""; BarTerNativeKeys.reset(); snapMap.clear(); rawWeaponKey=""; lastWeaponReadAt=-1;
   solarflare.ObserveDemand.markStatusDemandDirty();
  }
+
+	function hudEdit():Void {
+		config.open.set(true); builder.selectBar(hudBar);
+	}
+
+	function hudHide():Void {
+		hudBar.hidden = true; changed();
+	}
+
+	function hudClick(index:Int):Void {
+		var b = hudBar; var s = b.slots[index];
+		if (s.hasItem()) BarTerCache.queueClick(b.id,index,"",s.itemKind); else if (s.hasSkill()) BarTerCache.queueClick(b.id,index,s.skillId,"");
+	}
+
+	function hudContext(index:Int):Void {
+		builder.drawCellContext(hudBar,index,"hud");
+	}
+
+	function hudMenu():Void {
+		builder.drawBarMenu(hudBar);
+	}
 }

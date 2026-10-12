@@ -44,6 +44,15 @@ class AuraSignalReader {
 			case "target.hpRatio": percent(out, frame.targetKnown && frame.targetValid, frame.targetRatio);
 			case "combat.killKindMatches": bool(out, frame.killKnown, kindEq(frame.killKind, subject));
 			case "combat.damageTakenRecent": number(out, frame.damageTakenKnown, frame.damageTakenRecent);
+			case "combat.inCombat": bool(out, frame.combatKnown, frame.inCombat);
+			case "event.combat.entered":
+				duration(out, frame.combatKnown, frame.combatEnteredAge);
+				out.timeLeft = Math.NaN; // elapsed, never buff remaining
+				out.eventSerial = frame.combatEnteredSerial;
+			case "event.combat.left":
+				duration(out, frame.combatKnown, frame.combatLeftAge);
+				out.timeLeft = Math.NaN;
+				out.eventSerial = frame.combatLeftSerial;
 			case "event.cast.recent", "event.cast.active": readCast(frame, signal, subject, out);
 			case "event.playerCast.recent":
 				var key = solarflare.geaux.GeauxCache.sanitizeSkillId(subject).toLowerCase();

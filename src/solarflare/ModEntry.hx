@@ -54,9 +54,9 @@ class ModEntry {
 		solarflare.HealthHooks.keep();
 		solarflare.hooks.IdentityVitalsHooks.keep();
 		solarflare.attackcombo.AttackComboCache.keep();
-		solarflare.geaux.GeauxHooks.keep();
 		solarflare.ui.NativeHideHooks.keep();
 		solarflare.combatlog.CombatLogHooks.keep();
+		solarflare.aimcast.AimInstantHooks.keep();
 		solarflare.combatlog.UniqueHeroName.keep();
 		solarflare.lightsaber.Lightsaber.LightsaberHooks.keep();
 		solarflare.lightsaber.Lightsaber.SaberJsonlArchive.keep();

@@ -52,6 +52,31 @@ class UiScope {
 		return true;
 	}
 
+	static var reportedModules:Map<String, Bool> = new Map();
+
+	/**
+	 * Isolates one module's per-frame draw so it cannot take down the hub. The first failure per
+	 * module is traced; later frames stay quiet so a broken module does not flood the log.
+	 */
+	public static function guard(module:String, draw:Void->Void):Void {
+		var panels = HudChrome.panelDepth();
+		try {
+			draw();
+		} catch (e:Dynamic) {
+			HudChrome.unwindPanels(panels);
+			reportOnce("module", module, e);
+		}
+	}
+
+	/** Traces the first failure for a kind+id pair; repeats stay silent so per-frame errors do not flood the log. */
+	public static function reportOnce(kind:String, id:String, failure:Dynamic):Void {
+		var key = kind + ":" + id;
+		if (reportedModules.exists(key))
+			return;
+		reportedModules.set(key, true);
+		report(kind, id, failure);
+	}
+
 	public static function report(kind:String, id:String, failure:Dynamic):Void {
 		trace('SolarFlare ImGui $kind scope "$id" failed: $failure');
 	}

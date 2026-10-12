@@ -4,6 +4,7 @@ import imgui.ImGui;
 import imgui.Enums.ImGuiChildFlags;
 import imgui.Enums.ImGuiCond;
 import imgui.Enums.ImGuiMouseButton;
+import imgui.Enums.ImGuiStyleVar;
 import imgui.Enums.ImGuiWindowFlags;
 import imgui.Structs.ImVec2;
 
@@ -43,12 +44,71 @@ class HUDWidgetWindow {
 	static var lastVisualW:Map<String, Single> = new Map();
 	static var lastVisualH:Map<String, Single> = new Map();
 
+	/** `caption + "###" + id`, rebuilt only when the caption for an id changes. */
+	static var labels:Map<String, String> = new Map();
+	static var labelCaptions:Map<String, String> = new Map();
+
+	/*
+	 * Per-call context for the two chrome callbacks. Both run synchronously inside this call
+	 * (extraMenu from beginBody, the resize callback from drawResizeCorner), so one cached
+	 * closure each replaces a fresh closure per window per frame. Each context is set
+	 * immediately before the call that uses it, so a nested draw inside drawBody can't leak in.
+	 */
+	static var menuOpenBuilder:Void->Void = null;
+	static var menuQuickActions:Void->Void = null;
+	static var menuHide:Void->Void = null;
+	static var extraMenuFn:Void->Void = drawExtraMenu;
+	static var resizeId:String = null;
+	static var resizeMinFaceW:Single = 0;
+	static var resizeOW:Single = 0;
+	static var resizeOH:Single = 0;
+	static var resizeExtraW:Single = 0;
+	static var resizeExtraH:Single = 0;
+	static var resizeOnResize:Single->Single->Void = null;
+	static var resizeFn:Single->Single->Void = applyResize;
+
 	public static function draw(id:String, caption:String, chrome:HudChrome, w:Single, h:Single,
 			drawBody:ImVec2->Void, ?openBuilder:Void->Void, ?hide:Void->Void, layoutOverride:Bool = false,
 			?quickActions:Void->Void, onResize:Single->Single->Void = null, visualBounds:HUDVisualBounds = null):Void {
-		UiLayout.contentSpacing(function() {
-			drawContent(id, caption, chrome, w, h, drawBody, openBuilder, hide, layoutOverride, quickActions, onResize, visualBounds);
-		});
+		// Inline UiLayout.contentSpacing: same scope, no wrapper closure per frame.
+		ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, ImGui.vec2(3, 3));
+		var failure:Dynamic = null;
+		try
+			drawContent(id, caption, chrome, w, h, drawBody, openBuilder, hide, layoutOverride, quickActions, onResize, visualBounds)
+		catch (e:Dynamic)
+			failure = e;
+		ImGui.popStyleVar();
+		if (failure != null)
+			throw failure;
+	}
+
+	static function windowLabel(id:String, caption:String):String {
+		var cached = labels.get(id);
+		if (cached != null && labelCaptions.get(id) == caption)
+			return cached;
+		var label = caption + "###" + id;
+		labels.set(id, label);
+		labelCaptions.set(id, caption);
+		return label;
+	}
+
+	static function drawExtraMenu():Void {
+		if (menuOpenBuilder != null && ImGui.menuItem("Open Builder##hw_build"))
+			menuOpenBuilder();
+		if (menuQuickActions != null)
+			menuQuickActions();
+		if (menuHide != null && ImGui.menuItem("Hide##hw_hide"))
+			menuHide();
+	}
+
+	static function applyResize(outerW:Single, outerH:Single):Void {
+		var contentW:Single = Math.max(resizeMinFaceW, outerW - resizeOW - resizeExtraW);
+		var contentH:Single = Math.max(MIN_CONTENT_H, outerH - resizeOH - resizeExtraH);
+		lastW.set(resizeId, contentW);
+		lastH.set(resizeId, contentH);
+		if (resizeOnResize != null)
+			resizeOnResize(contentW, contentH);
+		SettingsStore.markDirty();
 	}
 
 	static function drawContent(id:String, caption:String, chrome:HudChrome, w:Single, h:Single,
@@ -102,17 +162,10 @@ class HUDWidgetWindow {
 		var flags = chrome.windowFlagsKeepClicks(FLAGS);
 		if (locked)
 			flags |= ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
-		chrome.extraMenu = function() {
-			if (openBuilder != null && ImGui.menuItem("Open Builder##hw_build"))
-				openBuilder();
-			if (quickActions != null)
-				quickActions();
-			if (hide != null && ImGui.menuItem("Hide##hw_hide"))
-				hide();
-		};
+		chrome.extraMenu = extraMenuFn;
 		var failed = false;
 		var failure:Dynamic = null;
-		var began = ImGui.begin(caption + "###" + id, null, flags);
+		var began = ImGui.begin(windowLabel(id, caption), null, flags);
 		try {
 			if (began) {
 				var win = ImGui.getWindowSize();
@@ -122,6 +175,9 @@ class HUDWidgetWindow {
 					chrome.capturePos();
 				}
 				var onClose:Void->Void = hide;
+				menuOpenBuilder = openBuilder;
+				menuQuickActions = quickActions;
+				menuHide = hide;
 				if (chrome.beginBody(onClose, null, caption, false, ImGuiWindowFlags.NoScrollWithMouse,
 						ImGuiChildFlags.AlwaysUseWindowPadding, RESIZE_FOOTER)) {
 					var avail = ImGui.getContentRegionAvail();
@@ -161,17 +217,16 @@ class HUDWidgetWindow {
 					}
 				}
 				chrome.closeBodyChild();
+				resizeId = id;
+				resizeMinFaceW = minFaceW;
+				resizeOW = oW;
+				resizeOH = oH;
+				resizeExtraW = extraW;
+				resizeExtraH = extraH;
+				resizeOnResize = onResize;
 				chrome.drawResizeCorner(id, editable,
 					minFaceW + extraW + oW, MIN_CONTENT_H + extraH + oH,
-					10000, 10000, function(outerW:Single, outerH:Single) {
-						var contentW:Single = Math.max(minFaceW, outerW - oW - extraW);
-						var contentH:Single = Math.max(MIN_CONTENT_H, outerH - oH - extraH);
-						lastW.set(id, contentW);
-						lastH.set(id, contentH);
-						if (onResize != null)
-							onResize(contentW, contentH);
-						SettingsStore.markDirty();
-					}, PADDING);
+					10000, 10000, resizeFn, PADDING);
 				chrome.pollTransparentSurfaceDrag(id, editable);
 			}
 		} catch (e:Dynamic) {
@@ -180,6 +235,9 @@ class HUDWidgetWindow {
 		}
 		HudChrome.endOverlayWindow(began, chrome);
 		chrome.extraMenu = null;
+		// Don't pin caller closures (and what they capture) until the next window draws.
+		menuOpenBuilder = menuQuickActions = menuHide = null;
+		resizeOnResize = null;
 		if (failed)
 			UiScope.report("HUD", id, failure);
 	}

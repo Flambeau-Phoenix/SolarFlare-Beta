@@ -24,6 +24,8 @@ class EnemyCastCache {
 			return;
 		var now = haxe.Timer.stamp();
 		var i = indexOf(sid);
+		if (solarflare.ObserveDemand.castSkillIds.indexOf(sid) >= 0)
+			solarflare.runtime.RuntimeMetrics.castTracked++;
 		if (i < 0) {
 			if (skillIds.length >= CAP) {
 				skillIds.pop();
@@ -56,6 +58,10 @@ class EnemyCastCache {
 		if (sid.length > 0) {
 			var i = indexOf(sid);
 			if (i >= 0) {
+				// One slot per skill id: a stop for an earlier overlapping instance must not clear the newer one.
+				var tracked = liveSkills[i];
+				if (tracked != null && tracked != skill)
+					return;
 				active[i] = false;
 				liveSkills[i] = null;
 				ledgerAge(sid, i);

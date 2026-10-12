@@ -22,7 +22,8 @@ class AuraRuleEvaluator {
 		aggregate(result, rule.mode == "all");
 		for (i in 0...n) {
 			var c = rule.conditions[i];
-			if (c != null && c.signal == "event.playerCast.recent" && c.op == "within" && !c.negate && result.conditions[i].hit)
+			if (c != null && (c.signal == "event.playerCast.recent" || AuraConditionValidator.isCombatEvent(c.signal))
+				&& c.op == "within" && !c.negate && result.conditions[i].hit)
 				result.eventSerial = Std.int(Math.max(result.eventSerial, result.resolved[i].eventSerial));
 		}
 		var pi = rule.presentationSource; if (pi < 0 || pi >= n) pi = 0;

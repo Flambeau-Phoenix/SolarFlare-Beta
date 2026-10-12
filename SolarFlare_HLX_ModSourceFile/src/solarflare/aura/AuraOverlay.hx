@@ -13,6 +13,14 @@ import imgui.Enums.ImGuiWindowFlags;
 import imgui.Theme;
 
 class AuraOverlay {
+	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
+	var hudAura:AuraDef;
+	var hudAllFn:Void->Void;
+	var hudBodyFn:imgui.Structs.ImVec2->Void;
+	var hudHideFn:Void->Void;
+	var hudQuickActionsFn:Void->Void;
+	var hudResizeFn:Single->Single->Void;
+
 	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
 		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
 		| ImGuiWindowFlags.NoBackground;
@@ -22,6 +30,12 @@ class AuraOverlay {
 	var visualBounds = new solarflare.ui.HUDVisualBounds();
 
 	public function new(cfg:AuraConfig) {
+		hudBodyFn = hudBody;
+		hudHideFn = hudHide;
+		hudQuickActionsFn = hudQuickActions;
+		hudResizeFn = hudResize;
+
+		hudAllFn = hudAll;
 		this.cfg = cfg;
 		theme = new Theme()
 			.varV(ImGuiStyleVar.WindowPadding, ImGui.vec2(2, 2))
@@ -37,13 +51,7 @@ class AuraOverlay {
 		AuraVisualRenderer.countdownAll = cfg.countdownAll.get();
 		AuraVisualRenderer.countdownCeiling = cfg.countdownAutoMax.get();
 		AuraVisualRenderer.countdownGlobalScale = Math.max(0.5, Math.min(3, cfg.countdownScale.get()));
-		theme.wrap(() -> {
-			for (a in cfg.auras) {
-				try
-					drawOne(a)
-				catch (_:Dynamic) {}
-			}
-		});
+		theme.wrap(hudAllFn);
 		AuraTimerBoard.openBuilder = openBuilder;
 		try
 			AuraTimerBoard.draw(cfg)
@@ -68,23 +76,9 @@ class AuraOverlay {
 		var w:Single = Math.max(24, a.w.get() * sc);
 		var h:Single = Math.max(24, a.h.get() * sc);
 		AuraVisualRenderer.measureBounds(a, w, h, a.stacks, a.counterValue, visualBounds, sc);
-		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Aura " + a.id, a.displayLabel(), a.chrome, w, h, function(size) {
-			var p = ImGui.getCursorScreenPos();
-			ImGui.dummy(size);
-			var dl = ImGui.getWindowDrawList();
-			AuraVisualRenderer.draw(dl, a, p.x, p.y, size.x, size.y, a.progress, a.stacks,
-				a.counterValue, !a.show && layout, a.fxAlpha, sc);
-			AuraVisualRenderer.drawKeyChip(dl, p.x, p.y, size.x, size.y, a, !a.show && layout);
-		}, openBuilder, function() { a.enabled.set(false); SettingsStore.markDirty(); }, false, function() {
-			if (a.isCounter.get() && ImGui.menuItem("Reset Counter")) {
-				a.counterValue = 0;
-				SettingsStore.markDirty();
-			}
-		}, function(newW:Single, newH:Single) {
-			a.w.set(Math.max(24, newW) / sc);
-			a.h.set(Math.max(24, newH) / sc);
-			SettingsStore.markDirty();
-		}, visualBounds);
+		hudAura = a;
+		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Aura " + a.id, a.displayLabel(), a.chrome, w, h, hudBodyFn, openBuilder, hudHideFn, false, hudQuickActionsFn, hudResizeFn, visualBounds);
+		hudAura = null;
 	}
 
 	function drawAlert(a:AuraDef):Void {
@@ -121,4 +115,43 @@ class AuraOverlay {
 		ImGui.end();
 	}
 
+
+	function hudAll():Void {
+		for (a in cfg.auras) {
+			try drawOne(a) catch (_:Dynamic) {}
+		}
+	}
+
+	function hudBody(size:imgui.Structs.ImVec2):Void {
+		var a = hudAura;
+		var sc:Single = Math.max(0.4, Math.min(2.5, a.scale.get()));
+		var layout = a.chrome == null || !a.chrome.locked.get();
+		var p = ImGui.getCursorScreenPos();
+		ImGui.dummy(size);
+		var dl = ImGui.getWindowDrawList();
+		AuraVisualRenderer.draw(dl, a, p.x, p.y, size.x, size.y, a.progress, a.stacks,
+			a.counterValue, !a.show && layout, a.fxAlpha, sc);
+		AuraVisualRenderer.drawKeyChip(dl, p.x, p.y, size.x, size.y, a, !a.show && layout);
+	}
+
+	function hudHide():Void {
+		var a = hudAura;
+		a.enabled.set(false); SettingsStore.markDirty();
+	}
+
+	function hudQuickActions():Void {
+		var a = hudAura;
+		if (a.isCounter.get() && ImGui.menuItem("Reset Counter")) {
+			a.counterValue = 0;
+			SettingsStore.markDirty();
+		}
+	}
+
+	function hudResize(newW:Single, newH:Single):Void {
+		var a = hudAura;
+		var sc:Single = Math.max(0.4, Math.min(2.5, a.scale.get()));
+		a.w.set(Math.max(24, newW) / sc);
+		a.h.set(Math.max(24, newH) / sc);
+		SettingsStore.markDirty();
+	}
 }

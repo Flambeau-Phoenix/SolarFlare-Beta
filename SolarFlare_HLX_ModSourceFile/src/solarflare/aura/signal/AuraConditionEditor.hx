@@ -14,6 +14,7 @@ import solarflare.ui.ByteUtil;
 import solarflare.ui.SettingsStore;
 import solarflare.ui.ThemePalette;
 import solarflare.ui.UiChrome;
+import solarflare.ui.UiScope;
 import solarflare.ui.WindowEffects;
 
 /**
@@ -44,7 +45,7 @@ class AuraConditionEditor {
 		if (count == 0) {
 			ImGui.textDisabled("No conditions yet — add one below.");
 		} else {
-			ImGui.textColored(ImGui.vec4(0.55, 0.85, 1.0, 1.0),
+			ImGui.textColored(ThemePalette.status(ThemePalette.STATUS_INFO),
 				allMode ? "Show when ALL of these are true:" : "Show when ANY of these is true:");
 			var i = 0;
 			for (c in r.conditions) {
@@ -60,9 +61,7 @@ class AuraConditionEditor {
 		while (ci < r.conditions.length) {
 			var c = r.conditions[ci];
 			var removed = false;
-			var border = c.negate
-				? ImGui.vec4(0.85, 0.35, 0.35, 0.9)
-				: ImGui.vec4(0.35, 0.75, 0.45, 0.9);
+			var border = ThemePalette.status(c.negate ? ThemePalette.STATUS_DANGER : ThemePalette.STATUS_SUCCESS);
 
 			ImGui.pushStyleColor(ImGuiCol.Border, border);
 			ImGui.pushStyleVar(ImGuiStyleVar.ChildBorderSize, prominent ? 2.0 : 1.5);
@@ -73,7 +72,9 @@ class AuraConditionEditor {
 				ImGuiChildFlags.Borders | ImGuiChildFlags.AutoResizeY | ImGuiChildFlags.AlwaysUseWindowPadding, 0);
 			try {
 				removed = drawConditionCard(a, r, c, ci, bossFocusId);
-			} catch (_:Dynamic) {}
+			} catch (e:Dynamic) {
+				UiScope.reportOnce("condition card", a.id + "_" + c.uiKey, e);
+			}
 			ImGui.endChild();
 
 			ImGui.popStyleVar(3);
@@ -162,9 +163,7 @@ class AuraConditionEditor {
 	 */
 	static function drawJoinChevron(allMode:Bool):Void {
 		var label = allMode ? "AND" : "OR";
-		var tint = allMode
-			? ImGui.vec4(0.33, 0.80, 0.44, 1.0)
-			: ImGui.vec4(0.97, 0.72, 0.30, 1.0);
+		var tint = ThemePalette.status(allMode ? ThemePalette.STATUS_SUCCESS : ThemePalette.STATUS_WARN);
 		var line = ImGui.colorConvertFloat4ToU32(tint);
 		var fill = ImGui.colorConvertFloat4ToU32(ImGui.vec4(tint.x, tint.y, tint.z, 0.18));
 
@@ -229,8 +228,9 @@ class AuraConditionEditor {
 		ImGui.pushStyleColor(ImGuiCol.Button, theme.cellBg);
 		ImGui.pushStyleColor(ImGuiCol.ButtonHovered, theme.windowBg);
 		ImGui.pushStyleColor(ImGuiCol.ButtonActive, theme.windowBg);
-		ImGui.pushStyleColor(ImGuiCol.Border, ImGui.vec4(0.90, 0.35, 0.35, 1.0));
-		ImGui.pushStyleColor(ImGuiCol.Text, ImGui.vec4(0.95, 0.50, 0.50, 1.0));
+		var danger = ThemePalette.status(ThemePalette.STATUS_DANGER);
+		ImGui.pushStyleColor(ImGuiCol.Border, danger);
+		ImGui.pushStyleColor(ImGuiCol.Text, danger);
 		ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.5);
 		ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, 4.0);
 		var remove = ImGui.smallButton("Remove##cond_rm_" + tag);
@@ -343,6 +343,8 @@ class AuraConditionEditor {
 				ImGui.textDisabled("Skill script shouldPlayInstantly (e.g. Staff_Craft_S1). For buffs, prefer Statuses.");
 			else if (d.id == "event.cast.recent" || d.id == "event.playerCast.recent")
 				ImGui.textDisabled("Seconds since cast. Use 'within' operator for windows (e.g. within 5s).");
+			else if (AuraConditionValidator.isCombatEvent(d.id))
+				ImGui.textWrapped("Use 'within' to choose how long the combat trigger stays active (e.g. 3s). For a countdown, choose a fixed timer duration.");
 		}
 
 		ImGui.dummy(ImGui.vec2(0, 2));
@@ -358,7 +360,7 @@ class AuraConditionEditor {
 		// validator rejects and compareValue routes to boolValue instead of present.
 		if (d != null && d.id == "status.present")
 			ops = ["present", "absent"];
-		else if (d != null && (d.id == "event.cast.recent" || d.id == "event.playerCast.recent"))
+		else if (d != null && (d.id == "event.cast.recent" || d.id == "event.playerCast.recent" || AuraConditionValidator.isCombatEvent(d.id)))
 			ops = ["within", "lt", "lte", "eq", "gte", "gt"];
 		else
 			ops = switch (d.kind) {

@@ -315,9 +315,10 @@ class LightsaberMeter {
 		if (!LightsaberCache.enabled)
 			return;
 		LightsaberCache.refreshName();
-		var lines = CombatLogCache.recentAll();
 		var maxSequence = lastIngestSequence;
-		for (line in lines) {
+		var n = CombatLogCache.lineCount();
+		for (i in CombatLogCache.firstIndexAfter(lastIngestSequence)...n) {
+			var line = CombatLogCache.lineAt(i);
 			if (line == null || line.sequence <= lastIngestSequence)
 				continue;
 			if (line.sequence > maxSequence)
@@ -785,47 +786,50 @@ class LightsaberOverlay {
 		var flags = cfg.chrome != null ? cfg.chrome.windowFlagsKeepClicks(FLAGS) : FLAGS;
 		flags |= ImGuiWindowFlags.NoSavedSettings;
 		var began = ImGui.begin("SolarFlare Lightsaber", null, flags);
-		if (began) {
-			if (cfg.chrome == null || !cfg.chrome.isLocked()) {
-				if (cfg.chrome != null)
-					cfg.chrome.capturePos();
-			}
-			var showBody = true;
-			if (cfg.chrome != null) {
-				showBody = cfg.chrome.beginBody(function() {
-					cfg.hidden.set(true);
-					SettingsStore.markDirty();
-				}, null, "Lightsaber", false, ImGuiWindowFlags.NoScrollWithMouse, 0, RESIZE_FOOTER);
-			}
-			if (showBody) {
-				drawSaberTitleLeading(cfg);
-				if (GetRiftyCache.inInstance) {
-					if (ImGui.checkbox("In that rift##saber_win_rift", cfg.showRiftMeter))
-						SettingsStore.markDirty();
+		var failure:Dynamic = null;
+		try {
+			if (began) {
+				if (cfg.chrome == null || !cfg.chrome.isLocked()) {
+					if (cfg.chrome != null)
+						cfg.chrome.capturePos();
 				}
-				drawMeterVals(LightsaberCache.you);
-				if (cfg.expandSkills.get()) {
-					var avail = ImGui.getContentRegionAvail();
-					var tableFlags = trans ? ImGuiWindowFlags.NoBackground : 0;
-					if (ImGui.beginChild("saber_table_host", ImGui.vec2(0, avail.y), 0, tableFlags))
-						drawSkillTable("saber_skills", LightsaberCache.you);
-					ImGui.endChild();
+				var showBody = true;
+				if (cfg.chrome != null) {
+					showBody = cfg.chrome.beginBody(function() {
+						cfg.hidden.set(true);
+						SettingsStore.markDirty();
+					}, null, "Lightsaber", false, ImGuiWindowFlags.NoScrollWithMouse, 0, RESIZE_FOOTER);
+				}
+				if (showBody) {
+					drawSaberTitleLeading(cfg);
+					if (GetRiftyCache.inInstance) {
+						if (ImGui.checkbox("In that rift##saber_win_rift", cfg.showRiftMeter))
+							SettingsStore.markDirty();
+					}
+					drawMeterVals(LightsaberCache.you);
+					if (cfg.expandSkills.get()) {
+						var avail = ImGui.getContentRegionAvail();
+						var tableFlags = trans ? ImGuiWindowFlags.NoBackground : 0;
+						drawSkillTableHost("saber_table_host", "saber_skills", LightsaberCache.you, avail.y, tableFlags);
+					}
+				}
+				if (cfg.chrome != null) {
+					cfg.chrome.closeBodyChild();
+					cfg.chrome.drawResizeCorner("lightsaber", !cfg.chrome.isLocked(),
+						LightsaberConfig.MIN_W, LightsaberConfig.MIN_H,
+						LightsaberConfig.MAX_W, LightsaberConfig.MAX_H,
+						function(nextW:Single, nextH:Single) {
+							cfg.width.set(nextW);
+							cfg.height.set(nextH);
+							SettingsStore.markDirty();
+						}, RESIZE_INSET);
+					cfg.chrome.pollTransparentSurfaceDrag("lightsaber", !cfg.chrome.isLocked());
 				}
 			}
-			if (cfg.chrome != null) {
-				cfg.chrome.closeBodyChild();
-				cfg.chrome.drawResizeCorner("lightsaber", !cfg.chrome.isLocked(),
-					LightsaberConfig.MIN_W, LightsaberConfig.MIN_H,
-					LightsaberConfig.MAX_W, LightsaberConfig.MAX_H,
-					function(nextW:Single, nextH:Single) {
-						cfg.width.set(nextW);
-						cfg.height.set(nextH);
-						SettingsStore.markDirty();
-					}, RESIZE_INSET);
-				cfg.chrome.pollTransparentSurfaceDrag("lightsaber", !cfg.chrome.isLocked());
-			}
-		}
+		} catch (e:Dynamic) failure = e;
+		// End must run on every path or later overlays submit into this window.
 		solarflare.ui.HudChrome.endOverlayWindow(began, cfg.chrome);
+		if (failure != null) solarflare.ui.UiScope.reportOnce("window", "lightsaber", failure);
 	}
 
 	function drawRiftWindow(cfg:LightsaberConfig):Void {
@@ -865,17 +869,35 @@ class LightsaberOverlay {
 		var flags = cfg.riftChrome != null ? cfg.riftChrome.windowFlagsKeepClicks(FLAGS) : FLAGS;
 		flags |= ImGuiWindowFlags.NoSavedSettings;
 		var began = ImGui.begin("SolarFlare Lightsaber Rift", null, flags);
-		if (began) {
-			if (cfg.riftChrome == null || !cfg.riftChrome.isLocked()) {
-				if (cfg.riftChrome != null)
-					cfg.riftChrome.capturePos();
-			}
-			var showBody = true;
-			if (cfg.riftChrome != null) {
-				showBody = cfg.riftChrome.beginBody(function() {
-					cfg.showRiftMeter.set(false);
-					SettingsStore.markDirty();
-				}, function() {
+		var failure:Dynamic = null;
+		try {
+			if (began) {
+				if (cfg.riftChrome == null || !cfg.riftChrome.isLocked()) {
+					if (cfg.riftChrome != null)
+						cfg.riftChrome.capturePos();
+				}
+				var showBody = true;
+				if (cfg.riftChrome != null) {
+					showBody = cfg.riftChrome.beginBody(function() {
+						cfg.showRiftMeter.set(false);
+						SettingsStore.markDirty();
+					}, function() {
+						ImGui.text("In that rift  heroes [" + meterStatus(LightsaberCache.rift) + "]");
+						ImGui.sameLine();
+						ImGui.pushStyleColor(ImGuiCol.Button, ImGui.vec4(0.52, 0.20, 0.20, 0.9));
+						ImGui.pushStyleColor(ImGuiCol.ButtonHovered, ImGui.vec4(0.68, 0.26, 0.26, 1));
+						ImGui.pushStyleColor(ImGuiCol.ButtonActive, ImGui.vec4(0.40, 0.15, 0.15, 1));
+						if (ImGui.button("Reset##saber_reset_rift")) {
+							LightsaberCache.rift.reset();
+							ToastManager.info("In-rift DPS meter reset");
+						}
+						if (ImGui.isItemHovered())
+							ImGui.setTooltip("Reset in-rift hero encounter metrics");
+						ImGui.popStyleColor(3);
+						ImGui.sameLine();
+						drawRiftTimerBox("saber_rift_grp");
+					}, "", false, ImGuiWindowFlags.NoScrollWithMouse, 0, RESIZE_FOOTER);
+				} else {
 					ImGui.text("In that rift  heroes [" + meterStatus(LightsaberCache.rift) + "]");
 					ImGui.sameLine();
 					ImGui.pushStyleColor(ImGuiCol.Button, ImGui.vec4(0.52, 0.20, 0.20, 0.9));
@@ -890,49 +912,34 @@ class LightsaberOverlay {
 					ImGui.popStyleColor(3);
 					ImGui.sameLine();
 					drawRiftTimerBox("saber_rift_grp");
-				}, "", false, ImGuiWindowFlags.NoScrollWithMouse, 0, RESIZE_FOOTER);
-			} else {
-				ImGui.text("In that rift  heroes [" + meterStatus(LightsaberCache.rift) + "]");
-				ImGui.sameLine();
-				ImGui.pushStyleColor(ImGuiCol.Button, ImGui.vec4(0.52, 0.20, 0.20, 0.9));
-				ImGui.pushStyleColor(ImGuiCol.ButtonHovered, ImGui.vec4(0.68, 0.26, 0.26, 1));
-				ImGui.pushStyleColor(ImGuiCol.ButtonActive, ImGui.vec4(0.40, 0.15, 0.15, 1));
-				if (ImGui.button("Reset##saber_reset_rift")) {
-					LightsaberCache.rift.reset();
-					ToastManager.info("In-rift DPS meter reset");
 				}
-				if (ImGui.isItemHovered())
-					ImGui.setTooltip("Reset in-rift hero encounter metrics");
-				ImGui.popStyleColor(3);
-				ImGui.sameLine();
-				drawRiftTimerBox("saber_rift_grp");
-			}
-			if (showBody) {
-				var m = LightsaberCache.rift;
-				drawMeterVals(m);
-				drawPlayerTable(m);
-				if (cfg.expandSkills.get()) {
-					var avail = ImGui.getContentRegionAvail();
-					var tableFlags = trans ? ImGuiWindowFlags.NoBackground : 0;
-					if (ImGui.beginChild("saber_rift_table_host", ImGui.vec2(0, avail.y), 0, tableFlags))
-						drawSkillTable("saber_rift_skills", m);
-					ImGui.endChild();
+				if (showBody) {
+					var m = LightsaberCache.rift;
+					drawMeterVals(m);
+					drawPlayerTable(m);
+					if (cfg.expandSkills.get()) {
+						var avail = ImGui.getContentRegionAvail();
+						var tableFlags = trans ? ImGuiWindowFlags.NoBackground : 0;
+						drawSkillTableHost("saber_rift_table_host", "saber_rift_skills", m, avail.y, tableFlags);
+					}
+				}
+				if (cfg.riftChrome != null) {
+					cfg.riftChrome.closeBodyChild();
+					cfg.riftChrome.drawResizeCorner("lightsaber_rift", !cfg.riftChrome.isLocked(),
+						LightsaberConfig.MIN_W, LightsaberConfig.MIN_H,
+						LightsaberConfig.MAX_W, LightsaberConfig.MAX_H,
+						function(nextW:Single, nextH:Single) {
+							cfg.riftWidth.set(nextW);
+							cfg.riftHeight.set(nextH);
+							SettingsStore.markDirty();
+						}, RESIZE_INSET);
+					cfg.riftChrome.pollTransparentSurfaceDrag("lightsaber_rift", !cfg.riftChrome.isLocked());
 				}
 			}
-			if (cfg.riftChrome != null) {
-				cfg.riftChrome.closeBodyChild();
-				cfg.riftChrome.drawResizeCorner("lightsaber_rift", !cfg.riftChrome.isLocked(),
-					LightsaberConfig.MIN_W, LightsaberConfig.MIN_H,
-					LightsaberConfig.MAX_W, LightsaberConfig.MAX_H,
-					function(nextW:Single, nextH:Single) {
-						cfg.riftWidth.set(nextW);
-						cfg.riftHeight.set(nextH);
-						SettingsStore.markDirty();
-					}, RESIZE_INSET);
-				cfg.riftChrome.pollTransparentSurfaceDrag("lightsaber_rift", !cfg.riftChrome.isLocked());
-			}
-		}
+		} catch (e:Dynamic) failure = e;
+		// End must run on every path or later overlays submit into this window.
 		solarflare.ui.HudChrome.endOverlayWindow(began, cfg.riftChrome);
+		if (failure != null) solarflare.ui.UiScope.reportOnce("window", "lightsaber_rift", failure);
 	}
 
 	function drawSaberTitleLeading(cfg:LightsaberConfig):Void {
@@ -1025,6 +1032,21 @@ class LightsaberOverlay {
 			}
 		}
 		ImGui.endTable();
+	}
+
+	/** BeginChild always needs EndChild; row building can throw after the child opens. */
+	function drawSkillTableHost(hostId:String, tableId:String, m:LightsaberMeter, height:Single, windowFlags:Int):Void {
+		var shown = ImGui.beginChild(hostId, ImGui.vec2(0, height), 0, windowFlags);
+		var failure:Dynamic = null;
+		if (shown) {
+			try
+				drawSkillTable(tableId, m)
+			catch (e:Dynamic)
+				failure = e;
+		}
+		ImGui.endChild();
+		if (failure != null)
+			throw failure;
 	}
 
 	function drawSkillTable(tableId:String, m:LightsaberMeter):Void {

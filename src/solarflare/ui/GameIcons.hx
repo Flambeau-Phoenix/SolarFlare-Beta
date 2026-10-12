@@ -66,6 +66,10 @@ class GameIcons {
 	/** @deprecated Kept for diagnostics; prefer AtlasFrame.tex after multi-atlas merge. */
 	static var atlasTex:TextureHandle = 0;
 	static var atlasAttempted = false;
+	/** True once every planned sheet decoded; resetSearchDirs then keeps the textures instead of decoding again. */
+	static var atlasComplete = false;
+	/** Consumable status id -> consumable_* art key, resolved in observe so draw stays map-only. */
+	static var statusAliases = new Map<String, String>();
 	static var atlasSheetCount:Int = 0;
 
 	static var dimW = new Map<String, Int>();
@@ -82,9 +86,7 @@ class GameIcons {
 	public static inline var RIFT_SUN = "rift-sun";
 	public static inline var RIFT_TIMER_BG = "rifttimerbg";
 	public static inline var COMBO_POINT = "Rogue_ComboPoints";
-	public static inline var COMBO_POINT_ALT = "ComboPoints";
-	public static inline var COMBO_MAX = "Rogue_ComboPoints_Max";
-	public static inline var COMBO_MAX_ALT = "ComboPoints_Max";
+	public static inline var COMBO_MAX = "Rogue_ComboMax";
 	public static inline var RESOURCE_MAX = "resource-max";
 	public static inline var CHROME_SUN = "chrome-sun";
 	public static inline var HUB_LOGO = "solarflarefulllogo";
@@ -111,8 +113,11 @@ class GameIcons {
 		if (searchDirs == null)
 			return;
 		var loadedSheets = new Map<String, Bool>();
-		for (entry in atlasLoadPlan(searchDirs))
+		var plan = atlasLoadPlan(searchDirs);
+		for (entry in plan)
 			tryLoadAtlasPair(entry.root, entry.stem, loadedSheets);
+		// A current atlas family loads exactly its planned sheets; a partial or legacy set stays retryable.
+		atlasComplete = plan.length > 0 && atlasSheetCount == plan.length;
 	}
 
 	/** A current atlas1 selects its whole family; stale legacy sheets cannot fill it in. */
@@ -161,7 +166,11 @@ class GameIcons {
 		loadAtlasSheet(jsonPath, pngPath, stem);
 	}
 
+	/** Per-sheet load cost (JSON parse + PNG decode + texture register), shown in diagnostics. */
+	static var atlasTimings:Array<String> = [];
+
 	static function loadAtlasSheet(jsonPath:String, pngPath:String, stem:String = "atlas"):Void {
+		var started = haxe.Timer.stamp();
 		try {
 			var parsed:Dynamic = haxe.Json.parse(File.getContent(jsonPath));
 			var framesObj:Dynamic = Reflect.field(parsed, "frames");
@@ -175,6 +184,7 @@ class GameIcons {
 				atlasTex = tex;
 			atlasSheetCount++;
 			indexAtlasFrames(framesObj, tex, dimW.get(textureKey), dimH.get(textureKey));
+			atlasTimings.push(stem + " " + Std.string(Std.int((haxe.Timer.stamp() - started) * 1000)) + "ms " + Std.string(dimW.get(textureKey)) + "x" + Std.string(dimH.get(textureKey)));
 		} catch (_:Dynamic) {}
 	}
 
@@ -220,6 +230,13 @@ class GameIcons {
 				return atlasMap.get(id);
 			if (atlasMap.exists(id + ".png"))
 				return atlasMap.get(id + ".png");
+			var alias = statusAliases.get(id);
+			if (alias != null) {
+				if (atlasMap.exists(alias))
+					return atlasMap.get(alias);
+				if (atlasMap.exists(alias + ".png"))
+					return atlasMap.get(alias + ".png");
+			}
 		}
 		return null;
 	}
@@ -271,6 +288,16 @@ class GameIcons {
 			requested.remove(id);
 			return atex;
 		}
+		if (frame == null && resolveStatusAlias(id)) {
+			frame = getFrame(id);
+			atex = atlasHandle(frame);
+			if (frame != null && atex != (0:TextureHandle)) {
+				dimW.set(id, Std.int(frame.w));
+				dimH.set(id, Std.int(frame.h));
+				requested.remove(id);
+				return atex;
+			}
+		}
 		if (cache.exists(id)) {
 			requested.remove(id);
 			return cache.get(id);
@@ -297,6 +324,25 @@ class GameIcons {
 		cache.set(id, tex);
 		requested.remove(id);
 		return tex;
+	}
+
+	/**
+	 * A consumable's status id (e.g. Whetstone_Status) has no art of its own; its item art is
+	 * consumable_<item>. Records that mapping once so every caller resolves it, not just those
+	 * that consult ConsumableCatalog themselves. Observe-phase only.
+	 */
+	static function resolveStatusAlias(id:String):Bool {
+		if (statusAliases.exists(id))
+			return true;
+		var entry = solarflare.cdb.ConsumableCatalog.findByStatus(id);
+		if (entry == null || atlasMap == null)
+			return false;
+		var art = solarflare.cdb.ConsumableCatalog.iconKey(entry.id);
+		if (art.length == 0 || !(atlasMap.exists(art) || atlasMap.exists(art + ".png")))
+			return false;
+		statusAliases.set(id, art);
+		failed.remove(id);
+		return true;
 	}
 
 	/** Drain draw-time requests outside the presentation path. */
@@ -336,7 +382,6 @@ class GameIcons {
 		var standardKeys = [
 			"menubutton", "cfg_f6", "RiftModsButtonNew_Test", "cfg_f7",
 			"chrome-sun", "rift-sun", "rifttimerbg", "resource-max", "BlankButton", "solarflarefulllogo",
-			"cleric", "mage", "rogue", "warrior", "swords",
 			PRAYER_SMITE, PRAYER_LIFE, PRAYER_SHIELD,
 			CHAINCAST, CHAINCAST_FALLBACK, COMBO_POINT, COMBO_MAX
 		];
@@ -345,16 +390,23 @@ class GameIcons {
 		}
 	}
 
-	/** Re-scan asset folders and retry keys that previously failed to resolve. */
-	public static function resetSearchDirs():Void {
+	/** Re-scan asset folders and retry keys that previously failed to resolve. Keeps a complete atlas unless forceAtlas. */
+	public static function resetSearchDirs(forceAtlas:Bool = false):Void {
 		searchDirs = null;
 		failed = new Map<String, Bool>();
 		requested = new Map<String, Bool>();
 		pending = [];
+		// Decoding the sheets costs seconds and each decode registers new textures, so an intact
+		// atlas survives a reload. Pass forceAtlas after replacing sheet files on disk.
+		if (atlasComplete && !forceAtlas)
+			return;
 		atlasAttempted = false;
+		atlasComplete = false;
 		atlasMap = null;
 		atlasTex = 0;
 		atlasSheetCount = 0;
+		atlasTimings = [];
+		statusAliases = new Map<String, String>();
 	}
 
 	/** Retry one asset without discarding already registered textures. */
@@ -480,12 +532,19 @@ class GameIcons {
 		for (_ in cache.keys()) cachedN++;
 		var failedN = 0;
 		for (_ in failed.keys()) failedN++;
+		var failedKeys:Array<String> = [];
+		for (k in failed.keys()) {
+			if (failedKeys.length >= 12)
+				break;
+			failedKeys.push(k);
+		}
+		var failedDetail = failedN > 0 ? " [" + failedKeys.join(", ") + (failedN > failedKeys.length ? ", ..." : "") + "]" : "";
 		var dirCount = searchDirs != null ? searchDirs.length : 0;
 		var mod = ModPaths.modDir();
 		var req = lastRequestedKey != null ? lastRequestedKey : "none";
 		var fail = lastFailedKey != null ? lastFailedKey : "none";
 		var atlasN = atlasMap != null ? Lambda.count(atlasMap) : 0;
-		return "ModDir: " + mod + " | IconDirs: " + dirCount + " | AtlasSheets: " + atlasSheetCount + " | AtlasFrames: " + atlasN + " | Cached: " + cachedN + " | Failed: " + failedN + " | LastReq: " + req + " | LastFail: " + fail;
+		return "ModDir: " + mod + " | IconDirs: " + dirCount + " | AtlasSheets: " + atlasSheetCount + " | AtlasFrames: " + atlasN + " | Cached: " + cachedN + " | Failed: " + failedN + failedDetail + " | AtlasLoad: [" + atlasTimings.join(", ") + "] | LastReq: " + req + " | LastFail: " + fail;
 	}
 
 	/** F6 / debug — which folders we search for `{SkillId}.png`. */
