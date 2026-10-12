@@ -40,6 +40,7 @@
 - Removed DevLog recorder from public release
 - Added multiple new chaincast designs
 - Added aura condition triggers: Entering & Leaving Combat
+- Added the Menu Visibility Toggle to the Utilities f6 panel settings
 
 ---
 
