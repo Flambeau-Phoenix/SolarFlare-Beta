@@ -30,29 +30,16 @@
 
 ---
 
-## What's New in v3.4b
+## Solar Flare v4.1b - Quick Cast
 
-### A reorganized hub
-* **Profile strip** — One compact line (`Profile  [selector]  Save  More`) shown on every hub page and in every builder. New, Copy, Delete, and "use this profile for this character" live in the **More** menu; a one-line chip tells you whether the profile auto-loads for your character. The large assign/reset button is gone.
-* **Grouped navigation** — Modules are grouped into **Display**, **Automation**, and **Tools**, with a status dot on every module that has an on/off state.
-* **Module cards** — Each hub page opens with a title, a one-line status, and a single **Open builder** button.
-* **Collapse to rail** — Shrink the hub to a narrow rail that keeps the profile strip and module switching reachable.
-* **GetRifty settings** are now a page in the hub instead of a separate window.
-* **Consistent styling** — Selected items use one flat accent style; the glossy accent button is reserved for primary actions. All colors come from your active theme (Purple & Gold is just the default), and chrome-less transparent overlays are unchanged.
-* **Calmer builders** — Collapsible groups in the Geaux and ExtraBars builders, bounded sliders, a header ladder with consistent spacing, and a card-based Aura Creation Home.
-
-### Gameplay & HUD
-* **BarTer follows your weapon** — Cells whose native action the worn weapon does not provide render empty (your layout is kept), and come back when you swap back.
-* **Correct key labels** — BarTer shows the single key the engine has bound to each action (class skills included). No second binding, no modifiers.
-* **Proc glimmer** — A soft sweep plays on BarTer and Geaux cells when a skill's instant proc turns on.
-* **Attack Combo Tracker rewritten** — It now reads the engine's own attack chain and next-attack link instead of reconstructing steps from a counter, so steps, idle, and the finisher flash follow the real combo window.
-* **Status Board** — Stable ordering with no flicker or duplicate rows; its context menu opens the hub's Status Board page; and statuses at the end of a busy list now fill in reliably after logging in or swapping characters.
-* **BarTer consumables** — "In my inventory only" filter, matching ExtraBars.
-
-### Under the hood
-* Skill procs, stacks, and highlight flags are read from each skill's own script rather than the base implementation.
-* Mana and Spark maxima are probed once and read through typed fields.
-* Removed a large amount of dead code left over from the old hook-heavy runtime.
+- Added Utilities button on the f6 panel
+- Removed NativeUI settings panel
+- Moved the native action bar toggle to Utilities f6 panel settings
+- Added Quick Cast toggle to utilities f6 panel settings
+- Fix an issue where some statuses didn't appear on the status board
+- Removed DevLog recorder from public release
+- Added multiple new chaincast designs
+- Added aura condition triggers: Entering & Leaving Combat
 
 ---
 
@@ -177,25 +164,6 @@ Your own bars of native skills, consumables, and statuses:
 ![SolarFlareMage](SolarFlareMage.png)
 ---
 
-## Previous Release Notes
-
-### v3.3b — Cooldown Resolution Corrections
-
-- Updated CDB data: Switched to the verified current game database and regenerated all 11 canonical tables. Added source and output fingerprints plus a deployment check for stale or inconsistent data.
-- Repaired status mappings: Restored omitted ability-to-status relationships, including timerless abilities and zero-duration statuses. Removed relationships targeting non-status skills and added authored stack limits.
-- Fixed Nectar Balls configuration: Corrected the saved aura and profile copies to watch the six-second pickup buff. Kept the eight-pickup counter separate and removed the empty second condition.
-- Unified status selection: Quick Build, wizard, manual selection, and saved rules now share status resolution. Explicit status IDs, unknown observed IDs, and selected display labels are preserved.
-- Fixed reversed cooldown triggering: Cooldown countdowns now start when the skill enters cooldown. Becoming ready or affordable no longer starts a countdown.
-- Repaired Game time: Ready and affordable conditions now retain live cooldown seconds, allowing their timers to follow the actual skill.
-- Improved modifier accuracy: Live remaining seconds take precedence over CDB estimates. Removed incorrect fraction and millisecond guesses from native timer readings.
-- Fixed stale skill observations: Enabled aura skill subjects are sampled independently of visible Geaux slots.
-- Improved charge handling: Available charges remain usable while another charge refills. Proc timers such as Pyroclasm retain their separate behavior.
-- Improved status timers: Active finite durations are rechecked for refreshes and extensions. Infinite statuses use explicit engine information; failed reads cannot repeatedly renew an estimate.
-- Removed chat telemetry: Removed unused chat payload capture, storage, ledger entries, and recording prompts.
-- Hardened hooks: Audited active hook declarations against current API signatures and isolated cast observer failures.
-- Preserved rollback options: Previous implementations, bytecode, and settings were backed up. One timer implementation is active.
-
----
 
 ## Developer & Build Reference
 
