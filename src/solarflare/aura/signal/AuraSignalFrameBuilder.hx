@@ -96,7 +96,7 @@ class AuraSignalFrameBuilder {
 		for (i in 0...n) {
 			var src = AuraStatusCache.snaps[i]; if (src == null || src.id == null || src.id.length == 0) continue;
 			var dst = frame.statuses[frame.statusCount++]; dst.rawId = src.id; dst.label = "";
-			dst.sourceItemId = src.sourceItemId; dst.sourceItemKnown = src.sourceItemKnown;
+			dst.instanceId = src.instanceId; dst.sourceItemId = src.sourceItemId; dst.sourceItemKnown = src.sourceItemKnown;
 			dst.ids = src.ids.copy(); dst.present = src.present; dst.durationKnown = src.durationKnown;
 			dst.stacks = src.stacks; dst.stacksKnown = src.stacksKnown; dst.durationLeft = src.left; dst.durationProgress = clamp01(src.progress);
 			dst.infinite = src.infinite;

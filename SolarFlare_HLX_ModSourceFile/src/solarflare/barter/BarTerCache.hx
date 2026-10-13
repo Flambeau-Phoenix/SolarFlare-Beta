@@ -11,6 +11,8 @@ typedef BarTerClick = {
 	var skillId:String;
 	var itemKind:String;
 	var gen:Int;
+	var action:String;
+	var nativeEpoch:Int;
 	/** Queue time; drainClicks drops clicks older than CLICK_TTL_S. */
 	var at:Float;
 }
@@ -33,13 +35,13 @@ class BarTerCache {
 
 	public static function generation():Int return clickGen;
 
-	public static function queueClick(barId:String, slot:Int, skillId:String = "", itemKind:String = ""):Void {
+	public static function queueClick(barId:String, slot:Int, skillId:String = "", itemKind:String = "", action:String=""):Void {
 		if (barId == null) return;
 		var skill = skillId != null ? skillId : "";
 		var item = itemKind != null ? itemKind : "";
 		if (item.length == 0 && skill.length == 0) return;
 		clickGen++;
-		pendingClicks.push({barId: barId, slot: slot, skillId: skill, itemKind: item, gen: clickGen, at: haxe.Timer.stamp()});
+		pendingClicks.push({barId: barId, slot: slot, skillId: skill, itemKind: item, gen: clickGen, at: haxe.Timer.stamp(),action:action,nativeEpoch:BarTerNativeKeys.epoch});
 		if (pendingClicks.length > 32)
 			pendingClicks.shift();
 	}
@@ -102,12 +104,14 @@ class BarTerCache {
 			}
 			if (cfg != null && cfg.hasStatus()) { sampleStatus(cfg.statusId,snap); continue; }
 			var id = cfg != null ? GeauxCache.sanitizeSkillId(cfg.skillId) : "";
+			var native=cfg!=null && cfg.nativeActionId.length>0 ? BarTerNativeKeys.action(cfg.nativeActionId) : null;
+			if (cfg!=null && cfg.nativeActionId.length>0) { if(native==null) continue; id=native.id; }
 			if (id.length == 0) continue;
 			if (cfg.nativeActionId.length > 0 && BarTerNativeKeys.actionAbsent(cfg.nativeActionId, haxe.Timer.stamp()))
 				continue;
 			snap.skillId = id;
 			snap.kind = "skill";
-			var native = BarTerNativeKeys.resolve(id,cfg.nativeActionId);
+			if (native==null) native=BarTerNativeKeys.find(id);
 			var gs = findGeaux(id);
 			if (gs == null && native != null) gs=findGeaux(native.id);
 			var observed = native != null;
@@ -115,6 +119,7 @@ class BarTerCache {
 			// Same data Geaux shows: a live poll of this id from any Geaux list is an observation.
 			if (!observed && gs != null && gs.present) observed=true;
 			BarTerSkillState.apply(snap,observed,gs,native);
+			if (native!=null && cfg.nativeActionId.length>0) { snap.iconId=native.icon; snap.label=native.label; }
 			if (!observed) {
 				snap.present = true; snap.label = solarflare.cdb.AuraCatalog.label(id);
 				if (snap.label.length == 0) snap.label = id;
@@ -122,8 +127,7 @@ class BarTerCache {
 			}
 			if (gs == null || !gs.present) {
 				snap.present = true;
-				snap.label = id;
-				snap.iconId = id;
+				if (native==null) { snap.label = id; snap.iconId = id; }
 				continue;
 			}
 			snap.present = true;
@@ -153,6 +157,7 @@ class BarTerCache {
 		if (s == null) { out.known=false; return; }
 		snap.available=s.known && s.present;
 		out.present=s.present; out.known=s.known; out.stacks=s.stacks; out.stacksKnown=s.stacksKnown;
+		out.instanceId=s.instanceId;
 		out.durationKnown=s.durationKnown; out.infinite=s.infinite; out.left=s.left;
 		out.progress=s.progress; out.endsAt=s.endsAt; out.totalDur=s.totalDur; out.stampSource=s.stampSource;
 		for (alias in s.ids) if (solarflare.ui.GameIcons.hasKey(alias)) { out.iconKey=alias; break; }
@@ -279,14 +284,7 @@ class BarTerCache {
 	 * Main + offhand + secondary kinds; empty when hero/weapons unavailable.
 	 */
 	public static function weaponLoadoutKey(hero:Dynamic):String {
-		if (hero == null) return "";
-		try {
-			var h:ent.Hero = cast hero;
-			var main=weaponTag(h.get_activeWeapon());
-			if (main.length == 0) return "";
-			return main+"|"+weaponTag(h.get_activeOffhand())+"|"+weaponTag(h.get_secondaryWeapon());
-		} catch (_:Dynamic) {}
-		return "";
+		return BarTerLoadoutIdentity.key(hero);
 	}
 
 	static function weaponTag(wep:Dynamic):String {

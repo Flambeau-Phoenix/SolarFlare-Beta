@@ -384,6 +384,10 @@ class ExtraBarsBuilder {
    });
    UiLayout.propertyRow("Visibility",function() check("Hidden##bar_hidden",bar.hidden,function(v) bar.hidden=v),"Keybinds still activate while this bar is hidden.");
    UiLayout.propertyRow("Cell size",function() slider("##bar_size",bar.slotSize,24,96,function(v) bar.slotSize=v));
+   UiLayout.propertyRow("Hotkey display",function() {
+    var selected=UiLayout.stringCombo("extra_hotkey_display",bar.hotkeyDisplay,ExtraBarsHotkeyDisplay.options,ExtraBarsHotkeyDisplay.label);
+    if (selected != null) change("Hotkey display",function() bar.hotkeyDisplay=selected);
+   },"Native keys follow equipped consumables. The tooltip always includes the ExtraBars binding.");
    UiLayout.propertyRow("Lock position",function() check("##bar_lock",bar.locked,function(v) bar.locked=v));
    owner.chromeFor(bar.id).drawPositionRow("extra_pos");
    UiLayout.propertyRow("Transparent",function() check("##bar_trans",bar.transparent,function(v) bar.transparent=v));

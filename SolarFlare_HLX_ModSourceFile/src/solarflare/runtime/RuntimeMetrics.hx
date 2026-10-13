@@ -27,6 +27,10 @@ class RuntimeMetrics {
 	public static var barHudNodes:Int = 0;
 	public static var barHudMs:Float = 0;
 	public static var barHudMaxMs:Float = 0;
+	public static var barterNativeSamples:Int=0;
+	public static var barterNativeEntries:Int=0;
+	public static var barterNativeMs:Float=0;
+	public static var barterNativeMaxMs:Float=0;
 	public static var layoutRecoveryPolls:Int = 0;
 	public static var eventQueued:Int = 0;
 	public static var eventDrained:Int = 0;
@@ -45,6 +49,7 @@ class RuntimeMetrics {
 		identityPolls = vitalsPolls = statusPolls = skillPolls = 0;
 		targetPolls = encounterPolls = auraTicks = layoutRecoveryPolls = 0;
 		barHudNodes = 0; barHudMs = barHudMaxMs = 0;
+		barterNativeSamples=barterNativeEntries=0; barterNativeMs=barterNativeMaxMs=0;
 		eventQueued = eventDrained = eventDropped = maxQueueDepth = 0;
 		clipChecks = clipUpdates = clipReleases = clipFailures = 0;
 	}
@@ -94,6 +99,7 @@ class RuntimeMetrics {
 				maxRebuildMs: StatusWorkMetrics.maxRebuildSeconds * 1000
 			},
 			barHudWork: {nodes: barHudNodes, lastMs: barHudMs, maxMs: barHudMaxMs},
+			barterNativeWork: {samples:barterNativeSamples,entries:barterNativeEntries,lastMs:barterNativeMs,maxMs:barterNativeMaxMs},
 			events: {queued: eventQueued, drained: eventDrained, dropped: eventDropped,
 				depth: EventRing.depth(), maxDepth: maxQueueDepth}
 		});

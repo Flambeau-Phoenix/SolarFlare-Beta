@@ -32,6 +32,16 @@ class BarTer {
  var statusChoiceMap:Map<String,{id:String,label:String,icon:String,active:Bool}> = new Map();
  var statusRevision:Int = -1;
  var pendingPopulation = "";
+ var pendingRepair:Bool=false;
+ var pendingNativeCheck:Bool=false;
+ public var nativeCheckReport:String="";
+ public var nativeCheckSummary:String="";
+ var commandEpoch:Int=-1;
+ var repairedGeneration:Int=-1;
+ var reconciledGeneration:Int=-1;
+ var nativeCoherent:Bool=false;
+ public var managedEditsReady(default,null):Bool=false;
+ public var comboLabel(default,null):String="Waiting for the equipped weapons…";
  var replacePopulation = false;
  public var host:solarflare.ui.ConfigPanel = null;
 
@@ -52,34 +62,40 @@ class BarTer {
    for (j in 0...b.slotCount) BarTerCache.prepareIcons(snaps[j]);
   }
  }
- public function changed():Void {
-  loadout.changed(config.bars,config.weaponLayouts); snapshotsDirty=true;
+ public function changed(contentEdit:Bool=false):Void {
+  loadout.changed(config.bars,config.weaponLayouts,contentEdit); snapshotsDirty=true;
   SettingsStore.markDirty(); solarflare.ObserveDemand.markStatusDemandDirty();
  }
  public function reserve(id:String,index:Int):Void { config.weaponLayouts.reserve(id,index); }
  public function requestPopulation(id:String,replace:Bool=false):Void {
+  commandEpoch=BarTerNativeKeys.epoch;
   pendingPopulation=id; replacePopulation=replace; lastStatus="Waiting for the current native skills…";
  }
  public function clearCell(b:BarTerBarConfig,index:Int):Void {
   if (b == null || index < 0 || index >= b.slotCount) return;
-  builder.recordChange(); reserve(b.id,index); b.slots[index].clearContent(); changed();
+  if (b.slots[index].nativeActionId.length>0 && !managedEditsReady) { lastStatus="Wait for the weapon change to finish."; return; }
+  builder.recordChange(); reserve(b.id,index); b.slots[index].clearContent(); changed(true);
  }
  public function clearBar(b:BarTerBarConfig):Void {
   if (b == null) return;
+  if (!managedEditsReady) for (s in b.slots) if (s.nativeActionId.length>0) { lastStatus="Wait for the weapon change to finish."; return; }
   builder.recordChange();
   for (i in 0...b.slotCount) { reserve(b.id,i); b.slots[i].clearContent(); }
-  changed(); lastStatus="Cleared "+b.name+". Undo restores it.";
+  changed(true); lastStatus="Cleared "+b.name+". Undo restores it.";
  }
  public function needsActionBarSeed():Bool return config != null && (config.demand() || config.open.get() || pendingPopulation.length > 0);
  public function clearTransientState():Void {
-  pendingPopulation=""; replacePopulation=false; BarTerCache.pendingClicks.resize(0);
-  loadout.resetCandidate(); lastStatus=""; snapshotsDirty=true; if (builder != null) builder.clearTransientState();
+  pendingNativeCheck=false; nativeCheckReport=nativeCheckSummary="";
+  pendingPopulation=""; pendingRepair=false; replacePopulation=false; commandEpoch=-1; BarTerCache.pendingClicks.resize(0);
+  loadout.resetCandidate(); reconciledGeneration=-1; nativeCoherent=false; lastStatus=""; snapshotsDirty=true; if (builder != null) builder.clearTransientState();
  }
+ public function requestRepair():Void { commandEpoch=BarTerNativeKeys.epoch; pendingRepair=true; lastStatus="Waiting to repair the current native skill cells…"; }
+ public function requestNativeCheck():Void { pendingNativeCheck=true; nativeCheckSummary="Waiting for a native skill observation…"; }
  public function observe():Void {
   var next=solarflare.HealthCache.characterId;
   if (next != character || identityGeneration != solarflare.HealthCache.identityGen) {
    clearTransientState(); builder.history.clear(); character=next; loadout.reset(); BarTerNativeKeys.reset(); rawWeaponKey=""; lastWeaponReadAt=-1;
-   identityGeneration=solarflare.HealthCache.identityGen; statusChoices.resize(0); statusChoiceMap.clear(); statusRevision=-1;
+   identityGeneration=solarflare.HealthCache.identityGen; repairedGeneration=reconciledGeneration=-1; statusChoices.resize(0); statusChoiceMap.clear(); statusRevision=-1;
    GeauxCache.actionBarLoadoutKey=""; GeauxCache.actionBarCharacterId="";
    GeauxCache.invalidateBarRoots();
   }
@@ -88,19 +104,53 @@ class BarTer {
   var now=haxe.Timer.stamp();
   observeStatusChoices();
   if (BarTerCache.hasAnyItem(config) || config.open.get()) try ConsumableCache.sample(hero,now) catch (_:Dynamic) {}
-  if (now-lastWeaponReadAt >= 0.1) { rawWeaponKey=BarTerCache.weaponLoadoutKey(hero); lastWeaponReadAt=now; }
-  var raw=rawWeaponKey;
-  var coherent=raw.length > 0 && character.length > 0 && GeauxCache.actionBarLoadoutKey == raw && GeauxCache.actionBarCharacterId == character;
-  // Identity/loadout completeness gates persistence, never live skill telemetry.
-  BarTerNativeKeys.sample(now);
-  if (coherent) {
-   reconcileLoadout(character+"|"+raw,now);
-   migrateAndFollowNativeSkills();
+  if (now-lastWeaponReadAt >= 0.1) {
+   var key=BarTerCache.weaponLoadoutKey(hero);
+   if (key!=rawWeaponKey) {
+    builder.clearTransientState(); BarTerCache.pendingClicks.resize(0); snapshotsDirty=true;
+    comboLabel=key.length>0 ? [for (part in key.split("|")) if (part.length>0) part].join(" + ") : "Waiting for the equipped weapons…";
+   }
+   rawWeaponKey=key; lastWeaponReadAt=now;
   }
+  var raw=rawWeaponKey;
+  var key=raw.length>0 && character.length>0 ? character+"|"+raw : "";
+  loadout.observeKey(key);
+  var nativeBefore=BarTerNativeKeys.observationGeneration;
+  BarTerNativeKeys.sample(now,pendingNativeCheck || managedEditsReady && (pendingRepair || pendingPopulation.length>0),raw,loadout.settling);
+  if(pendingNativeCheck) {
+   pendingNativeCheck=false; nativeCheckReport=BarTerNativeKeys.checkReport();
+   var count=0; for(r in BarTerNativeKeys.records) if(StringTools.startsWith(r.action,"Skill") && r.fresh==true) count++;
+   var signature=BarTerNativeKeys.action("SignatureSkill");
+   nativeCheckSummary=(BarTerNativeKeys.classReadable ? "Read "+count+" equipped class skill(s)." : "Class observation incomplete.")+
+    (signature!=null && signature.fresh==true ? " Signature: "+signature.label+"." : BarTerNativeKeys.signatureReadable ? " Signature slot empty." : " Signature observation incomplete. See the native skill check report.");
+  }
+  if ((pendingRepair || pendingPopulation.length>0) && commandEpoch!=BarTerNativeKeys.epoch) {
+   pendingRepair=false; pendingPopulation=""; replacePopulation=false; lastStatus="Weapon combination changed; request the edit again.";
+  }
+  // Recheck native equipment after the read; a mixed weapon generation cannot commit.
+  if(nativeBefore!=BarTerNativeKeys.observationGeneration || pendingRepair || pendingPopulation.length>0) nativeCoherent=key.length>0 && BarTerCache.weaponLoadoutKey(hero)==raw;
+  var coherent=key.length>0 && nativeCoherent;
+  managedEditsReady=false; config.weaponLayouts.activeCount=config.activeBarCount;
+  if (coherent && reconciledGeneration!=BarTerNativeKeys.observationGeneration) { reconciledGeneration=BarTerNativeKeys.observationGeneration; reconcileLoadout(key,now); }
+  managedEditsReady=!loadout.settling && coherent;
+  if (managedEditsReady && config.autoSeedOnWeaponSwap.get() && config.weaponLayouts.recoverClassOmissions(key,config.bars,BarTerNativeKeys.classReadable)) {
+   config.repairPending=true; SettingsStore.markDirty();
+  }
+  if (managedEditsReady && config.autoSeedOnWeaponSwap.get() && config.weaponLayouts.recoverSignatureOmission(key,config.bars,BarTerNativeKeys.action("SignatureSkill"))) {
+   config.repairPending=true; snapshotsDirty=true; SettingsStore.markDirty();
+  }
+  if (managedEditsReady && (pendingRepair || config.autoSeedOnWeaponSwap.get() && (config.repairPending || repairedGeneration!=BarTerNativeKeys.observationGeneration))) {
+   var before=pendingRepair ? dump() : null;
+   var edited=config.weaponLayouts.repair(key,config.bars,BarTerNativeKeys.skills,true);
+   config.layoutVersion=2; config.repairPending=false; repairedGeneration=BarTerNativeKeys.observationGeneration;
+   if (pendingRepair) { builder.history.push(editorSnapshotFrom(before,key)); pendingRepair=false; lastStatus="Repaired native skill cells."; }
+   if (edited>0) { snapshotsDirty=true; SettingsStore.markDirty(); }
+  }
+  if (config.weaponLayouts.shortfall>0) lastStatus=config.weaponLayouts.shortfall+" native action(s) need more available cells. Saved positions are retained.";
   // A deliberate editor command needs current skills, not a settled persistence key.
-  if (hero != null && pendingPopulation.length > 0) {
-   BarTerNativeKeys.sample(now,true);
-   populateRequestedBar();
+  if (hero != null && pendingPopulation.length > 0 && managedEditsReady) {
+   if (BarTerNativeKeys.weaponReadable && BarTerCache.weaponLoadoutKey(hero)==raw) populateRequestedBar();
+   else { pendingPopulation=""; replacePopulation=false; nativeCoherent=false; managedEditsReady=false; lastStatus="Weapon combination changed; request the edit again."; }
   }
   if (snapshotsDirty || now-lastSnapAt >= 0.05) { refreshSnaps(); snapshotsDirty=false; lastSnapAt=now; }
   // Same eligibility the ExtraBars policy enforces before any native use request.
@@ -114,56 +164,30 @@ class BarTer {
    if (c.itemKind.length > 0 && slot.hasItem() && slot.itemKind == c.itemKind) {
     var outcome=BarTerCache.useItem(c.itemKind,c.gen,hero); lastStatus=outcome.message;
     var snaps=snapsFor(c.barId); if (outcome.submitted && c.slot < snaps.length) snaps[c.slot].flashUntil=now+0.3;
-    } else if (c.skillId.length > 0 && slot.hasSkill() && slot.skillId == c.skillId) {
-    var outcome=BarTerCache.useSkill(c.skillId,slot.nativeActionId,hero); lastStatus=outcome.message;
+    } else if (c.skillId.length > 0 && slot.hasSkill() && c.nativeEpoch==BarTerNativeKeys.epoch
+     && (slot.nativeActionId.length>0 ? managedEditsReady && slot.nativeActionId==c.action && BarTerNativeKeys.current(c.action,c.skillId) : slot.skillId==c.skillId)) {
+    var outcome=BarTerCache.useSkill(c.skillId,c.action,hero); lastStatus=outcome.message;
      var snaps=snapsFor(c.barId); if (outcome.success && c.slot < snaps.length) snaps[c.slot].flashUntil=now+0.3;
    }
   },block.length > 0);
  }
  function reconcileLoadout(key:String,now:Float):Void {
-  if (!BarTerNativeKeys.known) return;
   var revision=loadout.revision;
-  if (!loadout.reconcile(key,BarTerNativeKeys.skills,GeauxCache.actionBarGeneration,now,config.bars,config.weaponLayouts,config.autoSeedOnWeaponSwap.get())) return;
-  if (revision != loadout.revision) changed();
- }
- function migrateAndFollowNativeSkills():Void {
-  var edited=false;
-  if (config.migrateNativeActions) {
-   var unresolved=false;
-   var migrated=false;
-   // Legacy skills acquire provenance only from an exact match in the observed native actions.
-   for (b in config.activeBars()) for (slot in b.slots) if (slot.hasSkill() && slot.nativeActionId.length == 0) {
-    var s=BarTerNativeKeys.find(slot.skillId);
-    if (s != null && s.action.length > 0) { slot.nativeActionId=s.action; migrated=true; }
-    else if (s != null) unresolved=true;
-   }
-   if (migrated || config.migrateNativeActions != unresolved) { config.migrateNativeActions=unresolved; edited=true; }
-  }
-  if (config.autoSeedOnWeaponSwap.get()) {
-   // Skill replacements within the same weapon use the action's existing destination.
-   for (b in config.bars) for (slot in b.slots) if (slot.nativeActionId.length > 0) {
-    var s=BarTerNativeKeys.action(slot.nativeActionId);
-    if (s != null && slot.skillId != s.id) { slot.assignSkill(s.id); slot.nativeActionId=s.action; edited=true; }
-   }
-  }
-  if (edited) {
-   // Immediate telemetry updates must not overwrite the destination weapon's
-   // saved arrangement before its stabilized restoration has run.
-   if (loadout.currentKey.length > 0 && loadout.currentKey == loadout.observedKey) changed();
-   else { snapshotsDirty=true; SettingsStore.markDirty(); solarflare.ObserveDemand.markStatusDemandDirty(); }
-  }
+  if (!loadout.reconcile(key,BarTerNativeKeys.records,BarTerNativeKeys.observationGeneration,now,config.bars,config.weaponLayouts,config.autoSeedOnWeaponSwap.get(),BarTerNativeKeys.weaponReadable)) return;
+  if (revision != loadout.revision) { snapshotsDirty=true; SettingsStore.markDirty(); }
  }
  function populateRequestedBar():Void {
   if (BarTerNativeKeys.skills.length == 0) return;
   if (pendingPopulation.length > 0) {
    var b=config.find(pendingPopulation); pendingPopulation="";
    if (b != null && config.isActive(b.id)) {
-    var before=dump();
+    if(config.weaponLayouts.recoverSignatureOmission(loadout.currentKey,config.bars,BarTerNativeKeys.action("SignatureSkill"))) SettingsStore.markDirty();
+    var before=editorSnapshot();
     if (replacePopulation) for (i in 0...b.slotCount) if (b.slots[i].hasSkill()) reserve(b.id,i);
     var wrote=replacePopulation ? BarTerWeaponLayouts.replaceSkills(b,BarTerNativeKeys.skills,config.activeBars())
      : BarTerWeaponLayouts.populate(b,BarTerNativeKeys.skills,config.activeBars());
     lastStatus=wrote > 0 ? "Added "+wrote+" native skill(s)." : "No new skills fit. Right-click a cell to clear it or replace this bar's skills.";
-    if (wrote > 0 || replacePopulation) { builder.history.push(before); changed(); }
+    if (wrote > 0 || replacePopulation) { builder.history.push(before); changed(true); }
    }
    replacePopulation=false;
   }
@@ -205,8 +229,13 @@ class BarTer {
  }
  public function drawBuilder():Void builder.draw();
  public function dump():Dynamic return config.dump();
+ public function editorSnapshot(scope:String=null):Dynamic return editorSnapshotFrom(dump(),scope==null ? loadout.currentKey : scope);
+ function editorSnapshotFrom(data:Dynamic,key:String):Dynamic { Reflect.setField(data,"editorKey",key); return data; }
  public function restoreEditorState(data:Dynamic):Void {
-  clearTransientState(); config.apply(data); snapMap.clear(); loadout.reset(); changed();
+  var current=new BarTerWeaponLayouts(); current.apply(config.weaponLayouts.dump(),config.weaponLayouts.dumpShared());
+  var key=loadout.currentKey; var scope=Std.isOfType(data.editorKey,String) ? data.editorKey : key;
+  clearTransientState(); config.apply(data); config.weaponLayouts.mergeUntouched(current,scope);
+  snapMap.clear(); loadout.reset(); loadout.observeKey(key); snapshotsDirty=true; SettingsStore.markDirty();
  }
  public function apply(data:Dynamic):Void {
   clearTransientState(); builder.history.clear(); config.apply(data);
@@ -224,7 +253,8 @@ class BarTer {
 
 	function hudClick(index:Int):Void {
 		var b = hudBar; var s = b.slots[index];
-		if (s.hasItem()) BarTerCache.queueClick(b.id,index,"",s.itemKind); else if (s.hasSkill()) BarTerCache.queueClick(b.id,index,s.skillId,"");
+		if (s.hasItem()) BarTerCache.queueClick(b.id,index,"",s.itemKind);
+		else if (s.hasSkill()) { var snaps=snapsFor(b.id); if (index<snaps.length && snaps[index].available) BarTerCache.queueClick(b.id,index,snaps[index].skillId,"",s.nativeActionId); }
 	}
 
 	function hudContext(index:Int):Void {

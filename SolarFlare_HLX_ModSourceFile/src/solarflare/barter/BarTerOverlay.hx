@@ -97,9 +97,8 @@ class BarTerOverlay {
   if (lit && flash > 0) VectorGlow.skillAlertBloom(dl,x,y,size,size,
    (accent & 0xFFFFFF)|(Std.int(flash*255) << 24),Math.min(16,size*0.25),4,10,1.85);
   if (s.flashUntil > now) ImGui.ImDrawList_AddRect(dl,ImGui.vec2(x+1,y+1),ImGui.vec2(x+size-1,y+size-1),accent,4,2);
-  if (showHotkeys && s.keyLabel.length > 0) {
-   var key=BarTerBindingResolver.primaryLabel(s.keyLabel);
-   if (key == "Unknown") key="?"; else if (key == "Unbound") key="-";
+  if (showHotkeys && s.keyLabel.length > 0 && s.keyLabel!="Unknown") {
+   var key=BarTerBindingResolver.badgeLabel(s.keyLabel);
    if (ImGui.calcTextSize(key).x > size-6) {
     while (key.length > 1 && ImGui.calcTextSize(key+"…").x > size-6) key=key.substr(0,key.length-1);
     key+="…";

@@ -25,6 +25,10 @@ class StatusBoardConfig {
  public var exclusions=new StatusBoardState();
  public var visible:Array<AuraStatusSnap>=[];
  public var active:Array<AuraStatusSnap>=[];
+ public var visuals:Array<StatusBoardVisual>=[];
+ var visualByKey:Map<String,StatusBoardVisual>=new Map();
+ var retiredVisuals:Array<String>=[];
+ var visualBySnapshot=new haxe.ds.ObjectMap<AuraStatusSnap,StatusBoardVisual>();
  var intRef=new IntRef(1);
  var boolRef=new BoolRef(false);
  var search=new SearchBar("Search status names or IDs");
@@ -43,12 +47,30 @@ class StatusBoardConfig {
  }
  var stabilizer=new StatusBoardStabilizer();
  public function observe():Void {
+  if (stabilizer.syncOwner(AuraStatusCache.ownerGeneration)) lastRevision=-1;
   if (lastRevision != AuraStatusCache.revision) {
    lastRevision=AuraStatusCache.revision;
    stabilizer.update(AuraStatusCache.snaps,AuraStatusCache.count,describe,maxIcons);
    active=stabilizer.shown;
   }
   exclusions.pack(stabilizer.shown,stabilizer.shown.length,visible,maxIcons);
+  for (v in visualByKey) v.seen=false;
+  var now=haxe.Timer.stamp();
+  for (i in 0...active.length) {
+   var s=active[i]; var key=s.instanceId.length>0 ? s.instanceId : s.id+"|"+s.sourceItemId+"|"+i;
+   var v=visualByKey.get(key);
+   if (v == null) { v=new StatusBoardVisual(key); visualByKey.set(key,v); }
+   if (v.snapshot != null && v.snapshot != s) visualBySnapshot.remove(v.snapshot);
+   v.seen=true; v.prepare(s,now,showSeconds,showStacks);
+   visualBySnapshot.set(s,v);
+   StatusBoardTooltipRenderer.prepare(StatusBoardTooltipCache.get(s.instanceId));
+  }
+  retiredVisuals.resize(0); for (key in visualByKey.keys()) if (!visualByKey.get(key).seen) retiredVisuals.push(key);
+  for (key in retiredVisuals) { var v=visualByKey.get(key); visualBySnapshot.remove(v.snapshot); visualByKey.remove(key); }
+  visuals.resize(0);
+  for (s in visible) {
+   var v=visualBySnapshot.get(s); if (v != null) visuals.push(v);
+  }
   lastActive=active.length; lastVisible=visible.length;
  }
  /** Primitive mirror of the board's own lists for the Dev Log (what is actually drawn, not what the cache holds). */
@@ -94,7 +116,9 @@ class StatusBoardConfig {
   maxIcons=data.hiddenStatusIds == null ? 512 : clamp(data.maxIcons,1,512,512);
   showSeconds=data.showSeconds != false; showStacks=data.showStacks != false;
   exclusions.apply(data.hiddenStatusIds);
-  labels.clear(); lastRevision=-1;
+  visualByKey.clear(); visuals.resize(0);
+  visualBySnapshot.clear(); StatusBoardTooltipCache.clear();
+  labels.clear(); lastRevision=-1; stabilizer.reset(); active=stabilizer.shown; visible.resize(0);
   if (Std.isOfType(data.hiddenStatusLabels,Array)) {
    var saved:Array<Dynamic>=cast data.hiddenStatusLabels;
    for (row in saved) if (row != null && Std.isOfType(row.id,String) && Std.isOfType(row.label,String)) labels.set(StatusBoardState.key(row.id),row.label);
@@ -137,9 +161,9 @@ class StatusBoardConfig {
   UiScope.child("##sb_active",ImGui.vec2(0,170),function() {
    for (s in active) {
     if (q.length > 0 && (s.label+" "+s.id).toLowerCase().indexOf(q) < 0) continue;
-    ImGui.pushID_Str(s.id+"_"+s.sourceItemId);
+    ImGui.pushID_Str(s.instanceId);
     try {
-    ImGui.text(s.label); if (ImGui.isItemHovered()) ImGui.setTooltip(StatusIcon.tooltip(s));
+    ImGui.text(s.label); if (ImGui.isItemHovered()) StatusBoardTooltipRenderer.draw(s.instanceId,s.label);
     ImGui.sameLine();
     if (exclusions.excluded(s)) { if (ImGui.smallButton("Restore##active")) { exclusions.restore(s.id); for (id in s.ids) exclusions.restore(id); SettingsStore.markDirty(); } }
     else if (ImGui.smallButton("Hide##active")) hideStatus(s.id);

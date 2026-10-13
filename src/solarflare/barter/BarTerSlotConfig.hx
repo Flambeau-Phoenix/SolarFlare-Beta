@@ -11,7 +11,7 @@ class BarTerSlotConfig {
 
 	public function new() {}
 
-	public function hasSkill():Bool return skillId != null && skillId.length > 0;
+	public function hasSkill():Bool return (skillId != null && skillId.length > 0) || nativeActionId.length > 0;
 	public function hasItem():Bool return itemKind != null && itemKind.length > 0;
 	public function hasStatus():Bool return statusId != null && statusId.length > 0;
 	public function hasContent():Bool return hasSkill() || hasItem() || hasStatus();
@@ -31,8 +31,7 @@ class BarTerSlotConfig {
 		statusId = text(data, "statusId", "");
 		nativeActionId = text(data, "nativeActionId", "");
 		itemKind = text(data, "itemKind", "");
-		if (hasItem() && hasSkill())
-			skillId = "";
+		if (hasItem()) { skillId = ""; nativeActionId = ""; }
 		if (hasStatus()) { skillId = itemKind = nativeActionId = ""; }
 		if (!hasSkill()) nativeActionId = "";
 		#if hl
@@ -56,6 +55,9 @@ class BarTerSlotConfig {
 		#end
 		skillId = "";
 		statusId = nativeActionId = "";
+	}
+	public function assignNative(action:String,id:String):Void {
+		assignSkill(id); nativeActionId=BarTerWeaponLayouts.normalize(action);
 	}
 	public function assignStatus(id:String):Void {
 		statusId = id == null ? "" : StringTools.trim(id);

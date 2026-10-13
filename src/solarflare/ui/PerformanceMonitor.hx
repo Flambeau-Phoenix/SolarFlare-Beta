@@ -129,6 +129,9 @@ class PerformanceMonitor {
 				UiLayout.propertyRow("Native bar discovery", function() {
 					ImGui.text('${m.barHudNodes} unique nodes  ${roundMs(m.barHudMs)} ms  max ${roundMs(m.barHudMaxMs)} ms');
 				});
+				UiLayout.propertyRow("BarTer native actions", function() {
+					ImGui.text('${m.barterNativeEntries}/9 actions  ${roundMs(m.barterNativeMs)} ms  max ${roundMs(m.barterNativeMaxMs)} ms');
+				});
 			});
 			UiLayout.inlinePair("##sf_runtime_metric_actions",
 				function(w:Single) {

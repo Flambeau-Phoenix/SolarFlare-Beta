@@ -11,6 +11,8 @@ class BarTerConfig {
 	public var activeBarCount:Int = 1;
 	public var weaponLayouts = new BarTerWeaponLayouts();
 	public var migrateNativeActions:Bool = false;
+	public var layoutVersion:Int=2;
+	public var repairPending:Bool=true;
 
 	public var open = new BoolRef(false);
 	public var enabled = new BoolRef(true);
@@ -105,6 +107,8 @@ class BarTerConfig {
 		return {
 			activeBarCount: activeBarCount,
 			weaponLayouts: weaponLayouts.dump(),
+			layoutVersion: 2,
+			sharedNativeLayouts: weaponLayouts.dumpShared(),
 			migrateNativeActions: migrateNativeActions,
 			enabled: enabled.get(),
 			hidden: hidden.get(),
@@ -166,7 +170,9 @@ class BarTerConfig {
 		if (bars.length == 0)
 			ensureDefaultBars();
 		setActiveCount(data.activeBarCount == null ? Std.int(Math.min(3,bars.length)) : Std.int(data.activeBarCount));
-		weaponLayouts.apply(data.weaponLayouts);
+		layoutVersion=data.layoutVersion==2 ? 2 : 1; repairPending=true;
+		weaponLayouts.apply(data.weaponLayouts,data.sharedNativeLayouts);
+		if (layoutVersion<2 && bars.length>0 && bars[0].slotCount==8) { bars[0].setCount(9); if (bars[0].columns==8) bars[0].setColumns(9); }
 		applyChromes(Reflect.field(data, "chromes"));
 	}
 

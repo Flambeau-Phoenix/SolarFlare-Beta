@@ -5,7 +5,7 @@ import solarflare.barter.BarTerWeaponLayouts.BarTerNativeSkill;
 /** Copy frozen Geaux telemetry even when input identity or binding reads fail. */
 class BarTerSkillState {
  public static function apply(snap:BarTerSnap,observed:Bool,gs:Dynamic,native:BarTerNativeSkill):Void {
-  snap.available=observed;
+  snap.available=observed && (native==null || native.fresh!=false);
   snap.keyLabel=native == null ? "Unknown" : native.keyText;
   snap.nativeActionId=native == null ? "" : native.action;
   snap.bindingKnown=native != null && native.keyKnown;

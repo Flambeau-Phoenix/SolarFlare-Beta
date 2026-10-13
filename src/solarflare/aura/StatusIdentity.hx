@@ -11,6 +11,9 @@ class StatusIdentity {
   return false;
  }
  public static function sameApplied(a:AuraStatusSnap,b:AuraStatusSnap):Bool {
+  if (a == null || b == null) return false;
+  if (a.instanceId.length > 0 || b.instanceId.length > 0)
+   return a.instanceId.length > 0 && a.instanceId == b.instanceId;
   if (a == null || b == null || a.sourceItemId != b.sourceItemId) return false;
   if (key(a.id) == key(b.id)) return true;
   return !a.present && matches(b,a.id);

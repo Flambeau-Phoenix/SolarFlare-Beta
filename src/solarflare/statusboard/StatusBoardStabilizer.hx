@@ -16,12 +16,9 @@ class StatusBoardEntry {
 /**
  * Presentation-only stabilizer between AuraStatusCache and the board.
  *
- * The cache rebuilds its rows every pass from lanes (typed lookup, published demand, sliced
- * discovery) that do not agree on order or on how an applied status is deduplicated, so a raw
- * read reorders and can show a second row for a single pass. This keeps first-seen order, merges
- * rows sharing an applied identity within a pass, requires two consecutive passes before a new
- * status appears, and lets a status linger briefly when a pass misses it. It never writes into
- * the cache's rows, so enabling the board cannot change what auras read.
+ * Keeps first-seen order and merges only observations of the same primitive application identity.
+ * Legacy synthetic rows without an instance id use the timing fallback. Appearance needs two passes;
+ * a missing row gets three passes of presentation grace. All retained rows are board-owned copies.
  */
 class StatusBoardStabilizer {
  /** Consecutive passes a new status must be seen before it is shown. */
@@ -33,8 +30,13 @@ class StatusBoardStabilizer {
  /** Entries per `id|sourceItem` key: distinct statuses can share one (generic ids such as `ItemStatus`). */
  var byKey:Map<String,Array<StatusBoardEntry>> = new Map();
  var scratch = new AuraStatusSnap();
+ var ownerGeneration:Int = -1;
  public function new() {}
  public function reset():Void { entries.resize(0); byKey.clear(); shown.resize(0); }
+ public function syncOwner(generation:Int):Bool {
+  if (generation == ownerGeneration) return false;
+  reset(); ownerGeneration=generation; return true;
+ }
 
  /** `describe` fills label, icon and source item on a board-owned copy, never on the cache row. */
  public function update(source:Array<AuraStatusSnap>, count:Int, describe:AuraStatusSnap->Void, limit:Int):Void {
@@ -46,7 +48,7 @@ class StatusBoardStabilizer {
    if (s == null || !s.known || !s.present || s.id.length == 0) continue;
    copy(scratch, s);
    describe(scratch);
-   var key = scratch.id.toLowerCase() + "|" + scratch.sourceItemId.toLowerCase();
+   var key = scratch.instanceId.length > 0 ? scratch.instanceId : scratch.id.toLowerCase() + "|" + scratch.sourceItemId.toLowerCase();
    var list = byKey.get(key);
    var match:StatusBoardEntry = null;
    var dup:StatusBoardEntry = null;
@@ -97,6 +99,7 @@ class StatusBoardStabilizer {
   * rows without timing on either side keep the old behaviour and merge.
   */
  static function sameStatus(a:AuraStatusSnap, b:AuraStatusSnap, now:Float):Bool {
+  if (a.instanceId.length > 0 || b.instanceId.length > 0) return a.instanceId.length > 0 && a.instanceId == b.instanceId;
   if (!a.durationKnown || !b.durationKnown) return true;
   if (a.infinite != b.infinite) return false;
   if (a.infinite) return true;
@@ -107,10 +110,13 @@ class StatusBoardStabilizer {
  }
 
  static function copy(dst:AuraStatusSnap, src:AuraStatusSnap):Void {
+  dst.instanceId = src.instanceId;
   dst.id = src.id;
   dst.sourceItemId = src.sourceItemId; dst.sourceItemKnown = src.sourceItemKnown;
   dst.ids.resize(0); dst.idsLower.resize(0);
   for (j in 0...src.ids.length) { dst.ids.push(src.ids[j]); dst.idsLower.push(src.idsLower[j]); }
+  dst.nativeTimerEligible=src.nativeTimerEligible; dst.nativeStacksVisible=src.nativeStacksVisible;
+  dst.nativeProgressVisible=src.nativeProgressVisible;
   dst.stacks = src.stacks; dst.stacksKnown = src.stacksKnown;
   dst.label = src.label; dst.iconKey = src.iconKey;
   dst.known = src.known; dst.present = src.present;

@@ -9,6 +9,19 @@ class ExtraBarsPrototypeSlot {
 	public var icon:String = "";
 	public var binding:String = "Unbound";
 	public var keyHint:String = "";
+	public var nativeKeyHint:String = "";
+	public var extraKeyHint:String = "";
+	public var secondaryKeyHint:String = "";
+	/** Retained presentation cache; changed bindings rebuild the tooltip once. */
+	public var displayMode:String="";
+	public var displayNativeText:String="";
+	public var displayNativeState:String="";
+	public var displayNativeAction:String="";
+	public var displayExtraHint:String="";
+	public var displayExtraBinding:String="";
+	public var displayPrimary:String="";
+	public var displaySecondary:String="";
+	public var displayTooltip:String="";
 	public var modifierHint:String = "";
 	public var count:Int = 0;
 	public var known:Bool = false;
@@ -38,7 +51,7 @@ class ExtraBarsPrototypeSlot {
 		setInputState(false, "toggle");
 		triggerStrength = 0;
 		enabled = false; name = "Unassigned"; icon = ""; binding = "Unbound";
-		keyHint = ""; modifierHint = ""; progress = 0;
+		keyHint = ""; nativeKeyHint=""; extraKeyHint=""; secondaryKeyHint=""; displayMode=""; displayTooltip=""; modifierHint = ""; progress = 0;
 		count = 0; known = false; ready = false; reason = "Waiting for gameplay.";
 	}
 }

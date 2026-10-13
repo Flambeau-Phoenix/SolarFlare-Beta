@@ -16,7 +16,17 @@ class BarTerSkillActivation {
    if (pc == null || pc.get_hero() != h)
     return {success:false,message:"Local skill controller unavailable."};
    var skill:st.skill.Skill=null;
-   if (action.length > 0) {
+   var managed=BarTerWeaponLayouts.normalize(action);
+   if (managed.length>0) {
+    var record=BarTerNativeKeys.action(managed);
+    if (record==null || !BarTerNativeKeys.current(managed,skillId.length>0 ? skillId : record.id)) return {success:false,message:"Native action observation unavailable: "+label};
+    if (record.loadoutKey.length>0 && BarTerLoadoutIdentity.key(hero)!=record.loadoutKey) return {success:false,message:"Weapon combination changed: "+label};
+    var current=BarTerNativeAccess.read(hero,managed,null,true);
+    if (!current.readable || current.effective==null || BarTerNativeAccess.definition(current.effective)!=record.id || BarTerNativeAccess.definition(current.base)!=record.baseId)
+     return {success:false,message:"Skill binding changed: "+label};
+    skill=current.effective; action=managed;
+   }
+   else if (action.length > 0) {
     skill=GeauxCache.skillByInput(h,action);
     if (skill == null && isCoreAction(action))
      return {success:false,message:"Skill binding unavailable: "+label};
@@ -25,7 +35,7 @@ class BarTerSkillActivation {
    }
    if (skill == null && skillId.length > 0) skill=GeauxCache.liveSkill(skillId);
    var owner:Dynamic=skill == null ? null : skill.owner;
-   if (skill == null || owner != hero || (skillId.length > 0 && !GeauxCache.skillMatches(skill,skillId)))
+   if (skill == null || owner != hero || skill.removed || (managed.length==0 && skillId.length > 0 && !BarTerNativeAccess.matchesDefinition(skill,skillId)))
     return {success:false,message:"Skill unavailable: "+label};
    var reason=pc.requestSkill(skill,action.length > 0 ? action : skillId);
    if (reason == null) return {success:false,message:"Skill request returned no result: "+label};

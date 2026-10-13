@@ -26,7 +26,7 @@ class StatusStamp {
  * overflow read length only. Neither can trigger a full container ingest per tick.
  *
  * Poll authority: 20 Hz accumulator, dirty-wake via ObserveDemand.auraStatusDirty.
- * Expiry authority: SkillRemain left <= 0.02 clears present (recycled snaps start absent).
+ * Expiry authority: authoritative live duration left <= 0.02; estimates never prove removal.
  */
 class AuraStatusCache {
 	public static inline var MAX:Int = solarflare.aura.signal.AuraSignalFrame.MAX_STATUSES;
@@ -48,6 +48,12 @@ class AuraStatusCache {
 	static var bindings = new Map<String, StatusRecord>();
 	static var recordCount:Int = 0;
 	static var generation:Int = 0;
+	public static var ownerGeneration(get, never):Int;
+	static function get_ownerGeneration():Int return generation;
+	// Only UID-less applications retain an object key, inside the observer and bounded by MAX.
+	static var fallbackInstances = new haxe.ds.ObjectMap<Dynamic, String>();
+	static var fallbackCount:Int = 0;
+	static var nextInstance:Int = 0;
 	static var sweep:Int = 0;
 	static var passDeadline:Float = 0;
 	static var cacheMode:Int = -1;
@@ -101,6 +107,8 @@ class AuraStatusCache {
 	}
 	static function clearRecords():Void {
 		generation++;
+		solarflare.statusboard.StatusBoardTooltipCache.syncOwner(generation);
+		fallbackInstances.clear(); fallbackCount = 0; nextInstance = 0;
 		for (record in records) record.ref = null;
 		records.clear(); bindings.clear(); recordCount = 0;
 	}
@@ -155,6 +163,8 @@ class AuraStatusCache {
 		cacheMode = mode;
 		lastSampleAt = now;
 		var sampleStarted = stamp();
+		solarflare.statusboard.StatusBoardTooltipCache.beginPass();
+		solarflare.statusboard.StatusBoardNativeRules.beginPass();
 		work.identityCacheEnabled = identityCacheEnabled;
 		work.stateRefreshEnabled = stateRefreshEnabled && identityCacheEnabled;
 		solarflare.ObserveDemand.auraStatusDirty = false;
@@ -179,7 +189,6 @@ class AuraStatusCache {
 		passDeadline = stamp() + WORK_BUDGET_S;
 		sampleTargeted();
 		var fast = stateRefreshEnabled && identityCacheEnabled;
-		if (!fast) publishTargeted();
 		var publishDiscovery = solarflare.ObserveDemand.auraBuilderOpen
 			|| solarflare.ObserveDemand.barterBuilderOpen
 			|| solarflare.ObserveDemand.statusBoard;
@@ -188,10 +197,9 @@ class AuraStatusCache {
 		if (wantDiscovery) {
 			if (!discoveryWanted) { nextDiscoveryAt = 0; solarflare.ObserveDemand.statusDiscoveryDirty = true; }
 			discoverSlice(hero, now);
-			if (fast) publishTargeted();
 			domainKnown = domainKnown && !scanActive && scanComplete;
 			var rebuildStarted = stamp(); var rebuildRows = 0;
-			// Publication deduplicates by applied status AND source item, like discovery/ingest.
+			// Publication deduplicates by application instance, like discovery/ingest.
 			// A kind lookup collapses distinct ItemStatus buffs between sweeps (food, cauldron, etc.).
 			for (key => cached in discovered) if (publishDiscovery && !rowsApplied.exists(key) && count < MAX) {
 				var out = allocSnap(); copySnap(out, cached);
@@ -208,8 +216,11 @@ class AuraStatusCache {
 		} else if (discoveryWanted) {
 			clearDiscovery();
 		}
-		if (!wantDiscovery && fast) publishTargeted();
+		// Publish demands only after real applied rows from both lanes have been reconciled.
+		publishTargeted();
 		discoveryWanted = wantDiscovery;
+		if (solarflare.ObserveDemand.statusBoard) solarflare.statusboard.StatusBoardTooltipCache.reconcile(snaps,count,discoveryCompletedThisPass);
+		else solarflare.statusboard.StatusBoardTooltipCache.clear();
 		work.samples++;
 		work.lastSampleSeconds = stamp() - sampleStarted;
 		if (work.lastSampleSeconds > work.maxSampleSeconds) work.maxSampleSeconds = work.lastSampleSeconds;
@@ -293,15 +304,16 @@ class AuraStatusCache {
 		}
 	}
 	/**
-	 * A retained live discovery row that carries the demanded id only as an ALIAS (its applied id differs). A native
-	 * lookup by kind misses such a row by construction, so the miss says nothing about it. A row whose applied id IS
-	 * the demanded id is excluded: for it the typed miss is authoritative and complete sweeps certify removal.
+		 * An observed application outranks a lookup miss, for both exact kinds and observed aliases.
+		 * Membership removal is certified by a complete readable sweep, not an isolated lookup miss.
 	 */
 	static function liveDiscovered(want:String):AuraStatusSnap {
 		var key = StatusIdentity.key(want);
 		if (key.length == 0) return null;
 		for (d in discovered) {
-			if (!d.present || d.id.toLowerCase() == key) continue;
+			if (!d.present) continue;
+			var span = stamps.get(stampKey(d));
+			if (span != null && !span.infinite && span.source == "live" && span.endsAt - stamp() <= 0.02) continue;
 			if (d.idsLower.indexOf(key) >= 0) return d;
 		}
 		return null;
@@ -321,18 +333,16 @@ class AuraStatusCache {
 		try {
 			// The container the discovery sweep walks. Game arrays cross a module boundary, so they are
 			// never cast to ArrayBase here (that cast fails at runtime); FieldWalk unwraps and reads them.
-			var list:Dynamic = FieldWalk.extractObject(hero, "statuses");
+			var list:Dynamic = readContainer(hero);
 			if (list == null)
-				list = FieldWalk.extractObject(hero, "statusList");
-			if (list == null)
-				return "Check: the character has no status container.";
+				return "Check: status container unavailable for the current character (observation unknown).";
 			var total = FieldWalk.arrayLen(list, -1);
 			if (total < 0)
-				return "Check: the status container length is unreadable.";
+				return "Check: status container unreadable (observation unknown).";
 			var scan = total > 512 ? 512 : total;
 			var order:Array<String> = [];
 			var seen = new Map<String, Bool>();
-			var removedCount = 0;
+			var removedCount = 0; var applications = 0;
 			var unreadable = 0;
 			var unreadableTypes:Array<String> = [];
 			for (i in 0...scan) {
@@ -359,6 +369,7 @@ class AuraStatusCache {
 						unreadableTypes.push(typeName);
 					continue;
 				}
+				applications++;
 				var key = clean.toLowerCase();
 				if (!seen.exists(key)) {
 					seen.set(key, true);
@@ -385,11 +396,11 @@ class AuraStatusCache {
 				if (!found)
 					missing.push(kind);
 			}
-			var text = "Check: engine " + total + " statuses (" + order.length + " kinds"
+			var text = "Check: engine " + applications + " applications in " + total + " entries (" + order.length + " distinct kinds"
 				+ (removedCount > 0 ? ", " + removedCount + " removed" : "")
 				+ (unreadable > 0 ? ", " + unreadable + " unreadable" : "")
 				+ ") | cache " + cacheLive + " | board " + solarflare.statusboard.StatusBoardConfig.lastVisible
-				+ " | observation " + (domainKnown ? "complete" : "incomplete");
+				+ " | observation " + (total == 0 ? "confirmed empty container" : domainKnown ? "complete" : "incomplete sweep");
 			if (unreadableTypes.length > 0)
 				text += " | unreadable: " + unreadableTypes.join(", ");
 			if (lastSweepUnresolved > 0)
@@ -412,14 +423,17 @@ class AuraStatusCache {
 		discoveryCompletedThisPass = false;
 		work.lastSliceEntries = 0; work.lastSliceSeconds = 0;
 		if (stateRefreshEnabled && identityCacheEnabled && stamp() >= passDeadline) return;
+		var started = stamp();
+		var arr:Dynamic = null;
+		if (solarflare.ObserveDemand.statusBoard && solarflare.statusboard.StatusBoardTooltipCache.due(now).length > 0) {
+			arr=readContainer(hero); serviceTooltipHint(hero,arr,now);
+		}
 		var dirty = solarflare.ObserveDemand.statusDiscoveryDirty;
 		if (!scanActive && now < nextDiscoveryAt
-			&& !(dirty && now - lastDiscoveryStart >= DISCOVERY_WAKE_S)) return;
-		var started = stamp();
-		var arr = FieldWalk.extractObject(hero, "statuses");
-		if (arr == null) arr = FieldWalk.extractObject(hero, "statusList");
+			&& !(dirty && now - lastDiscoveryStart >= DISCOVERY_WAKE_S)) { finishDiscoveryWork(started); return; }
+		if (arr == null) arr = readContainer(hero);
 		var len = FieldWalk.arrayLen(arr, -1);
-		if (len < 0) { scanActive = false; scanArray = null; scanComplete = false; nextDiscoveryAt = now + DISCOVERY_INTERVAL_S; return; }
+		if (len < 0) { scanActive = false; scanArray = null; scanComplete = false; nextDiscoveryAt = now + DISCOVERY_INTERVAL_S; finishDiscoveryWork(started); return; }
 		if (!scanActive || arr != scanArray) {
 			sweep++;
 			scanArray = arr; scanLength = len; scanCursor = 0; scanSeen.clear();
@@ -435,13 +449,15 @@ class AuraStatusCache {
 		while (scanCursor < end && work.lastSliceEntries < DISCOVERY_ENTRIES_PER_SLICE) {
 			if (work.lastSliceEntries > 0 && (stamp() - started >= DISCOVERY_BUDGET_S
 				|| (stateRefreshEnabled && identityCacheEnabled && stamp() >= passDeadline))) break;
-			var item = FieldWalk.arrayAt(arr, scanCursor++);
+			var index=scanCursor++;
+			var item = FieldWalk.arrayAt(arr, index);
 			var row = item == null ? null : ingest(item);
 			var record = item == null ? null : records.get(item);
 			if (record != null) record.seenSweep = sweep;
 			work.lastSliceEntries++; work.discoveryEntries++;
 			if (row == null) { scanComplete = false; sweepUnresolved++; continue; }
 			var key = stampKey(row); scanSeen.set(key, true);
+			if (solarflare.ObserveDemand.statusBoard) solarflare.statusboard.StatusBoardTooltipCache.noteIndex(row.instanceId,index);
 			var cached = discovered.get(key);
 			if (cached == null) {
 				if (discoveredCount >= MAX) continue;
@@ -449,10 +465,7 @@ class AuraStatusCache {
 			}
 			copySnap(cached, row);
 		}
-		work.discoverySlices++;
-		work.lastSliceSeconds = stamp() - started;
-		if (work.lastSliceEntries > work.maxSliceEntries) work.maxSliceEntries = work.lastSliceEntries;
-		if (work.lastSliceSeconds > work.maxSliceSeconds) work.maxSliceSeconds = work.lastSliceSeconds;
+		finishDiscoveryWork(started);
 		if (scanCursor >= end) {
 			lastSweepUnresolved = sweepUnresolved;
 			scanActive = false; scanArray = null; nextDiscoveryAt = now + DISCOVERY_INTERVAL_S;
@@ -464,6 +477,18 @@ class AuraStatusCache {
 				for (ref in retired) retireRecord(records.get(ref));
 				var gone = [for (key in discovered.keys()) if (!scanSeen.exists(key)) key];
 				for (key in gone) { discovered.remove(key); discoveredCount--; stamps.remove(key); }
+				var retiredFallback:Array<Dynamic> = [];
+				for (ref => identity in fallbackInstances) if (!scanSeen.exists(identity)) retiredFallback.push(ref);
+				for (ref in retiredFallback) { fallbackInstances.remove(ref); fallbackCount--; }
+				for (cached in targeted) if (cached.instanceId.length > 0 && !scanSeen.exists(cached.instanceId)) {
+					setGone(cached); stamps.remove(cached.instanceId);
+				}
+				for (i in 0...count) {
+					var row=snaps[i];
+					if (row.instanceId.length > 0 && !scanSeen.exists(row.instanceId)) {
+						setGone(row); stamps.remove(row.instanceId);
+					}
+				}
 				work.discoveryCompletions++;
 				discoveryCompletedThisPass = true;
 			} else scanComplete = false;
@@ -472,13 +497,36 @@ class AuraStatusCache {
 		domainKnown = domainKnown && !scanActive && scanComplete;
 	}
 
+	static function serviceTooltipHint(hero:Dynamic,arr:Dynamic,now:Float):Void {
+		var cache=solarflare.statusboard.StatusBoardTooltipCache;
+		var id=cache.due(now); var index=cache.indexOf(id);
+		var len=FieldWalk.arrayLen(arr,-1);
+		if (id.length == 0 || index<0 || index>=len || index>=MAX || stamp()>=passDeadline) return;
+		var item=FieldWalk.arrayAt(arr,index);
+		work.lastSliceEntries++; work.discoveryEntries++;
+		if (item != null && instanceOf(item,false) == id) cache.observe(item,id,hero,now);
+		else { cache.forgetIndex(id); solarflare.ObserveDemand.statusDiscoveryDirty=true; }
+	}
+	static function finishDiscoveryWork(started:Float):Void {
+		if (work.lastSliceEntries == 0) return;
+		work.discoverySlices++;
+		work.lastSliceSeconds = stamp() - started;
+		if (work.lastSliceEntries > work.maxSliceEntries) work.maxSliceEntries = work.lastSliceEntries;
+		if (work.lastSliceSeconds > work.maxSliceSeconds) work.maxSliceSeconds = work.lastSliceSeconds;
+	}
+	static function readContainer(hero:Dynamic):Dynamic {
+		if (hero == null) return null;
+		#if hl
+		try { var object:ent.GameObject = hero; var container:Dynamic = object.statuses; if (container != null) return container; } catch (_:Dynamic) {}
+		#end
+		var container = FieldWalk.extractObject(hero, "statuses");
+		return container != null ? container : FieldWalk.extractObject(hero, "statusList");
+	}
 	/** Cheap length only — no per-status FieldWalk / SkillRemain. */
 	static function measureContainer(owner:Dynamic):Void {
 		containerLength = -1;
 		domainKnown = false;
-		var arr = FieldWalk.extractObject(owner, "statuses");
-		if (arr == null)
-			arr = FieldWalk.extractObject(owner, "statusList");
+		var arr = readContainer(owner);
 		if (arr == null)
 			return;
 		var len = FieldWalk.arrayLen(arr, -1);
@@ -509,7 +557,7 @@ class AuraStatusCache {
 		while (i < count) {
 			var s = snaps[i];
 			if (s != null && s.id.length > 0 && matches(s, want))
-				stamps.remove(s.id.toLowerCase() + (s.sourceItemId.length > 0 ? ":" + s.sourceItemId.toLowerCase() : ""));
+				stamps.remove(stampKey(s));
 			i++;
 		}
 	}
@@ -575,6 +623,8 @@ class AuraStatusCache {
 				return null;
 			snap.id = snap.ids[0];
 		}
+		snap.instanceId = instanceOf(item);
+		if (snap.instanceId.length == 0) return null;
 		if ((record == null || !record.sourceResolved) && (solarflare.ObserveDemand.aurasNeedConsumables || solarflare.ObserveDemand.auraBuilderOpen || solarflare.ObserveDemand.statusBoard)) {
 			try {
 				var base:st.skill.BaseSkill = item;
@@ -603,6 +653,10 @@ class AuraStatusCache {
 			snap.stacksKnown = observedStacks >= 0;
 			snap.stacks = observedStacks < 0 ? 0 : observedStacks;
 			applyRemain(snap, item);
+			try {
+				var status:st.skill.Status = item;
+				if (status.removed) { snap.present = false; stamps.remove(stampKey(snap)); }
+			} catch (_:Dynamic) { snap.known = false; }
 			if (record != null) {
 				record.lastReadAt = stamp(); record.stacks = snap.stacks; record.stacksKnown = snap.stacksKnown;
 				record.state = snap.known ? "live" : "unknown";
@@ -611,6 +665,13 @@ class AuraStatusCache {
 		if (snap.known && !snap.present) {
 			// Keep known-absent row for typed ids; do not count as active.
 			snap.stacks = 0;
+		}
+		if (solarflare.ObserveDemand.statusBoard) {
+			try { var native:st.skill.Status=item; snap.nativeTimerEligible=native.canElapsedStop(); } catch (_:Dynamic) {}
+			try { var native:st.skill.Status=item; snap.nativeProgressVisible=native.duration>0; } catch (_:Dynamic) {}
+			if (snap.stacksKnown) snap.nativeStacksVisible=solarflare.statusboard.StatusBoardNativeRules.stacks(item,snap.stacks);
+			if (snap.known && snap.present && stamp()<passDeadline)
+				solarflare.statusboard.StatusBoardTooltipCache.observe(item,snap.instanceId,sampledHero,stamp());
 		}
 		var existing = findExistingSnap(snap);
 		if (existing != null) {
@@ -698,7 +759,7 @@ class AuraStatusCache {
 		rowsApplied.set(stampKey(row), row);
 		var key = row.id.toLowerCase();
 		var exact = rowsExact.get(key);
-		if (exact == null || !exact.present || row.present) rowsExact.set(key, row);
+		if (exact == null || (!exact.present && row.present)) rowsExact.set(key, row);
 		for (alias in row.idsLower) {
 			var old = rowsAlias.get(alias);
 			if (old == null || !old.present) rowsAlias.set(alias, row);
@@ -746,7 +807,30 @@ class AuraStatusCache {
 	}
 
 	static function stampKey(snap:AuraStatusSnap):String {
+		if (snap.instanceId.length > 0) return snap.instanceId;
 		return snap.id.toLowerCase() + (snap.sourceItemId.length > 0 ? ":" + snap.sourceItemId.toLowerCase() : "");
+	}
+	static function instanceOf(item:Dynamic,create:Bool=true):String {
+		#if hl
+		try {
+			var base:st.BaseState = item;
+			var uid = base.__uid;
+			if (uid != 0) return generation + ":uid:" + haxe.Int64.toStr(uid);
+		} catch (_:Dynamic) {}
+		#else
+		try {
+			var uid:haxe.Int64 = FieldWalk.extractObject(item, "__uid");
+			if (uid != null && uid != 0) return generation + ":uid:" + haxe.Int64.toStr(uid);
+		} catch (_:Dynamic) {}
+		#end
+		var identity = fallbackInstances.get(item);
+		if (identity == null) {
+			if (!create) return "";
+			if (fallbackCount >= MAX) return "";
+			identity = generation + ":local:" + (++nextInstance);
+			fallbackInstances.set(item, identity); fallbackCount++;
+		}
+		return identity;
 	}
 
 	static function pruneAbsentStamps():Void {
@@ -838,6 +922,7 @@ class AuraStatusCache {
 	}
 
 	static function copySnap(dst:AuraStatusSnap, src:AuraStatusSnap):Void {
+		dst.instanceId = src.instanceId;
 		dst.id = src.id;
 		dst.sourceItemId = src.sourceItemId; dst.sourceItemKnown = src.sourceItemKnown;
 		dst.ids.resize(0);
@@ -850,6 +935,8 @@ class AuraStatusCache {
 		}
 		dst.stacks = src.stacks;
 		dst.stacksKnown = src.stacksKnown;
+		dst.nativeTimerEligible = src.nativeTimerEligible; dst.nativeStacksVisible = src.nativeStacksVisible;
+		dst.nativeProgressVisible = src.nativeProgressVisible;
 		dst.known = src.known;
 		dst.present = src.present;
 		dst.durationKnown = src.durationKnown;
@@ -861,6 +948,7 @@ class AuraStatusCache {
 		dst.stampSource = src.stampSource;
 	}
 
+	static var queryScratch = new AuraStatusSnap();
 	static function lookupTyped(want:String):AuraStatusSnap {
 		var hero = sampledHero;
 		if (hero == null)
@@ -893,38 +981,12 @@ class AuraStatusCache {
 				}
 			}
 			if (snap == null) {
-				// Merge into any walked row that already aliases this demand id.
-				var existing = findByWant(want);
-				if (existing == null) {
-					// A native miss for this kind must not erase a live observation discovery still retains (the
-					// demanded id can be an alias of the applied kind). Publish a copy; discovery stays untouched.
-					var retained = liveDiscovered(want);
-					if (retained != null) {
-						existing = allocSnap();
-						copySnap(existing, retained);
-						count++;
-					}
-				}
-				if (existing != null) {
-					pushId(existing, want);
-					snap = existing;
-				} else {
-					snap = allocSnap();
-					snap.id = want;
-					pushId(snap, want);
-					snap.present = false;
-					snap.stacks = 0;
-					count++;
-				}
+				snap = queryScratch; snap.clear(); snap.id = want; pushId(snap, want);
+				snap.present = false;
 			}
 		} catch (_:Dynamic) {
-			snap = allocSnap();
-			snap.id = want;
-			pushId(snap, want);
-			snap.known = false;
-			snap.present = false;
-			snap.stacks = 0;
-			count++;
+			snap = queryScratch; snap.clear(); snap.id = want; pushId(snap, want);
+			snap.known = false; snap.present = false;
 		}
 		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed() && snap != null) {
@@ -952,7 +1014,7 @@ class AuraStatusCache {
 				);
 		}
 		#end
-		if (snap != null) indexRow(snap);
+		if (snap != null && snap.instanceId.length > 0) indexRow(snap);
 		return snap;
 	}
 

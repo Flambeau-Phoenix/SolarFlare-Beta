@@ -2,228 +2,106 @@ package solarflare.barter;
 import solarflare.barter.BarTerWeaponLayouts.BarTerNativeSkill;
 import solarflare.geaux.GeauxCache;
 
-/** Observe-only effective native bindings, associated with real HUD actions. */
+/** Fixed native-action observation. Catalog/icon aliases never establish presence. */
 class BarTerNativeKeys {
  public static var skills:Array<BarTerNativeSkill>=[];
+ public static var records:Array<BarTerNativeSkill>=[];
  public static var known:Bool=false;
- static var aliases:Map<String,String>=new Map();
- static var mouseKeys:Map<Int,String>=new Map();
+ public static var weaponReadable:Bool=false;
+ public static var classReadable(default,null):Bool=false;
+ public static var signatureReadable(default,null):Bool=false;
+ public static var classBoundary(default,null):BarTerClassSlots.BarTerClassBoundary=null;
+ public static var ownerGeneration(default,null):Int=0;
+ public static var observationGeneration(default,null):Int=0;
+ public static var epoch(default,null):Int=0;
+ public static var lastEntries(default,null):Int=0;
+ public static var lastSeconds(default,null):Float=0;
+ public static var maxSeconds(default,null):Float=0;
+ static var owner:Dynamic;
+ static var ownerKey:String="";
  static var lastRead:Float=-1;
+ static var byAction:Map<String,BarTerNativeSkill>=new Map();
+ static var aliases:Map<String,String>=new Map();
  static var lastSeen:Map<String,Float>=new Map();
- public static function reset():Void { skills.resize(0); aliases.clear(); lastSeen.clear(); known=false; lastRead=-1; }
- /**
-  * True when the worn loadout does not provide this native action (weapon swap, empty slot).
-  * Grace period keeps a cell on screen across the engine's brief array refreshes.
-  */
- public static function actionAbsent(action:String,now:Float):Bool {
-  // Only weapon-bound actions change with the worn loadout; class skills never hide.
-  if (!(action == "Attack" || action == "Secondary" || StringTools.startsWith(action,"WeaponSkill"))) return false;
-  if (!known || BarTerNativeKeys.action(action) != null) return false;
-  var seen=lastSeen.get(action);
-  return seen == null || now-seen > 1.5;
+ public static inline var HOLD_S:Float=1.5;
+ public static function reset():Void {
+  skills.resize(0); records.resize(0); byAction.clear(); aliases.clear(); lastSeen.clear(); owner=null; ownerKey=""; known=weaponReadable=false; lastRead=-1; ownerGeneration++; epoch++;
+  solarflare.input.NativeActionBindings.reset();
+  classReadable=signatureReadable=false; classBoundary=null;
  }
- /** Seconds a previously reported action survives a sample that no longer reports it (engine skill-array rebuilds). */
- public static inline var HOLD_S:Float = 1.5;
- /**
-  * Actions reported by the previous sample, missing from this one, and last seen within `hold` seconds.
-  * `refreshSkills` empties and refills the hero's skill lists in one engine call, so a sample can briefly miss
-  * skills that are still equipped; a real swap replaces the action's skill or lets it expire after the hold.
-  */
- public static function carryForward(previous:Array<BarTerNativeSkill>,current:Array<BarTerNativeSkill>,
-   seen:Map<String,Float>,now:Float,hold:Float):Array<BarTerNativeSkill> {
-  var kept:Array<BarTerNativeSkill>=[];
-  for (p in previous) {
-   if (p.action.length == 0) continue;
-   var present=false;
-   for (c in current) if (c.action == p.action) { present=true; break; }
-   if (present) continue;
-   var at=seen.get(p.action);
-   if (at != null && now-at <= hold) kept.push(p);
-  }
-  return kept;
- }
- public static function sample(now:Float,force:Bool=false):Void {
-  if (!force && now-lastRead < 0.5) return;
-  lastRead=now;
-  var previous=skills.copy(); var previousAliases=aliases.copy(); var seenBefore=lastSeen.copy();
-  // Actions the bar policy deliberately rejected this sample (a basic combo attack): a decision, never a gap to hold.
-  var declined:Map<String,Bool>=new Map();
-  // Each action's resolved skill, so an actionless HUD snap that is the same skill under another id inherits its action.
-  var actionSkills:Array<{action:String,id:String,skill:Dynamic}>=[];
-  skills.resize(0); aliases.clear(); known=false;
+ public static function sample(now:Float,force:Bool=false,loadoutKey:String="",transition:Bool=false):Void {
   var hero:Dynamic=solarflare.HealthCache.localHero;
-  if (hero == null) return;
-  if (!mouseKeys.keys().hasNext()) {
-   try {
-    var type=HlxRuntime.resolveType("hxd.Key");
-    for (entry in [{name:"MOUSE_LEFT",label:"LMB"},{name:"MOUSE_RIGHT",label:"RMB"},
-     {name:"MOUSE_MIDDLE",label:"MMB"},{name:"MOUSE_BACK",label:"Mouse4"},{name:"MOUSE_FORWARD",label:"Mouse5"}]) {
-     var code:Null<Int>=HlxRuntime.resolveStaticField(type,entry.name);
-     if (code != null) mouseKeys.set(code,entry.label);
+  if (hero!=owner) { reset(); owner=hero; }
+  if (loadoutKey!=ownerKey) { ownerKey=loadoutKey; epoch++; lastRead=-1; }
+  if (!force && now-lastRead<(transition ? 0.1 : 0.5)) return;
+  lastRead=now; observationGeneration++; skills.resize(0); records.resize(0); aliases.clear(); known=false; weaponReadable=true;
+  var started=haxe.Timer.stamp(); lastEntries=0;
+  BarTerSignatureSlot.beginPass(); signatureReadable=false;
+  if (hero==null) { byAction.clear(); weaponReadable=false; return; }
+  var classes=BarTerClassSlots.read(hero);
+  classReadable=true;
+  for (actionName in BarTerWeaponLayouts.ACTIONS) {
+   var previous=byAction.get(actionName);
+   var native=BarTerNativeAccess.read(hero,actionName,classes); lastEntries++;
+   var state=native.readable ? (native.base==null && native.effective==null ? "absent" : "present") : "unreadable";
+   if (BarTerWeaponLayouts.weapon(actionName) && state=="unreadable") weaponReadable=false;
+   var row:BarTerNativeSkill={action:actionName,id:"",baseId:"",label:"",icon:"",keyText:"Unknown",keyKnown:false,availability:state,fresh:state=="present",ownerGeneration:ownerGeneration,observationGeneration:observationGeneration,loadoutKey:loadoutKey,selectedId:native.selectedId==null ? "" : native.selectedId,source:native.source==null ? "" : native.source,reason:native.reason==null ? "" : native.reason};
+   if (state=="present") {
+    row.baseId=BarTerNativeAccess.definition(native.base);
+    row.id=BarTerNativeAccess.definition(native.effective);
+    row.icon=GeauxCache.getSkillId(native.effective);
+    if (row.id.length==0 || native.base!=null && row.baseId.length==0 || !GeauxCache.isBarSkillId(row.icon)) { row.availability="unreadable"; row.fresh=false; row.reason="presentation_identity_unreadable"; if (BarTerWeaponLayouts.weapon(actionName)) weaponReadable=false; }
+    else {
+     var name=solarflare.cdb.AuraCatalog.label(row.icon); row.label=name.length>0 ? name : row.id;
+     lastSeen.set(actionName,now); known=true;
+     GeauxCache.observeNativeSkill(native.effective,row.id);
+     addAlias(row.id,actionName); addAlias(row.baseId,actionName); addAlias(row.icon,actionName);
+     try { addAlias(solarflare.EngineText.cleanId((cast native.effective:st.skill.Skill).kind),actionName); } catch (_:Dynamic) {}
+     solarflare.ui.GameIcons.get(row.icon);
     }
-   } catch(_:Dynamic) {}
-  }
-  for (pair in GeauxCache.nativeActionPairs) {
-   for (s in GeauxCache.barSnaps()) if (s.present && s.id == pair.id && pair.action.length > 0) {
-    append(pair.action,s.id,s.label,s.iconId); break;
    }
-  }
-  // These are the complete accepted inputs in the current Hero.getSkillByInput.
-  // Use the same script identity as the telemetry cache, never a parallel kind ID.
-  for (actionName in ["WeaponSkill1","WeaponSkill2","WeaponSkill3","WeaponSkill4","Attack","Secondary"]) {
-   try {
-    var h:ent.Hero=cast hero;
-    var skill:st.skill.Skill=h.getSkillByInput(actionName);
-    if (skill == null) continue;
-    var id=GeauxCache.getSkillId(skill);
-    if (id == null || id.length == 0) id=solarflare.EngineText.cleanId(skill.kind);
-    if (id == null || id.length == 0) continue;
-    if (!GeauxCache.isBarSkillId(id)) { declined.set(actionName,true); continue; }
-    var existing=action(actionName);
-    if (existing != null) { existing.id=id; existing.icon=id; existing.label=label(id); }
-    else append(actionName,id,label(id),id);
-    rememberAliases(id,skill);
-    actionSkills.push({action:actionName,id:id,skill:skill});
-   } catch(_:Dynamic) {}
-  }
-  // Class skills, resolved the way Geaux does: hero.skillSlots[N-1] is the skill id shown in HUD slot SkillN
-  // (ent.Hero.getSkillByType with SkillType.Skill). findSkillById + preferScriptId give the same identity
-  // Geaux snapshots use, so the cell finds its cooldown and label.
-  try {
-   var hc:ent.Hero=cast hero;
-   var slots=hc.skillSlots;
-   var count=slots == null ? 0 : slots.length;
-   // refreshSkills empties this local mirror before refilling it. Geaux also reads the replicated
-   // specialization.skillSlots (authoritative, never cleared); do the same when the mirror has a gap.
-   var fallback:Dynamic=null; var fallbackLen=0;
-   try {
-    var spec:Dynamic=HlxRuntime.resolveField(hero,"specialization");
-    var proxy:Dynamic=spec == null ? null : HlxRuntime.resolveField(spec,"skillSlots");
-    fallback=proxy == null ? null : HlxRuntime.resolveField(proxy,"array");
-    fallbackLen=fallback == null ? 0 : fallback.length;
-   } catch(_:Dynamic) { fallback=null; fallbackLen=0; }
-   var wanted=count < fallbackLen ? fallbackLen : count;
-   for (n in 0...(wanted < 4 ? wanted : 4)) {
-    var slotId=n < count ? GeauxCache.sanitizeSkillId(slots.getDyn(n)) : "";
-    if (slotId.length == 0 && n < fallbackLen) slotId=GeauxCache.sanitizeSkillId(fallback.getDyn(n));
-    if (slotId.length == 0) continue;
-    var skill:Dynamic=GeauxCache.findSkillById(hero,slotId);
-    var id=skill != null ? GeauxCache.preferScriptId(slotId,skill) : slotId;
-    id=GeauxCache.sanitizeSkillId(id);
-    if (id.length > 0 && !GeauxCache.isBarSkillId(id)) declined.set("Skill"+(n+1),true);
-    if (id.length == 0 || !GeauxCache.isBarSkillId(id)) continue;
-    var actionName="Skill"+(n+1);
-    var existing=action(actionName);
-    if (existing != null) { existing.id=id; existing.icon=id; existing.label=label(id); }
-    else append(actionName,id,label(id),id);
-    if (skill != null) { rememberAliases(id,skill); actionSkills.push({action:actionName,id:id,skill:skill}); }
+   if (row.availability=="unreadable" && previous!=null && previous.ownerGeneration==ownerGeneration && (!BarTerWeaponLayouts.weapon(actionName) || previous.loadoutKey==loadoutKey) && previous.id.length>0) {
+    var at=lastSeen.get(actionName);
+    if (at!=null && now-at<=HOLD_S) { row.id=previous.id; row.baseId=previous.baseId; row.icon=previous.icon; row.label=previous.label; }
    }
-  } catch(_:Dynamic) {}
-  // Signature skill (the T slot), from Geaux's own signature list: the HUD walk does not always surface it,
-  // and without it the skill is neither listed, auto-populated nor polled for its cooldown.
-  for (sig in GeauxCache.signatures) {
-   if (sig == null || !sig.present || sig.id == null || sig.id.length == 0 || !GeauxCache.isBarSkillId(sig.id)) continue;
-   if (find(sig.id) != null) continue;
-   var owner=ownerOf(sig.id,actionSkills);
-   if (owner != null) { aliases.set(sig.id,owner.id); continue; }
-   append(inputOf(sig.id,sig.nativeActionId),sig.id,label(sig.id),sig.iconId == null ? "" : sig.iconId);
-  }
-  // Missing input metadata does not remove an observed skill or its cooldown. A snap that is the same skill as an
-  // action's (script id vs kind id) is that action, not a second cell with an unknown key.
-  for (s in GeauxCache.barSnaps()) if (s.present && find(s.id) == null) {
-   var owner=ownerOf(s.id,actionSkills);
-   if (owner != null) { aliases.set(s.id,owner.id); continue; }
-   append(inputOf(s.id,s.nativeActionId),s.id,s.label,s.iconId);
-  }
-  for (s in skills) {
-   rememberAliases(s.id,GeauxCache.liveSkill(s.id));
-   if (s.action.length > 0) { known=true; lastSeen.set(s.action,now); }
-  }
-  // Hold actions a rebuild momentarily hid. Only a partial gap qualifies: a sample with no action identity at
-  // all stays uncertified and unpadded (BarTerNativeObservationTest). Held entries do not refresh lastSeen, so
-  // they expire on their own.
-  if (known) for (p in carryForward(previous,skills,seenBefore,now,HOLD_S)) {
-   if (declined.exists(p.action)) continue;
-   skills.push(p);
-   for (kind => id in previousAliases) if (id == p.id && !aliases.exists(kind)) aliases.set(kind,id);
-  }
-  skills=BarTerWeaponLayouts.populationOrder(skills);
- }
- /** The real input kind (CDB input sheet) for a skill whose HUD slot did not report one. */
- static function inputOf(id:String,hinted:String):String {
-  if (hinted != null && hinted.length > 0) return hinted;
-  if (GeauxCache.isSignatureId(id,null)) return "SignatureSkill";
-  if (id == "Dash_Base" || StringTools.startsWith(id,"Dash_")) return "Dash";
-  return "";
- }
- static function ownerOf(id:String,list:Array<{action:String,id:String,skill:Dynamic}>):{action:String,id:String,skill:Dynamic} {
-  for (e in list) {
-   if (e.id == id) return e;
-   if (e.skill != null) { try { if (GeauxCache.skillMatches(cast e.skill,id)) return e; } catch(_:Dynamic) {} }
-  }
-  return null;
- }
- static function label(id:String):String {
-  var text=solarflare.cdb.AuraCatalog.label(id); return text.length > 0 ? text : id;
- }
- static function rememberAliases(id:String,skill:Dynamic):Void {
-  if (skill == null) return;
-  try {
-   var typed:st.skill.Skill=cast skill;
-   var kind=solarflare.EngineText.cleanId(typed.kind);
-   if (kind.length > 0) aliases.set(kind,id);
-  } catch(_:Dynamic) {}
- }
- static function append(action:String,id:String,text:String,icon:String):Void {
-  var binding=action.length > 0 ? readBinding(action) : {text:"Unknown",known:false};
-  var iconId=icon.length > 0 ? icon : id; solarflare.ui.GameIcons.get(iconId);
-  skills.push({action:action,id:id,label:text.length > 0 ? text : id,icon:iconId,keyText:binding.text,keyKnown:binding.known});
- }
- /**
-  * One plain key per action. The engine lets a player pick a single key with no modifiers, so only the
-  * first keyboard/mouse binding is read (gamepad entries have no code). lib.Input.getBindingText is
-  * not used: it returns "?" for any action that also has a gamepad binding.
-  */
- static function readBinding(action:String):{text:String,known:Bool} {
-  try {
-   var bindings=lib.Input.getBindings(action);
-   if (bindings == null || bindings.length < 0 || bindings.length > 32) return {text:"Unknown",known:false};
-   // getBindings returns a shared scratch array; consume it before another call.
-   for (i in 0...bindings.length) {
-    var raw=bindings.getDyn(i);
-    if (raw == null) continue;
-    var code:Null<Int>=HlxRuntime.resolveField(raw,"code");
-    if (code == null) continue;
-    var key="";
-    try key=solarflare.EngineText.cleanId(lib.Input.getKeyName(code)) catch(_:Dynamic) {}
-    if (key.length == 0 || key == "?") key=mouseKeys.exists(code) ? mouseKeys.get(code) : plainKeyName(code);
-    if (key.length > 0) return {text:key,known:true};
+   if (row.id.length>0) {
+    var b=solarflare.input.NativeActionBindings.read(actionName,hero,now); row.keyText=b.text; row.keyKnown=b.known;
+    skills.push(row);
    }
-   return {text:"Unbound",known:true};
-  } catch(_:Dynamic) { return {text:"Unknown",known:false}; }
+   records.push(row); byAction.set(actionName,row);
+   if(actionName=="SignatureSkill") signatureReadable=row.availability!="unreadable";
+   if(StringTools.startsWith(actionName,"Skill") && row.availability=="unreadable") classReadable=false;
+  }
+  classBoundary={replicatedType:classes.replicated.arrayType,replicatedReadable:classes.replicated.readable,replicatedCount:classes.replicated.count,mirrorType:classes.mirror.arrayType,mirrorReadable:classes.mirror.readable,mirrorIds:[for(raw in classes.mirror.values) solarflare.EngineText.cleanId(raw)],itemReads:BarTerClassSlots.itemReads,getterCalls:BarTerClassSlots.getterCalls};
+  lastSeconds=haxe.Timer.stamp()-started; if (lastSeconds>maxSeconds) maxSeconds=lastSeconds;
+  #if hl
+  var metrics=solarflare.runtime.RuntimeMetrics;
+  metrics.barterNativeSamples++; metrics.barterNativeEntries=lastEntries; metrics.barterNativeMs=lastSeconds*1000;
+  if (metrics.barterNativeMs>metrics.barterNativeMaxMs) metrics.barterNativeMaxMs=metrics.barterNativeMs;
+  #end
  }
- /** Last resort for codes the engine localizer cannot name (hxd.Key codes are ASCII for letters/digits). */
- static function plainKeyName(code:Int):String {
-  if (code >= 65 && code <= 90) return String.fromCharCode(code);
-  if (code >= 48 && code <= 57) return String.fromCharCode(code);
-  if (code >= 112 && code <= 123) return "F"+(code-111);
-  if (code >= 96 && code <= 105) return "Num"+(code-96);
-  return switch(code) {
-   case 32: "Space"; case 9: "Tab"; case 13: "Enter"; case 27: "Esc"; case 16: "Shift"; case 17: "Ctrl"; case 18: "Alt";
-   case 37: "Left"; case 38: "Up"; case 39: "Right"; case 40: "Down";
-   default: "";
-  };
+ /** Explicit check only, prepared in observe. No engine objects or raw native identifiers. */
+ public static function checkReport():String return haxe.Json.stringify({schema:"solarflare.barter-native-check.v1",boundary:
+  #if hl "HashLink/HLX" #else "fixture" #end
+  ,ownerGeneration:ownerGeneration,observationGeneration:observationGeneration,weaponReadable:weaponReadable,classReadable:classReadable,classBoundary:classBoundary,
+  signatureBoundary:{skillType:BarTerSignatureSlot.TYPE,index:0,readable:signatureReadable,getterCalls:BarTerSignatureSlot.getterCalls},
+  entries:[for(r in records) {action:r.action,selectedId:r.selectedId,baseId:r.baseId,effectiveId:r.id,label:r.label,key:r.keyText,keyKnown:r.keyKnown,availability:r.availability,fresh:r.fresh,source:r.source,reason:r.reason}]},null,"  ");
+ static function addAlias(id:String,action:String):Void {
+  if (id==null || id.length==0) return;
+  var existing=aliases.get(id); if (existing==null) aliases.set(id,action); else if (existing!=action) aliases.set(id,"");
  }
  public static function find(id:String):BarTerNativeSkill {
-  var exact=BarTerBindingResolver.find(id,skills); if (exact != null) return exact;
-  return aliases.exists(id) ? BarTerBindingResolver.find(aliases.get(id),skills) : null;
+  var actionName=aliases.get(id); return actionName==null || actionName.length==0 ? null : byAction.get(actionName);
  }
  public static function resolve(id:String,actionId:String):BarTerNativeSkill {
-  var canonical=aliases.exists(id) ? aliases.get(id) : id;
-  return BarTerBindingResolver.resolve(canonical,actionId,skills);
+  if (actionId.length>0) return action(BarTerWeaponLayouts.normalize(actionId));
+  return find(id);
  }
- public static function action(action:String):BarTerNativeSkill {
-  for (s in skills) if (s.action == action) return s;
-  return null;
+ public static function action(name:String):BarTerNativeSkill { var row=byAction.get(name); return row!=null && row.id.length>0 ? row : null; }
+ public static function actionAbsent(name:String,now:Float):Bool { var r=byAction.get(BarTerWeaponLayouts.normalize(name)); return r!=null && r.id.length==0; }
+ public static function current(name:String,id:String):Bool { var r=action(name); return r!=null && r.fresh!=false && r.availability=="present" && r.ownerGeneration==ownerGeneration && r.loadoutKey==ownerKey && (id==r.id || id==r.baseId || find(id)==r); }
+ /** Legacy pure helper retained for downstream tests; production retention also checks owner/loadout. */
+ public static function carryForward(previous:Array<BarTerNativeSkill>,current:Array<BarTerNativeSkill>,seen:Map<String,Float>,now:Float,hold:Float):Array<BarTerNativeSkill> {
+  var out:Array<BarTerNativeSkill>=[]; for (p in previous) { var found=false; for (c in current) if (c.action==p.action) found=true; var at=seen.get(p.action); if (!found && at!=null && now-at<=hold) out.push(p); } return out;
  }
 }

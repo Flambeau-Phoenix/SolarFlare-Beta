@@ -160,6 +160,27 @@ class GeauxCache {
 	static var barBtnById:Map<String, Dynamic> = new Map();
 	/** Cached HUD bar roots after first successful resolve — skip full HUD crawl on later layouts. */
 	static var cachedBarRoots:Array<Dynamic> = null;
+	/** Observer-owned typed slot descriptors, retained across native strip visibility changes. */
+	static var nativeSlots:Map<String,Dynamic>=new Map();
+	static var nativeSlotTypes:Map<String,hl.Type>=new Map();
+	public static function nativeSlotSkill(action:String,hero:Dynamic):{readable:Bool,base:Dynamic,effective:Dynamic} {
+		var node=nativeSlots.get(action);
+		if (node==null || hero==null) return {readable:false,base:null,effective:null};
+		return solarflare.barter.BarTerNativeSlotAccess.read(node,action,hero);
+	}
+	static function captureNativeSlot(node:Dynamic):Void {
+		#if hl
+		try {
+			var type=hl.Type.getDynamic(node); var wanted=nativeSlotTypes.get("ui.hud.SkillSlotButton"); var valid=false;
+			if (wanted!=null) valid=type.safeCast(wanted);
+			else { var depth=0; while (type.kind==hl.Type.TypeKind.HObj && depth++<16) { if (type.getTypeName()=="ui.hud.SkillSlotButton") { nativeSlotTypes.set("ui.hud.SkillSlotButton",type); valid=true; break; } type=type.getSuper(); } }
+			if (!valid) return;
+			var slot:ui.hud.SkillSlotButton=node; var input=solarflare.EngineText.cleanId(slot.input);
+			var action=solarflare.barter.BarTerWeaponLayouts.normalize(input);
+			if (action.length>0 && slot.unit==hudHero) nativeSlots.set(action,node);
+		} catch (_:Dynamic) {}
+		#end
+	}
 	static var iconCandidatesCache:Map<String, Array<String>> = new Map();
 	static var cdMaxFieldWin:String = "";
 	static var cdPoll = new GeauxCdPoll();
@@ -319,6 +340,7 @@ class GeauxCache {
 
 	/** Drop cached HUD roots (zone unload / hero change). Next layout rediscovers. */
 	public static function invalidateBarRoots():Void {
+		nativeSlots.clear();
 		clearReadyFlashes();
 		cachedBarRoots = null;
 	}
@@ -360,6 +382,7 @@ class GeauxCache {
 			costsKnown = new Map();
 			costSpecsById = new Map();
 			cachedBarRoots = null;
+			nativeSlots.clear();
 			layoutDirty = true;
 			layoutHero = null;
 			layoutCount = -1;
@@ -723,6 +746,9 @@ class GeauxCache {
 	public static function barSnaps():Array<GeauxSlotSnap> {
 		return weapons;
 	}
+	public static function observeNativeSkill(skill:Dynamic,id:String):Void {
+		if (solarflare.barter.BarTerNativeAccess.owned(skill,solarflare.HealthCache.localHero)) rememberSkill(skill,id);
+	}
 
 	/** True while any BarTer-polled skill is on cooldown (drives ObserveDemand.dueBarTer hot). */
 	public static function barTerHot():Bool {
@@ -761,7 +787,9 @@ class GeauxCache {
 			availWeaponsLen = weapons.length;
 			availStaticGen = staticGen;
 		}
-		for (id in solarflare.ObserveDemand.barterSkillIds) {
+		var demanded=solarflare.ObserveDemand.barterSkillIds.copy();
+		for (native in solarflare.barter.BarTerNativeKeys.skills) if (native.fresh!=false && native.id.length>0 && demanded.indexOf(native.id)<0) demanded.push(native.id);
+		for (id in demanded) {
 			if (id == null || id.length == 0) continue;
 			// Large grids may contain the entire catalog. Only observed native actions
 			// are available in BarTer, so inactive assignments never pay native CD polls.
@@ -781,6 +809,7 @@ class GeauxCache {
 					if (!available && bookIds.indexOf(id) >= 0) available = true;
 				availMemo.set(id, available);
 			}
+			for (native in solarflare.barter.BarTerNativeKeys.skills) if (native.id==id && native.fresh!=false) { available=true; break; }
 			if (!available) continue;
 			var snap = barTerPool.get(id);
 			if (snap == null) {
@@ -1361,6 +1390,7 @@ class GeauxCache {
 	static function ingestAnyBarSlot(node:Dynamic):Void {
 		if (node == null || hudHero == null)
 			return;
+		captureNativeSlot(node);
 
 		// Typed wrappers first — arsenal / weapon strip skills live on WeaponSkillSlotButton,
 		// class strip on SkillSlotButton; the live Skill is often only on getOverrideSkill().
@@ -1517,6 +1547,9 @@ class GeauxCache {
 			isSignatureMem = resolveMem("st.skill.BaseSkill", "isSignature");
 		if (byInputMem == null)
 			byInputMem = resolveMem("ent.Hero", "getSkillByInput");
+		var native=nativeSlotSkill("SignatureSkill",hero);
+		if (native.readable && native.base!=null)
+			pushSkillSnap(hero,signatures,native.base,getSkillId(native.base),"SIG");
 
 		// Signature inputs are not accepted by the installed Hero.getSkillByInput (see skillByInput); the
 		// guarded lookup keeps this working on a build that accepts them without a throw per call.
@@ -1570,8 +1603,7 @@ class GeauxCache {
 		}
 
 		ensureSignatureHashes();
-		for (id in CLASS_SIGNATURE_SCRIPTS)
-			forceSignature(hero, id);
+		// A list of possible class signatures is catalog knowledge, never evidence of ownership.
 		if (solarflare.PrayerCache.active)
 			forceSignature(hero, solarflare.PrayerCache.judgmentId());
 	}
@@ -1658,6 +1690,7 @@ class GeauxCache {
 			skill = findSkillById(hero, id);
 		if (skill == null && scriptId.length > 0)
 			skill = findSkillById(hero, scriptId);
+		if (!solarflare.barter.BarTerNativeAccess.owned(skill,hero) || !skillMatches(cast skill,id)) return;
 		// Prefer script id so GameIcons hits Warrior_Rage_Strike.png / Mage_RayOfSpark.png / etc.
 		var storeId = scriptId;
 		var resolved = getSkillId(skill);
@@ -1794,6 +1827,7 @@ class GeauxCache {
 			skill = findSkillById(hero, id);
 		if (skill == null)
 			skill = skillOverride(hero, id);
+		if (group=="SIG" && (!solarflare.barter.BarTerSignaturePolicy.present(hero,skill) || !skillMatches(cast skill,id))) return;
 		// Weapon / class / HUD paths must keep skills the vanilla bar still shows.
 		var prevTrust = trustHudSkills;
 		if (group == "BAR" || group == "WEP" || group == "CLS")

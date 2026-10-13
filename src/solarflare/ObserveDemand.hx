@@ -196,7 +196,7 @@ class ObserveDemand {
 				for (i in 0...b.slotCount) {
 					var slot = b.slots[i];
 					if (slot == null) continue;
-					if (slot.hasSkill()) pushBarTerSkillId(slot.skillId);
+					if (slot.hasSkill() && slot.nativeActionId.length==0) pushBarTerSkillId(slot.skillId);
 					if (slot.hasStatus() && barterStatusIds.indexOf(slot.statusId) < 0) barterStatusIds.push(slot.statusId);
 				}
 			}

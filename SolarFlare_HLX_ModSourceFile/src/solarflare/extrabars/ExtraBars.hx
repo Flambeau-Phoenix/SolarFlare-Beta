@@ -135,6 +135,7 @@ class ExtraBars {
 		builder.clearTransientState();
 	}
 	public function clearSession():Void {
+		solarflare.input.NativeConsumableBindings.reset();
 		clearTransientState(); ExtraBarsNativeInput.shutdown(); previousHero = null; signature = ""; views.clear(); countChecks = []; spark.reset();
 		for (item in catalog) { item.count = 0; item.known = false; item.owned = false; }
 	}
@@ -195,6 +196,7 @@ class ExtraBars {
 		assignments.rebuild(model);
 		gate = blockReason(app, controller, hero); if (ExtraBarsKeyMap.error.length > 0) gate = "Key resolution failed: " + ExtraBarsKeyMap.error;
 		ConsumableCache.sample(hero, now);
+		solarflare.input.NativeConsumableBindings.sample(hero, now);
 		if (now - lastSample >= 0.25) {
 			lastSample = now; for (item in catalog) { var snap = ConsumableCache.find(item.id); item.count = snap != null ? snap.count : 0; item.known = snap != null && snap.known; item.owned = item.known && snap.owned; }
 			var remaining = [];
@@ -214,6 +216,10 @@ class ExtraBars {
 					ExtraBarsActivationConfig.prefixLabel(model.prefix) + " / " + ExtraBarsActivationConfig.modeLabel(model.mode) + " / " + ExtraBarsKeyMap.label(assignment.keyCode,0), issue.length > 0 ? issue : gate,
 					ConsumableCache.find(assignment.itemKind), ExtraBarsActivationConfig.badge(model.prefix,model.mode,ExtraBarsKeyMap.keyHint(assignment.keyCode)));
 				frozen.setInputState(false,model.mode); var until = flashes.get(bar.id + ":" + i); frozen.triggerStrength = gate.length == 0 && until != null ? Math.max(0, Math.min(1,(until-now)/0.30)) : 0;
+				if (assignment.itemKind.length > 0) {
+					var native=solarflare.input.NativeConsumableBindings.find(assignment.itemKind);
+					ExtraBarsHotkeyDisplay.apply(frozen,bar.hotkeyDisplay,native.text,native.state,native.actionId,frozen.keyHint);
+				} else { frozen.keyHint=""; frozen.secondaryKeyHint=""; frozen.nativeKeyHint=""; frozen.extraKeyHint=""; }
 				var mapped = ExtraBarsKeyMap.find(assignment.keyCode);
 				if (bar.enabled && i < bar.slotCount && assignment.itemKind.length > 0 && entry != null && mapped != null && issue.length == 0) {
 					routes.push({barId:bar.id,index:i,kind:assignment.itemKind,generation:generation,click:false}); keyTable.setI32(mapped.nativeCode*4,routes.length);

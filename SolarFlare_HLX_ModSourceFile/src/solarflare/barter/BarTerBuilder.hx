@@ -5,6 +5,7 @@ import imgui.Enums.ImGuiChildFlags;
 import imgui.Enums.ImGuiTableColumnFlags;
 import imgui.Enums.ImGuiTableFlags;
 import imgui.Enums.ImGuiWindowFlags;
+import imgui.Enums.ImGuiStyleVar;
 import imgui.ref.BoolRef;
 import imgui.ref.IntRef;
 import solarflare.aura.ConsumableCache;
@@ -43,7 +44,7 @@ class BarTerBuilder {
   ByteUtil.clearBytes(dragBuf,512); nameOwner="";
   editEpoch++; skillSearch.clear(); itemSearch.clear(); ByteUtil.clearBytes(nameBuf,96);
  }
- public function recordChange():Void history.push(owner.dump());
+ public function recordChange():Void history.push(owner.editorSnapshot());
  public function draw():Void {
   if (owner == null || !owner.config.open.get()) return;
   EditorWindow.drawMenuWindow("BarTer###SolarFlare.BarTer.Builder",owner.config.open,1000,860,drawBody);
@@ -97,6 +98,19 @@ class BarTerBuilder {
    ImGui.textWrapped("Right-click a cell to clear it or clear this bar. Replacement keeps consumables and statuses.");
   },8);
   drawNativeStrip(bar);
+  ImGui.textDisabled("Weapon arrangement · "+owner.comboLabel);
+  if (!owner.managedEditsReady) ImGui.textDisabled("Resolving weapon change · native cell moves are paused.");
+  UiLayout.inlinePair("##bt_native_tools",function(w) {
+   ImGui.beginDisabled(!owner.managedEditsReady);
+   try { if (UiChrome.ghostButton("Repair native skill cells##bt_repair",ImGui.vec2(w,28))) owner.requestRepair(); }
+   catch(e:Dynamic) { ImGui.endDisabled(); throw e; }
+   ImGui.endDisabled();
+  },function(w) { if (UiChrome.ghostButton("Check native skills##bt_check_native",ImGui.vec2(w,28))) owner.requestNativeCheck(); });
+  if(owner.nativeCheckSummary.length>0) ImGui.textWrapped(owner.nativeCheckSummary);
+  if(owner.nativeCheckReport.length>0 && UiChrome.groupHeader("Native skill check##bt_native_report",false)) {
+   if(UiChrome.ghostButton("Copy report##bt_copy_native_report",ImGui.vec2(160,26))) solarflare.ui.UiActionQueue.copyText(owner.nativeCheckReport);
+   ImGui.textWrapped(owner.nativeCheckReport);
+  }
   UiScope.table("##bt_catalogs",2,function() {
    ImGui.tableSetupColumn("Skills and statuses",ImGuiTableColumnFlags.WidthStretch,0.6);
    ImGui.tableSetupColumn("Consumables",ImGuiTableColumnFlags.WidthStretch,0.4);
@@ -112,7 +126,9 @@ class BarTerBuilder {
     var clicked=UiChrome.ghostButton(i == 0 ? "Undo##bt_undo" : "Redo##bt_redo",ImGui.vec2(w,28));
     ImGui.endDisabled();
     if (clicked) {
-     var state=i == 0 ? history.undo(owner.dump()) : history.redo(owner.dump());
+     var list=i==0 ? history.past : history.future;
+     var scope=list.length>0 && Std.isOfType(list[list.length-1].editorKey,String) ? list[list.length-1].editorKey : null;
+     var state=i == 0 ? history.undo(owner.editorSnapshot(scope)) : history.redo(owner.editorSnapshot(scope));
      if (state != null) owner.restoreEditorState(state);
     }
    } else if (UiChrome.accentButton("Save##bt_save",ImGui.vec2(w,28))) solarflare.ui.UiActionQueue.save();
@@ -147,12 +163,16 @@ class BarTerBuilder {
  }
  function drawNativeStrip(b:BarTerBarConfig):Void {
   ImGui.textDisabled("Native skills · drag into any cell");
-  UiScope.child("##bt_native_strip",ImGui.vec2(0,60),function() {
+  ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding,ImGui.vec2(BarTerNativePickerLayout.PADDING,BarTerNativePickerLayout.PADDING));
+  ImGui.pushStyleVar(ImGuiStyleVar.ScrollbarSize,BarTerNativePickerLayout.SCROLLBAR);
+  UiScope.child("##bt_native_strip",ImGui.vec2(0,BarTerNativePickerLayout.HEIGHT),function() {
+   var origin=ImGui.getCursorScreenPos();
    var i=0;
    for (s in BarTerNativeKeys.skills) {
-    if (i++ > 0) ImGui.sameLine();
+    if (s.fresh==false) continue;
+    ImGui.setCursorScreenPos(ImGui.vec2(origin.x+BarTerNativePickerLayout.x(i++),origin.y));
     var p=ImGui.getCursorScreenPos();
-    if (ImGui.invisibleButton("##bt_native_"+s.action+"_"+s.id,ImGui.vec2(42,42))) assign(b,selection.cell,"native",s.id,s.action);
+    if (ImGui.invisibleButton("##bt_native_"+s.action,ImGui.vec2(BarTerNativePickerLayout.CELL,BarTerNativePickerLayout.CELL))) assign(b,selection.cell,"native",s.id,s.action);
     var hovered=ImGui.isItemHovered();
     beginSource("native",s.id,s.label,s.action);
     var dl=ImGui.getWindowDrawList();
@@ -161,7 +181,9 @@ class BarTerBuilder {
     if (hovered) ImGui.setTooltip(s.label+"\n"+s.keyText);
    }
    if (i == 0) ImGui.textDisabled("Native skills are not available yet.");
+   else { ImGui.setCursorScreenPos(origin); ImGui.dummy(ImGui.vec2(BarTerNativePickerLayout.width(i),BarTerNativePickerLayout.CELL)); }
   },ImGuiChildFlags.Borders,ImGuiWindowFlags.HorizontalScrollbar);
+  ImGui.popStyleVar(2);
  }
  function drawSkillCatalog(b:BarTerBarConfig):Void {
   UiLayout.inlinePair("##bt_catalog_tabs",function(w) {
@@ -222,7 +244,7 @@ class BarTerBuilder {
   var snap=selection.cell < snaps.length ? snaps[selection.cell] : null;
   UiLayout.propertyGrid("##bt_details",function() {
    UiLayout.propertyRow("Content",function() {
-    ImGui.textWrapped(s.hasStatus() ? "Status · "+s.statusId : s.hasItem() ? "Consumable · "+s.itemKind : s.hasSkill() ? "Skill · "+s.skillId : "Empty");
+    ImGui.textWrapped(s.hasStatus() ? "Status · "+s.statusId : s.hasItem() ? "Consumable · "+s.itemKind : s.nativeActionId.length>0 ? s.nativeActionId+" · "+(snap==null ? "Resolving…" : snap.label) : s.hasSkill() ? "Pinned skill · "+s.skillId : "Empty");
    });
    UiLayout.propertyRow("Binding",function() {
     ImGui.textWrapped(s.hasStatus() ? "Display only" : s.hasSkill() ? (snap == null ? "Unknown" : snap.keyLabel)+" · native keyboard activation" : "No mod hotkey · uses the in-game consumable binding");
@@ -274,7 +296,10 @@ class BarTerBuilder {
    }
    UiLayout.propertyRow("Empty cells",function() { boolRef.set(b.showEmptyCells); if (ImGui.checkbox("Show on HUD##bt_empty",boolRef)) { b.showEmptyCells=boolRef.get(); owner.changed(); } });
    UiLayout.propertyRow("Key chips",function() { if (ImGui.checkbox("Show##bt_chips",owner.config.showHotkeys)) owner.changed(); });
-   UiLayout.propertyRow("Weapon layouts",function() { if (ImGui.checkbox("Follow native skills##bt_follow",owner.config.autoSeedOnWeaponSwap)) owner.changed(); });
+   UiLayout.propertyRow("Weapon layouts",function() {
+    if (ImGui.checkbox("Follow native skills##bt_follow",owner.config.autoSeedOnWeaponSwap)) owner.changed();
+    if (ImGui.isItemHovered()) ImGui.setTooltip("Restore remembered weapon positions and fill missing native actions on weapon changes. Native-action cells show their current skill; assign from the catalog to pin a specific skill.");
+   });
   });
   ImGui.textDisabled("Hidden cells and inactive bars remain saved. Maximum: 3 active bars, 64 cells each.");
  }
@@ -289,15 +314,21 @@ class BarTerBuilder {
  function assign(b:BarTerBarConfig,index:Int,kind:String,id:String,action:String=""):Void {
   if (index < 0 || index >= b.slotCount || id == null || id.length == 0 || id.length > 192) return;
   if (kind != "skill" && kind != "native" && kind != "item" && kind != "status") return;
+  if (!owner.managedEditsReady && (kind=="native" || b.slots[index].nativeActionId.length>0)) { owner.lastStatus="Wait for the weapon change to finish."; return; }
+  var native=kind=="native" ? BarTerNativeKeys.action(action) : null;
+  if (kind=="native" && (native==null || native.fresh==false)) return;
   recordChange(); owner.reserve(b.id,index);
   var s=b.slots[index];
   if (kind == "item") s.assignItem(id);
   else if (kind == "status") s.assignStatus(id);
   else {
    s.assignSkill(id);
-   if (kind == "native") { var n=BarTerBindingResolver.resolve(id,action,BarTerNativeKeys.skills); if (n != null) s.nativeActionId=n.action; }
+   if (kind == "native") {
+    for (bar in owner.config.bars) for (slot in bar.slots) if (slot!=s && slot.nativeActionId==native.action) slot.clearContent();
+    s.assignNative(native.action,native.baseId);
+   }
   }
-  owner.changed();
+  owner.changed(true);
  }
  function beginSource(kind:String,id:String,label:String,action:String=""):Void {
   if (!ImGui.beginDragDropSource()) return;
@@ -329,19 +360,14 @@ class BarTerBuilder {
   if (cell != null && cell.epoch == editEpoch && Std.isOfType(cell.bar,String) && Std.isOfType(cell.index,Int)) {
    var from=owner.config.find(cell.bar);
    if (from != null && owner.config.isActive(from.id) && cell.index >= 0 && cell.index < from.slotCount && !(from.id == b.id && cell.index == index)) {
+    if (!owner.managedEditsReady && (from.slots[cell.index].nativeActionId.length>0 || b.slots[index].nativeActionId.length>0)) { owner.lastStatus="Wait for the weapon change to finish."; return; }
     recordChange();
-    promoteMovedNative(from.slots[cell.index]); promoteMovedNative(b.slots[index]);
     owner.reserve(from.id,cell.index); owner.reserve(b.id,index);
-    owner.config.swap(from.id,cell.index,b.id,index); selection.selectCell(index,b.slotCount); owner.changed();
+    owner.config.swap(from.id,cell.index,b.id,index); selection.selectCell(index,b.slotCount); owner.changed(true);
    }
   }
   if (assignment != null && assignment.epoch == editEpoch && Std.isOfType(assignment.kind,String) && Std.isOfType(assignment.id,String)) {
    assign(b,index,assignment.kind,assignment.id,Std.isOfType(assignment.action,String) ? assignment.action : ""); selection.selectCell(index,b.slotCount);
-  }
- }
- function promoteMovedNative(slot:BarTerSlotConfig):Void {
-  if (slot.hasSkill() && slot.nativeActionId.length == 0) {
-   var native=BarTerNativeKeys.find(slot.skillId); if (native != null) slot.nativeActionId=native.action;
   }
  }
 }

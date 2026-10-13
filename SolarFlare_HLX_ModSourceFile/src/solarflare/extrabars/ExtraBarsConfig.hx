@@ -27,6 +27,7 @@ class ExtraBarsBarConfig {
 	public var rows(get, never):Int;
 	function get_rows():Int return Std.int(Math.ceil(slotCount / columns));
 	public var slotSize:Int = 48;
+	public var hotkeyDisplay:String = "native";
 	public var slots:Array<ExtraBarsSlotConfig> = [];
 	public function new(id:String, name:String) {
 		this.id = id; this.name = name;
@@ -36,7 +37,7 @@ class ExtraBarsBarConfig {
 	public function setColumns(value:Int):Void columns = Std.int(Math.max(1, Math.min(slotCount, value)));
 	public function setRows(value:Int):Void setColumns(Std.int(Math.ceil(slotCount / Math.max(1, Math.min(slotCount, value)))));
 	public function dump():Dynamic return {id:id, name:name, enabled:enabled, hidden:hidden, locked:locked, transparent:transparent,
-		opacity:opacity, slotCount:slotCount, columns:columns, slotSize:slotSize, slots:[for (slot in slots) slot.dump()]};
+		opacity:opacity, slotCount:slotCount, columns:columns, slotSize:slotSize, hotkeyDisplay:hotkeyDisplay, slots:[for (slot in slots) slot.dump()]};
 	public function apply(data:Dynamic):Void {
 		name = ExtraBarsConfig.text(data, "name", name);
 		enabled = Reflect.field(data, "enabled") == true; hidden = Reflect.field(data, "hidden") == true;
@@ -45,6 +46,7 @@ class ExtraBarsBarConfig {
 		setCount(ExtraBarsConfig.integer(data, "slotCount", 8, 1, 10));
 		setColumns(ExtraBarsConfig.integer(data, "columns", 4, 1, 10));
 		slotSize = ExtraBarsConfig.integer(data, "slotSize", 48, 24, 96);
+		hotkeyDisplay = ExtraBarsHotkeyDisplay.clean(ExtraBarsConfig.text(data, "hotkeyDisplay", "native"));
 		var saved = Reflect.field(data, "slots");
 		if (Std.isOfType(saved, Array)) { var rows:Array<Dynamic> = cast saved; for (i in 0...Std.int(Math.min(10, rows.length))) slots[i].apply(rows[i]); }
 	}

@@ -3,6 +3,8 @@
 -resource assets/cdb/aura-quickstart.json@aura-quickstart
 -resource assets/cdb/status-durations.json@status-durations
 -resource assets/cdb/consumables.json@consumables
+-resource assets/cdb/skill-ids.json@skill-ids
+-resource assets/cdb/skill-links.json@skill-links
 -lib farever-gamelib
 -lib hlx-runtime
 -lib hl-imgui

@@ -62,6 +62,8 @@ class ExtraBarsPrototypeBar {
    ImGui.ImDrawList_PathStroke(dl, ImGui.colorConvertFloat4ToU32(theme.accent), 3);
   }
   drawKeyBadge(dl, slot.keyHint, x + 3, y + 2, ImGui.colorConvertFloat4ToU32(edge), pixels - 6);
+  drawKeyBadge(dl, slot.secondaryKeyHint, x + 3, y + pixels - Math.min(12,ImGui.getFontSize()) - 3,
+    ImGui.colorConvertFloat4ToU32(edge), pixels * 0.60 - 5);
   var count = slot.known ? Std.string(slot.count) : "?";
   var textSize = ImGui.calcTextSize(count);
   var countX:Single = x + pixels - 3 - textSize.x;

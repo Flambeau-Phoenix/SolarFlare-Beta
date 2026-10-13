@@ -1,6 +1,8 @@
 ﻿package solarflare.aura;
 
 class AuraStatusSnap {
+	/** Observer-owned applied-object identity; never an engine reference. */
+	public var instanceId:String = "";
 	public var id:String = "";
 	public var sourceItemId:String = "";
 	public var sourceItemKnown:Bool = false;
@@ -8,6 +10,9 @@ class AuraStatusSnap {
 	public var idsLower:Array<String> = [];
 	public var stacks:Int = 0;
 	public var stacksKnown:Bool = false;
+	public var nativeTimerEligible:Bool = false;
+	public var nativeProgressVisible:Bool = false;
+	public var nativeStacksVisible:Bool = false;
 	public var label:String = "";
 	public var iconKey:String = "";
 	public var known:Bool = true;
@@ -28,11 +33,12 @@ class AuraStatusSnap {
 	public function new() {}
 
 	public function clear():Void {
+		instanceId = "";
 		id = ""; sourceItemId = ""; sourceItemKnown = false;
 		ids.resize(0);
 		idsLower.resize(0);
 		stacks = 0;
-		stacksKnown = false; label = ""; iconKey = "";
+		stacksKnown = false; nativeTimerEligible = false; nativeProgressVisible = false; nativeStacksVisible = false; label = ""; iconKey = "";
 		known = true;
 		present = false;
 		durationKnown = false;
