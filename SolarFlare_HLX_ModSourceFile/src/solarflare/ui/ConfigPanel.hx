@@ -53,6 +53,7 @@ class ConfigPanel {
 	static inline var TAB_GETRIFTY:Int = 12;
 	static inline var TAB_SETTINGS:Int = 13;
 	static inline var TAB_UTILITIES:Int = 14;
+	static inline var TAB_NATIVE_UI:Int = 15;
 	public var open:BoolRef;
 	public var vitals:VitalsConfig;
 	public var uiPack:UiPackConfig;
@@ -190,9 +191,7 @@ class ConfigPanel {
 		rebuildInteractiveRegistry();
 		SettingsStore.bind(this);
 		SettingsStore.load(this);
-		// Stray HUD: never leave combo pips enabled from legacy profiles / max_combo auras.
-		if (combo != null)
-			combo.hidden.set(true);
+		// Preserve the resource tracker's saved visibility; only retire legacy aura trackers.
 		if (showCombo != null)
 			showCombo.set(false);
 		if (auras != null)
@@ -531,7 +530,7 @@ class ConfigPanel {
 
 	static var NAV_GROUP_NAMES:Array<String> = ["Display", "Automation", "Tools"];
 	static var NAV_GROUPS:Array<Array<Int>> = [
-		[TAB_RESOURCES, TAB_GEAUX, TAB_BARTER, TAB_EXTRABARS, TAB_ATTACK, TAB_STATUS],
+		[TAB_RESOURCES, TAB_GEAUX, TAB_BARTER, TAB_EXTRABARS, TAB_ATTACK, TAB_STATUS, TAB_NATIVE_UI],
 		[TAB_AURAS, TAB_COMBAT_LOG],
 		[TAB_NOTEBOOK, TAB_LIGHTSABER, TAB_THEME, TAB_GETRIFTY, TAB_UTILITIES, TAB_SETTINGS]
 	];
@@ -550,6 +549,7 @@ class ConfigPanel {
 			case TAB_BARTER: "BarTer";
 			case TAB_GETRIFTY: "GetRifty";
 			case TAB_UTILITIES: "Utilities";
+			case TAB_NATIVE_UI: "Native UI";
 			case TAB_SETTINGS: "Hub Settings";
 			default: "Status Board";
 		}
@@ -622,6 +622,7 @@ class ConfigPanel {
 			case "getrifty": TAB_GETRIFTY;
 			case "settings": TAB_SETTINGS;
 			case "utilities": TAB_UTILITIES;
+			case "nativeui": TAB_NATIVE_UI;
 			default: -1;
 		};
 		if (id < 0) return;
@@ -742,6 +743,7 @@ class ConfigPanel {
 								SettingsStore.markDirty();
 						});
 				}, "Unlock to drag the overlay; resize it from the bottom-right grip.");
+				chrome.drawPositionRow("hub_pos_" + id);
 			}
 		});
 	}
@@ -787,6 +789,8 @@ class ConfigPanel {
 				}
 			case TAB_UTILITIES:
 				drawUtilities();
+			case TAB_NATIVE_UI:
+				NativeUiPanel.draw(nativeHide);
 			case TAB_SETTINGS:
 				drawHubSettings();
 			default:
@@ -834,6 +838,7 @@ class ConfigPanel {
 				if (ImGui.sliderFloat("##tab_aura_tb_row", auras.timerBoardRowH, 16, 64, "%.0f px"))
 					SettingsStore.markDirty();
 			});
+			auras.timerBoardChrome.drawPositionRow("tab_aura_tb_pos");
 		});
 	}
 
@@ -885,6 +890,7 @@ class ConfigPanel {
 						}
 					);
 				}, "Unlock MENU, then drag its sun icon; click to collapse/expand. Resize from the bottom-right grip.");
+				launchers.f6.chrome.drawPositionRow("hub_f6_pos");
 			}
 		});
 
@@ -979,7 +985,7 @@ class ConfigPanel {
 		if (v != null) items.push({id: "rage", label: "Rage Bar", hidden: v.rageHidden});
 		if (v != null) items.push({id: "mana", label: "Mana/Spark", hidden: v.manaHidden});
 		if (v != null) items.push({id: "prayers", label: "Prayers", hidden: v.prayersHidden});
-		if (combo != null) items.push({id: "combo", label: "Combo Points", hidden: combo.hidden});
+		if (combo != null) items.push({id: "combo", label: "Rogue Combo Points", hidden: combo.hidden});
 		if (attackCombo != null) items.push({id: "attack", label: "Combo Tracker", hidden: attackCombo.hidden});
 		if (chaincast != null) items.push({id: "chaincast", label: "Chaincast", hidden: chaincast.hidden});
 		if (conduit != null) items.push({id: "conduit", label: "Conduits", hidden: conduit.hidden});
@@ -1018,6 +1024,10 @@ class ConfigPanel {
 		solarflare.ui.UtilitiesPanel.drawAutoHide();
 		UiChrome.subHeader("Native UI");
 		solarflare.ui.UtilitiesPanel.drawNativeBottomBar(nativeHide);
+		if (UiChrome.ghostButton("More native pieces...##util_native_more", ImGui.vec2(190, 26))) {
+			activeHubTab = TAB_NATIVE_UI;
+			SettingsStore.markDirty();
+		}
 		UiChrome.subHeader("Ground skills");
 		UiLayout.propertyGrid("##hub_res_aim", function() {
 			UiLayout.propertyRow("Instant cast", function() {
@@ -1052,6 +1062,7 @@ class ConfigPanel {
 								SettingsStore.markDirty();
 						});
 				});
+				geaux.chrome.drawPositionRow("hub_geaux_pos");
 			}
 		});
 	}
@@ -1061,7 +1072,7 @@ class ConfigPanel {
 	public function applyProfileUiTab(value:Int):Void {
 		if (value == TAB_NATIVE)
 			activeHubTab = TAB_RESOURCES;
-		else if (value >= TAB_RESOURCES && value <= TAB_UTILITIES)
+		else if (value >= TAB_RESOURCES && value <= TAB_NATIVE_UI)
 			activeHubTab = value;
 	}
 

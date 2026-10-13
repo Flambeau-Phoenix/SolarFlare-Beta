@@ -714,6 +714,11 @@ class GeauxCache {
 		return weapons;
 	}
 
+	/** True when Geaux's book (every skill its builder offers this hero) lists the id. */
+	public static function inBook(id:String):Bool {
+		return id != null && id.length > 0 && bookIds.indexOf(id) >= 0;
+	}
+
 	/** Skills currently on the vanilla action bar (class + weapon + signature strips). */
 	public static function barSnaps():Array<GeauxSlotSnap> {
 		return weapons;
@@ -766,8 +771,14 @@ class GeauxCache {
 				available = known;
 			else {
 				for (native in weapons) if (native.present && (native.id == id || skillMatches(cachedSkill(native.id),id))) {
-					available = true; break;
-				}
+						available = true; break;
+					}
+					// The signature (T) skill is not on the HUD-walked bar list; Geaux polls it from its own list.
+					if (!available) for (sig in signatures) if (sig.present && (sig.id == id || skillMatches(cachedSkill(sig.id),id))) {
+						available = true; break;
+					}
+					// Anything Geaux's builder can offer this hero is trackable here too (same book, same poll).
+					if (!available && bookIds.indexOf(id) >= 0) available = true;
 				availMemo.set(id, available);
 			}
 			if (!available) continue;

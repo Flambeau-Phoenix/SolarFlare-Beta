@@ -92,6 +92,7 @@ class NativeHideCache {
 			if (failed && (hud != null || gui != null)) clearSession(false);
 			// A hook failure releases ownership once, then remains disabled this session.
 			cfg.status = failed ? "NativeHide stopped after a runtime error; native restoration attempted" : initStatus;
+			cfg.elementsStatus = cfg.status;
 			return;
 		}
 		try {
@@ -112,6 +113,8 @@ class NativeHideCache {
 			appRef = app;
 			hudArgs[0] = hud;
 			refreshBars();
+			// Per-widget Native UI rows ride on the HUD already resolved here. It isolates its own failures.
+			NativeElementCache.apply(hud, heroBar, heroBarPad, cfg);
 			if (hud == null || bottom == null) {
 				cfg.status = "Waiting for native HUD";
 				return;
@@ -226,12 +229,15 @@ class NativeHideCache {
 
 	/** Explicit host cleanup API; the mod runtime does not promise an unload callback. */
 	public static function clearSession(resetFailure:Bool = true):Void {
+		var hudAttached = false;
 		try {
 			var currentGui = field(appRef, "gui");
 			guiArgs[0] = currentGui;
 			var currentHud = currentGui == null || getHud == null ? null : HlxRuntime.callResolved(getHud, guiArgs);
+			hudAttached = currentHud != null && currentHud == hud;
 			restore(currentGui == gui, currentHud == hud && field(currentHud, "bottomBar") == bottom);
 		} catch (_:Dynamic) { suppress = false; }
+		NativeElementCache.releaseAll(hudAttached, resetFailure);
 		gui = null; hud = null; bottom = null; heroBar = null; heroBarPad = null; appRef = null;
 		precedingMode = null; rootOwned = false; bottomOwned = false; suppress = false;
 		if (resetFailure) failed = false;

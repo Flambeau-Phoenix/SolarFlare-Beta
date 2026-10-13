@@ -164,6 +164,7 @@ class VitalsConfig {
 						}
 					);
 				});
+				chrome.drawPositionRow("vitals_hp_pos");
 
 				UiLayout.propertyRow("Health size", function() {
 					UiLayout.inlinePair(

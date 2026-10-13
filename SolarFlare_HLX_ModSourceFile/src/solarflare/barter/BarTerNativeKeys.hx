@@ -48,6 +48,8 @@ class BarTerNativeKeys {
   var previous=skills.copy(); var previousAliases=aliases.copy(); var seenBefore=lastSeen.copy();
   // Actions the bar policy deliberately rejected this sample (a basic combo attack): a decision, never a gap to hold.
   var declined:Map<String,Bool>=new Map();
+  // Each action's resolved skill, so an actionless HUD snap that is the same skill under another id inherits its action.
+  var actionSkills:Array<{action:String,id:String,skill:Dynamic}>=[];
   skills.resize(0); aliases.clear(); known=false;
   var hero:Dynamic=solarflare.HealthCache.localHero;
   if (hero == null) return;
@@ -81,6 +83,7 @@ class BarTerNativeKeys {
     if (existing != null) { existing.id=id; existing.icon=id; existing.label=label(id); }
     else append(actionName,id,label(id),id);
     rememberAliases(id,skill);
+    actionSkills.push({action:actionName,id:id,skill:skill});
    } catch(_:Dynamic) {}
   }
   // Class skills, resolved the way Geaux does: hero.skillSlots[N-1] is the skill id shown in HUD slot SkillN
@@ -113,12 +116,25 @@ class BarTerNativeKeys {
     var existing=action(actionName);
     if (existing != null) { existing.id=id; existing.icon=id; existing.label=label(id); }
     else append(actionName,id,label(id),id);
-    if (skill != null) rememberAliases(id,skill);
+    if (skill != null) { rememberAliases(id,skill); actionSkills.push({action:actionName,id:id,skill:skill}); }
    }
   } catch(_:Dynamic) {}
-  // Missing input metadata does not remove an observed skill or its cooldown.
-  for (s in GeauxCache.barSnaps()) if (s.present && find(s.id) == null)
-   append("",s.id,s.label,s.iconId);
+  // Signature skill (the T slot), from Geaux's own signature list: the HUD walk does not always surface it,
+  // and without it the skill is neither listed, auto-populated nor polled for its cooldown.
+  for (sig in GeauxCache.signatures) {
+   if (sig == null || !sig.present || sig.id == null || sig.id.length == 0 || !GeauxCache.isBarSkillId(sig.id)) continue;
+   if (find(sig.id) != null) continue;
+   var owner=ownerOf(sig.id,actionSkills);
+   if (owner != null) { aliases.set(sig.id,owner.id); continue; }
+   append(inputOf(sig.id,sig.nativeActionId),sig.id,label(sig.id),sig.iconId == null ? "" : sig.iconId);
+  }
+  // Missing input metadata does not remove an observed skill or its cooldown. A snap that is the same skill as an
+  // action's (script id vs kind id) is that action, not a second cell with an unknown key.
+  for (s in GeauxCache.barSnaps()) if (s.present && find(s.id) == null) {
+   var owner=ownerOf(s.id,actionSkills);
+   if (owner != null) { aliases.set(s.id,owner.id); continue; }
+   append(inputOf(s.id,s.nativeActionId),s.id,s.label,s.iconId);
+  }
   for (s in skills) {
    rememberAliases(s.id,GeauxCache.liveSkill(s.id));
    if (s.action.length > 0) { known=true; lastSeen.set(s.action,now); }
@@ -132,6 +148,20 @@ class BarTerNativeKeys {
    for (kind => id in previousAliases) if (id == p.id && !aliases.exists(kind)) aliases.set(kind,id);
   }
   skills=BarTerWeaponLayouts.populationOrder(skills);
+ }
+ /** The real input kind (CDB input sheet) for a skill whose HUD slot did not report one. */
+ static function inputOf(id:String,hinted:String):String {
+  if (hinted != null && hinted.length > 0) return hinted;
+  if (GeauxCache.isSignatureId(id,null)) return "SignatureSkill";
+  if (id == "Dash_Base" || StringTools.startsWith(id,"Dash_")) return "Dash";
+  return "";
+ }
+ static function ownerOf(id:String,list:Array<{action:String,id:String,skill:Dynamic}>):{action:String,id:String,skill:Dynamic} {
+  for (e in list) {
+   if (e.id == id) return e;
+   if (e.skill != null) { try { if (GeauxCache.skillMatches(cast e.skill,id)) return e; } catch(_:Dynamic) {} }
+  }
+  return null;
  }
  static function label(id:String):String {
   var text=solarflare.cdb.AuraCatalog.label(id); return text.length > 0 ? text : id;

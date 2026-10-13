@@ -53,8 +53,7 @@ class UtilitiesPanel {
 			}, "Hides the game's own skill bar, for example when BarTer replaces it.");
 			UiLayout.propertyRow("Recovery", function() {
 				if (ImGui.button("Restore native UI##util_nb_restore")) {
-					cfg.hideAll.set(false);
-					cfg.hideBottomBar.set(false);
+					cfg.showAll();
 					SettingsStore.markDirty();
 				}
 			});

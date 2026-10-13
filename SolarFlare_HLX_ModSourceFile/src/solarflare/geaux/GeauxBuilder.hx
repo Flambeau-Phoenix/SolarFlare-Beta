@@ -410,6 +410,7 @@ class GeauxBuilder {
 				UiLayout.propertyRow("Lock bar", function() {
 					if (ImGui.checkbox("##gb_st_lock", cfg.chrome.locked)) SettingsStore.markDirty();
 				});
+				cfg.chrome.drawPositionRow("gb_st_pos");
 			}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);
 
 		}

@@ -20,7 +20,7 @@ import imgui.ref.IntRef;
 
 /**
  * Rogue combo-point snapshot mirroring ent.HeroAttributes.comboPoint (AttributeBlockBar).
- * Cap is 6; Finisher spends via the engine setter — we only mirror the live value.
+ * Supports a configured five- or six-point resource display.
  */
 class ComboPointsCache {
 	public static inline var MAX:Int = 6;
@@ -28,7 +28,7 @@ class ComboPointsCache {
 
 	public static var active:Bool = false;
 	public static var current:Int = 0;
-	public static var max:Int = MAX;
+	public static var max:Int = 5;
 	public static var valid:Bool = false;
 	public static var alertUntil:Float = 0;
 
@@ -39,7 +39,6 @@ class ComboPointsCache {
 	public static function clear():Void {
 		active = false;
 		current = 0;
-		max = MAX;
 		valid = false;
 		alertUntil = 0;
 	}
@@ -72,7 +71,16 @@ class ComboPointsCache {
 
 	public static function noteRogue():Void {
 		active = true;
-		max = MAX;
+	}
+
+	/** Observe-phase configuration; keep the snapshot inside the selected range. */
+	public static function configureMax(points:Int):Void {
+		var next = points == 6 ? 6 : 5;
+		if (max != next) {
+			max = next;
+			if (current > max) current = max;
+			alertUntil = 0;
+		}
 	}
 
 	public static function comboId():String {
@@ -178,6 +186,7 @@ class ComboConfig {
 	public var hidden = new BoolRef(false);
 	public var vertical = new BoolRef(false);
 	public var shape = new IntRef(PipShapes.DIAMOND);
+	public var pointCount = new IntRef(5);
 	public var width = new FloatRef(220);
 	public var height = new FloatRef(36);
 	public var sizeDirty = true;
@@ -187,12 +196,33 @@ class ComboConfig {
 		chrome = new HudChrome(40, 160);
 	}
 
+	public inline function points():Int return pointCount.get() == 6 ? 6 : 5;
+
+	public function drawPointCount(id:String):Void {
+		UiLayout.propertyGrid("##combo_count_props_" + id, function() {
+			UiLayout.propertyRow("Combo points", function() {
+				if (ImGui.beginCombo("##combo_count_" + id, points() == 6 ? "6 points" : "5 points")) {
+					if (ImGui.selectable("5 points", points() == 5)) {
+						pointCount.set(5);
+						SettingsStore.markDirty();
+					}
+					if (ImGui.selectable("6 points", points() == 6)) {
+						pointCount.set(6);
+						SettingsStore.markDirty();
+					}
+					ImGui.endCombo();
+				}
+			});
+		});
+	}
+
 	public function draw():Void {
 		if (!open.get())
 			return;
 		ImGui.setNextWindowSize(ImGui.vec2(360, 0), ImGuiCond.FirstUseEver);
 		if (HudChrome.beginPanel("Combo Points", open, "Combo Points")) {
-			ImGui.textWrapped("Mirrors hero.attr.comboPoint (0–6). Move / resize the overlay.");
+			ImGui.textWrapped("Shows Rogue combo points with five or six pips. Move / resize the overlay.");
+			drawPointCount("panel");
 			ImGui.separatorText("Window");
 			chrome.drawWindowSettings(hidden, "combo");
 			UiLayout.propertyGrid("##combo_props", function() {
@@ -279,7 +309,7 @@ class ComboOverlay {
 	}
 
 	static function drawPips(rowW:Single, rowH:Single, cfg:ComboConfig):Void {
-		var n = ComboPointsCache.MAX;
+		var n = cfg.points();
 		var filled = ComboPointsCache.valid ? ComboPointsCache.current : 0;
 		if (filled < 0)
 			filled = 0;

@@ -326,6 +326,64 @@ class HudChrome {
 		return changed;
 	}
 
+	/**
+	 * One "Position" row for a propertyGrid: exact X / Y entry in pixels. Type a value or use the step
+	 * arrows (Ctrl = 10 px). Writes the same x/y the drag grip writes, so locked and unlocked overlays
+	 * both move. Chromes that do not bind position (config panels) draw nothing.
+	 * `id` must be unique per call site; it scopes the two ImGui item ids.
+	 */
+	public function drawPositionRow(id:String):Bool {
+		if (!bindPos)
+			return false;
+		var changed = false;
+		UiLayout.propertyRow("Position", function() {
+			UiLayout.inlinePair(
+				"##" + id + "_pos",
+				function(_:Single) {
+					if (positionField("##" + id + "_posx", "X  %.1f", x, true))
+						changed = true;
+				},
+				function(_:Single) {
+					if (positionField("##" + id + "_posy", "Y  %.1f", y, false))
+						changed = true;
+				}
+			);
+		}, "Exact screen position in pixels. Type a value or use the arrows; hold Ctrl for 10 px steps.");
+		return changed;
+	}
+
+	function positionField(label:String, format:String, ref:FloatRef, horizontal:Bool):Bool {
+		if (!ImGui.inputFloat(label, ref, 1, 10, format))
+			return false;
+		// Keep a typed value on screen; applyPos would otherwise snap an out-of-range one to a default.
+		var extent = viewportExtent();
+		var limit = (horizontal ? extent.x : extent.y) - 40;
+		var value = ref.get();
+		if (!Math.isFinite(value))
+			value = 0;
+		ref.set(Math.max(0, Math.min(limit, value)));
+		posDirty = true;
+		SettingsStore.markDirty();
+		return true;
+	}
+
+	/** Main viewport size, or 1920x1080 before ImGui has presented. Called on edits only. */
+	static function viewportExtent():ImVec2 {
+		var w:Single = 1920;
+		var h:Single = 1080;
+		try {
+			var vp = ImGui.getMainViewport();
+			if (vp != null) {
+				var c = ImGui.ImGuiViewport_GetCenter(vp);
+				if (c != null && c.x * 2 >= 320 && c.y * 2 >= 240) {
+					w = c.x * 2;
+					h = c.y * 2;
+				}
+			}
+		} catch (_:Dynamic) {}
+		return ImGui.vec2(w, h);
+	}
+
 	/** Standard editor prefix for every independently movable HUD window. */
 	public function drawWindowSettings(hidden:BoolRef, id:String):Bool {
 		var changed = false;
@@ -349,6 +407,8 @@ class HudChrome {
 					}
 				);
 			});
+			if (drawPositionRow(id + "_win"))
+				changed = true;
 		});
 		if (changed)
 			SettingsStore.markDirty();

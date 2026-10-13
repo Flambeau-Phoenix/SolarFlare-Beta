@@ -55,7 +55,7 @@ class PreviewState {
 	// Combo points --------------------------------------------------------
 	public var comboActive:Bool = false;
 	public var comboCurrent:Int = 0;
-	public var comboMax:Int = 6;
+	public var comboMax:Int = 5;
 	public var comboValid:Bool = false;
 	public var comboAlert:Bool = false;
 
@@ -118,7 +118,7 @@ class PreviewState {
 		s.shieldReady = false;
 		s.comboActive = true;
 		s.comboCurrent = 3;
-		s.comboMax = 6;
+		s.comboMax = 5;
 		s.comboValid = true;
 		s.comboAlert = false;
 		s.attackStep = 2;
@@ -173,7 +173,7 @@ class PreviewState {
 		s.shieldReady = false;
 		s.comboActive = true;
 		s.comboCurrent = 0;
-		s.comboMax = 6;
+		s.comboMax = 5;
 		s.comboValid = true;
 		s.comboAlert = false;
 		s.attackStep = 0;
@@ -226,8 +226,8 @@ class PreviewState {
 		s.lifeReady = true;
 		s.shieldReady = true;
 		s.comboActive = true;
-		s.comboCurrent = 6;
-		s.comboMax = 6;
+		s.comboCurrent = 5;
+		s.comboMax = 5;
 		s.comboValid = true;
 		s.comboAlert = false;
 		s.attackStep = 4;
@@ -280,8 +280,8 @@ class PreviewState {
 		s.lifeReady = true;
 		s.shieldReady = true;
 		s.comboActive = true;
-		s.comboCurrent = 6;
-		s.comboMax = 6;
+		s.comboCurrent = 5;
+		s.comboMax = 5;
 		s.comboValid = true;
 		s.comboAlert = true;
 		s.attackStep = 4;

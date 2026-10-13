@@ -108,6 +108,8 @@ class TelemetryKernel {
 		}
 
 		// These consumers own an independent ObserveDemand cadence.
+		if (cfg != null && cfg.combo != null)
+			solarflare.combo.Combo.ComboPointsCache.configureMax(cfg.combo.points());
 		HookIngress.consume(DirtyDomains.OVERLAYS | DirtyDomains.ATTACK_COMBO);
 		try HealthHooks.reconcileOverlays() catch (_:Dynamic) {}
 		try {

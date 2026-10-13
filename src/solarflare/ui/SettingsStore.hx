@@ -503,6 +503,7 @@ class SettingsStore {
 		if (c == null)
 			return {};
 		return {
+			pointCount: c.points(),
 			hidden: c.hidden.get(),
 			vertical: c.vertical.get(),
 			shape: c.shape.get(),
@@ -858,6 +859,9 @@ class SettingsStore {
 	public static function applyCombo(c:ComboConfig, data:Dynamic):Void {
 		if (c == null || data == null)
 			return;
+		c.pointCount.set(5);
+		setInt(c.pointCount, data.pointCount);
+		c.pointCount.set(c.points());
 		setBool(c.hidden, data.hidden);
 		setBool(c.vertical, data.vertical);
 		setInt(c.shape, data.shape);

@@ -2208,6 +2208,7 @@ class AuraBuilder {
 
 	function drawWindowLayout(a:AuraDef):Void {
 		UiLayout.propertyGrid("##ab_window_layout", function() {
+				a.chrome.drawPositionRow("ab_pos");
 			UiLayout.propertyRow("Size", function() {
 				UiLayout.inlinePair(
 					"##ab_wh",

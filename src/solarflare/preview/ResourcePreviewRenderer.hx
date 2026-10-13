@@ -103,8 +103,10 @@ class ResourcePreviewRenderer {
 				PipShapes.drawCount(width, height, 3, s.prayersCharged, false, PipShapes.RING,
 					Std.string(s.prayersCharged), null);
 			case "combo":
-				PipShapes.drawCount(width, height, s.comboMax, s.comboCurrent, cfg.combo.vertical.get(), cfg.combo.shape.get(),
-					s.comboAlert ? "MAX" : Std.string(s.comboCurrent), null);
+				var points = cfg.combo.points();
+				var filled = s.comboCurrent >= s.comboMax ? points : Std.int(Math.min(points, s.comboCurrent));
+				PipShapes.drawCount(width, height, points, filled, cfg.combo.vertical.get(), cfg.combo.shape.get(),
+					s.comboAlert ? "MAX" : Std.string(filled), null);
 			case "attack":
 				AttackComboRenderer.draw(s.attackStep, s.attackLength, s.attackFlashFinal, s.attackWithinCombo, cfg.attackCombo, width, height,
 					AttackComboRenderer.RESOURCE_PREVIEW);

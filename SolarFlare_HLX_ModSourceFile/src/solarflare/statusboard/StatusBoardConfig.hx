@@ -120,6 +120,7 @@ class StatusBoardConfig {
      if (i == 3 && ImGui.button("Place##sb_place")) { enabled.set(true); hidden.set(false); chrome.locked.set(false); SettingsStore.markDirty(); }
     });
    });
+   chrome.drawPositionRow("sb_pos");
    UiLayout.propertyRow("Icon size",function() { intRef.set(slotSize); if (ImGui.sliderInt("##sb_size",intRef,28,72)) { slotSize=intRef.get(); contentWidth=0; SettingsStore.markDirty(); } });
    UiLayout.propertyRow("Columns",function() { intRef.set(columns); if (ImGui.sliderInt("##sb_columns",intRef,1,16)) { columns=intRef.get(); contentWidth=0; SettingsStore.markDirty(); } });
    UiLayout.propertyRow("Badges",function() {

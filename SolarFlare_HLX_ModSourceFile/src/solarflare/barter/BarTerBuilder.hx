@@ -61,6 +61,7 @@ class BarTerBuilder {
     owner.changed();
    }
   });
+  UiLayout.propertyGrid("##bt_position",function() cfg.chromeFor(bar.id).drawPositionRow("bt_pos_"+bar.id));
   UiLayout.inlineSplit("##bt_grid",4,function(i,w) {
    if (i == 0) {
     ImGui.textDisabled("Selected bar"); ImGui.setNextItemWidth(Math.min(w,220));
@@ -181,7 +182,7 @@ class BarTerBuilder {
    } else {
     for (entry in AuraCatalog.entries) {
      if (entry.kind != "skill" || !AuraCatalog.entryMatchesSearch(entry,query)) continue;
-     var available=BarTerNativeKeys.find(entry.id) != null;
+     var available=BarTerNativeKeys.find(entry.id) != null || solarflare.geaux.GeauxCache.inBook(entry.id);
      catalogRow(b,"skill",entry.id,entry.name,entry.id,available); if (++shown >= 200) break;
     }
     if (shown == 0) ImGui.textDisabled("No skills match.");

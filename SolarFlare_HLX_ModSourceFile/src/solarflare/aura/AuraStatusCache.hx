@@ -68,6 +68,9 @@ class AuraStatusCache {
 	static var scanLength:Int = -1;
 	static var scanActive:Bool = false;
 	static var scanComplete:Bool = false;
+	/** Entries the current/last sweep could not identify (diagnostic only; the audit reports it). */
+	static var sweepUnresolved:Int = 0;
+	static var lastSweepUnresolved:Int = 0;
 	static var nextDiscoveryAt:Float = 0;
 	static var lastDiscoveryStart:Float = -1;
 	static var discoveryWanted:Bool = false;
@@ -214,7 +217,7 @@ class AuraStatusCache {
 
 	static function clearDiscovery():Void {
 		discovered.clear(); discoveredCount = 0; scanSeen.clear(); scanArray = null;
-		scanCursor = 0; scanLength = -1; scanActive = scanComplete = discoveryWanted = false;
+		scanCursor = 0; scanLength = -1; scanActive = scanComplete = discoveryWanted = false; sweepUnresolved = lastSweepUnresolved = 0;
 		nextDiscoveryAt = 0; lastDiscoveryStart = -1;
 		work.lastSliceEntries = 0; work.lastSliceSeconds = 0;
 	}
@@ -316,21 +319,24 @@ class AuraStatusCache {
 	static function auditEngine(hero:Dynamic):String {
 		#if hl
 		try {
-			var owner:ent.GameObject = hero;
-			var proxy = owner.statuses;
-			if (proxy == null)
-				return "Check: the character has no status container.";
-			var list:hl.types.ArrayBase = cast proxy.array;
+			// The container the discovery sweep walks. Game arrays cross a module boundary, so they are
+			// never cast to ArrayBase here (that cast fails at runtime); FieldWalk unwraps and reads them.
+			var list:Dynamic = FieldWalk.extractObject(hero, "statuses");
 			if (list == null)
-				return "Check: the status container has no list.";
-			var total = list.length;
+				list = FieldWalk.extractObject(hero, "statusList");
+			if (list == null)
+				return "Check: the character has no status container.";
+			var total = FieldWalk.arrayLen(list, -1);
+			if (total < 0)
+				return "Check: the status container length is unreadable.";
 			var scan = total > 512 ? 512 : total;
 			var order:Array<String> = [];
 			var seen = new Map<String, Bool>();
 			var removedCount = 0;
 			var unreadable = 0;
+			var unreadableTypes:Array<String> = [];
 			for (i in 0...scan) {
-				var el:Dynamic = list.getDyn(i);
+				var el:Dynamic = FieldWalk.arrayAt(list, i);
 				if (el == null) {
 					unreadable++;
 					continue;
@@ -347,6 +353,10 @@ class AuraStatusCache {
 				var clean = kind == null ? "" : solarflare.EngineText.cleanId(kind);
 				if (clean.length == 0) {
 					unreadable++;
+					// Name what the unidentifiable entries are, so a report says which statuses the sweep cannot read.
+					var typeName = FieldWalk.liveTypeName(el);
+					if (unreadableTypes.length < 4 && typeName.length > 0 && unreadableTypes.indexOf(typeName) < 0)
+						unreadableTypes.push(typeName);
 					continue;
 				}
 				var key = clean.toLowerCase();
@@ -380,6 +390,12 @@ class AuraStatusCache {
 				+ (unreadable > 0 ? ", " + unreadable + " unreadable" : "")
 				+ ") | cache " + cacheLive + " | board " + solarflare.statusboard.StatusBoardConfig.lastVisible
 				+ " | observation " + (domainKnown ? "complete" : "incomplete");
+			if (unreadableTypes.length > 0)
+				text += " | unreadable: " + unreadableTypes.join(", ");
+			if (lastSweepUnresolved > 0)
+				text += " | last sweep left " + lastSweepUnresolved + " unresolved";
+			if (!domainKnown)
+				text += " | container " + containerLength + (scanActive ? ", sweep running" : ", sweep " + (scanComplete ? "complete" : "incomplete"));
 			if (missing.length > 0)
 				text += " | not in cache (" + missing.length + "): " + missing.slice(0, 10).join(", ") + (missing.length > 10 ? ", ..." : "");
 			return text;
@@ -407,7 +423,7 @@ class AuraStatusCache {
 		if (!scanActive || arr != scanArray) {
 			sweep++;
 			scanArray = arr; scanLength = len; scanCursor = 0; scanSeen.clear();
-			scanActive = true; scanComplete = true; lastDiscoveryStart = now;
+			scanActive = true; scanComplete = true; lastDiscoveryStart = now; sweepUnresolved = 0;
 			solarflare.ObserveDemand.statusDiscoveryDirty = false;
 		} else if (len != scanLength) {
 			// A status applied or removed mid-sweep must not restart it: a busy status list changes
@@ -424,7 +440,7 @@ class AuraStatusCache {
 			var record = item == null ? null : records.get(item);
 			if (record != null) record.seenSweep = sweep;
 			work.lastSliceEntries++; work.discoveryEntries++;
-			if (row == null) { scanComplete = false; continue; }
+			if (row == null) { scanComplete = false; sweepUnresolved++; continue; }
 			var key = stampKey(row); scanSeen.set(key, true);
 			var cached = discovered.get(key);
 			if (cached == null) {
@@ -438,6 +454,7 @@ class AuraStatusCache {
 		if (work.lastSliceEntries > work.maxSliceEntries) work.maxSliceEntries = work.lastSliceEntries;
 		if (work.lastSliceSeconds > work.maxSliceSeconds) work.maxSliceSeconds = work.lastSliceSeconds;
 		if (scanCursor >= end) {
+			lastSweepUnresolved = sweepUnresolved;
 			scanActive = false; scanArray = null; nextDiscoveryAt = now + DISCOVERY_INTERVAL_S;
 			if (!scanComplete) nextDiscoveryAt = now + DISCOVERY_WAKE_S;
 			if (scanComplete && len <= MAX) {

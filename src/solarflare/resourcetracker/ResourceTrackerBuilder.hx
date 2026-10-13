@@ -108,7 +108,7 @@ class ResourceTrackerBuilder {
 			navRow("mana", "Mana/Spark", v.manaHidden);
 			navRow("prayers", "Prayers", v.prayersHidden);
 		}
-		if (host.combo != null) navRow("combo", "Combo Points", host.combo.hidden);
+		if (host.combo != null) navRow("combo", "Rogue Combo Points", host.combo.hidden);
 		if (host.chaincast != null) navRow("chaincast", "Chaincast", host.chaincast.hidden);
 		if (host.conduit != null) navRow("conduit", "Conduits", host.conduit.hidden);
 		drawHideAll();
@@ -212,9 +212,10 @@ class ResourceTrackerBuilder {
 			case "combo":
 				drawWindow(host.combo.hidden, host.combo.chrome, host.combo.width, host.combo.height, "combo");
 				section("Appearance");
+				host.combo.drawPointCount("builder");
 				if (solarflare.ui.UiChrome.toggleTileRef("##rt_combo_vertical", "Vertical", host.combo.vertical, 108, 28)) SettingsStore.markDirty();
 				PipShapes.drawShapeCombo("Pip shape##rt_combo_shape", host.combo.shape);
-				drawBehaviorText("Shows Rogue combo points from 0 through 6.");
+				drawBehaviorText("Choose five or six combo points to match your Rogue. The full-resource alert uses the selected maximum.");
 			case "attack":
 				drawWindow(host.attackCombo.hidden, host.attackCombo.chrome, host.attackCombo.width, host.attackCombo.height, "attack");
 				section("Appearance"); host.attackCombo.drawAppearanceSettings();

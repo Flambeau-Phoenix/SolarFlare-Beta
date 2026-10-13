@@ -5,12 +5,16 @@ import imgui.ref.BoolRef;
 /**
  * Global presentation preferences; never part of a character/gear profile.
  *
- * The only supported control is hiding the native bottom action bar (Utilities page).
- * Full-root hiding hid the entire game UI and is closed: `hideAll` is never read from or written
- * to settings, and NativeHideCache ignores it while FULL_ROOT_ENABLED is false.
+ * Supported controls: hiding the native bottom action bar (Utilities page and the Native UI page share
+ * `hideBottomBar`) and the per-widget rows in `elements` (Native UI page). Full-root hiding hid the entire
+ * game UI and is closed: `hideAll` is never read from or written to settings, and NativeHideCache ignores it
+ * while FULL_ROOT_ENABLED is false.
  */
 class NativeHideConfig {
 	public static inline var FULL_ROOT_ENABLED:Bool = false;
+
+	public static inline var GROUP_ACTION:String = "Action bar";
+	public static inline var GROUP_HUD:String = "HUD";
 
 	public var hideBottomBar = new BoolRef(true);
 	/** Kept only so older callers compile; always false and never persisted. */
@@ -18,11 +22,38 @@ class NativeHideConfig {
 	/** Session-only. Only meaningful for the closed full-root path. */
 	public var bottomBarAccepted = new BoolRef(false);
 	public var status:String = "Waiting for native HUD";
+	/**
+	 * Per-widget rows. One line per widget here, plus its lookup in NativeElementCache.TARGETS.
+	 * Everything starts shown; saved choices are applied over this.
+	 */
+	public var elements:Array<NativeHideElement>;
+	/** Set by the Native UI page while it is drawn; observation consumes it so state is only looked up then. */
+	public var probe:Bool = false;
+	/** Written by observation: empty when fine, otherwise why the per-widget rows are not working. */
+	public var elementsStatus:String = "";
 
-	public function new() {}
+	public function new() {
+		elements = [
+			new NativeHideElement("consumables", "Consumables (2x2)", GROUP_ACTION,
+				"The four quick-use consumable slots on the native bar. The skills and bars beside them stay."),
+			new NativeHideElement("menuBar", "Menu buttons", GROUP_HUD,
+				"The row of window buttons. Their hotkeys still open each window."),
+			new NativeHideElement("chat", "Chat", GROUP_HUD,
+				"The native chat box. Left alone while the Enhanced Chat mod owns it."),
+			new NativeHideElement("compass", "Compass", GROUP_HUD, "The compass strip."),
+			new NativeHideElement("groupBar", "Party frames", GROUP_HUD, "Group member frames."),
+			new NativeHideElement("bossesInfo", "Boss frames", GROUP_HUD, "Boss health frames during encounters."),
+			new NativeHideElement("oxygen", "Oxygen", GROUP_HUD, "The underwater breath gauge."),
+			new NativeHideElement("combatMeter", "Combat meter", GROUP_HUD, "The native damage meter."),
+			new NativeHideElement("feed", "Effects feed", GROUP_HUD, "The scrolling effects feed.")
+		];
+	}
 
 	public function dump():Dynamic {
-		return {hideBottomBar: hideBottomBar.get(), hideAll: false};
+		var rows:Array<Dynamic> = [];
+		for (e in elements)
+			rows.push({id: e.id, hidden: e.hidden.get()});
+		return {hideBottomBar: hideBottomBar.get(), hideAll: false, elements: rows};
 	}
 
 	public function apply(data:Dynamic):Void {
@@ -31,5 +62,38 @@ class NativeHideConfig {
 		if (Std.isOfType(bottom, Bool)) hideBottomBar.set(bottom);
 		// A saved hideAll from older builds is ignored on purpose: it could hide the whole UI on load.
 		hideAll.set(false);
+		var rows:Dynamic = Reflect.field(data, "elements");
+		if (rows == null) return;
+		try {
+			var arr:Array<Dynamic> = cast rows;
+			if (arr == null) return;
+			for (row in arr) {
+				var id = Std.string(Reflect.field(row, "id"));
+				var value:Dynamic = Reflect.field(row, "hidden");
+				if (!Std.isOfType(value, Bool)) continue;
+				for (e in elements) {
+					if (e.id == id) {
+						e.hidden.set(value);
+						break;
+					}
+				}
+			}
+		} catch (_:Dynamic) {}
+	}
+
+	/** True when the user is hiding the bottom bar or any element row. */
+	public function anyHidden():Bool {
+		if (hideBottomBar.get()) return true;
+		for (e in elements)
+			if (e.hidden.get()) return true;
+		return false;
+	}
+
+	/** Recovery: show every native piece again. Ownership is released by the next observation pass. */
+	public function showAll():Void {
+		hideAll.set(false);
+		hideBottomBar.set(false);
+		for (e in elements)
+			e.hidden.set(false);
 	}
 }

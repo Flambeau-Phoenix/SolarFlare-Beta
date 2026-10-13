@@ -112,6 +112,8 @@ class BarTerCache {
 			if (gs == null && native != null) gs=findGeaux(native.id);
 			var observed = native != null;
 			for (s in GeauxCache.barSnaps()) if (s.present && s.id == id) { observed=true; break; }
+			// Same data Geaux shows: a live poll of this id from any Geaux list is an observation.
+			if (!observed && gs != null && gs.present) observed=true;
 			BarTerSkillState.apply(snap,observed,gs,native);
 			if (!observed) {
 				snap.present = true; snap.label = solarflare.cdb.AuraCatalog.label(id);

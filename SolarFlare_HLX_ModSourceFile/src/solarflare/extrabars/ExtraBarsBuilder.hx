@@ -352,6 +352,7 @@ class ExtraBarsBuilder {
     UiLayout.propertyRow("Show tracker",function() check("##spark_enabled",owner.model.sparkEnabled,function(v) owner.model.sparkEnabled=v));
     UiLayout.propertyRow("Size",function() slider("##spark_size",owner.model.sparkSize,40,120,function(v) owner.model.sparkSize=v));
     UiLayout.propertyRow("Lock position",function() check("##spark_lock",owner.model.sparkLocked,function(v) owner.model.sparkLocked=v));
+    owner.chromeFor("spark").drawPositionRow("extra_spark_pos");
     UiLayout.propertyRow("Transparent",function() check("##spark_trans",owner.model.sparkTransparent,function(v) owner.model.sparkTransparent=v));
     UiLayout.propertyRow("Show hotkey",function() check("##spark_show_hotkey",owner.model.sparkShowHotkey,function(v) owner.model.sparkShowHotkey=v));
     UiLayout.propertyRow("Hotkey label",function() {
@@ -384,6 +385,7 @@ class ExtraBarsBuilder {
    UiLayout.propertyRow("Visibility",function() check("Hidden##bar_hidden",bar.hidden,function(v) bar.hidden=v),"Keybinds still activate while this bar is hidden.");
    UiLayout.propertyRow("Cell size",function() slider("##bar_size",bar.slotSize,24,96,function(v) bar.slotSize=v));
    UiLayout.propertyRow("Lock position",function() check("##bar_lock",bar.locked,function(v) bar.locked=v));
+   owner.chromeFor(bar.id).drawPositionRow("extra_pos");
    UiLayout.propertyRow("Transparent",function() check("##bar_trans",bar.transparent,function(v) bar.transparent=v));
    UiLayout.propertyRow("Opacity",function() {
     floatRef.set(bar.opacity); var before=owner.model.dump();
