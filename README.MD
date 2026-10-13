@@ -1,7 +1,3 @@
-![Aura instant cast proc](ghub.gif)
-<video src="solargif.mp4" controls="controls" style="max-width: 100%;">
-  Your browser does not support the video tag.
-</video>
 
 # SolarFlare — v4.0b (Beta)
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
