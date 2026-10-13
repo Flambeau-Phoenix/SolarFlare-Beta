@@ -1,4 +1,4 @@
-![Aura instant cast proc](ghub.gif)
+![solargif](solar.gif)
 
 # SolarFlare — v4.0b (Beta)
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
