@@ -8,8 +8,8 @@ class BarTerCellState {
  public static function lit(s:BarTerSnap):Bool {
   if (!active(s)) return false;
   if (s.isItem) return s.usable;
-  var ammo=s.chargesMax > 0 && s.charges > 0;
-  return s.affordable && (ammo || (s.chargesMax == 0 && s.ready && !s.onCd));
+  var ammo=solarflare.geaux.SkillAttentionPolicy.hasCharges(s.chargesMax,s.charges);
+  return solarflare.geaux.SkillAttentionPolicy.lit(true,s.ready,ammo,s.affordable);
  }
  public static function empty(s:BarTerSnap):Bool return s == null || s.kind == "empty";
 }

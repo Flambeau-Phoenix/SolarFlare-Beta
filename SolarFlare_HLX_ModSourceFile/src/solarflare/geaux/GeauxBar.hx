@@ -247,15 +247,15 @@ class GeauxBar {
 		var present = snap != null && snap.present;
 		var ready = present && snap.ready;
 		var affordable = !present || snap.affordable != false;
-		var hasCharges = present && snap.chargesMax > 0 && snap.charges > 0;
-		var onCd = present && (snap.cdLeft > 0.05 || snap.remaining > 0.02 || (!ready && !hasCharges));
+		var hasCharges = present && SkillAttentionPolicy.hasCharges(snap.chargesMax,snap.charges);
+		var onCd = SkillAttentionPolicy.cooling(present,ready,hasCharges,present ? snap.cdLeft : 0,present ? snap.remaining : 0);
 		// Hide only when truly unavailable: empty charge pool or non-charged on CD.
 		var hideForCd = onCd && !hasCharges;
 		if (present && hideForCd && style.hideOnCooldown()) {
 			return {clicked: clicked, rightClicked: rightClicked, hovered: hovered};
 		}
 		// Lit while usable ammo remains (pinwheel may still show regen).
-		var lit = present && (ready || hasCharges) && (affordable || !style.dimOnNoResource.get());
+		var lit = SkillAttentionPolicy.lit(present,ready,hasCharges,affordable,style.dimOnNoResource.get());
 		if (present && onCd && !hasCharges && !style.shouldDimOnCooldown() && style.effectiveCdDisplay() == GeauxStyle.CD_SHOW_FULL)
 			lit = true;
 		var showCdFx = !style.hideOnCooldown() || hasCharges;
@@ -272,11 +272,8 @@ class GeauxBar {
 		var border = style.borderCol(lit);
 
 		// Near-ready CD pulse only (usable/proc SAO draws after icon).
-		if (present && onCd && !hasCharges && snap.cdLeft <= 1.2 && snap.cdLeft > 0.05) {
-			var pulseAlpha = 0.25 + 0.25 * Math.sin(ImGui.getTime() * 8.0);
-			var pulseCol = 0x00FFFF | (Std.int(pulseAlpha * 255) << 24);
-			solarflare.ui.VectorGlow.radial(dl, x + size * 0.5, y + size * 0.5, size * 0.5, pulseCol, 0.4, 4);
-		}
+		if (SkillAttentionPolicy.nearReady(present,onCd,hasCharges,present ? snap.cdLeft : 0))
+			SkillAttentionRenderer.nearReady(dl,x,y,size,ImGui.getTime());
 
 		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + size, y + size), ImGui.colorConvertFloat4ToU32(fill), rounding);
 		if (pickable && hovered) {
@@ -366,26 +363,14 @@ class GeauxBar {
 		// Snapshot deadline uses the same monotonic clock as observation. Preview deadline is isolated.
 		var deadline:Float = present ? snap.readyFlashUntil : 0;
 		if (pickable && previewFlashUntil > 0) deadline = previewFlashUntil;
-		var flashAlpha = ReadyFlashState.opacity(deadline, haxe.Timer.stamp());
+		var flashAlpha = SkillAttentionPolicy.readyAlpha(present,lit,affordable,deadline,haxe.Timer.stamp());
 		var glowDl = pickable ? dl : ImGui.getBackgroundDrawList();
 		// Cooldown-completion attention after icon, before CD text & hotkeys.
-		if (present) {
-			if (lit && affordable && flashAlpha > 0 && style.readyAttention.get() == GeauxStyle.ATTN_PROC) {
-				// Shared Aura renderer; live HUD bloom can extend beyond the window chrome.
-				solarflare.aura.AuraGlowRenderer.drawStyle(glowDl, style.glowStyle, style.glowStrength.get(), style.glowOuter.get(),
-					style.glowInner.get(), solarflare.aura.AuraGlowStyle.fromImGuiColor(style.glowColor(1)), x, y, size, size, flashAlpha);
-			} else if (lit && affordable && flashAlpha > 0 && style.readyAttention.get() == GeauxStyle.ATTN_PULSE) {
-				// Wide exponential neon bloom — travels into gap/chrome, not FringeScale fat stroke.
-				var bloomDist:Single = Math.min(24, size * 0.35);
-				solarflare.ui.VectorGlow.skillAlertBloom(glowDl, x, y, size, size, style.glowColor(flashAlpha), bloomDist, rounding, 14, 2.2);
-			} else if (lit && affordable && flashAlpha > 0 && style.readyAttention.get() == GeauxStyle.ATTN_BRIGHT) {
-				// Tighter high-intensity outline bloom (fewer layers / shorter reach).
-				solarflare.ui.VectorGlow.skillAlertBloom(glowDl, x, y, size, size, style.glowColor(flashAlpha), Math.min(16, size * 0.2), rounding, 10, 1.85);
-			}
-		}
+		if (flashAlpha>0) SkillAttentionRenderer.ready(glowDl,style.readyAttention.get(),style.glowStyle,style.glowStrength.get(),
+			style.glowOuter.get(),style.glowInner.get(),solarflare.aura.AuraGlowStyle.fromImGuiColor(style.glowColor(1)),x,y,size,rounding,flashAlpha);
 
 		if (present && snap.procReady == true)
-			solarflare.ui.VectorGlow.glimmer(dl, x, y, size, size, (haxe.Timer.stamp() - snap.procStart) % 2.6);
+			SkillAttentionRenderer.proc(dl,x,y,size,snap.procStart,haxe.Timer.stamp());
 
 		if (present && style.showPinwheel.get() && showCdFx && snap.remaining > 0.02
 			&& (snap.cdLeft > 0.05 || snap.remaining < 0.98))

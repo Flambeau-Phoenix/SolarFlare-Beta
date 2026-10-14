@@ -219,7 +219,7 @@ class AuraStatusCache {
 		// Publish demands only after real applied rows from both lanes have been reconciled.
 		publishTargeted();
 		discoveryWanted = wantDiscovery;
-		if (solarflare.ObserveDemand.statusBoard) solarflare.statusboard.StatusBoardTooltipCache.reconcile(snaps,count,discoveryCompletedThisPass);
+		if (solarflare.statusboard.StatusBoardTooltipCache.demand()) solarflare.statusboard.StatusBoardTooltipCache.reconcile(snaps,count,discoveryCompletedThisPass);
 		else solarflare.statusboard.StatusBoardTooltipCache.clear();
 		work.samples++;
 		work.lastSampleSeconds = stamp() - sampleStarted;
@@ -425,7 +425,7 @@ class AuraStatusCache {
 		if (stateRefreshEnabled && identityCacheEnabled && stamp() >= passDeadline) return;
 		var started = stamp();
 		var arr:Dynamic = null;
-		if (solarflare.ObserveDemand.statusBoard && solarflare.statusboard.StatusBoardTooltipCache.due(now).length > 0) {
+		if (solarflare.statusboard.StatusBoardTooltipCache.demand() && solarflare.statusboard.StatusBoardTooltipCache.due(now).length > 0) {
 			arr=readContainer(hero); serviceTooltipHint(hero,arr,now);
 		}
 		var dirty = solarflare.ObserveDemand.statusDiscoveryDirty;
@@ -457,7 +457,7 @@ class AuraStatusCache {
 			work.lastSliceEntries++; work.discoveryEntries++;
 			if (row == null) { scanComplete = false; sweepUnresolved++; continue; }
 			var key = stampKey(row); scanSeen.set(key, true);
-			if (solarflare.ObserveDemand.statusBoard) solarflare.statusboard.StatusBoardTooltipCache.noteIndex(row.instanceId,index);
+			if (solarflare.statusboard.StatusBoardTooltipCache.demand()) solarflare.statusboard.StatusBoardTooltipCache.noteIndex(row.instanceId,index);
 			var cached = discovered.get(key);
 			if (cached == null) {
 				if (discoveredCount >= MAX) continue;
@@ -625,7 +625,7 @@ class AuraStatusCache {
 		}
 		snap.instanceId = instanceOf(item);
 		if (snap.instanceId.length == 0) return null;
-		if ((record == null || !record.sourceResolved) && (solarflare.ObserveDemand.aurasNeedConsumables || solarflare.ObserveDemand.auraBuilderOpen || solarflare.ObserveDemand.statusBoard)) {
+		if ((record == null || !record.sourceResolved) && (solarflare.ObserveDemand.aurasNeedConsumables || solarflare.ObserveDemand.auraBuilderOpen || solarflare.statusboard.StatusBoardTooltipCache.demand())) {
 			try {
 				var base:st.skill.BaseSkill = item;
 				var source = base.getSourceItem();
@@ -670,9 +670,9 @@ class AuraStatusCache {
 			try { var native:st.skill.Status=item; snap.nativeTimerEligible=native.canElapsedStop(); } catch (_:Dynamic) {}
 			try { var native:st.skill.Status=item; snap.nativeProgressVisible=native.duration>0; } catch (_:Dynamic) {}
 			if (snap.stacksKnown) snap.nativeStacksVisible=solarflare.statusboard.StatusBoardNativeRules.stacks(item,snap.stacks);
-			if (snap.known && snap.present && stamp()<passDeadline)
-				solarflare.statusboard.StatusBoardTooltipCache.observe(item,snap.instanceId,sampledHero,stamp());
 		}
+		if (solarflare.statusboard.StatusBoardTooltipCache.demand() && snap.known && snap.present && stamp()<passDeadline)
+			solarflare.statusboard.StatusBoardTooltipCache.observe(item,snap.instanceId,sampledHero,stamp());
 		var existing = findExistingSnap(snap);
 		if (existing != null) {
 			copySnap(existing, snap);

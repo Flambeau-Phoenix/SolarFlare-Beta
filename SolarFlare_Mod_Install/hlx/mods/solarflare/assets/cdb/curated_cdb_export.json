@@ -1,7 +1,7 @@
 {
   "source": "data.cdb",
   "format": "CastleDB curated export",
-  "count": 2835,
+  "count": 2838,
   "selection": [
     {
       "sheet": "unit",
@@ -2616,570 +2616,576 @@
     {
       "sheet": "unit",
       "row_index": 435,
+      "id": "RobinHoofMeat",
+      "name": "Chunk of Meat"
+    },
+    {
+      "sheet": "unit",
+      "row_index": 436,
       "id": "Base_Critter",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 436,
+      "row_index": 437,
       "id": "Rabbit_Yellow",
       "name": "Buttontail"
     },
     {
       "sheet": "unit",
-      "row_index": 437,
+      "row_index": 438,
       "id": "Rabbit_Brown",
       "name": "Brown Buttontail"
     },
     {
       "sheet": "unit",
-      "row_index": 438,
+      "row_index": 439,
       "id": "Rabbit_Green",
       "name": "Woods Buttontail"
     },
     {
       "sheet": "unit",
-      "row_index": 439,
+      "row_index": 440,
       "id": "Rabbit_Grey",
       "name": "Misty Buttontail"
     },
     {
       "sheet": "unit",
-      "row_index": 440,
+      "row_index": 441,
       "id": "Rabbit_Yellow02",
       "name": "Yellow Buttontail"
     },
     {
       "sheet": "unit",
-      "row_index": 441,
+      "row_index": 442,
       "id": "Rabbit_Pink",
       "name": "Pink Buttontail"
     },
     {
       "sheet": "unit",
-      "row_index": 442,
+      "row_index": 443,
       "id": "Rabbit_Demon",
       "name": "Night Buttontail"
     },
     {
       "sheet": "unit",
-      "row_index": 443,
+      "row_index": 444,
       "id": "Rabbit_Spark",
       "name": "Sparkling Buttontail"
     },
     {
       "sheet": "unit",
-      "row_index": 444,
+      "row_index": 445,
       "id": "Rabbit_EarlyAccess_Spark",
       "name": "Sparktail"
     },
     {
       "sheet": "unit",
-      "row_index": 445,
+      "row_index": 446,
       "id": "Sheep_Beige",
       "name": "Woolybell"
     },
     {
       "sheet": "unit",
-      "row_index": 446,
+      "row_index": 447,
       "id": "Sheep_Black",
       "name": "Black Woolybell"
     },
     {
       "sheet": "unit",
-      "row_index": 447,
+      "row_index": 448,
       "id": "Sheep_Brown",
       "name": "Brown Woolybell"
     },
     {
       "sheet": "unit",
-      "row_index": 448,
+      "row_index": 449,
       "id": "Sheep_Brown02",
       "name": "Fields Woolybell"
     },
     {
       "sheet": "unit",
-      "row_index": 449,
+      "row_index": 450,
       "id": "Sheep_Demon",
       "name": "Night Woolybell"
     },
     {
       "sheet": "unit",
-      "row_index": 450,
+      "row_index": 451,
       "id": "Sheep_Black02",
       "name": "Radiated Woolybell"
     },
     {
       "sheet": "unit",
-      "row_index": 451,
+      "row_index": 452,
       "id": "Sheep_Spark",
       "name": "Sparkling Woolybell"
     },
     {
       "sheet": "unit",
-      "row_index": 452,
+      "row_index": 453,
       "id": "Squirrel_Brown",
       "name": "Brown Leafcutter"
     },
     {
       "sheet": "unit",
-      "row_index": 453,
+      "row_index": 454,
       "id": "Squirrel_Blue",
       "name": "Green Leafcutter"
     },
     {
       "sheet": "unit",
-      "row_index": 454,
+      "row_index": 455,
       "id": "Squirrel_Demon",
       "name": "Demonic Leafcutter"
     },
     {
       "sheet": "unit",
-      "row_index": 455,
+      "row_index": 456,
       "id": "Squirrel_Green",
       "name": "Autumnal Leafcutter"
     },
     {
       "sheet": "unit",
-      "row_index": 456,
+      "row_index": 457,
       "id": "Squirrel_Grey",
       "name": "Grey Leafcutter"
     },
     {
       "sheet": "unit",
-      "row_index": 457,
+      "row_index": 458,
       "id": "Squirrel_Red",
       "name": "Red Leafcutter"
     },
     {
       "sheet": "unit",
-      "row_index": 458,
+      "row_index": 459,
       "id": "Squirrel_Spark",
       "name": "Sparkling Leafcutter"
     },
     {
       "sheet": "unit",
-      "row_index": 459,
+      "row_index": 460,
       "id": "DemonDog_Red",
       "name": "Red Demodoggo"
     },
     {
       "sheet": "unit",
-      "row_index": 460,
+      "row_index": 461,
       "id": "DemonDog_Beige",
       "name": "Camel Demodoggo"
     },
     {
       "sheet": "unit",
-      "row_index": 461,
+      "row_index": 462,
       "id": "DemonDog_Blue",
       "name": "Dark Demodoggo"
     },
     {
       "sheet": "unit",
-      "row_index": 462,
+      "row_index": 463,
       "id": "DemonDog_Blue02",
       "name": "Blue Demodoggo"
     },
     {
       "sheet": "unit",
-      "row_index": 463,
+      "row_index": 464,
       "id": "DemonDog_Orange",
       "name": "Black Demodoggo"
     },
     {
       "sheet": "unit",
-      "row_index": 464,
+      "row_index": 465,
       "id": "DemonDog_Purple",
       "name": "Purple Demodoggo"
     },
     {
       "sheet": "unit",
-      "row_index": 465,
+      "row_index": 466,
       "id": "Goat_Beige01",
       "name": "Camel Raminiature"
     },
     {
       "sheet": "unit",
-      "row_index": 466,
+      "row_index": 467,
       "id": "Goat_Beige02",
       "name": "White Raminiature"
     },
     {
       "sheet": "unit",
-      "row_index": 467,
+      "row_index": 468,
       "id": "Goat_Black",
       "name": "Black Raminiature"
     },
     {
       "sheet": "unit",
-      "row_index": 468,
+      "row_index": 469,
       "id": "Goat_Brown",
       "name": "Brown Raminiature"
     },
     {
       "sheet": "unit",
-      "row_index": 469,
+      "row_index": 470,
       "id": "Goat_Demon",
       "name": "Demonic Raminiature"
     },
     {
       "sheet": "unit",
-      "row_index": 470,
+      "row_index": 471,
       "id": "Goat_Grey",
       "name": "Grey Raminiature"
     },
     {
       "sheet": "unit",
-      "row_index": 471,
+      "row_index": 472,
       "id": "Goat_Spark",
       "name": "Sparkling Raminiature"
     },
     {
       "sheet": "unit",
-      "row_index": 472,
+      "row_index": 473,
       "id": "Frog_BlueGreen",
       "name": "Grassflopper"
     },
     {
       "sheet": "unit",
-      "row_index": 473,
+      "row_index": 474,
       "id": "Frog_Blue",
       "name": "Aqua Grassflopper"
     },
     {
       "sheet": "unit",
-      "row_index": 474,
+      "row_index": 475,
       "id": "Frog_BluePurple",
       "name": "Cloudy Grassflopper"
     },
     {
       "sheet": "unit",
-      "row_index": 475,
+      "row_index": 476,
       "id": "Frog_Brown",
       "name": "Brown Grassflopper"
     },
     {
       "sheet": "unit",
-      "row_index": 476,
+      "row_index": 477,
       "id": "Frog_Green",
       "name": "Swamp Grassflopper"
     },
     {
       "sheet": "unit",
-      "row_index": 477,
+      "row_index": 478,
       "id": "Frog_Yellow",
       "name": "Yellow Grassflopper"
     },
     {
       "sheet": "unit",
-      "row_index": 478,
+      "row_index": 479,
       "id": "Frog_RedOrange",
       "name": "Orange Grassflopper"
     },
     {
       "sheet": "unit",
-      "row_index": 479,
+      "row_index": 480,
       "id": "Frog_Demon",
       "name": "Night Grassflopper"
     },
     {
       "sheet": "unit",
-      "row_index": 480,
+      "row_index": 481,
       "id": "Frog_Spark",
       "name": "Sparkling Grassflopper"
     },
     {
       "sheet": "unit",
-      "row_index": 481,
+      "row_index": 482,
       "id": "Ladybug_Red",
       "name": "Red Leggybug"
     },
     {
       "sheet": "unit",
-      "row_index": 482,
+      "row_index": 483,
       "id": "Ladybug_Blue",
       "name": "Blue Leggybug"
     },
     {
       "sheet": "unit",
-      "row_index": 483,
+      "row_index": 484,
       "id": "Ladybug_Green",
       "name": "Grass Leggybug"
     },
     {
       "sheet": "unit",
-      "row_index": 484,
+      "row_index": 485,
       "id": "Ladybug_Purple",
       "name": "Purple Leggybug"
     },
     {
       "sheet": "unit",
-      "row_index": 485,
+      "row_index": 486,
       "id": "Ladybug_Yellow",
       "name": "Yellow Leggybug"
     },
     {
       "sheet": "unit",
-      "row_index": 486,
+      "row_index": 487,
       "id": "Ladybug_Demon",
       "name": "Night Leggybug"
     },
     {
       "sheet": "unit",
-      "row_index": 487,
+      "row_index": 488,
       "id": "Ladybug_Spark",
       "name": "Sparkling Leggybug"
     },
     {
       "sheet": "unit",
-      "row_index": 488,
+      "row_index": 489,
       "id": "Turtle_Grey",
       "name": "Tortrock"
     },
     {
       "sheet": "unit",
-      "row_index": 489,
+      "row_index": 490,
       "id": "Turtle_Green",
       "name": "Green Tortrock"
     },
     {
       "sheet": "unit",
-      "row_index": 490,
+      "row_index": 491,
       "id": "Turtle_Blue",
       "name": "Aqua Tortrock"
     },
     {
       "sheet": "unit",
-      "row_index": 491,
+      "row_index": 492,
       "id": "Turtle_Pink",
       "name": "Pink Tortrock"
     },
     {
       "sheet": "unit",
-      "row_index": 492,
+      "row_index": 493,
       "id": "Turtle_Red",
       "name": "Red Tortrock"
     },
     {
       "sheet": "unit",
-      "row_index": 493,
+      "row_index": 494,
       "id": "Turtle_Yellow",
       "name": "Yellow Tortrock"
     },
     {
       "sheet": "unit",
-      "row_index": 494,
+      "row_index": 495,
       "id": "Turtle_Spark",
       "name": "Sparkling Tortrock"
     },
     {
       "sheet": "unit",
-      "row_index": 495,
+      "row_index": 496,
       "id": "Turtle_Demon",
       "name": "Night Tortrock"
     },
     {
       "sheet": "unit",
-      "row_index": 496,
+      "row_index": 497,
       "id": "Lizard_Green",
       "name": "Saladmander"
     },
     {
       "sheet": "unit",
-      "row_index": 497,
+      "row_index": 498,
       "id": "Lizard_Blue",
       "name": "Blue Saladmander"
     },
     {
       "sheet": "unit",
-      "row_index": 498,
+      "row_index": 499,
       "id": "Lizard_Yellow",
       "name": "Yellow Saladmander"
     },
     {
       "sheet": "unit",
-      "row_index": 499,
+      "row_index": 500,
       "id": "Lizard_RedOrange",
       "name": "Crimson Saladmander"
     },
     {
       "sheet": "unit",
-      "row_index": 500,
+      "row_index": 501,
       "id": "Lizard_Demon",
       "name": "Night Saladmander"
     },
     {
       "sheet": "unit",
-      "row_index": 501,
+      "row_index": 502,
       "id": "Lizard_BlueOrange",
       "name": "Clown Saladmander"
     },
     {
       "sheet": "unit",
-      "row_index": 502,
+      "row_index": 503,
       "id": "Lizard_Spark",
       "name": "Sparkling Saladmander"
     },
     {
       "sheet": "unit",
-      "row_index": 503,
+      "row_index": 504,
       "id": "Lizard_Shop_Dragon",
       "name": "TODO"
     },
     {
       "sheet": "unit",
-      "row_index": 504,
+      "row_index": 505,
       "id": "StinkBug_Green",
       "name": "Aromabug"
     },
     {
       "sheet": "unit",
-      "row_index": 505,
+      "row_index": 506,
       "id": "StinkBug_Purple",
       "name": "Purple Aromabug"
     },
     {
       "sheet": "unit",
-      "row_index": 506,
+      "row_index": 507,
       "id": "StinkBug_Blue",
       "name": "Aqua Aromabug"
     },
     {
       "sheet": "unit",
-      "row_index": 507,
+      "row_index": 508,
       "id": "StinkBug_RedOrange",
       "name": "Crimson Aromabug"
     },
     {
       "sheet": "unit",
-      "row_index": 508,
+      "row_index": 509,
       "id": "StinkBug_Demon",
       "name": "Night Aromabug"
     },
     {
       "sheet": "unit",
-      "row_index": 509,
+      "row_index": 510,
       "id": "StinkBug_Spark",
       "name": "Sparkling Aromabug"
     },
     {
       "sheet": "unit",
-      "row_index": 510,
+      "row_index": 511,
       "id": "CannonHoney",
       "name": "Honey Cannon"
     },
     {
       "sheet": "unit",
-      "row_index": 511,
+      "row_index": 512,
       "id": "Cannon_Mokshi",
       "name": "Honey Cannon"
     },
     {
       "sheet": "unit",
-      "row_index": 512,
+      "row_index": 513,
       "id": "CannonPlant",
       "name": "Cannon Plant"
     },
     {
       "sheet": "unit",
-      "row_index": 513,
+      "row_index": 514,
       "id": "BaseHero",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 514,
+      "row_index": 515,
       "id": "BaseMount",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 515,
+      "row_index": 516,
       "id": "BaseMob",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 516,
+      "row_index": 517,
       "id": "BaseSummon",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 517,
+      "row_index": 518,
       "id": "W_Base",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 518,
+      "row_index": 519,
       "id": "W_Base_Small",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 519,
+      "row_index": 520,
       "id": "W_Base_Big",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 520,
+      "row_index": 521,
       "id": "W_Base_Unique",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 521,
+      "row_index": 522,
       "id": "W_Base_Elite",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 522,
+      "row_index": 523,
       "id": "D_Base",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 523,
+      "row_index": 524,
       "id": "D_Base_Small",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 524,
+      "row_index": 525,
       "id": "D_Base_Big",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 525,
+      "row_index": 526,
       "id": "D_Base_Elite",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 526,
+      "row_index": 527,
       "id": "W_Assassin",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 527,
+      "row_index": 528,
       "id": "W_Assassin_U",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 528,
+      "row_index": 529,
       "id": "D_Assassin",
       "name": ""
     },
     {
       "sheet": "unit",
-      "row_index": 529,
+      "row_index": 530,
       "id": "World",
       "name": "Environment"
     },
@@ -7752,2022 +7758,2034 @@
     {
       "sheet": "skill",
       "row_index": 761,
+      "id": "Wolf_Robin_Hoof_Auto",
+      "name": ""
+    },
+    {
+      "sheet": "skill",
+      "row_index": 762,
       "id": "Wolf_Auto_Status",
       "name": "Bleeding"
     },
     {
       "sheet": "skill",
-      "row_index": 762,
+      "row_index": 763,
+      "id": "Wolf_Robin_Hoof_Status",
+      "name": "Bleeding"
+    },
+    {
+      "sheet": "skill",
+      "row_index": 764,
       "id": "Wolf_Skill1",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 763,
+      "row_index": 765,
       "id": "Wolf_Skill1_Status",
       "name": "Destabilized"
     },
     {
       "sheet": "skill",
-      "row_index": 764,
+      "row_index": 766,
       "id": "Wolf_Skill2",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 765,
+      "row_index": 767,
       "id": "Wolf_Chaos_Passive",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 766,
+      "row_index": 768,
       "id": "Crab_Attack",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 767,
+      "row_index": 769,
       "id": "Crab_Elite_Attack",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 768,
+      "row_index": 770,
       "id": "Crab_Bubble",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 769,
+      "row_index": 771,
       "id": "GiantCrawler_Slash_Skill",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 770,
+      "row_index": 772,
       "id": "Slime_Attack",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 771,
+      "row_index": 773,
       "id": "Slime_Attack_Elite",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 772,
+      "row_index": 774,
       "id": "Slime_Slam_Skill",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 773,
+      "row_index": 775,
       "id": "Slime_Slam_Skill_Elite",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 774,
+      "row_index": 776,
       "id": "Demon_Slime_Slam_Skill_Elite1",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 775,
+      "row_index": 777,
       "id": "HoneySlime_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 776,
+      "row_index": 778,
       "id": "EarthGolem_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 777,
+      "row_index": 779,
       "id": "FireGolem_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 778,
+      "row_index": 780,
       "id": "Golem_Scream",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 779,
+      "row_index": 781,
       "id": "Golem_Auto_Elite",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 780,
+      "row_index": 782,
       "id": "FireGolem_Auto_Elite",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 781,
+      "row_index": 783,
       "id": "Golem_Skill",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 782,
+      "row_index": 784,
       "id": "FireGolem_Skill",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 783,
+      "row_index": 785,
       "id": "Golem_Earth_Elite_Eruption",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 784,
+      "row_index": 786,
       "id": "Golem_Fire_Elite_Eruption",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 785,
+      "row_index": 787,
       "id": "Golem_DeathDoorExplosion",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 786,
+      "row_index": 788,
       "id": "Golem_DeathDoorExplosion_Elite",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 787,
+      "row_index": 789,
       "id": "Golem_Explosion",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 788,
+      "row_index": 790,
       "id": "Golem_Explosion_Elite",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 789,
+      "row_index": 791,
       "id": "Spore_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 790,
+      "row_index": 792,
       "id": "WaterSpore_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 791,
+      "row_index": 793,
       "id": "LavaSpore_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 792,
+      "row_index": 794,
       "id": "Spore_Skill",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 793,
+      "row_index": 795,
       "id": "WaterSpore_Skill1",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 794,
+      "row_index": 796,
       "id": "Spirit_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 795,
+      "row_index": 797,
       "id": "Spirit_Skill",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 796,
+      "row_index": 798,
       "id": "Spirit_Donut",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 797,
+      "row_index": 799,
       "id": "ManfishBoss_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 798,
+      "row_index": 800,
       "id": "ManfishBoss_Aoe",
       "name": "Aquatic Eruption"
     },
     {
       "sheet": "skill",
-      "row_index": 799,
+      "row_index": 801,
       "id": "ManfishBoss_WaterVolley",
       "name": "Water Volley"
     },
     {
       "sheet": "skill",
-      "row_index": 800,
+      "row_index": 802,
       "id": "ManfishBoss_WaterVolley_Target",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 801,
+      "row_index": 803,
       "id": "ManfishBoss_WaterBreath",
       "name": "Water Breath"
     },
     {
       "sheet": "skill",
-      "row_index": 802,
+      "row_index": 804,
       "id": "ManfishBoss_WaterBreath_Shield",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 803,
+      "row_index": 805,
       "id": "ManfishBoss_WaterBreathStun",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 804,
+      "row_index": 806,
       "id": "ManfishBoss_Totem_HealBeam",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 805,
+      "row_index": 807,
       "id": "ManfishBoss_Bubble_Roam",
       "name": "Bubble Run"
     },
     {
       "sheet": "skill",
-      "row_index": 806,
+      "row_index": 808,
       "id": "ManfishBoss_Bubble_Roam_Status",
       "name": "Water Scar"
     },
     {
       "sheet": "skill",
-      "row_index": 807,
+      "row_index": 809,
       "id": "ManfishBoss_Bubble_Roam_Status_Slow",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 808,
+      "row_index": 810,
       "id": "Gatsbee_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 809,
+      "row_index": 811,
       "id": "Gatsbee_Barrage",
       "name": "Barrage"
     },
     {
       "sheet": "skill",
-      "row_index": 810,
+      "row_index": 812,
       "id": "Gatsbee_Heroic_Barrage_Bounce",
       "name": "Barrage"
     },
     {
       "sheet": "skill",
-      "row_index": 811,
+      "row_index": 813,
       "id": "Gatsbee_Heroic_Barrage_Puddle",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 812,
+      "row_index": 814,
       "id": "Gatsbee_Tornado",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 813,
+      "row_index": 815,
       "id": "Gatsbee_Tornado_Area",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 814,
+      "row_index": 816,
       "id": "Gatsbee_Heroic_Swarm",
       "name": "Heart of the Swarm"
     },
     {
       "sheet": "skill",
-      "row_index": 815,
+      "row_index": 817,
       "id": "Gastbee_Heroic_Swarm_Status",
       "name": "Biting Swarm"
     },
     {
       "sheet": "skill",
-      "row_index": 816,
+      "row_index": 818,
       "id": "Reblochonk_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 817,
+      "row_index": 819,
       "id": "Reblochonk_Skill1",
       "name": "Rampage"
     },
     {
       "sheet": "skill",
-      "row_index": 818,
+      "row_index": 820,
       "id": "Reblochonk_CheeseShot",
       "name": "Fragrant Wheel"
     },
     {
       "sheet": "skill",
-      "row_index": 819,
+      "row_index": 821,
       "id": "Reblochonk_Heroic_CheeseExplosion",
       "name": "Cheese Explosion"
     },
     {
       "sheet": "skill",
-      "row_index": 820,
+      "row_index": 822,
       "id": "R1CrabBoss_TidalSlash",
       "name": "Tidal Slash"
     },
     {
       "sheet": "skill",
-      "row_index": 821,
+      "row_index": 823,
       "id": "R1CrabBoss_TidalSlash_Heroic",
       "name": "Tidal Slash"
     },
     {
       "sheet": "skill",
-      "row_index": 822,
+      "row_index": 824,
       "id": "R1CrabBoss_ChitinousExoskeleton",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 823,
+      "row_index": 825,
       "id": "R1CrabBoss_ChitinousExoskeleton_Spike",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 824,
+      "row_index": 826,
       "id": "R1CrabBoss_Heroic_Avalanche",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 825,
+      "row_index": 827,
       "id": "R1CrabBoss_Heroic_Bubble",
       "name": "Bubble"
     },
     {
       "sheet": "skill",
-      "row_index": 826,
+      "row_index": 828,
       "id": "R1CrabBoss_Heroic_Bubble_Status",
       "name": "Bubble Shock"
     },
     {
       "sheet": "skill",
-      "row_index": 827,
+      "row_index": 829,
       "id": "R1CrabBoss_NayasFury",
       "name": "Naya's Fury"
     },
     {
       "sheet": "skill",
-      "row_index": 828,
+      "row_index": 830,
       "id": "R1CrabBoss_NayasFuryMoveStatus",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 829,
+      "row_index": 831,
       "id": "R1CrabBoss_HuntDown",
       "name": "Devour"
     },
     {
       "sheet": "skill",
-      "row_index": 830,
+      "row_index": 832,
       "id": "R1CrabBoss_HuntDownStatus",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 831,
+      "row_index": 833,
       "id": "Ratsar_Attack",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 832,
+      "row_index": 834,
       "id": "Ratsar_Heroic_Attack_Bleed",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 833,
+      "row_index": 835,
       "id": "Ratsar_GreatSlam",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 834,
+      "row_index": 836,
       "id": "Ratsar_GreatSlamArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 835,
+      "row_index": 837,
       "id": "Ratsar_GreatSlamAreaFire",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 836,
+      "row_index": 838,
       "id": "Ratsar_Heroic_Burn",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 837,
+      "row_index": 839,
       "id": "Ratsar_Spin",
       "name": "Raging Spin"
     },
     {
       "sheet": "skill",
-      "row_index": 838,
+      "row_index": 840,
       "id": "Ratsar_SparkAbsorption",
       "name": "Spark Absorption"
     },
     {
       "sheet": "skill",
-      "row_index": 839,
+      "row_index": 841,
       "id": "Ratsar_KingRage",
       "name": "King's Rage"
     },
     {
       "sheet": "skill",
-      "row_index": 840,
+      "row_index": 842,
       "id": "Ratsar_KingRageFailState",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 841,
+      "row_index": 843,
       "id": "Ratsar_KingRageSuccessState",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 842,
+      "row_index": 844,
       "id": "Ratsar_SparklingShield",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 843,
+      "row_index": 845,
       "id": "MChuck_Attack",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 844,
+      "row_index": 846,
       "id": "MChuck_Dash",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 845,
+      "row_index": 847,
       "id": "MChuck_IsolatedHeal",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 846,
+      "row_index": 848,
       "id": "MChuck_StaticBomb",
       "name": "Static Bomb"
     },
     {
       "sheet": "skill",
-      "row_index": 847,
+      "row_index": 849,
       "id": "MChuck_StaticBombArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 848,
+      "row_index": 850,
       "id": "MChuck_SprayedFondue",
       "name": "Sprayed Fondue"
     },
     {
       "sheet": "skill",
-      "row_index": 849,
+      "row_index": 851,
       "id": "MChuck_SprayedFondueArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 850,
+      "row_index": 852,
       "id": "MChuck_SprayedFondueStatus",
       "name": "Hot Cheese"
     },
     {
       "sheet": "skill",
-      "row_index": 851,
+      "row_index": 853,
       "id": "MChuck_CheeseCatapult",
       "name": "Cheese catapult"
     },
     {
       "sheet": "skill",
-      "row_index": 852,
+      "row_index": 854,
       "id": "MChuck_CheeseCatapultArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 853,
+      "row_index": 855,
       "id": "MChuck_Heroic",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 854,
+      "row_index": 856,
       "id": "MChuck_MadBombing",
       "name": "Mad bombing"
     },
     {
       "sheet": "skill",
-      "row_index": 855,
-      "id": "MChuck_MadBombingArea",
-      "name": ""
-    },
-    {
-      "sheet": "skill",
-      "row_index": 856,
+      "row_index": 857,
       "id": "Cleodora_Phase3Entry",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 857,
+      "row_index": 858,
       "id": "Cleodora_ChampionSummon",
       "name": "Champion of the Hive"
     },
     {
       "sheet": "skill",
-      "row_index": 858,
+      "row_index": 859,
       "id": "Cleodora_SparkRay",
       "name": "Spark-infused Ray"
     },
     {
       "sheet": "skill",
-      "row_index": 859,
+      "row_index": 860,
       "id": "Cleodora_SparkRayHitArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 860,
+      "row_index": 861,
       "id": "Cleodora_SparkRayFireArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 861,
+      "row_index": 862,
       "id": "Cleodora_Devastation",
       "name": "Devastation"
     },
     {
       "sheet": "skill",
-      "row_index": 862,
+      "row_index": 863,
       "id": "Cleodora_Strike",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 863,
+      "row_index": 864,
       "id": "Cleodora_RoyalSmash",
       "name": "Royal Smash"
     },
     {
       "sheet": "skill",
-      "row_index": 864,
+      "row_index": 865,
       "id": "Cleodora_RoyalSmashArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 865,
+      "row_index": 866,
       "id": "Cleodora_SparkAfllux_Start",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 866,
+      "row_index": 867,
       "id": "Cleodora_SparkAfllux_End",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 867,
+      "row_index": 868,
       "id": "CleodoraEgg_Cast",
       "name": "Champion Awakening"
     },
     {
       "sheet": "skill",
-      "row_index": 868,
+      "row_index": 869,
       "id": "CleodoraChamp_Spawn",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 869,
+      "row_index": 870,
       "id": "CleodoraChamp_Tornado",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 870,
+      "row_index": 871,
       "id": "CleodoraChamp_TornadoArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 871,
+      "row_index": 872,
       "id": "CleodoraFeeder_Beam",
       "name": "Feed the Queen"
     },
     {
       "sheet": "skill",
-      "row_index": 872,
+      "row_index": 873,
       "id": "Queenslayer_ChaosStrike",
       "name": "Chaos Strike"
     },
     {
       "sheet": "skill",
-      "row_index": 873,
+      "row_index": 874,
       "id": "Queenslayer_ChaosSlow",
       "name": "Chaos Slow"
     },
     {
       "sheet": "skill",
-      "row_index": 874,
+      "row_index": 875,
       "id": "Queenslayer_ChaosMark",
       "name": "Chaos Mark"
     },
     {
       "sheet": "skill",
-      "row_index": 875,
+      "row_index": 876,
       "id": "Queenslayer_Obliterate",
       "name": "Obliterate"
     },
     {
       "sheet": "skill",
-      "row_index": 876,
+      "row_index": 877,
       "id": "Queenslayer_ChaosAwakening",
       "name": "Chaos Awakening"
     },
     {
       "sheet": "skill",
-      "row_index": 877,
+      "row_index": 878,
       "id": "Queenslayer_DivideToReign",
       "name": "Divide to Reign"
     },
     {
       "sheet": "skill",
-      "row_index": 878,
+      "row_index": 879,
       "id": "Mokshi_Attack",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 879,
+      "row_index": 880,
       "id": "Mokshi_Leaves",
       "name": "Sharp Leaves"
     },
     {
       "sheet": "skill",
-      "row_index": 880,
+      "row_index": 881,
       "id": "Mokshi_DeadlyBlossom",
       "name": "Deadly Blossom"
     },
     {
       "sheet": "skill",
-      "row_index": 881,
+      "row_index": 882,
       "id": "Mokshi_Barrage",
       "name": "Royal Barrage"
     },
     {
       "sheet": "skill",
-      "row_index": 882,
+      "row_index": 883,
       "id": "Mokshi_Phase2Screech",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 883,
+      "row_index": 884,
       "id": "Mokshi_Heroic_Last_Stand",
       "name": "The Last Queen"
     },
     {
       "sheet": "skill",
-      "row_index": 884,
+      "row_index": 885,
       "id": "Mokshi_EnterChrysalis",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 885,
+      "row_index": 886,
       "id": "Mokshi_ChrysalisStatus",
       "name": "Chrysalis"
     },
     {
       "sheet": "skill",
-      "row_index": 886,
+      "row_index": 887,
       "id": "Mokshi_ChrysalisLaser",
       "name": "Charged Honey Beam"
     },
     {
       "sheet": "skill",
-      "row_index": 887,
+      "row_index": 888,
       "id": "Mokshi_ChrysalisEnd_Stun",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 888,
+      "row_index": 889,
       "id": "Mokshi_Phase3Screech",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 889,
+      "row_index": 890,
       "id": "Mokshi_Purge_Area",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 890,
+      "row_index": 891,
       "id": "Mokshi_Efflorescence",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 891,
+      "row_index": 892,
       "id": "Spongeblob_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 892,
+      "row_index": 893,
       "id": "Spongeblob_Skill1",
       "name": "Tidal Whirlwind"
     },
     {
       "sheet": "skill",
-      "row_index": 893,
+      "row_index": 894,
       "id": "Spongeblob_Skill1_Projectiles",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 894,
+      "row_index": 895,
       "id": "Spongeblob_Skill2",
       "name": "Abyssal Dance"
     },
     {
       "sheet": "skill",
-      "row_index": 895,
+      "row_index": 896,
       "id": "Spongeblob_Heroic_Bubble_Wall",
       "name": "Bubble Wall"
     },
     {
       "sheet": "skill",
-      "row_index": 896,
+      "row_index": 897,
       "id": "Spongeblob_Suffocation",
       "name": "Suffocation"
     },
     {
       "sheet": "skill",
-      "row_index": 897,
+      "row_index": 898,
       "id": "Spongeblob_Dance_DoubleJump",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 898,
+      "row_index": 899,
       "id": "Spongeblob_Dance_Low",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 899,
+      "row_index": 900,
       "id": "Spongeblob_Dance_High",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 900,
+      "row_index": 901,
       "id": "Golcano_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 901,
+      "row_index": 902,
       "id": "Golcano_ShieldApply",
       "name": "Fire Blast"
     },
     {
       "sheet": "skill",
-      "row_index": 902,
+      "row_index": 903,
       "id": "Golcano_ShieldApply_Status",
       "name": "Melting"
     },
     {
       "sheet": "skill",
-      "row_index": 903,
+      "row_index": 904,
       "id": "Golcano_Shield",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 904,
+      "row_index": 905,
       "id": "Golcano_Eruption",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 905,
+      "row_index": 906,
       "id": "Golcano_Minion_Auto",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 906,
+      "row_index": 907,
       "id": "Golcano_Volcano",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 907,
+      "row_index": 908,
       "id": "Golcano_Volcano_Spill",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 908,
+      "row_index": 909,
       "id": "Golcano_Minion_Eruption",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 909,
+      "row_index": 910,
       "id": "Golcano_Minion_DeathDoorExplosion",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 910,
+      "row_index": 911,
       "id": "Golcano_Minion_Explosion",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 911,
+      "row_index": 912,
       "id": "RobinHoof_Auto",
       "name": "Aimed shot"
     },
     {
       "sheet": "skill",
-      "row_index": 912,
+      "row_index": 913,
       "id": "RobinHoof_Disengage",
       "name": "Disengage"
     },
     {
       "sheet": "skill",
-      "row_index": 913,
+      "row_index": 914,
       "id": "RobinHoof_Heroic_Caltrops",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 914,
+      "row_index": 915,
       "id": "RobinHoof_Heroic_Caltrops_Slow",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 915,
+      "row_index": 916,
       "id": "RobinHoof_Arrow",
       "name": "Bellshot"
     },
     {
       "sheet": "skill",
-      "row_index": 916,
+      "row_index": 917,
       "id": "RobinHoof_Summon",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 917,
+      "row_index": 918,
       "id": "RobinHoof_Heroic_Dog_Buff",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 918,
-      "id": "Phrixes_Strike",
-      "name": ""
-    },
-    {
-      "sheet": "skill",
       "row_index": 919,
-      "id": "Phrixes_Phase1_Passive",
+      "id": "RobinHoof_Meat_Status",
       "name": ""
     },
     {
       "sheet": "skill",
       "row_index": 920,
-      "id": "Phrixes_Phase2_EnergyRegen",
+      "id": "Phrixes_Strike",
       "name": ""
     },
     {
       "sheet": "skill",
       "row_index": 921,
-      "id": "Phrixes_LightBolt",
-      "name": "Light Bolt"
+      "id": "Phrixes_Phase1_Passive",
+      "name": ""
     },
     {
       "sheet": "skill",
       "row_index": 922,
-      "id": "Phrixes_Phase1End",
+      "id": "Phrixes_Phase2_EnergyRegen",
       "name": ""
     },
     {
       "sheet": "skill",
       "row_index": 923,
+      "id": "Phrixes_LightBolt",
+      "name": "Light Bolt"
+    },
+    {
+      "sheet": "skill",
+      "row_index": 924,
+      "id": "Phrixes_Phase1End",
+      "name": ""
+    },
+    {
+      "sheet": "skill",
+      "row_index": 925,
       "id": "Phrixes_Phase2Entry",
       "name": "Surrendering to Darkness"
     },
     {
       "sheet": "skill",
-      "row_index": 924,
+      "row_index": 926,
       "id": "Phrixes_NightBolt",
       "name": "Night Bolt"
     },
     {
       "sheet": "skill",
-      "row_index": 925,
+      "row_index": 927,
       "id": "Phrixes_SigilOfWrath",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 926,
+      "row_index": 928,
       "id": "Phrixes_SigilOfWrathArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 927,
+      "row_index": 929,
       "id": "Phrixes_OrbSigil",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 928,
+      "row_index": 930,
       "id": "Phrixes_DimensionalInstability",
       "name": "Dimensional Instability"
     },
     {
       "sheet": "skill",
-      "row_index": 929,
+      "row_index": 931,
       "id": "Phrixes_DimensionalInstabilityStatus",
       "name": "Dimensional Instability"
     },
     {
       "sheet": "skill",
-      "row_index": 930,
+      "row_index": 932,
       "id": "Phrixes_Phase3Entry",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 931,
+      "row_index": 933,
       "id": "Phrixes_EternalNight",
       "name": "Eternal Night"
     },
     {
       "sheet": "skill",
-      "row_index": 932,
+      "row_index": 934,
       "id": "Phrixes_EternalNightStatus",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 933,
+      "row_index": 935,
       "id": "Phrixes_Phase4Entry",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 934,
+      "row_index": 936,
       "id": "Phrixes_DemonicStrike",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 935,
+      "row_index": 937,
       "id": "Phrixes_NightSalvo",
       "name": "Night Salvo"
     },
     {
       "sheet": "skill",
-      "row_index": 936,
+      "row_index": 938,
       "id": "Phrixes_PowerExpulsion",
       "name": "Power Expulsion"
     },
     {
       "sheet": "skill",
-      "row_index": 937,
+      "row_index": 939,
       "id": "Phrixes_OpenRift",
       "name": "Open Rift"
     },
     {
       "sheet": "skill",
-      "row_index": 938,
+      "row_index": 940,
       "id": "Phrixes_OpenRiftStatus",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 939,
+      "row_index": 941,
       "id": "Phrixes_RiftExplosion",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 940,
+      "row_index": 942,
       "id": "Phrixes_ChaosOrb",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 941,
+      "row_index": 943,
       "id": "Phrixes_ChaosOrbStatus",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 942,
+      "row_index": 944,
       "id": "Phrixes_HeapsChaosHorizontal",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 943,
+      "row_index": 945,
       "id": "Phrixes_HeapsChaosHorizontalArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 944,
+      "row_index": 946,
       "id": "Phrixes_HeapsChaosVertical",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 945,
+      "row_index": 947,
       "id": "Phrixes_HeapsChaosVerticalArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 946,
+      "row_index": 948,
       "id": "Phrixes_Demon_Summon",
       "name": "Gate to Niflel"
     },
     {
       "sheet": "skill",
-      "row_index": 947,
+      "row_index": 949,
       "id": "Phrixes_Demon_Gate_Summon",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 948,
+      "row_index": 950,
       "id": "Phrixes_H_NC_Spawn",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 949,
+      "row_index": 951,
       "id": "Phrixes_H_NC_Passive",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 950,
+      "row_index": 952,
       "id": "Phrixes_H_NC_Explosion",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 951,
+      "row_index": 953,
       "id": "Phrixes_NC_Bonus",
       "name": "Demonic Power"
     },
     {
       "sheet": "skill",
-      "row_index": 952,
+      "row_index": 954,
       "id": "Phrixes_NC_Bonus_Scale",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 953,
+      "row_index": 955,
       "id": "Phrixes_H_NG_Spawn",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 954,
+      "row_index": 956,
       "id": "Phrixes_H_NG_Status",
       "name": "Rift bound"
     },
     {
       "sheet": "skill",
-      "row_index": 955,
+      "row_index": 957,
       "id": "Phrixes_H_NG_ChaosBeam",
       "name": "Annihilation"
     },
     {
       "sheet": "skill",
-      "row_index": 956,
+      "row_index": 958,
       "id": "Phrixes_H_NG_ChaosMeteor",
       "name": "Chaos Meteor"
     },
     {
       "sheet": "skill",
-      "row_index": 957,
+      "row_index": 959,
       "id": "Phrixes_H_NG_NightSalvo",
       "name": "Night Salvo"
     },
     {
       "sheet": "skill",
-      "row_index": 958,
+      "row_index": 960,
       "id": "Phrixes_H_NG_NightSalvo_Voley",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 959,
+      "row_index": 961,
       "id": "Phrixes_H_NG_CosmicPower",
       "name": "Cosmic Power"
     },
     {
       "sheet": "skill",
-      "row_index": 960,
+      "row_index": 962,
       "id": "Phrixes_H_NGGate_Visual_Status",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 961,
+      "row_index": 963,
       "id": "Phrixes_H_NGGate_Beam",
       "name": "TODO"
     },
     {
       "sheet": "skill",
-      "row_index": 962,
+      "row_index": 964,
       "id": "Ulserous_Auto",
       "name": "Luon Blast"
     },
     {
       "sheet": "skill",
-      "row_index": 963,
+      "row_index": 965,
       "id": "Ulserous_Summon",
       "name": "Ancient Manifestation"
     },
     {
       "sheet": "skill",
-      "row_index": 964,
+      "row_index": 966,
       "id": "Ulserous_Summon_Aoe",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 965,
+      "row_index": 967,
       "id": "Ulserous_Keekoho",
       "name": "Kee Ko Ho"
     },
     {
       "sheet": "skill",
-      "row_index": 966,
+      "row_index": 968,
       "id": "Ulserous_LuonDischarge",
       "name": "Luon Discharge"
     },
     {
       "sheet": "skill",
-      "row_index": 967,
+      "row_index": 969,
       "id": "Ulserous_LuonDischargeArea",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 968,
+      "row_index": 970,
       "id": "Cannon_HoneyShot_Liquid",
       "name": "Shoot Liquid Honey"
     },
     {
       "sheet": "skill",
-      "row_index": 969,
+      "row_index": 971,
       "id": "Cannon_HoneyShot_Solid",
       "name": "Shoot solid Honey"
     },
     {
       "sheet": "skill",
-      "row_index": 970,
+      "row_index": 972,
       "id": "Cannon_MokshiShot",
       "name": "Shoot solid Honey"
     },
     {
       "sheet": "skill",
-      "row_index": 971,
+      "row_index": 973,
       "id": "CannonPlant_Load",
       "name": "Digestion"
     },
     {
       "sheet": "skill",
-      "row_index": 972,
+      "row_index": 974,
       "id": "CannonPlant_Shoot",
       "name": "Spit Out"
     },
     {
       "sheet": "skill",
-      "row_index": 973,
+      "row_index": 975,
       "id": "Trap_Spikes",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 974,
+      "row_index": 976,
       "id": "CliffDefenderFire",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 975,
+      "row_index": 977,
       "id": "CliffDefenderNature",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 976,
+      "row_index": 978,
       "id": "Fire_Geyser_Vertical",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 977,
+      "row_index": 979,
       "id": "Fire_Geyser_Horizontal",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 978,
+      "row_index": 980,
       "id": "Oxygen_Geyser_Vertical",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 979,
+      "row_index": 981,
       "id": "Pilgrims_FlaskSpeed_Status",
       "name": "Pilgrim's Stride"
     },
     {
       "sheet": "skill",
-      "row_index": 980,
+      "row_index": 982,
       "id": "ConsumeFlask",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 981,
+      "row_index": 983,
       "id": "ConsumeItem",
       "name": "[Item_Consume]"
     },
     {
       "sheet": "skill",
-      "row_index": 982,
+      "row_index": 984,
       "id": "GainItem",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 983,
+      "row_index": 985,
       "id": "Mount",
       "name": "Mount"
     },
     {
       "sheet": "skill",
-      "row_index": 984,
+      "row_index": 986,
       "id": "ConsumePotion",
       "name": "[Item_Consume]"
     },
     {
       "sheet": "skill",
-      "row_index": 985,
+      "row_index": 987,
       "id": "ConsumeDrink",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 986,
+      "row_index": 988,
       "id": "ConsumeScroll",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 987,
+      "row_index": 989,
       "id": "ConsumeFood",
       "name": "[Item_Consume]"
     },
     {
       "sheet": "skill",
-      "row_index": 988,
+      "row_index": 990,
       "id": "PrepareWorldConsumable",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 989,
+      "row_index": 991,
       "id": "LearnRecipe",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 990,
+      "row_index": 992,
       "id": "ItemStatus",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 991,
+      "row_index": 993,
       "id": "MinorShieldPotion_Status",
       "name": "Minor Shield Potion"
     },
     {
       "sheet": "skill",
-      "row_index": 992,
+      "row_index": 994,
       "id": "ShieldPotion_Status",
       "name": "Shield Potion"
     },
     {
       "sheet": "skill",
-      "row_index": 993,
+      "row_index": 995,
       "id": "MinorVelocityPotion_Status",
       "name": "Minor Velocity Potion"
     },
     {
       "sheet": "skill",
-      "row_index": 994,
+      "row_index": 996,
       "id": "FastSwimPotion",
       "name": "Fast Swim Potion"
     },
     {
       "sheet": "skill",
-      "row_index": 995,
+      "row_index": 997,
       "id": "FastSwimPotionStatus",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 996,
+      "row_index": 998,
       "id": "LongBreathPotion",
       "name": "Long Breath Potion"
     },
     {
       "sheet": "skill",
-      "row_index": 997,
+      "row_index": 999,
       "id": "SacrificePotion_Status",
       "name": "Sacrifice Potion"
     },
     {
       "sheet": "skill",
-      "row_index": 998,
+      "row_index": 1000,
       "id": "VesselPotion_Status",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 999,
+      "row_index": 1001,
       "id": "ElixirOfAbundanceStatus",
       "name": "Elixir of Abundance"
     },
     {
       "sheet": "skill",
-      "row_index": 1000,
+      "row_index": 1002,
       "id": "Enchant_FlamingWeapon",
       "name": "Flaming Weapon"
     },
     {
       "sheet": "skill",
-      "row_index": 1001,
+      "row_index": 1003,
       "id": "Enchant_SparkHarvesting",
       "name": "Spark Harvesting"
     },
     {
       "sheet": "skill",
-      "row_index": 1002,
+      "row_index": 1004,
       "id": "Enchant_Zealot",
       "name": "Zealot"
     },
     {
       "sheet": "skill",
-      "row_index": 1003,
+      "row_index": 1005,
       "id": "Enchant_Zealot_Status",
       "name": "Zealot"
     },
     {
       "sheet": "skill",
-      "row_index": 1004,
+      "row_index": 1006,
       "id": "Enchant_Devote",
       "name": "Devote"
     },
     {
       "sheet": "skill",
-      "row_index": 1005,
+      "row_index": 1007,
       "id": "Enchant_Devote_Status",
       "name": "Devote"
     },
     {
       "sheet": "skill",
-      "row_index": 1006,
+      "row_index": 1008,
       "id": "Enchant_Lifestealing",
       "name": "Lifestealing"
     },
     {
       "sheet": "skill",
-      "row_index": 1007,
+      "row_index": 1009,
       "id": "Whetstone_Status",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1008,
+      "row_index": 1010,
       "id": "Weighstone_Status",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1009,
+      "row_index": 1011,
       "id": "StoneOfPower_Trinket",
       "name": "Stone of Power"
     },
     {
       "sheet": "skill",
-      "row_index": 1010,
+      "row_index": 1012,
       "id": "StoneOfPower_Trinket_Status",
       "name": "Stone of Power"
     },
     {
       "sheet": "skill",
-      "row_index": 1011,
+      "row_index": 1013,
       "id": "StoneOfCunning_Trinket",
       "name": "Stone of Cunning"
     },
     {
       "sheet": "skill",
-      "row_index": 1012,
+      "row_index": 1014,
       "id": "StoneOfCunning_Trinket_Status",
       "name": "Stone of Cunning"
     },
     {
       "sheet": "skill",
-      "row_index": 1013,
+      "row_index": 1015,
       "id": "StoneOfWisdom_Trinket",
       "name": "Stone of Wisdom"
     },
     {
       "sheet": "skill",
-      "row_index": 1014,
+      "row_index": 1016,
       "id": "StoneOfWisdom_Trinket_Status",
       "name": "Stone of Wisdom"
     },
     {
       "sheet": "skill",
-      "row_index": 1015,
+      "row_index": 1017,
       "id": "StoneOfRighteousness_Trinket",
       "name": "Stone of Righteousness"
     },
     {
       "sheet": "skill",
-      "row_index": 1016,
+      "row_index": 1018,
       "id": "StoneOfRighteousness_Trinket_Status",
       "name": "Stone of Righteousness"
     },
     {
       "sheet": "skill",
-      "row_index": 1017,
+      "row_index": 1019,
       "id": "InfusedTusk",
       "name": "Infused Tusk"
     },
     {
       "sheet": "skill",
-      "row_index": 1018,
+      "row_index": 1020,
       "id": "InfusedTusk_Cooldown",
       "name": "Infused Tusk"
     },
     {
       "sheet": "skill",
-      "row_index": 1019,
+      "row_index": 1021,
       "id": "InfusedTusk_Status",
       "name": "Infused Tusk"
     },
     {
       "sheet": "skill",
-      "row_index": 1020,
+      "row_index": 1022,
       "id": "PurifiedHeart",
       "name": "Purified Heart"
     },
     {
       "sheet": "skill",
-      "row_index": 1021,
+      "row_index": 1023,
       "id": "PurifiedHeart_Status",
       "name": "Purified Heart"
     },
     {
       "sheet": "skill",
-      "row_index": 1022,
+      "row_index": 1024,
       "id": "PurifiedHeart_Proc",
       "name": "Purified Heart"
     },
     {
       "sheet": "skill",
-      "row_index": 1023,
+      "row_index": 1025,
       "id": "PrismaticPearl",
       "name": "Prismatic Pearl"
     },
     {
       "sheet": "skill",
-      "row_index": 1024,
+      "row_index": 1026,
       "id": "PrismaticPearl_Status",
       "name": "Prismatic Pearl"
     },
     {
       "sheet": "skill",
-      "row_index": 1025,
+      "row_index": 1027,
       "id": "PrismaticPearl_Status2",
       "name": "Prismatic Pearl"
     },
     {
       "sheet": "skill",
-      "row_index": 1026,
+      "row_index": 1028,
       "id": "Trinket_Manfish",
       "name": "Poetrident"
     },
     {
       "sheet": "skill",
-      "row_index": 1027,
+      "row_index": 1029,
       "id": "Trinket_Manfish_Status",
       "name": "Poetrident"
     },
     {
       "sheet": "skill",
-      "row_index": 1028,
+      "row_index": 1030,
       "id": "Trinket_Kobold",
       "name": "Raclette Pan"
     },
     {
       "sheet": "skill",
-      "row_index": 1029,
+      "row_index": 1031,
       "id": "Trinket_Kobold_Status",
       "name": "Raclette Pan"
     },
     {
       "sheet": "skill",
-      "row_index": 1030,
+      "row_index": 1032,
       "id": "Trinket_Bee",
       "name": "Eternal Flower Heart"
     },
     {
       "sheet": "skill",
-      "row_index": 1031,
+      "row_index": 1033,
       "id": "Trinket_Bee_Status",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1032,
+      "row_index": 1034,
       "id": "Trinket_Crimson",
       "name": "Lost Relic Found"
     },
     {
       "sheet": "skill",
-      "row_index": 1033,
+      "row_index": 1035,
       "id": "Trinket_Crimson_Status",
       "name": "Lost Relic Found"
     },
     {
       "sheet": "skill",
-      "row_index": 1034,
+      "row_index": 1036,
       "id": "Trinket_Demon",
       "name": "Finger of Sukuna'Maatata"
     },
     {
       "sheet": "skill",
-      "row_index": 1035,
+      "row_index": 1037,
       "id": "Trinket_Demon_Status",
       "name": "Finger of Sukuna'Maatata"
     },
     {
       "sheet": "skill",
-      "row_index": 1036,
+      "row_index": 1038,
       "id": "Sword_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1037,
+      "row_index": 1039,
       "id": "Mace_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1038,
+      "row_index": 1040,
       "id": "Axe_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1039,
+      "row_index": 1041,
       "id": "DualSwords_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1040,
+      "row_index": 1042,
       "id": "DualMaces_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1041,
+      "row_index": 1043,
       "id": "DualAxes_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1042,
+      "row_index": 1044,
       "id": "Daggers_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1043,
+      "row_index": 1045,
       "id": "Fists_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1044,
+      "row_index": 1046,
       "id": "GreatSword_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1045,
+      "row_index": 1047,
       "id": "GreatAxe_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1046,
+      "row_index": 1048,
       "id": "GreatMace_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1047,
+      "row_index": 1049,
       "id": "Spear_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1048,
+      "row_index": 1050,
       "id": "Crescent_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1049,
+      "row_index": 1051,
       "id": "Staff_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1050,
+      "row_index": 1052,
       "id": "Bow_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1051,
+      "row_index": 1053,
       "id": "Book_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1052,
+      "row_index": 1054,
       "id": "Halos_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1053,
+      "row_index": 1055,
       "id": "Scepter_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1054,
+      "row_index": 1056,
       "id": "Thrown_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1055,
+      "row_index": 1057,
       "id": "Shield_Upgrade",
       "name": "Weapon Upgraded"
     },
     {
       "sheet": "skill",
-      "row_index": 1056,
+      "row_index": 1058,
       "id": "Luck_LegendaryWeapon_Status",
       "name": "Legendary Insight"
     },
     {
       "sheet": "skill",
-      "row_index": 1057,
+      "row_index": 1059,
       "id": "Luck_Mount_Status",
       "name": "Beastcaller"
     },
     {
       "sheet": "skill",
-      "row_index": 1058,
+      "row_index": 1060,
       "id": "Luck_Glider_Status",
       "name": "Windborn"
     },
     {
       "sheet": "skill",
-      "row_index": 1059,
+      "row_index": 1061,
       "id": "Luck_RareMaterial_Status",
       "name": "Prospector's Eye"
     },
     {
       "sheet": "skill",
-      "row_index": 1060,
+      "row_index": 1062,
       "id": "Luck_PrismaticGear_Status",
       "name": "Prismatic Fortune"
     },
     {
       "sheet": "skill",
-      "row_index": 1061,
-      "id": "Interact_Instant",
-      "name": ""
-    },
-    {
-      "sheet": "skill",
-      "row_index": 1062,
-      "id": "Interact_Talk",
-      "name": "Talk"
-    },
-    {
-      "sheet": "skill",
       "row_index": 1063,
-      "id": "Interact_Fast",
+      "id": "Interact_Instant",
       "name": "Interact"
     },
     {
       "sheet": "skill",
       "row_index": 1064,
-      "id": "Interact_Medium",
-      "name": "Interact"
+      "id": "Interact_Talk",
+      "name": "Talk"
     },
     {
       "sheet": "skill",
       "row_index": 1065,
-      "id": "Interact_Chest",
+      "id": "Interact_Fast",
       "name": "Interact"
     },
     {
       "sheet": "skill",
       "row_index": 1066,
+      "id": "Interact_Medium",
+      "name": "Interact"
+    },
+    {
+      "sheet": "skill",
+      "row_index": 1067,
+      "id": "Interact_Chest",
+      "name": "Interact"
+    },
+    {
+      "sheet": "skill",
+      "row_index": 1068,
       "id": "Complete_Package",
       "name": "Complete"
     },
     {
       "sheet": "skill",
-      "row_index": 1067,
+      "row_index": 1069,
       "id": "Mine",
       "name": "Mine"
     },
     {
       "sheet": "skill",
-      "row_index": 1068,
+      "row_index": 1070,
       "id": "Craft",
       "name": "Mine"
     },
     {
       "sheet": "skill",
-      "row_index": 1069,
+      "row_index": 1071,
       "id": "Gather",
       "name": "Gather"
     },
     {
       "sheet": "skill",
-      "row_index": 1070,
+      "row_index": 1072,
       "id": "Exit_Vehicle",
       "name": "Exit"
     },
     {
       "sheet": "skill",
-      "row_index": 1071,
+      "row_index": 1073,
       "id": "TeleportationStone",
       "name": "Recall"
     },
     {
       "sheet": "skill",
-      "row_index": 1072,
+      "row_index": 1074,
       "id": "AddToCollection",
       "name": "Add to Collection"
     },
     {
       "sheet": "skill",
-      "row_index": 1073,
+      "row_index": 1075,
       "id": "Resurrect",
       "name": "Resurrect"
     },
     {
       "sheet": "skill",
-      "row_index": 1074,
+      "row_index": 1076,
       "id": "OreAffix_Fire",
       "name": "Pyrh Blessed"
     },
     {
       "sheet": "skill",
-      "row_index": 1075,
+      "row_index": 1077,
       "id": "OreAffix_Fire_Status",
       "name": "Pyrh Blessed"
     },
     {
       "sheet": "skill",
-      "row_index": 1076,
+      "row_index": 1078,
       "id": "OreAffix_Ice",
       "name": "Naya Blessed"
     },
     {
       "sheet": "skill",
-      "row_index": 1077,
+      "row_index": 1079,
       "id": "OreAffix_Ice_Status",
       "name": "Naya Blessed"
     },
     {
       "sheet": "skill",
-      "row_index": 1078,
+      "row_index": 1080,
       "id": "OreAffix_Ice_Slow",
       "name": "Naya Blessed"
     },
     {
       "sheet": "skill",
-      "row_index": 1079,
+      "row_index": 1081,
       "id": "OreAffix_Air",
       "name": "Aoyl Blessed"
     },
     {
       "sheet": "skill",
-      "row_index": 1080,
+      "row_index": 1082,
       "id": "OreAffix_Air_Status",
       "name": "Aoyl Blessed"
     },
     {
       "sheet": "skill",
-      "row_index": 1081,
+      "row_index": 1083,
       "id": "OreAffix_Nature",
       "name": "Mely Blessed"
     },
     {
       "sheet": "skill",
-      "row_index": 1082,
+      "row_index": 1084,
       "id": "OreAffix_Nature_Status",
       "name": "Mely Blessed"
     },
     {
       "sheet": "skill",
-      "row_index": 1083,
+      "row_index": 1085,
       "id": "RiftstalkersReputation_Skill",
       "name": "Nightlings' Favor"
     },
     {
       "sheet": "skill",
-      "row_index": 1084,
+      "row_index": 1086,
       "id": "RiftstalkersReputation_RiftKillBuff",
       "name": "Chaos Predator"
     },
     {
       "sheet": "skill",
-      "row_index": 1085,
+      "row_index": 1087,
       "id": "RiftstalkersReputation_SoulwellVitality",
       "name": "Chaos Vitality"
     },
     {
       "sheet": "skill",
-      "row_index": 1086,
+      "row_index": 1088,
       "id": "Activity_BallonBouncing",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1087,
+      "row_index": 1089,
       "id": "Activity_BallonBouncing_StatusCounter",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1088,
+      "row_index": 1090,
       "id": "Respawn_Remaining",
       "name": "Remaining Respawn"
     },
     {
       "sheet": "skill",
-      "row_index": 1089,
+      "row_index": 1091,
       "id": "FallDamage",
       "name": "Fall Damage"
     },
     {
       "sheet": "skill",
-      "row_index": 1090,
+      "row_index": 1092,
       "id": "GenericHeal",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1091,
+      "row_index": 1093,
       "id": "DebugShield",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1092,
+      "row_index": 1094,
       "id": "DebugShieldStatus",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1093,
+      "row_index": 1095,
       "id": "FXTest",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1094,
+      "row_index": 1096,
       "id": "Count",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1095,
+      "row_index": 1097,
       "id": "ConsumableStatus",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1096,
+      "row_index": 1098,
       "id": "ProjTest",
       "name": ""
     },
     {
       "sheet": "skill",
-      "row_index": 1097,
+      "row_index": 1099,
       "id": "SpeedBoost",
       "name": ""
     },
@@ -39171,12 +39189,6 @@
             "props": {}
           },
           {
-            "skill": "MChuck_SprayedFondue",
-            "flags": 1,
-            "phaseBlacklist": [],
-            "props": {}
-          },
-          {
             "skill": "MChuck_CheeseCatapult",
             "phaseBlacklist": [],
             "props": {},
@@ -39203,101 +39215,25 @@
         ],
         "stats": [
           {
-            "levelScaling": [
-              {
-                "val": 65
-              },
-              {
-                "val": 990,
-                "comment": ""
-              }
-            ],
-            "attribute": "Strength",
-            "flags": 0,
-            "specScaling": {
-              "playerCount": [
-                {
-                  "multiply": 1
-                },
-                {
-                  "multiply": 1.2
-                },
-                {
-                  "multiply": 1.4
-                },
-                {
-                  "multiply": 1.6
-                }
-              ]
-            }
-          },
-          {
-            "levelScaling": [
-              {
-                "val": 35
-              },
-              {
-                "val": 110,
-                "comment": ""
-              }
-            ],
-            "attribute": "Dexterity",
-            "flags": 0
-          },
-          {
-            "levelScaling": [
-              {
-                "val": 65
-              },
-              {
-                "val": 990,
-                "comment": ""
-              }
-            ],
-            "attribute": "Intellect",
-            "flags": 0
-          },
-          {
-            "levelScaling": [
-              {
-                "val": 35
-              },
-              {
-                "val": 110,
-                "comment": ""
-              }
-            ],
-            "attribute": "Faith",
-            "flags": 0
-          },
-          {
-            "levelScaling": [
-              {
-                "val": 2000
-              },
-              {
-                "val": 22000,
-                "comment": ""
-              }
-            ],
+            "levelScaling": [],
             "attribute": "Vitality",
             "flags": 0,
-            "specScaling": {
-              "playerCount": [
-                {
-                  "multiply": 1
-                },
-                {
-                  "multiply": 2.5
-                },
-                {
-                  "multiply": 3.5
-                },
-                {
-                  "multiply": 4.5
-                }
-              ]
-            }
+            "multiplier": 22,
+            "heroic": false
+          },
+          {
+            "levelScaling": [],
+            "flags": 0,
+            "attribute": "Vitality",
+            "multiplier": 40,
+            "heroic": true
+          },
+          {
+            "levelScaling": [],
+            "attribute": "FoePower",
+            "flags": 0,
+            "multiplier": 1.5,
+            "heroic": true
           },
           {
             "levelScaling": [],
@@ -39305,15 +39241,17 @@
             "flags": 0,
             "specScaling": {
               "armorReduction": 0.4
-            }
+            },
+            "heroic": true
           },
           {
             "levelScaling": [],
-            "flags": 0,
             "attribute": "MagicArmor",
+            "flags": 0,
             "specScaling": {
               "magicReduction": 0.4
-            }
+            },
+            "heroic": true
           },
           {
             "levelScaling": [],
@@ -39371,7 +39309,8 @@
             ]
           },
           "bossLootTable": "MunsterChuck",
-          "lootTable": "MunsterChuck_LT2"
+          "lootTable": "MunsterChuck_LT2",
+          "heroicLootTable": "MunsterChuck_HM"
         },
         "flags": 8208,
         "vars": {
@@ -39386,15 +39325,15 @@
               "comment": "phase 1"
             },
             {
-              "interval": 4,
+              "interval": 5,
               "comment": "phase 2"
             },
             {
-              "interval": 3,
+              "interval": 5,
               "comment": "phase 3"
             },
             {
-              "interval": 2,
+              "interval": 5,
               "comment": "phase 4"
             }
           ],
@@ -39422,13 +39361,13 @@
         },
         "inherit": [
           {
-            "ref": "W_Base"
+            "ref": "D_Base"
           }
         ],
         "type": "Kobold",
         "faction": "Kobold",
         "talentTrees": [],
-        "script": "// var1: How many sprayed fondue runs in a row\n// var2: Room with inverted trains (negative value to disable)\n// var3: move speed factor when changing room or using SprayedFondue\n// salvo: cooldown between two train in seconds for each phase\n// wait1: how long before summoning dockerTrain when changing phase\n// delay: how many seconds ahead of trains to trigger avoidance (negative value means no avoidance)\n// range: Distance to avoidance point to trigger Chuck's dodge\n// summon1: DockerTrain foe group\n\nfunction onEnterCombat() {\n\tsetChallenge(unit, Ach.Complete_Z2_Munster_HM_Special, true);\n}"
+        "script": "// var1: How many sprayed fondue runs in a row\n// var2: Room with inverted trains (negative value to disable)\n// var3: move speed factor when changing room or using SprayedFondue\n// salvo: cooldown between two train in seconds for each phase\n// wait1: how long before dockerTrain departs when dockers are cleared\n// delay: how many seconds ahead of trains to trigger avoidance (negative value means no avoidance)\n// range: Distance to avoidance point to trigger Chuck's dodge\n// summon1: DockerTrain foe group\n\nfunction onEnterCombat() {\n\tsetChallenge(unit, Ach.Complete_Z2_Munster_HM_Special, true);\n}"
       },
       {
         "id": "Mokshi",
@@ -40334,7 +40273,8 @@
             ]
           },
           "lootTable": "Phrixes",
-          "bossLootTable": "Phrixes_LT2"
+          "bossLootTable": "Phrixes_LT2",
+          "heroicLootTable": "Phrixes_HM"
         },
         "flags": 16,
         "vars": {
@@ -41131,7 +41071,8 @@
             }
           ],
           "bossLootTable": "Cleodora",
-          "lootTable": "Cleodora_LT2"
+          "lootTable": "Cleodora_LT2",
+          "heroicLootTable": "Cleodora_HM"
         },
         "flags": 16,
         "vars": {},
@@ -41902,7 +41843,46 @@
           }
         ],
         "talentTrees": [],
-        "stats": [],
+        "stats": [
+          {
+            "levelScaling": [],
+            "flags": 0,
+            "attribute": "WalkSpeed",
+            "value": 400
+          },
+          {
+            "levelScaling": [],
+            "flags": 0,
+            "attribute": "Vitality",
+            "heroic": true,
+            "multiplier": 3.5
+          },
+          {
+            "levelScaling": [],
+            "flags": 0,
+            "attribute": "FoePower",
+            "heroic": true,
+            "multiplier": 1.5
+          },
+          {
+            "levelScaling": [],
+            "flags": 0,
+            "attribute": "Armor",
+            "specScaling": {
+              "armorReduction": 0.4
+            },
+            "heroic": true
+          },
+          {
+            "levelScaling": [],
+            "flags": 0,
+            "attribute": "MagicArmor",
+            "specScaling": {
+              "magicReduction": 0.4
+            },
+            "heroic": true
+          }
+        ],
         "props": {
           "list": [
             {
@@ -41942,8 +41922,9 @@
               }
             ]
           },
-          "bossLootTable": "RobinHoof_LT2",
-          "lootTable": "RobinHoof"
+          "bossLootTable": "RobinHoof",
+          "lootTable": "RobinHoof_LT2",
+          "heroicLootTable": "RobinHoof_HM"
         },
         "flags": 16,
         "vars": {},
@@ -41976,7 +41957,7 @@
         "parts": {},
         "skills": [
           {
-            "skill": "Wolf_Elite_Auto",
+            "skill": "Wolf_Robin_Hoof_Auto",
             "flags": 0,
             "phaseBlacklist": [],
             "props": {}
@@ -42012,6 +41993,53 @@
           "x": 0,
           "y": 0
         }
+      },
+      {
+        "id": "RobinHoofMeat",
+        "type": "Human",
+        "texts": {
+          "name": "Chunk of Meat"
+        },
+        "models": [
+          {
+            "ref": "RobinHoof_Meat",
+            "template": 0
+          }
+        ],
+        "parts": {},
+        "skills": [
+          {
+            "skill": "RobinHoof_Meat_Status",
+            "phaseBlacklist": [],
+            "props": {},
+            "flags": 0
+          }
+        ],
+        "talentTrees": [],
+        "stats": [
+          {
+            "levelScaling": [],
+            "flags": 0,
+            "attribute": "Vitality",
+            "multiplier": 0.2
+          }
+        ],
+        "props": {},
+        "flags": 802496,
+        "vars": {},
+        "gfx": {
+          "file": "UI/Portraits/Units/Hound_Redhead.png",
+          "size": 256,
+          "x": 0,
+          "y": 0
+        },
+        "faction": "Crimson",
+        "inherit": [
+          {
+            "ref": "W_Base"
+          }
+        ],
+        "lvl": 23
       },
       {
         "id": "Base_Critter",
@@ -46207,7 +46235,7 @@
         "nature": 2,
         "texts": {
           "name": "Parry",
-          "desc": "Blocks incoming [Attack]s, reducing their damage by ::val1%::.\nPerfect blocking reduces their damage by an additional ::var2%:: and increases the damage of your next [Attack] by ::ref_damage%::.",
+          "desc": "Blocks incoming [Attack]s, reducing their damage by ::val1%::.\nPerfect blocking reduces their damage by an additional ::var2%:: and increases the damage of your next [ComboAttack] by ::ref_damage%::.",
           "refs": {
             "ref": "PhysicalBlock_Status_WellTimed"
           }
@@ -66643,37 +66671,10 @@
         },
         "steps": [
           {
-            "on": 14,
-            "props": {},
-            "type": 25,
-            "visuals": {
-              "fxs": [
-                {
-                  "set": "Telegraph_Line_Preview",
-                  "props": {
-                    "matchStep": "Shoot"
-                  },
-                  "flags": 24
-                }
-              ]
-            },
-            "range": 40
-          },
-          {
             "on": 0,
             "props": {},
             "duration": 0.25,
             "type": 3
-          },
-          {
-            "on": 0,
-            "props": {
-              "rotation": {
-                "direction": 1,
-                "limiter": 0
-              }
-            },
-            "type": 13
           },
           {
             "on": 7,
@@ -66718,7 +66719,8 @@
                   "duration": 0,
                   "stepLinked": true
                 },
-                "speed": 50
+                "speed": 50,
+                "aimStyle": 0
               }
             },
             "id": "Shoot",
@@ -66729,15 +66731,17 @@
         "flags": 5120,
         "mastery": [],
         "props": {},
-        "vars": {},
+        "vars": {
+          "time": 0.08
+        },
         "gfx": {
           "file": "UI/icons/atlas_Book_96PX.png",
           "size": 96,
           "x": 8,
           "y": 0
         },
-        "script": "function shouldHighlightSkill() {\n\treturn true;\n}\n\nfunction onStep(s) {\n\tif (s.kind == Steps.Trigger) {\n\t\tvar orbCount = getStatusCount(owner, Skill.Book_WaterOrbs_Orb_Charge);\n\t\tfor (i in 0...orbCount) {\n\t\t\tdelay(i * 0.15, () -> {\n\t\t\t\tconsumeStatus(owner, Skill.Book_WaterOrbs_Orb_Charge, 1);\n\t\t\t\tplayStep(Steps.Shoot);\n\t\t\t});\n\t\t}\n\t}\n}\n\nfunction onProc(ctx) {\n\tremoveStatus(owner, Skill.Book_WaterOrbs_Skill2_Recast_Proc);\n}\n\nfunction onDamage(dmg) {\n\n}\n\nfunction onProjectileEnd(proj) {\n\tvar waterOrbSkill = owner.getSkill(Skill.Book_WaterOrbs_Skill1);\n\tplayGlobalStep(StepGlobal.Book_WaterOrb_WaterOrb, null, proj.position);\n}",
-        "duration": 0.35,
+        "script": "function shouldHighlightSkill() {\n\treturn true;\n}\n\nfunction onStep(s) {\n\tif (s.kind == Steps.Trigger) {\n\t\tvar orbCount = getOrbCount();\n\t\tfor (i in 0...orbCount) {\n\t\t\tdelay(i * vars.time, () -> {\n\t\t\t\tconsumeStatus(owner, Skill.Book_WaterOrbs_Orb_Charge, 1);\n\t\t\t\tplayStep(Steps.Shoot);\n\t\t\t});\n\t\t}\n\t}\n}\n\nfunction getOrbCount() {\n\treturn getStatusCount(owner, Skill.Book_WaterOrbs_Orb_Charge);\n}\n\nfunction onProc(ctx) {\n\tremoveStatus(owner, Skill.Book_WaterOrbs_Skill2_Recast_Proc);\n}\n\nfunction onProjectileEnd(proj) {\n\tvar waterOrbSkill = owner.getSkill(Skill.Book_WaterOrbs_Skill1);\n\tplayGlobalStep(StepGlobal.Book_WaterOrb_WaterOrb, null, proj.position);\n}",
+        "duration": 0.5,
         "status": 2,
         "type": 8
       },
@@ -90520,7 +90524,7 @@
             "val": -0.2
           }
         ],
-        "duration": 3,
+        "duration": 10,
         "status": 2
       },
       {
@@ -91700,7 +91704,7 @@
           "width": 2,
           "height": 2
         },
-        "script": "function onInflictHit(hit) {\n\tif (hit.skillId == Skill.Rogue_Sig_Finisher && hit.isFirstHit) {\n\t\tvar cp = Math.round(owner.atb(Attribute.ComboPoint));\n\t\tif (checkProba(vars.chance * cp)) {\n\t\t\tplayStep(Steps.Area, hit.target, hit.target.position);\n\t\t}\n\t}\n}",
+        "script": "var cp = 0;\nfunction onUseSkill(ctx) {\n\tif (ctx.skillId == Skill.Rogue_Sig_Finisher) {\n\t\tcp = Math.round(owner.atb(Attribute.ComboPoint));\n\t}\n}\n\nfunction onInflictHit(hit) {\n\tif (hit.skillId == Skill.Rogue_Sig_Finisher) {\n\t\tif (hit.isFirstHit || (hit.projectile != null && hit.hitCount == 0)) {\n\t\t\tif (checkProba(vars.chance * cp)) {\n\t\t\t\tplayStep(Steps.Area, hit.target, hit.target.position);\n\t\t\t}\n\t\t\tcp = 0;\n\t\t}\n\t}\n}",
         "status": 2
       },
       {
@@ -113261,6 +113265,119 @@
         "status": 2
       },
       {
+        "id": "Wolf_Robin_Hoof_Auto",
+        "nature": 0,
+        "texts": {},
+        "anim": {
+          "ref": "AttackHeavy"
+        },
+        "steps": [
+          {
+            "props": {
+              "rotation": {
+                "limiter": 210
+              }
+            },
+            "duration": 1.1,
+            "on": 0,
+            "type": 13
+          },
+          {
+            "props": {
+              "move": {
+                "flags": 8,
+                "direction": [
+                  0
+                ],
+                "dashSmoothing": 1
+              }
+            },
+            "on": 0,
+            "type": 8,
+            "range": 8,
+            "duration": 0.4,
+            "delay": 1.3
+          },
+          {
+            "props": {
+              "area": {
+                "shape": [
+                  1,
+                  3
+                ],
+                "targetCooldown": 1
+              }
+            },
+            "on": 0,
+            "type": 0,
+            "delay": 1.45,
+            "range": 4.5,
+            "effects": [
+              {
+                "affinity": "Physical",
+                "effect": 0,
+                "scaling": [
+                  {
+                    "ratio": 0.65,
+                    "atb": "FoePower"
+                  }
+                ],
+                "baseVal": 0,
+                "flags": 0,
+                "status": "Wolf_Robin_Hoof_Status"
+              }
+            ]
+          },
+          {
+            "props": {
+              "startSteps": [
+                {
+                  "step": "HitStop",
+                  "force": false
+                }
+              ]
+            },
+            "on": 1,
+            "type": 11,
+            "delay": 0,
+            "id": "Hit",
+            "visuals": {
+              "ref": "Attack",
+              "playAnims": [
+                {
+                  "anim": {
+                    "ref": "AttackHeavy",
+                    "startFrame": 46,
+                    "blend": 0.15
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "on": 13,
+            "props": {},
+            "id": "HitStop",
+            "type": 10,
+            "delay": 0.86
+          }
+        ],
+        "flags": 0,
+        "mastery": [],
+        "props": {
+          "needTarget": true
+        },
+        "vars": {},
+        "status": 2,
+        "type": 0,
+        "cooldown": 4,
+        "duration": 2,
+        "aiProps": {
+          "castMaxRange": 4
+        },
+        "script": ""
+      },
+      {
         "id": "Wolf_Auto_Status",
         "nature": 4,
         "texts": {
@@ -113317,6 +113434,64 @@
         "duration": 9,
         "script": "",
         "status": 2
+      },
+      {
+        "id": "Wolf_Robin_Hoof_Status",
+        "nature": 4,
+        "texts": {
+          "name": "Bleeding",
+          "desc": "A [Bleed] that deals ::dmg:: over ::duration::."
+        },
+        "anim": {},
+        "steps": [
+          {
+            "effects": [
+              {
+                "affinity": "Raw",
+                "effect": 0,
+                "scaling": [
+                  {
+                    "ratio": 0.45,
+                    "atb": "FoePower"
+                  }
+                ],
+                "flags": 0
+              }
+            ],
+            "on": 0,
+            "props": {
+              "loop": {
+                "tick": 2
+              }
+            },
+            "type": 12,
+            "duration": -1
+          }
+        ],
+        "flags": 0,
+        "mastery": [],
+        "props": {
+          "status": {
+            "types": [
+              {
+                "type": "Bleed"
+              },
+              {
+                "type": "Debuff"
+              }
+            ]
+          }
+        },
+        "vars": {},
+        "status": 2,
+        "gfx": {
+          "file": "UI/icons/atlas_abilities_status_96PX.png",
+          "size": 96,
+          "x": 4,
+          "y": 0
+        },
+        "duration": 9,
+        "script": ""
       },
       {
         "id": "Wolf_Skill1",
@@ -122006,7 +122181,17 @@
                 "scaling": [
                   {
                     "ratio": 0.45,
-                    "atb": "FoePower"
+                    "atb": "FoePower",
+                    "conds": {
+                      "heroic": false
+                    }
+                  },
+                  {
+                    "ratio": 1.5,
+                    "atb": "FoePower",
+                    "conds": {
+                      "heroic": true
+                    }
                   }
                 ],
                 "baseVal": 0,
@@ -122189,7 +122374,7 @@
         },
         "aiProps": {
           "castMaxRange": 40,
-          "pickPrio": 5,
+          "pickPrio": 10,
           "targetProfile": [
             0
           ]
@@ -122236,7 +122421,7 @@
               }
             },
             "duration": 3,
-            "range": 6
+            "range": 10
           },
           {
             "on": 0,
@@ -122270,7 +122455,7 @@
                 }
               }
             ],
-            "range": 6,
+            "range": 10,
             "delay": 3,
             "visuals": {
               "fxs": [
@@ -122307,7 +122492,7 @@
               }
             },
             "duration": 15,
-            "range": 6,
+            "range": 10,
             "type": 4,
             "effects": [
               {
@@ -122334,7 +122519,9 @@
               "fxs": [
                 {
                   "set": "Electric_AOE_Ground_Lasting",
-                  "props": {}
+                  "props": {},
+                  "flags": 16,
+                  "space": 1
                 }
               ]
             }
@@ -122502,7 +122689,8 @@
               },
               "position": {
                 "groundSnap": true,
-                "origin": 4
+                "origin": 4,
+                "includePlatforms": false
               }
             },
             "type": 4,
@@ -122731,7 +122919,63 @@
                 "flags": 0,
                 "baseVal": 0
               }
-            ]
+            ],
+            "cond": {
+              "heroic": false
+            }
+          },
+          {
+            "on": 0,
+            "props": {
+              "position": {
+                "origin": 4,
+                "groundSnap": true,
+                "includePlatforms": false
+              },
+              "loop": {
+                "tick": 0.5
+              },
+              "area": {
+                "travelTime": 2.5,
+                "telegraph": 0
+              }
+            },
+            "id": "Cheese1",
+            "type": 4,
+            "visuals": {
+              "fxs": [
+                {
+                  "set": "Cheese_AOE_Ground_Small",
+                  "props": {},
+                  "space": 1,
+                  "flags": 16
+                }
+              ],
+              "bellFx": {
+                "set": "Projectile_Cheese",
+                "height": 7,
+                "startObj": "ATTACH_Local_R"
+              }
+            },
+            "duration": -1,
+            "range": 5,
+            "effects": [
+              {
+                "effect": 0,
+                "scaling": [
+                  {
+                    "ratio": 0.4,
+                    "atb": "FoePower"
+                  }
+                ],
+                "affinity": "Cheese",
+                "flags": 0,
+                "baseVal": 0
+              }
+            ],
+            "cond": {
+              "heroic": true
+            }
           }
         ],
         "flags": 32,
@@ -122757,7 +123001,7 @@
           "heroic": true
         },
         "vars": {
-          "damage": 1,
+          "damage": 1000,
           "health": 0.5
         },
         "status": 4,
@@ -122784,64 +123028,28 @@
           {
             "on": 13,
             "props": {
-              "targetSkill": "MChuck_MadBombingArea",
-              "position": {
-                "random": {
-                  "maxZDiff": 3,
-                  "range": 20,
-                  "minRange": 1
-                },
-                "groundSnap": true
-              }
-            },
-            "id": "Area",
-            "type": 5
-          }
-        ],
-        "flags": 0,
-        "mastery": [],
-        "props": {
-          "heroic": true
-        },
-        "vars": {
-          "var1": 15,
-          "var2": 3
-        },
-        "status": 4,
-        "type": 11,
-        "cooldown": 60,
-        "aiProps": {
-          "castMaxRange": 20,
-          "pickPrio": 10
-        },
-        "script": "function onStep(s) {\n\tif(!isServer) return;\n    if(s.kind == Steps.AreasCast) {\n\t\tfor(i in 0...round(vars.var1)) {\n            wait(random(0, vars.var2), function() {\n                playStep(Steps.Area);\n            });\n        }\n    }\n}"
-      },
-      {
-        "id": "MChuck_MadBombingArea",
-        "nature": 6,
-        "texts": {},
-        "anim": {},
-        "steps": [
-          {
-            "on": 0,
-            "props": {
               "area": {
                 "travelTime": 1,
                 "height": [
                   0
                 ],
-                "telegraph": 0
+                "telegraph": 0,
+                "overlapTolerance": 0
               },
               "position": {
                 "origin": 4,
                 "groundSnap": true,
-                "includePlatforms": false
+                "includePlatforms": false,
+                "random": {
+                  "range": 25
+                }
               },
               "loop": {
                 "tick": 0.25,
                 "flags": 2
               }
             },
+            "id": "Area",
             "type": 4,
             "visuals": {
               "bellFx": {
@@ -122869,39 +123077,18 @@
                     }
                   },
                   "flags": 0
-                }
-              ]
-            },
-            "range": 3,
-            "duration": -1,
-            "id": "Timer"
-          },
-          {
-            "on": 0,
-            "props": {
-              "position": {
-                "origin": 4
-              }
-            },
-            "type": 11,
-            "visuals": {
-              "fxs": [
+                },
                 {
                   "set": "Generic_Bomb_Lasting",
-                  "props": {}
+                  "props": {},
+                  "scale": 1,
+                  "flags": 0,
+                  "space": 1
                 }
               ]
             },
-            "delay": 1,
-            "duration": -1
-          },
-          {
-            "on": 1,
-            "props": {},
-            "type": 10,
-            "cond": {
-              "step": "Timer"
-            }
+            "duration": 30,
+            "range": 3
           },
           {
             "on": 13,
@@ -122912,22 +123099,8 @@
                 "includePlatforms": false
               }
             },
+            "id": "Explosion",
             "type": 4,
-            "range": 3,
-            "effects": [
-              {
-                "effect": 0,
-                "scaling": [
-                  {
-                    "ratio": 0.3,
-                    "atb": "FoePower"
-                  }
-                ],
-                "flags": 0,
-                "baseVal": 0,
-                "affinity": "Physical"
-              }
-            ],
             "visuals": {
               "fxs": [
                 {
@@ -122936,16 +123109,40 @@
                 }
               ]
             },
-            "id": "Explosion"
+            "range": 3,
+            "effects": [
+              {
+                "effect": 0,
+                "scaling": [
+                  {
+                    "ratio": 1,
+                    "atb": "FoePower"
+                  }
+                ],
+                "flags": 0,
+                "baseVal": 0,
+                "affinity": "Physical"
+              }
+            ]
           }
         ],
         "flags": 0,
         "mastery": [],
-        "props": {},
-        "vars": {},
+        "props": {
+          "heroic": true
+        },
+        "vars": {
+          "var1": 20,
+          "var2": 1
+        },
         "status": 4,
-        "duration": 30,
-        "script": "function onStop(ctx) {\n\tplayStep(Steps.Explosion, ctx.aimTarget, ctx.aimPosition);\n}\n\nfunction onHit(hit) {\n\tif (hit.stepId == Steps.Timer && hit.target.isHero())\n\t\tsetChallenge(owner, Ach.Complete_Z2_Munster_HM_Special, false);\n}"
+        "type": 11,
+        "cooldown": 30,
+        "aiProps": {
+          "castMaxRange": 20,
+          "pickPrio": 10
+        },
+        "script": "function onStep(s) {\n\tif(!isServer) return;\n    if(s.kind == Steps.AreasCast) {\n\t\tfor(i in 0...round(vars.var1)) {\n            wait(random(0, vars.var2), function() {\n                playStep(Steps.Area);\n            });\n        }\n    }\n}\n\nfunction onHit(hit) {\n\tif (hit.stepId == Steps.Area) {\n\t\tplayStep(Steps.Explosion, null, hit.area.position);\n\t\thit.area.remove();\n\t}\n\tif (hit.stepId == Steps.Explosion) {\n\t\tif (hit.target.isHero()) {\n\t\t\tsetChallenge(owner, Ach.Complete_Z2_Munster_HM_Special, false);\n\t\t}\n\t}\n}\n\nfunction onAreaElapsed(area,units) {\n\tplayStep(Steps.Explosion, null, area.position);\n}"
       },
       {
         "id": "Cleodora_Phase3Entry",
@@ -128756,7 +128953,17 @@
                 "scaling": [
                   {
                     "ratio": 1.1,
-                    "atb": "FoePower"
+                    "atb": "FoePower",
+                    "conds": {
+                      "heroic": false
+                    }
+                  },
+                  {
+                    "ratio": 2,
+                    "atb": "FoePower",
+                    "conds": {
+                      "heroic": true
+                    }
                   }
                 ],
                 "flags": 0
@@ -128942,7 +129149,7 @@
               }
             },
             "type": 1,
-            "duration": 3
+            "duration": 2
           }
         ],
         "flags": 0,
@@ -128954,7 +129161,7 @@
           "var1": 15
         },
         "type": 11,
-        "cooldown": 10,
+        "cooldown": 15,
         "duration": 0.9,
         "aiProps": {
           "pickPrio": 10
@@ -128972,7 +129179,8 @@
             "on": 13,
             "props": {
               "area": {
-                "travelTime": 0.6
+                "travelTime": 1,
+                "telegraph": 0
               },
               "loop": {
                 "tick": 0.2
@@ -128987,13 +129195,15 @@
             },
             "id": "Traps",
             "type": 4,
-            "range": 0.5,
+            "range": 1.5,
             "visuals": {
               "fxs": [
                 {
                   "set": "Robin_Hoof_Picot",
                   "props": {},
-                  "flags": 24
+                  "flags": 24,
+                  "scale": 2,
+                  "space": 0
                 },
                 {
                   "set": "Telegraph_TrigerZone_Violence",
@@ -129003,8 +129213,10 @@
               ],
               "bellFx": {
                 "set": "Robin_Hoof_Picot",
-                "from": 3
-              }
+                "from": 3,
+                "scale": 2
+              },
+              "telegraphFx": "Telegraph_Circle_Physical"
             },
             "duration": 30
           }
@@ -129013,7 +129225,7 @@
         "mastery": [],
         "props": {},
         "vars": {
-          "var1": 15
+          "var1": 8
         },
         "type": 11,
         "script": "function onStart(ctx) {\n\tfor (i in 0...Math.round(vars.var1)) {\n\t\t\t\tplayStep(Steps.Traps);\n\t}\n}\nfunction onHit(hit) {\n\tif (hit.ctx.currentArea != null) {\n\t\taddStatus(hit.target, Skill.RobinHoof_Heroic_Caltrops_Slow);\n\t\thit.ctx.currentArea.remove();\n\t}\n}"
@@ -129021,7 +129233,9 @@
       {
         "id": "RobinHoof_Heroic_Caltrops_Slow",
         "nature": 4,
-        "texts": {},
+        "texts": {
+          "desc": "Deals ::dmg:: over ::duration::."
+        },
         "anim": {},
         "steps": [
           {
@@ -129034,6 +129248,28 @@
                   "set": "State_Bleeding",
                   "props": {},
                   "flags": 8
+                },
+                {
+                  "set": "Hit_Blood",
+                  "props": {
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0,
+                      "height": 0.5
+                    }
+                  }
+                },
+                {
+                  "set": "Hit_Physic",
+                  "props": {
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0,
+                      "height": 0.5
+                    }
+                  }
                 }
               ]
             },
@@ -129041,20 +129277,62 @@
           },
           {
             "on": 6,
-            "props": {},
-            "type": 12,
+            "props": {
+              "loop": {
+                "tick": 1,
+                "flags": 3
+              }
+            },
+            "type": 6,
             "effects": [
               {
                 "effect": 0,
                 "scaling": [
                   {
-                    "ratio": 0.5,
+                    "ratio": 0.8,
                     "atb": "FoePower"
                   }
                 ],
-                "flags": 0
+                "flags": 0,
+                "affinity": "Physical"
               }
-            ]
+            ],
+            "duration": -1,
+            "range": "",
+            "visuals": {
+              "fxs": [
+                {
+                  "set": "Hit_Blood",
+                  "props": {}
+                }
+              ]
+            }
+          },
+          {
+            "on": 0,
+            "props": {
+              "loop": {
+                "tick": 1,
+                "flags": 3
+              }
+            },
+            "type": 11,
+            "visuals": {
+              "fxs": [
+                {
+                  "set": "Hit_Blood",
+                  "props": {
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0,
+                      "height": 0.5
+                    }
+                  }
+                }
+              ]
+            },
+            "duration": -1
           }
         ],
         "flags": 0,
@@ -129084,10 +129362,18 @@
             "ref": "TAttribute_MRatio",
             "conds": {},
             "mod": {},
-            "val": 0.3
+            "val": 0.5
           }
         ],
-        "duration": 6
+        "duration": 6,
+        "gfx": {
+          "file": "UI/icons/atlas_abilities_status_96PX.png",
+          "size": 48,
+          "x": 16,
+          "y": 0,
+          "width": 2,
+          "height": 2
+        }
       },
       {
         "id": "RobinHoof_Arrow",
@@ -129111,7 +129397,8 @@
                 "telegraph": 0,
                 "height": [
                   0
-                ]
+                ],
+                "overlapTolerance": 0
               }
             },
             "effects": [
@@ -129120,7 +129407,17 @@
                 "scaling": [
                   {
                     "ratio": 0.6,
-                    "atb": "FoePower"
+                    "atb": "FoePower",
+                    "conds": {
+                      "heroic": false
+                    }
+                  },
+                  {
+                    "ratio": 1.2,
+                    "atb": "FoePower",
+                    "conds": {
+                      "heroic": true
+                    }
                   }
                 ],
                 "affinity": "Physical",
@@ -129147,7 +129444,7 @@
               "position": {
                 "random": {
                   "maxZDiff": 3,
-                  "range": 20,
+                  "range": 30,
                   "minRange": 1
                 },
                 "groundSnap": true
@@ -129157,7 +129454,8 @@
                 "telegraph": 0,
                 "height": [
                   0
-                ]
+                ],
+                "overlapTolerance": 0
               }
             },
             "id": "Area",
@@ -129177,7 +129475,17 @@
                 "scaling": [
                   {
                     "ratio": 0.6,
-                    "atb": "FoePower"
+                    "atb": "FoePower",
+                    "conds": {
+                      "heroic": false
+                    }
+                  },
+                  {
+                    "ratio": 1.2,
+                    "atb": "FoePower",
+                    "conds": {
+                      "heroic": true
+                    }
                   }
                 ],
                 "affinity": "Physical",
@@ -129190,18 +129498,18 @@
         "mastery": [],
         "props": {},
         "vars": {
-          "var1": 30,
+          "var1": 60,
           "var2": 0,
           "var3": 5
         },
         "status": 2,
         "type": 11,
-        "cooldown": 10,
+        "cooldown": 15,
         "aiProps": {
           "castMaxRange": 20,
           "pickPrio": 10
         },
-        "script": "function onStep(s) {\n\tif(!isServer) return;\n    if(s.kind == Steps.AreasCast) {\n\t\tfor(i in 0...round(vars.var1)) {\n            wait(random(0, vars.var2), function() {\n                playStep(Steps.Area);\n            });\n        }\n    }\n}",
+        "script": "function onStep(s) {\n\tif(!isServer) return;\n    if(s.kind == Steps.AreasCast) {\n\t\tfor(i in 0...round(vars.var1)) {\n            playStep(Steps.Area);\n        }\n    }\n}",
         "duration": 0.8
       },
       {
@@ -129236,19 +129544,15 @@
               "position": {
                 "origin": 4,
                 "random": {
-                  "range": 5,
-                  "minRange": 10
+                  "range": 10,
+                  "minRange": 18
                 }
               },
               "area": {
-                "travelTime": 1,
-                "hitFilter": 2
-              },
-              "loop": {
-                "tick": 0.25
+                "travelTime": 1
               }
             },
-            "id": "Meat",
+            "id": "Projectile",
             "type": 4,
             "range": 1,
             "visuals": {
@@ -129271,8 +129575,20 @@
                   "props": {}
                 }
               ]
+            }
+          },
+          {
+            "on": 13,
+            "props": {
+              "position": {
+                "origin": 4
+              },
+              "summon": {
+                "unit": "RobinHoofMeat"
+              }
             },
-            "duration": 1000
+            "id": "MeatSummon",
+            "type": 23
           }
         ],
         "flags": 0,
@@ -129285,7 +129601,7 @@
           "var1": 3
         },
         "type": 11,
-        "script": "var fedDogs : Array<ent.Unit> = [];\n\nfunction onStep(s) {\n\tif( s.kind == Steps.Summon && s.ownerUnit.healthRatio <= vars.threshold ) {\n\t\tplayStep(Steps.Summon2);\n\t}\n\tif (isHeroicMode) {\n\t\tfor (i in 0...Math.round(vars.var1)) {\n\t\t\tplayStep(Steps.Meat);\n\t\t}\n\t}\n}\n\nfunction onHit(hit) {\n\tif (hit.stepId == Steps.Meat && hit.targetUnit.kind == Unit.RobinHoofDog01) {\n\t\taddStatus(hit.target, Skill.RobinHoof_Heroic_Dog_Buff);\n\t\thit.ctx.currentArea.remove();\n\t\tpushUnique(fedDogs, hit.targetUnit);\n\t}\n}\n\nfunction onReceiveKill(source) {\n\tvar dogs = 0;\n\tfor (d in fedDogs)\n\t\tif (!d.isDead())\n\t\t\tdogs++;\n\tsetChallenge(owner, Ach.Complete_Z3_Barracks_HM_Special, dogs >= AchConst.Complete_Z3_Barracks_HM_Special.Dogs);\n}",
+        "script": "function onStep(s) {\n\tif( s.kind == Steps.Summon) {\n\t\tif (isHeroicMode) {\n\t\t\tfor (i in 0...Math.round(vars.var1)) {\n\t\t\t\tplayStep(Steps.Projectile);\n\t\t\t}\n\t\t}\n\t\tif (s.ownerUnit.healthRatio <= vars.threshold) {\n\t\t\tplayStep(Steps.Summon2);\n\t\t}\n\t}\n}\n\nfunction onAreaTick(area,hitCount) {\n\tif (area.stepKind == Steps.Projectile) {\n\t\tplayStep(Steps.MeatSummon, null, area.position);\n\t}\n}\n\nfunction onReceiveKill(source) {\n\tvar dogs = getSummons(skill.kind).filter(u -> u.hasStatus(Skill.RobinHoof_Heroic_Dog_Buff)).length;\n\tsetChallenge(owner, Ach.Complete_Z3_Barracks_HM_Special, dogs >= AchConst.Complete_Z3_Barracks_HM_Special.Dogs);\n}",
         "status": 2
       },
       {
@@ -129359,7 +129675,8 @@
               {
                 "type": "Buff"
               }
-            ]
+            ],
+            "maxStacks": 3
           }
         },
         "vars": {},
@@ -129373,9 +129690,99 @@
             "conds": {},
             "mod": {},
             "val": 2
+          },
+          {
+            "target": {
+              "attribute": "ScaleFactor"
+            },
+            "target2": {},
+            "ref": "TAttribute_ARatio",
+            "conds": {},
+            "mod": {},
+            "val": 0.3
           }
         ],
-        "duration": 30
+        "duration": 10000
+      },
+      {
+        "id": "RobinHoof_Meat_Status",
+        "nature": 5,
+        "texts": {},
+        "anim": {},
+        "steps": [
+          {
+            "on": 0,
+            "props": {},
+            "type": 11,
+            "visuals": {
+              "fxs": [
+                {
+                  "set": "Robin_Hoof_Ham",
+                  "props": {},
+                  "flags": 24
+                },
+                {
+                  "set": "Telegraph_TrigerZone_Violence",
+                  "props": {},
+                  "flags": 24
+                },
+                {
+                  "set": "Violence_Puff_Unit",
+                  "props": {}
+                }
+              ]
+            },
+            "duration": -1
+          },
+          {
+            "on": 0,
+            "props": {
+              "area": {
+                "hitFilter": 2
+              },
+              "loop": {
+                "tick": 0.2
+              }
+            },
+            "type": 4,
+            "duration": -1,
+            "range": 3
+          },
+          {
+            "on": 13,
+            "props": {},
+            "type": 6,
+            "effects": [
+              {
+                "effect": 1,
+                "scaling": [
+                  {
+                    "ratio": 1,
+                    "atb": "MaxHealth"
+                  }
+                ],
+                "flags": 0,
+                "affinity": "Raw"
+              }
+            ],
+            "id": "Heal",
+            "visuals": {
+              "fxs": [
+                {
+                  "set": "Warrior_Enraged",
+                  "props": {},
+                  "flags": 0
+                }
+              ]
+            }
+          }
+        ],
+        "flags": 67108864,
+        "mastery": [],
+        "props": {},
+        "vars": {},
+        "duration": 10000,
+        "script": "function onHit(hit) {\n\tif (hit.ctx == null || hit.ctx.currentArea == null) { return; }\n\tif (hit.targetUnit.kind == Unit.RobinHoofDog01 && (!hit.targetUnit.hasStatus(Skill.RobinHoof_Heroic_Dog_Buff) || hit.targetUnit.healthRatio < 1)) {\n\t\tif (!hit.targetUnit.hasStatus(Skill.RobinHoof_Heroic_Dog_Buff)) {\n\t\t\taddStatus(hit.target, Skill.RobinHoof_Heroic_Dog_Buff);\n\t\t}\n\t\tif (hit.targetUnit.healthRatio < 1) {\n\t\t\tplayStep(Steps.Heal, hit.targetUnit);\n\t\t}\n\t\tvar area = hit.ctx.currentArea;\n\t\twait(0, () ->  {\n\t\t\tarea.remove();\n\t\t\towner.remove();\n\t\t});\n\t}\n}"
       },
       {
         "id": "Phrixes_Strike",
@@ -138895,7 +139302,9 @@
       {
         "id": "Interact_Instant",
         "nature": 2,
-        "texts": {},
+        "texts": {
+          "name": "Interact"
+        },
         "anim": {},
         "steps": [],
         "flags": 0,
@@ -140429,7 +140838,7 @@
         "mastery": [],
         "props": {
           "status": {
-            "maxStacks": 99,
+            "maxStacks": 1,
             "types": [
               {
                 "type": "Buff"
@@ -140642,7 +141051,7 @@
           "desc": "Gained by completing Dungeons in Heroic difficulty."
         },
         "visuals": {
-          "modelPath": "Items/Loot/Coin/RamGold.prefab"
+          "modelPath": "Items/Loot/Coin/InfusionMedal.prefab"
         },
         "type": "Currency",
         "aptitudes": [],

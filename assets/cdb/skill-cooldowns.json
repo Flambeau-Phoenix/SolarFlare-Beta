@@ -918,7 +918,7 @@
     {
       "id": "MChuck_MadBombing",
       "name": "Mad bombing",
-      "cooldown": 60.0,
+      "cooldown": 30.0,
       "type": 11
     },
     {
@@ -1344,13 +1344,13 @@
     {
       "id": "RobinHoof_Arrow",
       "name": "Bellshot",
-      "cooldown": 10.0,
+      "cooldown": 15.0,
       "type": 11
     },
     {
       "id": "RobinHoof_Disengage",
       "name": "Disengage",
-      "cooldown": 10.0,
+      "cooldown": 15.0,
       "type": 11
     },
     {
@@ -1876,6 +1876,12 @@
     {
       "id": "Wolf_Elite_Auto",
       "name": "Wolf_Elite_Auto",
+      "cooldown": 4.0,
+      "type": 0
+    },
+    {
+      "id": "Wolf_Robin_Hoof_Auto",
+      "name": "Wolf_Robin_Hoof_Auto",
       "cooldown": 4.0,
       "type": 0
     },

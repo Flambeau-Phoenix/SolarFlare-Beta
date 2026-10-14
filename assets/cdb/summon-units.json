@@ -1,5 +1,5 @@
 {
-  "source": "58a792afdcfa8532e229aaca74292d3a6d8e460fa2b33d639fe35d80cb47ec65",
+  "source": "ae3b19a30a190d9500858af469750ef9c989a531b058a630a3e9728e5ce88280",
   "units": {
     "ChaoticPortal": "Chaotic Portal",
     "DemonSuperElite_Fairy_FalseClone": "Nightqueen Shaarlize Te'ror",
@@ -11,6 +11,7 @@
     "Phrixes_ChaoticPortal": "Gate to Niflel",
     "Phrixes_NightGodGate": "Gate to Niflel",
     "RobinHoofDog01": "Crimson Hunting Dog",
+    "RobinHoofMeat": "Chunk of Meat",
     "Sprout_Garlic_Z2W": "Garlic Seedling",
     "Summon_Bee": "Angry Bee",
     "Summon_Imp": "Nightling Terror",
@@ -41,14 +42,15 @@
     "Phrixes_H_NG_Spawn": "Phrixes_NightGodGate",
     "PhysicalBlock": "Nepsilon_Totem",
     "Priest_BeaconOfHope": "Totem_BeaconOfHope",
-    "RobinHoof_Summon": "RobinHoofDog01",
+    "RobinHoof_Meat_Status": "RobinHoofMeat",
+    "RobinHoof_Summon": "RobinHoofMeat",
     "Sprout_Auto": "Sprout_Garlic_Z2W",
     "Staff_SummonDemon_Skill2": "Summon_Imp",
     "SummonBee_HoneyBolt": "Summon_Bee",
     "Summon_Imp_Auto": "Summon_Imp",
     "Trinket_Bee": "Summon_Bee",
     "Ulserous_Summon_Aoe": "TODO_Z1W_HeraldSpirit_E",
-    "Wolf_Elite_Auto": "RobinHoofDog01",
+    "Wolf_Robin_Hoof_Auto": "RobinHoofDog01",
     "Wolf_Skill1": "RobinHoofDog01",
     "Wolf_Skill2": "RobinHoofDog01"
   }

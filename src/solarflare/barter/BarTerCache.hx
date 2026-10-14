@@ -21,6 +21,7 @@ typedef BarTerClick = {
  * Observe-only cells for BarTer. Consumable use retains the audited ExtraBars policy.
  */
 class BarTerCache {
+	static var statusApplications=new solarflare.statusboard.StatusBoardApplicationIndex();
 	public static var pendingClicks:Array<BarTerClick> = [];
 	static var clickGen:Int = 0;
 	/** A click that waited longer than this (stall, loading screen) is not replayed as a native use. */
@@ -152,14 +153,22 @@ class BarTerCache {
 		snap.keyLabel="";
 		var s=solarflare.aura.AuraStatusCache.findExact(id);
 		var out=snap.status; out.id=id; out.label=solarflare.cdb.AuraCatalog.label(id);
-		if (out.label.length == 0) out.label=id;
+		out.label=solarflare.statusboard.StatusBoardNativeText.fallback(out.label,id);
 		out.iconKey=id; snap.label=out.label;
 		if (s == null) { out.known=false; return; }
 		snap.available=s.known && s.present;
 		out.present=s.present; out.known=s.known; out.stacks=s.stacks; out.stacksKnown=s.stacksKnown;
-		out.instanceId=s.instanceId;
+		// Type-only assignments can match several independent applications; describe only an exact one.
+		statusApplications.sync(solarflare.aura.AuraStatusCache.snaps,solarflare.aura.AuraStatusCache.count,
+			solarflare.aura.AuraStatusCache.revision,solarflare.aura.AuraStatusCache.ownerGeneration);
+		out.instanceId=statusApplications.unique(id,solarflare.aura.AuraStatusCache.domainKnown);
 		out.durationKnown=s.durationKnown; out.infinite=s.infinite; out.left=s.left;
+		out.sourceItemId=s.sourceItemId; out.sourceItemKnown=s.sourceItemKnown;
 		out.progress=s.progress; out.endsAt=s.endsAt; out.totalDur=s.totalDur; out.stampSource=s.stampSource;
+		if (out.instanceId.length>0) {
+			solarflare.statusboard.StatusBoardTooltipCache.facts(out,haxe.Timer.stamp());
+			solarflare.statusboard.StatusBoardTooltipRenderer.prepare(solarflare.statusboard.StatusBoardTooltipCache.get(out.instanceId));
+		}
 		for (alias in s.ids) if (solarflare.ui.GameIcons.hasKey(alias)) { out.iconKey=alias; break; }
 	}
 

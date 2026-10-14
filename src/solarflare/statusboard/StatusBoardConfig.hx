@@ -34,7 +34,11 @@ class StatusBoardConfig {
  var search=new SearchBar("Search status names or IDs");
  var labels:Map<String,String>=new Map();
  var lastRevision:Int=-1;
- public function new() {}
+ var copyTooltipCoverageFn:Void->Void;
+ public function new() { copyTooltipCoverageFn=copyTooltipCoverage; }
+ function copyTooltipCoverage():Void {
+  solarflare.ui.UiActionQueue.copyText(haxe.Json.stringify({schema:"solarflare.status-tooltip-coverage.v1",scope:"hovered applications only",rows:StatusBoardTooltipCache.coverage()},null,"  "));
+ }
  public function demand():Bool return enabled.get() && !hidden.get();
  public function hideStatus(id:String):Void { if (exclusions.hide(id)) SettingsStore.markDirty(); }
  public function setColumnsFromWidth(w:Single,gap:Int):Void {
@@ -63,6 +67,7 @@ class StatusBoardConfig {
    if (v.snapshot != null && v.snapshot != s) visualBySnapshot.remove(v.snapshot);
    v.seen=true; v.prepare(s,now,showSeconds,showStacks);
    visualBySnapshot.set(s,v);
+   StatusBoardTooltipCache.facts(s,now);
    StatusBoardTooltipRenderer.prepare(StatusBoardTooltipCache.get(s.instanceId));
   }
   retiredVisuals.resize(0); for (key in visualByKey.keys()) if (!visualByKey.get(key).seen) retiredVisuals.push(key);
@@ -90,11 +95,11 @@ class StatusBoardConfig {
    s.iconKey=solarflare.cdb.ConsumableCatalog.iconKey(entry.id);
   } else {
    var label=solarflare.cdb.AuraCatalog.label(s.id);
-   s.label=label.length > 0 ? label : s.id;
+   s.label=StatusBoardNativeText.fallback(label,s.id);
    s.iconKey=s.id;
    for (alias in s.ids) {
     solarflare.ui.GameIcons.get(alias);
-    if (label.length == 0) { var aliasLabel=solarflare.cdb.AuraCatalog.label(alias); if (aliasLabel.length > 0) { s.label=aliasLabel; label=aliasLabel; } }
+    if (label.length == 0) { var aliasLabel=solarflare.cdb.AuraCatalog.label(alias); if (StatusBoardNativeText.meaningful(aliasLabel,alias) && aliasLabel!=alias) { s.label=aliasLabel; label=aliasLabel; } }
     if (solarflare.ui.GameIcons.hasKey(alias)) { s.iconKey=alias; break; }
    }
   }
@@ -154,6 +159,9 @@ class StatusBoardConfig {
   ImGui.textDisabled(active.length+" active / "+visible.length+" visible / "+exclusions.hiddenIds.length+" hidden");
   if (ImGui.smallButton("Check statuses##sb_audit")) AuraStatusCache.auditRequested=true;
   if (ImGui.isItemHovered()) ImGui.setTooltip("Compares the game's own status list with what SolarFlare read and what this board shows.");
+  ImGui.sameLine();
+  if (ImGui.smallButton("Copy tooltip coverage##sb_tooltip_audit")) solarflare.ui.UiActionQueue.custom(copyTooltipCoverageFn);
+  if (ImGui.isItemHovered()) ImGui.setTooltip("Copies resolution details for hovered status applications. Hover an effect first; unhovered effects have not been formatted.");
   if (AuraStatusCache.lastAudit.length > 0) ImGui.textWrapped(AuraStatusCache.lastAudit);
   if (!AuraStatusCache.domainKnown) ImGui.textWrapped("Status observation is incomplete; unavailable values are not treated as absence.");
   var q=search.draw("##sb_search");

@@ -8,6 +8,7 @@ import imgui.Enums.ImGuiWindowFlags;
 import imgui.Enums.ImGuiStyleVar;
 import imgui.ref.BoolRef;
 import imgui.ref.IntRef;
+import imgui.ref.FloatRef;
 import solarflare.aura.ConsumableCache;
 import solarflare.cdb.AuraCatalog;
 import solarflare.cdb.ConsumableCatalog;
@@ -29,6 +30,11 @@ class BarTerBuilder {
  public var history = new BarTerHistory<Dynamic>();
  var boolRef = new BoolRef(false);
  var intRef = new IntRef(1);
+ var glowNumberRef=new FloatRef(1);
+ static var readyModes=["None","Pulse","Bright","Aura glow"];
+ static var cooldownModes=["None","Dim","Outline"];
+ static var auraStyles=["proc","soft","pulse"];
+ var glowEditBefore:Dynamic=null;
  var skillSearch = new SearchBar("Search skills or status IDs");
  var itemSearch = new SearchBar("Search consumables");
  var catalogTab = 0;
@@ -41,6 +47,7 @@ class BarTerBuilder {
  public function new(owner:BarTer) { this.owner=owner; ByteUtil.clearBytes(nameBuf,96); ByteUtil.clearBytes(dragBuf,512); }
  public function selectBar(b:BarTerBarConfig):Void { selection.selectBar(b.id,b.slotCount); nameOwner=""; }
  public function clearTransientState():Void {
+  glowEditBefore=null;
   ByteUtil.clearBytes(dragBuf,512); nameOwner="";
   editEpoch++; skillSearch.clear(); itemSearch.clear(); ByteUtil.clearBytes(nameBuf,96);
  }
@@ -144,9 +151,10 @@ class BarTerBuilder {
   var snaps=owner.snapsFor(b.id);
   var p=ImGui.getCursorScreenPos(); var dl=ImGui.getWindowDrawList();
   var available=ImGui.getContentRegionAvail().x;
-  var px:Single=Math.max(32,Math.min(52,(available-(b.columns-1)*4)/b.columns));
+  var margin:Single=b.glow.reach(52);
+  var px:Single=Math.max(32,Math.min(52,(available-margin*2-(b.columns-1)*4)/b.columns));
   for (i in 0...b.slotCount) {
-   var x:Single=p.x+(i%b.columns)*(px+4); var y:Single=p.y+Std.int(i/b.columns)*(px+4);
+   var x:Single=p.x+margin+(i%b.columns)*(px+4); var y:Single=p.y+margin+Std.int(i/b.columns)*(px+4);
    ImGui.setCursorScreenPos(ImGui.vec2(x,y));
    if (ImGui.invisibleButton("##bt_cell_"+b.id+"_"+i,ImGui.vec2(px,px))) selection.selectCell(i,b.slotCount);
    var hovered=ImGui.isItemHovered();
@@ -156,24 +164,31 @@ class BarTerBuilder {
    BarTerOverlay.drawCell(dl,s,x,y,px,haxe.Timer.stamp(),ImGui.getTime(),hovered,owner.config.showHotkeys.get(),b);
    if (selection.cell == i) ImGui.ImDrawList_AddRect(dl,ImGui.vec2(x,y),ImGui.vec2(x+px,y+px),
     ImGui.colorConvertFloat4ToU32(ThemePalette.current().accent),4,3);
-   if (hovered && s != null) ImGui.setTooltip(BarTerOverlay.tooltip(s));
+   if (hovered && s != null) BarTerOverlay.drawTooltip(s);
    drawCellContext(b,i,"preview",rightClicked);
   }
-  ImGui.setCursorScreenPos(p); ImGui.dummy(ImGui.vec2(b.columns*(px+4)-4,b.rows*(px+4)-4));
+  ImGui.setCursorScreenPos(p); ImGui.dummy(ImGui.vec2(b.columns*(px+4)-4+margin*2,b.rows*(px+4)-4+margin*2));
  }
  function drawNativeStrip(b:BarTerBarConfig):Void {
-  ImGui.textDisabled("Native skills · drag into any cell");
+  var picker=owner.nativePicker;
+  ImGui.textDisabled(picker.caption);
+  ImGui.beginDisabled(picker.signatureIndex<0);
+  var revealSignature=ImGui.smallButton("Show signature##bt_show_signature");
+  ImGui.endDisabled();
+  ImGui.sameLine(); ImGui.textDisabled(picker.signatureSummary);
+  if (picker.signatureTooltip.length>0 && ImGui.isItemHovered()) ImGui.setTooltip(picker.signatureTooltip);
   ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding,ImGui.vec2(BarTerNativePickerLayout.PADDING,BarTerNativePickerLayout.PADDING));
   ImGui.pushStyleVar(ImGuiStyleVar.ScrollbarSize,BarTerNativePickerLayout.SCROLLBAR);
+  try {
   UiScope.child("##bt_native_strip",ImGui.vec2(0,BarTerNativePickerLayout.HEIGHT),function() {
    var origin=ImGui.getCursorScreenPos();
    var i=0;
-   for (s in BarTerNativeKeys.skills) {
-    if (s.fresh==false) continue;
+   for (s in picker.rows) {
     ImGui.setCursorScreenPos(ImGui.vec2(origin.x+BarTerNativePickerLayout.x(i++),origin.y));
     var p=ImGui.getCursorScreenPos();
     if (ImGui.invisibleButton("##bt_native_"+s.action,ImGui.vec2(BarTerNativePickerLayout.CELL,BarTerNativePickerLayout.CELL))) assign(b,selection.cell,"native",s.id,s.action);
     var hovered=ImGui.isItemHovered();
+    if (revealSignature && s.action=="SignatureSkill") ImGui.setScrollHereX(0.5);
     beginSource("native",s.id,s.label,s.action);
     var dl=ImGui.getWindowDrawList();
     if (!GameIcons.drawKey(dl,s.icon,p.x+3,p.y+3,36,36,0xFFFFFFFF))
@@ -183,6 +198,7 @@ class BarTerBuilder {
    if (i == 0) ImGui.textDisabled("Native skills are not available yet.");
    else { ImGui.setCursorScreenPos(origin); ImGui.dummy(ImGui.vec2(BarTerNativePickerLayout.width(i),BarTerNativePickerLayout.CELL)); }
   },ImGuiChildFlags.Borders,ImGuiWindowFlags.HorizontalScrollbar);
+  } catch(e:Dynamic) { ImGui.popStyleVar(2); throw e; }
   ImGui.popStyleVar(2);
  }
  function drawSkillCatalog(b:BarTerBarConfig):Void {
@@ -301,7 +317,53 @@ class BarTerBuilder {
     if (ImGui.isItemHovered()) ImGui.setTooltip("Restore remembered weapon positions and fill missing native actions on weapon changes. Native-action cells show their current skill; assign from the catalog to pin a specific skill.");
    });
   });
+  drawGlow(b);
   ImGui.textDisabled("Hidden cells and inactive bars remain saved. Maximum: 3 active bars, 64 cells each.");
+ }
+ function drawGlow(b:BarTerBarConfig):Void {
+  if (!UiChrome.groupHeader("Glow##bt_glow",false)) return;
+  var g=b.glow;
+  UiLayout.propertyGrid("##bt_glow_properties",function() {
+   UiLayout.propertyRow("Ready glow",function() {
+    combo("##bt_glow_ready",readyModes[g.readyMode],function() {
+     for(i in 0...readyModes.length) if(ImGui.selectable(readyModes[i],g.readyMode==i)) { recordChange(); g.readyMode=i; owner.changed(); }
+    });
+   },"Uses Geaux's 15-second cooldown-completion fade.");
+   UiLayout.propertyRow("Cooldown",function() {
+    combo("##bt_glow_cooldown",cooldownModes[g.cooldownMode],function() {
+     for(i in 0...cooldownModes.length) if(ImGui.selectable(cooldownModes[i],g.cooldownMode==i)) { recordChange(); g.cooldownMode=i; owner.changed(); }
+    });
+   });
+   UiLayout.propertyRow("Glow color",function() {
+    colorBuf.setF32(0,((g.color>>16)&255)/255.); colorBuf.setF32(4,((g.color>>8)&255)/255.); colorBuf.setF32(8,(g.color&255)/255.);
+    var changed=ImGui.colorEdit3("##bt_glow_color",colorBuf);
+    if(ImGui.isItemActivated()) glowEditBefore=owner.editorSnapshot();
+    if(changed) { g.color=(Std.int(colorBuf.getF32(0)*255)<<16)|(Std.int(colorBuf.getF32(4)*255)<<8)|Std.int(colorBuf.getF32(8)*255); owner.changed(); }
+    finishGlowEdit();
+   });
+   ImGui.beginDisabled(g.readyMode!=solarflare.geaux.SkillAttentionPolicy.AURA);
+   try {
+    UiLayout.propertyRow("Aura style",function() {
+     combo("##bt_glow_style",g.auraStyle,function() {
+      for(style in auraStyles) if(ImGui.selectable(style,g.auraStyle==style)) { recordChange(); g.auraStyle=style; owner.changed(); }
+     });
+    });
+    UiLayout.propertyRow("Strength",function() g.strength=glowNumber("##bt_glow_strength",g.strength,2));
+    UiLayout.propertyRow("Outside spread",function() g.outer=glowNumber("##bt_glow_outer",g.outer,96));
+    UiLayout.propertyRow("Inside spread",function() g.inner=glowNumber("##bt_glow_inner",g.inner,96));
+   } catch(e:Dynamic) { ImGui.endDisabled(); throw e; }
+   ImGui.endDisabled();
+  });
+ }
+ function finishGlowEdit():Void {
+  if(ImGui.isItemDeactivatedAfterEdit() && glowEditBefore!=null) { history.push(glowEditBefore); glowEditBefore=null; }
+ }
+ function glowNumber(id:String,value:Float,max:Float):Float {
+  glowNumberRef.set(value);
+  var changed=ImGui.sliderFloat(id,glowNumberRef,0,max,"%.2f");
+  if(ImGui.isItemActivated()) glowEditBefore=owner.editorSnapshot();
+  if(changed) owner.changed();
+  finishGlowEdit(); return changed ? glowNumberRef.get() : value;
  }
  function editColor(id:String,rgb:Int):Int {
   colorBuf.setF32(0,((rgb >> 16)&255)/255.0); colorBuf.setF32(4,((rgb >> 8)&255)/255.0); colorBuf.setF32(8,(rgb&255)/255.0);

@@ -1,6 +1,6 @@
 {
   "source": {
-    "sha256": "58a792afdcfa8532e229aaca74292d3a6d8e460fa2b33d639fe35d80cb47ec65",
+    "sha256": "ae3b19a30a190d9500858af469750ef9c989a531b058a630a3e9728e5ce88280",
     "toolVersion": "refresh_cdb_assets"
   },
   "bosses": [
@@ -255,10 +255,6 @@
         {
           "id": "MChuck_StaticBomb",
           "name": "Static Bomb"
-        },
-        {
-          "id": "MChuck_SprayedFondue",
-          "name": "Sprayed Fondue"
         },
         {
           "id": "MChuck_CheeseCatapult",

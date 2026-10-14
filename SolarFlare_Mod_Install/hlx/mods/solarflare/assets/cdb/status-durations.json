@@ -370,6 +370,7 @@
     },
     {
       "id": "Book_WaterOrbs_Skill2_Recast",
+      "duration": 0.5,
       "grantedStatus": "Book_WaterOrbs_Skill2_Recast_Proc",
       "gfx": {
         "file": "UI/icons/atlas_Book_96PX.png",
@@ -759,7 +760,7 @@
       "id": "ConsumableStatus",
       "duration": 10.0,
       "isStatus": true,
-      "maxStacks": 99
+      "maxStacks": 1
     },
     {
       "id": "ConsumeFlask",
@@ -4168,11 +4169,7 @@
     },
     {
       "id": "MChuck_MadBombing",
-      "cooldown": 60.0
-    },
-    {
-      "id": "MChuck_MadBombingArea",
-      "duration": 30.0
+      "cooldown": 30.0
     },
     {
       "id": "MChuck_SprayedFondue",
@@ -6185,7 +6182,7 @@
     {
       "id": "RobinHoof_Arrow",
       "duration": 0.8,
-      "cooldown": 10.0
+      "cooldown": 15.0
     },
     {
       "id": "RobinHoof_Auto",
@@ -6194,7 +6191,7 @@
     {
       "id": "RobinHoof_Disengage",
       "duration": 0.9,
-      "cooldown": 10.0
+      "cooldown": 15.0
     },
     {
       "id": "RobinHoof_Heroic_Caltrops",
@@ -6203,15 +6200,25 @@
     {
       "id": "RobinHoof_Heroic_Caltrops_Slow",
       "duration": 6.0,
-      "isStatus": true
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 48,
+        "x": 16,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
     },
     {
       "id": "RobinHoof_Heroic_Dog_Buff",
-      "duration": 30.0,
-      "isStatus": true
+      "duration": 10000.0,
+      "isStatus": true,
+      "maxStacks": 3
     },
     {
-      "id": "RobinHoof_Summon",
+      "id": "RobinHoof_Meat_Status",
+      "duration": 10000.0,
       "grantedStatus": "RobinHoof_Heroic_Dog_Buff"
     },
     {
@@ -6293,7 +6300,7 @@
     },
     {
       "id": "Rogue_KnivesTempest_Status2",
-      "duration": 3.0,
+      "duration": 10.0,
       "isStatus": true,
       "gfx": {
         "file": "UI/icons/atlas_class_Rogue_96PX.png",
@@ -9272,6 +9279,24 @@
       "id": "Wolf_Elite_Auto",
       "duration": 2.0,
       "cooldown": 4.0
+    },
+    {
+      "id": "Wolf_Robin_Hoof_Auto",
+      "duration": 2.0,
+      "cooldown": 4.0
+    },
+    {
+      "id": "Wolf_Robin_Hoof_Status",
+      "duration": 9.0,
+      "isStatus": true,
+      "gfx": {
+        "file": "UI/icons/atlas_abilities_status_96PX.png",
+        "size": 96,
+        "x": 4,
+        "y": 0,
+        "width": null,
+        "height": null
+      }
     },
     {
       "id": "Wolf_Skill1",

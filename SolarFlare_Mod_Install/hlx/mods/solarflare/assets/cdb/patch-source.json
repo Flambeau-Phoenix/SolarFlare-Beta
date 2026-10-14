@@ -1,40 +1,40 @@
 {
   "source": "E:\\Solar_Flare_2_Mod\\tools\\current_cdb\\data.cdb",
-  "sha256": "58a792afdcfa8532e229aaca74292d3a6d8e460fa2b33d639fe35d80cb47ec65",
+  "sha256": "ae3b19a30a190d9500858af469750ef9c989a531b058a630a3e9728e5ce88280",
   "generator": "tools/refresh_cdb_assets.py",
   "files": {
     "aura-catalog.json": {
-      "sha256": "4aa0916bc62ae416e6bc8c003c10b456885392012cb20e34cedbe44aa83346cc"
+      "sha256": "a694d35aba55a916ed218b5ca080d03357f12f1f7c9a43fef9b249d5f39a9341"
     },
     "aura-quickstart.json": {
-      "sha256": "6199540a94584a7bc5337350afad95da343f1c1c84d512b4d8258480d78c2899"
+      "sha256": "a8744a192e78ffd10be31368864111cade1cdebef66961d7d0aa0bdcb7218e40"
     },
     "class-signatures.json": {
       "sha256": "55647312abace36b2a74eefebb828bd1ea1fd06271c77779fd21a347cb242adc"
     },
     "combat-catalog.json": {
-      "sha256": "0e5fcfe2826f4bc8db992fb1742c702dcfa1216f9a2d941fcfda2cac73384ea3"
+      "sha256": "2996ef3e1de23a5a10910f1f8d193022baaa29cd0d3e9634c09dc2320e607425"
     },
     "consumables.json": {
-      "sha256": "cd6007011795182a12d5953aa34ac15980bd9cd4afead726aec1d9627621b7a3"
+      "sha256": "c1e625178155b119c32de77615b4afb855d75fe77d27623399b66d4becafa533"
     },
     "geaux-skill-feed.json": {
       "sha256": "845f45fa41fdfde68f5187f5f6ca71fbd88cb77b42b344495fad4663505bca1d"
     },
     "skill-cooldowns.json": {
-      "sha256": "1997eac1a1fcd5b7e4cb9729220c5d937ec5cc87b92435af49375ec78cd30f20"
+      "sha256": "201b41021e8bba118f3a3d301914873fe57604d4897ccbdbbdbd084b28c4ad28"
     },
     "status-durations.json": {
-      "sha256": "c79142bf0bc1313ac46b706f91146b5b57e6adfec245ff088f7549b8b05b51f0"
+      "sha256": "6c51c32bc58f809352ec17cb428d75aa7aafeb778b15e1ef7bb8875dc3ae1341"
     },
     "summon-units.json": {
-      "sha256": "b0371cabd32aacccb803fb132345810e98ce64f7c56fff8c0412fb188b802900"
+      "sha256": "122ff35ba1ff84d8f5f631d09cd53ef9f23f80b140d8d36e75b01a296fc76cb8"
     },
     "talent-effects.json": {
       "sha256": "9893218760058d9829dffae51e059560916cea876f044de8004d6eef4943367e"
     },
     "unit-names.json": {
-      "sha256": "637eff44b20f531630884c2bbb4e55c9e4a43d1a4e77876ab8d55e0396c7d272"
+      "sha256": "fece106392b719ddec3a8e77b6edc973f7a9827be40f7bc1cd9a519c932fbf8b"
     }
   }
 }

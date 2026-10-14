@@ -771,6 +771,11 @@
       "kind": "skill"
     },
     {
+      "id": "Wolf_Robin_Hoof_Status",
+      "name": "Bleeding",
+      "kind": "skill"
+    },
+    {
       "id": "Crimson_Z3W_GA_2",
       "name": "Blessed Crimson Executioner",
       "kind": "unit"
@@ -1614,6 +1619,11 @@
       "id": "Mokshi_ChrysalisStatus",
       "name": "Chrysalis",
       "kind": "skill"
+    },
+    {
+      "id": "RobinHoofMeat",
+      "name": "Chunk of Meat",
+      "kind": "unit"
     },
     {
       "id": "Shield_Firebreath_Passive",
@@ -5061,13 +5071,13 @@
       "kind": "skill"
     },
     {
-      "id": "Interact_Medium",
+      "id": "Interact_Instant",
       "name": "Interact",
       "kind": "skill"
     },
     {
-      "id": "Interact_Instant",
-      "name": "Interact_Instant",
+      "id": "Interact_Medium",
+      "name": "Interact",
       "kind": "skill"
     },
     {
@@ -5843,11 +5853,6 @@
     {
       "id": "MChuck_IsolatedHeal",
       "name": "MChuck_IsolatedHeal",
-      "kind": "skill"
-    },
-    {
-      "id": "MChuck_MadBombingArea",
-      "name": "MChuck_MadBombingArea",
       "kind": "skill"
     },
     {
@@ -7773,6 +7778,11 @@
     {
       "id": "RobinHoof_Heroic_Dog_Buff",
       "name": "RobinHoof_Heroic_Dog_Buff",
+      "kind": "skill"
+    },
+    {
+      "id": "RobinHoof_Meat_Status",
+      "name": "RobinHoof_Meat_Status",
       "kind": "skill"
     },
     {
@@ -10078,6 +10088,11 @@
     {
       "id": "Wolf_Elite_Auto",
       "name": "Wolf_Elite_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "Wolf_Robin_Hoof_Auto",
+      "name": "Wolf_Robin_Hoof_Auto",
       "kind": "skill"
     },
     {

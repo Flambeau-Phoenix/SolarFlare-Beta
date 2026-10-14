@@ -17,7 +17,7 @@ class StatusBoardTooltipRenderer {
   row.heading=heading.runs; row.headingHeight=heading.height;
  }
  public static function draw(instanceId:String,fallback:String):Void {
-  StatusBoardTooltipCache.request(instanceId,haxe.Timer.stamp());
+  StatusBoardTooltipCache.request(instanceId,haxe.Timer.stamp(),fallback);
   var row=StatusBoardTooltipCache.get(instanceId);
   if (!ImGui.beginTooltip()) return;
   try {
@@ -31,6 +31,7 @@ class StatusBoardTooltipRenderer {
     }
     ImGui.dummy(ImGui.vec2(WIDTH,row.headingHeight+3));
    } else { ImGui.pushTextWrapPos(ImGui.getCursorPos().x+WIDTH); try { ImGui.textWrapped(title); } catch(e:Dynamic) { ImGui.popTextWrapPos(); throw e; } ImGui.popTextWrapPos(); }
+   if (row == null) ImGui.textDisabled(StatusBoardTooltipLabels.loading);
    if (row != null) {
     if (row.caption.length>0) ImGui.textDisabled(row.caption);
     pos=ImGui.getCursorScreenPos();
@@ -40,6 +41,7 @@ class StatusBoardTooltipRenderer {
      if (run.bold) ImGui.ImDrawList_AddText_Vec2(dl,ImGui.vec2(pos.x+run.x+0.4,pos.y+run.y),c,run.text);
     }
     if (row.bodyHeight>0) ImGui.dummy(ImGui.vec2(WIDTH,row.bodyHeight));
+    if (row.facts.length>0) ImGui.textDisabled(row.facts);
    }
   } catch (e:Dynamic) { ImGui.endTooltip(); throw e; }
   ImGui.endTooltip();

@@ -49,8 +49,10 @@ class BarTerNativeKeys {
    if (state=="present") {
     row.baseId=BarTerNativeAccess.definition(native.base);
     row.id=BarTerNativeAccess.definition(native.effective);
-    row.icon=GeauxCache.getSkillId(native.effective);
-    if (row.id.length==0 || native.base!=null && row.baseId.length==0 || !GeauxCache.isBarSkillId(row.icon)) { row.availability="unreadable"; row.fresh=false; row.reason="presentation_identity_unreadable"; if (BarTerWeaponLayouts.weapon(actionName)) weaponReadable=false; }
+    row.icon=GeauxCache.sanitizeSkillId(GeauxCache.getSkillId(native.effective));
+    // The owner/type-17 reader already proves the signature action. Art aliases cannot veto it.
+    if (actionName=="SignatureSkill" && row.icon.length==0) row.icon=row.id;
+    if (row.id.length==0 || native.base!=null && row.baseId.length==0 || actionName!="SignatureSkill" && !GeauxCache.isBarSkillId(row.icon)) { row.availability="unreadable"; row.fresh=false; row.reason="presentation_identity_unreadable"; if (BarTerWeaponLayouts.weapon(actionName)) weaponReadable=false; }
     else {
      var name=solarflare.cdb.AuraCatalog.label(row.icon); row.label=name.length>0 ? name : row.id;
      lastSeen.set(actionName,now); known=true;
@@ -81,11 +83,15 @@ class BarTerNativeKeys {
   #end
  }
  /** Explicit check only, prepared in observe. No engine objects or raw native identifiers. */
- public static function checkReport():String return haxe.Json.stringify({schema:"solarflare.barter-native-check.v1",boundary:
+ public static function checkReport():String {
+  var picker=new BarTerNativePickerState(); picker.refresh(records,ownerGeneration,observationGeneration);
+  return haxe.Json.stringify({schema:"solarflare.barter-native-check.v1",boundary:
   #if hl "HashLink/HLX" #else "fixture" #end
   ,ownerGeneration:ownerGeneration,observationGeneration:observationGeneration,weaponReadable:weaponReadable,classReadable:classReadable,classBoundary:classBoundary,
   signatureBoundary:{skillType:BarTerSignatureSlot.TYPE,index:0,readable:signatureReadable,getterCalls:BarTerSignatureSlot.getterCalls},
+  picker:{actions:[for(r in picker.rows) r.action],signatureIndex:picker.signatureIndex,signatureId:picker.signatureIndex>=0 ? picker.rows[picker.signatureIndex].id : ""},
   entries:[for(r in records) {action:r.action,selectedId:r.selectedId,baseId:r.baseId,effectiveId:r.id,label:r.label,key:r.keyText,keyKnown:r.keyKnown,availability:r.availability,fresh:r.fresh,source:r.source,reason:r.reason}]},null,"  ");
+ }
  static function addAlias(id:String,action:String):Void {
   if (id==null || id.length==0) return;
   var existing=aliases.get(id); if (existing==null) aliases.set(id,action); else if (existing!=action) aliases.set(id,"");

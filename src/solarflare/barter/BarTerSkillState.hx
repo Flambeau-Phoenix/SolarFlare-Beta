@@ -13,7 +13,7 @@ class BarTerSkillState {
   snap.ready=gs.ready;
   snap.affordable=gs.affordable != false;
   var proc=gs.procReady == true;
-  if (proc && !snap.procReady) snap.procStart=haxe.Timer.stamp();
+  snap.procStart=proc && gs.procStart!=null ? gs.procStart : 0;
   snap.procReady=proc;
   snap.cdLeft=gs.cdLeft; snap.remaining=gs.remaining;
   snap.chargesMax=gs.chargesMax > 1 ? gs.chargesMax : 0;

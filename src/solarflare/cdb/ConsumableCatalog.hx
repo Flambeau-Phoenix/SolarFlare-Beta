@@ -11,6 +11,7 @@ class ConsumableCatalog {
 	public static var entries(default, null):Array<ConsumableEntry> = [];
 	static var byId = new Map<String, ConsumableEntry>();
 	static var byStatusId = new Map<String, ConsumableEntry>();
+	static var ambiguousStatuses = new Map<String, Bool>();
 	static var ready = false;
 	public static function keep():Void {
 		if (ready) return;
@@ -23,13 +24,19 @@ class ConsumableCatalog {
 			var effects:Array<Dynamic> = row.statuses;
 			for (effect in effects) {
 				entry.statuses.push({id:effect.id, duration:effect.duration, shared:effect.shared == true});
-				if (effect.id != null) byStatusId.set(effect.id.toLowerCase(), entry);
+				if (effect.id != null) {
+					var key=effect.id.toLowerCase(); var previous=byStatusId.get(key);
+					if (effect.shared == true || (previous != null && previous.id != entry.id)) ambiguousStatuses.set(key,true);
+					byStatusId.set(key,entry);
+				}
 			}
 			entries.push(entry); byId.set(entry.id.toLowerCase(), entry);
 		}
 	}
 	public static function find(id:String):ConsumableEntry return id == null ? null : byId.get(id.toLowerCase());
-	public static function findByStatus(statusId:String):ConsumableEntry return statusId == null ? null : byStatusId.get(statusId.toLowerCase());
+	/** Shared status IDs cannot establish which consumable applied an effect. */
+	public static function findByStatus(statusId:String):ConsumableEntry return statusId == null || statusAmbiguous(statusId) ? null : byStatusId.get(statusId.toLowerCase());
+	public static function statusAmbiguous(statusId:String):Bool return statusId != null && ambiguousStatuses.exists(statusId.toLowerCase());
 	public static function iconKey(id:String):String {
 		var entry = find(id);
 		return entry == null ? "" : "consumable_" + entry.id;

@@ -482,15 +482,15 @@ class GeauxStyle {
 	public static inline var CD_HIDE:Int = 1;
 	public static inline var CD_SHOW_FULL:Int = 2;
 
-	public static inline var ATTN_NONE:Int = 0;
-	public static inline var ATTN_PULSE:Int = 1;
-	public static inline var ATTN_BRIGHT:Int = 2;
+	public static inline var ATTN_NONE:Int = SkillAttentionPolicy.NONE;
+	public static inline var ATTN_PULSE:Int = SkillAttentionPolicy.PULSE;
+	public static inline var ATTN_BRIGHT:Int = SkillAttentionPolicy.BRIGHT;
 	/** The aura Glow tile's effect: bright core with sparks travelling the border. */
-	public static inline var ATTN_PROC:Int = 3;
+	public static inline var ATTN_PROC:Int = SkillAttentionPolicy.AURA;
 
-	public static inline var CD_ATTN_NONE:Int = 0;
-	public static inline var CD_ATTN_DIM:Int = 1;
-	public static inline var CD_ATTN_OUTLINE:Int = 2;
+	public static inline var CD_ATTN_NONE:Int = SkillAttentionPolicy.CD_NONE;
+	public static inline var CD_ATTN_DIM:Int = SkillAttentionPolicy.CD_DIM;
+	public static inline var CD_ATTN_OUTLINE:Int = SkillAttentionPolicy.CD_OUTLINE;
 
 	public var gap = new FloatRef(4);
 	public var padding = new FloatRef(8);

@@ -36,6 +36,7 @@ class BarTer {
  var pendingNativeCheck:Bool=false;
  public var nativeCheckReport:String="";
  public var nativeCheckSummary:String="";
+ public var nativePicker(default,null)=new BarTerNativePickerState();
  var commandEpoch:Int=-1;
  var repairedGeneration:Int=-1;
  var reconciledGeneration:Int=-1;
@@ -117,6 +118,7 @@ class BarTer {
   loadout.observeKey(key);
   var nativeBefore=BarTerNativeKeys.observationGeneration;
   BarTerNativeKeys.sample(now,pendingNativeCheck || managedEditsReady && (pendingRepair || pendingPopulation.length>0),raw,loadout.settling);
+  nativePicker.refresh(BarTerNativeKeys.records,BarTerNativeKeys.ownerGeneration,BarTerNativeKeys.observationGeneration);
   if(pendingNativeCheck) {
    pendingNativeCheck=false; nativeCheckReport=BarTerNativeKeys.checkReport();
    var count=0; for(r in BarTerNativeKeys.records) if(StringTools.startsWith(r.action,"Skill") && r.fresh==true) count++;

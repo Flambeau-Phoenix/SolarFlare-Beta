@@ -16,6 +16,7 @@ class BarTerBarConfig {
 	public var fillColor:Int = 0x181B20;
 	public var borderColor:Int = 0x626970;
 	public var readyColor:Int = 0xB7C3CE;
+	public var glow=new solarflare.geaux.SkillAttentionStyle();
 	public var showEmptyCells:Bool = false;
 	public var slotCount:Int = 9;
 	public var columns:Int = 9;
@@ -60,6 +61,7 @@ class BarTerBarConfig {
 			fillColor: fillColor,
 			borderColor: borderColor,
 			readyColor: readyColor,
+			glow: glow.dump(),
 			showEmptyCells: showEmptyCells,
 			slotCount: slotCount,
 			columns: columns,
@@ -81,6 +83,7 @@ class BarTerBarConfig {
 		fillColor = integer(data,"fillColor",0x181B20,0,0xFFFFFF);
 		borderColor = integer(data,"borderColor",0x626970,0,0xFFFFFF);
 		readyColor = integer(data,"readyColor",0xB7C3CE,0,0xFFFFFF);
+		glow.apply(Reflect.field(data,"glow"));
 		showEmptyCells = Reflect.field(data,"showEmptyCells") == true;
 		if (transparent && opacity >= 0.99)
 			opacity = 0.55;
