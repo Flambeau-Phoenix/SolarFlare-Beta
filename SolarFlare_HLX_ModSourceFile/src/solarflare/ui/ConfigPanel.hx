@@ -85,6 +85,8 @@ class ConfigPanel {
 	public var hubH:FloatRef;
 	public var hubSizeDirty = true;
 	public var rememberHubLayout = new BoolRef(true);
+	public var uiLayouts=new UiLayouts();
+	public var preventCtrlFullscreen=new BoolRef(false);
 	var lastHubX:Float = Math.NaN;
 	var lastHubY:Float = Math.NaN;
 
@@ -190,6 +192,8 @@ class ConfigPanel {
 		}
 		rebuildInteractiveRegistry();
 		SettingsStore.bind(this);
+  // Seed migration from the actual client extent; this does not call ImGui before its first frame.
+  try { var window=hxd.Window.getInstance(); if(window!=null) HudChrome.observeViewport(window.get_width(),window.get_height()); } catch(_:Dynamic) {}
 		SettingsStore.load(this);
 		// Preserve the resource tracker's saved visibility; only retire legacy aura trackers.
 		if (showCombo != null)
@@ -206,6 +210,7 @@ class ConfigPanel {
 	function rebuildInteractiveRegistry():Void {
 		interactiveOpenRefs = [];
 		registerInteractive(open);
+		registerInteractive(uiLayouts.open);
 		registerInteractive(dbgMetrics);
 		registerInteractive(dbgLog);
 		registerInteractive(solarflare.debug.DebugSystem.open);
@@ -269,6 +274,7 @@ class ConfigPanel {
 			auraBuilder.clearTransientState();
 		if (extraBarsPrototype != null) extraBarsPrototype.clearTransientState();
 		if (barter != null) barter.clearTransientState();
+		uiLayouts.clearTransientState();
 		if (changed) SettingsStore.markDirty();
 	}
 
@@ -432,6 +438,7 @@ class ConfigPanel {
 			UiScope.guard("Aura Builder", auraBuilder.draw);
 		if (extraBarsPrototype != null)
 			UiScope.guard("ExtraBars", extraBarsPrototype.draw);
+		UiScope.guard("UI Layouts",function() uiLayouts.draw(this));
 		trackProfileWindowState();
 		if (target != null)
 			UiScope.guard("Target Frame", target.draw);
@@ -894,7 +901,15 @@ class ConfigPanel {
 			}
 		});
 
+		UiChrome.subHeader("Input");
+		UiLayout.propertyGrid("##hub_input_properties",function() {
+			UiLayout.propertyRow("Fullscreen shortcut",function() {
+				if(ImGui.checkbox("Prevent accidental Ctrl+F fullscreen toggle##sf_ctrl_f",preventCtrlFullscreen)) SettingsStore.markDirty();
+			},"Consumes exactly Ctrl+F during gameplay. Other fullscreen controls remain available.");
+   if(preventCtrlFullscreen.get() && FullscreenShortcutGuard.status<0) ImGui.textDisabled("Ctrl+F guard unavailable: update sfcursor.hdll and restart Farever.");
+		});
 		UiChrome.subHeader("Workspace and docking");
+		if(UiChrome.ghostButton("UI Layouts##sf_ui_layouts",ImGui.vec2(150,28))) uiLayouts.open.set(true);
 		UiLayout.propertyGrid("##hub_workspace_props", function() {
 			UiLayout.propertyRow("Geometry", function() {
 				if (ImGui.checkbox("Remember F6 position/size##hub_remember", rememberHubLayout))
@@ -907,11 +922,11 @@ class ConfigPanel {
 				UiLayout.inlinePair(
 					"##hub_dock_actions",
 					function(w:Single) {
-						if (ImGui.button("Save Layout##sf_save_dock", ImGui.vec2(w, 26)))
+						if (ImGui.button("Save Docking##sf_save_dock", ImGui.vec2(w, 26)))
 							UiActionQueue.save();
 					},
 					function(w:Single) {
-						if (ImGui.button("Reset Layout##sf_reset_dock", ImGui.vec2(w, 26)))
+						if (ImGui.button("Reset Docking##sf_reset_dock", ImGui.vec2(w, 26)))
 							UiActionQueue.enqueue(UiActionKind.ResetDockLayout);
 					}
 				);

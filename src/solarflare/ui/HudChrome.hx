@@ -47,6 +47,27 @@ class HudChrome {
 	public var x = new FloatRef(40);
 	public var y = new FloatRef(40);
 	public var posDirty = false;
+ public var referenceWidth:Float=0;
+ public var referenceHeight:Float=0;
+ public var screenX(default,null):Single=40;
+ public var screenY(default,null):Single=40;
+ public static var viewportWidth(default,null):Float=1920;
+ public static var viewportHeight(default,null):Float=1080;
+ static var viewportEpoch:Int=0;
+ static var originX:Single=0;
+ static var originY:Single=0;
+ var positionEpoch:Int=-1;
+ public static function observeViewport(w:Float,h:Float):Void {
+  if(!Math.isFinite(w) || !Math.isFinite(h) || w<320 || h<240) return;
+  if(w!=viewportWidth || h!=viewportHeight) { viewportWidth=w; viewportHeight=h; viewportEpoch++; }
+ }
+ /** Explicit edits commit a new reference; automatic projection never does. */
+ public function setDisplayPosition(px:Float,py:Float):Void {
+  x.set(px-originX); y.set(py-originY);
+  referenceWidth=viewportWidth; referenceHeight=viewportHeight; posDirty=true;
+ }
+ public function resetReference():Void { referenceWidth=0; referenceHeight=0; posDirty=true; }
+
 	public var expandSizeDirty = false;
 	/** When false, collapse still resizes; x/y are not forced each frame (config panels). */
 	public var bindPos:Bool = true;
@@ -255,10 +276,10 @@ class HudChrome {
 		// A locked HUD is an anchored HUD. Reassert the saved position every frame
 		// so an ImGui window instance left over from another character/profile can
 		// never donate its transient coordinates to the locked layout.
-		if (bindPos && (posDirty || isLocked())) {
+		if (bindPos) {
 			clampToViewport();
-			ImGui.setNextWindowPos(ImGui.vec2(HUDVisualBounds.hostCoordinate(x.get(), visualOffsetX),
-				HUDVisualBounds.hostCoordinate(y.get(), visualOffsetY)), ImGuiCond.Always);
+			ImGui.setNextWindowPos(ImGui.vec2(HUDVisualBounds.hostCoordinate(screenX, visualOffsetX),
+				HUDVisualBounds.hostCoordinate(screenY, visualOffsetY)), ImGuiCond.Always);
 			posDirty = false;
 		}
 		if (collapsed.get())
@@ -271,47 +292,23 @@ class HudChrome {
 
 	/** Keep overlays on-screen after resolution / multi-monitor moves. Safe before ImGui init. */
 	public function clampToViewport():Void {
-		var maxX:Single = 1920;
-		var maxY:Single = 1080;
-		try {
-			// getMainViewport AV's if called during mod main() before ImGuiFrame presents.
-			var vp = ImGui.getMainViewport();
-			if (vp != null) {
-				var c = ImGui.ImGuiViewport_GetCenter(vp);
-				if (c != null) {
-					maxX = c.x * 2;
-					maxY = c.y * 2;
-				}
-			}
-		} catch (_:Dynamic) {}
-		if (maxX < 320 || maxY < 240)
-			return;
-		var px = x.get();
-		var py = y.get();
-		if (px > maxX - 40)
-			px = maxX - 200;
-		if (py > maxY - 40)
-			py = maxY - 120;
-		if (px < 0)
-			px = 20;
-		if (py < 0)
-			py = 20;
-		x.set(px);
-		y.set(py);
-	}
+  if(!bindPos) return;
+  // The game client extent is observed once, not inferred from the viewport's center.
+  try {
+   var vp=ImGui.getMainViewport();
+   if(vp!=null) { var center=ImGui.ImGuiViewport_GetCenter(vp); originX=center.x-viewportWidth*0.5; originY=center.y-viewportHeight*0.5; }
+  } catch(_:Dynamic) {}
+  if(positionEpoch!=viewportEpoch) {
+   dragSun=false; didDrag=false; activeResizeId=null; activeSurfaceDragId=null;
+   positionEpoch=viewportEpoch; posDirty=true;
+  }
+  if(referenceWidth<320 || referenceHeight<240) { referenceWidth=viewportWidth; referenceHeight=viewportHeight; }
+  screenX=originX+HudCoordinates.project(x.get(),referenceWidth,viewportWidth,winW,visualOffsetX);
+  screenY=originY+HudCoordinates.project(y.get(),referenceHeight,viewportHeight,winH,visualOffsetY);
+ }
 
-	public function capturePos():Void {
-		var host = ImGui.getWindowPos();
-		var p = ImGui.vec2(HUDVisualBounds.anchorCoordinate(host.x, visualOffsetX),
-			HUDVisualBounds.anchorCoordinate(host.y, visualOffsetY));
-		var ox = x.get();
-		var oy = y.get();
-		if (Math.abs(p.x - ox) > 0.5 || Math.abs(p.y - oy) > 0.5) {
-			x.set(p.x);
-			y.set(p.y);
-			SettingsStore.markDirty();
-		}
-	}
+ /** Native/ImGui automatic movement is not a user layout edit. Custom drags commit explicitly. */
+ public function capturePos():Void {}
 
 	public function drawToggles(id:String):Bool {
 		var changed = false;
@@ -361,28 +358,18 @@ class HudChrome {
 		var value = ref.get();
 		if (!Math.isFinite(value))
 			value = 0;
-		ref.set(Math.max(0, Math.min(limit, value)));
+		value=Math.max(0,Math.min(limit,value));
+  var otherX=x.get()*(referenceWidth>=320 ? viewportWidth/referenceWidth : 1);
+  var otherY=y.get()*(referenceHeight>=240 ? viewportHeight/referenceHeight : 1);
+  x.set(horizontal ? value : otherX); y.set(horizontal ? otherY : value);
+  referenceWidth=viewportWidth; referenceHeight=viewportHeight;
 		posDirty = true;
 		SettingsStore.markDirty();
 		return true;
 	}
 
 	/** Main viewport size, or 1920x1080 before ImGui has presented. Called on edits only. */
-	static function viewportExtent():ImVec2 {
-		var w:Single = 1920;
-		var h:Single = 1080;
-		try {
-			var vp = ImGui.getMainViewport();
-			if (vp != null) {
-				var c = ImGui.ImGuiViewport_GetCenter(vp);
-				if (c != null && c.x * 2 >= 320 && c.y * 2 >= 240) {
-					w = c.x * 2;
-					h = c.y * 2;
-				}
-			}
-		} catch (_:Dynamic) {}
-		return ImGui.vec2(w, h);
-	}
+	static function viewportExtent():ImVec2 return ImGui.vec2(viewportWidth,viewportHeight);
 
 	/** Standard editor prefix for every independently movable HUD window. */
 	public function drawWindowSettings(hidden:BoolRef, id:String):Bool {
@@ -549,7 +536,7 @@ class HudChrome {
 			ImGui.separator();
 			if (ImGui.menuItem("Reset Position##ctx_rst")) {
 				x.set(40);
-				y.set(40);
+				y.set(40); resetReference();
 				posDirty = true;
 				SettingsStore.markDirty();
 				ToastManager.info('$title position reset');
@@ -698,8 +685,7 @@ class HudChrome {
 			}
 			var nx:Single = mouse.x - surfaceGrabX;
 			var ny:Single = mouse.y - surfaceGrabY;
-			x.set(HUDVisualBounds.anchorCoordinate(nx, visualOffsetX));
-			y.set(HUDVisualBounds.anchorCoordinate(ny, visualOffsetY));
+			setDisplayPosition(HUDVisualBounds.anchorCoordinate(nx,visualOffsetX),HUDVisualBounds.anchorCoordinate(ny,visualOffsetY));
 			ImGui.setWindowPos(ImGui.vec2(nx, ny));
 			SettingsStore.markDirty();
 			return;
@@ -779,8 +765,7 @@ class HudChrome {
 				didDrag = true;
 				var nx = m.x - dragOffX;
 				var ny = m.y - dragOffY;
-				this.x.set(HUDVisualBounds.anchorCoordinate(nx, visualOffsetX));
-				this.y.set(HUDVisualBounds.anchorCoordinate(ny, visualOffsetY));
+				setDisplayPosition(HUDVisualBounds.anchorCoordinate(nx,visualOffsetX),HUDVisualBounds.anchorCoordinate(ny,visualOffsetY));
 				ImGui.setWindowPos(ImGui.vec2(nx, ny));
 				SettingsStore.markDirty();
 			}

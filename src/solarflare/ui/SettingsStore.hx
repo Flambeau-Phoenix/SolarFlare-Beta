@@ -15,7 +15,7 @@ import imgui.ImGui;
  * Persist SolarFlare layout + toggles next to the installed mod.
  */
 class SettingsStore {
-	static inline var VERSION:Int = 29;
+	static inline var VERSION:Int = 30;
 	static inline var TMP_SUFFIX:String = ".tmp";
 	static inline var PREV_SUFFIX:String = ".prev";
 	static var dirty = false;
@@ -120,7 +120,7 @@ class SettingsStore {
 				backupBeforeMigration(path, raw, oldVersion);
 			apply(cfg, data);
 			FeatureProfiles.load(cfg, data);
-			if (oldVersion < 27) dirty = true;
+			if (oldVersion < VERSION) dirty = true;
 			// v24: the first cast-bar build persisted the new overlay as hidden,
 			// including in the active universal profile, so no telemetry was demanded.
 			if (oldVersion < 24) {
@@ -279,7 +279,7 @@ class SettingsStore {
 
 	static function dumpCore(cfg:ConfigPanel):Dynamic {
 		lastCaptureWarning = "";
-		var data:Dynamic = {v: VERSION, activeTheme: activeTheme};
+		var data:Dynamic = {v: VERSION, activeTheme: activeTheme,preventCtrlFullscreen:cfg.preventCtrlFullscreen.get()};
 		assignDump(data, "customTheme", function() return ThemePalette.dumpCustom());
 		assignDump(data, "uiPack", function() return cfg.uiPack != null ? cfg.uiPack.dump() : {id: "custom"});
 		assignDump(data, "nativeHide", function() return cfg.nativeHide.dump());
@@ -704,6 +704,7 @@ class SettingsStore {
 	static function apply(cfg:ConfigPanel, data:Dynamic):Void {
 		if (data == null)
 			return;
+		cfg.preventCtrlFullscreen.set(Reflect.field(data,"preventCtrlFullscreen")==true);
 		if (cfg.uiPack != null)
 			cfg.uiPack.apply(Reflect.field(data, "uiPack"));
 		cfg.nativeHide.apply(Reflect.field(data, "nativeHide"));

@@ -11,6 +11,9 @@ class BarTerSkillState {
   snap.bindingKnown=native != null && native.keyKnown;
   if (!observed || gs == null || !gs.present) return;
   snap.ready=gs.ready;
+  snap.cooldownValid=gs.cooldownValid==true;
+  snap.readyAt=gs.readyAt!=null ? gs.readyAt : gs.readyFlashUntil>0 ? gs.readyFlashUntil-15 : 0;
+  snap.procValid=gs.procValid==true; snap.procSource=gs.procSource==null ? "unknown" : gs.procSource;
   snap.affordable=gs.affordable != false;
   var proc=gs.procReady == true;
   snap.procStart=proc && gs.procStart!=null ? gs.procStart : 0;

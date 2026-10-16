@@ -196,34 +196,10 @@ class BarTerCache {
 	}
 
 	static function findGeaux(id:String):Dynamic {
-		if (id == null || id.length == 0) return null;
-		// The id's live record is the freshest poll from any list (Geaux, aura or BarTer).
-		var live = GeauxCache.liveSnap(id);
-		if (live != null) return live;
-		// The dedicated bounded BarTer poll is fresher than dormant Geaux slots.
-		for (s in GeauxCache.barTerSkills) if (s != null && s.present && s.id == id) return s;
-		// Any matching snap is fine — twins refresh from the live record each pass.
-		var i = 0;
-		while (i < GeauxCache.count) {
-			var s = GeauxCache.slots[i];
-			if (s != null && s.present && s.id == id)
-				return s;
-			i++;
-		}
-		for (s in GeauxCache.auraSkills) {
-			if (s != null && s.present && s.id == id)
-				return s;
-		}
-		for (s in GeauxCache.weaponSnaps()) {
-			if (s != null && s.present && s.id == id)
-				return s;
-		}
-		for (s in GeauxCache.barTerSkills) {
-			if (s != null && s.present && s.id == id)
-				return s;
-		}
-		return null;
-	}
+  // The canonical record is bounded by freshness; dormant lists never donate stale values.
+  return GeauxCache.liveSnap(id);
+ }
+
 
 
 	/**

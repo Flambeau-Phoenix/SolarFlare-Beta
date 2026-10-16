@@ -23,6 +23,14 @@ class BarTerConfig {
 	public var showHotkeys = new BoolRef(true);
 	public var bars:Array<BarTerBarConfig> = [];
 	public var nextId:Int = 1;
+	public var glowOverrides:Map<String,solarflare.geaux.SkillAttentionStyle>=new Map();
+	public var glowDiagnostics=new BoolRef(false);
+	public function glowFor(id:String,bar:BarTerBarConfig):solarflare.geaux.SkillAttentionStyle {
+		var style=glowOverrides.get(id); return style==null ? bar.glow : style;
+	}
+	public function dumpGlowOverrides():Dynamic {
+		var out:Dynamic={}; for(id=>g in glowOverrides) Reflect.setField(out,id,g.dump()); return out;
+	}
 	public var chromes:Map<String, HudChrome> = new Map();
 
 	public function new() {
@@ -105,6 +113,7 @@ class BarTerConfig {
 				Reflect.setField(ch, id, dumpChrome(c));
 		}
 		return {
+			glowOverrides:dumpGlowOverrides(), glowDiagnostics:glowDiagnostics.get(),
 			activeBarCount: activeBarCount,
 			weaponLayouts: weaponLayouts.dump(),
 			layoutVersion: 2,
@@ -138,6 +147,10 @@ class BarTerConfig {
 			ensureDefaultBars();
 			return;
 		}
+		glowOverrides.clear();
+		var overrides=Reflect.field(data,"glowOverrides");
+		if(overrides!=null) for(id in Reflect.fields(overrides)) { var g=new solarflare.geaux.SkillAttentionStyle(); g.apply(Reflect.field(overrides,id)); glowOverrides.set(id,g); }
+		glowDiagnostics.set(Reflect.field(data,"glowDiagnostics")==true);
 		enabled.set(Reflect.field(data, "enabled") != false);
 		migrateNativeActions = data.migrateNativeActions == true || !Reflect.hasField(data,"weaponLayouts");
 		hidden.set(Reflect.field(data, "hidden") == true);

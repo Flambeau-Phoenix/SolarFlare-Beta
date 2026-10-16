@@ -21,6 +21,8 @@ class BarTer {
  var overlay:BarTerOverlay;
  var snapMap:Map<String,Array<BarTerSnap>> = new Map();
  public var lastStatus:String = "";
+ public var glowDiagnosticReport:String="";
+ var glowDiagnosticAt:Float=0;
  var loadout = new BarTerLoadoutState();
  var lastWeaponReadAt:Float = -1;
  var rawWeaponKey:String = "";
@@ -60,8 +62,23 @@ class BarTer {
  public function refreshSnaps():Void {
   for (i in 0...Std.int(Math.min(config.activeBarCount,config.bars.length))) {
    var b=config.bars[i]; var snaps=snapsFor(b.id); BarTerCache.sampleBar(b,snaps);
-   for (j in 0...b.slotCount) BarTerCache.prepareIcons(snaps[j]);
+   for (j in 0...b.slotCount) {
+    var s=snaps[j]; var slot=b.slots[j]; var base=slot.skillId;
+    if(slot.nativeActionId.length>0) { var record=BarTerNativeKeys.action(slot.nativeActionId); if(record!=null && record.baseId!=null && record.baseId.length>0) base=record.baseId; }
+    s.baseSkillId=GeauxCache.canonicalGlowId(base);
+    s.glow=config.glowFor(s.baseSkillId,b);
+    BarTerCache.prepareIcons(s);
+   }
   }
+ }
+ function recordGlowDiagnostics():Void {
+  if(!config.glowDiagnostics.get()) { glowDiagnosticReport=""; return; }
+  var now=haxe.Timer.stamp(); if(now<glowDiagnosticAt) return; glowDiagnosticAt=now+1;
+  var rows:Array<Dynamic>=[];
+  for(b in config.activeBars()) for(s in snapsFor(b.id)) if(s.kind=="skill") rows.push({bar:b.id,base:s.baseSkillId,effective:s.skillId,
+   available:s.available,cooldownValid:s.cooldownValid,ready:s.ready,affordable:s.affordable,charges:s.charges,chargesMax:s.chargesMax,
+   cdLeft:s.cdLeft,procValid:s.procValid,proc:s.procReady,source:s.procSource,readyAt:s.readyAt,procStart:s.procStart});
+  glowDiagnosticReport=haxe.Json.stringify({at:now,owner:character,loadout:loadout.currentKey,skills:rows},null,"  ");
  }
  public function changed(contentEdit:Bool=false):Void {
   loadout.changed(config.bars,config.weaponLayouts,contentEdit); snapshotsDirty=true;
@@ -108,6 +125,7 @@ class BarTer {
   if (now-lastWeaponReadAt >= 0.1) {
    var key=BarTerCache.weaponLoadoutKey(hero);
    if (key!=rawWeaponKey) {
+    GeauxCache.invalidateAttention();
     builder.clearTransientState(); BarTerCache.pendingClicks.resize(0); snapshotsDirty=true;
     comboLabel=key.length>0 ? [for (part in key.split("|")) if (part.length>0) part].join(" + ") : "Waiting for the equipped weapons…";
    }
@@ -155,6 +173,7 @@ class BarTer {
    else { pendingPopulation=""; replacePopulation=false; nativeCoherent=false; managedEditsReady=false; lastStatus="Weapon combination changed; request the edit again."; }
   }
   if (snapshotsDirty || now-lastSnapAt >= 0.05) { refreshSnaps(); snapshotsDirty=false; lastSnapAt=now; }
+  recordGlowDiagnostics();
   // Same eligibility the ExtraBars policy enforces before any native use request.
   var block=BarTerCache.pendingClicks.length > 0 ? BarTerCache.gameplayBlockReason(hero) : "";
   if (block.length > 0) lastStatus=block;

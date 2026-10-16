@@ -153,6 +153,7 @@ class SolarFlarePanel {
 		catch (_:Dynamic) {}
 
 		CursorCaptureFix.apply(app);
+		solarflare.ui.FullscreenShortcutGuard.observe(config);
 		// Every independently retained editor closes on entry to camera mode.
 		// An open editor cannot exempt itself: NoMouse alone leaves its lifetime
 		// and drag/text state alive behind the hidden cursor.

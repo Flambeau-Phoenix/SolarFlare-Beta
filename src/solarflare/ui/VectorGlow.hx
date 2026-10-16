@@ -60,7 +60,7 @@ class VectorGlow {
 	 * @param power  exponential decay (2.5 = neon; ~1.8 with fewer layers)
 	 */
 	public static function skillAlertBloom(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, glowColor:Int,
-			maxGlowDistance:Single = 40.0, rounding:Single = 4.0, layers:Int = 14, power:Single = 2.2):Void {
+			maxGlowDistance:Single = 40.0, rounding:Single = 4.0, layers:Int = 14, power:Single = 2.2, phase:Float = -1):Void {
 		if (dl == null || w < 1 || h < 1 || maxGlowDistance <= 0)
 			return;
 		if (layers < 4)
@@ -70,7 +70,7 @@ class VectorGlow {
 
 		var col = ImGui.colorConvertU32ToFloat4(glowColor);
 		var time:Single = ImGui.getTime();
-		var pulse:Single = 0.55 + 0.45 * Math.abs(Math.sin(time * 4.0));
+		var pulse:Single = phase < 0 ? 0.55 + 0.45 * Math.abs(Math.sin(time * 4.0)) : phase;
 		var currentMax:Single = maxGlowDistance * pulse;
 		var stroke:Single = 2.8;
 

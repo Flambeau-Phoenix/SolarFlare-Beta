@@ -8,13 +8,13 @@ import hlx.runtime.ResolvedMember;
 /**
  * Snapshot of hero skill slots + skill book for ImGui.
  * Slot snaps are primitives only. Live Skill pointers live in `liveById` (identity-only,
- * observe/postfix) — draw must never walk them.
+ * observe/postfix) â€” draw must never walk them.
  * Game arrays are hl.types.ArrayObj; never recast them to ArrayBase/ArrayDyn across modules.
  */
 class GeauxSlotSnap {
 	public var index:Int = 0;
 	public var id:String = "";
-	/** PNG stem for GameIcons (`{iconId}.png`) — prefer script-style `inf.id` over HASH. */
+	/** PNG stem for GameIcons (`{iconId}.png`) â€” prefer script-style `inf.id` over HASH. */
 	public var iconId:String = "";
 	public var label:String = "";
 	public var group:String = "";
@@ -24,9 +24,13 @@ class GeauxSlotSnap {
 	public var ready:Bool = false;
 	public var cooldownValid:Bool = false;
 	public var readyFlashUntil:Float = 0;
+	public var readyAt:Float=0;
+	public var procValid:Bool=false;
+	public var procSource:String="";
+ public var observedAt:Float=0;
 	/** False when off cooldown but missing cast resources (rage/spark/etc.). */
 	public var affordable:Bool = true;
-	/** SkillScript.shouldPlayInstantly — frozen observe; draw must not query scripts. */
+	/** SkillScript.shouldPlayInstantly â€” frozen observe; draw must not query scripts. */
 	public var procReady:Bool = false;
 	/** Monotonic stamp when procReady last turned on; drives the glimmer. */
 	public var procStart:Float = 0;
@@ -56,13 +60,13 @@ class GeauxSlotSnap {
 	public var cdMaxStatic:Float = 0;
 	public var chargeStaticGen:Int = -1;
 	public var chargesMaxStatic:Int = 0;
-	/** Frozen PNG stems — draw must not call findSkillById. */
+	/** Frozen PNG stems â€” draw must not call findSkillById. */
 	public var iconCandidates:Array<String> = [];
 
 	public function new() {}
 }
 
-/** Reused cooldown poll — no per-slot allocation. */
+/** Reused cooldown poll â€” no per-slot allocation. */
 class GeauxCdPoll {
 	public var valid:Bool = false;
 	public var max:Float = 0;
@@ -100,6 +104,10 @@ class GeauxCdBinds {
 #end
 
 class GeauxCache {
+ public static function canonicalGlowId(id:String):String {
+  var clean=sanitizeSkillId(id); var script=classSignatureScriptId(clean);
+  return script.length>0 ? script : clean;
+ }
 	public static var actionBarLoadoutKey:String = "";
 	public static var actionBarCharacterId:String = "";
 	public static var actionBarGeneration:Int = 0;
@@ -108,12 +116,14 @@ class GeauxCache {
 	static var hudWalkVisited = new haxe.ds.ObjectMap<Dynamic, Bool>();
 	static var readyFlashes = new Map<String, ReadyFlashState>();
 	static var readySkillRefs = new Map<String, Dynamic>();
-	static function clearReadyFlashes():Void { readyFlashes.clear(); readySkillRefs.clear(); }
+	static var attentionStates=new Map<String,SkillAttentionState>();
+	static function clearReadyFlashes():Void { readyFlashes.clear(); readySkillRefs.clear(); attentionStates.clear(); }
+ public static function invalidateAttention():Void { clearReadyFlashes(); clearLiveRecords(); }
 
 	public static var slots:Array<GeauxSlotSnap> = [];
 	/** Observe-only snapshots for aura subjects, including skills outside visible slots. */
 	public static var auraSkills:Array<GeauxSlotSnap> = [];
-	/** BarTer-assigned skills — light poll, not full Geaux layout. */
+	/** BarTer-assigned skills â€” light poll, not full Geaux layout. */
 	public static var barTerSkills:Array<GeauxSlotSnap> = [];
 	static var barTerSeedAt:Float = 0;
 	static inline var BARTER_SEED_S:Float = 1.0;
@@ -125,7 +135,7 @@ class GeauxCache {
 	public static var bookGroups:Array<String> = [];
 	/** Skills currently on the vanilla action bar (flat list). */
 	public static var weapons:Array<GeauxSlotSnap> = [];
-	/** Unused — kept for older settings / API compat. */
+	/** Unused â€” kept for older settings / API compat. */
 	public static var classSkills:Array<GeauxSlotSnap> = [];
 	public static var signatures:Array<GeauxSlotSnap> = [];
 	public static var lastUseAt:Map<String, Float> = new Map();
@@ -158,7 +168,7 @@ class GeauxCache {
 	/** Vanilla action-bar Skill / SkillButton pinned by id (layout / equip). Observe polls these pointers only. */
 	static var barSkillById:Map<String, Dynamic> = new Map();
 	static var barBtnById:Map<String, Dynamic> = new Map();
-	/** Cached HUD bar roots after first successful resolve — skip full HUD crawl on later layouts. */
+	/** Cached HUD bar roots after first successful resolve â€” skip full HUD crawl on later layouts. */
 	static var cachedBarRoots:Array<Dynamic> = null;
 	/** Observer-owned typed slot descriptors, retained across native strip visibility changes. */
 	static var nativeSlots:Map<String,Dynamic>=new Map();
@@ -212,7 +222,7 @@ class GeauxCache {
 	static var isSignatureMem:ResolvedMember;
 	static var isDashMem:ResolvedMember;
 	static var skillMainWepMem:ResolvedMember;
-	/** One getSkillByInput pass per observe — matching snaps does not re-hit Hero. */
+	/** One getSkillByInput pass per observe â€” matching snaps does not re-hit Hero. */
 	static var barInputSkills:Array<Dynamic> = [];
 
 	/**
@@ -437,7 +447,7 @@ class GeauxCache {
 
 	static function telemetryInterval():Float {
 		// Aura skill subjects ride the same sampler; do NOT force 20 Hz solely because
-		// auras exist — that doubled combat cost with Geaux slot polls. Idle unless CD/hot.
+		// auras exist â€” that doubled combat cost with Geaux slot polls. Idle unless CD/hot.
 		if (solarflare.ObserveDemand.geauxBuilder || solarflare.ObserveDemand.geauxDirty || telemetryDirty)
 			return TELEMETRY_HOT_S;
 		// Hot while any visible slot has a live cooldown.
@@ -510,9 +520,13 @@ class GeauxCache {
 		active.clear();
 		for (s in slots) if (s.present) active.set(s.id, true);
 		for (s in auraSkills) if (s.present) active.set(s.id, true);
+		// Geaux must never retire the edges of a skill demanded only by BarTer.
+		for (id in solarflare.ObserveDemand.barterSkillIds) active.set(id,true);
+		for (s in barTerSkills) if(s.present) active.set(s.id,true);
+  if(solarflare.ObserveDemand.barter) for(s in solarflare.barter.BarTerNativeKeys.skills) if(s.fresh!=false) active.set(s.id,true);
 		staleKeysBuf.resize(0);
 		for (key in readyFlashes.keys()) if (!active.exists(key)) staleKeysBuf.push(key);
-		for (key in staleKeysBuf) { readyFlashes.remove(key); readySkillRefs.remove(key); }
+		for (key in staleKeysBuf) { readyFlashes.remove(key); readySkillRefs.remove(key); attentionStates.remove(key); }
 		staleKeysBuf.resize(0);
 	}
 
@@ -730,7 +744,8 @@ class GeauxCache {
 		if (id == null || id.length == 0)
 			return null;
 		var rec = liveRecords.get(id);
-		return rec != null && rec.present && rec.id == id ? rec : null;
+		var at=liveAt.get(id);
+		return rec != null && rec.present && rec.id == id && at!=null && nowStamp()-at<=0.35 ? rec : null;
 	}
 
 	public static function weaponSnaps():Array<GeauxSlotSnap> {
@@ -870,6 +885,7 @@ class GeauxCache {
 		dest.ready = src.ready;
 		dest.cooldownValid = src.cooldownValid;
 		dest.readyFlashUntil = src.readyFlashUntil;
+		dest.readyAt=src.readyAt; dest.procValid=src.procValid; dest.procSource=src.procSource; dest.observedAt=src.observedAt;
 		dest.affordable = src.affordable;
 		dest.procReady = src.procReady;
 		dest.procStart = src.procStart;
@@ -945,7 +961,7 @@ class GeauxCache {
 				for (root in cachedBarRoots)
 					walkActionBarAll(root, 0);
 			}
-			// Dead HUD after zone reload — one full rediscover.
+			// Dead HUD after zone reload â€” one full rediscover.
 			if (hudWalkNodes == 0) {
 				cachedBarRoots = null;
 				ensureBarRoots();
@@ -1063,7 +1079,7 @@ class GeauxCache {
 		return skill != null && callSkillBoolOpt(wepSkillMem, skill) != true;
 	}
 
-	/** Live weaponSkills array — includes sheathed arsenal entries marked isFromArsenal. */
+	/** Live weaponSkills array â€” includes sheathed arsenal entries marked isFromArsenal. */
 	static function fillBarFromWeaponSkills(hero:Dynamic):Void {
 		if (hero == null)
 			return;
@@ -1105,7 +1121,7 @@ class GeauxCache {
 		}
 	}
 
-	/** MH / OH / active weapon skill lists from equipped items (not arsenal — that uses getArsenalSkills). */
+	/** MH / OH / active weapon skill lists from equipped items (not arsenal â€” that uses getArsenalSkills). */
 	static function fillBarFromEquipment(hero:Dynamic):Void {
 		if (hero == null)
 			return;
@@ -1131,7 +1147,7 @@ class GeauxCache {
 				id = sanitizeSkillId(dynString(field(arrayAt(skills, i), "id")));
 			if (id.length == 0)
 				continue;
-			// Weapon inf lists passives + unused arsenal options — keep actives / arsenal only.
+			// Weapon inf lists passives + unused arsenal options â€” keep actives / arsenal only.
 			if (skipWeaponId(id))
 				continue;
 			if (parsed.skill != null) {
@@ -1146,7 +1162,7 @@ class GeauxCache {
 
 	/**
 	 * Selected arsenal skills for the secondary (arsenal) weapon via HeroSpecialization.getArsenalSkills.
-	 * Tries multiple type keys — inventory ids vs weapon-family types differ.
+	 * Tries multiple type keys â€” inventory ids vs weapon-family types differ.
 	 */
 	static function fillBarFromArsenalApi(hero:Dynamic):Void {
 		if (hero == null)
@@ -1392,7 +1408,7 @@ class GeauxCache {
 			return;
 		captureNativeSlot(node);
 
-		// Typed wrappers first — arsenal / weapon strip skills live on WeaponSkillSlotButton,
+		// Typed wrappers first â€” arsenal / weapon strip skills live on WeaponSkillSlotButton,
 		// class strip on SkillSlotButton; the live Skill is often only on getOverrideSkill().
 			try {
 			var wslot:ui.hud.WeaponSkillSlotButton = node;
@@ -2078,6 +2094,7 @@ class GeauxCache {
 		dest.ready = src.ready;
 		dest.cooldownValid = src.cooldownValid;
 		dest.readyFlashUntil = src.readyFlashUntil;
+		dest.readyAt=src.readyAt; dest.procValid=src.procValid; dest.procSource=src.procSource; dest.observedAt=src.observedAt;
 		dest.affordable = src.affordable;
 		dest.procReady = src.procReady;
 		dest.procStart = src.procStart;
@@ -2266,8 +2283,8 @@ class GeauxCache {
 	}
 
 	/**
-	 * Solarflare ENGINE_ID_REGISTRY §5.1: prefer script-style ids (contain `_`) for icons.
-	 * Order: inf.id → kind → inf.script → skill.id. Never return `{bytes…}` dumps.
+	 * Solarflare ENGINE_ID_REGISTRY Â§5.1: prefer script-style ids (contain `_`) for icons.
+	 * Order: inf.id â†’ kind â†’ inf.script â†’ skill.id. Never return `{bytesâ€¦}` dumps.
 	 */
 	public static function getSkillId(skill:Dynamic):String {
 		if (skill == null)
@@ -2292,7 +2309,7 @@ class GeauxCache {
 			try {
 				var s:st.skill.BaseSkill = skill;
 				if (s != null) {
-					// Always coerce — kind/inf.id are often HASH Bytes at runtime.
+					// Always coerce â€” kind/inf.id are often HASH Bytes at runtime.
 					addAlias(cands, s.kind);
 					if (s.inf != null) {
 						addAlias(cands, s.inf.id);
@@ -2343,7 +2360,7 @@ class GeauxCache {
 		return id;
 	}
 
-	/** Ids safe for PNG lookup / UI — reject object dumps and empty. */
+	/** Ids safe for PNG lookup / UI â€” reject object dumps and empty. */
 	public static function isUsableSkillId(id:String):Bool {
 		if (id == null || id.length < 3)
 			return false;
@@ -2382,7 +2399,7 @@ class GeauxCache {
 			else if (k == "shield")
 				addAlias(raw, "Priest_Prayer_Shield");
 		}
-		// Only Judgment aliases to priest sig assets — do not remap Warrior/Mage/Rogue.
+		// Only Judgment aliases to priest sig assets â€” do not remap Warrior/Mage/Rogue.
 		ensureSignatureHashes();
 		if (solarflare.PrayerCache.isJudgementId(id)
 			|| id == PRIEST_SIG_SCRIPT
@@ -2643,7 +2660,7 @@ class GeauxCache {
 		}
 		// Exact left already won: never use FieldWalk max aliases on this poll.
 		if (leftExact && (!Math.isFinite(out.max) || out.max <= 0)) {
-			// typed.cooldownDuration already tried above; leave max 0 → commit synthesizes from left.
+			// typed.cooldownDuration already tried above; leave max 0 â†’ commit synthesizes from left.
 		} else if (!leftExact && (!Math.isFinite(out.max) || out.max <= 0)) {
 			var fw = readMaxCdField(skill);
 			if (fw > 0)
@@ -2789,11 +2806,12 @@ class GeauxCache {
 				return;
 			}
 		}
+		snap.observedAt=tickAt;
 		snap.cooldownValid = false;
 		snap.nativeCdTotal = 0;
 		snap.nativeCdTotalValid = false;
 		snap.observedRank = null;
-		snap.readyFlashUntil = 0;
+		snap.readyFlashUntil = 0; snap.readyAt=0; snap.procValid=false; snap.procSource="unknown";
 		if (!snap.present || snap.id == null || snap.id.length == 0) {
 			snap.affordable = true;
 			snap.procReady = false;
@@ -2825,14 +2843,17 @@ class GeauxCache {
 		if (snap.chargesMax > 0)
 			snap.ready = snap.charges > 0;
 		applyAffordSnap(hero, snap, skill);
-		applyProcReady(snap, skill);
 		var key = snap.id;
 		if (!readyFlashes.exists(key) || readySkillRefs.get(key) != skill) {
-			readyFlashes.set(key, new ReadyFlashState());
+			var state=new SkillAttentionState();
+			attentionStates.set(key,state);
+			readyFlashes.set(key, state.flash);
 			readySkillRefs.set(key, skill);
 		}
 		snap.readyFlashUntil = readyFlashes.get(key).observe(skill != null && snap.cooldownValid,
-			snap.cdLeft > 0.05 || snap.remaining > 0.02, haxe.Timer.stamp());
+			snap.chargesMax>1 ? snap.charges<=0 : snap.cdLeft > 0.05 || snap.remaining > 0.02, tickAt);
+		snap.readyAt=readyFlashes.get(key).started;
+		applyProcReady(snap,skill);
 		// This snap is now the id's live record for LIVE_REUSE_S.
 		liveRecords.set(snap.id, snap);
 		liveAt.set(snap.id, tickAt);
@@ -2840,15 +2861,15 @@ class GeauxCache {
 
 	/** Observe-only: freeze Spell Activation Overlay flag from typed SkillScript. */
 	static function applyProcReady(snap:GeauxSlotSnap, skill:Dynamic):Void {
-		var was = snap.procReady;
-		snap.procReady = false;
-		if (skill == null || snap == null)
-			return;
-		// Instant-play proc, or the script asking the HUD to highlight the skill.
-		if (scriptProc(skill, snap.id) == true || scriptHighlight(skill, snap.id) == true)
-			snap.procReady = true;
-		if (snap.procReady && !was)
-			snap.procStart = haxe.Timer.stamp();
+		if(snap==null) return;
+		var instant=skill==null ? null : scriptProc(skill,snap.id);
+		var highlight=skill==null ? null : scriptHighlight(skill,snap.id);
+		snap.procValid=instant!=null || highlight!=null;
+		snap.procSource=instant==true ? "instant" : highlight==true ? "highlight" : snap.procValid ? "none" : "unknown";
+		var state=attentionStates.get(snap.id);
+		if(state==null) { state=new SkillAttentionState(); attentionStates.set(snap.id,state); }
+		state.observeProc(snap.procValid,instant==true || highlight==true,haxe.Timer.stamp());
+		snap.procReady=state.procReady; snap.procStart=state.procStart;
 	}
 
 	static var scriptMems:Map<String, ResolvedMember> = new Map();
@@ -2895,7 +2916,7 @@ class GeauxCache {
 
 	/** One member per skill id, bound once on the script's live type; per call only [script]. */
 	static function scriptCall(skill:Dynamic, id:String, method:String, mems:Map<String, ResolvedMember>, miss:Map<String, Bool>):Dynamic {
-		if (skill == null || id == null || id.length == 0 || miss.exists(id))
+		if (skill == null || id == null || id.length == 0)
 			return null;
 		var sc:Dynamic = null;
 		try {
@@ -2904,7 +2925,10 @@ class GeauxCache {
 		} catch (_:Dynamic) {}
 		if (sc == null)
 			return null;
-		var mem = mems.get(id);
+		var liveType=FieldWalk.liveTypeName(sc);
+		var cacheKey=id+"|"+liveType;
+		if(miss.exists(cacheKey)) return null;
+		var mem = mems.get(cacheKey);
 		if (mem == null) {
 			try {
 				var typeName = FieldWalk.liveTypeName(sc);
@@ -2915,10 +2939,10 @@ class GeauxCache {
 				}
 			} catch (_:Dynamic) {}
 			if (mem == null) {
-				miss.set(id, true);
+				miss.set(cacheKey, true);
 				return null;
 			}
-			mems.set(id, mem);
+			mems.set(cacheKey, mem);
 		}
 		try {
 			return HlxRuntime.callResolved(mem, [sc]);
@@ -2951,7 +2975,7 @@ class GeauxCache {
 		return skill;
 	}
 
-	/** Engine map lookup — not HUD, not SignatureSkill input, not array scan. */
+	/** Engine map lookup â€” not HUD, not SignatureSkill input, not array scan. */
 	static function ownerGetSkill(hero:Dynamic, id:String):Dynamic {
 		if (hero == null || id == null || id.length == 0)
 			return null;
@@ -3130,7 +3154,7 @@ class GeauxCache {
 		return false;
 	}
 
-	/** Four bound ledger rows per emit site — this is the highest-rate caller in the mod. */
+	/** Four bound ledger rows per emit site â€” this is the highest-rate caller in the mod. */
 	#if solarflare_telemetry
 	static var cdBinds:Map<String, GeauxCdBinds> = new Map();
 	static var lastCdLeftMilli:Int = -1;
@@ -3221,7 +3245,7 @@ class GeauxCache {
 
 	/**
 	 * Freeze stacks for Geaux + BarTer.
-	 * 1) script.SkillScript.get_stacks → skill.stacks (Farever IL fn 6670)
+	 * 1) script.SkillScript.get_stacks â†’ skill.stacks (Farever IL fn 6670)
 	 * 2) AuraStatusCache (Status.set_stacks hooks) for skill id / granted status
 	 * Take the max so either path lights the corner badge.
 	 */
@@ -3336,8 +3360,8 @@ class GeauxCache {
 
 	/**
 	 * Off-cooldown skills that the hero cannot afford / enable are marked unaffordable
-	 * so the bar can dim them. Never clears present/ready — resource lack is dim-only.
-	 * Uses cost props + Skill.isEnabled (not Hero.canUseSkill — that includes targeting).
+	 * so the bar can dim them. Never clears present/ready â€” resource lack is dim-only.
+	 * Uses cost props + Skill.isEnabled (not Hero.canUseSkill â€” that includes targeting).
 	 */
 	static function applyAffordSnap(hero:ent.Hero, snap:GeauxSlotSnap, skill:Dynamic = null):Void {
 		if (snap == null) {
@@ -3351,7 +3375,7 @@ class GeauxCache {
 			snap.affordable = snap.ready;
 			return;
 		}
-		if (!snap.ready || snap.cdLeft > 0.05 || snap.remaining > 0.02) {
+		if (!snap.ready && !(snap.chargesMax>1 && snap.charges>0)) {
 			snap.affordable = true;
 			return;
 		}
@@ -3436,7 +3460,7 @@ class GeauxCache {
 		var costs:Dynamic = null;
 		try {
 			if (typed != null && typed.inf != null) {
-				// Sanctioned engine-field route (skill §3): HlxRuntime.resolveField, never Reflect.field.
+				// Sanctioned engine-field route (skill Â§3): HlxRuntime.resolveField, never Reflect.field.
 				var props:Dynamic = null;
 				try
 					props = HlxRuntime.resolveField(typed.inf, "props")
@@ -3726,7 +3750,7 @@ class GeauxCache {
 		return isCleanLabel(clean) ? clean : "";
 	}
 
-	/** Confirmed engine id for UI (never `{bytes…}` dumps or menu names). */
+	/** Confirmed engine id for UI (never `{bytesâ€¦}` dumps or menu names). */
 	public static function shortLabel(id:String):String {
 		return solarflare.EngineSkillId.display(sanitizeSkillId(id));
 	}
@@ -3775,7 +3799,7 @@ class GeauxCache {
 				return s;
 			}
 		} catch (_:Dynamic) {}
-		// Never Std.string(v) — Bytes / objects become "{bytes :…}".
+		// Never Std.string(v) â€” Bytes / objects become "{bytes :â€¦}".
 		return "";
 	}
 

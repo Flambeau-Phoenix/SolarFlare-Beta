@@ -19,4 +19,12 @@ class SkillAttentionPolicy {
  public static function readyAlpha(present:Bool,lit:Bool,affordable:Bool,until:Float,now:Float):Float
   return present && lit && affordable ? ReadyFlashState.opacity(until,now) : 0;
  public static function procPhase(start:Float,now:Float):Float return Math.max(0,now-start)%2.6;
+ public static function configuredAlpha(style:SkillAttentionStyle,valid:Bool,usable:Bool,started:Float,now:Float):Float {
+  if (!valid || !usable || style.behavior==0) return 0;
+  if (style.behavior==2) return 1;
+  if (started<=0 || now<started || now>=started+style.flashDuration) return 0;
+  if (!style.fade) return 1;
+  var u=1-(now-started)/style.flashDuration;
+  return u*u*(3-2*u);
+ }
 }

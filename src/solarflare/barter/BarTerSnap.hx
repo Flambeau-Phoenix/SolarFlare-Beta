@@ -17,6 +17,12 @@ class BarTerSnap {
 	public var keyLabel:String = "";
 	public var present:Bool = false;
 	public var ready:Bool = false;
+	public var baseSkillId:String="";
+	public var cooldownValid:Bool=false;
+	public var readyAt:Float=0;
+	public var procValid:Bool=false;
+	public var procSource:String="unknown";
+	public var glow:solarflare.geaux.SkillAttentionStyle=null;
 	public var affordable:Bool = true;
 	public var procReady:Bool = false;
 	/** Monotonic stamp when procReady last turned on; drives the glimmer. */
@@ -39,6 +45,7 @@ class BarTerSnap {
 
 	public function clear():Void {
 		iconKey=""; nativeActionId=""; bindingKnown=false;
+		baseSkillId=""; cooldownValid=false; readyAt=0; procValid=false; procSource="unknown"; glow=null;
 		skillId = itemKind = iconId = label = keyLabel = "";
 		statusId = ""; kind = "empty"; available = false; status.clear();
 		isItem = present = ready = procReady = usable = false;

@@ -8,16 +8,17 @@ class AuraGlowRenderer {
 		drawStyle(dl, a.glowStyle, a.glowStrength.get(), a.glowOuter.get(), a.glowInner.get(), a.glowColor, x, y, w, h, alpha);
 	}
 	public static function drawStyle(dl:Dynamic, glowStyle:String, glowStrength:Float, glowOuter:Float, glowInner:Float, packed:Int,
-			x:Single, y:Single, w:Single, h:Single, alpha:Float):Void {
+			x:Single, y:Single, w:Single, h:Single, alpha:Float, animationTime:Float = -1):Void {
+		var time=animationTime<0 ? ImGui.getTime() : animationTime;
 		var style = AuraGlowStyle.normalize(glowStyle);
-		var strength = AuraGlowStyle.intensity(style, glowStrength, ImGui.getTime()) * alpha * ((packed >>> 24) & 255) / 255;
+		var strength = AuraGlowStyle.intensity(style, glowStrength, time) * alpha * ((packed >>> 24) & 255) / 255;
 		if (strength <= 0.001 || w < 1 || h < 1) return;
 		var outer:Single = AuraGlowStyle.spread(glowOuter);
 		var inner:Single = Math.min(AuraGlowStyle.spread(glowInner), Math.max(0, Math.min(w, h) * 0.5 - 2));
 		if (style == "proc") {
 			var extra:Single = Math.max(0, outer - 12);
 			solarflare.ui.VectorGlow.procTinted(dl, x - extra, y - extra, w + extra * 2, h + extra * 2,
-				ImGui.getTime(), packed, strength);
+				time, packed, strength);
 		} else {
 			for (i in 0...12) {
 				var t:Single = (i + 1) / 12;

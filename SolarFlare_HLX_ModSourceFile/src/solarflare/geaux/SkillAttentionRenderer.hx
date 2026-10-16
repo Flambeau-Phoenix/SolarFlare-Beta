@@ -24,4 +24,27 @@ class SkillAttentionRenderer {
  }
  public static function proc(dl:Dynamic,x:Single,y:Single,size:Single,start:Float,now:Float):Void
   VectorGlow.glimmer(dl,x,y,size,size,SkillAttentionPolicy.procPhase(start,now));
+ public static function configuredReady(dl:Dynamic,g:SkillAttentionStyle,x:Single,y:Single,size:Single,alpha:Float,time:Float):Void {
+  if (alpha<=0 || g.readyMode==0 || g.strength<=0) return;
+  var phase=g.pulsing ? 0.55+0.45*Math.abs(Math.sin(time*4*g.speed)) : 1.;
+  if (g.readyMode==SkillAttentionPolicy.AURA) {
+   // Freeze the style's internal animation in steady mode through the explicit phase argument.
+   AuraGlowRenderer.drawStyle(dl,g.auraStyle,g.strength,g.outer,g.inner,g.color|0xFF000000,x,y,size,size,alpha,
+    g.pulsing ? time*g.speed : 0.);
+  } else {
+   var packed=UiCol.rgb(g.color,Std.int(255*Math.min(1,alpha*g.strength)));
+   var reach=g.readyMode==1 ? Math.min(24,size*0.35) : Math.min(16,size*0.2);
+   VectorGlow.skillAlertBloom(dl,x,y,size,size,packed,reach,4,g.readyMode==1 ? 14 : 10,g.readyMode==1 ? 2.2 : 1.85,phase);
+  }
+ }
+ public static function configuredProc(dl:Dynamic,g:SkillAttentionStyle,x:Single,y:Single,size:Single,start:Float,now:Float):Void {
+  switch(g.procMode) {
+   case 1: VectorGlow.glimmer(dl,x,y,size,size,(Math.max(0,now-start)*g.speed)%2.6);
+   case 2: if(g.strength>0) VectorGlow.rect(dl,x,y,size,size,UiCol.rgb(g.color,Std.int(255*Math.min(1,g.strength))),4,2);
+   case 3:
+    var phase=g.pulsing ? 0.55+0.45*Math.abs(Math.sin((now-start)*4*g.speed)) : 1.;
+    if(g.strength>0) VectorGlow.skillAlertBloom(dl,x,y,size,size,UiCol.rgb(g.color,Std.int(255*Math.min(1,g.strength))),Math.min(24,size*0.35),4,14,2.2,phase);
+   default:
+  }
+ }
 }

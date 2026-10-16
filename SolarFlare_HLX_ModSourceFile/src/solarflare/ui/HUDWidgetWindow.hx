@@ -154,8 +154,8 @@ class HUDWidgetWindow {
 		chrome.clampToViewport();
 		chrome.applyPos();
 		if (!chrome.collapsed.get() && !chrome.isLocked()) {
-			ImGui.setNextWindowPos(ImGui.vec2(HUDVisualBounds.hostCoordinate(chrome.x.get(), left),
-				HUDVisualBounds.hostCoordinate(chrome.y.get(), top)), ImGuiCond.FirstUseEver);
+			ImGui.setNextWindowPos(ImGui.vec2(HUDVisualBounds.hostCoordinate(chrome.screenX, left),
+				HUDVisualBounds.hostCoordinate(chrome.screenY, top)), ImGuiCond.FirstUseEver);
 		}
 
 		var editable = !chrome.isLocked() || layoutOverride;

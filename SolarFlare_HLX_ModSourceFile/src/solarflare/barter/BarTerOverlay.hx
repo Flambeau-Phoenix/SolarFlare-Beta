@@ -42,6 +42,7 @@ class BarTerOverlay {
   hudContext = context;
   hudShowHotkeys = showHotkeys;
   var reach=bar.glow.reach(bar.slotSize);
+  for(s in snaps) if(s.glow!=null) reach=Math.max(reach,s.glow.reach(bar.slotSize));
   visualBounds.reset(w,h); visualBounds.include(-reach,-reach,w+reach*2,h+reach*2);
   HUDWidgetWindow.draw("SolarFlare.BarTer."+bar.id,bar.name,chrome,w,h,hudBodyFn,edit,hide,false,barMenu,hudResizeFn,visualBounds);
   hudBar = null; hudSnaps = null; hudClick = null; hudContext = null;
@@ -79,10 +80,10 @@ class BarTerOverlay {
   }
   var active=BarTerCellState.active(s);
   var lit=BarTerCellState.lit(s);
-  var glow=bar!=null ? bar.glow : defaultGlow;
+  var glow=s!=null && s.glow!=null ? s.glow : bar!=null ? bar.glow : defaultGlow;
   var skill=active && s.kind=="skill";
   var ammo=skill && SkillAttentionPolicy.hasCharges(s.chargesMax,s.charges);
-  if (skill && SkillAttentionPolicy.nearReady(true,s.onCd,ammo,s.cdLeft)) SkillAttentionRenderer.nearReady(dl,x,y,size,time);
+  if (skill && s.cooldownValid && glow.nearEnabled && !ammo && s.cdLeft>0.05 && s.cdLeft<=glow.nearThreshold) SkillAttentionRenderer.nearReady(dl,x,y,size,time);
   ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(x,y),ImGui.vec2(x+size,y+size),fill,4);
   ImGui.ImDrawList_AddRect(dl,ImGui.vec2(x,y),ImGui.vec2(x+size,y+size),hovered || lit ? accent : border,4,lit ? 2 : 1);
   if (skill && !lit && s.onCd && glow.cooldownMode==SkillAttentionPolicy.CD_OUTLINE)
@@ -96,10 +97,9 @@ class BarTerOverlay {
   // Preserve readable icons; cooldown/resource state is a separate overlay.
   if (active && !lit && (!skill || !s.affordable || glow.cooldownMode==SkillAttentionPolicy.CD_DIM))
    ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(x+pad,y+pad),ImGui.vec2(x+size-pad,y+size-pad),0x44000000,2);
-  var flash=skill ? SkillAttentionPolicy.readyAlpha(true,lit,s.affordable,s.readyFlashUntil,now) : 0;
-  if (flash>0) SkillAttentionRenderer.ready(dl,glow.readyMode,glow.auraStyle,glow.strength,glow.outer,glow.inner,
-   glow.color|0xFF000000,x,y,size,4,flash);
-  if (skill && s.procReady) SkillAttentionRenderer.proc(dl,x,y,size,s.procStart,now);
+  var flash=skill ? SkillAttentionPolicy.configuredAlpha(glow,s.cooldownValid,lit,s.readyAt,now) : 0;
+  if(flash>0) SkillAttentionRenderer.configuredReady(dl,glow,x,y,size,flash,time);
+  if(skill && s.procValid && s.procReady) SkillAttentionRenderer.configuredProc(dl,glow,x,y,size,s.procStart,now);
   if (active && s.remaining > 0.02) {
    ImGui.ImDrawList_PathClear(dl); ImGui.ImDrawList_PathLineTo(dl,ImGui.vec2(x+size/2,y+size/2));
    ImGui.ImDrawList_PathArcTo(dl,ImGui.vec2(x+size/2,y+size/2),size*0.48,-Math.PI/2,-Math.PI/2+s.remaining*Math.PI*2,28);
