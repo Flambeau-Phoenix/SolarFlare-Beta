@@ -19,11 +19,12 @@ class AuraPack {
 
 	public static var FIGHTS:Array<String> = ["maat", "nightqueen", "shared"];
 
-	public static function encode(fight:String, packId:String, packName:String, auras:Array<AuraDef>):String {
-		return ShareCodec.encodeObj(toObj(fight, packId, packName, auras));
+	public static function encode(fight:String, packId:String, packName:String, auras:Array<AuraDef>, ?groups:Array<Dynamic>):String {
+		return ShareCodec.encodeObj(toObj(fight, packId, packName, auras, groups));
 	}
 
-	public static function toObj(fight:String, packId:String, packName:String, auras:Array<AuraDef>):Dynamic {
+	/** `groups` (AuraConfig.dumpGroups rows) travels with the pack so members re-form on import. */
+	public static function toObj(fight:String, packId:String, packName:String, auras:Array<AuraDef>, ?groups:Array<Dynamic>):Dynamic {
 		var list:Array<Dynamic> = [];
 		var drm:Array<Dynamic> = [];
 		var i = 0;
@@ -40,7 +41,7 @@ class AuraPack {
 		var fid = packId != null && packId.length > 0 ? packId : "aura_pack";
 		var fname = packName != null && packName.length > 0 ? packName : fid;
 		var ffight = fight != null && fight.length > 0 ? fight : "shared";
-		return {
+		var out:Dynamic = {
 			kind: KIND,
 			v: VER,
 			id: fid,
@@ -49,6 +50,9 @@ class AuraPack {
 			auras: list,
 			drm: drm
 		};
+		if (groups != null && groups.length > 0)
+			out.groups = groups;
+		return out;
 	}
 
 	/** Map one aura to a DRM custom pack alert row when a skill id exists. */

@@ -29,6 +29,18 @@ class AuraOverlay {
 	var theme:Theme;
 	var visualBounds = new solarflare.ui.HUDVisualBounds();
 
+	/** Dynamic groups: reused per frame so drawing a group allocates nothing once warmed up. */
+	var hudGroup:AuraGroupDef;
+	var hudGroupBodyFn:imgui.Structs.ImVec2->Void;
+	var hudGroupHideFn:Void->Void;
+	var hudGroupResizeFn:Single->Single->Void;
+	var groupMembers:Array<AuraDef> = [];
+	var groupW:Array<Float> = [];
+	var groupH:Array<Float> = [];
+	var groupLayout = new AuraGroupLayout();
+	var groupBounds = new solarflare.ui.HUDVisualBounds();
+	var memberBounds = new solarflare.ui.HUDVisualBounds();
+
 	public function new(cfg:AuraConfig) {
 		hudBodyFn = hudBody;
 		hudHideFn = hudHide;
@@ -36,6 +48,9 @@ class AuraOverlay {
 		hudResizeFn = hudResize;
 
 		hudAllFn = hudAll;
+		hudGroupBodyFn = hudGroupBody;
+		hudGroupHideFn = hudGroupHide;
+		hudGroupResizeFn = hudGroupResize;
 		this.cfg = cfg;
 		theme = new Theme()
 			.varV(ImGuiStyleVar.WindowPadding, ImGui.vec2(2, 2))
@@ -64,6 +79,8 @@ class AuraOverlay {
 		// Typed alerts are independent of the ordinary face's visibility / layout lock.
 		if (a.alertShow) drawAlert(a);
 		if (!a.visual.get()) return;
+		// Group members are drawn by their group's window.
+		if (a.group != null && a.group.length > 0 && cfg.findGroup(a.group) != null) return;
 		// A window that is individually locked must hide when conditions are not met,
 		// regardless of the legacy global unlock flag.
 		var indivLocked = a.chrome != null && a.chrome.locked.get();
@@ -120,6 +137,95 @@ class AuraOverlay {
 		for (a in cfg.auras) {
 			try drawOne(a) catch (_:Dynamic) {}
 		}
+		for (g in cfg.groups) {
+			try drawGroup(g) catch (_:Dynamic) {}
+		}
+	}
+
+	static inline function memberScale(a:AuraDef, g:AuraGroupDef):Single {
+		return Math.max(0.4, Math.min(2.5, a.scale.get())) * g.scale;
+	}
+
+	static function byTime(a:AuraDef, b:AuraDef):Int {
+		var c = AuraGroupLayout.compareTime(a.timerInfinite, a.timeLeft, b.timerInfinite, b.timeLeft);
+		return c != 0 ? c : Reflect.compare(a.id, b.id);
+	}
+
+	/**
+	 * One window per group. Locked: only showing members, packed so gaps close. Unlocked: every member,
+	 * non-showing ones as ghosts, so the author sees and positions the full footprint.
+	 */
+	function drawGroup(g:AuraGroupDef):Void {
+		if (g == null) return;
+		var chrome = cfg.groupChrome(g);
+		var layout = !chrome.locked.get();
+		groupMembers.splice(0, groupMembers.length);
+		for (a in cfg.auras) {
+			if (a == null || a.group != g.id || !a.enabled.get() || !a.visual.get()) continue;
+			if (!a.show && !layout) continue;
+			groupMembers.push(a);
+		}
+		var n = groupMembers.length;
+		if (n == 0) return;
+		if (g.sort == "time") groupMembers.sort(byTime);
+		for (i in 0...n) {
+			var a = groupMembers[i];
+			var sc = memberScale(a, g);
+			setAt(groupW, i, Math.max(24, a.w.get() * sc));
+			setAt(groupH, i, Math.max(24, a.h.get() * sc));
+		}
+		groupLayout.compute(groupW, groupH, n, g.grow, g.wrap, g.spacing * g.scale, g.align);
+		groupBounds.reset(groupLayout.totalW, groupLayout.totalH);
+		for (i in 0...n) {
+			var a = groupMembers[i];
+			AuraVisualRenderer.measureBounds(a, groupW[i], groupH[i], a.stacks, a.counterValue, memberBounds, memberScale(a, g));
+			groupBounds.include(groupLayout.xs[i] + memberBounds.minX, groupLayout.ys[i] + memberBounds.minY,
+				memberBounds.width(), memberBounds.height());
+		}
+		hudGroup = g;
+		try
+			solarflare.ui.HUDWidgetWindow.draw("SolarFlare AuraGroup " + g.id, g.name, chrome, groupLayout.totalW, groupLayout.totalH,
+				hudGroupBodyFn, openBuilder, hudGroupHideFn, false, null, hudGroupResizeFn, groupBounds)
+		catch (e:Dynamic) { hudGroup = null; throw e; }
+		hudGroup = null;
+	}
+
+	function hudGroupBody(size:imgui.Structs.ImVec2):Void {
+		var g = hudGroup;
+		var layout = !cfg.groupChrome(g).locked.get();
+		var p = ImGui.getCursorScreenPos();
+		ImGui.dummy(size);
+		var dl = ImGui.getWindowDrawList();
+		for (i in 0...groupLayout.count) {
+			var a = groupMembers[i];
+			var x:Single = p.x + groupLayout.xs[i];
+			var y:Single = p.y + groupLayout.ys[i];
+			var ghost = !a.show && layout;
+			AuraVisualRenderer.draw(dl, a, x, y, groupW[i], groupH[i], a.progress, a.stacks, a.counterValue, ghost,
+				a.fxAlpha * g.opacity, memberScale(a, g));
+			AuraVisualRenderer.drawKeyChip(dl, x, y, groupW[i], groupH[i], a, ghost);
+		}
+	}
+
+	/** Window menu Hide: turns every member off, like Hide on a single aura. */
+	function hudGroupHide():Void {
+		var g = hudGroup;
+		for (a in cfg.auras)
+			if (a != null && a.group == g.id)
+				a.enabled.set(false);
+		SettingsStore.markDirty();
+	}
+
+	/** Dragging the grip scales the whole group. */
+	function hudGroupResize(newW:Single, newH:Single):Void {
+		var g = hudGroup;
+		if (g == null || groupLayout.totalW < 1) return;
+		g.scale = Math.max(0.25, Math.min(4, g.scale * (newW / groupLayout.totalW)));
+		SettingsStore.markDirty();
+	}
+
+	static inline function setAt(arr:Array<Float>, i:Int, v:Float):Void {
+		if (i < arr.length) arr[i] = v; else arr.push(v);
 	}
 
 	function hudBody(size:imgui.Structs.ImVec2):Void {

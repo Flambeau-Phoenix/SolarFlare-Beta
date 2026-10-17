@@ -14,6 +14,7 @@ import solarflare.combatlog.CombatLogCache;
 class AuraSignalFrameBuilder {
 	public static function build(frame:AuraSignalFrame, now:Float):Void {
 		frame.resetCollections(); frame.generation++; frame.builtAt = now;
+		frame.castDomainKnown = true;
 		frame.heroKnown = HealthCache.localHero != null;
 		var localCasts = solarflare.aura.LocalCastHistory.shared;
 		localCasts.bindHero(HealthCache.localHero);
@@ -90,7 +91,9 @@ class AuraSignalFrameBuilder {
 			fillInstantReady(frame);
 		if (solarflare.ObserveDemand.aurasNeedSpecial)
 			fillSpecialReady(frame);
-		frame.statusDomainKnown = AuraStatusCache.isCurrent(HealthCache.localHero) && AuraStatusCache.domainKnown;
+		// A full publication buffer cannot prove absence for omitted demand subjects.
+		frame.statusDomainKnown = AuraStatusCache.isCurrent(HealthCache.localHero) && AuraStatusCache.domainKnown
+			&& AuraStatusCache.count < AuraSignalFrame.MAX_STATUSES;
 		frame.setStatusContainerLength(AuraStatusCache.isCurrent(HealthCache.localHero) ? AuraStatusCache.containerLength : -1);
 		var n = AuraStatusCache.count; if (n > AuraSignalFrame.MAX_STATUSES) n = AuraSignalFrame.MAX_STATUSES;
 		for (i in 0...n) {
@@ -264,7 +267,8 @@ class AuraSignalFrameBuilder {
 			return;
 		}
 		for (id in ids) {
-			if (id == null || id.length == 0 || frame.castCount >= AuraSignalFrame.MAX_CASTS)
+			if (frame.castCount >= AuraSignalFrame.MAX_CASTS) { frame.castDomainKnown = false; continue; }
+			if (id == null || id.length == 0)
 				continue;
 			if (frame.findCast(id) != null)
 				continue;

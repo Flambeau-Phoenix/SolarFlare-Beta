@@ -12,6 +12,12 @@ class UiLayouts {
  public var bank=new HudLayoutModel();
  var nameBuf=new hl.Bytes(96);
  var initialized:Bool=false;
+ var defaults:Array<HudLayoutRow>=[];
+ var applied=new Map<String,HudChrome>();
+ var reconcileWanted:Bool=false;
+ public function requestReconcile():Void reconcileWanted=true;
+ /** Snapshot constructor geometry before settings/profile loading changes any widget. */
+ public function captureDefaults(c:ConfigPanel):Void defaults=HudLayoutBindings.capture(c);
  /** "New" or "Rename" while the name modal is wanted; empty when closed. */
  var nameAction:String="";
  /** Strip id that opens the name modal next; set in the More menu, consumed outside the popup scope. */
@@ -20,21 +26,48 @@ class UiLayouts {
  public function clearTransientState():Void { nameAction=""; openFor=""; ByteUtil.clearBytes(nameBuf,96); }
  public function retain(c:ConfigPanel):Void {
   if(!initialized) { bank=HudLayoutModel.load(null,HudLayoutBindings.capture(c)); initialized=true; }
-  else bank.layouts.set(bank.active,HudLayoutBindings.capture(c));
+  else bank.retain(HudLayoutBindings.capture(c));
  }
  public function dumpCurrent(c:ConfigPanel):Dynamic { retain(c); return bank.dump(); }
  public function load(c:ConfigPanel,data:Dynamic,fallback:Array<HudLayoutRow>):Void {
-  clearTransientState(); bank=HudLayoutModel.load(data,fallback); initialized=true;
-  HudLayoutBindings.apply(c,bank.layouts.get(bank.active));
+  clearTransientState();
+  bank=HudLayoutModel.load(data,HudLayoutModel.merge(defaults,fallback)); initialized=true;
+  applySelected(c);
+  if(!bank.saveSafe) SettingsStore.blockSaving(bank.loadWarning);
  }
- public static function migrateSnapshot(snapshot:Dynamic):Void {
-  if(snapshot==null || Reflect.field(snapshot,"uiLayouts")!=null) return;
-  Reflect.setField(snapshot,"uiLayouts",HudLayoutModel.load(null,HudLayoutModel.legacy(snapshot,HudChrome.viewportWidth,HudChrome.viewportHeight)).dump());
+ public static function migrateSnapshot(snapshot:Dynamic,root:Dynamic=null):Void {
+  if(snapshot==null) return;
+  var before=Reflect.field(snapshot,"uiLayouts");
+  var bank=HudLayoutModel.load(before,HudLayoutModel.legacy(snapshot,HudChrome.viewportWidth,HudChrome.viewportHeight,root));
+  if(bank.saveSafe) Reflect.setField(snapshot,"uiLayouts",bank.dump());
+  else SettingsStore.blockSaving(bank.loadWarning);
+ }
+ function applySelected(c:ConfigPanel):Int {
+  reconcileWanted=false;
+  applied.clear();
+  var bindings=HudLayoutBindings.build(c);
+  var missing=HudLayoutBinding.applyRows(bindings,bank.layouts.get(bank.active));
+  for(b in bindings) applied.set(b.id,b.chrome);
+  return missing;
+ }
+ /** Observe-only: character restores can replace dynamic chromes after profile loading. */
+ public function reconcile(c:ConfigPanel):Void {
+  if(!initialized || !reconcileWanted) return;
+  reconcileWanted=false;
+  var rows=bank.layouts.get(bank.active); var bindings=HudLayoutBindings.build(c);
+  for(b in bindings) if(applied.get(b.id)!=b.chrome) {
+   for(row in rows) if(row.id==b.id) { b.apply(row); break; }
+   applied.set(b.id,b.chrome);
+  }
+ }
+ /** Explicit deletion only; absence during loading never removes a saved row. */
+ public function forgetWidget(id:String):Void {
+  if(initialized) bank.forget(id); applied.remove(id);
  }
  public function select(c:ConfigPanel,name:String):Void {
   if(!bank.layouts.exists(name)) return;
   retain(c); bank.active=name;
-  var missing=HudLayoutBindings.apply(c,bank.layouts.get(name)); SettingsStore.markDirty();
+  var missing=applySelected(c); SettingsStore.markDirty();
   if(missing>0) ToastManager.warn("Loaded layout \""+name+"\"; "+missing+" unmatched widgets left unchanged.");
   else ToastManager.info("Switched to layout \""+name+"\"");
  }
@@ -63,7 +96,7 @@ class UiLayouts {
  function remove(c:ConfigPanel):Void {
   if(bank.order.length<=1) return;
   var old=bank.active; bank.layouts.remove(old); bank.order.remove(old); bank.active=bank.order[0];
-  HudLayoutBindings.apply(c,bank.layouts.get(bank.active)); SettingsStore.markDirty();
+  applySelected(c); SettingsStore.markDirty();
   ToastManager.info("Deleted layout \""+old+"\".");
  }
  function importClipboard(c:ConfigPanel):Void {
@@ -72,7 +105,7 @@ class UiLayouts {
    // Parse into a temporary bank first; invalid input cannot even save outgoing edits.
    var temporary=new HudLayoutModel(); var key=temporary.importText(text); var rows=temporary.layouts.get(key);
    retain(c); key=bank.add(key,rows);
-   var missing=HudLayoutBindings.apply(c,rows); SettingsStore.markDirty();
+   var missing=applySelected(c); SettingsStore.markDirty();
    ToastManager.success("Imported layout \""+key+"\""+(missing>0 ? "; "+missing+" unmatched widgets." : "."));
   } catch(e:Dynamic) { ToastManager.error("Import failed: "+Std.string(e)); }
  }

@@ -133,6 +133,7 @@ class BarTerConfig {
 		if (c == null) return {};
 		return {
 			hudLayoutVersion: c.hudLayoutVersion,
+			referenceWidth: c.referenceWidth, referenceHeight: c.referenceHeight,
 			lock: c.locked.get(),
 			trans: c.transparent.get(),
 			collapsed: c.collapsed.get(),
@@ -199,6 +200,7 @@ class BarTerConfig {
 			catch (_:Dynamic) {}
 			if (row == null) continue;
 			var c = chromeFor(b.id);
+			c.restoreReference(row);
 			c.hudLayoutVersion = row.hudLayoutVersion != null ? Std.int(row.hudLayoutVersion) : 0;
 			if (Reflect.hasField(row, "lock") || Reflect.hasField(row, "locked"))
 				c.locked.set(Reflect.field(row, "lock") == true || Reflect.field(row, "locked") == true);

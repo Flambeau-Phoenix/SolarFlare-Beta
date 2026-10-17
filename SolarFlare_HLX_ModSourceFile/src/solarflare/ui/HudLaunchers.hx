@@ -1,4 +1,4 @@
-﻿package solarflare.ui;
+package solarflare.ui;
 
 import solarflare.ui.GameIcons;
 import solarflare.ui.HudChrome;
@@ -87,6 +87,7 @@ class HudLaunchers {
 			hidden: s.hidden.get(),
 			size: s.size.get(),
 			chrome: c == null ? {} : {
+				referenceWidth: c.referenceWidth, referenceHeight: c.referenceHeight,
 				lock: c.locked.get(),
 				trans: c.transparent.get(),
 				sun: c.showGrip.get(),
@@ -112,6 +113,7 @@ class HudLaunchers {
 		} catch (_:Dynamic) {}
 		var ch = data.chrome;
 		if (s.chrome != null && ch != null) {
+			s.chrome.restoreReference(ch);
 			try
 				if (ch.collapsed != null)
 					s.chrome.collapsed.set(ch.collapsed == true)

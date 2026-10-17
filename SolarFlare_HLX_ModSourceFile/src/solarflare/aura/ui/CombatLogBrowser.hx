@@ -545,7 +545,7 @@ class CombatLogBrowser {
 			UiLayout.propertyRow("Warn at", function() {
 				healthRef.set(state.healthPercent);
 				ImGui.setNextItemWidth(-1);
-				if (ImGui.sliderInt("##ab_cl_hp", healthRef, 5, 95)) state.setHealthPercent(healthRef.get());
+				if (solarflare.ui.NumberField.drawInt("##ab_cl_hp", healthRef, 5, 95, "%.0f%%")) state.setHealthPercent(healthRef.get());
 			}, "The alert shows once this enemy's health is at or below this percent.");
 		});
 		if (enemyInfo != null && Math.isFinite(enemyInfo.lowestHp))

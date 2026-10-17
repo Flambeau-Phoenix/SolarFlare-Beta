@@ -25,16 +25,26 @@ class AuraConditionEditor {
 	public static function draw(a:AuraDef, prominent:Bool = false, onBatchSnapshot:Void->Void = null, bossFocusId:String = ""):Void {
 		if (a == null) return;
 		if (a.rule == null) a.rule = new AuraRuleDef();
-		var r = a.rule;
+		a.ruleEditor.id = a.id;
+		a.ruleEditor.rule = a.rule;
+		a.ruleEditor.snapshot = onBatchSnapshot;
+		drawContext(a.ruleEditor, prominent, bossFocusId);
+	}
 
+	public static function drawContext(a:AuraRuleEditorContext, prominent:Bool = false, bossFocusId:String = ""):Void {
+		if (a == null || a.rule == null) return;
+		var r = a.rule;
+		var onBatchSnapshot = a.snapshot;
 		UiChrome.subHeader("Require");
 		var allMode = r.mode == "all";
 		if (ImGui.radioButton("ALL conditions (AND)##rule_all_" + a.id, allMode)) {
+			if (a.snapshot != null) a.snapshot();
 			r.mode = "all";
 			SettingsStore.markDirty();
 		}
 		ImGui.sameLine();
 		if (ImGui.radioButton("ANY condition (OR)##rule_any_" + a.id, !allMode)) {
+			if (a.snapshot != null) a.snapshot();
 			r.mode = "any";
 			SettingsStore.markDirty();
 		}
@@ -43,7 +53,7 @@ class AuraConditionEditor {
 		ImGui.spacing();
 		var count = r.conditions != null ? r.conditions.length : 0;
 		if (count == 0) {
-			ImGui.textDisabled("No conditions yet — add one below.");
+			ImGui.textDisabled("No conditions yet â€” add one below.");
 		} else {
 			ImGui.textColored(ThemePalette.status(ThemePalette.STATUS_INFO),
 				allMode ? "Show when ALL of these are true:" : "Show when ANY of these is true:");
@@ -51,7 +61,7 @@ class AuraConditionEditor {
 			for (c in r.conditions) {
 				var join = i == 0 ? "" : (allMode ? "  and " : "  or ");
 				ImGui.textWrapped(join + humanConditionSummary(c)
-					+ (r.presentationSource == i && count > 1 ? "  (main trigger)" : ""));
+					+ (a.presentation && r.presentationSource == i && count > 1 ? "  (main trigger)" : ""));
 				i++;
 			}
 		}
@@ -66,7 +76,6 @@ class AuraConditionEditor {
 			ImGui.pushStyleColor(ImGuiCol.Border, border);
 			ImGui.pushStyleVar(ImGuiStyleVar.ChildBorderSize, prominent ? 2.0 : 1.5);
 			ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, ImGui.vec2(10, 8));
-			ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, ImGui.vec2(6, 4));
 
 			ImGui.beginChild("##condition_card_" + c.uiKey, ImGui.vec2(0, 0),
 				ImGuiChildFlags.Borders | ImGuiChildFlags.AutoResizeY | ImGuiChildFlags.AlwaysUseWindowPadding, 0);
@@ -77,7 +86,7 @@ class AuraConditionEditor {
 			}
 			ImGui.endChild();
 
-			ImGui.popStyleVar(3);
+			ImGui.popStyleVar(2);
 			ImGui.popStyleColor();
 
 			var cardUi = ci < a.conditionUi.length ? a.conditionUi[ci] : null;
@@ -192,7 +201,7 @@ class AuraConditionEditor {
 		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(px + 8, cy - ts.y * 0.5), line, label);
 	}
 
-	static function drawConditionCard(a:AuraDef, r:AuraRuleDef, c:AuraConditionDef, index:Int, bossFocusId:String):Bool {
+	static function drawConditionCard(a:AuraRuleEditorContext, r:AuraRuleDef, c:AuraConditionDef, index:Int, bossFocusId:String):Bool {
 		var tag = a.id + "_" + c.uiKey;
 		while (a.conditionUi.length <= index)
 			a.conditionUi.push(new AuraConditionUiState());
@@ -207,6 +216,7 @@ class AuraConditionEditor {
 		ImGui.textDisabled("Condition " + (index + 1));
 		ImGui.sameLine();
 		if (index > 0 && ImGui.smallButton("^##cond_up_" + tag)) {
+			if (a.snapshot != null) a.snapshot();
 			var p = r.conditions[index - 1];
 			r.conditions[index - 1] = c;
 			r.conditions[index] = p;
@@ -215,6 +225,7 @@ class AuraConditionEditor {
 		}
 		ImGui.sameLine();
 		if (index + 1 < r.conditions.length && ImGui.smallButton("v##cond_dn_" + tag)) {
+			if (a.snapshot != null) a.snapshot();
 			var n = r.conditions[index + 1];
 			r.conditions[index + 1] = c;
 			r.conditions[index] = n;
@@ -239,14 +250,16 @@ class AuraConditionEditor {
 
 		ImGui.sameLine();
 		if (ImGui.checkbox("Invert##cond_neg_" + tag, ui.negateRef)) {
+			if (a.snapshot != null) a.snapshot();
 			ui.pull(c);
 			ui.flashContext();
 			SettingsStore.markDirty();
 		}
-		if (r.conditions.length > 1) {
-			ImGui.sameLine();
+		if (a.presentation && r.conditions.length > 1) {
+			if (ImGui.getContentRegionAvail().x > 230) ImGui.sameLine();
 			var isMain = r.presentationSource == index;
 			if (ImGui.smallButton(isMain ? "Main Trigger##cond_main_" + tag : "Use as Main Trigger##cond_main_" + tag)) {
+				if (a.snapshot != null) a.snapshot();
 				r.presentationSource = index;
 				SettingsStore.markDirty();
 			}
@@ -259,8 +272,9 @@ class AuraConditionEditor {
 		ImGui.text("Show when");
 		ImGui.sameLine();
 
+		var compact = ImGui.getContentRegionAvail().x < 700;
 		var d = AuraSignalCatalog.find(c.signal);
-		var preview = d != null ? d.label : (c.signal.length > 0 ? c.signal : "Select signal…");
+		var preview = d != null ? d.label : (c.signal.length > 0 ? c.signal : "Select signalâ€¦");
 		ImGui.setNextItemWidth(210);
 		if (ImGui.beginCombo("##cond_sig_" + tag, preview)) {
 			var currentGroup = "";
@@ -270,6 +284,7 @@ class AuraConditionEditor {
 					ImGui.separatorText(item.group);
 				}
 				if (ImGui.selectable(item.label + "##sig_" + tag + item.id, c.signal == item.id)) {
+					if (a.snapshot != null) a.snapshot();
 					c.signal = item.id;
 					c.op = AuraConditionValidator.defaultOperator(item);
 					c.subject = "";
@@ -286,13 +301,13 @@ class AuraConditionEditor {
 
 		d = AuraSignalCatalog.find(c.signal);
 		if (d != null && d.subjectKind.length > 0) {
-			ImGui.sameLine();
+			if (!compact) ImGui.sameLine();
 			drawSubjectInline(a, c, ui, d.subjectKind, tag, bossFocusId);
 		}
 
 		if (d != null) {
-			ImGui.sameLine();
-			drawOperatorInline(c, ui, d, tag);
+			if (!compact) ImGui.sameLine();
+			drawOperatorInline(c, ui, d, tag, a.snapshot);
 		}
 
 		if (d != null && d.id != "status.present") {
@@ -300,34 +315,35 @@ class AuraConditionEditor {
 			switch (d.kind) {
 				case Boolean:
 					if (ImGui.checkbox("active##cond_bool_" + tag, ui.boolRef)) {
+						if (a.snapshot != null) a.snapshot();
 						ui.pull(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
 					}
 				case Percent:
 					ImGui.setNextItemWidth(100);
-					if (solarflare.ui.BuilderSlider.draw("##cond_pct_" + tag, ui.percentRef, 0, 100, "%.0f%%")) {
+					if (solarflare.ui.NumberField.draw("##cond_pct_" + tag, ui.percentRef, 0, 100, "%.0f%%", a.snapshot)) {
 						ui.pullPercent(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
 					}
 				case Count:
 					ImGui.setNextItemWidth(90);
-					if (solarflare.ui.BuilderSlider.draw("##cond_cnt_" + tag, ui.numberRef, 0, 100, "%.0f")) {
+					if (solarflare.ui.NumberField.draw("##cond_cnt_" + tag, ui.numberRef, 0, 100, "%.0f", a.snapshot)) {
 						ui.pull(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
 					}
 				case Duration:
 					ImGui.setNextItemWidth(100);
-					if (solarflare.ui.BuilderSlider.draw("##cond_dur_" + tag, ui.numberRef, 0, 60, "%.1fs")) {
+					if (solarflare.ui.NumberField.draw("##cond_dur_" + tag, ui.numberRef, 0, 60, "%.1fs", a.snapshot)) {
 						ui.pull(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
 					}
 				default:
 					ImGui.setNextItemWidth(90);
-					if (solarflare.ui.BuilderSlider.draw("##cond_num_" + tag, ui.numberRef, 0, 100, "%.1f")) {
+					if (solarflare.ui.NumberField.draw("##cond_num_" + tag, ui.numberRef, 0, 100, "%.1f", a.snapshot)) {
 						ui.pull(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
@@ -352,7 +368,7 @@ class AuraConditionEditor {
 		return remove;
 	}
 
-	static function drawOperatorInline(c:AuraConditionDef, ui:AuraConditionUiState, d:AuraSignalDescriptor, tag:String):Void {
+	static function drawOperatorInline(c:AuraConditionDef, ui:AuraConditionUiState, d:AuraSignalDescriptor, tag:String, beforeEdit:Void->Void):Void {
 		var ops:Array<String>;
 		// status.present is Boolean-kinded but AuraConditionValidator.isValidOperator
 		// accepts only present/absent for it. Without this case the generic Boolean
@@ -375,6 +391,7 @@ class AuraConditionEditor {
 		if (ImGui.beginCombo("##cond_op_" + tag, label)) {
 			for (op in ops) {
 				if (ImGui.selectable(friendlyOp(op) + "##op_" + tag + op, c.op == op)) {
+					if (beforeEdit != null) beforeEdit();
 					c.op = op;
 					ui.flashContext();
 					SettingsStore.markDirty();
@@ -393,13 +410,13 @@ class AuraConditionEditor {
 		return c.subject;
 	}
 
-	static function drawSubjectInline(a:AuraDef, c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String, bossFocusId:String):Void {
+	static function drawSubjectInline(a:AuraRuleEditorContext, c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String, bossFocusId:String):Void {
 		var name = subjectName(c);
 		if (name.length > 0) c.subjectLabel = name;
 
 		// Same beginCombo pattern as AuraBuilder.drawWizardCatalogPicker / signal combo.
 		// ghostButton+popup inside AutoResizeY condition cards eats clicks and sticks.
-		var previewText = name.length > 0 ? name : "Select " + kind + "…";
+		var previewText = name.length > 0 ? name : "Select " + kind + "â€¦";
 		ImGui.setNextItemWidth(210);
 		ImGui.setNextWindowSize(ImGui.vec2(480, 420), ImGuiCond.Always);
 		if (!ImGui.beginCombo("##cond_subj_" + tag, previewText)) {
@@ -420,7 +437,7 @@ class AuraConditionEditor {
 			var childOpen = ImGui.beginChild("##cond_subj_list_" + tag, ImGui.vec2(0, 0), ImGuiChildFlags.Borders);
 			try {
 				if (childOpen)
-					drawSubjectList(c, ui, kind, tag, bossFocusId);
+					drawSubjectList(c, ui, kind, tag, bossFocusId, a.snapshot);
 			} catch (e:Dynamic) {
 				ImGui.endChild();
 				throw e;
@@ -433,7 +450,7 @@ class AuraConditionEditor {
 		ImGui.endCombo();
 	}
 
-	static function drawSubjectList(c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String, bossFocusId:String):Void {
+	static function drawSubjectList(c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String, bossFocusId:String, beforeEdit:Void->Void):Void {
 		var statusSkills:Array<{id:String, name:String, kind:String}> = [];
 		var otherSkills:Array<{id:String, name:String, kind:String}> = [];
 		var categories:Array<{id:String, name:String, kind:String}> = [];
@@ -470,9 +487,9 @@ class AuraConditionEditor {
 				if (solarflare.cdb.AuraCatalog.matchesSearch(status.rawId, label, ui.search))
 					observed.push({id: status.rawId, name: label, kind: "active status"});
 			}
-			shown += drawSubjectSection(c, ui, tag + "_live", "Currently on your character", observed, kind);
-			shown += drawSubjectSection(c, ui, tag, "Status / Proc IDs", statusSkills, kind);
-			shown += drawSubjectSection(c, ui, tag, "Other skills", otherSkills, kind);
+			shown += drawSubjectSection(c, ui, tag + "_live", "Currently on your character", observed, kind, beforeEdit);
+			shown += drawSubjectSection(c, ui, tag, "Status / Proc IDs", statusSkills, kind, beforeEdit);
+			shown += drawSubjectSection(c, ui, tag, "Other skills", otherSkills, kind, beforeEdit);
 		} else if (kind == "unit") {
 			var recent:Array<{id:String, name:String, kind:String}> = [];
 			var rids = solarflare.target.RecentTargetCache.ids();
@@ -485,21 +502,21 @@ class AuraConditionEditor {
 					recent.push({id: rid, name: rlab, kind: "recent target"});
 				ri++;
 			}
-			shown += drawSubjectSection(c, ui, tag + "_recent", "Recent targets", recent, kind);
-			shown += drawSubjectSection(c, ui, tag, "Units", units, kind);
+			shown += drawSubjectSection(c, ui, tag + "_recent", "Recent targets", recent, kind, beforeEdit);
+			shown += drawSubjectSection(c, ui, tag, "Units", units, kind, beforeEdit);
 		} else {
-			shown += drawSubjectSection(c, ui, tag, kind == "consumable" ? "Consumables / usable items" : "Skills", otherSkills, kind);
+			shown += drawSubjectSection(c, ui, tag, kind == "consumable" ? "Consumables / usable items" : "Skills", otherSkills, kind, beforeEdit);
 		}
 		ImGui.textDisabled(shown + " matching");
 	}
 
 	static function drawSubjectSection(c:AuraConditionDef, ui:AuraConditionUiState, tag:String, title:String,
-			rows:Array<{id:String, name:String, kind:String}>, subjectKind:String):Int {
+			rows:Array<{id:String, name:String, kind:String}>, subjectKind:String, beforeEdit:Void->Void):Int {
 		if (rows == null || rows.length == 0) return 0;
 		ImGui.separatorText(title + " (" + rows.length + ")");
 		var n = 0;
 		for (entry in rows) {
-			drawSubjectRow(c, ui, entry.id, entry.name, entry.kind, tag, subjectKind);
+			drawSubjectRow(c, ui, entry.id, entry.name, entry.kind, tag, subjectKind, beforeEdit);
 			n++;
 		}
 		return n;
@@ -509,11 +526,11 @@ class AuraConditionEditor {
 	 * Status pickers can list either the real stacking status (Status / Proc IDs, Currently
 	 * on your character) or the ability that grants it (Other skills). Picking the ability by
 	 * mistake used to leave `status.stacks`/`status.present` pointed at an id the engine never
-	 * stacks — the granted status underneath it does. Redirect to the granted status id here so
+	 * stacks â€” the granted status underneath it does. Redirect to the granted status id here so
 	 * every entry point (wizard, Home templates, manual edit) lands on the trackable id.
 	 */
 	static function drawSubjectRow(c:AuraConditionDef, ui:AuraConditionUiState, id:String, name:String, entryKind:String, tag:String,
-			subjectKind:String = ""):Void {
+			subjectKind:String = "", beforeEdit:Void->Void = null):Void {
 		if (!ImGui.isRectVisible(ImGui.vec2(ImGui.getContentRegionAvail().x, 28))) {
 			ImGui.dummy(ImGui.vec2(1, 28));
 			return;
@@ -522,7 +539,8 @@ class AuraConditionEditor {
 		ImGui.sameLine();
 		var resolvedId = subjectKind == "status" ? solarflare.cdb.CdbAuraTable.statusSubjectId(id) : id;
 		var kindTag = entryKind == "statustype" ? "category" : entryKind;
-		if (ImGui.selectable(name + " [" + id + "] · " + kindTag + "##subject_" + tag + id, c.subject == resolvedId)) {
+		if (ImGui.selectable(name + " [" + id + "] Â· " + kindTag + "##subject_" + tag + id, c.subject == resolvedId)) {
+			if (beforeEdit != null) beforeEdit();
 			c.subject = resolvedId;
 			// Keep the catalog identity stable; the tooltip shows the resolved id.
 			c.subjectLabel = name;

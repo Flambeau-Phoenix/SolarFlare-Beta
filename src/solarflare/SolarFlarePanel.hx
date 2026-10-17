@@ -139,6 +139,7 @@ class SolarFlarePanel {
 	public function resetExtraBarsSession():Void {
 		solarflare.hemorrhage.HemorrhageService.interrupt("World unloaded");
 		if (config.extraBarsPrototype != null) config.extraBarsPrototype.clearSession();
+		if (config.stacks != null) config.stacks.reset();
 	}
 
 	public function observeAssets():Void {
@@ -171,6 +172,11 @@ class SolarFlarePanel {
 		catch (_:Dynamic) {}
 
 		solarflare.runtime.TelemetryKernel.observe(app, config, restoreNativeChat);
+		// Character-owned widgets must exist before applying a profile/layout.
+		if (config.extraBarsPrototype != null) {
+			try config.extraBarsPrototype.observeLayoutCharacter() catch (_:Dynamic) {}
+			try config.uiLayouts.reconcile(config) catch (_:Dynamic) {}
+		}
 		// Profile switching consumes the frozen identity only after telemetry has
 		// refreshed it; no live game objects are touched from the profile system.
 		try
@@ -190,9 +196,13 @@ class SolarFlarePanel {
 		if (config.statusBoard != null) {
 			try config.statusBoard.observe() catch (_:Dynamic) {}
 		}
+		if (config.stacks != null) {
+			try config.stacks.observe() catch (_:Dynamic) {}
+		}
 		if (config.lootBrowser != null) {
 			try config.lootBrowser.observe() catch (_:Dynamic) {}
 		}
+		try config.uiLayouts.reconcile(config) catch (_:Dynamic) {}
 		solarflare.ui.NativeHideCache.apply(app, config.nativeHide);
 		try
 			solarflare.ui.HideMoveCache.apply(config.hideMove)
@@ -265,6 +275,9 @@ class SolarFlarePanel {
 			if (!suppressed && config.statusBoard != null) {
 				config.statusBoard.draw();
 			}
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
+		try {
+			if (!suppressed && config.stacks != null) config.stacks.draw();
 		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		// Each overlay isolated — a Geaux throw must not skip Lightsaber / Auras.
 		try {

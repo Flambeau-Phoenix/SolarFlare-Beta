@@ -12,9 +12,11 @@ class CompactHudLayout {
 		for (key in ["hp", "rage", "mana"]) {
 			var style:Dynamic = Reflect.field(data, key + "Style");
 			var vertical:Dynamic = Reflect.field(data, key + "Vert");
-			if (horizontalRow(style == null ? 0 : Std.int(style), vertical == true)) Reflect.setField(data, key + "H", HEIGHT);
+			var existing:Dynamic=Reflect.field(data,key+"H");
+			if (horizontalRow(style == null ? 0 : Std.int(style), vertical == true) && (!HudLayoutModel.finite(existing) || existing<=0)) Reflect.setField(data, key + "H", HEIGHT);
 		}
-		Reflect.setField(data, "prayersH", HEIGHT);
+		var prayers:Dynamic=Reflect.field(data,"prayersH");
+		if (!HudLayoutModel.finite(prayers) || prayers<=0) Reflect.setField(data, "prayersH", HEIGHT);
 		Reflect.setField(data, "hudLayoutVersion", VERSION);
 	}
 }

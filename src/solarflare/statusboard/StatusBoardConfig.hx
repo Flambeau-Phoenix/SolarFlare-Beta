@@ -110,7 +110,8 @@ class StatusBoardConfig {
   contentWidth:contentWidth,contentHeight:contentHeight,
   showSeconds:showSeconds,showStacks:showStacks,hiddenStatusIds:exclusions.hiddenIds.copy(),
   hiddenStatusLabels:[for (id in exclusions.hiddenIds) {id:id,label:labels.exists(id) ? labels.get(id) : id}],
-  locked:chrome.locked.get(),transparent:chrome.transparent.get(),x:chrome.x.get(),y:chrome.y.get()
+  locked:chrome.locked.get(),transparent:chrome.transparent.get(),x:chrome.x.get(),y:chrome.y.get(),
+  referenceWidth:chrome.referenceWidth,referenceHeight:chrome.referenceHeight
  };
  public function apply(data:Dynamic):Void {
   if (data == null) return;
@@ -128,7 +129,7 @@ class StatusBoardConfig {
    var saved:Array<Dynamic>=cast data.hiddenStatusLabels;
    for (row in saved) if (row != null && Std.isOfType(row.id,String) && Std.isOfType(row.label,String)) labels.set(StatusBoardState.key(row.id),row.label);
   }
-  chrome.locked.set(data.locked == true); chrome.transparent.set(data.transparent == true);
+  chrome.restoreReference(data); chrome.locked.set(data.locked == true); chrome.transparent.set(data.transparent == true);
   if (data.x != null) chrome.x.set(data.x); if (data.y != null) chrome.y.set(data.y);
   chrome.posDirty=true;
  }

@@ -16,6 +16,7 @@ class AdvancedAuraPreview {
 	public var stacks = new IntRef(3);
 	public var counter = new IntRef(7);
 	public var autoPlay:Bool = false;
+	public var liveCanvasConditions:Bool = false;
 	public var animSpeed = new FloatRef(0.8);
 	public var lastDrawX:Float = 0;
 	public var lastDrawY:Float = 0;
@@ -28,6 +29,7 @@ class AdvancedAuraPreview {
 	public function new() {}
 	public function reset():Void {
 		autoPlay = false;
+		liveCanvasConditions = false;
 		lastStamp = 0;
 		lastAuraId = "";
 		progress.set(0.65);
@@ -66,7 +68,7 @@ class AdvancedAuraPreview {
 		for (_ in 0...5) {
 			drawW = baseW * fit;
 			drawH = baseH * fit;
-			AuraVisualRenderer.measureBounds(a, drawW, drawH, stacks.get(), counter.get(), bounds, sc * fit, simLeft, glow);
+			AuraVisualRenderer.measureBounds(a, drawW, drawH, stacks.get(), counter.get(), bounds, sc * fit, simLeft, glow, !liveCanvasConditions);
 			var next = Math.min(1, Math.min(Math.max(1, width - 8) / bounds.width(), Math.max(1, height - 8) / bounds.height()));
 			if (next >= 0.999) break;
 			if (_ < 4) fit *= next;
@@ -76,8 +78,8 @@ class AdvancedAuraPreview {
 		var dl = ImGui.getWindowDrawList();
 		ImGui.ImDrawList_PushClipRect(dl, pos, ImGui.vec2(pos.x + width, pos.y + height), true);
 		try {
-			AuraVisualRenderer.draw(dl, a, cx, cy, drawW, drawH, a.timerMode == AuraTimer.MODE_UP ? 1 - progress.get() : progress.get(), stacks.get(), counter.get(),
-				false, 1, sc * fit, simLeft, glow);
+			AuraVisualRenderer.draw(dl, a, cx, cy, drawW, drawH, gaugeProgress(a), stacks.get(), counter.get(),
+				false, 1, sc * fit, simLeft, glow, !liveCanvasConditions);
 			AuraVisualRenderer.drawKeyChip(dl, cx, cy, drawW, drawH, a, false);
 		} catch (e:Dynamic) { ImGui.ImDrawList_PopClipRect(dl); throw e; }
 		ImGui.ImDrawList_PopClipRect(dl);
@@ -86,6 +88,12 @@ class AdvancedAuraPreview {
 		lastDrawW = drawW;
 		lastDrawH = drawH;
 		if (withControls) drawControls();
+	}
+
+	/** Input is a remaining fraction; the production helper owns direction mapping. */
+	public function gaugeProgress(a:AuraDef):Float {
+		return a.cooldownDriven() ? solarflare.aura.AuraGaugePolicy.fraction(a.gaugeFillMode, a.timerMode, progress.get(), progress.get())
+			: a.timerMode == AuraTimer.MODE_UP ? 1 - progress.get() : progress.get();
 	}
 
 	/** Only supported preview state, no unrelated prefab Pulse/Expire/Ready artwork. */
@@ -102,7 +110,7 @@ class AdvancedAuraPreview {
 				}
 			});
 			UiLayout.propertyRow("Remaining", function() {
-				if (ImGui.sliderFloat("##apv_progress", progress, 0, 1, "%.2f")) autoPlay = false;
+				if (solarflare.ui.NumberField.draw("##apv_progress", progress, 0, 1, "%.2f")) autoPlay = false;
 			});
 			UiLayout.propertyRow("Stacks", function() {
 				if (ImGui.inputInt("##apv_stacks", stacks, 0, 0)) stacks.set(Std.int(Math.max(0, stacks.get())));
@@ -111,7 +119,7 @@ class AdvancedAuraPreview {
 				if (ImGui.inputInt("##apv_counter", counter, 0, 0)) counter.set(Std.int(Math.max(0, counter.get())));
 			});
 			UiLayout.propertyRow("Playback speed", function() {
-				ImGui.sliderFloat("##apv_speed", animSpeed, 0.1, 2, "%.2fx");
+				solarflare.ui.NumberField.draw("##apv_speed", animSpeed, 0.1, 2, "%.2fx");
 			});
 		});
 		ImGui.textDisabled("Preview only. Shows the display options enabled for this aura.");

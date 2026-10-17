@@ -105,7 +105,7 @@ class FeatureProfiles {
 			}
 		}
 
-		for(snap in profiles) UiLayouts.migrateSnapshot(snap);
+		for(snap in profiles) UiLayouts.migrateSnapshot(snap,data);
 		init(cfg);
 		applyUniversal(cfg, activeProfile);
 	}
@@ -420,6 +420,7 @@ class FeatureProfiles {
 			geaux: {layout: SettingsStore.geauxDump(cfg.geaux)},
 			barter: cfg.barter != null ? cfg.barter.dump() : {},
 			statusBoard: cfg.statusBoard != null ? cfg.statusBoard.dump() : {},
+			stacks: cfg.stacks != null ? cfg.stacks.dump() : {},
 			auras: {config: SettingsStore.aurasDump(cfg.auras)},
 			resources: captureResources(cfg),
 			uiLayouts: cfg.uiLayouts.dumpCurrent(cfg),
@@ -459,6 +460,7 @@ class FeatureProfiles {
 		if (barterSnap != null && cfg.barter != null)
 			cfg.barter.apply(barterSnap);
 
+		if (cfg.stacks != null) cfg.stacks.apply(Reflect.field(snap,"stacks"));
 		var statusBoardSnap = Reflect.field(snap, "statusBoard");
         if (statusBoardSnap != null && cfg.statusBoard != null) cfg.statusBoard.apply(statusBoardSnap);
 

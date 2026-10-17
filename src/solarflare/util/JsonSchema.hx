@@ -48,6 +48,10 @@ typedef AuraCanvasImportModel = {
 	@:optional var h:Float;
 	@:optional var fontSize:Float;
 	@:optional var color:Int;
+	@:optional var hidden:Bool;
+	@:optional var locked:Bool;
+	@:optional var shadow:Bool;
+	@:optional var stroke:Float;
 }
 
 /**
@@ -76,6 +80,7 @@ typedef AuraImportExportModel = {
 	@:optional var plate:String;
 	@:optional var announce:String;
 	@:optional var fight:String;
+	@:optional var group:String;
 	@:optional var volume:Float;
 	@:optional var opacity:Float;
 	@:optional var scale:Float;

@@ -33,6 +33,7 @@ class ToolWindow {
 			return false;
 		}
 		DockingHelper.init();
+		SettingsStore.ensureEditorLayout();
 		var wasOpen = lastOpen.exists(title) && lastOpen.get(title);
 		var nowOpen = open == null || open.get();
 		if (nowOpen && !wasOpen)

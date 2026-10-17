@@ -308,7 +308,7 @@ class ThesdGauge {
 	static inline var SEGS:Int = 36;
 
 	public static function draw(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, ratio:Single, color:ImVec4,
-			label:String = "", flip:Bool = false, innerRatio:Single = -1, ?innerColor:ImVec4):Void {
+			label:String = "", flip:Bool = false, innerRatio:Single = -1, ?innerColor:ImVec4, shield:Float = 0):Void {
 		if (ratio < 0)
 			ratio = 0;
 		if (ratio > 1)
@@ -380,6 +380,8 @@ class ThesdGauge {
 			}
 		}
 
+		if (shield > 0) ShieldFill.arc(dl, ImGui.vec2(cx,cy), r, flip ? a1-SWEEP*shield : a0, flip ? a1 : a0+SWEEP*shield, thick, true);
+
 		if (label != null && label.length > 0) {
 			var ts = ImGui.calcTextSize(label);
 			var tx:Single = x + (w - ts.x) * 0.5;
@@ -417,7 +419,7 @@ class CrescentGauge {
 	}
 
 	public static function draw(dl:Dynamic, center:ImVec2, radius:Single, ratio:Single, color:ImVec4, label:String = "",
-			thickness:Single = 6):Void {
+			thickness:Single = 6, shield:Float = 0):Void {
 		if (ratio < 0)
 			ratio = 0;
 		if (ratio > 1)
@@ -447,6 +449,8 @@ class CrescentGauge {
 			ImGui.ImDrawList_AddCircleFilled(dl, endPt, capR, fillCol, 12);
 		}
 
+		if (shield > 0) ShieldFill.arc(dl,center,radius,start,start+sweepTotal*shield,thickness,true);
+
 		if (label != null && label.length > 0) {
 			var ts = ImGui.calcTextSize(label);
 			var tx:Single = center.x - ts.x * 0.5;
@@ -462,7 +466,7 @@ class CrescentGauge {
  */
 class HalfDomeGauge {
 	public static function draw(dl:Dynamic, center:ImVec2, radius:Single, ratio:Single, color:ImVec4, label:String = "",
-			thickness:Single = 5):Void {
+			thickness:Single = 5, shield:Float = 0):Void {
 		if (ratio < 0)
 			ratio = 0;
 		if (ratio > 1)
@@ -501,6 +505,8 @@ class HalfDomeGauge {
 			ImGui.ImDrawList_PathStroke(dl, fillCol, thickness, 0);
 		}
 
+		ShieldFill.dome(dl,center,radius,shield,thickness);
+
 		if (label != null && label.length > 0) {
 			var ts = ImGui.calcTextSize(label);
 			var tx:Single = center.x - ts.x * 0.5;
@@ -516,7 +522,7 @@ class HalfDomeGauge {
  */
 class VerticalBarGauge {
 	public static function draw(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, ratio:Single, color:ImVec4,
-			label:String = ""):Void {
+			label:String = "", shield:Float = 0):Void {
 		if (ratio < 0)
 			ratio = 0;
 		if (ratio > 1)
@@ -530,6 +536,8 @@ class VerticalBarGauge {
 			ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y + h - fillH), ImGui.vec2(x + w, y + h), fill, 4);
 		}
 		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), border, 4, 1);
+		ShieldFill.bar(dl,x,y,w,h,shield,true);
+
 		if (label != null && label.length > 0) {
 			var ts = ImGui.calcTextSize(label);
 		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + (w - ts.x) * 0.5, y + (h - ts.y) * 0.5),
@@ -547,7 +555,7 @@ class VerticalBarGauge {
  */
 class HorizontalBarGauge {
 	public static function draw(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, ratio:Single, color:ImVec4,
-			label:String = ""):Void {
+			label:String = "", shield:Float = 0):Void {
 		if (ratio < 0)
 			ratio = 0;
 		if (ratio > 1)
@@ -561,6 +569,8 @@ class HorizontalBarGauge {
 			ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + fillW, y + h), fill, 4);
 		}
 		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), border, 4, 1);
+		ShieldFill.bar(dl,x,y,w,h,shield,false);
+
 		if (label != null && label.length > 0) {
 			var ts = ImGui.calcTextSize(label);
 			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + (w - ts.x) * 0.5, y + (h - ts.y) * 0.5),
@@ -571,7 +581,7 @@ class HorizontalBarGauge {
 
 class RingGauge {
 	public static function draw(dl:Dynamic, center:imgui.Structs.ImVec2, radius:Single, ratio:Float,
-			color:imgui.Structs.ImVec4, label:String = "", vectorScale:Float = 1):Void {
+			color:imgui.Structs.ImVec4, label:String = "", vectorScale:Float = 1, shield:Float = 0):Void {
 		if (ratio < 0)
 			ratio = 0;
 		if (ratio > 1)
@@ -606,6 +616,8 @@ class RingGauge {
 					Math.max(2.5 * vectorScale, thickness * 0.42), fillCol, 16);
 			}
 		}
+		if (shield > 0) ShieldFill.arc(dl,center,radius,start,start+Math.PI*2*shield,thickness);
+
 		if (label != null && label.length > 0) {
 			var ts = ImGui.calcTextSize(label);
 			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(center.x - ts.x * 0.5, center.y - ts.y * 0.5),

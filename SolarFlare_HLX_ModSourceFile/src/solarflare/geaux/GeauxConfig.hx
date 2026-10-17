@@ -128,6 +128,7 @@ class GeauxConfig {
 			hotkeys: hotkeys,
 			chrome: chrome != null ? {
 				hudLayoutVersion: chrome.hudLayoutVersion,
+				referenceWidth: chrome.referenceWidth, referenceHeight: chrome.referenceHeight,
 				lock: chrome.locked.get(),
 				trans: chrome.transparent.get(),
 				collapsed: chrome.collapsed.get(),
@@ -200,6 +201,7 @@ class GeauxConfig {
 		try {
 			if (chrome != null && data.chrome != null) {
 				var ch:Dynamic = data.chrome;
+				chrome.restoreReference(ch);
 				chrome.hudLayoutVersion = ch.hudLayoutVersion != null ? Std.int(ch.hudLayoutVersion) : 0;
 				if (ch.lock != null)
 					chrome.locked.set(ch.lock == true);

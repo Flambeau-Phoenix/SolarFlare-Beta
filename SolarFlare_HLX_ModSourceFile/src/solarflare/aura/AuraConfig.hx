@@ -36,6 +36,9 @@ class AuraConfig {
 	/** Aura Sets (an aura's `fight` tag is its set id). Edit through the methods below so the gate rebuilds. */
 	public var sets:Array<AuraSetDef> = [];
 	public static inline var MAX_SETS:Int = 32;
+	/** Dynamic display groups (an aura's `group` tag is its group id). Window chrome is keyed by group id. */
+	public var groups:Array<AuraGroupDef> = [];
+	var groupChromes:Map<String, HudChrome> = new Map();
 	var setsDirty = true;
 	var gateMapRevision = -1;
 	var gate:Map<String, Bool> = new Map();
@@ -212,6 +215,153 @@ class AuraConfig {
 		ensureSets();
 	}
 
+	// ---- Dynamic display groups -------------------------------------------------------------
+
+	public function findGroup(id:String):AuraGroupDef {
+		if (id == null || id.length == 0) return null;
+		for (g in groups)
+			if (g != null && g.id == id)
+				return g;
+		return null;
+	}
+
+	/** The group an aura is drawn in, or null when it has its own window. */
+	public function groupOf(a:AuraDef):AuraGroupDef {
+		return a != null ? findGroup(a.group) : null;
+	}
+
+	public function groupChrome(g:AuraGroupDef):HudChrome {
+		var c = groupChromes.get(g.id);
+		if (c == null) {
+			c = new HudChrome(240, 240);
+			groupChromes.set(g.id, c);
+		}
+		return c;
+	}
+
+	/** Library-order members. Allocates; builder and save paths only, never the HUD draw. */
+	public function groupMembers(id:String):Array<AuraDef> {
+		return [for (a in auras) if (a != null && a.group == id) a];
+	}
+
+	public function uniqueGroupId(name:String):String {
+		var base = ~/[^a-z0-9]+/g.replace(StringTools.trim(name != null ? name : "").toLowerCase(), "_");
+		base = ~/^_+|_+$/g.replace(base, "");
+		if (base.length == 0) base = "group";
+		return AuraGroupDef.uniqueId(base, function(id) return findGroup(id) != null);
+	}
+
+	/** New group holding `members`, its window placed where the first member's window was. */
+	public function addGroup(name:String, members:Array<AuraDef>):AuraGroupDef {
+		if (groups.length >= AuraGroupDef.MAX)
+			return null;
+		var shown = name != null ? StringTools.trim(name) : "";
+		if (shown.length == 0) shown = "New group";
+		var g = new AuraGroupDef(uniqueGroupId(shown), shown);
+		groups.push(g);
+		var first:AuraDef = null;
+		if (members != null)
+			for (a in members)
+				if (a != null) {
+					a.group = g.id;
+					if (first == null) first = a;
+				}
+		var c = groupChrome(g);
+		if (first != null && first.chrome != null) {
+			c.x.set(first.chrome.x.get());
+			c.y.set(first.chrome.y.get());
+			c.posDirty = true;
+		}
+		return g;
+	}
+
+	/** Ungrouping keeps every aura; members get their own windows back. */
+	public function removeGroup(id:String):Void {
+		var g = findGroup(id);
+		if (g == null) return;
+		groups.remove(g);
+		groupChromes.remove(id);
+		for (a in auras)
+			if (a != null && a.group == id)
+				a.group = "";
+	}
+
+	public function moveToGroup(a:AuraDef, id:String):Void {
+		if (a == null) return;
+		a.group = findGroup(id) != null ? id : "";
+	}
+
+	/** Clears tags that name no existing group. */
+	public function ensureGroups():Void {
+		for (a in auras)
+			if (a != null && a.group != null && a.group.length > 0 && findGroup(a.group) == null)
+				a.group = "";
+	}
+
+	public function dumpGroups():Array<Dynamic> {
+		var out:Array<Dynamic> = [];
+		for (g in groups)
+			if (g != null)
+				out.push(dumpGroup(g));
+		return out;
+	}
+
+	/** One group's settings plus its window position, as saved and shared. */
+	public function dumpGroup(g:AuraGroupDef):Dynamic {
+		var o:Dynamic = g.toObj();
+		var c = groupChrome(g);
+		o.x = c.x.get();
+		o.y = c.y.get();
+		o.lock = c.locked.get();
+		o.transparent = c.transparent.get();
+		o.referenceWidth = c.referenceWidth;
+		o.referenceHeight = c.referenceHeight;
+		return o;
+	}
+
+	/** Replace every group from a dump (profile load, undo, settings load); null clears them. */
+	public function applyGroups(raw:Dynamic):Void {
+		var next:Array<AuraGroupDef> = [];
+		var chromes = new Map<String, HudChrome>();
+		if (raw != null && Std.isOfType(raw, Array)) {
+			var list:Array<Dynamic> = cast raw;
+			for (item in list) {
+				var g = AuraGroupDef.fromObj(item);
+				if (g == null || next.length >= AuraGroupDef.MAX || chromes.exists(g.id)) continue;
+				next.push(g);
+				var c = groupChromes.get(g.id);
+				if (c == null) c = new HudChrome(240, 240);
+				applyGroupChrome(c, item);
+				chromes.set(g.id, c);
+			}
+		}
+		groups = next;
+		groupChromes = chromes;
+		ensureGroups();
+	}
+
+	/** Add imported groups (ids already made unique by AuraGroupDef.remapImport). */
+	public function addImportedGroups(list:Array<AuraGroupDef>):Void {
+		if (list == null) return;
+		for (g in list) {
+			if (g == null || groups.length >= AuraGroupDef.MAX || findGroup(g.id) != null) continue;
+			groups.push(g);
+			applyGroupChrome(groupChrome(g), g.source);
+			g.source = null;
+		}
+		ensureGroups();
+	}
+
+	static function applyGroupChrome(c:HudChrome, d:Dynamic):Void {
+		if (c == null || d == null) return;
+		c.restoreReference(d);
+		if (d.x != null) c.x.set(d.x);
+		if (d.y != null) c.y.set(d.y);
+		c.locked.set(d.lock == true);
+		c.transparent.set(d.transparent == true);
+		c.posDirty = true;
+	}
+
 	public function find(id:String):AuraDef {
 		for (a in auras)
 			if (a.id == id)
@@ -296,6 +446,7 @@ class AuraConfig {
 			a.showBanner.set(true);
 		if (d.fight != null)
 			a.fight = Std.string(d.fight);
+		a.group = d.group != null ? StringTools.trim(Std.string(d.group)) : "";
 		if (d.keyText != null)
 			a.keyText = AuraDef.sanitizeKey(d.keyText);
 		else if (d.key != null)
@@ -355,6 +506,7 @@ class AuraConfig {
 			a.w.set(d.w);
 		if (d.h != null)
 			a.h.set(d.h);
+		a.chrome.restoreReference(d);
 		if (d.x != null)
 			a.chrome.x.set(d.x);
 		if (d.y != null)
@@ -380,6 +532,7 @@ class AuraConfig {
 		} catch (_:Dynamic) {}
 		AuraEffects.ensure(a);
 		AuraEffects.syncDormantFlag(a);
+		a.gaugeFillMode = AuraGaugePolicy.normalize(d.gaugeFillMode);
 		a.canvasElements = [];
 		try {
 			var rawCanvas:Dynamic = d.canvasElements;
@@ -455,6 +608,7 @@ class AuraConfig {
 		}
 		c.auras = next;
 		c.applySets(data.sets);
+		c.applyGroups(data.groups);
 	}
 
 	public function setRegionOverride(s:String):Void {
@@ -562,7 +716,7 @@ class AuraConfig {
 						}
 					});
 					UiLayout.propertyRow("Hold", function() {
-						if (solarflare.ui.BuilderSlider.draw("##fxh" + tag, e.holdRef, 0.1, 12, "%.1f s")) {
+						if (solarflare.ui.NumberField.draw("##fxh" + tag, e.holdRef, 0.1, 12, "%.1f s")) {
 							e.hold = e.holdRef.get();
 							SettingsStore.markDirty();
 						}
@@ -583,10 +737,10 @@ class AuraConfig {
 										SettingsStore.markDirty();
 								},
 								function(w:Single) {
-									if (solarflare.ui.BuilderSlider.draw("##fxa" + tag, e.alpha, 0.1, 1, "%.2f"))
+									if (solarflare.ui.NumberField.draw("##fxa" + tag, e.alpha, 0.1, 1, "%.2f"))
 										SettingsStore.markDirty();
 								});
-						}, "Glow adds a halo; the slider sets icon opacity.");
+						}, "Glow adds a halo; the field sets icon opacity.");
 					}
 				});
 				if (ImGui.button("Remove effect##fxrm" + tag, ImGui.vec2(-1, 24)))

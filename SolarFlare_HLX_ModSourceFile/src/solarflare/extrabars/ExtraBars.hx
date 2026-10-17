@@ -38,7 +38,7 @@ class ExtraBars {
 	var characters = new ExtraBarsCharacters();
 	public var characterLabel(default,null):String = "";
 	public var characterAvailable(default,null):Bool = false;
-	var host:ConfigPanel;
+	public var host(default,null):ConfigPanel;
 	public function closeEditors():Void host.closeInteractiveWindows();
 	var bindings = new ExtraBarsNativeBindings();
 	var assignments = new ExtraBarsAssignmentIndex();
@@ -89,15 +89,18 @@ class ExtraBars {
 		placements.clear(); applyPlacement(saved.placement);
 		views.clear(); countChecks=[]; signature=""; lastSample=-1;
 		builder.selectBar(model.bars.length > 0 ? model.bars[0].id : "");
+		if(host.uiLayouts!=null) host.uiLayouts.requestReconcile();
 	}
 	/** Consumes telemetry's frozen heroID after observe; never scans native identity. */
-	function observeCharacter():Void {
+	public function observeLayoutCharacter():Void {
 		var id=ExtraBarsCharacters.normalizeId(solarflare.HealthCache.characterId);
 		characterAvailable=id.length>0;
 		if (!characterAvailable) return;
 		characterLabel=solarflare.HealthCache.heroName==null ? "" : StringTools.trim(solarflare.HealthCache.heroName);
 		if (characterLabel.length==0) characterLabel="Current character";
 		if (id==characters.activeId) return;
+		// Retain the outgoing layout before character-owned chromes are replaced.
+		if(host.uiLayouts!=null) host.uiLayouts.retain(host);
 		var saved=characters.observe(id,characterSnapshot());
 		if (saved != null) { restoreCharacter(saved); SettingsStore.markDirty(); }
 	}
@@ -112,7 +115,7 @@ class ExtraBars {
 	}
 	public function dumpPlacement():Dynamic {
 		var rows:Array<Dynamic> = [];
-		for (id in placements.keys()) { var c = placements.get(id); rows.push({id:id, x:c.x.get(), y:c.y.get(), collapsed:c.collapsed.get(), hudLayoutVersion:c.hudLayoutVersion}); }
+		for (id in placements.keys()) { var c = placements.get(id); rows.push({id:id, x:c.x.get(), y:c.y.get(), collapsed:c.collapsed.get(), referenceWidth:c.referenceWidth, referenceHeight:c.referenceHeight, hudLayoutVersion:c.hudLayoutVersion}); }
 		return rows;
 	}
 	public function applyPlacement(data:Dynamic, legacy:Dynamic = null):Void {
@@ -121,7 +124,7 @@ class ExtraBars {
 			for (row in rows) {
 				var id = ExtraBarsConfig.text(row, "id", ""); if (id.length == 0) continue;
 				var c = chromeFor(id); c.x.set(ExtraBarsConfig.number(row,"x",80,-10000,10000)); c.y.set(ExtraBarsConfig.number(row,"y",320,-10000,10000));
-				c.collapsed.set(Reflect.field(row,"collapsed") == true); c.hudLayoutVersion = ExtraBarsConfig.integer(row,"hudLayoutVersion",0,0,100); c.posDirty = true;
+				c.restoreReference(row); c.collapsed.set(Reflect.field(row,"collapsed") == true); c.hudLayoutVersion = ExtraBarsConfig.integer(row,"hudLayoutVersion",0,0,100); c.posDirty = true;
 			}
 		} else if (legacy != null) {
 			var c = chromeFor("bar1"); c.x.set(ExtraBarsConfig.number(legacy,"x",80,-10000,10000)); c.y.set(ExtraBarsConfig.number(legacy,"y",320,-10000,10000)); c.posDirty = true;
@@ -167,7 +170,7 @@ class ExtraBars {
 		clicks.push({barId:barId,index:index,kind:kind,generation:generation,click:true});
 	}
 	public function observe(app:GameApp):Void {
-		observeCharacter();
+		observeLayoutCharacter();
 		if (wasEditorOpen && !open.get()) clearTransientState(); wasEditorOpen=open.get();
 		var now = haxe.Timer.stamp(); ExtraBarsKeyMap.initialize(); bindings.refresh(now);
 		if (now-lastSuggestions >= 1) {

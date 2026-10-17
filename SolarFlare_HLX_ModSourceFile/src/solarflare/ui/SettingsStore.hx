@@ -15,7 +15,7 @@ import imgui.ImGui;
  * Persist SolarFlare layout + toggles next to the installed mod.
  */
 class SettingsStore {
-	static inline var VERSION:Int = 33;
+	static inline var VERSION:Int = 34;
 	static inline var TMP_SUFFIX:String = ".tmp";
 	static inline var PREV_SUFFIX:String = ".prev";
 	static var dirty = false;
@@ -34,6 +34,13 @@ class SettingsStore {
 	static inline var MAX_DEFER_MS:Float = 30000;
 	static var activeTheme:String = "purple_gold";
 	static var lastCaptureWarning:String = "";
+
+	/** A partially recovered/newer layout must never be autosaved over its source. */
+	public static function blockSaving(reason:String):Void {
+		if (!saveBlocked) ToastManager.error(reason + " Saving is off this session.", 8.0);
+		saveBlocked=true;
+	}
+	public static function ensureEditorLayout():Void tryLoadIni();
 
 	public static function currentTheme():String return activeTheme;
 
@@ -96,10 +103,11 @@ class SettingsStore {
 		if (cfg == null)
 			return;
 		lastCfg = cfg;
+		cfg.uiLayouts.captureDefaults(cfg);
 		var path = jsonPath();
 		if (path == null)
 			return;
-		deleteLegacyBackups(path);
+		// Recovery copies belong to the user; updates must not delete them.
 		// A crash between deleting the old file and renaming the verified .tmp leaves only the .tmp.
 		var data:Dynamic = null;
 		var source:String = null;
@@ -113,14 +121,17 @@ class SettingsStore {
 				break;
 			} catch (_:Dynamic) {}
 		}
-		if (data == null)
+		if (data == null) {
+			if (sys.FileSystem.exists(path) || sys.FileSystem.exists(path+TMP_SUFFIX)) blockSaving("Saved settings could not be parsed; original files preserved.");
 			return;
+		}
 		if (source != path) {
 			dirty = true;
 			ToastManager.info("SolarFlare settings restored from " + haxe.io.Path.withoutDirectory(source) + ".", 4.0);
 		}
 		try {
 			var oldVersion = readVersion(data);
+			if (oldVersion > VERSION) blockSaving("Settings belong to a newer mod version; original files preserved.");
 			apply(cfg, data);
 			FeatureProfiles.load(cfg, data);
 			if (oldVersion < VERSION) dirty = true;
@@ -260,11 +271,12 @@ class SettingsStore {
 	static function tryLoadIni():Void {
 		if (iniTried)
 			return;
-		iniTried = true;
 		try {
+			if (ImGui.getIO() == null) return;
 			var ini = iniPath();
 			if (ini != null && sys.FileSystem.exists(ini))
 				ImGui.loadIniSettingsFromDisk(ini);
+			iniTried = true;
 		} catch (_:Dynamic) {}
 	}
 
@@ -288,6 +300,7 @@ class SettingsStore {
 		assignDump(data, "barter", function() return cfg.barter != null ? cfg.barter.dump() : {});
 		assignDump(data, "aimInstant", function() return cfg.aimInstant != null ? cfg.aimInstant.dump() : {});
 		assignDump(data, "statusBoard", function() return cfg.statusBoard != null ? cfg.statusBoard.dump() : {});
+		assignDump(data, "stacks", function() return cfg.stacks != null ? cfg.stacks.dump() : {});
 		assignDump(data, "vitals", function() return vitalsDump(cfg.vitals));
 		assignDump(data, "geaux", function() return geauxDump(cfg.geaux));
 		assignDump(data, "extraBars", function() return cfg.extraBarsPrototype.model.dump());
@@ -689,6 +702,7 @@ class SettingsStore {
 			timerBoardMax: c.timerBoardMax.get(),
 			list: auraList(c),
 			sets: c.dumpSets(),
+			groups: c.dumpGroups(),
 			auraCounter: solarflare.aura.AuraCounterState.dump(c.auras)
 		};
 	}
@@ -754,6 +768,7 @@ class SettingsStore {
 			return {};
 		return {
 			hudLayoutVersion: c.hudLayoutVersion,
+			referenceWidth: c.referenceWidth, referenceHeight: c.referenceHeight,
 			lock: c.locked.get(),
 			trans: c.transparent.get(),
 			collapsed: c.collapsed.get(),
@@ -778,6 +793,7 @@ class SettingsStore {
 			cfg.aimInstant.apply(Reflect.field(data, "aimInstant"));
 		if (cfg.statusBoard != null)
 			cfg.statusBoard.apply(Reflect.field(data, "statusBoard"));
+		if (cfg.stacks != null) cfg.stacks.apply(Reflect.field(data, "stacks"));
 		try if (data.activeTheme != null) activeTheme = Std.string(data.activeTheme) catch (_:Dynamic) {}
 		try if (data.customTheme != null) ThemePalette.applyCustomDump(data.customTheme) catch (_:Dynamic) {}
 		applyVitals(cfg.vitals, data.vitals);
@@ -834,7 +850,6 @@ class SettingsStore {
 		applyHub(cfg, data.hub);
 		if (cfg.combo != null && data.combo == null && data.comboHidden != null)
 			setBool(cfg.combo.hidden, data.comboHidden);
-		FeatureProfiles.load(cfg, data);
 	}
 
 	public static function applyVitals(v:VitalsConfig, data:Dynamic):Void {
@@ -1124,6 +1139,7 @@ class SettingsStore {
 	static function applyChrome(c:HudChrome, data:Dynamic):Void {
 		if (c == null || data == null)
 			return;
+		c.restoreReference(data);
 		c.hudLayoutVersion = data.hudLayoutVersion != null ? Std.int(data.hudLayoutVersion) : 0;
 		setBool(c.locked, data.lock);
 		setBool(c.transparent, data.trans);

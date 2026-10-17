@@ -74,6 +74,8 @@ class AuraSignalFrame {
 	public var statusCount:Int = 0;
 	public var casts:Array<EnemyCastSignalSnap> = [];
 	public var castCount:Int = 0;
+	/** False when bounded cast publication omitted requested subjects. */
+	public var castDomainKnown:Bool = true;
 	public var playerCasts:Array<EnemyCastSignalSnap> = [];
 	public var playerCastCount:Int = 0;
 	public var statusDomainKnown:Bool = false;

@@ -45,6 +45,7 @@ class VitalSnap {
  */
 class VitalsRenderer {
 	public static var lastHealthDiagnostic:String = "";
+	static function shieldRatio(snap:VitalSnap):Float return ShieldPolicy.ratio(snap.kind == VitalSnap.HP && snap.valid, snap.shield, snap.max);
 	static function healthTint(snap:VitalSnap, intentional:ImVec4):ImVec4 {
 		var confirmedDead = snap.deadKnown && snap.dead;
 		var col = solarflare.ui.HealthColorPolicy.resolve(confirmedDead, snap.tapped,
@@ -163,7 +164,7 @@ class VitalsRenderer {
 		}
 		var origin = ImGui.getCursorScreenPos();
 		var dl = ImGui.getWindowDrawList();
-		solarflare.ui.VitalsConfig.HorizontalBarGauge.draw(dl, origin.x, origin.y, w, h, fraction, main, overlay);
+		solarflare.ui.VitalsConfig.HorizontalBarGauge.draw(dl, origin.x, origin.y, w, h, fraction, main, overlay, shieldRatio(snap));
 		ImGui.dummy(ImGui.vec2(w, h));
 	}
 
@@ -173,7 +174,7 @@ class VitalsRenderer {
 		var perSeg:Float = style == VitalsConfig.STYLE_BAR_2X50 ? 50 : 10;
 		var value:Single = snap.valid ? snap.current : 0;
 		var text = snap.valid ? overlayValid(snap) : compactInvalid(snap);
-		PipShapes.drawValueSegments(w, h, segs, value, perSeg, vertical, text, fillColor(snap), dimColor());
+		PipShapes.drawValueSegments(w, h, segs, value, perSeg, vertical, text, fillColor(snap), dimColor(), shieldRatio(snap));
 	}
 
 	/** Pip blocks (Diamond / Circle / Hex / Ring pips). */
@@ -181,7 +182,7 @@ class VitalsRenderer {
 		var ratio:Single = snap.valid ? snap.ratio : 0;
 		var text = snap.valid ? compactValid(snap) : compactInvalid(snap);
 		PipShapes.drawRatio(w, h, PipShapes.SLOTS, ratio, vertical, VitalsConfig.pipShapeOf(style), text,
-			fillColor(snap), dimColor());
+			fillColor(snap), dimColor(), shieldRatio(snap));
 	}
 
 	static function drawVertical(snap:VitalSnap, w:Single, h:Single):Void {
@@ -190,7 +191,7 @@ class VitalsRenderer {
 		var ratio:Single = snap.valid ? snap.ratio : 0;
 		var text = snap.valid ? compactValid(snap) : compactInvalid(snap);
 		var col = snap.kind == VitalSnap.HP ? healthTint(snap, ImGui.vec4(0.22, 0.72, 0.38, 1)) : fillColor(snap);
-		VerticalBarGauge.draw(dl, origin.x, origin.y, w, h, ratio, col, text);
+		VerticalBarGauge.draw(dl, origin.x, origin.y, w, h, ratio, col, text, shieldRatio(snap));
 		ImGui.dummy(ImGui.vec2(w, h));
 	}
 
@@ -198,17 +199,11 @@ class VitalsRenderer {
 		var origin = ImGui.getCursorScreenPos();
 		var dl = ImGui.getWindowDrawList();
 		var ratio:Single = snap.valid ? snap.ratio : 0;
-		var inner:Single = -1;
 		var text = snap.valid ? overlayValid(snap) : overlayInvalid(snap);
 		var col = ImGui.vec4(0.28, 0.82, 0.42, 1);
-		var innerCol = ImGui.vec4(0.55, 0.82, 0.98, 1);
 		if (snap.kind == VitalSnap.HP) {
 			col = healthTint(snap, ImGui.vec4(0.82, 0.22, 0.20, 1));
-			if (snap.valid && snap.shield > 0.5 && snap.max > 0.5) {
-				inner = snap.shield / snap.max;
-				if (inner > 1)
-					inner = 1;
-			}
+
 		} else if (snap.kind == VitalSnap.RAGE) {
 			col = ImGui.vec4(0.92, 0.72, 0.18, 1);
 		} else {
@@ -216,7 +211,7 @@ class VitalsRenderer {
 				? ImGui.vec4(0.45, 0.72, 0.98, 1)
 				: ImGui.vec4(0.22, 0.42, 0.92, 1);
 		}
-		ThesdGauge.draw(dl, origin.x, origin.y, w, h, ratio, col, text, flip, inner, inner > 0 ? innerCol : null);
+		ThesdGauge.draw(dl, origin.x, origin.y, w, h, ratio, col, text, flip, -1, null, shieldRatio(snap));
 		ImGui.dummy(ImGui.vec2(w, h));
 	}
 
@@ -231,7 +226,7 @@ class VitalsRenderer {
 		var cy:Single = origin.y + h * 0.5;
 		var ratio:Single = snap.valid ? snap.ratio : 0;
 		var text = snap.valid ? compactValid(snap) : compactInvalid(snap);
-		CrescentGauge.draw(dl, ImGui.vec2(cx, cy), radius, ratio, fillColor(snap), text, thickness);
+		CrescentGauge.draw(dl, ImGui.vec2(cx, cy), radius, ratio, fillColor(snap), text, thickness, shieldRatio(snap));
 		ImGui.dummy(ImGui.vec2(w, h));
 	}
 
@@ -245,7 +240,7 @@ class VitalsRenderer {
 		var cy:Single = origin.y + h * 0.62;
 		var ratio:Single = snap.valid ? snap.ratio : 0;
 		var text = snap.valid ? compactValid(snap) : compactInvalid(snap);
-		HalfDomeGauge.draw(dl, ImGui.vec2(cx, cy), radius, ratio, fillColor(snap), text);
+		HalfDomeGauge.draw(dl, ImGui.vec2(cx, cy), radius, ratio, fillColor(snap), text, 5, shieldRatio(snap));
 		ImGui.dummy(ImGui.vec2(w, h));
 	}
 
@@ -257,7 +252,7 @@ class VitalsRenderer {
 			radius = 14;
 		var ratio:Single = snap.valid ? snap.ratio : 0;
 		var text = snap.valid ? compactValid(snap) : compactInvalid(snap);
-		RingGauge.draw(dl, ImGui.vec2(origin.x + w * 0.5, origin.y + h * 0.5), radius, ratio, fillColor(snap), text);
+		RingGauge.draw(dl, ImGui.vec2(origin.x + w * 0.5, origin.y + h * 0.5), radius, ratio, fillColor(snap), text, 1, shieldRatio(snap));
 		ImGui.dummy(ImGui.vec2(w, h));
 	}
 }

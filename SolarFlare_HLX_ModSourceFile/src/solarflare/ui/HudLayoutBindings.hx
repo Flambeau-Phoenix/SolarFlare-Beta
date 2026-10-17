@@ -22,7 +22,10 @@ class HudLayoutBindings {
   if(c.attackCombo!=null) add("resources.attackCombo.chrome",c.attackCombo.chrome,c.attackCombo.width,c.attackCombo.height);
   if(c.target!=null) add("resources.target.chrome",c.target.chrome,c.target.width,c.target.height);
   if(c.castBar!=null) add("resources.castBar.chrome",c.castBar.chrome,c.castBar.width,c.castBar.height);
-  if(c.chaincast!=null) add("resources.chaincast.chrome",c.chaincast.chrome,c.chaincast.width,c.chaincast.height);
+  if(c.chaincast!=null) {
+   add("resources.chaincast.chrome",c.chaincast.chrome,c.chaincast.width,c.chaincast.height);
+   for(m in c.chaincast.modules.all) add("resources.chaincast.modules."+m.key,m.chrome,m.width,m.height);
+  }
   if(c.conduit!=null) add("resources.conduit.chrome",c.conduit.chrome,c.conduit.width,c.conduit.height);
   if(c.hemorrhage!=null) { var h=c.hemorrhage; var b=add("resources.hemorrhage.chrome",h.chrome,h.width,h.height); b.changed=function() h.sizeDirty=true; }
   if(c.barter!=null) for(bar in c.barter.config.bars) {
@@ -33,6 +36,12 @@ class HudLayoutBindings {
   if(c.auras!=null) {
    for(a in c.auras.auras) { var item=a; var b=add("aura:"+a.id,a.chrome,a.w,a.h,a.scale); b.changed=function() item.sizeDirty=true; }
    add("global.auraTimers",c.auras.timerBoardChrome,c.auras.timerBoardW,c.auras.timerBoardRowH);
+   for(g in c.auras.groups) if(g!=null) add("auraGroup:"+g.id,c.auras.groupChrome(g));
+  }
+  if(c.stacks!=null) for(view in c.stacks.views) {
+   var item=view; var b=add("stacks:"+view.config.id,view.chrome);
+   b.sizeGet=function() return item.config.cellSize;
+   b.sizeSet=function(n) item.config.cellSize=Math.max(8,Math.min(128,n));
   }
   if(c.statusBoard!=null) {
    var s=c.statusBoard.config; var b=add("statusBoard.chrome",s.chrome);

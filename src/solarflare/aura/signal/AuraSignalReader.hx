@@ -104,6 +104,7 @@ class AuraSignalReader {
 	static function readCast(frame:AuraSignalFrame, signal:String, subject:String, out:AuraResolvedValue):Void {
 		var c = frame.findCast(subject);
 		if (c == null || !c.known) {
+			if (!frame.castDomainKnown) { out.code = UNKNOWN_DOMAIN; return; }
 			if (signal == "event.cast.active") {
 				bool(out, true, false);
 				return;

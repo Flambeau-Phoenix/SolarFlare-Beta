@@ -99,6 +99,7 @@ class AuraEngine {
 				AuraEffects.clearPresentation(a);
 			return;
 		}
+		if (a.canvasElements != null) for (el in a.canvasElements) if (el != null) el.observeVisibility(frame);
 		a.resolvedIcon = "";
 		if (a.rule != null) {
 			evalDeclarative(a, now);
@@ -537,6 +538,8 @@ class AuraEngine {
 			w: floatRef(a.w, 96),
 			h: floatRef(a.h, 96)
 		};
+		if (a.group != null && a.group.length > 0)
+			Reflect.setField(obj, "group", a.group);
 		if (a.canvasElements != null && a.canvasElements.length > 0) {
 			var canvas:Array<Dynamic> = [];
 			var ci = 0;
@@ -549,11 +552,14 @@ class AuraEngine {
 			Reflect.setField(obj, "canvasElements", canvas);
 		}
 		if (a.chrome != null) {
+			Reflect.setField(obj, "referenceWidth", a.chrome.referenceWidth);
+			Reflect.setField(obj, "referenceHeight", a.chrome.referenceHeight);
 			Reflect.setField(obj, "x", floatRef(a.chrome.x, 0));
 			Reflect.setField(obj, "y", floatRef(a.chrome.y, 0));
 			Reflect.setField(obj, "lock", boolRef(a.chrome.locked, false));
 			Reflect.setField(obj, "transparent", boolRef(a.chrome.transparent, false));
 		}
+		if (a.gaugeFillMode != AuraGaugePolicy.FOLLOW) Reflect.setField(obj, "gaugeFillMode", a.gaugeFillMode);
 		if (a.rule != null)
 			Reflect.setField(obj, "rule", AuraRuleCodec.toObj(a.rule));
 		return obj;

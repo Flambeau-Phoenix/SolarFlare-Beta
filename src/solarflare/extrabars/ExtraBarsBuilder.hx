@@ -48,10 +48,15 @@ class ExtraBarsBuilder {
  public function clearHistory():Void { history = new UndoManager<Dynamic>(50); clearTransientState(); }
  public function selectBar(id:String):Void { selectedBar = id; selectedCell = 0; nameOwner = ""; }
  public function change(action:String, mutate:Void->Void):Void {
-  history.push(action,owner.model.dump()); mutate(); changed();
+  history.push(action,editorSnapshot()); mutate(); changed();
  }
  function changed():Void { owner.clearTransientState(); SettingsStore.markDirty(); solarflare.ObserveDemand.markStatusDemandDirty(); }
- function restore(data:Dynamic):Void { owner.model.apply(data); changed(); }
+ function editorSnapshot():Dynamic return {config:owner.model.dump(),uiLayouts:owner.host.uiLayouts.dumpCurrent(owner.host)};
+ function restore(data:Dynamic):Void {
+  owner.model.apply(data.config!=null ? data.config : data);
+  if(data.uiLayouts!=null) owner.host.uiLayouts.load(owner.host,data.uiLayouts,[]);
+  owner.host.uiLayouts.requestReconcile(); changed();
+ }
  function check(label:String,value:Bool,set:Bool->Void):Void {
   boolRef.set(value); if (ImGui.checkbox(label,boolRef)) change(label,function() set(boolRef.get()));
  }
@@ -86,7 +91,7 @@ class ExtraBarsBuilder {
   try {
    UiChrome.heading("ExtraBars",1.45);
    owner.drawCapture();
-   history.drawButtons(owner.model.dump(),restore);
+   history.drawButtons(editorSnapshot(),restore);
    ImGui.sameLine(); if (ImGui.button("Save")) solarflare.ui.UiActionQueue.save();
    ImGui.sameLine(); if (ImGui.button("Close editors and test")) owner.closeEditors();
    ImGui.textWrapped(owner.characterAvailable
@@ -278,7 +283,7 @@ class ExtraBarsBuilder {
       catch(e:Dynamic) { ImGui.endCombo(); throw e; } ImGui.endCombo();
      }
     } else if (i==1) { if (ImGui.button("Add bar",ImGui.vec2(w,0))) change("Add bar",function() selectBar(owner.model.addBar().id)); }
-    else if (bar!=null && ImGui.button("Remove bar",ImGui.vec2(w,0))) change("Remove bar",function() { owner.model.removeBar(bar.id); selectedBar=""; });
+    else if (bar!=null && ImGui.button("Remove bar",ImGui.vec2(w,0))) change("Remove bar",function() { owner.host.uiLayouts.forgetWidget("global.extraBar:"+bar.id); owner.model.removeBar(bar.id); selectedBar=""; });
    });
    // Navigation can select another bar in this frame.
    bar = owner.model.find(selectedBar);

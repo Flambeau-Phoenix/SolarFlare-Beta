@@ -79,7 +79,7 @@ class PipShapes {
 
 	/** Value split across equal box segments (for example 2×10 or 2×50). */
 	public static function drawValueSegments(rowW:Single, rowH:Single, segs:Int, value:Float, perSeg:Float,
-			vertical:Bool, label:String, lit:ImVec4, dim:ImVec4):Void {
+			vertical:Bool, label:String, lit:ImVec4, dim:ImVec4, shield:Float = 0):Void {
 		if (segs < 1)
 			segs = 2;
 		if (perSeg < 1)
@@ -97,10 +97,10 @@ class PipShapes {
 		}
 		var borderLit = ImGui.vec4(lit.x * 0.7 + 0.3, lit.y * 0.7 + 0.3, lit.z * 0.7 + 0.3, 0.7);
 		var borderDim = ImGui.vec4(0.22, 0.26, 0.23, 1);
-		drawInternal(rowW, rowH, segs, amounts, vertical, BOX, label, null, lit, dim, borderLit, borderDim);
+		drawInternal(rowW, rowH, segs, amounts, vertical, BOX, label, null, lit, dim, borderLit, borderDim, shield);
 	}
 	public static function drawRatio(rowW:Single, rowH:Single, n:Int, ratio:Float, vertical:Bool, shape:Int,
-			label:String, lit:ImVec4, dim:ImVec4):Void {
+			label:String, lit:ImVec4, dim:ImVec4, shield:Float = 0):Void {
 		if (n < 1)
 			n = SLOTS;
 		var r = ratio;
@@ -121,7 +121,7 @@ class PipShapes {
 		}
 		var borderLit = ImGui.vec4(lit.x * 0.7 + 0.3, lit.y * 0.7 + 0.3, lit.z * 0.7 + 0.3, 0.7);
 		var borderDim = ImGui.vec4(0.22, 0.26, 0.23, 1);
-		drawInternal(rowW, rowH, n, amounts, vertical, shape, label, null, lit, dim, borderLit, borderDim);
+		drawInternal(rowW, rowH, n, amounts, vertical, shape, label, null, lit, dim, borderLit, borderDim, shield);
 	}
 
 	static function defaultLit():ImVec4 {
@@ -141,7 +141,7 @@ class PipShapes {
 	}
 
 	static function drawInternal(rowW:Single, rowH:Single, n:Int, amounts:Array<Float>, vertical:Bool, shape:Int,
-			label:String, iconId:String, lit:ImVec4, dim:ImVec4, litBorder:ImVec4, dimBorder:ImVec4):Void {
+			label:String, iconId:String, lit:ImVec4, dim:ImVec4, litBorder:ImVec4, dimBorder:ImVec4, shield:Float = 0):Void {
 		shape = normalize(shape);
 		var origin = ImGui.getCursorScreenPos();
 		var dl = ImGui.getWindowDrawList();
@@ -186,6 +186,7 @@ class PipShapes {
 				var y:Single = origin.y + (blockH + gap) * i;
 				var amt = idx < amounts.length ? amounts[idx] : 0;
 				drawOne(dl, origin.x, y, blockW, blockH, shape, amt, lit, dim, litBorder, dimBorder, tex, hasTex);
+				ShieldFill.pip(dl,origin.x,y,blockW,blockH,shape,solarflare.preview.ShieldPolicy.cell(shield,idx,n),true);
 			}
 		} else {
 			var blockW:Single = (pipW - gap * (n - 1)) / n;
@@ -198,6 +199,7 @@ class PipShapes {
 				var x:Single = origin.x + (blockW + gap) * i;
 				var amt = i < amounts.length ? amounts[i] : 0;
 				drawOne(dl, x, origin.y, blockW, blockH, shape, amt, lit, dim, litBorder, dimBorder, tex, hasTex);
+				ShieldFill.pip(dl,x,origin.y,blockW,blockH,shape,solarflare.preview.ShieldPolicy.cell(shield,i,n),false);
 			}
 		}
 

@@ -75,6 +75,7 @@ class ObserveDemand {
 	public static var statusDiscoveryDirty:Bool = true;
 	/** Rebuild statusIds / instant/special/cast subject lists when aura config mutates. */
 	public static var statusDemandDirty:Bool = true;
+	static var auraConditions:Array<solarflare.aura.signal.AuraConditionDef> = [];
 	static var rawNeedInstant:Bool = false;
 	static var rawNeedSpecial:Bool = false;
 	static var rawNeedEnemyCast:Bool = false;
@@ -155,6 +156,9 @@ class ObserveDemand {
 				castSkillIds.pop();
 			consumableIds.resize(0);
 			if (cfg.extraBarsPrototype != null && cfg.extraBarsPrototype.model.sparkEnabled) pushStatusId("SparkSurge_Status");
+			if (cfg.stacks != null) {
+				for (tracker in cfg.stacks.config.trackers) if (tracker.enabled && tracker.statusId.length > 0) pushStatusId(tracker.statusId);
+			}
 			if (mageStatusDemanded) {
 				if (chaincast) {
 					pushStatusId(solarflare.chaincast.Chaincast.ChaincastCache.statusId());
@@ -163,23 +167,26 @@ class ObserveDemand {
 				if (conduit)
 					for (id in solarflare.conduit.Conduit.ConduitCache.lookupIds()) pushStatusId(id);
 			}
+			auraConditions.resize(0);
 			if (cfg.auras != null) {
 				for (a in cfg.auras.auras) if (a != null && a.enabled.get()) {
-					if (a.rule != null && a.rule.conditions != null) {
-						for (c in a.rule.conditions) if (c != null && c.signal != null && StringTools.startsWith(c.signal, "skill.")) pushAuraSkillId(c.subject);
-					} else if (a.trigger == "cooldown") pushAuraSkillId(a.skillId);
+					solarflare.aura.signal.AuraRuleDemand.append(a.rule, a.canvasElements, auraConditions);
+					if (a.rule == null && a.trigger == "cooldown") pushAuraSkillId(a.skillId);
+					if (a.trigger == "status") addStatusId(a.skillId);
 				}
-				for (a in cfg.auras.auras) if (a != null && a.enabled.get() && a.rule != null) {
-					for (c in a.rule.conditions) if (c != null && StringTools.startsWith(c.signal, "consumable.")) {
-						var entry = solarflare.cdb.ConsumableCatalog.find(c.subject);
-						if (entry != null && consumableIds.indexOf(entry.id) < 0) {
-							consumableIds.push(entry.id);
-							for (effect in entry.statuses) pushStatusId(effect.id);
-						}
+			}
+			for (c in auraConditions) {
+				if (c.signal == null) continue;
+				if (StringTools.startsWith(c.signal, "skill.")) pushAuraSkillId(c.subject);
+				if (StringTools.startsWith(c.signal, "consumable.")) {
+					var entry = solarflare.cdb.ConsumableCatalog.find(c.subject);
+					if (entry != null && consumableIds.indexOf(entry.id) < 0) {
+						consumableIds.push(entry.id);
+						for (effect in entry.statuses) pushStatusId(effect.id);
 					}
 				}
-				auraRulesNeedStatus(cfg);
 			}
+			auraRulesNeedStatus(cfg);
 			rawNeedInstant = auraRulesNeedInstant(cfg);
 			rawNeedSpecial = auraRulesNeedSpecial(cfg);
 			rawNeedEnemyCast = auraRulesNeedEnemyCast(cfg);
@@ -262,26 +269,10 @@ class ObserveDemand {
 	}
 
 	static function auraRulesNeedStatus(cfg:ConfigPanel):Bool {
-		try {
-			for (a in cfg.auras.auras) {
-				if (a == null || !a.enabled.get())
-					continue;
-				if (a.trigger == "status")
-					addStatusId(a.skillId);
-				if (a.rule != null && a.rule.conditions != null) {
-					for (c in a.rule.conditions) {
-						if (c == null || c.signal == null)
-							continue;
-						if (c.signal == "status.count" || c.signal == "status.overflow") {
-							needsStatusContainer = true;
-							continue;
-						}
-						if (StringTools.startsWith(c.signal, "status."))
-							addStatusId(c.subject);
-					}
-				}
-			}
-		} catch (_:Dynamic) {}
+		for (c in auraConditions) {
+			if (c.signal == "status.count" || c.signal == "status.overflow") needsStatusContainer = true;
+			else if (c.signal != null && StringTools.startsWith(c.signal, "status.")) addStatusId(c.subject);
+		}
 		return statusIds.length > 0 || needsStatusContainer;
 	}
 
@@ -318,113 +309,28 @@ class ObserveDemand {
 			|| id.indexOf("_Proc_") >= 0 || id.indexOf("_proc_") >= 0;
 	}
 
+	static function collectAuraSubjects(signal:String, ids:Array<String>, alternate:String = ""):Bool {
+		ids.resize(0);
+		var need = false;
+		for (c in auraConditions) {
+			if (c.signal != signal && (alternate.length == 0 || c.signal != alternate)) continue;
+			need = true;
+			var id = solarflare.geaux.GeauxCache.sanitizeSkillId(c.subject);
+			if (id.length > 0 && ids.indexOf(id) < 0) ids.push(id);
+		}
+		return need;
+	}
 	static function auraRulesNeedInstant(cfg:ConfigPanel):Bool {
-		instantSkillIds = [];
-		var need = false;
-		try {
-			for (a in cfg.auras.auras) {
-				if (a == null || !a.enabled.get())
-					continue;
-				if (a.rule == null || a.rule.conditions == null)
-					continue;
-				for (c in a.rule.conditions) {
-					if (c == null || c.signal != "skill.instantReady")
-						continue;
-					need = true;
-					if (c.subject == null || c.subject.length == 0)
-						continue;
-					var id = solarflare.geaux.GeauxCache.sanitizeSkillId(c.subject);
-					if (id.length == 0)
-						continue;
-					var dup = false;
-					for (have in instantSkillIds)
-						if (have == id) {
-							dup = true;
-							break;
-						}
-					if (!dup)
-						instantSkillIds.push(id);
-				}
-			}
-		} catch (_:Dynamic) {}
-		return need;
+		return collectAuraSubjects("skill.instantReady", instantSkillIds);
 	}
-
 	static function auraRulesNeedSpecial(cfg:ConfigPanel):Bool {
-		specialSkillIds = [];
-		var need = false;
-		try {
-			for (a in cfg.auras.auras) {
-				if (a == null || !a.enabled.get() || a.rule == null || a.rule.conditions == null)
-					continue;
-				for (c in a.rule.conditions) {
-					if (c == null || c.signal != "skill.specialReady")
-						continue;
-					need = true;
-					if (c.subject == null || c.subject.length == 0)
-						continue;
-					var id = solarflare.geaux.GeauxCache.sanitizeSkillId(c.subject);
-					if (id.length == 0)
-						continue;
-					var dup = false;
-					for (have in specialSkillIds)
-						if (have == id) {
-							dup = true;
-							break;
-						}
-					if (!dup)
-						specialSkillIds.push(id);
-				}
-			}
-		} catch (_:Dynamic) {}
-		return need;
+		return collectAuraSubjects("skill.specialReady", specialSkillIds);
 	}
-
 	static function auraRulesNeedEnemyCast(cfg:ConfigPanel):Bool {
-		castSkillIds = [];
-		var need = false;
-		try {
-			for (a in cfg.auras.auras) {
-				if (a == null || !a.enabled.get() || a.rule == null || a.rule.conditions == null)
-					continue;
-				for (c in a.rule.conditions) {
-					if (c == null || c.signal == null)
-						continue;
-					if (c.signal != "event.cast.recent" && c.signal != "event.cast.active")
-						continue;
-					need = true;
-					if (c.subject == null || c.subject.length == 0)
-						continue;
-					var id = solarflare.geaux.GeauxCache.sanitizeSkillId(c.subject);
-					if (id.length == 0)
-						continue;
-					var dup = false;
-					for (have in castSkillIds)
-						if (have == id) {
-							dup = true;
-							break;
-						}
-					if (!dup)
-						castSkillIds.push(id);
-				}
-			}
-		} catch (_:Dynamic) {}
-		return need;
+		return collectAuraSubjects("event.cast.recent", castSkillIds, "event.cast.active");
 	}
-
 	static function auraRulesNeedTarget(cfg:ConfigPanel):Bool {
-		try {
-			for (a in cfg.auras.auras) {
-				if (a == null || !a.enabled.get() || a.rule == null || a.rule.conditions == null)
-					continue;
-				for (c in a.rule.conditions) {
-					if (c == null || c.signal == null)
-						continue;
-					if (StringTools.startsWith(c.signal, "target."))
-						return true;
-				}
-			}
-		} catch (_:Dynamic) {}
+		for (c in auraConditions) if (c.signal != null && StringTools.startsWith(c.signal, "target.")) return true;
 		return false;
 	}
 

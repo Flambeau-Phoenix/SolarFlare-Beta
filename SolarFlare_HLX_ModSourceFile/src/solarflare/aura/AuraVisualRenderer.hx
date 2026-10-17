@@ -28,7 +28,7 @@ class AuraVisualRenderer {
 	/** Measure the same face and plates as draw(), before choosing the host/preview clip. */
 	public static function measureBounds(a:AuraDef, w:Single, h:Single, stacks:Int, counterValue:Int,
 			out:HUDVisualBounds, vectorScale:Float = 1, previewLeft:Null<Float> = null,
-			previewGlow:Null<Bool> = null):Void {
+			previewGlow:Null<Bool> = null, editAllCanvas:Bool = false):Void {
 		out.reset(w, h);
 		bindFace(a, false, previewLeft, previewGlow);
 		var fx:Single = 0;
@@ -60,9 +60,9 @@ class AuraVisualRenderer {
 		}
 		if (a.region == "canvas" && !icon) {
 			for (el in (a.canvasElements != null ? a.canvasElements : [])) {
-				if (el == null) continue;
-				if (el.kind == AuraCanvasElement.KIND_ICON) {
-					if (!a.showIcon.get()) continue;
+				if (el == null || !el.visible(editAllCanvas)) continue;
+				if (el.kind == AuraCanvasElement.KIND_ICON || el.kind == AuraCanvasElement.KIND_SHAPE) {
+					if (el.kind == AuraCanvasElement.KIND_ICON && !a.showIcon.get()) continue;
 					out.include(el.x * vectorScale, el.y * vectorScale,
 						el.w > 1 ? el.w * vectorScale : w, el.h > 1 ? el.h * vectorScale : h);
 				} else {
@@ -134,7 +134,7 @@ class AuraVisualRenderer {
 
 	public static function draw(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single,
 			progress:Float, stacks:Int, counterValue:Int, ghost:Bool, effectAlpha:Float = 1,
-			vectorScale:Float = 1, previewLeft:Null<Float> = null, previewGlow:Null<Bool> = null):Void {
+			vectorScale:Float = 1, previewLeft:Null<Float> = null, previewGlow:Null<Bool> = null, editAllCanvas:Bool = false):Void {
 		if (a == null || w < 1 || h < 1)
 			return;
 		bindFace(a, ghost, previewLeft, previewGlow);
@@ -145,7 +145,7 @@ class AuraVisualRenderer {
 			alpha *= 0.38;
 		var label = a.region == "text" ? (a.announce != null ? a.announce : "") : a.displayLabel();
 		if (a.region == "canvas") {
-			drawCanvas(dl, a, x, y, w, h, p, stacks, counterValue, alpha, vectorScale);
+			drawCanvas(dl, a, x, y, w, h, p, stacks, counterValue, alpha, vectorScale, editAllCanvas);
 			drawBadges(dl, a, x, y, w, h, stacks, counterValue, alpha);
 			return;
 		}
@@ -253,7 +253,7 @@ class AuraVisualRenderer {
 
 	/** Freeform element placements + optional glow / fuse / countdown overlays. */
 	static function drawCanvas(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single,
-			progress:Float, stacks:Int, counter:Int, alpha:Float, vectorScale:Float):Void {
+			progress:Float, stacks:Int, counter:Int, alpha:Float, vectorScale:Float, editAllCanvas:Bool):Void {
 		// Empty canvas has no portrait until an icon element is explicitly added.
 		var els = a.canvasElements != null ? a.canvasElements : [];
 		if (faceFx && faceGlow) drawGlowRect(dl, x, y, w, h, a, alpha);
@@ -262,9 +262,13 @@ class AuraVisualRenderer {
 		while (i < els.length) {
 			var el = els[i];
 			i++;
-			if (el == null)
+			if (el == null || !el.visible(editAllCanvas))
 				continue;
-			if (el.kind == AuraCanvasElement.KIND_ICON) {
+			if (el.kind == AuraCanvasElement.KIND_SHAPE) {
+				drawCanvasShape(dl, el.content, x + el.x * vectorScale, y + el.y * vectorScale,
+					el.w > 1 ? el.w * vectorScale : w, el.h > 1 ? el.h * vectorScale : h,
+					applyAlphaToPacked(el.color, alpha), el.stroke * vectorScale);
+			} else if (el.kind == AuraCanvasElement.KIND_ICON) {
 				if (!a.showIcon.get()) continue;
 				var iw:Single = el.w > 1 ? el.w * vectorScale : w;
 				var ih:Single = el.h > 1 ? el.h * vectorScale : h;
@@ -284,7 +288,13 @@ class AuraVisualRenderer {
 				ImGui.pushFont(ImGui.getFont(), fontSize);
 				try {
 					var col = applyAlphaToPacked(el.color, alpha);
-					ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(x + el.x * vectorScale, y + el.y * vectorScale), col, formatted);
+					var tx:Single = x + el.x * vectorScale;
+					var ty:Single = y + el.y * vectorScale;
+					if (el.shadow) {
+						var off:Single = Math.max(1, fontSize / 16);
+						ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + off, ty + off), applyAlphaToPacked(0xE0000000, alpha), formatted);
+					}
+					ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty), col, formatted);
 				} catch (e:Dynamic) { ImGui.popFont(); throw e; }
 				ImGui.popFont();
 			}
@@ -297,6 +307,56 @@ class AuraVisualRenderer {
 				drawFuse(dl, x, y, Math.min(w, h), progress, alpha);
 		}
 
+	}
+
+	/** Six points max (hex); allocated once, filled per shape. */
+	static var polyPts:hl.Bytes = new hl.Bytes(8 * 6);
+	static var polyN:Int = 0;
+	static inline function polyPoint(px:Single, py:Single):Void {
+		polyPts.setF32(polyN * 8, px);
+		polyPts.setF32(polyN * 8 + 4, py);
+		polyN++;
+	}
+
+	/** Canvas plate in the element box. stroke 0 fills, otherwise outlines at that thickness. */
+	public static function drawCanvasShape(dl:Dynamic, shape:String, x:Single, y:Single, w:Single, h:Single,
+			col:Int, stroke:Float):Void {
+		var outline = stroke > 0;
+		var t:Single = outline ? stroke : 1;
+		var cx:Single = x + w * 0.5;
+		var cy:Single = y + h * 0.5;
+		switch (shape) {
+			case "circle":
+				var r = ImGui.vec2(w * 0.5, h * 0.5);
+				if (outline) ImGui.ImDrawList_AddEllipse(dl, ImGui.vec2(cx, cy), r, col, 0, t);
+				else ImGui.ImDrawList_AddEllipseFilled(dl, ImGui.vec2(cx, cy), r, col);
+				return;
+			case "rounded":
+				var rr:Single = Math.min(w, h) * 0.22;
+				if (outline) ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col, rr, t);
+				else ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col, rr);
+				return;
+			case "line":
+				ImGui.ImDrawList_AddLine(dl, ImGui.vec2(x, cy), ImGui.vec2(x + w, cy), col, Math.max(1, outline ? t : h));
+				return;
+			case "diamond":
+				polyN = 0;
+				polyPoint(cx, y); polyPoint(x + w, cy); polyPoint(cx, y + h); polyPoint(x, cy);
+			case "hex":
+				polyN = 0;
+				var q:Single = w * 0.25;
+				polyPoint(x + q, y); polyPoint(x + w - q, y); polyPoint(x + w, cy);
+				polyPoint(x + w - q, y + h); polyPoint(x + q, y + h); polyPoint(x, cy);
+			case "triangle":
+				polyN = 0;
+				polyPoint(cx, y); polyPoint(x + w, y + h); polyPoint(x, y + h);
+			default:
+				if (outline) ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col, 0, t);
+				else ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col);
+				return;
+		}
+		if (outline) ImGui.ImDrawList_AddPolyline(dl, polyPts, polyN, col, t, imgui.Enums.ImDrawFlags.Closed);
+		else ImGui.ImDrawList_AddConvexPolyFilled(dl, polyPts, polyN, col);
 	}
 
 	static function drawIcon(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single,
@@ -322,7 +382,8 @@ class AuraVisualRenderer {
 		if (faceFx && faceGlow) {
 			drawGlowRect(dl, ix - 2, iy - 2, side + 4, side + 4, a, alpha);
 		}
-		if (a.progressRing != null && a.progressRing.get() && progress > 0.001 && progress < 0.999) {
+		if (a.progressRing != null && a.progressRing.get() && progress > 0.001
+			&& (progress < 0.999 || a.gaugeFillMode == AuraGaugePolicy.FILL || a.timerMode == AuraTimer.MODE_UP)) {
 			var rad:Single = side * 0.46;
 			RingGauge.draw(dl, ImGui.vec2(ix + side * 0.5, iy + side * 0.5), rad, progress,
 				ImGui.vec4(0.95, 0.82, 0.28, 0.9 * alpha), "", vectorScale);
@@ -420,7 +481,7 @@ class AuraVisualRenderer {
 	}
 
 	/** Substitute independent live stack and activation count values. */
-	static function formatTokens(content:String, a:AuraDef, stacks:Int = 0, counter:Int = 0):String {
+	public static function formatTokens(content:String, a:AuraDef, stacks:Int = 0, counter:Int = 0):String {
 		if (content == null || content.length == 0)
 			return "";
 		var s = content;

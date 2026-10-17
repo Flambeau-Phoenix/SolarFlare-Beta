@@ -586,6 +586,8 @@ class GameIcons {
 	}
 
 	static function loadPng(id:String):TextureHandle {
+		if (StringTools.startsWith(id, solarflare.aura.AuraCanvasElement.CUSTOM_PREFIX))
+			return loadFilePng(CustomImages.pathFor(CustomImages.stemOf(id)), id, CustomImages.MAX_DIM);
 		if (id == CHROME_SUN) {
 			var icoPath = resolvePath(id + ".ico");
 			if (icoPath != null) {
@@ -631,7 +633,7 @@ class GameIcons {
 		return bytes.sub(bestOffset, bestLength);
 	}
 
-	static function loadFilePng(path:String, id:String):TextureHandle {
+	static function loadFilePng(path:String, id:String, maxDim:Int = 0):TextureHandle {
 		#if !hl
 		return 0;
 		#else
@@ -646,6 +648,8 @@ class GameIcons {
 				return 0;
 			var header = Tools.getHeader(data);
 			if (header == null || header.width <= 0 || header.height <= 0)
+				return 0;
+			if (maxDim > 0 && (header.width > maxDim || header.height > maxDim))
 				return 0;
 			var bgra = Tools.extract32(data);
 			if (bgra == null || bgra.length < header.width * header.height * 4)

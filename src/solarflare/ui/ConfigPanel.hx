@@ -56,6 +56,7 @@ class ConfigPanel {
 	static inline var TAB_UTILITIES:Int = 14;
 	static inline var TAB_NATIVE_UI:Int = 15;
 	static inline var TAB_LOOT:Int = 16;
+	static inline var TAB_STACKS:Int = 17;
 	public var open:BoolRef;
 	public var vitals:VitalsConfig;
 	public var uiPack:UiPackConfig;
@@ -63,6 +64,7 @@ class ConfigPanel {
 	public var hideMove:HideMoveConfig;
 	public var barter:solarflare.barter.BarTer;
 	public var statusBoard:solarflare.statusboard.StatusBoard;
+	public var stacks:solarflare.stacks.Stacks;
 	public var geaux:GeauxConfig;
 	public var getRifty:GetRiftyConfig;
 	public var combo:ComboConfig;
@@ -154,6 +156,7 @@ class ConfigPanel {
 		barter = new solarflare.barter.BarTer();
 		barter.host = this;
 		statusBoard = new solarflare.statusboard.StatusBoard();
+		stacks = new solarflare.stacks.Stacks(this);
 		geaux = new GeauxConfig();
 		getRifty = new GetRiftyConfig();
 		combo = new ComboConfig();
@@ -227,6 +230,7 @@ class ConfigPanel {
 		if (hemorrhage != null) registerInteractive(hemorrhage.tool.open);
 		if (geauxBuilder != null) registerInteractive(geauxBuilder.open);
 		if (auraBuilder != null) registerInteractive(auraBuilder.open);
+		if (stacks != null) registerInteractive(stacks.open);
 		if (extraBarsPrototype != null) registerInteractive(extraBarsPrototype.open);
 		if (barter != null && barter.config != null) registerInteractive(barter.config.open);
 		if (notebook != null) registerInteractive(notebook.open);
@@ -283,6 +287,7 @@ class ConfigPanel {
 		if (auraBuilder != null)
 			auraBuilder.clearTransientState();
 		if (extraBarsPrototype != null) extraBarsPrototype.clearTransientState();
+		if (stacks != null) stacks.clearTransientState();
 		if (lootBrowser != null) lootBrowser.clearTransientState();
 		if (barter != null) barter.clearTransientState();
 		if (hemorrhage != null) hemorrhage.tool.clearTransientState();
@@ -451,6 +456,7 @@ class ConfigPanel {
 			UiScope.guard("Aura Builder", auraBuilder.draw);
 		if (extraBarsPrototype != null)
 			UiScope.guard("ExtraBars", extraBarsPrototype.draw);
+		if (stacks != null) UiScope.guard("StacksBuilder", stacks.builder.draw);
 		trackProfileWindowState();
 		if (target != null)
 			UiScope.guard("Target Frame", target.draw);
@@ -476,6 +482,7 @@ class ConfigPanel {
 				extraBarsPrototype.open.set(true);
 			if (ImGui.menuItem("BarTer"))
 				if (barter != null) barter.config.open.set(true);
+			if (ImGui.menuItem("Stacks")) stacks.open.set(true);
 			if (ImGui.menuItem("Status Board"))
 				showHubTab("status");
 			if (ImGui.menuItem("Resource Tracker"))
@@ -553,7 +560,7 @@ class ConfigPanel {
 
 	static var NAV_GROUP_NAMES:Array<String> = ["Display", "Automation", "Tools"];
 	static var NAV_GROUPS:Array<Array<Int>> = [
-		[TAB_RESOURCES, TAB_GEAUX, TAB_BARTER, TAB_EXTRABARS, TAB_ATTACK, TAB_STATUS, TAB_NATIVE_UI],
+		[TAB_RESOURCES, TAB_GEAUX, TAB_BARTER, TAB_EXTRABARS, TAB_ATTACK, TAB_STATUS, TAB_STACKS, TAB_NATIVE_UI],
 		[TAB_AURAS, TAB_COMBAT_LOG],
 		[TAB_NOTEBOOK, TAB_LOOT, TAB_LIGHTSABER, TAB_THEME, TAB_GETRIFTY, TAB_UTILITIES, TAB_SETTINGS]
 	];
@@ -574,6 +581,7 @@ class ConfigPanel {
 			case TAB_UTILITIES: "Utilities";
 			case TAB_NATIVE_UI: "Native UI";
 			case TAB_LOOT: "Loot Browser";
+			case TAB_STACKS: "Stacks";
 			case TAB_SETTINGS: "Hub Settings";
 			default: "Status Board";
 		}
@@ -590,6 +598,9 @@ class ConfigPanel {
 				return auras != null ? (auras.enabled.get() ? 1 : 0) : -1;
 			case TAB_LIGHTSABER:
 				return lightsaber != null ? (lightsaber.hidden.get() ? 0 : 1) : -1;
+			case TAB_STACKS:
+				if (stacks != null) for(t in stacks.config.trackers) if(t.enabled && !t.hidden) return 1;
+				return 0;
 			case TAB_STATUS:
 				return statusBoard != null ? (statusBoard.config.hidden.get() ? 0 : 1) : -1;
 			case TAB_GETRIFTY:
@@ -637,6 +648,7 @@ class ConfigPanel {
 		if (id == TAB_NOTEBOOK) notebook.open.set(true);
 		if (id == TAB_LOOT) lootBrowser.open.set(true);
 		if (id == TAB_EXTRABARS) extraBarsPrototype.open.set(true);
+		if (id == TAB_STACKS && stacks != null) stacks.open.set(true);
 		if (id == TAB_BARTER && barter != null) barter.config.open.set(true);
 	}
 
@@ -644,6 +656,7 @@ class ConfigPanel {
 	public function showHubTab(which:String):Void {
 		var id = switch (which) {
 			case "status": TAB_STATUS;
+			case "stacks": TAB_STACKS;
 			case "getrifty": TAB_GETRIFTY;
 			case "settings": TAB_SETTINGS;
 			case "utilities": TAB_UTILITIES;
@@ -721,7 +734,7 @@ class ConfigPanel {
 			case TAB_AURAS: if (auraBuilder != null) auraBuilder.open.set(true);
 			case TAB_LIGHTSABER: if (lightsaber != null) lightsaber.open.set(true);
 			case TAB_ATTACK: if (resourceTracker != null) resourceTracker.openFor("attack");
-			case TAB_NOTEBOOK | TAB_LOOT | TAB_EXTRABARS | TAB_BARTER:
+			case TAB_NOTEBOOK | TAB_LOOT | TAB_EXTRABARS | TAB_BARTER | TAB_STACKS:
 			default: setRail(false);
 		}
 	}
@@ -799,6 +812,8 @@ class ConfigPanel {
 				combatLog.drawEditorContents();
 			case TAB_EXTRABARS:
 				drawExtraBarsModule();
+			case TAB_STACKS:
+				if (stacks != null && drawModuleHeader("Stacks", stacks.config.trackers.length+" tracker(s)", "Open builder", "stacks_open")) stacks.open.set(true);
 			case TAB_STATUS:
 				if (statusBoard != null)
 					statusBoard.config.drawContents();
@@ -1078,7 +1093,7 @@ class ConfigPanel {
 	public function applyProfileUiTab(value:Int):Void {
 		if (value == TAB_NATIVE)
 			activeHubTab = TAB_RESOURCES;
-		else if (value >= TAB_RESOURCES && value <= TAB_LOOT)
+		else if (value >= TAB_RESOURCES && value <= TAB_STACKS)
 			activeHubTab = value;
 	}
 

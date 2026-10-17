@@ -133,10 +133,25 @@ class AuraEffects {
 		if (a.timerActive && a.timerMode != AuraTimer.MODE_OFF) {
 			a.timeLeft = cooldownDriven && !AuraTimerClock.running(a) ? Math.NaN : a.timerValue;
 			a.timerInfinite = false;
-			if (a.timerSource == AuraTimer.SRC_FIXED || !(Math.isFinite(drawProg) && drawProg > 0.001 && drawProg < 0.999)) {
+			if (a.timerTotal > 0.001 && Math.isFinite(a.timerTotal)) {
 				var frac = AuraTimer.fraction(a);
 				a.progress = frac;
 			}
+		}
+		if (cooldownDriven) {
+			var cdKnown = cooldown != null && cooldown.known && cooldown.cooldownKnown;
+			var cdLeft = cdKnown ? cooldown.cooldownLeft : Math.NaN;
+			var cdActive = cdKnown && (cooldown.inCooldown || Math.isFinite(cdLeft) && cdLeft > 0);
+			var gaugeLeft = cdLeft;
+			var gaugeTotal = cdKnown ? cooldown.cooldownTotal : Math.NaN;
+			// The clock's existing one-shot estimate is usable only during confirmed activity.
+			if (cdKnown && cdActive && !(Math.isFinite(cdLeft) && cdLeft > 0) && AuraTimerClock.running(a)) {
+				gaugeLeft = Math.max(0, a.timerEndsAt - now);
+				gaugeTotal = a.timerTotal;
+			}
+			a.progress = AuraGaugePolicy.observe(a.gauge, a.gaugeFillMode, a.timerMode, cdKnown, cdActive,
+				gaugeLeft, gaugeTotal, cdKnown ? cooldown.cooldownProgress : Math.NaN,
+				a.timerTotal > 0 ? a.timerTotal : a.timerSource == AuraTimer.SRC_FIXED ? a.timerSeconds.get() : 0);
 		}
 		if (rise && a.isCounter != null && a.isCounter.get()) {
 			if (a.counterValue < 2147483647) {
@@ -177,6 +192,8 @@ class AuraEffects {
 		if (a == null)
 			return;
 		a.show = false;
+		a.gauge.reset();
+		if (a.canvasElements != null) for (el in a.canvasElements) if (el != null) el.clearVisibility();
 		AuraTimer.reset(a);
 		a.condWas = false;
 		a.timerEventSerial = 0;

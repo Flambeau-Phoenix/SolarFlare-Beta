@@ -37,6 +37,8 @@ class AuraDef {
 	public var cue:String;
 	public var plate:String;
 	public var announce:String;
+	/** Dynamic display group id (AuraGroupDef); empty = own window. Independent of the Set tag. */
+	public var group:String = "";
 	public var fight:String;
 	public var volume:FloatRef;
 	/** SolarFlare visual alpha. DRM sound volume remains in `volume`. */
@@ -101,6 +103,9 @@ class AuraDef {
 	/** Frozen, reusable runtime result; never serialized. */
 	public var ruleResult:AuraRuleResult;
 	public var conditionUi:Array<AuraConditionUiState>;
+	public var ruleEditor:solarflare.aura.signal.AuraRuleEditorContext;
+	public var gaugeFillMode:String = AuraGaugePolicy.FOLLOW;
+	public var gauge = new AuraGaugePolicy.AuraGaugeState();
 
 	/** 0 = off, 1 = count down, 2 = count up. */
 	public var timerMode:Int;
@@ -214,6 +219,7 @@ class AuraDef {
 		ruleResult = new AuraRuleResult();
 		conditionUi = [];
 		for (_ in 0...AuraRuleDef.MAX_CONDITIONS) conditionUi.push(new AuraConditionUiState());
+		ruleEditor = new solarflare.aura.signal.AuraRuleEditorContext(id, rule, ruleResult, conditionUi, true);
 		w = new FloatRef(96);
 		h = new FloatRef(96);
 		volume = new FloatRef(1);
@@ -335,6 +341,15 @@ class AuraDef {
 	 * condition's subject. Unlike preferredIconId this never maps to a gfx stem, since
 	 * the timing tables are keyed by record id.
 	 */
+	public function cooldownDriven():Bool {
+		if (rule == null) return trigger == "cooldown";
+		if (rule.conditions == null || rule.conditions.length == 0) return false;
+		var pi = rule.presentationSource;
+		if (pi < 0 || pi >= rule.conditions.length) pi = 0;
+		var c = rule.conditions[pi];
+		return c != null && AuraTimingReferencePolicy.isCooldown(c.signal);
+	}
+
 	public function timingSubjectId():String {
 		if (skillId != null && skillId.length > 0)
 			return skillId;
