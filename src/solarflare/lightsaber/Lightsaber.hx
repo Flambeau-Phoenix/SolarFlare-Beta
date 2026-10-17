@@ -174,6 +174,11 @@ class LightsaberMeter {
 	var groupByCaster:Bool;
 	var writeLog:Bool;
 
+	/** Hit logs are written only while the combat-log "Record JSONL" opt-in is on. */
+	function logging():Bool {
+		return writeLog && solarflare.combatlog.CombatLogRecorder.enabled.get();
+	}
+
 	public function new(groupByCaster:Bool, writeLog:Bool) {
 		this.groupByCaster = groupByCaster;
 		this.writeLog = writeLog;
@@ -193,7 +198,7 @@ class LightsaberMeter {
 		byId = new Map();
 		if (discardPending)
 			lastIngestSequence = CombatLogCache.latestSequence;
-		if (writeLog)
+		if (logging())
 			LightsaberLog.clearLive();
 	}
 
@@ -256,7 +261,7 @@ class LightsaberMeter {
 		if (amount > row.maxHit)
 			row.maxHit = amount;
 		sortSkills();
-		if (writeLog)
+		if (logging())
 			LightsaberLog.push(nowSec, confirmed == "Unknown" ? "" : confirmed, who, minion, target, amount, crit, targetHp,
 				targetMaxHp);
 	}
@@ -269,7 +274,7 @@ class LightsaberMeter {
 			elapsedSec = 0;
 		if (lastHitAt > 0 && (nowSec - lastHitAt) >= LightsaberCache.IDLE_SEC) {
 			ended = true;
-			if (writeLog)
+			if (logging())
 				LightsaberLog.seal();
 		}
 	}

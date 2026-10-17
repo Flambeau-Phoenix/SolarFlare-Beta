@@ -13,8 +13,14 @@ class CombatLogRecorder {
 	public static inline var IDLE_S:Float = 30;
 	/** Opportunistic flush cadence so recording never rides on the draw/observe loop. */
 	public static inline var FLUSH_S:Float = 0.5;
-	/** Hard per-session cap; once exceeded the oldest lines are dropped to keep the newest. */
+	/** In-RAM queue bound when a disk write keeps failing. */
 	public static inline var MAX_BYTES:Int = 5 * 1024 * 1024;
+	/** Once the clog-*.jsonl files total more than this, the oldest data is pruned. */
+	public static inline var PRUNE_ABOVE_BYTES:Int = 15 * 1024 * 1024;
+	/** A prune keeps this much of the most recent data (oldest files go first, then the oldest lines of the boundary file). */
+	public static inline var PRUNE_KEEP_BYTES:Int = 15 * 1024 * 512;
+	/** Appended bytes between folder-size checks, so the folder is not scanned on every flush. */
+	static inline var CHECK_EVERY_BYTES:Int = 256 * 1024;
 
 	/** Fresh installs are silent; SettingsStore restores an explicit persisted opt-in. */
 	public static var enabled = new BoolRef(false);
@@ -28,6 +34,32 @@ class CombatLogRecorder {
 	static var sessionPath:String = "";
 	static var lastFlushAt:Float = 0;
 	static var lastEventAt:Float = 0;
+	/** Map the open file belongs to; a known change of map closes it so each file is one map visit. */
+	static var sessionMap:String = "";
+	/** Header timestamp of the open file, so the header line can be rewritten once the map becomes known. */
+	static var sessionAt:String = "";
+	/** Bytes appended since the last folder-size check; the check is edge-driven off this counter. */
+	static var sinceCheck:Int = 0;
+
+	/**
+	 * One switch for every UI that records. Turning it on also captures nearby world activity, because enemy
+	 * casts aimed at other players or the ground are otherwise never saved; turning it off only stops recording
+	 * and leaves the player's own filter choices alone.
+	 */
+	public static function setCapture(on:Bool):Void {
+		if (enabled.get() == on)
+			return;
+		enabled.set(on);
+		if (on) {
+			var cfg = CombatLogConfig.live;
+			if (cfg != null) {
+				cfg.recordWorld.set(true);
+				cfg.recordInProximity.set(true);
+			}
+			newSession();
+		} else
+			endSession();
+	}
 
 	public static function queue(line:CombatLogLine):Void {
 		if (!enabled.get() || line == null)
@@ -51,6 +83,14 @@ class CombatLogRecorder {
 
 	public static function tick():Void {
 		var now = stamp();
+		var map = solarflare.aura.AuraMapContext.mapId;
+		if (sessionPath.length > 0 && map.length > 0) {
+			if (sessionMap.length == 0) {
+				sessionMap = map;
+				stampMapOnHeader(map);
+			} else if (map != sessionMap)
+				endSession();
+		}
 		if (sessionPath.length > 0 && lastEventAt > 0 && now - lastEventAt >= IDLE_S)
 			endSession();
 		if (buf.length == 0)
@@ -74,7 +114,9 @@ class CombatLogRecorder {
 			out.close();
 			written += chunk.split("\n").length - 1;
 			lastFlushAt = stamp();
-			enforceCap();
+			sinceCheck += chunk.length;
+			if (sinceCheck >= CHECK_EVERY_BYTES)
+				pruneLogs();
 			lastStatus = "recording " + written + "  " + fileName()
 				+ (trimmed > 0 ? "  (trimmed " + trimmed + ")" : "");
 		} catch (_:Dynamic) {
@@ -91,24 +133,56 @@ class CombatLogRecorder {
 		}
 	}
 
-	/** Hard size cap: drop the oldest bytes so one session can never grow unbounded. */
-	static function enforceCap():Void {
-		if (sessionPath.length == 0)
-			return;
+	/**
+	 * Folder cap: when the clog-*.jsonl files total more than PRUNE_ABOVE_BYTES, delete the oldest files and then
+	 * drop the oldest lines of the boundary file (its session header stays) so PRUNE_KEEP_BYTES of the most recent
+	 * data remain. The file name carries the timestamp, so name order is age order and the open file is the newest.
+	 * Runs at session start and every CHECK_EVERY_BYTES of recording, never per flush.
+	 */
+	static function pruneLogs():Void {
+		sinceCheck = 0;
 		try {
-			if (!sys.FileSystem.exists(sessionPath))
+			var dir = logDir();
+			if (dir == null || !sys.FileSystem.exists(dir))
 				return;
-			if (sys.FileSystem.stat(sessionPath).size <= MAX_BYTES)
+			var files:Array<{name:String, size:Int}> = [];
+			var total = 0;
+			for (name in sys.FileSystem.readDirectory(dir)) {
+				if (!StringTools.startsWith(name, "clog-") || !StringTools.endsWith(name, ".jsonl"))
+					continue;
+				var size = sys.FileSystem.stat(haxe.io.Path.join([dir, name])).size;
+				files.push({name: name, size: size});
+				total += size;
+			}
+			if (total <= PRUNE_ABOVE_BYTES)
 				return;
-			var content = sys.io.File.getContent(sessionPath);
-			var cut = content.length - MAX_BYTES;
-			if (cut <= 0)
-				return;
-			var nl = content.indexOf("\n", cut);
-			var head = nl >= 0 ? content.substr(nl + 1) : content.substr(cut);
-			trimmed += nl >= 0 ? nl + 1 : cut;
-			sys.io.File.saveContent(sessionPath, head);
+			files.sort(function(a, b) return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0));
+			var excess = total - PRUNE_KEEP_BYTES;
+			for (f in files) {
+				if (excess <= 0)
+					break;
+				var path = haxe.io.Path.join([dir, f.name]);
+				if (f.size <= excess && path != sessionPath) {
+					sys.FileSystem.deleteFile(path);
+					excess -= f.size;
+				} else {
+					trimOldest(path, excess);
+					break;
+				}
+			}
 		} catch (_:Dynamic) {}
+	}
+
+	/** Drops about `cut` of the oldest bytes of a recording at a line boundary, keeping its session header. */
+	static function trimOldest(path:String, cut:Int):Void {
+		var content = sys.io.File.getContent(path);
+		var nl = content.indexOf("\n");
+		var header = nl >= 0 && content.substr(0, nl).indexOf("\"type\":\"session\"") >= 0 ? content.substr(0, nl + 1) : "";
+		var body = content.substr(header.length);
+		var at = body.indexOf("\n", cut);
+		var kept = at >= 0 ? body.substr(at + 1) : "";
+		trimmed += body.length - kept.length;
+		sys.io.File.saveContent(path, header + kept);
 	}
 
 	public static function endSession():Void {
@@ -145,19 +219,46 @@ class CombatLogRecorder {
 		lastPath = sessionPath;
 		written = 0;
 		try {
-			var header = haxe.Json.stringify({
-				type: "session",
-				v: 1,
-				mod: "solarflare",
-				at: d.toString()
-			});
-			sys.io.File.saveContent(sessionPath, header + "\n");
+			sessionMap = solarflare.aura.AuraMapContext.mapId;
+			sessionAt = d.toString();
+			sys.io.File.saveContent(sessionPath, headerLine(sessionAt, sessionMap) + "\n");
 			lastStatus = "recording " + name;
 			lastEventAt = stamp();
+			pruneLogs();
 		} catch (_:Dynamic) {
 			sessionPath = "";
 			lastStatus = "record fail (create)";
 		}
+	}
+
+	static function headerLine(at:String, map:String):String {
+		return haxe.Json.stringify({
+			type: "session",
+			v: 1,
+			mod: "solarflare",
+			at: at,
+			map: map
+		});
+	}
+
+	/**
+	 * Recording often starts before the map has been sampled (the first background pass after the switch is turned
+	 * on), which left the header without a map. Once the map is known, rewrite the header line of the still-small
+	 * open file so the browser can group recordings by map.
+	 */
+	static function stampMapOnHeader(map:String):Void {
+		if (sessionPath.length == 0 || map.length == 0)
+			return;
+		try {
+			flush();
+			if (!sys.FileSystem.exists(sessionPath))
+				return;
+			var content = sys.io.File.getContent(sessionPath);
+			var nl = content.indexOf("\n");
+			if (nl < 0 || content.substr(0, nl).indexOf("\"type\":\"session\"") < 0)
+				return;
+			sys.io.File.saveContent(sessionPath, headerLine(sessionAt, map) + content.substr(nl));
+		} catch (_:Dynamic) {}
 	}
 
 	static function logDir():String {

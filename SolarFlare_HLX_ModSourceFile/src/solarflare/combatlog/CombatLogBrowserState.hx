@@ -1,69 +1,80 @@
 package solarflare.combatlog;
 
-import solarflare.combatlog.CombatLogDocument.CombatLogEvent;
 import solarflare.combatlog.CombatLogAnalysis.CombatLogSkillStats;
 
-/** Session navigation only; deliberately has no aura/config/settings dependencies. */
+/**
+ * Selection state for the Boss Mods browser: which recording is open, what is being looked at, which
+ * abilities are ticked for a batch. Deliberately has no aura/config/settings dependencies.
+ */
 class CombatLogBrowserState {
+	public static inline var VIEW_ENEMY:String = "enemy";
+	public static inline var VIEW_MINE:String = "mine";
+	public static inline var VIEW_DAMAGE:String = "damage";
+	public static inline var VIEW_SETS:String = "sets";
+	public static var STYLES:Array<String> = ["banner", "countdown", "glow"];
+
 	public var analysis(default, null):CombatLogAnalysis = null;
 	public var path(default, null):String = "";
-	public var page(default, null):String = "files";
-	public var tab(default, null):String = "Enemies";
+	public var view(default, null):String = VIEW_ENEMY;
 	public var enemy(default, null):Null<String> = null;
-	public var skill(default, null):CombatLogSkillStats = null;
-	public var hit(default, null):CombatLogEvent = null;
-	public var showMore:Bool = false;
-	public var filters:Map<String, String> = new Map();
-	public var scroll:Map<String, Float> = new Map();
-	var selections:Map<String, Int> = new Map();
+	/** Key of the ability whose drawer is open ("" when none). */
+	public var expanded(default, null):String = "";
+	/** Look chosen for batch-created alerts: banner, countdown or glow. */
+	public var style(default, null):String = "banner";
+	public var filter(default, null):String = "";
+	/** Health threshold (percent) offered by the enemy Health alert. */
+	public var healthPercent(default, null):Int = 50;
+	/** Bumps whenever anything a cached row list depends on changes. */
 	public var revision(default, null):Int = 0;
+	var picks:Map<String, Bool> = new Map();
+	/** The enemy to return to when coming back to the Enemies tab. */
+	var lastEnemy:Null<String> = null;
+
 	public function new() {}
+
 	public function accept(document:CombatLogDocument, path:String):Void {
 		// Construct first so a failed load cannot replace the previous recording.
 		var next = new CombatLogAnalysis(document);
-		analysis = next; this.path = path; page = "recording"; tab = "Enemies";
-		enemy = null; skill = null; hit = null; showMore = false;
-		filters = new Map(); scroll = new Map(); selections = new Map(); revision++;
-	}
-	public function files():Void { page = "files"; revision++; }
-	public function recording():Void { if (analysis != null) { page = "recording"; enemy = null; skill = null; hit = null; revision++; } }
-	public function setTab(value:String):Void {
-		if (["Enemies", "Me", "Damage taken"].indexOf(value) < 0 || tab == value) return;
-		tab = value; enemy = null; skill = null; hit = null; revision++;
-	}
-	public function selectEnemy(name:String):Void { enemy = name; skill = null; hit = null; page = "enemy"; revision++; }
-	public function selectSkill(stats:CombatLogSkillStats):Void {
-		if (page == "recording") { enemy = null; hit = null; }
-		if (page == "enemy") hit = null;
-		skill = stats; page = "skill"; showMore = false; revision++;
-	}
-	public function selectHit(event:CombatLogEvent):Void { enemy = null; hit = event; skill = analysis.forEvent(event); page = "damage"; showMore = false; revision++; }
-	public function back():Void {
-		if (page == "skill" && hit != null) page = "damage";
-		else if ((page == "skill" || page == "damage") && enemy != null) page = "enemy";
-		else if (page == "enemy" || page == "skill" || page == "damage") page = "recording";
-		else page = "files";
+		analysis = next; this.path = path;
+		picks = new Map(); expanded = ""; filter = "";
+		if (next.enemyList.length > 0) { view = VIEW_ENEMY; enemy = next.enemyList[0].name; lastEnemy = enemy; }
+		else { enemy = null; lastEnemy = null; view = next.mySkills.length > 0 ? VIEW_MINE : VIEW_DAMAGE; }
 		revision++;
 	}
-	public function key():String {
-		return haxe.Json.stringify([page, tab, page == "enemy" ? enemy : page == "skill" && skill != null ? skill.key
-			: page == "damage" && hit != null ? Std.string(hit.row) : ""]);
+
+	public function selectEnemy(name:String):Void { view = VIEW_ENEMY; enemy = name; lastEnemy = name; reset(); }
+	/** Enemies tab: the enemy last looked at, else the busiest one. */
+	public function showEnemies():Void {
+		var name = lastEnemy != null ? lastEnemy : analysis != null && analysis.enemyList.length > 0 ? analysis.enemyList[0].name : null;
+		view = VIEW_ENEMY; enemy = name; reset();
 	}
-	public function filter():String { var value = filters.get(key()); return value != null ? value : ""; }
-	public function setFilter(value:String):Void { filters.set(key(), value); revision++; }
-	public function selectRow(row:Int):Void selections.set(key(), row);
-	public function rowSelected(row:Int):Bool return selections.exists(key()) && selections.get(key()) == row;
-	public function eventRows():Array<CombatLogEvent> {
-		if (analysis == null) return [];
-		return switch (page) {
-			case "enemy": analysis.castsBy(enemy);
-			case "skill": skill != null ? skill.events : [];
-			case "damage": hit != null ? [hit] : [];
-			default: tab == "Enemies" ? analysis.enemyCasts : tab == "Damage taken" ? analysis.damageTaken : [];
-		};
+	public function selectMine():Void { view = VIEW_MINE; enemy = null; reset(); }
+	public function selectDamage():Void { view = VIEW_DAMAGE; enemy = null; reset(); }
+	public function selectSets():Void { view = VIEW_SETS; enemy = null; reset(); }
+	public function setHealthPercent(value:Int):Void {
+		var next = value < 5 ? 5 : value > 95 ? 95 : value;
+		if (next != healthPercent) { healthPercent = next; revision++; }
 	}
-	public function skillRows():Array<CombatLogSkillStats> {
+	function reset():Void { expanded = ""; filter = ""; revision++; }
+
+	public function toggleExpanded(key:String):Void { expanded = expanded == key ? "" : key; revision++; }
+	public function setFilter(value:String):Void { if (value == filter) return; filter = value; revision++; }
+	public function setStyle(value:String):Void { if (STYLES.indexOf(value) >= 0 && value != style) { style = value; revision++; } }
+
+	public function isPicked(key:String):Bool return picks.exists(key);
+	public function togglePick(key:String):Void { if (picks.exists(key)) picks.remove(key); else picks.set(key, true); revision++; }
+	public function pickAll(keys:Array<String>):Void { for (k in keys) picks.set(k, true); revision++; }
+	public function clearPicks():Void { picks = new Map(); revision++; }
+	public function pickedCount():Int { var n = 0; for (_ in picks.keys()) n++; return n; }
+
+	/** The ticked abilities of the open enemy, in recorded order. */
+	public function pickedAbilities():Array<CombatLogSkillStats> {
+		if (analysis == null || enemy == null) return [];
+		return [for (stats in analysis.abilitiesOf(enemy)) if (picks.exists(stats.key)) stats];
+	}
+
+	public function abilities():Array<CombatLogSkillStats> {
 		if (analysis == null) return [];
-		return page == "enemy" ? analysis.skillsBy(enemy) : page == "recording" && tab == "Me" ? analysis.mySkills : [];
+		return view == VIEW_ENEMY && enemy != null ? analysis.abilitiesOf(enemy) : view == VIEW_MINE ? analysis.mySkills : [];
 	}
 }

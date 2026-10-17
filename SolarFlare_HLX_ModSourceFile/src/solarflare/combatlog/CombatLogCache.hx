@@ -508,6 +508,7 @@ class CombatLogCache {
 		var shown = solarflare.EngineSkillId.display(sid);
 		var line = new CombatLogLine();
 		line.kind = kind;
+		line.identityGen = HealthCache.identityGen;
 		line.skillId = sid;
 		line.skillName = shown.length > 0 ? shown : sid;
 		line.skillLabel = line.skillName;
@@ -561,6 +562,10 @@ class CombatLogCache {
 				} catch (_:Dynamic) {}
 				try line.physical = dr.get_isPhysical() catch (_:Dynamic) {}
 				try line.magic = dr.get_isMagic() catch (_:Dynamic) {}
+				try {
+					line.isDoT = dr.get_isDoT();
+					line.isDoTKnown = true;
+				} catch (_:Dynamic) {}
 				try line.auto = dr.get_isBaseAttack() catch (_:Dynamic) {}
 				var aff = dr.affinity;
 				if (aff != null && isPlainName(aff))
@@ -673,6 +678,8 @@ class CombatLogCache {
 	static function commitNow(line:CombatLogLine):Void {
 		stampRift(line);
 		line.sequence = ++latestSequence;
+		// Independent subscriber: consume once before the shared history can roll over.
+		solarflare.hemorrhage.HemorrhageService.consume(line);
 		if (line.kind != KIND_ENCOUNTER) {
 			if (lines.length < CAP) {
 				lines.push(line);

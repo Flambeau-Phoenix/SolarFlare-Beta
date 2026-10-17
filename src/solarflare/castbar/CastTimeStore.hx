@@ -1,12 +1,11 @@
 package solarflare.castbar;
 
-import haxe.crypto.Sha256;
 import haxe.io.Path;
 import sys.FileSystem;
 import sys.io.File;
 
 /**
- * Cached learned evidence, with staged validation and content-verified replacement backups.
+ * Cached learned evidence, with staged validation. No backup copies are written.
  *
  * v4.1b: the release runs this with persist=false (session-only). The on-disk cache never loaded across
  * restarts in practice (the final rename failed), so it is deleted from users' installs in bounded steps
@@ -19,10 +18,6 @@ class CastTimeStore {
 	public var compatible(default, null):Bool = false;
 	public var canLearn(default, null):Bool = false;
 	public var loadedEvidence(default, null):String = null;
-	/** Content-hash backups kept per store (main file and abandoned stage together); older ones are pruned. */
-	static inline var MAX_BACKUPS = 20;
-	/** Bounds one prune pass so a large legacy pile is cleared over several flushes, never in one stall. */
-	static inline var MAX_PRUNE_PER_CALL = 200;
 	/** Bounds one legacy-cache purge pass so a large pile is cleared over several ticks, never in one stall. */
 	static inline var MAX_PURGE_PER_CALL = 100;
 	var path:String;
@@ -60,14 +55,9 @@ class CastTimeStore {
 			if (!FileSystem.exists(parent)) FileSystem.createDirectory(parent);
 			var staged = path + ".staged";
 			var json = book.toJson();
-			// Preserve an abandoned stage as well; every replacement keeps complete content.
-			if (FileSystem.exists(staged)) backup(staged);
 			File.saveContent(staged, json);
 			if (File.getContent(staged) != json || CastTimeBook.fromJson(File.getContent(staged)).sourceFingerprint != book.sourceFingerprint)
 				throw "Staged cast-time validation failed";
-			var originalHash:String = null;
-			if (FileSystem.exists(path)) originalHash = backup(path);
-			if (originalHash != null && Sha256.make(File.getBytes(path)).toHex() != originalHash) throw "Cast-time file changed during replacement";
 			// Native rename replaces atomically; failure leaves the existing destination intact.
 			FileSystem.rename(staged, path);
 			book.markSaved(); compatible = true; loadedEvidence = json; lastError = "";
@@ -103,41 +93,5 @@ class CastTimeStore {
 	static function isCacheFamily(name:String, stem:String):Bool {
 		if (name == stem || name == stem + ".staged") return true;
 		return StringTools.startsWith(name, stem + ".") && StringTools.endsWith(name, ".bak") && name.indexOf(".sha256-") > 0;
-	}
-	function backup(source:String):String {
-		var bytes = File.getBytes(source);
-		var hash = Sha256.make(bytes).toHex();
-		var destination = source + ".sha256-" + hash + ".bak";
-		var created = !FileSystem.exists(destination);
-		if (created) File.saveBytes(destination, bytes);
-		if (Sha256.make(File.getBytes(destination)).toHex() != hash) throw "Cast-time backup verification failed";
-		if (created) pruneBackups(Path.withoutDirectory(destination));
-		return hash;
-	}
-	/** Keeps the newest MAX_BACKUPS `<file>[.staged].sha256-*.bak` files; the one just written is never removed. Best effort. */
-	function pruneBackups(justWritten:String):Void {
-		try {
-			var dir = Path.directory(path);
-			var stem = Path.withoutDirectory(path) + ".";
-			var found:Array<{name:String, time:Float}> = [];
-			for (name in FileSystem.readDirectory(dir == "" ? "." : dir)) {
-				if (!StringTools.startsWith(name, stem) || !StringTools.endsWith(name, ".bak") || name.indexOf(".sha256-") < 0) continue;
-				found.push({name: name, time: FileSystem.stat(dir == "" ? name : dir + "/" + name).mtime.getTime()});
-			}
-			if (found.length <= MAX_BACKUPS) return;
-			found.sort(function(a, b) {
-				if (a.name == justWritten) return -1;
-				if (b.name == justWritten) return 1;
-				if (a.time != b.time) return a.time > b.time ? -1 : 1;
-				return a.name > b.name ? -1 : (a.name < b.name ? 1 : 0);
-			});
-			var removed = 0;
-			var i = MAX_BACKUPS;
-			while (i < found.length && removed < MAX_PRUNE_PER_CALL) {
-				try FileSystem.deleteFile(dir == "" ? found[i].name : dir + "/" + found[i].name) catch (_:Dynamic) {}
-				removed++;
-				i++;
-			}
-		} catch (_:Dynamic) {}
 	}
 }

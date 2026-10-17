@@ -75,6 +75,12 @@ class HudChrome {
 	public var itemContextMenus:Bool = false;
 	public var winW:Single = 0;
 	public var winH:Single = 0;
+	/** Last on-screen window origin, written by the window wrapper; siblings (the target cast strip) anchor to it. */
+	public var winX:Single = 0;
+	public var winY:Single = 0;
+	/** Invisible chrome (footer, padding) that may hang past the far screen edge; set by the window wrapper. */
+	public var overhangX:Single = 0;
+	public var overhangY:Single = 0;
 	/** Draw-only expansion around an Aura face; persisted x/y keep their legacy anchor. */
 	public var visualOffsetX:Single = 0;
 	public var visualOffsetY:Single = 0;
@@ -303,8 +309,21 @@ class HudChrome {
    positionEpoch=viewportEpoch; posDirty=true;
   }
   if(referenceWidth<320 || referenceHeight<240) { referenceWidth=viewportWidth; referenceHeight=viewportHeight; }
-  screenX=originX+HudCoordinates.project(x.get(),referenceWidth,viewportWidth,winW,visualOffsetX);
-  screenY=originY+HudCoordinates.project(y.get(),referenceHeight,viewportHeight,winH,visualOffsetY);
+  screenX=originX+HudCoordinates.project(x.get(),referenceWidth,viewportWidth,winW,visualOffsetX,overhangX);
+  screenY=originY+HudCoordinates.project(y.get(),referenceHeight,viewportHeight,winH,visualOffsetY,overhangY);
+ }
+
+ /**
+  * Window position kept inside the exact bounds the locked projection uses, so a spot reached by dragging can
+  * never be moved by locking. Unbound chromes (editors) pass through unchanged.
+  */
+ function clampDrag(nx:Float,ny:Float):ImVec2 {
+  if(!bindPos) return ImGui.vec2(nx,ny);
+  var ax=HUDVisualBounds.anchorCoordinate(nx,visualOffsetX)-originX;
+  var ay=HUDVisualBounds.anchorCoordinate(ny,visualOffsetY)-originY;
+  var cx=HudCoordinates.project(ax,0,viewportWidth,winW,visualOffsetX,overhangX);
+  var cy=HudCoordinates.project(ay,0,viewportHeight,winH,visualOffsetY,overhangY);
+  return ImGui.vec2(HUDVisualBounds.hostCoordinate(cx+originX,visualOffsetX),HUDVisualBounds.hostCoordinate(cy+originY,visualOffsetY));
  }
 
  /** Native/ImGui automatic movement is not a user layout edit. Custom drags commit explicitly. */
@@ -354,7 +373,7 @@ class HudChrome {
 			return false;
 		// Keep a typed value on screen; applyPos would otherwise snap an out-of-range one to a default.
 		var extent = viewportExtent();
-		var limit = (horizontal ? extent.x : extent.y) - 40;
+		var limit = horizontal ? extent.x - Math.max(40, winW - overhangX) : extent.y - Math.max(40, winH - overhangY);
 		var value = ref.get();
 		if (!Math.isFinite(value))
 			value = 0;
@@ -683,10 +702,9 @@ class HudChrome {
 				activeSurfaceDragId = null;
 				return;
 			}
-			var nx:Single = mouse.x - surfaceGrabX;
-			var ny:Single = mouse.y - surfaceGrabY;
-			setDisplayPosition(HUDVisualBounds.anchorCoordinate(nx,visualOffsetX),HUDVisualBounds.anchorCoordinate(ny,visualOffsetY));
-			ImGui.setWindowPos(ImGui.vec2(nx, ny));
+			var placed = clampDrag(mouse.x - surfaceGrabX, mouse.y - surfaceGrabY);
+			setDisplayPosition(HUDVisualBounds.anchorCoordinate(placed.x,visualOffsetX),HUDVisualBounds.anchorCoordinate(placed.y,visualOffsetY));
+			ImGui.setWindowPos(placed);
 			SettingsStore.markDirty();
 			return;
 		}
@@ -763,10 +781,9 @@ class HudChrome {
 			}
 			if (ImGui.isMouseDragging(ImGuiMouseButton.Left, 4) && !isLocked()) {
 				didDrag = true;
-				var nx = m.x - dragOffX;
-				var ny = m.y - dragOffY;
-				setDisplayPosition(HUDVisualBounds.anchorCoordinate(nx,visualOffsetX),HUDVisualBounds.anchorCoordinate(ny,visualOffsetY));
-				ImGui.setWindowPos(ImGui.vec2(nx, ny));
+				var placed = clampDrag(m.x - dragOffX, m.y - dragOffY);
+				setDisplayPosition(HUDVisualBounds.anchorCoordinate(placed.x,visualOffsetX),HUDVisualBounds.anchorCoordinate(placed.y,visualOffsetY));
+				ImGui.setWindowPos(placed);
 				SettingsStore.markDirty();
 			}
 		}

@@ -10,6 +10,7 @@ import solarflare.geaux.GeauxConfig;
 import solarflare.geaux.GeauxBuilder;
 import solarflare.getrifty.GetRifty;
 import solarflare.lightsaber.Lightsaber;
+import solarflare.loot.LootBrowser;
 import solarflare.notebook.Notebook;
 import solarflare.resourcetracker.ResourceTrackerBuilder;
 import solarflare.target.TargetConfig;
@@ -54,6 +55,7 @@ class ConfigPanel {
 	static inline var TAB_SETTINGS:Int = 13;
 	static inline var TAB_UTILITIES:Int = 14;
 	static inline var TAB_NATIVE_UI:Int = 15;
+	static inline var TAB_LOOT:Int = 16;
 	public var open:BoolRef;
 	public var vitals:VitalsConfig;
 	public var uiPack:UiPackConfig;
@@ -66,10 +68,12 @@ class ConfigPanel {
 	public var combo:ComboConfig;
 	public var chaincast:ChaincastConfig;
 	public var conduit:ConduitConfig;
+	public var hemorrhage:solarflare.hemorrhage.HemorrhageConfig;
 	public var combatLog:CombatLogConfig;
 	public var target:TargetConfig;
 	public var castBar:CastBarConfig;
 	public var notebook:Notebook;
+	public var lootBrowser:LootBrowser;
 	public var launchers:HudLaunchers;
 	public var auras:solarflare.aura.AuraConfig;
 	public var lightsaber:LightsaberConfig;
@@ -155,10 +159,12 @@ class ConfigPanel {
 		combo = new ComboConfig();
 		chaincast = new ChaincastConfig();
 		conduit = new ConduitConfig();
+		hemorrhage = new solarflare.hemorrhage.HemorrhageConfig();
 		combatLog = new CombatLogConfig();
 		target = new TargetConfig();
 		castBar = new CastBarConfig();
 		notebook = new Notebook();
+		lootBrowser = new LootBrowser();
 		launchers = new HudLaunchers();
 		auras = new solarflare.aura.AuraConfig();
 		lightsaber = new LightsaberConfig();
@@ -210,7 +216,6 @@ class ConfigPanel {
 	function rebuildInteractiveRegistry():Void {
 		interactiveOpenRefs = [];
 		registerInteractive(open);
-		registerInteractive(uiLayouts.open);
 		registerInteractive(dbgMetrics);
 		registerInteractive(dbgLog);
 		registerInteractive(solarflare.debug.DebugSystem.open);
@@ -219,15 +224,20 @@ class ConfigPanel {
 		registerInteractive(solarflare.debug.ResolutionLedger.enabled);
 		#end
 		if (resourceTracker != null) registerInteractive(resourceTracker.open);
+		if (hemorrhage != null) registerInteractive(hemorrhage.tool.open);
 		if (geauxBuilder != null) registerInteractive(geauxBuilder.open);
 		if (auraBuilder != null) registerInteractive(auraBuilder.open);
 		if (extraBarsPrototype != null) registerInteractive(extraBarsPrototype.open);
 		if (barter != null && barter.config != null) registerInteractive(barter.config.open);
 		if (notebook != null) registerInteractive(notebook.open);
+		if (lootBrowser != null) registerInteractive(lootBrowser.open);
 		if (vitals != null) registerInteractive(vitals.open);
 		if (geaux != null) registerInteractive(geaux.open);
 		if (combo != null) registerInteractive(combo.open);
-		if (chaincast != null) registerInteractive(chaincast.open);
+		if (chaincast != null) {
+			registerInteractive(chaincast.open);
+			for (m in chaincast.modules.all) registerInteractive(m.open);
+		}
 		if (conduit != null) registerInteractive(conduit.open);
 		if (target != null) registerInteractive(target.open);
 		if (castBar != null) registerInteractive(castBar.open);
@@ -273,7 +283,10 @@ class ConfigPanel {
 		if (auraBuilder != null)
 			auraBuilder.clearTransientState();
 		if (extraBarsPrototype != null) extraBarsPrototype.clearTransientState();
+		if (lootBrowser != null) lootBrowser.clearTransientState();
 		if (barter != null) barter.clearTransientState();
+		if (hemorrhage != null) hemorrhage.tool.clearTransientState();
+		if (chaincast != null) chaincast.modules.clearTransientState();
 		uiLayouts.clearTransientState();
 		if (changed) SettingsStore.markDirty();
 	}
@@ -438,7 +451,6 @@ class ConfigPanel {
 			UiScope.guard("Aura Builder", auraBuilder.draw);
 		if (extraBarsPrototype != null)
 			UiScope.guard("ExtraBars", extraBarsPrototype.draw);
-		UiScope.guard("UI Layouts",function() uiLayouts.draw(this));
 		trackProfileWindowState();
 		if (target != null)
 			UiScope.guard("Target Frame", target.draw);
@@ -446,6 +458,8 @@ class ConfigPanel {
 			UiScope.guard("Player Cast Bar", castBar.draw);
 		if (notebook != null)
 			UiScope.guard("Notebook", notebook.draw);
+		if (lootBrowser != null)
+			UiScope.guard("Loot Browser", lootBrowser.draw);
 		if (lightsaber != null)
 			UiScope.guard("Lightsaber", lightsaber.draw);
 	}
@@ -470,6 +484,8 @@ class ConfigPanel {
 				castBar.open.set(true);
 			if (ImGui.menuItem("Notebook"))
 				notebook.open.set(true);
+			if (ImGui.menuItem("Loot Browser"))
+				lootBrowser.open.set(true);
 			if (ImGui.menuItem("Lightsaber"))
 				lightsaber.open.set(true);
 			if (ImGui.menuItem("GetRifty"))
@@ -539,7 +555,7 @@ class ConfigPanel {
 	static var NAV_GROUPS:Array<Array<Int>> = [
 		[TAB_RESOURCES, TAB_GEAUX, TAB_BARTER, TAB_EXTRABARS, TAB_ATTACK, TAB_STATUS, TAB_NATIVE_UI],
 		[TAB_AURAS, TAB_COMBAT_LOG],
-		[TAB_NOTEBOOK, TAB_LIGHTSABER, TAB_THEME, TAB_GETRIFTY, TAB_UTILITIES, TAB_SETTINGS]
+		[TAB_NOTEBOOK, TAB_LOOT, TAB_LIGHTSABER, TAB_THEME, TAB_GETRIFTY, TAB_UTILITIES, TAB_SETTINGS]
 	];
 
 	static function tabLabel(id:Int):String {
@@ -557,6 +573,7 @@ class ConfigPanel {
 			case TAB_GETRIFTY: "GetRifty";
 			case TAB_UTILITIES: "Utilities";
 			case TAB_NATIVE_UI: "Native UI";
+			case TAB_LOOT: "Loot Browser";
 			case TAB_SETTINGS: "Hub Settings";
 			default: "Status Board";
 		}
@@ -618,6 +635,7 @@ class ConfigPanel {
 	/** Selecting a module also opens the editors that are their own window. */
 	function onModuleChosen(id:Int):Void {
 		if (id == TAB_NOTEBOOK) notebook.open.set(true);
+		if (id == TAB_LOOT) lootBrowser.open.set(true);
 		if (id == TAB_EXTRABARS) extraBarsPrototype.open.set(true);
 		if (id == TAB_BARTER && barter != null) barter.config.open.set(true);
 	}
@@ -703,7 +721,7 @@ class ConfigPanel {
 			case TAB_AURAS: if (auraBuilder != null) auraBuilder.open.set(true);
 			case TAB_LIGHTSABER: if (lightsaber != null) lightsaber.open.set(true);
 			case TAB_ATTACK: if (resourceTracker != null) resourceTracker.openFor("attack");
-			case TAB_NOTEBOOK | TAB_EXTRABARS | TAB_BARTER:
+			case TAB_NOTEBOOK | TAB_LOOT | TAB_EXTRABARS | TAB_BARTER:
 			default: setRail(false);
 		}
 	}
@@ -798,6 +816,10 @@ class ConfigPanel {
 				drawUtilities();
 			case TAB_NATIVE_UI:
 				NativeUiPanel.draw(nativeHide);
+			case TAB_LOOT:
+				if (drawModuleHeader("Loot Browser", solarflare.cdb.LootCatalog.tables.length + " loot tables / " + solarflare.cdb.LootCatalog.items.length + " items", "Open browser", "tab_loot_open"))
+					lootBrowser.open.set(true);
+				ImGui.textWrapped("Search every CDB loot table and item, with thumbnails, drop chances and which units use each table.");
 			case TAB_SETTINGS:
 				drawHubSettings();
 			default:
@@ -816,6 +838,8 @@ class ConfigPanel {
 					SettingsStore.markDirty();
 			}, "Enable the aura system, then open the builder to create auras.");
 		});
+		UiChrome.subHeader("Aura Sets");
+		auraBuilder.drawSetSwitches("auras");
 		UiChrome.subHeader("Status countdowns");
 		UiLayout.propertyGrid("##tab_aura_countdown", function() {
 			UiLayout.propertyRow("Every status", function() {
@@ -901,15 +925,7 @@ class ConfigPanel {
 			}
 		});
 
-		UiChrome.subHeader("Input");
-		UiLayout.propertyGrid("##hub_input_properties",function() {
-			UiLayout.propertyRow("Fullscreen shortcut",function() {
-				if(ImGui.checkbox("Prevent accidental Ctrl+F fullscreen toggle##sf_ctrl_f",preventCtrlFullscreen)) SettingsStore.markDirty();
-			},"Consumes exactly Ctrl+F during gameplay. Other fullscreen controls remain available.");
-   if(preventCtrlFullscreen.get() && FullscreenShortcutGuard.status<0) ImGui.textDisabled("Ctrl+F guard unavailable: update sfcursor.hdll and restart Farever.");
-		});
 		UiChrome.subHeader("Workspace and docking");
-		if(UiChrome.ghostButton("UI Layouts##sf_ui_layouts",ImGui.vec2(150,28))) uiLayouts.open.set(true);
 		UiLayout.propertyGrid("##hub_workspace_props", function() {
 			UiLayout.propertyRow("Geometry", function() {
 				if (ImGui.checkbox("Remember F6 position/size##hub_remember", rememberHubLayout))
@@ -934,7 +950,6 @@ class ConfigPanel {
 		});
 
 		UiChrome.subHeader("Diagnostics");
-		ImGui.textWrapped("Font/style stacks are global with other HLX mods. Latin/Greek/Cyrillic is bundled.");
 		var tools:Array<{label:String, ref:BoolRef}> = [
 			{label: "Perf monitor", ref: solarflare.ui.PerformanceMonitor.open},
 			{label: "Metrics", ref: dbgMetrics},
@@ -955,34 +970,6 @@ class ConfigPanel {
 				ImGui.checkbox("Resolution ledger##sf_ledger", solarflare.debug.ResolutionLedger.enabled);
 			}, "Panel open is session-only. Recording never auto-starts. JSONL: hlx/mods/solarflare/logs/");
 			#end
-			UiLayout.propertyRow("Status", function() {
-				ImGui.pushTextWrapPos(0);
-				ImGui.textDisabled(solarflare.geaux.GeauxBar.lastStatus);
-				ImGui.popTextWrapPos();
-			});
-			UiLayout.propertyRow("Bindings", function() {
-				UiLayout.inlinePair(
-					"##hub_bindings_actions",
-					function(w:Single) {
-						if (ImGui.button("Read bindings##sf_read_bindings", ImGui.vec2(w, 26)))
-							UiActionQueue.custom(BindingInventory.capture);
-					},
-					function(w:Single) {
-						if (ImGui.button("Copy table##sf_copy_bindings", ImGui.vec2(w, 26)))
-							UiActionQueue.copyText(BindingInventory.table(), "Binding table copied");
-					}
-				);
-			}, "Reads the game's effective keybinds, including modifier and mode, for planning. Saved to logs/bindings.json.");
-			UiLayout.propertyRow("Result", function() {
-				ImGui.pushTextWrapPos(0);
-				ImGui.textDisabled(BindingInventory.status);
-				ImGui.popTextWrapPos();
-			});
-			UiLayout.propertyRow("Icons", function() {
-				ImGui.pushTextWrapPos(0);
-				ImGui.textDisabled(solarflare.ui.GameIcons.statusLine());
-				ImGui.popTextWrapPos();
-			});
 		});
 		#if solarflare_telemetry
 		if (solarflare.debug.FieldWalkLog.lastPath.length > 0)
@@ -1004,6 +991,7 @@ class ConfigPanel {
 		if (attackCombo != null) items.push({id: "attack", label: "Combo Tracker", hidden: attackCombo.hidden});
 		if (chaincast != null) items.push({id: "chaincast", label: "Chaincast", hidden: chaincast.hidden});
 		if (conduit != null) items.push({id: "conduit", label: "Conduits", hidden: conduit.hidden});
+		if (hemorrhage != null) items.push({id: "hemorrhage", label: "Hemorrhage", hidden: hemorrhage.hidden});
 		if (target != null) items.push({id: "target", label: "Target Frame", hidden: target.hidden});
 		if (castBar != null) items.push({id: "castbar", label: "Player Cast Bar", hidden: castBar.hidden});
 		if (statusBoard != null) items.push({id: "statuses", label: "Status Board", hidden: statusBoard.config.hidden});
@@ -1039,10 +1027,13 @@ class ConfigPanel {
 		solarflare.ui.UtilitiesPanel.drawAutoHide();
 		UiChrome.subHeader("Native UI");
 		solarflare.ui.UtilitiesPanel.drawNativeBottomBar(nativeHide);
-		if (UiChrome.ghostButton("More native pieces...##util_native_more", ImGui.vec2(190, 26))) {
-			activeHubTab = TAB_NATIVE_UI;
-			SettingsStore.markDirty();
-		}
+		if (ImGui.collapsingHeader("Individual native elements##util_native_more")) NativeUiPanel.drawElements(nativeHide,"utilities");
+		UiChrome.subHeader("Combat recording");
+		UtilitiesPanel.drawCombatRecording(auraBuilder.openCombatLogsWindow);
+		UiChrome.subHeader("Alignment grid");
+		AlignmentGrid.drawSettings("utilities");
+		UiChrome.subHeader("Fullscreen shortcut");
+		UtilitiesPanel.drawFullscreenShortcut(preventCtrlFullscreen);
 		UiChrome.subHeader("Ground skills");
 		UiLayout.propertyGrid("##hub_res_aim", function() {
 			UiLayout.propertyRow("Instant cast", function() {
@@ -1087,7 +1078,7 @@ class ConfigPanel {
 	public function applyProfileUiTab(value:Int):Void {
 		if (value == TAB_NATIVE)
 			activeHubTab = TAB_RESOURCES;
-		else if (value >= TAB_RESOURCES && value <= TAB_NATIVE_UI)
+		else if (value >= TAB_RESOURCES && value <= TAB_LOOT)
 			activeHubTab = value;
 	}
 

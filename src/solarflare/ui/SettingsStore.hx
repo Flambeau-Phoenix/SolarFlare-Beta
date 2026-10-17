@@ -15,7 +15,7 @@ import imgui.ImGui;
  * Persist SolarFlare layout + toggles next to the installed mod.
  */
 class SettingsStore {
-	static inline var VERSION:Int = 30;
+	static inline var VERSION:Int = 33;
 	static inline var TMP_SUFFIX:String = ".tmp";
 	static inline var PREV_SUFFIX:String = ".prev";
 	static var dirty = false;
@@ -26,6 +26,12 @@ class SettingsStore {
 	static var lastCfg:ConfigPanel = null;
 	static var lastSaveMs:Float = 0;
 	static var lastEditMs:Float = 0;
+	/** First unsaved edit since the last good save; bounds how long a debounce can defer a write. */
+	static var dirtySinceMs:Float = 0;
+	/** A save is synchronous on the render thread (stringify, write, re-parse, rename): wait for edits to settle. */
+	static inline var QUIET_MS:Float = 1500;
+	static inline var MIN_GAP_MS:Float = 4000;
+	static inline var MAX_DEFER_MS:Float = 30000;
 	static var activeTheme:String = "purple_gold";
 	static var lastCaptureWarning:String = "";
 
@@ -70,8 +76,11 @@ class SettingsStore {
 	static var combatMigrated = false;
 
 	public static function markDirty():Void {
+		var stamp = haxe.Timer.stamp() * 1000;
+		if (!dirty || dirtySinceMs <= 0)
+			dirtySinceMs = stamp;
 		dirty = true;
-		lastEditMs = haxe.Timer.stamp() * 1000;
+		lastEditMs = stamp;
 		try
 			solarflare.ObserveDemand.markStatusDemandDirty()
 		catch (_:Dynamic) {}
@@ -90,23 +99,19 @@ class SettingsStore {
 		var path = jsonPath();
 		if (path == null)
 			return;
-		// Newest first: a crash mid-save leaves the verified .tmp, or only .prev if it hit between renames.
-		var raw:String = null;
+		deleteLegacyBackups(path);
+		// A crash between deleting the old file and renaming the verified .tmp leaves only the .tmp.
 		var data:Dynamic = null;
 		var source:String = null;
-		for (candidate in [path, path + TMP_SUFFIX, path + PREV_SUFFIX]) {
+		for (candidate in [path, path + TMP_SUFFIX]) {
 			var text = readText(candidate);
 			if (text == null || text.length == 0)
 				continue;
 			try {
 				data = haxe.Json.parse(text);
-				raw = text;
 				source = candidate;
 				break;
-			} catch (_:Dynamic) {
-				if (candidate == path)
-					preserveUnreadable(path, text);
-			}
+			} catch (_:Dynamic) {}
 		}
 		if (data == null)
 			return;
@@ -116,8 +121,6 @@ class SettingsStore {
 		}
 		try {
 			var oldVersion = readVersion(data);
-			if (oldVersion < VERSION)
-				backupBeforeMigration(path, raw, oldVersion);
 			apply(cfg, data);
 			FeatureProfiles.load(cfg, data);
 			if (oldVersion < VERSION) dirty = true;
@@ -131,10 +134,35 @@ class SettingsStore {
 			try
 				solarflare.ObserveDemand.markStatusDemandDirty()
 			catch (_:Dynamic) {}
-		} catch (_:Dynamic) {
-			// A partial apply would be saved over the user's file on the next edit; keep the original.
-			preserveUnreadable(source, raw);
+		} catch (e:Dynamic) {
+			// A partial apply would be saved over the user's file on the next edit; leave the file untouched.
+			saveBlocked = true;
+			ToastManager.error("SolarFlare settings could not be loaded (" + Std.string(e)
+				+ "). Saving is off this session so the file is left as it is.", 8.0);
 		}
+	}
+
+	/** Earlier builds left `<file>.prev`, `<file>.unreadable-*.bak` and `<file>.v<N>.bak` beside the settings; nothing writes them now. */
+	static function deleteLegacyBackups(path:String):Void {
+		try {
+			var dir = haxe.io.Path.directory(path);
+			var scan = dir == "" ? "." : dir;
+			var stem = haxe.io.Path.withoutDirectory(path);
+			var removed = 0;
+			for (name in sys.FileSystem.readDirectory(scan)) {
+				if (removed >= 100)
+					break;
+				if (!StringTools.startsWith(name, stem + "."))
+					continue;
+				var tail = name.substr(stem.length);
+				var legacy = tail == PREV_SUFFIX
+					|| StringTools.endsWith(tail, ".bak") && (StringTools.startsWith(tail, ".unreadable-") || ~/^\.v[0-9]+\.bak$/.match(tail));
+				if (!legacy)
+					continue;
+				try sys.FileSystem.deleteFile(dir == "" ? name : dir + "/" + name) catch (_:Dynamic) {}
+				removed++;
+			}
+		} catch (_:Dynamic) {}
 	}
 
 	static function readText(path:String):String {
@@ -144,22 +172,6 @@ class SettingsStore {
 			return sys.io.File.getContent(path);
 		} catch (_:Dynamic) {
 			return null;
-		}
-	}
-
-	/** Copy a settings file that could not be loaded before any save is allowed to replace it. */
-	static function preserveUnreadable(path:String, raw:String):Void {
-		if (path == null || raw == null || raw.length == 0)
-			return;
-		var copy = path + ".unreadable-" + DateTools.format(Date.now(), "%Y%m%d-%H%M%S") + ".bak";
-		try {
-			sys.io.File.saveContent(copy, raw);
-			ToastManager.error("SolarFlare settings could not be loaded. A copy was kept as "
-				+ haxe.io.Path.withoutDirectory(copy) + ".", 6.0);
-		} catch (_:Dynamic) {
-			// No copy exists, so this session must not overwrite the only one.
-			saveBlocked = true;
-			ToastManager.error("SolarFlare settings could not be loaded or backed up; saving is off until restart.", 8.0);
 		}
 	}
 
@@ -173,24 +185,16 @@ class SettingsStore {
 		}
 	}
 
-	/** One recoverable copy per source schema; legacy fields remain accepted on load. */
-	static function backupBeforeMigration(path:String, raw:String, oldVersion:Int):Void {
-		if (path == null || path.length == 0 || raw == null)
-			return;
-		try {
-			var backup = path + ".v" + oldVersion + ".bak";
-			if (!sys.FileSystem.exists(backup))
-				sys.io.File.saveContent(backup, raw);
-		} catch (_:Dynamic) {}
-	}
-
 	public static function tick(?cfg:ConfigPanel):Void {
 		tryLoadIni();
 		var target = cfg != null ? cfg : lastCfg;
 		if (!dirty || target == null)
 			return;
 		var now = haxe.Timer.stamp() * 1000;
-		if (now - lastEditMs < 500 || now - lastSaveMs < 300 || now < retryAtMs)
+		if (dirtySinceMs <= 0)
+			dirtySinceMs = now;
+		var overdue = now - dirtySinceMs >= MAX_DEFER_MS;
+		if (now < retryAtMs || (!overdue && (now - lastEditMs < QUIET_MS || now - lastSaveMs < MIN_GAP_MS)))
 			return;
 		save(target);
 	}
@@ -224,6 +228,7 @@ class SettingsStore {
 			haxe.Json.parse(sys.io.File.getContent(tmp));
 			replaceWith(tmp, path);
 			dirty = false;
+			dirtySinceMs = 0;
 			lastSaveMs = haxe.Timer.stamp() * 1000;
 			failCount = 0;
 			retryAtMs = 0;
@@ -243,16 +248,12 @@ class SettingsStore {
 	}
 
 	/**
-	 * Rename can't overwrite on Windows, so the old file steps aside to .prev first.
-	 * Every crash point leaves the old file, the verified .tmp, or both; load() checks all three.
+	 * Rename can't overwrite on Windows, so the old file is deleted once the verified .tmp is on disk.
+	 * Every crash point leaves the old file or the verified .tmp; load() checks both. No backup file is kept.
 	 */
 	static function replaceWith(tmp:String, path:String):Void {
-		if (sys.FileSystem.exists(path)) {
-			var prev = path + PREV_SUFFIX;
-			if (sys.FileSystem.exists(prev))
-				sys.FileSystem.deleteFile(prev);
-			sys.FileSystem.rename(path, prev);
-		}
+		if (sys.FileSystem.exists(path))
+			sys.FileSystem.deleteFile(path);
 		sys.FileSystem.rename(tmp, path);
 	}
 
@@ -296,6 +297,7 @@ class SettingsStore {
 		assignDump(data, "combo", function() return comboDump(cfg.combo));
 		assignDump(data, "chaincast", function() return chaincastDump(cfg.chaincast));
 		assignDump(data, "conduit", function() return conduitDump(cfg.conduit));
+		assignDump(data, "hemorrhage", function() return hemorrhageDump(cfg.hemorrhage));
 		assignDump(data, "attackCombo", function() return attackComboDump(cfg.attackCombo));
 		assignDump(data, "resourceTracker", function() return resourceTrackerDump(cfg));
 		assignDump(data, "clog", function() return clogDump(cfg.combatLog));
@@ -305,6 +307,7 @@ class SettingsStore {
 		assignDump(data, "saber", function() return saberDump(cfg.lightsaber));
 		assignDump(data, "auras", function() return aurasDump(cfg.auras));
 		assignDump(data, "hideAll", hideAllDump);
+		assignDump(data, "alignGrid", AlignmentGrid.dump);
 		assignDump(data, "universalProfiles", function() return FeatureProfiles.dump());
 		assignDump(data, "hub", function() return {
 			w: cfg.hubW != null ? cfg.hubW.get() : 360,
@@ -526,6 +529,23 @@ class SettingsStore {
 		};
 	}
 
+	public static function hemorrhageDump(c:solarflare.hemorrhage.HemorrhageConfig):Dynamic {
+		return c == null ? {} : {hidden:c.hidden.get(),autoScroll:c.autoScroll.get(),floatingText:c.floatingText.get(),
+			textSize:c.textSize.get(),textLifetime:c.textLifetime.get(),w:c.width.get(),h:c.height.get(),chrome:chromeDump(c.chrome)};
+	}
+
+	public static function applyHemorrhage(c:solarflare.hemorrhage.HemorrhageConfig,data:Dynamic):Void {
+		if(c==null) return;
+		if(data==null) { c.hidden.set(true); c.autoScroll.set(true); c.floatingText.set(false); return; }
+		setBool(c.hidden,data.hidden); setBool(c.autoScroll,data.autoScroll); setBool(c.floatingText,data.floatingText);
+		setFloat(c.textSize,data.textSize); setFloat(c.textLifetime,data.textLifetime);
+		setFloat(c.width,data.w); setFloat(c.height,data.h);
+		c.textSize.set(Math.max(12,Math.min(28,c.textSize.get())));
+		c.textLifetime.set(Math.max(0.5,Math.min(3,c.textLifetime.get())));
+		c.width.set(Math.max(300,Math.min(1600,c.width.get()))); c.height.set(Math.max(150,Math.min(1200,c.height.get())));
+		applyChrome(c.chrome,data.chrome); c.sizeDirty=true;
+	}
+
 	public static function chaincastDump(c:ChaincastConfig):Dynamic {
 		if (c == null)
 			return {};
@@ -555,8 +575,47 @@ class SettingsStore {
 			spend: spend,
 			style: c.style.get(),
 			showStackBadge: c.showStackBadge.get(),
-			chrome: chromeDump(c.chrome)
+			chrome: chromeDump(c.chrome),
+			modules: chaincastModulesDump(c.modules)
 		};
+	}
+
+	/** Chaincast module windows: one entry per module key; chrome carries position, lock and transparency. */
+	static function chaincastModulesDump(ms:solarflare.chaincast.ChaincastModules):Dynamic {
+		var out:Dynamic = {};
+		if (ms == null)
+			return out;
+		for (m in ms.all)
+			Reflect.setField(out, m.key, {
+				hidden: m.hidden.get(),
+				w: m.width.get(),
+				h: m.height.get(),
+				style: m.style.get(),
+				autoHide: m.autoHide.get(),
+				opt: m.opt.get(),
+				chrome: chromeDump(m.chrome)
+			});
+		return out;
+	}
+
+	/** A module absent from the data (older profile) returns to its defaults instead of keeping the previous profile's values. */
+	static function applyChaincastModules(ms:solarflare.chaincast.ChaincastModules, data:Dynamic):Void {
+		if (ms == null)
+			return;
+		for (m in ms.all) {
+			var d:Dynamic = data != null ? Reflect.field(data, m.key) : null;
+			m.resetDefaults();
+			if (d == null)
+				continue;
+			setBool(m.hidden, d.hidden);
+			setFloat(m.width, d.w);
+			setFloat(m.height, d.h);
+			setInt(m.style, d.style);
+			setBool(m.autoHide, d.autoHide);
+			setBool(m.opt, d.opt);
+			m.sanitize();
+			applyChrome(m.chrome, d.chrome);
+		}
 	}
 
 	static function clogDump(c:CombatLogConfig):Dynamic {
@@ -629,6 +688,7 @@ class SettingsStore {
 			timerBoardRowH: c.timerBoardRowH.get(),
 			timerBoardMax: c.timerBoardMax.get(),
 			list: auraList(c),
+			sets: c.dumpSets(),
 			auraCounter: solarflare.aura.AuraCounterState.dump(c.auras)
 		};
 	}
@@ -675,7 +735,8 @@ class SettingsStore {
 		return {
 			hideAllKey: HideAllBind.choice.get(),
 			hideAllMmb: HideAllBind.middleMouse.get(),
-			autoHideWindows: WindowAutoHide.enabled.get()
+			autoHideWindows: WindowAutoHide.enabled.get(),
+			autoHideCategories: WindowAutoHide.dumpCategories()
 		};
 	}
 
@@ -685,6 +746,7 @@ class SettingsStore {
 		setInt(HideAllBind.choice, data.hideAllKey);
 		setBool(HideAllBind.middleMouse, data.hideAllMmb);
 		setBool(WindowAutoHide.enabled, data.autoHideWindows);
+		WindowAutoHide.applyCategories(Reflect.field(data,"autoHideCategories"));
 	}
 
 	static function chromeDump(c:HudChrome):Dynamic {
@@ -756,6 +818,7 @@ class SettingsStore {
 		applyCombo(cfg.combo, data.combo);
 		applyChaincast(cfg.chaincast, data.chaincast);
 		applyConduit(cfg.conduit, data.conduit);
+		applyHemorrhage(cfg.hemorrhage, data.hemorrhage);
 		applyAttackCombo(cfg.attackCombo, data.attackCombo);
 		applyResourceTracker(cfg, data);
 		applyClog(cfg.combatLog, data.clog);
@@ -765,6 +828,7 @@ class SettingsStore {
 		applyAurasProfile(cfg.auras, data.auras);
 		// Saves written earlier today carry the binding under the old `smartHide` key.
 		applyHideAll(data.hideAll != null ? data.hideAll : data.smartHide);
+		AlignmentGrid.apply(Reflect.field(data, "alignGrid"));
 		if (cfg.launchers != null)
 			cfg.launchers.apply(data.launchers);
 		applyHub(cfg, data.hub);
@@ -920,10 +984,11 @@ class SettingsStore {
 		// Old profiles retain the original rail; invalid future IDs safely fall back.
 		c.style.set(0);
 		setInt(c.style, data.style);
-		if (c.style.get() < 0 || c.style.get() >= solarflare.chaincast.ChaincastRenderer.STYLE_COUNT)
+		if (c.style.get() < 0 || c.style.get() >= solarflare.chaincast.ChaincastRenderer.GRAPHIC_COUNT)
 			c.style.set(0);
 		c.sizeDirty = true;
 		applyChrome(c.chrome, data.chrome);
+		applyChaincastModules(c.modules, Reflect.field(data, "modules"));
 	}
 
 	public static function applyConduit(c:ConduitConfig, data:Dynamic):Void {

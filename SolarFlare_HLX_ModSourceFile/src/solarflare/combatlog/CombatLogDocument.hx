@@ -15,6 +15,8 @@ class CombatLogEvent {
 	public var ms(default, null):Float;
 	public var crit(default, null):Bool;
 	public var kill(default, null):Bool;
+	/** Target health as a 0..1 fraction at the moment of the event, or -1 when the line did not carry one. */
+	public var targetHp(default, null):Float;
 	public function new(row:Int, o:Dynamic) {
 		this.row = row;
 		kind = string(o, "kind"); skill = string(o, "skill"); label = string(o, "skillName");
@@ -22,10 +24,11 @@ class CombatLogEvent {
 		sourceRole = role(o, "sourceRole"); targetRole = role(o, "targetRole");
 		amount = number(o, "amount"); t = number(o, "t", -1); ms = number(o, "ms", -1);
 		crit = flag(o, "crit"); kill = flag(o, "kill");
+		targetHp = number(o, "targetHpPct", -1);
 		if (kind.length == 0) throw "Missing event kind.";
 		// Validate known fields even when they are not used by this browser.
 		for (key in ["sourcePlayer", "targetPlayer", "minion", "affinity"]) string(o, key);
-		for (key in ["block", "targetHp", "targetMaxHp", "targetHpPct"]) number(o, key);
+		for (key in ["block", "targetHp", "targetMaxHp"]) number(o, key);
 		for (key in ["blocked", "physical", "magic", "auto"]) flag(o, key);
 	}
 	static function string(o:Dynamic, key:String):String {
@@ -63,19 +66,29 @@ class CombatLogDocument {
 	public var events(default, null):Array<CombatLogEvent>;
 	public var legacy(default, null):Bool;
 	public var recordedAt(default, null):String;
-	public function new(events:Array<CombatLogEvent>, legacy:Bool, recordedAt:String) {
-		this.events = events.copy(); this.legacy = legacy; this.recordedAt = recordedAt;
+	/** Map the recording was made on; empty for older files or when the map was unknown. */
+	public var mapId(default, null):String;
+	public function new(events:Array<CombatLogEvent>, legacy:Bool, recordedAt:String, mapId:String = "") {
+		this.events = events.copy(); this.legacy = legacy; this.recordedAt = recordedAt; this.mapId = mapId == null ? "" : mapId;
+	}
+	/** Seconds since the first recorded event, or NaN when the clock is unusable (reset, missing, huge). */
+	public function elapsed(event:CombatLogEvent):Float {
+		var first = events.length > 0 ? events[0] : event;
+		var value = event.t >= 0 && first.t >= 0 ? event.t - first.t
+			: event.ms >= 0 && first.ms >= 0 ? (event.ms - first.ms) / 1000 : Math.NaN;
+		// Clock discontinuity: preserve recording order and never fabricate a time.
+		return Math.isFinite(value) && value >= 0 && value <= 214748364.7 ? value : Math.NaN;
 	}
 	public function time(event:CombatLogEvent):String {
-		var first = events.length > 0 ? events[0] : event;
-		var elapsed = event.t >= 0 && first.t >= 0 ? event.t - first.t
-			: event.ms >= 0 && first.ms >= 0 ? (event.ms - first.ms) / 1000 : Math.NaN;
-		if (!Math.isFinite(elapsed)) return "line " + event.row;
-		if (elapsed < 0 || elapsed > 214748364.7) return "line " + event.row; // Clock discontinuity: preserve recording order.
-		var ticks = Math.round(elapsed * 10);
+		var secs = elapsed(event);
+		if (!Math.isFinite(secs)) return "line " + event.row;
+		return clock(secs, true);
+	}
+	/** "+m:ss" or "+m:ss.t". */
+	public static function clock(seconds:Float, tenths:Bool = false):String {
+		var ticks = Math.round(seconds * 10);
 		var sec = Std.int(ticks / 10);
-		return "+" + Std.int(sec / 60) + ":" + (sec % 60 < 10 ? "0" : "") + (sec % 60)
-			+ "." + (ticks % 10);
+		return "+" + Std.int(sec / 60) + ":" + (sec % 60 < 10 ? "0" : "") + (sec % 60) + (tenths ? "." + (ticks % 10) : "");
 	}
 }
 
@@ -101,6 +114,7 @@ class CombatLogParseJob {
 	var events:Array<CombatLogEvent> = [];
 	var header:Bool = false;
 	var at:String = "";
+	var map:String = "";
 	public function new(input:haxe.io.Input) this.input = new CombatLogBoundedInput(input);
 	public static function text(raw:String):CombatLogParseJob {
 		var data = haxe.io.Bytes.ofString(raw);
@@ -114,7 +128,7 @@ class CombatLogParseJob {
 			try { line = input.readLine(); }
 			catch (_:haxe.io.Eof) {
 				if (!header && events.length == 0) fail("The file contains no combat recording.");
-				else { result = new CombatLogDocument(events, !header, at); finish(); }
+				else { result = new CombatLogDocument(events, !header, at, map); finish(); }
 				return;
 			} catch (e:Dynamic) { fail("Could not read the log: " + Std.string(e)); return; }
 			lines++;
@@ -130,6 +144,7 @@ class CombatLogParseJob {
 					if (o.mod != "solarflare") throw "This is not a SolarFlare combat log.";
 					if (o.at != null && !Std.isOfType(o.at, String)) throw "Invalid session date.";
 					header = true; at = o.at != null ? o.at : "";
+					if (Std.isOfType(o.map, String)) map = o.map;
 				} else if (o.type == "event") {
 					if (events.length >= CombatLogDocument.MAX_EVENTS) throw "Log exceeds the 20,000-event limit.";
 					events.push(new CombatLogEvent(lines, o));

@@ -15,6 +15,10 @@ class NativeHideElement {
 	public static inline var STATE_ABSENT:Int = 2;
 	/** Another mod owns this widget's visibility; SolarFlare leaves it alone. */
 	public static inline var STATE_EXTERNAL:Int = 3;
+	public static inline var STATE_HIDDEN:Int = 4;
+	public static inline var STATE_COVERED:Int = 5;
+	public static inline var STATE_ERROR:Int = 6;
+	public static inline var STATE_NATIVE_HIDDEN:Int = 7;
 
 	public var id:String;
 	public var label:String;

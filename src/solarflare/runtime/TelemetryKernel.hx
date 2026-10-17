@@ -68,9 +68,12 @@ class TelemetryKernel {
 			settingsInitialized = true;
 			try solarflare.ui.SettingsStore.tick(cfg) catch (_:Dynamic) {}
 		}
+		solarflare.hemorrhage.HemorrhageService.beforeDrain(now);
+		cfg.hemorrhage.observe(HealthCache.localHero, now);
 		ObserveDemand.publish(cfg);
 		demand.capture(cfg);
 		EventRing.drain(solarflare.combatlog.CombatLogCache.consumeHookEvent, 128, 0.0005);
+		solarflare.hemorrhage.HemorrhageService.afterDrain(now, !cfg.hemorrhage.hidden.get() || cfg.hemorrhage.tool.open.get());
 
 		try solarflare.ui.HideAllBind.ensureCodes() catch (_:Dynamic) {}
 		try solarflare.ui.WindowAutoHide.observe(app, now) catch (_:Dynamic) {}
@@ -169,6 +172,9 @@ class TelemetryKernel {
 			try solarflare.castbar.LearnedCastTimes.tick(now) catch (_:Dynamic) {}
 			RuntimeMetrics.backgroundPasses++;
 			try if (restoreNativeChat != null) restoreNativeChat() catch (_:Dynamic) {}
+			if (ObserveDemand.mapContext) {
+				try solarflare.aura.AuraMapContext.observe(app, now) catch (_:Dynamic) {}
+			}
 			try {
 				if (solarflare.combatlog.CombatLogRecorder.enabled.get())
 					solarflare.combatlog.CombatLogRecorder.tick();

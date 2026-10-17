@@ -151,11 +151,18 @@ class HUDWidgetWindow {
 		var locked = chrome.isLocked() && !layoutOverride;
 		var sizeCond = (locked || external || !measured) ? ImGuiCond.Always : ImGuiCond.FirstUseEver;
 		ImGui.setNextWindowSize(ImGui.vec2(w + extraW + oW, h + extraH + oH), sizeCond);
+		// The footer and padding are not art; they may hang past the far edge so locking never nudges a HUD
+		// that was dragged flush with the screen.
+		chrome.overhangY = RESIZE_FOOTER + PADDING;
+		// applyPos clears posDirty, so read it first: typed X/Y, Reset Position, a resolution change and
+		// a changed visual offset all have to move an unlocked window too, not only a locked one.
+		var moveRequested = chrome.posDirty;
 		chrome.clampToViewport();
+		moveRequested = moveRequested || chrome.posDirty;
 		chrome.applyPos();
 		if (!chrome.collapsed.get() && !chrome.isLocked()) {
 			ImGui.setNextWindowPos(ImGui.vec2(HUDVisualBounds.hostCoordinate(chrome.screenX, left),
-				HUDVisualBounds.hostCoordinate(chrome.screenY, top)), ImGuiCond.FirstUseEver);
+				HUDVisualBounds.hostCoordinate(chrome.screenY, top)), moveRequested ? ImGuiCond.Always : ImGuiCond.FirstUseEver);
 		}
 
 		var editable = !chrome.isLocked() || layoutOverride;
@@ -171,6 +178,9 @@ class HUDWidgetWindow {
 				var win = ImGui.getWindowSize();
 				chrome.winW = win.x;
 				chrome.winH = win.y;
+				var winPos = ImGui.getWindowPos();
+				chrome.winX = winPos.x;
+				chrome.winY = winPos.y;
 				if (editable) {
 					chrome.capturePos();
 				}

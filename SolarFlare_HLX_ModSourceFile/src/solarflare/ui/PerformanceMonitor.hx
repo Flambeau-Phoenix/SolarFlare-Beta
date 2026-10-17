@@ -132,6 +132,11 @@ class PerformanceMonitor {
 				UiLayout.propertyRow("BarTer native actions", function() {
 					ImGui.text('${m.barterNativeEntries}/9 actions  ${roundMs(m.barterNativeMs)} ms  max ${roundMs(m.barterNativeMaxMs)} ms');
 				});
+				UiLayout.propertyRow("Native UI visibility", function() {
+					var n=NativeVisibilityWork;
+					ImGui.text('${roundMs(n.lastMs)} ms  max ${roundMs(n.maxMs)} ms  ${n.scans} scans  ${n.nodes}/192 nodes');
+					ImGui.text('Late chat: ${roundMs(n.lateMs)} ms  max ${roundMs(n.lateMaxMs)} ms');
+				});
 			});
 			UiLayout.inlinePair("##sf_runtime_metric_actions",
 				function(w:Single) {

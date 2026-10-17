@@ -284,7 +284,7 @@ class HealthHooks {
 	static function onHeroSkillUse(self:Dynamic, skill:Dynamic):Void {
 		if (!HealthCache.isLocalHero(self))
 			return;
-		if (ObserveDemand.auras || ObserveDemand.auraBuilderOpen) {
+		if (ObserveDemand.auras || ObserveDemand.auraBuilderOpen || ObserveDemand.chainTrail) {
 			var casts = solarflare.aura.LocalCastHistory.shared;
 			casts.bindHero(self);
 			casts.note(EngineSkillId.ofSkill(skill), haxe.Timer.stamp(), solarflare.aura.AuraStatusCache.capturePresentIds(self),

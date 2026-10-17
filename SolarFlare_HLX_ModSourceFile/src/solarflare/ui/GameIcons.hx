@@ -168,6 +168,33 @@ class GameIcons {
 
 	/** Per-sheet load cost (JSON parse + PNG decode + texture register), shown in diagnostics. */
 	static var atlasTimings:Array<String> = [];
+	/** Optional sheets (not in the startup plan) by stem: true once decoded, false while absent. */
+	static var optionalSheets = new Map<String, Bool>();
+
+	/**
+	 * Decode one optional sheet beside the main atlas on first use (e.g. "atlas_loot"). Observe-phase only:
+	 * it reads the disk and registers a texture. Idempotent; a missing sheet is retried after resetSearchDirs.
+	 */
+	public static function ensureSheet(stem:String):Bool {
+		if (!ENABLED || stem == null || stem.length == 0)
+			return false;
+		if (optionalSheets.exists(stem))
+			return optionalSheets.get(stem);
+		initAtlas();
+		optionalSheets.set(stem, false);
+		if (atlasMap == null || searchDirs == null)
+			return false;
+		var before = atlasSheetCount;
+		var loadedSheets = new Map<String, Bool>();
+		for (root in prioritizeAssetsIcons(searchDirs)) {
+			tryLoadAtlasPair(root, stem, loadedSheets);
+			if (atlasSheetCount > before)
+				break;
+		}
+		var loaded = atlasSheetCount > before;
+		optionalSheets.set(stem, loaded);
+		return loaded;
+	}
 
 	static function loadAtlasSheet(jsonPath:String, pngPath:String, stem:String = "atlas"):Void {
 		var started = haxe.Timer.stamp();
@@ -398,8 +425,14 @@ class GameIcons {
 		pending = [];
 		// Decoding the sheets costs seconds and each decode registers new textures, so an intact
 		// atlas survives a reload. Pass forceAtlas after replacing sheet files on disk.
-		if (atlasComplete && !forceAtlas)
+		if (atlasComplete && !forceAtlas) {
+			// Keep decoded optional sheets (their textures are still registered); retry the absent ones.
+			for (stem in Lambda.array({iterator: function() return optionalSheets.keys()}))
+				if (!optionalSheets.get(stem))
+					optionalSheets.remove(stem);
 			return;
+		}
+		optionalSheets = new Map<String, Bool>();
 		atlasAttempted = false;
 		atlasComplete = false;
 		atlasMap = null;

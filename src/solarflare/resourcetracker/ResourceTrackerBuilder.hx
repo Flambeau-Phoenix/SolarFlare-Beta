@@ -111,6 +111,7 @@ class ResourceTrackerBuilder {
 		if (host.combo != null) navRow("combo", "Rogue Combo Points", host.combo.hidden);
 		if (host.chaincast != null) navRow("chaincast", "Chaincast", host.chaincast.hidden);
 		if (host.conduit != null) navRow("conduit", "Conduits", host.conduit.hidden);
+		if (host.hemorrhage != null) navRow("hemorrhage", "Hemorrhage", host.hemorrhage.hidden);
 		drawHideAll();
 	}
 
@@ -147,6 +148,10 @@ class ResourceTrackerBuilder {
 	}
 
 	function drawPreview():Void {
+		if (selected == "hemorrhage") {
+			ImGui.textWrapped("Hemorrhage uses recorded damage events. Enable Showing to position its live HUD; open the tool to record and compare builds.");
+			return;
+		}
 		section("Preview");
 		// Property rows instead of centred headings with manual cursor maths: the two
 		// controls are ordinary settings and read better as labelled rows.
@@ -236,6 +241,7 @@ class ResourceTrackerBuilder {
 				if (solarflare.ui.UiChrome.toggleTileRef("##rt_conduit_vertical", "Vertical", host.conduit.vertical, 108, 28)) SettingsStore.markDirty();
 				PipShapes.drawShapeCombo("Pip shape##rt_conduit_shape", host.conduit.shape);
 				drawBehaviorText("Shows Sparkmaster conduit slots and Power stacks from 0 through 20.");
+			case "hemorrhage": host.hemorrhage.drawEditorContents();
 			default: ImGui.textDisabled("Select a resource from the left pane.");
 		}
 	}
@@ -333,9 +339,9 @@ class ResourceTrackerBuilder {
 		case "combo": "Combo Points"; case "attack": "Combo Tracker"; case "target": "Current Target";
 		case "castbar": "Player Cast Bar";
 		case "chaincast": "Chaincast";
-		case "conduit": "Conduits"; default: "Resource";
+		case "conduit": "Conduits"; case "hemorrhage": "Hemorrhage"; default: "Resource";
 	};
 
 	static function isResourceId(id:String):Bool return id == "health" || id == "rage" || id == "mana" || id == "prayers"
-		|| id == "combo" || id == "attack" || id == "target" || id == "castbar" || id == "chaincast" || id == "conduit";
+		|| id == "combo" || id == "attack" || id == "target" || id == "castbar" || id == "chaincast" || id == "conduit" || id == "hemorrhage";
 }

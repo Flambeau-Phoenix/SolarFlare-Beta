@@ -2,6 +2,8 @@ package solarflare.castbar;
 
 import solarflare.ui.HudChrome;
 import solarflare.ui.SettingsStore;
+import solarflare.ui.ThemePalette;
+import solarflare.ui.UiChrome;
 import solarflare.ui.UiLayout;
 import imgui.ImGui;
 import imgui.Enums.ImGuiCond;
@@ -54,6 +56,7 @@ class CastBarConfig {
 	}
 
 	public function drawSettings(id:String):Void {
+		drawSkinPicker(id);
 		ImGui.separatorText("Window");
 		chrome.drawWindowSettings(hidden, id);
 		UiLayout.propertyGrid("##" + id + "_window", function() {
@@ -67,7 +70,6 @@ class CastBarConfig {
 		});
 		ImGui.separatorText("Appearance");
 		UiLayout.propertyGrid("##" + id + "_appearance", function() {
-			UiLayout.propertyRow("Skin", function() { drawSkinCombo("##" + id + "_skin"); });
 			UiLayout.propertyRow("Show", function() {
 				if (ImGui.checkbox("Icon##" + id, showIcon)) SettingsStore.markDirty();
 				ImGui.sameLine();
@@ -78,16 +80,45 @@ class CastBarConfig {
 		});
 	}
 
-	function drawSkinCombo(id:String):Void {
+	/**
+	 * The skin choice is the most visible decision here, so it is a grid of large cards, each showing the real
+	 * skin, instead of a small dropdown. It comes first, directly under the preview.
+	 */
+	public function drawSkinPicker(id:String):Void {
+		UiChrome.subHeader("Skin");
+		var names = CastBarRenderer.SKIN_NAMES;
 		var current = skin.get();
-		if (current < 0 || current >= CastBarRenderer.SKIN_NAMES.length) current = 0;
-		if (!ImGui.beginCombo(id, CastBarRenderer.SKIN_NAMES[current])) return;
-		for (i in 0...CastBarRenderer.SKIN_NAMES.length) {
-			if (ImGui.selectable(CastBarRenderer.SKIN_NAMES[i] + "##skin" + i, current == i)) {
+		if (current < 0 || current >= names.length) current = 0;
+		var theme = ThemePalette.current();
+		var gap:Single = 8;
+		var avail:Single = ImGui.getContentRegionAvail().x;
+		var columns = Std.int(Math.max(1, Math.floor((avail + gap) / (190 + gap))));
+		var cardW:Single = (avail - gap * (columns - 1)) / columns;
+		var cardH:Single = 66;
+		for (i in 0...names.length) {
+			if (i % columns != 0) ImGui.sameLine(0, gap);
+			var p = ImGui.getCursorScreenPos();
+			var clicked = ImGui.invisibleButton("##" + id + "_skin_" + i, ImGui.vec2(cardW, cardH));
+			var hovered = ImGui.isItemHovered();
+			var dl = ImGui.getWindowDrawList();
+			var max = ImGui.vec2(p.x + cardW, p.y + cardH);
+			var selected = i == current;
+			var mix:Single = selected ? 0.34 : hovered ? 0.12 : 0;
+			ImGui.ImDrawList_AddRectFilled(dl, p, max, ImGui.colorConvertFloat4ToU32(ImGui.vec4(
+				theme.cellBg.x * (1 - mix) + theme.accent.x * mix,
+				theme.cellBg.y * (1 - mix) + theme.accent.y * mix,
+				theme.cellBg.z * (1 - mix) + theme.accent.z * mix, 0.96)), 10);
+			ImGui.ImDrawList_AddRect(dl, p, max, ImGui.colorConvertFloat4ToU32(selected ? theme.accent : theme.border), 10, selected ? 2 : 1, 0);
+			CastBarRenderer.drawPlayer(preview, i, false, false, false, p.x + 10, p.y + 8, cardW - 20, 28);
+			var label = names[i];
+			var ts = ImGui.calcTextSize(label);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(p.x + (cardW - ts.x) * 0.5, p.y + cardH - ts.y - 7),
+				ImGui.colorConvertFloat4ToU32(selected ? theme.text : theme.textDisabled), label);
+			if (clicked && i != current) {
 				skin.set(i);
 				SettingsStore.markDirty();
 			}
 		}
-		ImGui.endCombo();
+		ImGui.spacing();
 	}
 }

@@ -13,7 +13,7 @@ class UtilitiesPanel {
 			UiLayout.propertyRow("Hidden", function() {
 				if (ImGui.checkbox("##util_ha_state", HudSuppress.hideAll))
 					SettingsStore.markDirty();
-			}, "Blanks every SolarFlare window so the game underneath is clickable.");
+			}, "Hides SolarFlare HUD overlays. Settings and builders remain accessible.");
 			UiLayout.propertyRow("Hotkey", function() {
 				var labels = HideAllBind.LABELS;
 				var current = HideAllBind.choice.get();
@@ -67,11 +67,60 @@ class UtilitiesPanel {
 			UiLayout.propertyRow("On game windows", function() {
 				if (ImGui.checkbox("Hide overlays while one is open##util_ah_on", WindowAutoHide.enabled))
 					SettingsStore.markDirty();
-			}, "Bank, trader, crafting and upgrade tables, obelisk travel and dungeon/rift portal pages. Off by default.");
+			}, "Hides all HUD overlays while selected native windows are open. Settings stay accessible. Off by default.");
+			ImGui.beginDisabled(!WindowAutoHide.enabled.get());
+			UiLayout.propertyRow("Inventory", function() {
+				if (ImGui.checkbox("##util_ah_inventory",WindowAutoHide.inventory)) SettingsStore.markDirty();
+			});
+			UiLayout.propertyRow("Bank / vendor", function() {
+				if (ImGui.checkbox("##util_ah_bank",WindowAutoHide.bankVendor)) SettingsStore.markDirty();
+			});
+			UiLayout.propertyRow("Crafting / upgrades", function() {
+				if (ImGui.checkbox("##util_ah_craft",WindowAutoHide.craftUpgrade)) SettingsStore.markDirty();
+			});
+			UiLayout.propertyRow("Travel / portals", function() {
+				if (ImGui.checkbox("##util_ah_travel",WindowAutoHide.travel)) SettingsStore.markDirty();
+			});
+			UiLayout.propertyRow("Obelisks", function() {
+				if (ImGui.checkbox("##util_ah_obelisk",WindowAutoHide.obelisk)) SettingsStore.markDirty();
+			}, "The obelisk dialog (Fly to another obelisk, Set point, View cutscene).");
+			ImGui.endDisabled();
 		});
-		if (WindowAutoHide.active())
-			ImGui.textColored(ImGui.vec4(0.95, 0.72, 0.25, 1), "Hidden now — a game window is open.");
-		else
-			ImGui.textDisabled("Overlays return as soon as the window closes.");
+		ImGui.textWrapped(WindowAutoHide.reason);
+		ImGui.textDisabled("HUD returns after the last selected window closes, unless manually hidden.");
+	}
+
+	/** Record fights for the Combat Log Aura Builder, plus a shortcut straight into it. */
+	public static function drawCombatRecording(openBuilder:Void->Void):Void {
+		UiLayout.propertyGrid("##util_combat_rec", function() {
+			UiLayout.propertyRow("Record combat", function() {
+				var recording = solarflare.combatlog.CombatLogRecorder.enabled.get();
+				if (ImGui.checkbox("Record combat for Aura building data##util_cr_on", solarflare.combatlog.CombatLogRecorder.enabled)) {
+					var wanted = solarflare.combatlog.CombatLogRecorder.enabled.get();
+					solarflare.combatlog.CombatLogRecorder.enabled.set(recording);
+					solarflare.combatlog.CombatLogRecorder.setCapture(wanted);
+					SettingsStore.markDirty();
+				}
+			}, "Saves your fights, including nearby enemy casts, so you can turn them into alerts. Off by default. Files stay in hlx/mods/solarflare/logs/combatlog.");
+			UiLayout.propertyRow("Status", function() {
+				ImGui.pushTextWrapPos(0);
+				ImGui.textDisabled(solarflare.combatlog.CombatLogRecorder.lastStatus);
+				ImGui.popTextWrapPos();
+			});
+			UiLayout.propertyRow("Aura builder", function() {
+				if (UiChrome.ghostButton("Open Combat Log Aura Builder##util_open_clog", ImGui.vec2(240, 28)) && openBuilder != null)
+					openBuilder();
+			}, "Opens the Aura Builder on your recorded fights.");
+		});
+	}
+
+	public static function drawFullscreenShortcut(enabled:imgui.ref.BoolRef):Void {
+		UiLayout.propertyGrid("##util_fullscreen_properties",function() {
+			UiLayout.propertyRow("Ctrl+F protection",function() {
+				if(ImGui.checkbox("Prevent accidental fullscreen toggle##sf_ctrl_f",enabled)) SettingsStore.markDirty();
+			},"Consumes exactly Ctrl+F during gameplay. Other fullscreen controls remain available.");
+		});
+		if(enabled.get() && FullscreenShortcutGuard.status<0)
+			ImGui.textWrapped("Ctrl+F guard unavailable: update sfcursor.hdll and restart Farever.");
 	}
 }

@@ -127,8 +127,10 @@ class TargetOverlay {
 		if (cfg.chrome == null || cfg.chrome.collapsed.get())
 			return;
 		var castH:Single = Math.max(12, Math.min(28, cfg.castBarHeight.get()));
-		var wx:Single = cfg.chrome.x.get();
-		var wy:Single = cfg.chrome.y.get();
+		// Anchor to where the HP window really is (projected and clamped), not to the raw stored coordinates.
+		var placed = cfg.chrome.winH > 0;
+		var wx:Single = placed ? cfg.chrome.winX : cfg.chrome.x.get();
+		var wy:Single = placed ? cfg.chrome.winY : cfg.chrome.y.get();
 		var hpH:Single = lastHpWinH > 0 ? lastHpWinH : (contentW > 0 ? cfg.height.get() + CHROME_OVERHEAD : cfg.height.get() + CHROME_OVERHEAD);
 		var winW:Single = lastHpWinW > 0 ? lastHpWinW : contentW;
 		ImGui.setNextWindowPos(ImGui.vec2(wx, wy + hpH + CAST_GAP), ImGuiCond.Always);

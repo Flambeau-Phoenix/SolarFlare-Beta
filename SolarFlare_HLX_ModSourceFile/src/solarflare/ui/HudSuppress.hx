@@ -21,6 +21,6 @@ class HudSuppress {
 	public static var hideAll = new BoolRef(false);
 
 	public static function active():Bool {
-		return hideAll.get() || WindowAutoHide.active();
+		return WindowAutoHidePolicy.suppress(hideAll.get(), WindowAutoHide.active());
 	}
 }

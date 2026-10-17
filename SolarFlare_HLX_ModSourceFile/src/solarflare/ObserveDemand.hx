@@ -12,6 +12,8 @@ class ObserveDemand {
 	public static var prayers:Bool = false;
 	public static var comboPoints:Bool = false;
 	public static var chaincast:Bool = false;
+	/** Chaincast Cast Trail module is on: HealthHooks keeps LocalCastHistory fed for it. */
+	public static var chainTrail:Bool = false;
 	public static var conduit:Bool = false;
 	public static var attackCombo:Bool = false;
 	public static var targetHud:Bool = false;
@@ -24,6 +26,7 @@ class ObserveDemand {
 	 * The damage/cast hooks return before attribution when false.
 	 */
 	public static var combatLines:Bool = false;
+	public static var hemorrhage:Bool = false;
 	public static var geaux:Bool = false;
 	public static var geauxBuilder:Bool = false;
 	/** BarTer skill bars — light sampleBarTer path, not full Geaux skills demand. */
@@ -56,6 +59,8 @@ class ObserveDemand {
 	/** Skill subjects for event.cast.* (sanitized IDs, rebuilt each publish). */
 	public static var castSkillIds:Array<String> = [];
 	public static var auraBuilderOpen:Bool = false;
+	/** Sample the current map: a map-bound Aura Set, the combat recorder, or the Aura Builder wants it. */
+	public static var mapContext:Bool = false;
 	public static var getRifty:Bool = false;
 	/** Sample GetRiftyCache.inInstance even when clock overlay hidden (combat log / saber). */
 	public static var riftFlag:Bool = false;
@@ -111,7 +116,8 @@ class ObserveDemand {
 		resourceBars = cfg.vitals != null && cfg.vitals.anyBarVisible();
 		prayers = cfg.vitals != null && !cfg.vitals.prayersHidden.get();
 		comboPoints = cfg.combo != null && !cfg.combo.hidden.get();
-		chaincast = cfg.chaincast != null && !cfg.chaincast.hidden.get();
+		chaincast = cfg.chaincast != null && (!cfg.chaincast.hidden.get() || cfg.chaincast.modules.anyVisible());
+		chainTrail = chaincast && cfg.chaincast.modules.trailWanted();
 		conduit = cfg.conduit != null && !cfg.conduit.hidden.get();
 		attackCombo = cfg.attackCombo != null && (!cfg.attackCombo.hidden.get() || cfg.attackCombo.open.get());
 		targetHud = cfg.target != null && !cfg.target.hidden.get();
@@ -216,9 +222,11 @@ class ObserveDemand {
 		catch (_:Dynamic)
 			recording = false;
 		riftFlag = getRifty || combatLog || saberRift || auras || auraBuilderOpen || recording;
+		mapContext = auraBuilderOpen || recording || (cfg.auras != null && cfg.auras.anySetUsesMaps());
 		var saber = cfg.lightsaber != null && (!cfg.lightsaber.hidden.get() || cfg.lightsaber.showLog.get());
 		var sparkCube = cfg.extraBarsPrototype != null && cfg.extraBarsPrototype.model.sparkEnabled;
-		combatLines = combatLog || recording || saber || auras || auraBuilderOpen || sparkCube;
+		hemorrhage = solarflare.hemorrhage.HemorrhageService.active();
+		combatLines = combatLog || recording || saber || auras || auraBuilderOpen || sparkCube || hemorrhage;
 		#if solarflare_telemetry
 		riftFlag = riftFlag || solarflare.debug.ResolutionLedger.armed();
 		#end

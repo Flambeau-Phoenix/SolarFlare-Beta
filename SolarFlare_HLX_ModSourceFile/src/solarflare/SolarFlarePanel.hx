@@ -52,6 +52,7 @@ class SolarFlarePanel {
 	var comboOverlay:ComboOverlay;
 	var chaincastOverlay:ChaincastOverlay;
 	var conduitOverlay:ConduitOverlay;
+	var hemorrhageOverlay:solarflare.hemorrhage.HemorrhageOverlay;
 	var attackComboOverlay:AttackComboOverlay;
 	var combatLogOverlay:CombatLogOverlay;
 	var targetOverlay:TargetOverlay;
@@ -97,6 +98,7 @@ class SolarFlarePanel {
 		comboOverlay = new ComboOverlay();
 		chaincastOverlay = new ChaincastOverlay();
 		conduitOverlay = new ConduitOverlay();
+		hemorrhageOverlay = new solarflare.hemorrhage.HemorrhageOverlay();
 		attackComboOverlay = new AttackComboOverlay();
 		combatLogOverlay = new CombatLogOverlay();
 		targetOverlay = new TargetOverlay();
@@ -135,6 +137,7 @@ class SolarFlarePanel {
 
 	/** UI assets also load at the title screen, before GameApp exists. */
 	public function resetExtraBarsSession():Void {
+		solarflare.hemorrhage.HemorrhageService.interrupt("World unloaded");
 		if (config.extraBarsPrototype != null) config.extraBarsPrototype.clearSession();
 	}
 
@@ -187,6 +190,9 @@ class SolarFlarePanel {
 		if (config.statusBoard != null) {
 			try config.statusBoard.observe() catch (_:Dynamic) {}
 		}
+		if (config.lootBrowser != null) {
+			try config.lootBrowser.observe() catch (_:Dynamic) {}
+		}
 		solarflare.ui.NativeHideCache.apply(app, config.nativeHide);
 		try
 			solarflare.ui.HideMoveCache.apply(config.hideMove)
@@ -217,9 +223,22 @@ class SolarFlarePanel {
 			solarflare.ui.DockingHelper.setupMainDockSpace();
 		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 
+		// Background layer under every overlay; ignores Hide All because it is a layout aid, not HUD.
+		try
+			solarflare.ui.AlignmentGrid.draw()
+		catch (_:Dynamic) {}
+
 		try
 			config.draw()
 		catch (_:Dynamic) {}
+		try {
+			config.hemorrhage.tool.draw(config.hemorrhage.autoScroll);
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
+
+		// Editors remain reachable while automatic/manual HUD suppression is active.
+		try {
+			if (config.barter != null) config.barter.drawBuilder();
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 
 		// Only draw in-game HUD elements when the hero/world is active:
 		if (!HealthCache.valid && HealthCache.localHero == null) {
@@ -242,13 +261,15 @@ class SolarFlarePanel {
 		try {
 			if (!suppressed && config.barter != null) {
 				config.barter.draw();
-				config.barter.drawBuilder();
 			}
 			if (!suppressed && config.statusBoard != null) {
 				config.statusBoard.draw();
 			}
 		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		// Each overlay isolated — a Geaux throw must not skip Lightsaber / Auras.
+		try {
+			if (!suppressed) hemorrhageOverlay.draw(config.hemorrhage);
+		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed)
 				geauxBar.draw(config.geaux);
@@ -320,6 +341,7 @@ class SolarFlarePanel {
 
 	/** Flush pending layout/toggles when GameApp is gone (logout / shutdown). */
 	public function flushPendingSettings():Void {
+		solarflare.ui.WindowAutoHide.reset();
 		solarflare.ui.NativeHideCache.clearSession();
 		try
 			solarflare.ui.HideMoveCache.clearSession()

@@ -47,7 +47,7 @@ import haxe.Json;
  * All existing condition/effect/canvas/icon/undo/import-export capability is preserved.
  * Creation mode wizard (Boss / Skill / Utility / Free) adds guided entry without new engine.
  */
-class AuraBuilder {
+class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 	public var open = new BoolRef(false);
 	var cfg:AuraConfig;
 	var host:ConfigPanel;
@@ -65,6 +65,13 @@ class AuraBuilder {
 	var volumePercent = new FloatRef(100);
 	var search:String = "";
 	var scopeFilter:String = "All";
+	/** Aura Sets: folded groups, the set whose editor popup should open next, buffers for the editor. */
+	var setFolded:Map<String, Bool> = new Map();
+	var openSetEditorFor:String = "";
+	var setNameFor:String = "";
+	var setNameBuf = new hl.Bytes(64);
+	var mapAddBuf = new hl.Bytes(96);
+	var setDeleteArmed:String = "";
 	var iconSearchBuf = new hl.Bytes(80);
 	var iconSearch:String = "";
 	var iconKindFilter:String = "All";
@@ -170,6 +177,9 @@ class AuraBuilder {
 
 	public function clearTransientState():Void {
 		combatLogsOpen = false;
+		combatLogBrowser.suspend();
+		openSetEditorFor = "";
+		setDeleteArmed = "";
 		quickBuild.cancel();
 		advancedPreview.reset();
 		boundEditorAura = null;
@@ -367,9 +377,7 @@ class AuraBuilder {
 
 	function drawWorkspace():Void {
 		if (combatLogsOpen) {
-			combatLogBrowser.draw(cfg.auras.length >= AuraEngine.MAX, function(choice, label) {
-				quickBuild.start(AuraQuickBuildDraft.fromCombatLog(choice, label));
-			});
+			combatLogBrowser.draw(this);
 			return;
 		}
 		var a = selectedAura();
@@ -456,6 +464,10 @@ class AuraBuilder {
 			}, 8);
 
 			ImGui.dummy(ImGui.vec2(0, 4));
+			UiChrome.subHeader("Boss Mods");
+			ImGui.textWrapped("Fought a boss with recording on? Open it, tick its abilities and create a whole set of alerts at once.");
+			if (UiChrome.ghostButton("Build boss alerts from a recording##ab_home_bossmods", ImGui.vec2(280, 30))) openCombatLogs();
+			ImGui.dummy(ImGui.vec2(0, 6));
 			UiChrome.subHeader("Encounter starters");
 			// setScrollHereY must fire at the target widget's Y position, not at the
 			// hero block above it. Placing it here (after the subHeader) scrolls the
@@ -553,6 +565,7 @@ class AuraBuilder {
 		a.id = uniqueAuraId("aura_" + (cfg.auras.length + 1));
 		a.enabled.set(issue.length == 0);
 		cfg.auras.push(a);
+		cfg.ensureSets();
 		selected = cfg.auras.length - 1;
 		selectedIds = new Map();
 		selectedIds.set(a.id, true);
@@ -566,6 +579,93 @@ class AuraBuilder {
 		return "";
 	}
 
+	/**
+	 * Boss Mods transaction: many drafts, ONE undo step and ONE save, never past the library cap.
+	 * `setId` (optional) becomes each aura's encounter/set tag.
+	 */
+	public function commitBatch(drafts:Array<AuraQuickBuildDraft>, setId:String):{made:Int, skipped:Int, why:String} {
+		if (cfg == null || drafts == null || drafts.length == 0) return {made: 0, skipped: 0, why: "Nothing to create."};
+		if (cfg.auras.length >= AuraEngine.MAX)
+			return {made: 0, skipped: drafts.length, why: "Aura limit reached. Delete an aura before creating another."};
+		snapshot("Create boss alerts");
+		var made = 0;
+		var skipped = 0;
+		var why = "";
+		selectedIds = new Map();
+		for (draft in drafts) {
+			if (draft == null || cfg.auras.indexOf(draft.aura) >= 0) { skipped++; continue; }
+			if (cfg.auras.length >= AuraEngine.MAX) { skipped++; why = "Aura limit reached."; continue; }
+			var a = draft.aura;
+			a.id = uniqueAuraId("aura_" + (cfg.auras.length + 1));
+			if (setId != null && setId.length > 0) { a.fight = setId; a.syncFightBuf(); }
+			a.enabled.set(draft.issue(GameIcons.hasKey).length == 0);
+			cfg.auras.push(a);
+			selectedIds.set(a.id, true);
+			rangeAnchorId = a.id;
+			selected = cfg.auras.length - 1;
+			made++;
+		}
+		cfg.ensureSets();
+		deleteArmed = -1;
+		if (made > 0) {
+			SettingsStore.markDirty();
+			UiActionQueue.save();
+		}
+		return {made: made, skipped: skipped, why: why};
+	}
+
+	// ---------------------------------------------------------------------------------------------
+	// Boss Mods host (see BossModsHost)
+	// ---------------------------------------------------------------------------------------------
+
+	public function bossCfg():AuraConfig return cfg;
+
+	public function bossBuild(draft:AuraQuickBuildDraft):Void quickBuild.start(draft);
+
+	public function bossAddSet(name:String):AuraSetDef {
+		var created = cfg.addSet(name);
+		if (created != null) SettingsStore.markDirty();
+		return created;
+	}
+
+	public function bossSetsChanged():Void {
+		cfg.markSetsDirty();
+		SettingsStore.markDirty();
+	}
+
+	public function bossOpenAura(id:String):Void {
+		for (i in 0...cfg.auras.length) {
+			var a = cfg.auras[i];
+			if (a == null || a.id != id) continue;
+			combatLogsOpen = false;
+			creationHomeOpen = false;
+			selected = i;
+			selectedIds = new Map();
+			selectedIds.set(id, true);
+			rangeAnchorId = id;
+			canvasSel = -1;
+			lastGlowAuraId = "";
+			return;
+		}
+	}
+
+	/**
+	 * Creates several drafts as one undo step. `setId` empty means no Aura Set. A non-empty `mapId` arms the set on
+	 * that map, but only when the set is empty or already map-bound, so an existing set keeps its behavior.
+	 */
+	public function bossCreate(drafts:Array<AuraQuickBuildDraft>, setId:String, mapId:String):solarflare.aura.ui.BossModsHost.BossAlertResult {
+		if (cfg == null) return {made: 0, skipped: drafts.length, why: "Aura library is unavailable.", set: ""};
+		var set = setId != null && setId.length > 0 ? cfg.findSet(setId) : null;
+		var map = AuraSetDef.normalizeMap(mapId);
+		if (set != null && map.length > 0 && (cfg.countIn(set.id) == 0 || set.mode == AuraSetDef.MODE_MAPS)) {
+			set.mode = AuraSetDef.MODE_MAPS;
+			set.addMap(map);
+		}
+		cfg.markSetsDirty();
+		var result = commitBatch(drafts, set != null ? set.id : "");
+		return {made: result.made, skipped: result.skipped, why: result.why, set: set != null ? set.name : ""};
+	}
+
 	function openCreationHome():Void {
 		combatLogsOpen = false;
 		creationHomeOpen = true;
@@ -574,6 +674,13 @@ class AuraBuilder {
 	function openCombatLogs():Void {
 		combatLogsOpen = true;
 		combatLogBrowser.enter();
+	}
+
+	/** Entry point for other pages (Utilities): show the builder already on the combat-log workspace. */
+	public function openCombatLogsWindow():Void {
+		open.set(true);
+		creationHomeOpen = false;
+		openCombatLogs();
 	}
 
 	function drawConsumableList():Void {
@@ -880,21 +987,22 @@ class AuraBuilder {
 				a.syncFightBuf();
 				SettingsStore.markDirty();
 			}
-			for (fight in AuraPack.FIGHTS) {
-				if (fight == null || fight == "shared") continue;
-				if (ImGui.selectable(fight + "##ab_fight_" + fight, a.fight == fight)) {
-					a.fight = fight;
-					a.syncFightBuf();
+			for (set in cfg.sets) {
+				if (set == null) continue;
+				if (ImGui.selectable(set.name + "##ab_fight_" + set.id, AuraConfig.tagOf(a) == set.id)) {
+					cfg.moveToSet(a, set.id);
 					SettingsStore.markDirty();
 				}
 			}
 			ImGui.separator();
-			ImGui.textDisabled("Custom encounter tag");
+			ImGui.textDisabled("New encounter tag");
 			ImGui.setNextItemWidth(-1);
 			if (ImGui.inputTextWithHint("##ab_ed_fight", "tag id", a.fightBuf, AuraDef.FIGHT_BUF)) {
 				a.fight = readBytes(a.fightBuf, AuraDef.FIGHT_BUF);
 				SettingsStore.markDirty();
 			}
+			// The tag becomes a set once typing ends, not on every keystroke.
+			if (ImGui.isItemDeactivatedAfterEdit()) cfg.ensureSets();
 		} catch (e:Dynamic) { ImGui.endCombo(); throw e; }
 		ImGui.endCombo();
 	}
@@ -1398,11 +1506,17 @@ class AuraBuilder {
 				ImGui.setTooltip("Collapse library to rail");
 		}, 6);
 		ImGui.textDisabled(Std.string(cfg.auras.length) + " / " + AuraEngine.MAX);
+		ImGui.sameLine(0, 10);
+		if (ImGui.smallButton("+ Set##ab_new_set")) {
+			var created = cfg.addSet("New set");
+			if (created != null) { openSetEditorFor = created.id; setNameFor = ""; setFolded.remove(created.id); SettingsStore.markDirty(); }
+		}
+		if (ImGui.isItemHovered()) ImGui.setTooltip("Create an Aura Set to group alerts for one fight");
 
 		var atCap = cfg.auras.length >= AuraEngine.MAX;
 		var atHome = !combatLogsOpen && (creationHomeOpen || selectedAura() == null);
 		if (UiChrome.navButton("Creation Home##ab_open_creation_home", atHome, ImGui.vec2(-1, 28))) openCreationHome();
-		if (UiChrome.navButton("Combat Logs##ab_library_combat_logs", combatLogsOpen, ImGui.vec2(-1, 28))) openCombatLogs();
+		if (UiChrome.navButton("Boss Mods (Combat Logs)##ab_library_combat_logs", combatLogsOpen, ImGui.vec2(-1, 28))) openCombatLogs();
 		ImGui.beginDisabled(atCap);
 		try {
 			if (UiChrome.ghostButton("Start with blank aura##ab_quick_blank", ImGui.vec2(-1, 28))) createBlankFromHome();
@@ -1833,24 +1947,59 @@ class AuraBuilder {
 	// ----------------------------------------------------------------
 
 	function drawAuraList():Void {
-		var visibleIds:Array<String> = [];
-		var visibleIndices:Array<Int> = [];
+		// Groups in display order: each Aura Set, then Shared. Auras keep their library order inside a group.
+		var filtering = search.length > 0 || scopeFilter != "All";
+		var groups:Array<{set:AuraSetDef, rows:Array<Int>}> = [];
+		for (s in cfg.sets) if (s != null) groups.push({set: s, rows: []});
+		var shared:Array<Int> = [];
 		for (i in 0...cfg.auras.length) {
 			var a = cfg.auras[i];
 			if (a == null || !matchesFilter(a)) continue;
-			visibleIds.push(a.id);
-			visibleIndices.push(i);
+			var tag = AuraConfig.tagOf(a);
+			var placed = false;
+			for (g in groups) if (g.set.id == tag) { g.rows.push(i); placed = true; break; }
+			if (!placed) shared.push(i);
 		}
-		for (vi in 0...visibleIndices.length) {
-			var i = visibleIndices[vi];
-			var a = cfg.auras[i];
-			if (a == null) continue;
-			ImGui.pushID_Str(a.id);
-			try {
+		var visibleIds:Array<String> = [];
+		for (g in groups) if (!setFolded.exists(g.set.id)) for (i in g.rows) visibleIds.push(cfg.auras[i].id);
+		if (!setFolded.exists("")) for (i in shared) visibleIds.push(cfg.auras[i].id);
+		var shown = 0;
+		for (g in groups) {
+			if (g.rows.length == 0 && filtering) continue;
+			drawSetHeader(g.set, g.rows.length);
+			if (!setFolded.exists(g.set.id)) {
+				for (i in g.rows) drawAuraRow(i, visibleIds);
+				if (g.rows.length == 0) ImGui.textDisabled("   Empty. Move auras here from their right-click menu.");
+			}
+			shown += g.rows.length;
+		}
+		if (groups.length > 0 && (shared.length > 0 || !filtering)) drawSharedHeader(shared.length);
+		if (!setFolded.exists("")) for (i in shared) drawAuraRow(i, visibleIds);
+		shown += shared.length;
+		if (shown == 0) ImGui.textDisabled("No auras match.");
+	}
+
+	function drawSharedHeader(count:Int):Void {
+		ImGui.pushID_Str("ab_set_shared");
+		try {
+			var folded = setFolded.exists("");
+			if (ImGui.smallButton(folded ? ">##ab_set_fold" : "v##ab_set_fold")) { if (folded) setFolded.remove(""); else setFolded.set("", true); }
+			ImGui.sameLine(0, 6);
+			ImGui.textDisabled("Shared (" + count + ")");
+		} catch (e:Dynamic) { ImGui.popID(); throw e; }
+		ImGui.popID();
+	}
+
+	function drawAuraRow(i:Int, visibleIds:Array<String>):Void {
+		var a = cfg.auras[i];
+		if (a == null) return;
+		ImGui.pushID_Str(a.id);
+		try {
 			var eyeLabel = a.enabled.get() ? "O##ab_eye" : "-##ab_eye";
 			if (ImGui.smallButton(eyeLabel)) { a.enabled.set(!a.enabled.get()); SettingsStore.markDirty(); }
 			ImGui.sameLine();
 			var state = setupIssue(a).length > 0 ? " SETUP" : "";
+			if (!cfg.setActive(AuraConfig.tagOf(a))) state += " (set off)";
 			var displayName = a.name.length > 0 ? a.name : a.id;
 			var rowSelected = isAuraSelected(a.id) || selected == i;
 			if (ImGui.selectable(displayName + state + "##ab_item", rowSelected)) {
@@ -1863,7 +2012,7 @@ class AuraBuilder {
 			}
 			if (ImGui.isItemClicked(1)) {
 				combatLogsOpen = false;
-				selected = i; creationHomeOpen = false; 
+				selected = i; creationHomeOpen = false;
 				selectedIds = new Map(); selectedIds.set(a.id, true); rangeAnchorId = a.id; deleteArmed = -1;
 				ImGui.openPopup("ab_ctx_pop_" + a.id);
 			}
@@ -1879,10 +2028,127 @@ class AuraBuilder {
 				if (moved != null) { selectedIds = new Map(); selectedIds.set(moved.id, true); rangeAnchorId = moved.id; }
 				SettingsStore.markDirty();
 			}
-			} catch (e:Dynamic) { ImGui.popID(); throw e; }
-			ImGui.popID();
+		} catch (e:Dynamic) { ImGui.popID(); throw e; }
+		ImGui.popID();
+	}
+
+	// ----------------------------------------------------------------
+	// Aura Sets
+	// ----------------------------------------------------------------
+
+	static function setChip(cfg:AuraConfig, s:AuraSetDef):{text:String, kind:Int} {
+		if (s.mode == AuraSetDef.MODE_OFF) return {text: "OFF", kind: solarflare.ui.ThemePalette.STATUS_WARN};
+		if (s.mode == AuraSetDef.MODE_MAPS)
+			return cfg.setActive(s.id) ? {text: "ARMED", kind: solarflare.ui.ThemePalette.STATUS_SUCCESS}
+				: {text: "WAITING FOR MAP", kind: solarflare.ui.ThemePalette.STATUS_INFO};
+		return {text: "ALWAYS ON", kind: solarflare.ui.ThemePalette.STATUS_INFO};
+	}
+
+	function drawSetHeader(s:AuraSetDef, count:Int):Void {
+		ImGui.pushID_Str("ab_set_" + s.id);
+		try {
+			UiLayout.inlinePair("##ab_set_row", function(w:Single) {
+				var folded = setFolded.exists(s.id);
+				if (ImGui.smallButton(folded ? ">##ab_set_fold" : "v##ab_set_fold")) { if (folded) setFolded.remove(s.id); else setFolded.set(s.id, true); }
+				ImGui.sameLine(0, 6);
+				ImGui.text(s.name + " (" + count + ")");
+			}, function(w:Single) {
+				var chip = setChip(cfg, s);
+				ImGui.textColored(solarflare.ui.ThemePalette.status(chip.kind), chip.text);
+				ImGui.sameLine(0, 6);
+				if (ImGui.smallButton("Edit##ab_set_edit")) { setDeleteArmed = ""; ImGui.openPopup("ab_set_pop"); }
+				if (openSetEditorFor == s.id) { openSetEditorFor = ""; setDeleteArmed = ""; ImGui.openPopup("ab_set_pop"); }
+				if (ImGui.beginPopup("ab_set_pop")) {
+					try drawSetEditor(s) catch (e:Dynamic) { ImGui.endPopup(); throw e; }
+					ImGui.endPopup();
+				}
+			}, 6);
+		} catch (e:Dynamic) { ImGui.popID(); throw e; }
+		ImGui.popID();
+	}
+
+	function drawSetEditor(s:AuraSetDef):Void {
+		if (setNameFor != s.id) { setNameFor = s.id; ByteUtil.fillBuf(setNameBuf, 64, s.name); }
+		ImGui.setNextItemWidth(260);
+		if (ImGui.inputText("##ab_set_name", setNameBuf, 64)) {
+			var next = StringTools.trim(readBytes(setNameBuf, 64));
+			if (next.length > 0) { s.name = next; SettingsStore.markDirty(); }
 		}
-		if (visibleIndices.length == 0) ImGui.textDisabled("No auras match.");
+		ImGui.textDisabled("When should this set run?");
+		UiLayout.inlineSplit("##ab_set_mode", 3, function(i:Int, w:Single) {
+			var label = ["Always", "On chosen maps", "Off"][i];
+			if (UiChrome.navButton(label + "##ab_set_mode_" + i, s.mode == i, ImGui.vec2(w, 26))) {
+				s.mode = i; cfg.markSetsDirty(); SettingsStore.markDirty();
+			}
+		}, 4);
+		if (s.mode == AuraSetDef.MODE_MAPS) {
+			ImGui.textWrapped("Bosses never appear in the open world, so a set can arm itself on the map where its fight happens.");
+			var here = AuraMapContext.mapId;
+			ImGui.textDisabled("Current map: " + AuraMapContext.label(here));
+			for (m in s.maps.copy()) {
+				ImGui.text("  " + m);
+				ImGui.sameLine(0, 8);
+				if (ImGui.smallButton("Remove##ab_set_map_rm_" + m)) { s.removeMap(m); cfg.markSetsDirty(); SettingsStore.markDirty(); }
+			}
+			if (s.maps.length == 0) ImGui.textDisabled("  No maps yet.");
+			ImGui.beginDisabled(here.length == 0 || s.hasMap(here));
+			if (UiChrome.ghostButton("Add current map##ab_set_add_here", ImGui.vec2(180, 26))) {
+				s.addMap(here); cfg.markSetsDirty(); SettingsStore.markDirty();
+			}
+			ImGui.endDisabled();
+			ImGui.setNextItemWidth(180);
+			ImGui.inputTextWithHint("##ab_set_map_input", "Map id", mapAddBuf, 96);
+			ImGui.sameLine(0, 6);
+			if (ImGui.smallButton("Add##ab_set_map_add")) {
+				if (s.addMap(readBytes(mapAddBuf, 96))) { ByteUtil.clearBytes(mapAddBuf, 96); cfg.markSetsDirty(); SettingsStore.markDirty(); }
+			}
+		}
+		ImGui.separator();
+		if (UiChrome.ghostButton("Export set##ab_set_export", ImGui.vec2(120, 26))) {
+			var pack:Array<AuraDef> = [];
+			for (a in cfg.auras) if (a != null && AuraConfig.tagOf(a) == s.id) pack.push(a);
+			var share = try AuraPack.encode(s.id, s.id, s.name, pack) catch (_) "";
+			if (share.length > 0) UiActionQueue.copyText(share, "Set share key copied");
+		}
+		ImGui.sameLine(0, 6);
+		var armed = setDeleteArmed == s.id;
+		if (UiChrome.ghostButton((armed ? "Really delete? Auras go to Shared" : "Delete set") + "##ab_set_delete", ImGui.vec2(armed ? 230 : 120, 26))) {
+			if (armed) {
+				snapshot("Delete set");
+				cfg.removeSet(s.id);
+				setDeleteArmed = "";
+				SettingsStore.markDirty();
+				ImGui.closeCurrentPopup();
+			} else setDeleteArmed = s.id;
+		}
+	}
+
+	/** Compact arm/disarm list for the hub, so a set can be switched without opening the builder. */
+	public function drawSetSwitches(id:String):Void {
+		if (cfg == null || cfg.sets.length == 0) {
+			ImGui.textDisabled("No Aura Sets yet. Tag auras with an encounter or build alerts from a recording.");
+			return;
+		}
+		UiLayout.propertyGrid("##hub_sets_" + id, function() {
+			for (s in cfg.sets) {
+				if (s == null) continue;
+				UiLayout.propertyRow(s.name, function() {
+					ImGui.setNextItemWidth(150);
+					if (ImGui.beginCombo("##hub_set_mode_" + s.id, ["Always on", "On chosen maps", "Off"][s.mode])) {
+						try {
+							for (i in 0...3)
+								if (ImGui.selectable(["Always on", "On chosen maps", "Off"][i] + "##hub_set_mode_" + s.id + "_" + i, s.mode == i)) {
+									s.mode = i; cfg.markSetsDirty(); SettingsStore.markDirty();
+								}
+						} catch (e:Dynamic) { ImGui.endCombo(); throw e; }
+						ImGui.endCombo();
+					}
+					ImGui.sameLine(0, 8);
+					var chip = setChip(cfg, s);
+					ImGui.textColored(solarflare.ui.ThemePalette.status(chip.kind), chip.text);
+				});
+			}
+		});
 	}
 
 	function drawAuraItemContextMenu(index:Int, a:AuraDef):Void {
@@ -1897,6 +2163,16 @@ class AuraBuilder {
 				snapshot("Duplicate Aura");
 				var copy = AuraConfig.cloneAura(a, uniqueAuraId(a.id + "_copy"), a.name + " Copy");
 				if (copy != null && cfg.auras.length < AuraEngine.MAX) { cfg.auras.push(copy); selected = cfg.auras.length - 1; creationHomeOpen = false; SettingsStore.markDirty(); ToastManager.success('Duplicated: ${a.name}'); }
+			}
+			if (cfg.sets.length > 0 && ImGui.beginMenu("Move to set")) {
+				try {
+					if (ImGui.menuItem("Shared", "", AuraConfig.tagOf(a).length == 0)) { snapshot("Move to set"); cfg.moveToSet(a, ""); SettingsStore.markDirty(); }
+					for (set in cfg.sets)
+						if (set != null && ImGui.menuItem(set.name + "##ab_mv_" + set.id, "", AuraConfig.tagOf(a) == set.id)) {
+							snapshot("Move to set"); cfg.moveToSet(a, set.id); SettingsStore.markDirty();
+						}
+				} catch (e:Dynamic) { ImGui.endMenu(); throw e; }
+				ImGui.endMenu();
 			}
 			if (ImGui.menuItem("Copy Aura Share Key")) {
 				var share = ShareCodec.wrapJson(Json.stringify(AuraEngine.toObj(a)));
@@ -2471,7 +2747,7 @@ class AuraBuilder {
 			if (json == null) { setIoStatus("Import failed: invalid share key or JSON.", true); ToastManager.error("Import failed: invalid share key or JSON."); return; }
 			var imported = importAurasFromJson(json);
 			var added = 0; snapshot("Import JSON");
-			for (item in imported) { if (item == null || cfg.auras.length >= AuraEngine.MAX) break; item.id = uniqueAuraId(item.id); cfg.auras.push(item); added++; }
+			for (item in imported) { if (item == null || cfg.auras.length >= AuraEngine.MAX) break; item.id = uniqueAuraId(item.id); cfg.auras.push(item); added++; } cfg.ensureSets();
 			if (added == 0) { setIoStatus(cfg.auras.length >= AuraEngine.MAX ? "The Aura library is full." : "No valid Aura objects were found.", true); ToastManager.error("No valid Aura objects found."); }
 			else { selected = cfg.auras.length - 1; creationHomeOpen = false; deleteArmed = -1; SettingsStore.markDirty(); var msg = added + " Aura(s) imported successfully!"; setIoStatus(msg, false); ToastManager.success(msg); }
 		} catch (_:Dynamic) { setIoStatus("Import failed: invalid Aura share key or JSON.", true); ToastManager.error("Import failed: invalid Aura share key or JSON."); }

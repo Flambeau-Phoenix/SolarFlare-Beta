@@ -1,0 +1,2880 @@
+{
+  "frames": {
+    "loot_Agate.png": {
+      "x": 0,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Amber.png": {
+      "x": 96,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_AncientThymePetal.png": {
+      "x": 192,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Axe_Boomerang.png": {
+      "x": 288,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EBee_AssCle.png": {
+      "x": 384,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EBee_FigAss.png": {
+      "x": 480,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EBee_Wiz.png": {
+      "x": 576,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_ECrimson_AssWiz.png": {
+      "x": 672,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_ECrimson_Fig.png": {
+      "x": 768,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_ECrimson_WizCle.png": {
+      "x": 864,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EDemon_Ass.png": {
+      "x": 960,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EDemon_Cle.png": {
+      "x": 1056,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EDemon_FigWiz.png": {
+      "x": 1152,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EKobold_Ass.png": {
+      "x": 1248,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EKobold_Cle.png": {
+      "x": 1344,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EKobold_FigWiz.png": {
+      "x": 1440,
+      "y": 0,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EManfish_AssWiz.png": {
+      "x": 0,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EManfish_FigCle.png": {
+      "x": 96,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_EManfish_WizCle.png": {
+      "x": 192,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_RDemon_Ass.png": {
+      "x": 288,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_RDemon_Cle.png": {
+      "x": 384,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Back_RDemon_FigWiz.png": {
+      "x": 480,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Beryl.png": {
+      "x": 576,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Blood_Z1.png": {
+      "x": 672,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_BoarMeat_Z1.png": {
+      "x": 768,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Book_WaterOrbs.png": {
+      "x": 864,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Bow_BigGame.png": {
+      "x": 960,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Bow_Craft.png": {
+      "x": 1056,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Cheese_Z1.png": {
+      "x": 1152,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Cheese_Z2.png": {
+      "x": 1248,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EBee_AssCle.png": {
+      "x": 1344,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EBee_Fig.png": {
+      "x": 1440,
+      "y": 96,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EBee_WizCle.png": {
+      "x": 0,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_ECrimson_Ass.png": {
+      "x": 96,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_ECrimson_FigCle.png": {
+      "x": 192,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_ECrimson_Wiz.png": {
+      "x": 288,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EDemon_Ass.png": {
+      "x": 384,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EDemon_FigCle.png": {
+      "x": 480,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EDemon_WizCle.png": {
+      "x": 576,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EKobold_AssWiz.png": {
+      "x": 672,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EKobold_Cle.png": {
+      "x": 768,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EKobold_FigAss.png": {
+      "x": 864,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EManfish_AssCle.png": {
+      "x": 960,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EManfish_Cle.png": {
+      "x": 1056,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_EManfish_FigWiz.png": {
+      "x": 1152,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_RDemon_Ass.png": {
+      "x": 1248,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_RDemon_FigCle.png": {
+      "x": 1344,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Chest_RDemon_WizCle.png": {
+      "x": 1440,
+      "y": 192,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_ChippedTusk.png": {
+      "x": 0,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Cloth_Z1.png": {
+      "x": 96,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Coal.png": {
+      "x": 192,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_CopperOre.png": {
+      "x": 288,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_CoyoteMeat.png": {
+      "x": 384,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_CrabEgg.png": {
+      "x": 480,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_CrabMeat_Z1.png": {
+      "x": 576,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_CraftPoint.png": {
+      "x": 672,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Crescent_FlowerSpiral.png": {
+      "x": 768,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DA_Water.png": {
+      "x": 864,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DM_Multispin.png": {
+      "x": 960,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DS_Z1RBee_AssWiz.png": {
+      "x": 1056,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Daggers_Demondash.png": {
+      "x": 1152,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Daggers_DuplicatePoison.png": {
+      "x": 1248,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_APToCrit.png": {
+      "x": 1344,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_APToFerv.png": {
+      "x": 1440,
+      "y": 288,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_APToMP.png": {
+      "x": 0,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_CritToAP.png": {
+      "x": 96,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_CritToFerv.png": {
+      "x": 192,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_CritToMP.png": {
+      "x": 288,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_FervToAp.png": {
+      "x": 384,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_FervToCrit.png": {
+      "x": 480,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_FervToMP.png": {
+      "x": 576,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_MPToAP.png": {
+      "x": 672,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_MPToCrit.png": {
+      "x": 768,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgradeRare_MPToFerv.png": {
+      "x": 864,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_APToCrit.png": {
+      "x": 960,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_APToFerv.png": {
+      "x": 1056,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_APToMP.png": {
+      "x": 1152,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_CritToAP.png": {
+      "x": 1248,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_CritToFerv.png": {
+      "x": 1344,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_CritToMP.png": {
+      "x": 1440,
+      "y": 384,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_FervToAp.png": {
+      "x": 0,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_FervToCrit.png": {
+      "x": 96,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_FervToMP.png": {
+      "x": 192,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_MPToAP.png": {
+      "x": 288,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_MPToCrit.png": {
+      "x": 384,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonGearUpgrade_MPToFerv.png": {
+      "x": 480,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_Mage_HighVoltage.png": {
+      "x": 576,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_Mage_Lifebolt.png": {
+      "x": 672,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_Mage_SparkExplosion.png": {
+      "x": 768,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_Priest_LuminousBastion.png": {
+      "x": 864,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_Priest_SolarDevotion.png": {
+      "x": 960,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_Priest_SunHalo.png": {
+      "x": 1056,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_Rogue_CheatDeath.png": {
+      "x": 1152,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_Rogue_VenomousFinisher.png": {
+      "x": 1248,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_Rogue_VirulentMagic.png": {
+      "x": 1344,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_War_InfusedWounds.png": {
+      "x": 1440,
+      "y": 480,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_War_SecondWind.png": {
+      "x": 0,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonSigil_War_SurgeOfViolence.png": {
+      "x": 96,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonicHorn.png": {
+      "x": 192,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_DemonicSoul.png": {
+      "x": 288,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Eye_Z1.png": {
+      "x": 384,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Fang_Z1.png": {
+      "x": 480,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Fat.png": {
+      "x": 576,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EBee_AssWiz.png": {
+      "x": 672,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EBee_Cle.png": {
+      "x": 768,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EBee_Fig.png": {
+      "x": 864,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_ECrimson_Ass.png": {
+      "x": 960,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_ECrimson_FigCle.png": {
+      "x": 1056,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_ECrimson_Wiz.png": {
+      "x": 1152,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EDemon_AssCle.png": {
+      "x": 1248,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EDemon_Fig.png": {
+      "x": 1344,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EDemon_WizCle.png": {
+      "x": 1440,
+      "y": 576,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EKobold_AssCle.png": {
+      "x": 0,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EKobold_FigAss.png": {
+      "x": 96,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EKobold_WizCle.png": {
+      "x": 192,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EManfish_Ass.png": {
+      "x": 288,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EManfish_FigWiz.png": {
+      "x": 384,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_EManfish_Wiz.png": {
+      "x": 480,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_RDemon_AssCle.png": {
+      "x": 576,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_RDemon_Fig.png": {
+      "x": 672,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Feet_RDemon_WizCle.png": {
+      "x": 768,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_FiendishEye.png": {
+      "x": 864,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Fin_Z1.png": {
+      "x": 960,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Fists_LightMonk.png": {
+      "x": 1056,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Fists_WaterUppecut.png": {
+      "x": 1152,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_GA_Craft.png": {
+      "x": 1248,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_GA_Demon.png": {
+      "x": 1344,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_GM_MassGrab.png": {
+      "x": 1440,
+      "y": 672,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_GS_Nova.png": {
+      "x": 0,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Bat_BlackWhite.png": {
+      "x": 96,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Bat_Brown.png": {
+      "x": 192,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Bat_Demon.png": {
+      "x": 288,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Bat_WhiteBlack.png": {
+      "x": 384,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Butterfly_Blue.png": {
+      "x": 480,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Butterfly_Yellow.png": {
+      "x": 576,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Crimson01.png": {
+      "x": 672,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Demon_Blue02.png": {
+      "x": 768,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Demon_Grey.png": {
+      "x": 864,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Demon_Purple.png": {
+      "x": 960,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Dragon_Demon.png": {
+      "x": 1056,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Dragon_Lava.png": {
+      "x": 1152,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Dragon_Yellow.png": {
+      "x": 1248,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_FlyingFish_Acid.png": {
+      "x": 1344,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_FlyingFish_BlueGreen.png": {
+      "x": 1440,
+      "y": 768,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_FlyingFish_Demon.png": {
+      "x": 0,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_FlyingFish_Orange.png": {
+      "x": 96,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_FlyingFish_Red.png": {
+      "x": 192,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Pigeon_Beige.png": {
+      "x": 288,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Pigeon_Blue.png": {
+      "x": 384,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Pigeon_Grey.png": {
+      "x": 480,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Pigeon_Grey02.png": {
+      "x": 576,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Pigeon_Purple.png": {
+      "x": 672,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Sprout_Green.png": {
+      "x": 768,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Glider_Sprout_Red.png": {
+      "x": 864,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_GlossyChitin.png": {
+      "x": 960,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Gold.png": {
+      "x": 1056,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Halos_Demon.png": {
+      "x": 1152,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Halos_Totem.png": {
+      "x": 1248,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hammer.png": {
+      "x": 1344,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EBee_AssWiz.png": {
+      "x": 1440,
+      "y": 864,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EBee_Cle.png": {
+      "x": 0,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EBee_FigAss.png": {
+      "x": 96,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_ECrimson_Ass.png": {
+      "x": 192,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_ECrimson_Fig.png": {
+      "x": 288,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_ECrimson_Wiz.png": {
+      "x": 384,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EDemon_AssWiz.png": {
+      "x": 480,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EDemon_FigAss.png": {
+      "x": 576,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EDemon_WizCle.png": {
+      "x": 672,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EKobold_AssCle.png": {
+      "x": 768,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EKobold_FigWiz.png": {
+      "x": 864,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EKobold_WizCle.png": {
+      "x": 960,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EManfish_Ass.png": {
+      "x": 1056,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EManfish_FigCle.png": {
+      "x": 1152,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_EManfish_Wiz.png": {
+      "x": 1248,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_RDemon_AssWiz.png": {
+      "x": 1344,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_RDemon_FigAss.png": {
+      "x": 1440,
+      "y": 960,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Hands_RDemon_WizCle.png": {
+      "x": 0,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EBee_AssWiz.png": {
+      "x": 96,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EBee_FigWiz.png": {
+      "x": 192,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EBee_WizCle.png": {
+      "x": 288,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_ECrimson_AssCle.png": {
+      "x": 384,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_ECrimson_Cle.png": {
+      "x": 480,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_ECrimson_FigAss.png": {
+      "x": 576,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EDemon_AssCle.png": {
+      "x": 672,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EDemon_FigWiz.png": {
+      "x": 768,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EDemon_Wiz.png": {
+      "x": 864,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EKobold_AssWiz.png": {
+      "x": 960,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EKobold_FigCle.png": {
+      "x": 1056,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EKobold_WizCle.png": {
+      "x": 1152,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EManfish_Ass.png": {
+      "x": 1248,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EManfish_Fig.png": {
+      "x": 1344,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_EManfish_Wiz.png": {
+      "x": 1440,
+      "y": 1056,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_RDemon_AssCle.png": {
+      "x": 0,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_RDemon_FigWiz.png": {
+      "x": 96,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Head_RDemon_Wiz.png": {
+      "x": 192,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Honey_Z1.png": {
+      "x": 288,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Bee_DPS.png": {
+      "x": 384,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Bee_Support.png": {
+      "x": 480,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Bee_Tank.png": {
+      "x": 576,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Crimson_DPS.png": {
+      "x": 672,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Crimson_Support.png": {
+      "x": 768,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Crimson_Tank.png": {
+      "x": 864,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Kobold_DPS.png": {
+      "x": 960,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Kobold_Support.png": {
+      "x": 1056,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Kobold_Tank.png": {
+      "x": 1152,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Manfish_DPS.png": {
+      "x": 1248,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Manfish_Support.png": {
+      "x": 1344,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_InfusionPattern_Manfish_Tank.png": {
+      "x": 1440,
+      "y": 1152,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_KoboldMetal.png": {
+      "x": 0,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_LavendulaPetal.png": {
+      "x": 96,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Leather_Z1.png": {
+      "x": 192,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EBee_Ass.png": {
+      "x": 288,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EBee_FigCle.png": {
+      "x": 384,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EBee_WizCle.png": {
+      "x": 480,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_ECrimson_AssCle.png": {
+      "x": 576,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_ECrimson_Cle.png": {
+      "x": 672,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_ECrimson_FigWiz.png": {
+      "x": 768,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EDemon_AssCle.png": {
+      "x": 864,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EDemon_FigAss.png": {
+      "x": 960,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EDemon_Wiz.png": {
+      "x": 1056,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EKobold_AssWiz.png": {
+      "x": 1152,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EKobold_Fig.png": {
+      "x": 1248,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EKobold_Wiz.png": {
+      "x": 1344,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EManfish_AssCle.png": {
+      "x": 1440,
+      "y": 1248,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EManfish_Cle.png": {
+      "x": 0,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_EManfish_FigAss.png": {
+      "x": 96,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_RDemon_AssCle.png": {
+      "x": 192,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_RDemon_FigAss.png": {
+      "x": 288,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Legs_RDemon_Wiz.png": {
+      "x": 384,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mace_Benediction.png": {
+      "x": 480,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mackerel.png": {
+      "x": 576,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_MadrigoldPetal.png": {
+      "x": 672,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Malachite.png": {
+      "x": 768,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mastery.png": {
+      "x": 864,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_MinorHealingPotion.png": {
+      "x": 960,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_MoteOfAir.png": {
+      "x": 1056,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_MoteOfChaos.png": {
+      "x": 1152,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_MoteOfEarth.png": {
+      "x": 1248,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_MoteOfFire.png": {
+      "x": 1344,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_MoteOfNature.png": {
+      "x": 1440,
+      "y": 1344,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_MoteOfWater.png": {
+      "x": 0,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Aries_03.png": {
+      "x": 96,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Aries_05.png": {
+      "x": 192,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Boar_01.png": {
+      "x": 288,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Crab_Blue.png": {
+      "x": 384,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Crab_Demonic.png": {
+      "x": 480,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Crab_Red.png": {
+      "x": 576,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Crab_Yellow.png": {
+      "x": 672,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Demon_02.png": {
+      "x": 768,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Demon_04.png": {
+      "x": 864,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Demon_06.png": {
+      "x": 960,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Hound_01.png": {
+      "x": 1056,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Ladybug_Blue.png": {
+      "x": 1152,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Ladybug_Green.png": {
+      "x": 1248,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Ladybug_Purple.png": {
+      "x": 1344,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Ladybug_Red.png": {
+      "x": 1440,
+      "y": 1440,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Skunk_01.png": {
+      "x": 0,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Skunk_04.png": {
+      "x": 96,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Skunk_06.png": {
+      "x": 192,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Mount_Wolf_02.png": {
+      "x": 288,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_NepsidScale.png": {
+      "x": 384,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Nightblood.png": {
+      "x": 480,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Particle_Z1.png": {
+      "x": 576,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Pearl.png": {
+      "x": 672,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Pike.png": {
+      "x": 768,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Pumpkin.png": {
+      "x": 864,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Ramgold.png": {
+      "x": 960,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Rock_Z1.png": {
+      "x": 1056,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_RoyalJelly.png": {
+      "x": 1152,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Ruby.png": {
+      "x": 1248,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Scepter_Flamie.png": {
+      "x": 1344,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_ScrollOfDexterity.png": {
+      "x": 1440,
+      "y": 1536,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_ScrollOfFaith.png": {
+      "x": 0,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_ScrollOfIntelligence.png": {
+      "x": 96,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_ScrollOfStrength.png": {
+      "x": 192,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_ScrollOfVitality.png": {
+      "x": 288,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shield_Craft.png": {
+      "x": 384,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shield_Firebreath.png": {
+      "x": 480,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shield_OrbitWater.png": {
+      "x": 576,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EBee_Ass.png": {
+      "x": 672,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EBee_FigCle.png": {
+      "x": 768,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EBee_Wiz.png": {
+      "x": 864,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_ECrimson_AssCle.png": {
+      "x": 960,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_ECrimson_Cle.png": {
+      "x": 1056,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_ECrimson_FigWiz.png": {
+      "x": 1152,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EDemon_AssWiz.png": {
+      "x": 1248,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EDemon_Cle.png": {
+      "x": 1344,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EDemon_Fig.png": {
+      "x": 1440,
+      "y": 1632,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EKobold_Ass.png": {
+      "x": 0,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EKobold_Fig.png": {
+      "x": 96,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EKobold_Wiz.png": {
+      "x": 192,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EManfish_AssWiz.png": {
+      "x": 288,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EManfish_FigAss.png": {
+      "x": 384,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_EManfish_WizCle.png": {
+      "x": 480,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_RDemon_AssWiz.png": {
+      "x": 576,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_RDemon_Cle.png": {
+      "x": 672,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Shoulders_RDemon_Fig.png": {
+      "x": 768,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_SkillPointBook_Red.png": {
+      "x": 864,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_SkunkMeat_Z1.png": {
+      "x": 960,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_SmallPouch.png": {
+      "x": 1056,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_SoftFur.png": {
+      "x": 1152,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Soulstone_Z1_1.png": {
+      "x": 1248,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Soulstone_Z1_2.png": {
+      "x": 1344,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Soulstone_Z1_3.png": {
+      "x": 1440,
+      "y": 1728,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Soulstone_Z1_4.png": {
+      "x": 0,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Soulstone_Z2_1.png": {
+      "x": 96,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Soulstone_Z2_2.png": {
+      "x": 192,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Soulstone_Z2_3.png": {
+      "x": 288,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Soulstone_Z2_4.png": {
+      "x": 384,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_SparkSample.png": {
+      "x": 480,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Spear_Eruption.png": {
+      "x": 576,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Spear_Goo.png": {
+      "x": 672,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_SpiritHeart_Z2.png": {
+      "x": 768,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Staff_Censer.png": {
+      "x": 864,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Staff_Craft.png": {
+      "x": 960,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Staff_SummonDemon.png": {
+      "x": 1056,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_StaleBread.png": {
+      "x": 1152,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Stone_Ore_Z1.png": {
+      "x": 1248,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_StrangeSpores.png": {
+      "x": 1344,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_SweetRoot.png": {
+      "x": 1440,
+      "y": 1824,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Sword_Craft.png": {
+      "x": 0,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Sword_Swarm.png": {
+      "x": 96,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_TPDeathStone.png": {
+      "x": 192,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_TailSlice.png": {
+      "x": 288,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Thrown_Seeds.png": {
+      "x": 384,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_TinOre.png": {
+      "x": 480,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Trinket_Bee_E.png": {
+      "x": 576,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Trinket_Crimson_E.png": {
+      "x": 672,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Trinket_Demon.png": {
+      "x": 768,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Trinket_Demon_E.png": {
+      "x": 864,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Trinket_Kobold_E.png": {
+      "x": 960,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Trinket_Manfish_E.png": {
+      "x": 1056,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_TungsteneOre.png": {
+      "x": 1152,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_UpgradeAll.png": {
+      "x": 1248,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_UpgradeEpic.png": {
+      "x": 1344,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_UpgradeRare.png": {
+      "x": 1440,
+      "y": 1920,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_VeiledWing.png": {
+      "x": 0,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EBee_AssCle.png": {
+      "x": 96,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EBee_FigWiz.png": {
+      "x": 192,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EBee_Wiz.png": {
+      "x": 288,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_ECrimson_AssWiz.png": {
+      "x": 384,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_ECrimson_FigAss.png": {
+      "x": 480,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_ECrimson_WizCle.png": {
+      "x": 576,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EDemon_AssWiz.png": {
+      "x": 672,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EDemon_Cle.png": {
+      "x": 768,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EDemon_FigCle.png": {
+      "x": 864,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EKobold_Ass.png": {
+      "x": 960,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EKobold_Cle.png": {
+      "x": 1056,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EKobold_FigCle.png": {
+      "x": 1152,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EManfish_AssWiz.png": {
+      "x": 1248,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EManfish_Fig.png": {
+      "x": 1344,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_EManfish_WizCle.png": {
+      "x": 1440,
+      "y": 2016,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_RDemon_AssWiz.png": {
+      "x": 0,
+      "y": 2112,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_RDemon_Cle.png": {
+      "x": 96,
+      "y": 2112,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Waist_RDemon_FigCle.png": {
+      "x": 192,
+      "y": 2112,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Wheat.png": {
+      "x": 288,
+      "y": 2112,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_Wing_Z1.png": {
+      "x": 384,
+      "y": 2112,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_WolfMeat_Z1.png": {
+      "x": 480,
+      "y": 2112,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    },
+    "loot_ZealotusPetal.png": {
+      "x": 576,
+      "y": 2112,
+      "w": 96,
+      "h": 96,
+      "atlas_w": 1536,
+      "atlas_h": 2208
+    }
+  },
+  "meta": {
+    "width": 1536,
+    "height": 2208
+  }
+}

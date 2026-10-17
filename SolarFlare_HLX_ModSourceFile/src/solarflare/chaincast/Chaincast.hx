@@ -8,6 +8,7 @@ import solarflare.ui.UiLayout;
 import solarflare.EngineSkillId;
 import solarflare.geaux.GeauxCache;
 import solarflare.geaux.GeauxCache.GeauxSlotSnap;
+import solarflare.chaincast.ChaincastModules.ChaincastSnapMemo;
 import imgui.ImGui;
 import imgui.Enums.ImGuiCol;
 import imgui.Enums.ImGuiCond;
@@ -39,6 +40,13 @@ class ChaincastCache {
 	public static var readyProgress:Float = 0;
 	public static var pulseUntil:Float = 0;
 	static var lastShown:Int = 0;
+	/** Stamp of the last not-ready -> ready edge (Free Cast Banner). */
+	public static var readyEdgeAt:Float = -1000;
+	/** Icon keys of the casts that charged the chain (slot i = charge i + 1); "" = unknown cast. */
+	public static var trail:Array<String> = ["", "", "", ""];
+	public static var trailCount:Int = 0;
+	/** Icon key of the cast that spent the free charge; "" while the free slot is still open. */
+	public static var freeIcon:String = "";
 
 	static var talentKey:String = "Mage_Talent_Chaincast";
 	static var talentHash:String = "";
@@ -59,6 +67,38 @@ class ChaincastCache {
 		readyProgress = 0;
 		pulseUntil = 0;
 		lastShown = 0;
+		readyEdgeAt = -1000;
+		resetTrail();
+	}
+
+	static function resetTrail():Void {
+		for (i in 0...trail.length)
+			trail[i] = "";
+		trailCount = 0;
+		freeIcon = "";
+	}
+
+	/**
+	 * Trail bookkeeping on the stack edge (called from the status sample, not from draw). The cast that
+	 * produced the charge is the newest LocalCastHistory record; a record older than the window is unknown.
+	 */
+	static function noteTrail(prev:Int, now:Int, wasReady:Bool):Void {
+		if (now == 0) {
+			if (wasReady) {
+				// Free charge spent (a record after the ready edge), or the window simply expired.
+				freeIcon = ChaincastSnapMemo.latestCastIcon(readyEdgeAt, 0);
+			} else if (prev > 0)
+				resetTrail();
+			return;
+		}
+		if (prev == 0 && now > 0)
+			resetTrail();
+		if (now > prev) {
+			var icon = ChaincastSnapMemo.latestCastIcon(0, 2.5);
+			for (k in prev...now)
+				trail[k] = icon;
+			trailCount = now;
+		}
 	}
 
 	public static function noteMage():Void {
@@ -72,11 +112,14 @@ class ChaincastCache {
 			n = 0;
 		if (n > ACCUM_MAX)
 			n = ACCUM_MAX;
+		var wasReady = ready;
+		var prev = valid && !wasReady ? current : 0;
 		current = n;
 		max = ACCUM_MAX;
 		ready = false;
 		valid = true;
 		active = true;
+		noteTrail(prev, n, wasReady);
 		notePulse(n);
 	}
 
@@ -94,6 +137,13 @@ class ChaincastCache {
 	}
 
 	public static function setReady():Void {
+		if (!ready) {
+			readyEdgeAt = solarflare.ui.ResourceMaxAlert.nowSec();
+			// The fourth charge can arrive folded into the ready status; close the trail on the edge.
+			if (trailCount < ACCUM_MAX)
+				noteTrail(trailCount, ACCUM_MAX, false);
+			freeIcon = "";
+		}
 		current = ACCUM_MAX;
 		max = ACCUM_MAX;
 		ready = true;
@@ -229,11 +279,14 @@ class ChaincastConfig {
 	/** Left stack badge (N/4 or READY). Hide to use pip rail only. */
 	public var showStackBadge = new BoolRef(true);
 	public var titleBuf:hl.Bytes;
+	/** Independent movable Chaincast windows (counter, timer, gem, skill watch, trail, banner). */
+	public var modules:ChaincastModules;
 
 	public function new() {
 		chrome = new HudChrome(40, 210);
 		titleBuf = new hl.Bytes(TITLE_BUF);
 		syncTitleBuf();
+		modules = new ChaincastModules(this);
 	}
 
 	public function syncTitleBuf():Void {
@@ -275,11 +328,15 @@ class ChaincastConfig {
 	public function drawAppearanceSettings():Void {
 		UiLayout.propertyGrid("##chain_appearance", function() {
 			UiLayout.propertyRow("Graphic", function() {
-				var selected = style.get();
-				if (selected < 0 || selected >= ChaincastRenderer.STYLE_COUNT) selected = 0;
-				if (ImGui.beginCombo("##chain_style", ChaincastRenderer.STYLE_NAMES[selected])) {
-					for (i in 0...ChaincastRenderer.STYLE_COUNT) {
-						if (ImGui.selectable(ChaincastRenderer.STYLE_NAMES[i], selected == i)) {
+				var selected = ChaincastRenderer.clampGraphic(style.get());
+				if (ImGui.beginCombo("##chain_style", ChaincastRenderer.GRAPHIC_LABELS[selected])) {
+					var group = 0;
+					for (i in 0...ChaincastRenderer.GRAPHIC_COUNT) {
+						if (group < ChaincastRenderer.GRAPHIC_FIRST.length && i == ChaincastRenderer.GRAPHIC_FIRST[group]) {
+							ImGui.separatorText(ChaincastRenderer.GRAPHIC_GROUPS[group]);
+							group++;
+						}
+						if (ImGui.selectable(ChaincastRenderer.GRAPHIC_ITEMS[i], selected == i)) {
 							style.set(i);
 							sizeDirty = true;
 							SettingsStore.markDirty();
@@ -289,6 +346,8 @@ class ChaincastConfig {
 				}
 			});
 		});
+		if (style.get() >= ChaincastRenderer.STYLE_COUNT)
+			ImGui.textWrapped("This graphic is drawn by the matching Chaincast module, in this window's graphic band. The module's own window below is separate.");
 		if (ChaincastRenderer.isFlagship(style.get()))
 			ImGui.textWrapped("Four illuminated segments track Chaincast. The center checks the linked skill: check = off cooldown; X = cooldown with seconds remaining. ? = no current data. The ring fills as cooldown recovers. This does not check resource cost or range.");
 	}
@@ -315,6 +374,12 @@ class ChaincastConfig {
 				}
 			});
 		});
+		drawRotationEditor();
+		modules.drawHub();
+	}
+
+	/** Skills the legacy hint list and the Skill Watch module both read. */
+	public function drawRotationEditor():Void {
 		ImGui.separatorText("Next-cast list");
 		ImGui.textWrapped("Pick from your action bar and class skills. Highlight is a reminder only.");
 		var i = 0;
@@ -433,6 +498,19 @@ class ChaincastConfig {
 	}
 }
 
+/** Offsets of the combined window's bands (see ChaincastOverlay.layout). */
+class ChaincastLayout {
+	public var rowW:Single = 0;
+	public var headH:Single = 0;
+	public var timerY:Single = 0;
+	public var headY:Single = 0;
+	public var hintsY:Single = 0;
+	public var contentH:Single = 0;
+	public var rows:Int = 0;
+
+	public function new() {}
+}
+
 /**
  * Movable/resizable block gauge for mage Chaincast stacks.
  * Reads ChaincastCache only — never live status objects from the draw loop.
@@ -448,6 +526,8 @@ class ChaincastOverlay {
 	static inline var FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
 		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
 	static inline var PAD:Single = 6;
+	/** Content inset inside the window body. */
+	static inline var INSET:Single = 4;
 	static inline var HEAD_H:Single = 30;
 	static inline var TIMER_H:Single = 38;
 	static inline var HINT_H:Single = 22;
@@ -457,6 +537,7 @@ class ChaincastOverlay {
 
 	var theme:Theme;
 	var skillState = new ChaincastSkillState();
+	var lay = new ChaincastLayout();
 
 	public function new() {
 		hudBodyFn = hudBody;
@@ -474,7 +555,12 @@ class ChaincastOverlay {
 	}
 
 	public function draw(cfg:ChaincastConfig):Void {
-		if (cfg == null || cfg.hidden.get())
+		if (cfg == null)
+			return;
+		// Modules own their windows and visibility; the combined window below is just one more consumer.
+		if (cfg.modules != null)
+			cfg.modules.draw();
+		if (cfg.hidden.get())
 			return;
 		if (!ChaincastCache.active)
 			return;
@@ -483,14 +569,29 @@ class ChaincastOverlay {
 	}
 
 	public var openBuilder:Void->Void;
+
+	/**
+	 * The single layout of the combined window. drawWindow, hudBody and hudResize all read it, so the
+	 * rail, the timer band and the hint rows sit at fixed offsets and the window height never depends on
+	 * transient state (the chain timer is a reserved band, not an insertion above the rail).
+	 */
+	function layout(cfg:ChaincastConfig, w:Single):ChaincastLayout {
+		var rows:Int = cfg.rotation != null ? cfg.rotation.length : 0;
+		lay.rowW = w - INSET * 2;
+		var g = cfg.style.get();
+		lay.headH = g >= ChaincastRenderer.STYLE_COUNT && cfg.modules != null ? cfg.modules.graphicHeight(ChaincastRenderer.clampGraphic(g))
+			: ChaincastRenderer.headHeight(g, lay.rowW);
+		lay.timerY = INSET;
+		lay.headY = lay.timerY + TIMER_H + GAP;
+		lay.hintsY = lay.headY + lay.headH + GAP;
+		lay.rows = rows;
+		lay.contentH = (rows > 0 ? lay.hintsY + rows * (HINT_H + GAP) - GAP : lay.headY + lay.headH) + INSET;
+		return lay;
+	}
+
 	function drawWindow(cfg:ChaincastConfig):Void {
 		var w:Single = Math.max(ChaincastConfig.MIN_W, Math.min(ChaincastConfig.MAX_W, cfg.width.get()));
-		var rows:Int = cfg.rotation != null ? cfg.rotation.length : 0;
-		// Must match the draw order below, or the last row clips off the bottom.
-		var contentH:Single = 8 + ChaincastRenderer.headHeight(cfg.style.get(), w - 8)
-			+ (ChaincastCache.remainValid ? TIMER_H + GAP : 0)
-			+ (rows > 0 ? rows * (HINT_H + GAP) : 0);
-		var h:Single = Math.max(contentH, cfg.height.get());
+		var h:Single = Math.max(layout(cfg, w).contentH, cfg.height.get());
 		hudCfg = cfg;
 		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Chaincast", "Chaincast", cfg.chrome, w, h, hudBodyFn, openBuilder, hudHideFn, false, null, hudResizeFn);
 		hudCfg = null;
@@ -498,6 +599,13 @@ class ChaincastOverlay {
 
 	function drawHead(cfg:ChaincastConfig, rowW:Single, rowH:Single):Void {
 		var showBadge = cfg == null || cfg.showStackBadge == null || cfg.showStackBadge.get();
+		var graphic = cfg.style.get();
+		if (graphic >= ChaincastRenderer.STYLE_COUNT && cfg.modules != null) {
+			var gp = ImGui.getCursorScreenPos();
+			ImGui.dummy(ImGui.vec2(rowW, rowH));
+			cfg.modules.drawGraphic(ChaincastRenderer.clampGraphic(graphic), gp.x, gp.y, rowW, rowH, showBadge);
+			return;
+		}
 		var stacks = ChaincastCache.valid ? ChaincastCache.current : 0;
 		var ready = ChaincastCache.ready;
 		var pulse = ready || ChaincastCache.pulseActive();
@@ -510,20 +618,22 @@ class ChaincastOverlay {
 		ChaincastRenderer.drawHead(rowW, rowH, stacks, ready, showBadge, pulse, cfg.style.get(), skillState);
 	}
 
-	static function drawTimer(rowW:Single, rowH:Single):Void {
+	/** Always occupies its band; while no chain timer runs it shows a dim empty track instead. */
+	static function drawTimer(rowW:Single, rowH:Single, live:Bool):Void {
 		var origin = ImGui.getCursorScreenPos();
 		var dl = ImGui.getWindowDrawList();
-		var left = ChaincastCache.remainLeft;
-		var prog = ChaincastCache.remainProg;
+		var left = live ? ChaincastCache.remainLeft : 0;
+		var prog = live ? ChaincastCache.remainProg : 0;
 		if (prog < 0)
 			prog = 0;
 		if (prog > 1)
 			prog = 1;
-		var label = "CHAIN TIME REMAINING: " + formatReadyLeft(left) + "s";
+		var label = live ? "CHAIN TIME REMAINING: " + formatReadyLeft(left) + "s" : "CHAIN TIME";
+		var dim:Single = live ? 1 : 0.38;
 		ImGui.pushFont(ImGui.getFont(), LABEL_FONT);
 		var ts = ImGui.calcTextSize(label);
-		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(origin.x + 3, origin.y + 1), u32(0, 0, 0, 0.85), label);
-		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(origin.x + 2, origin.y), u32(0.75, 0.88, 1.0, 0.98), label);
+		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(origin.x + 3, origin.y + 1), u32(0, 0, 0, 0.85 * dim), label);
+		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(origin.x + 2, origin.y), u32(0.75, 0.88, 1.0, 0.98 * dim), label);
 		ImGui.popFont();
 		var barY:Single = origin.y + ts.y + 2;
 		var barH:Single = rowH - ts.y - 4;
@@ -634,15 +744,18 @@ class ChaincastOverlay {
 
 	function hudBody(size:imgui.Structs.ImVec2):Void {
 		var cfg = hudCfg;
-		var rows:Int = cfg.rotation != null ? cfg.rotation.length : 0;
+		var L = layout(cfg, size.x);
 		var p = ImGui.getCursorScreenPos();
 		ImGui.dummy(size);
-		ImGui.setCursorScreenPos(ImGui.vec2(p.x+4, p.y+4));
-		var rowW:Single = size.x - 8;
-		// Chain time sits above the blocks: underneath it was the first thing clipped.
-		if (ChaincastCache.remainValid) drawTimer(rowW, TIMER_H);
-		drawHead(cfg, rowW, ChaincastRenderer.headHeight(cfg.style.get(), rowW));
-		if (rows > 0) drawHints(cfg, rowW);
+		// Chain time sits above the blocks in its own reserved band.
+		ImGui.setCursorScreenPos(ImGui.vec2(p.x + INSET, p.y + L.timerY));
+		drawTimer(L.rowW, TIMER_H, ChaincastCache.remainValid);
+		ImGui.setCursorScreenPos(ImGui.vec2(p.x + INSET, p.y + L.headY));
+		drawHead(cfg, L.rowW, L.headH);
+		if (L.rows > 0) {
+			ImGui.setCursorScreenPos(ImGui.vec2(p.x + INSET, p.y + L.hintsY));
+			drawHints(cfg, L.rowW);
+		}
 	}
 
 	function hudHide():Void {
@@ -650,12 +763,11 @@ class ChaincastOverlay {
 		cfg.hidden.set(true); SettingsStore.markDirty();
 	}
 
+	/** Persist what the player asked for; the layout floor is applied when drawing, never baked in. */
 	function hudResize(newW:Single, newH:Single):Void {
 		var cfg = hudCfg;
-		var rows:Int = cfg.rotation != null ? cfg.rotation.length : 0;
-		var contentH:Single = 8 + ChaincastRenderer.headHeight(cfg.style.get(), newW - 8) + (ChaincastCache.remainValid ? TIMER_H + GAP : 0) + (rows > 0 ? rows * (HINT_H + GAP) : 0);
 		cfg.width.set(Math.max(ChaincastConfig.MIN_W, Math.min(ChaincastConfig.MAX_W, newW)));
-		cfg.height.set(Math.max(contentH, newH));
+		cfg.height.set(Math.max(ChaincastConfig.MIN_H, Math.min(ChaincastConfig.MAX_H, newH)));
 		SettingsStore.markDirty();
 	}
 

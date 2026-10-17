@@ -323,9 +323,11 @@ class ComboOverlay {
 		var p = ImGui.getCursorScreenPos();
 		ImGui.dummy(size);
 		ImGui.setCursorScreenPos(ImGui.vec2(p.x+4, p.y+4));
-		var rowH:Single = size.y - 8;
-		if (ComboPointsCache.alertActive()) { solarflare.ui.ResourceMaxAlert.drawToast(size.x-8, solarflare.ui.ResourceMaxAlert.TOAST_H); rowH -= solarflare.ui.ResourceMaxAlert.TOAST_H + 3; }
+		// Pips keep their place; the toast is appended below them so a proc never pushes the pips down.
+		var alert = ComboPointsCache.alertActive();
+		var rowH:Single = size.y - 8 - (alert ? solarflare.ui.ResourceMaxAlert.TOAST_H + 3 : 0);
 		drawPips(size.x-8, rowH, cfg);
+		if (alert) solarflare.ui.ResourceMaxAlert.drawToast(size.x-8, solarflare.ui.ResourceMaxAlert.TOAST_H);
 	}
 
 	function hudHide():Void {

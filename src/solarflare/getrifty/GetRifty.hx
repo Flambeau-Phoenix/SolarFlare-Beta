@@ -235,7 +235,7 @@ class GetRiftyCache {
 		return null;
 	}
 
-	static function resolveLayer(app:Dynamic):Dynamic {
+	public static function resolveLayer(app:Dynamic):Dynamic {
 		try {
 			var gApp:GameApp = cast app;
 			if (gApp != null) {
@@ -381,6 +381,12 @@ class GetRiftyConfig {
 	public static inline var STYLE_ASCII_STAR:Int = 13;
 	public static inline var STYLE_ASCII_DAY:Int = 14;
 	public static inline var STYLE_ASCII_NIGHT:Int = 15;
+	/** Draw-list art (GetRiftyVectorArt). Saved in profiles: never renumber. */
+	public static inline var STYLE_VEC_PORTAL:Int = 16;
+	public static inline var STYLE_VEC_HOURGLASS:Int = 17;
+	public static inline var STYLE_VEC_CRACK:Int = 18;
+	public static inline var STYLE_VEC_MOON:Int = 19;
+	public static inline var STYLE_LAST:Int = 19;
 
 	public var hidden:BoolRef;
 	public var size = new FloatRef(168);
@@ -430,6 +436,10 @@ class GetRiftyConfig {
 						pickStyle("Big Star", STYLE_ASCII_STAR);
 						pickStyle("Daytime Rift", STYLE_ASCII_DAY);
 						pickStyle("Nighttime Rift", STYLE_ASCII_NIGHT);
+						pickStyle("Rift Portal (drawn)", STYLE_VEC_PORTAL);
+						pickStyle("Hourglass (drawn)", STYLE_VEC_HOURGLASS);
+						pickStyle("Crack (drawn)", STYLE_VEC_CRACK);
+						pickStyle("Sleeping Moon (drawn)", STYLE_VEC_MOON);
 						ImGui.endCombo();
 					}
 				});
@@ -512,6 +522,10 @@ class GetRiftyConfig {
 			case STYLE_ASCII_STAR: "Big Star";
 			case STYLE_ASCII_DAY: "Daytime Rift";
 			case STYLE_ASCII_NIGHT: "Nighttime Rift";
+			case STYLE_VEC_PORTAL: "Rift Portal";
+			case STYLE_VEC_HOURGLASS: "Hourglass";
+			case STYLE_VEC_CRACK: "Crack";
+			case STYLE_VEC_MOON: "Sleeping Moon";
 			default: "Sun";
 		};
 	}
@@ -538,6 +552,34 @@ class GetRiftyConfig {
 
 	public static function isAsciiStyle(style:Int):Bool {
 		return asciiStem(style).length > 0;
+	}
+
+	/** Saved values outside the known range (older or newer profiles) draw as the default Sun. */
+	public static inline function normalizeStyle(style:Int):Int {
+		return style < 0 || style > STYLE_LAST ? STYLE_SUN : style;
+	}
+
+	/** Text hole bounds as the overlay uses them: swapped corners fixed, too-thin spans reset to the default. */
+	public function holeU0():Float {
+		var lo = Math.min(textU0.get(), textU1.get());
+		return Math.max(textU0.get(), textU1.get()) - lo < 0.12 ? 0.28 : lo;
+	}
+
+	public function holeU1():Float {
+		var lo = Math.min(textU0.get(), textU1.get());
+		var hi = Math.max(textU0.get(), textU1.get());
+		return hi - lo < 0.12 ? 0.72 : hi;
+	}
+
+	public function holeV0():Float {
+		var lo = Math.min(textV0.get(), textV1.get());
+		return Math.max(textV0.get(), textV1.get()) - lo < 0.12 ? 0.38 : lo;
+	}
+
+	public function holeV1():Float {
+		var lo = Math.min(textV0.get(), textV1.get());
+		var hi = Math.max(textV0.get(), textV1.get());
+		return hi - lo < 0.12 ? 0.68 : hi;
 	}
 
 	function drawCropPreview():Void {
@@ -666,10 +708,12 @@ class GetRiftyOverlay {
 				var sunY:Single = origin.y + bannerH;
 				if (GetRiftyCache.alertKind != GetRiftyCache.ALERT_NONE)
 					drawBanner(dl, origin.x, origin.y, winW, bannerH);
-				var style = cfg.clockStyle.get();
+				var style = GetRiftyConfig.normalizeStyle(cfg.clockStyle.get());
 				var usedAnim = drawAlertAnim(dl, origin.x, sunY, size);
 				if (!usedAnim) {
-					if (style == GetRiftyConfig.STYLE_PLAIN)
+					if (GetRiftyVectorArt.isVectorStyle(style))
+						GetRiftyVectorArt.draw(dl, origin.x, sunY, size, style, cfg.holeU0(), cfg.holeV0(), cfg.holeU1(), cfg.holeV1());
+					else if (style == GetRiftyConfig.STYLE_PLAIN)
 						drawPlain(dl, origin.x, sunY, size);
 					else if (style == GetRiftyConfig.STYLE_BLANK)
 						drawBlank(dl, origin.x, sunY, size);

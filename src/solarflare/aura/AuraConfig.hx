@@ -33,6 +33,12 @@ class AuraConfig {
 	public var timerBoardRowH = new FloatRef(28);
 	public var timerBoardMax = new IntRef(8);
 	public var auras:Array<AuraDef> = [];
+	/** Aura Sets (an aura's `fight` tag is its set id). Edit through the methods below so the gate rebuilds. */
+	public var sets:Array<AuraSetDef> = [];
+	public static inline var MAX_SETS:Int = 32;
+	var setsDirty = true;
+	var gateMapRevision = -1;
+	var gate:Map<String, Bool> = new Map();
 	public var importBuf:hl.Bytes;
 	public var packIdBuf:hl.Bytes;
 	public var packNameBuf:hl.Bytes;
@@ -57,6 +63,153 @@ class AuraConfig {
 		fillBuf(packNameBuf, PACK_NAME, packName);
 		seedDefaults();
 		AuraEngine.loadAll(this);
+		ensureSets();
+	}
+
+	/** Call after any change to a set (mode, maps, rename, add, remove) or an aura's `fight` tag. */
+	public function markSetsDirty():Void setsDirty = true;
+
+	/**
+	 * Whether an aura with this tag is armed right now. Untagged auras, `shared`, and tags without a set always
+	 * run. The table is rebuilt only after an edit or a map change, never per frame.
+	 */
+	public function setActive(fight:String):Bool {
+		if (fight == null || fight.length == 0)
+			return true;
+		if (setsDirty || gateMapRevision != AuraMapContext.revision)
+			rebuildGate();
+		var armed = gate.get(fight);
+		return armed == null ? true : armed;
+	}
+
+	function rebuildGate():Void {
+		gate = new Map();
+		for (s in sets)
+			if (s != null)
+				gate.set(s.id, s.activeOn(AuraMapContext.mapId));
+		setsDirty = false;
+		gateMapRevision = AuraMapContext.revision;
+	}
+
+	public function findSet(id:String):AuraSetDef {
+		for (s in sets)
+			if (s != null && s.id == id)
+				return s;
+		return null;
+	}
+
+	/** The set tag of an aura, or empty for the Shared group. */
+	public static function tagOf(a:AuraDef):String {
+		if (a == null || a.fight == null)
+			return "";
+		var t = StringTools.trim(a.fight);
+		return t.toLowerCase() == "shared" ? "" : t;
+	}
+
+	public function countIn(setId:String):Int {
+		var n = 0;
+		for (a in auras)
+			if (a != null && tagOf(a) == setId)
+				n++;
+		return n;
+	}
+
+	/** Every non-empty tag in use gets a set, so saves and packs from before Aura Sets keep their groups. */
+	public function ensureSets():Void {
+		for (a in auras) {
+			var tag = tagOf(a);
+			// Engine lookups use the raw tag, so keep it trimmed to match its set id.
+			if (tag.length > 0 && a.fight != tag) {
+				a.fight = tag;
+				a.syncFightBuf();
+			}
+			if (tag.length > 0 && findSet(tag) == null && sets.length < MAX_SETS) {
+				var shown = tag.charAt(0).toUpperCase() + tag.substr(1);
+				sets.push(new AuraSetDef(tag, shown));
+			}
+		}
+		setsDirty = true;
+	}
+
+	public function uniqueSetId(name:String):String {
+		var base = ~/[^a-z0-9]+/g.replace(StringTools.trim(name).toLowerCase(), "_");
+		base = ~/^_+|_+$/g.replace(base, "");
+		if (base.length == 0 || base == "shared")
+			base = "set";
+		var id = base;
+		var n = 2;
+		while (findSet(id) != null)
+			id = base + "_" + n++;
+		return id;
+	}
+
+	public function addSet(name:String):AuraSetDef {
+		if (sets.length >= MAX_SETS)
+			return null;
+		var shown = StringTools.trim(name);
+		if (shown.length == 0)
+			shown = "New set";
+		var s = new AuraSetDef(uniqueSetId(shown), shown);
+		sets.push(s);
+		setsDirty = true;
+		return s;
+	}
+
+	/** Deleting a set sends its auras back to Shared; no aura is deleted. */
+	public function removeSet(id:String):Void {
+		var s = findSet(id);
+		if (s == null)
+			return;
+		sets.remove(s);
+		for (a in auras)
+			if (a != null && tagOf(a) == id) {
+				a.fight = "";
+				a.syncFightBuf();
+			}
+		setsDirty = true;
+	}
+
+	public function moveToSet(a:AuraDef, setId:String):Void {
+		if (a == null)
+			return;
+		a.fight = setId == null ? "" : setId;
+		a.syncFightBuf();
+		setsDirty = true;
+	}
+
+	public function anySetUsesMaps():Bool {
+		for (s in sets)
+			if (s != null && s.mode == AuraSetDef.MODE_MAPS)
+				return true;
+		return false;
+	}
+
+	public function dumpSets():Array<Dynamic> {
+		var out:Array<Dynamic> = [];
+		for (s in sets)
+			if (s != null)
+				out.push(s.toObj());
+		return out;
+	}
+
+	public function applySets(raw:Dynamic):Void {
+		var next:Array<AuraSetDef> = [];
+		if (raw != null && Std.isOfType(raw, Array)) {
+			var list:Array<Dynamic> = cast raw;
+			for (item in list) {
+				var s = AuraSetDef.fromObj(item);
+				if (s != null && next.length < MAX_SETS) {
+					var dup = false;
+					for (o in next)
+						if (o.id == s.id)
+							dup = true;
+					if (!dup)
+						next.push(s);
+				}
+			}
+		}
+		sets = next;
+		ensureSets();
 	}
 
 	public function find(id:String):AuraDef {
@@ -301,6 +454,7 @@ class AuraConfig {
 			i++;
 		}
 		c.auras = next;
+		c.applySets(data.sets);
 	}
 
 	public function setRegionOverride(s:String):Void {

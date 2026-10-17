@@ -191,7 +191,6 @@ class ExtraBars {
 			if (bar != null && captureIndex >= 0 && captureIndex < bar.slotCount && issue.length == 0) {
 				var selected = bar.slots[captureIndex]; builder.change("Bind cell", function() { selected.keyCode = captured; selected.modifiers = 0; }); captureMessage = "Assigned " + ExtraBarsKeyMap.label(captured,0) + ".";
 			} else captureMessage = "Rejected: " + issue + " Make sure this binding is free before assigning it. Try a different plain key.";
-			log({event:"binding",key:captured,prefix:model.prefix,mode:model.mode,baseState:bindings.describe(captured),message:captureMessage});
 		}
 		assignments.rebuild(model);
 		gate = blockReason(app, controller, hero); if (ExtraBarsKeyMap.error.length > 0) gate = "Key resolution failed: " + ExtraBarsKeyMap.error;
@@ -200,7 +199,7 @@ class ExtraBars {
 		if (now - lastSample >= 0.25) {
 			lastSample = now; for (item in catalog) { var snap = ConsumableCache.find(item.id); item.count = snap != null ? snap.count : 0; item.known = snap != null && snap.known; item.owned = item.known && snap.owned; }
 			var remaining = [];
-			for (check in countChecks) { var snap = ConsumableCache.find(check.kind); if (snap != null && snap.known && (snap.count != check.before || now - check.at > 2)) log({event:"observation",item:check.kind,before:check.before,after:snap.count}); else remaining.push(check); }
+			for (check in countChecks) { var snap = ConsumableCache.find(check.kind); if (!(snap != null && snap.known && (snap.count != check.before || now - check.at > 2))) remaining.push(check); }
 			countChecks = remaining;
 		}
 		if (gate != previousGate) { clearTransientState(); previousGate=gate; }
@@ -256,7 +255,6 @@ class ExtraBars {
 			if (bar != null) views.get(bar.id)[request.index].triggerStrength = 1; else spark.trigger(now);
 			if (countChecks.length < 32) countChecks.push({kind:request.kind,before:outcome.countBefore,at:now});
 		}
-		log({event:"request",bar:request.barId,cell:request.index,item:request.kind,click:request.click,key:bar != null ? bar.slots[request.index].keyCode : 0,prefix:model.prefix,mode:model.mode,generation:generation,nativeState:request.click ? "click" : "filtered",submitted:outcome.submitted,before:outcome.countBefore,message:outcome.message});
 	}
 	function blockReason(app:GameApp, controller:client.PlayerController, hero:ent.Hero):String {
 		if (hero == null || controller == null || app == null) return "No local hero.";
@@ -281,11 +279,6 @@ class ExtraBars {
 				out.push({item:stack.item,count:loadout.getDisplayStackCount(inv,stack),shortcut:false,usable:stack.item.canBeUsed(hero)});
 			}
 		} scan(loadout.inventory,false); scan(loadout.equipment,true); return out;
-	}
-	function log(event:Dynamic):Void {
-		try { Reflect.setField(event,"at",haxe.Timer.stamp()); var dir = solarflare.ui.ModPaths.child("logs"); if (!sys.FileSystem.exists(dir)) sys.FileSystem.createDirectory(dir);
-			var file = sys.io.File.append(haxe.io.Path.join([dir,"extrabars-prototype.jsonl"]),false); try { file.writeString(haxe.Json.stringify(event)+"\n"); file.close(); } catch(e:Dynamic) { file.close(); throw e; }
-		} catch (_:Dynamic) {}
 	}
 	public function draw():Void { builder.draw(); }
 	public function drawBar():Void {

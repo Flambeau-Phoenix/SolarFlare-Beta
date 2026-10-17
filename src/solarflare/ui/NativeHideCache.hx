@@ -29,6 +29,11 @@ class NativeHideCache {
 	static var precedingAlphaHidden = false;
 	static var rootOwned = false;
 	static var precedingMode:Dynamic;
+	static inline var OBSERVE_S:Float = 0.25;
+	static var lastObserve:Float = -1e9;
+	static var lastOptions:Int = -1;
+	static var cfgRef:NativeHideConfig;
+	static var observeApp:Dynamic;
 	// Preallocated exact-arity argument buffers. Also scrubbed on session exit.
 	static var guiArgs:Array<Dynamic> = [null];
 	static var hudArgs:Array<Dynamic> = [null];
@@ -37,7 +42,7 @@ class NativeHideCache {
 	static var modeArgs:Array<Dynamic> = [null, null];
 
 	static function init():Void {
-		if (initialized) return;
+		if (initialized && available) return;
 		initialized = true;
 		try {
 			var hudType = HlxRuntime.resolveType("ui.Hud");
@@ -87,6 +92,14 @@ class NativeHideCache {
 
 	public static function apply(app:GameApp, cfg:NativeHideConfig):Void {
 		if (app == null || cfg == null) return;
+		var now = haxe.Timer.stamp();
+		var options = cfg.hideBottomBar.get() ? 1 : 0;
+		var bit = 2;
+		for (row in cfg.elements) { if (row.hidden.get()) options |= bit; bit <<= 1; }
+		// UI settings are primitive refs. Nothing resolves or traverses native UI
+		// until this gate is due. Late presentation enforcement lives in GameApp.update.
+		if (app == observeApp && cfg == cfgRef && options == lastOptions && now >= lastObserve && now - lastObserve < OBSERVE_S) return;
+		lastObserve = now; lastOptions = options; cfgRef = cfg; observeApp = app;
 		init();
 		if (!available || failed) {
 			if (failed && (hud != null || gui != null)) clearSession(false);
@@ -158,7 +171,10 @@ class NativeHideCache {
 	static function hideBars():Void {
 		bottomArgs[0] = hud;
 		bottomArgs[1] = false;
-		HlxRuntime.callResolved(setBottom, bottomArgs);
+		// This native setter can trigger presentation/layout work. Never repeat it
+		// when the bar is already hidden (the previous path called it every present).
+		if (bottom != null && field(bottom, "alpha") != 0.0)
+			HlxRuntime.callResolved(setBottom, bottomArgs);
 		visibleArgs[1] = false;
 		if (heroBar != null && field(heroBar, "visible") != false) {
 			visibleArgs[0] = heroBar;
@@ -172,6 +188,7 @@ class NativeHideCache {
 
 	/** No resolveMember, arrays, I/O, or returned-value override inside the hook. */
 	public static function afterUpdateVisibility(self:Dynamic):Void {
+		if (self != hud) { lastObserve = -1e9; return; }
 		if (!suppress || failed || self != hud) return;
 		try {
 			// Let observation acquire a rebuilt parent and capture its preceding alpha.
@@ -189,6 +206,18 @@ class NativeHideCache {
 		modeArgs[0] = gui;
 		modeArgs[1] = value;
 		HlxRuntime.callResolved(setMode, modeArgs);
+	}
+
+	/** Matches Enhanced Chat's late presentation timing, using observation-owned handles only. */
+	public static function afterGameUpdate(self:Dynamic):Void {
+		if ((!suppress && !NativeElementCache.hasLeases()) || self != appRef || failed || hud == null || getHud == null) return;
+		try {
+			if (field(self, "gui") != gui) return;
+			guiArgs[0] = gui;
+			if (HlxRuntime.callResolved(getHud, guiArgs) != hud) { lastObserve = -1e9; return; }
+			if (suppress && field(hud,"bottomBar") == bottom) { refreshBars(); hideBars(); }
+			NativeElementCache.reassert(hud);
+		} catch (_:Dynamic) {}
 	}
 
 	static function releaseBottom(attached:Bool):Void {
@@ -238,6 +267,7 @@ class NativeHideCache {
 			restore(currentGui == gui, currentHud == hud && field(currentHud, "bottomBar") == bottom);
 		} catch (_:Dynamic) { suppress = false; }
 		NativeElementCache.releaseAll(hudAttached, resetFailure);
+		lastObserve = -1e9; lastOptions = -1; cfgRef = null; observeApp = null;
 		gui = null; hud = null; bottom = null; heroBar = null; heroBarPad = null; appRef = null;
 		precedingMode = null; rootOwned = false; bottomOwned = false; suppress = false;
 		if (resetFailure) failed = false;

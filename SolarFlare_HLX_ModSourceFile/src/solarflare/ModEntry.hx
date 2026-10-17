@@ -46,6 +46,7 @@ class ModEntry {
 		solarflare.cdb.CdbSummonUnits.keep();
 		solarflare.cdb.AuraCatalog.keep();
 		solarflare.cdb.ConsumableCatalog.keep();
+		solarflare.cdb.LootCatalog.keep();
 		solarflare.cdb.AuraQuickStartCatalog.keep();
 		solarflare.cdb.CdbAuraTable.keep();
 		solarflare.castbar.LearnedCastTimes.keep();

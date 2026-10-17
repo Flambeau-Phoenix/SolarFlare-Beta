@@ -21,6 +21,10 @@ class CombatLogLine {
 	public var blocked:Bool = false;
 	public var physical:Bool = false;
 	public var magic:Bool = false;
+	/** Unknown is distinct from a known direct hit. */
+	public var isDoT:Bool = false;
+	public var isDoTKnown:Bool = false;
+	public var identityGen:Int = -1;
 	public var auto:Bool = false;
 	public var affinity:String = "";
 	public var involvesCurrentTarget:Bool = false;
@@ -78,6 +82,8 @@ class CombatLogLine {
 			blocked: blocked,
 			physical: physical,
 			magic: magic,
+			isDoT: isDoT,
+			isDoTKnown: isDoTKnown,
 			auto: auto,
 			affinity: jsonStr(affinity),
 			targetHp: round1(targetHp),

@@ -149,7 +149,15 @@ class GeauxCache {
 	static var costsById:Map<String, Dynamic> = new Map();
 	static var costsKnown:Map<String, Bool> = new Map();
 	static var costSpecsById:Map<String, Array<{atb:String, amount:Float}>> = new Map();
-	static inline var LAYOUT_RECOVERY_S:Float = 15.0; // missed-edge recovery only
+	/** How often the cheap layout fingerprint is re-checked for a missed dirty edge. */
+	static inline var LAYOUT_RECOVERY_S:Float = 15.0;
+	/** Unconditional rebuild interval; the full HUD walk costs tens of ms, so it is rare. */
+	static inline var LAYOUT_FORCED_S:Float = 120.0;
+	static var layoutCheckAt:Float = 0;
+	static var layoutPrint:String = "";
+	/** BarTer's seed walk only re-runs on change; this is its slow safety net. */
+	static inline var BARTER_RECOVERY_S:Float = 60.0;
+	static var barTerWalkAt:Float = 0;
 	static inline var TELEMETRY_IDLE_S:Float = 0.12; // ~8 Hz idle
 	static inline var TELEMETRY_HOT_S:Float = 0.05; // ~20 Hz while CD/drag/builder/dirty
 	static var layoutAt:Float = 0;
@@ -421,7 +429,12 @@ class GeauxCache {
 		}
 		var now = nowStamp();
 		// Layout only on dirty / identity / slot-count change; rare time fallback for missed dirty edges.
-		var recovery = layoutAt > 0 && now >= layoutAt + LAYOUT_RECOVERY_S;
+		// The time fallback only pays for the full rebuild when the cheap fingerprint moved (or on the long interval).
+		var recovery = false;
+		if (layoutAt > 0 && now >= layoutCheckAt) {
+			layoutCheckAt = now + LAYOUT_RECOVERY_S;
+			recovery = now >= layoutAt + LAYOUT_FORCED_S || layoutFingerprint(heroDyn) != layoutPrint;
+		}
 		if (layoutDirty || heroChanged || layoutCount != visibleCount || okey != layoutOverrideKey
 			|| recovery) {
 			if (recovery && !layoutDirty && !heroChanged && layoutCount == visibleCount
@@ -431,8 +444,10 @@ class GeauxCache {
 			layoutCount = visibleCount;
 			layoutOverrideKey = okey;
 			layoutAt = now;
+			layoutCheckAt = now + LAYOUT_RECOVERY_S;
 			layoutDirty = false;
 			refreshLayout(heroDyn, visibleCount, overrides);
+			layoutPrint = layoutFingerprint(heroDyn);
 			equipDirty = true;
 			telemetryDirty = true;
 		}
@@ -443,6 +458,18 @@ class GeauxCache {
 			telemetryAt = now + telemInterval;
 			tickTelemetry(heroDyn);
 		}
+	}
+
+	/** Weapons plus the skill-list lengths the layout is built from. A few field reads, no HUD walk. */
+	static function layoutFingerprint(hero:Dynamic):String {
+		if (hero == null)
+			return "";
+		var print = solarflare.barter.BarTerCache.weaponLoadoutKey(hero);
+		print += "|" + arrayLen(field(hero, "skillSlots")) + "|" + arrayLen(field(hero, "weaponSkills"));
+		try {
+			print += "|" + arrayLen(field(field(hero, "specialization"), "skillSlots"));
+		} catch (_:Dynamic) {}
+		return print;
 	}
 
 	static function telemetryInterval():Float {
@@ -778,13 +805,26 @@ class GeauxCache {
 	 * Light BarTer path: tick assigned skill ids only.
 	 * Action-bar HUD walk at most ~1 Hz when needSeed (seed / builder).
 	 */
+	static function barSeedStale(hero:Dynamic, now:Float):Bool {
+		if (hero == null || weapons == null || weapons.length == 0)
+			return true;
+		if (actionBarLoadoutKey == "" || actionBarCharacterId != solarflare.HealthCache.characterId)
+			return true;
+		if (solarflare.barter.BarTerCache.weaponLoadoutKey(hero) != actionBarLoadoutKey)
+			return true;
+		return now - barTerWalkAt >= BARTER_RECOVERY_S;
+	}
+
 	public static function sampleBarTer(heroDyn:Dynamic, needSeed:Bool):Void {
 		var now = nowStamp();
 		if (needSeed && (barTerSeedAt <= 0 || now >= barTerSeedAt)) {
 			barTerSeedAt = now + BARTER_SEED_S;
-			try
-				sampleActionBar(heroDyn)
-			catch (_:Dynamic) {}
+			// The HUD walk is tens of ms: only repeat it when the bar can have changed.
+			if (barSeedStale(heroDyn, now)) {
+				try
+					sampleActionBar(heroDyn)
+				catch (_:Dynamic) {}
+			}
 		}
 		barTerSkills.resize(0);
 		if (heroDyn == null) {
@@ -998,6 +1038,7 @@ class GeauxCache {
 		actionBarLoadoutKey = solarflare.barter.BarTerCache.weaponLoadoutKey(hero);
 		actionBarCharacterId = solarflare.HealthCache.characterId;
 		actionBarGeneration++;
+		barTerWalkAt = nowStamp();
 	}
 
 	static function sampleClassSkills(hero:Dynamic):Void {

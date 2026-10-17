@@ -34,6 +34,10 @@ class NativeHideConfig {
 
 	public function new() {
 		elements = [
+			new NativeHideElement("skills", "Weapon skills", GROUP_ACTION, "Native weapon, passive and vehicle skills on keyboard or controller."),
+			new NativeHideElement("baseActions", "Basic actions (2x2)", GROUP_ACTION, "Attack, dash, mount and block on the native keyboard bar."),
+			new NativeHideElement("statuses", "Statuses", GROUP_ACTION, "Both native buff and debuff bars above the bottom bar."),
+			new NativeHideElement("resources", "Health and resources", GROUP_ACTION, "Native health, class resources and Spark Surge gauge."),
 			new NativeHideElement("consumables", "Consumables (2x2)", GROUP_ACTION,
 				"The four quick-use consumable slots on the native bar. The skills and bars beside them stay."),
 			new NativeHideElement("menuBar", "Menu buttons", GROUP_HUD,
@@ -43,6 +47,8 @@ class NativeHideConfig {
 			new NativeHideElement("compass", "Compass", GROUP_HUD, "The compass strip."),
 			new NativeHideElement("groupBar", "Party frames", GROUP_HUD, "Group member frames."),
 			new NativeHideElement("bossesInfo", "Boss frames", GROUP_HUD, "Boss health frames during encounters."),
+			new NativeHideElement("castBar", "Cast bar", GROUP_HUD,
+				"The game's own player cast bar. SolarFlare's Player Cast Bar overlay is separate and has its own Hidden option."),
 			new NativeHideElement("oxygen", "Oxygen", GROUP_HUD, "The underwater breath gauge."),
 			new NativeHideElement("combatMeter", "Combat meter", GROUP_HUD, "The native damage meter."),
 			new NativeHideElement("feed", "Effects feed", GROUP_HUD, "The scrolling effects feed.")
@@ -67,10 +73,13 @@ class NativeHideConfig {
 		try {
 			var arr:Array<Dynamic> = cast rows;
 			if (arr == null) return;
+			var hasBase=false; var legacySkills:Null<Bool>=null;
 			for (row in arr) {
 				var id = Std.string(Reflect.field(row, "id"));
 				var value:Dynamic = Reflect.field(row, "hidden");
 				if (!Std.isOfType(value, Bool)) continue;
+				if(id=="baseActions") hasBase=true;
+				if(id=="skills") legacySkills=value;
 				for (e in elements) {
 					if (e.id == id) {
 						e.hidden.set(value);
@@ -78,6 +87,8 @@ class NativeHideConfig {
 					}
 				}
 			}
+			// Older Skills toggles included this block. Preserve that saved appearance once.
+			if(!hasBase && legacySkills!=null) for(e in elements) if(e.id=="baseActions") e.hidden.set(legacySkills);
 		} catch (_:Dynamic) {}
 	}
 

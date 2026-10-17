@@ -35,6 +35,8 @@ import solarflare.ui.UiScope;
 class AuraQuickBuildPopup {
 	static inline var TITLE:String = "Quick Build Aura###ab_quick_build_modal";
 	static inline var SEARCH_CAP:Int = 160;
+	/** Content width at which the preview moves beside the cards. */
+	static inline var SIDE_MIN_WIDTH:Single = 760;
 	static inline var FOOTER_HELP:String = "Configure multiple conditions, expressions, countdown/count-up, and recurring Status timers in Advanced.";
 	var draft:AuraQuickBuildDraft = null;
 	var visible = new BoolRef(false);
@@ -46,7 +48,6 @@ class AuraQuickBuildPopup {
 	var inputs = new AuraConditionUiState();
 	var glowColor = new hl.Bytes(16);
 	var preview = new AdvancedAuraPreview();
-	var previewExpanded = false;
 	var commitIssue = "";
 	var castRank:Null<Int> = null;
 	var castRankChosen:Bool = false;
@@ -66,7 +67,6 @@ class AuraQuickBuildPopup {
 		var signal = AuraSignalCatalog.find(draft.condition.signal);
 		group = signal != null ? signal.group : "";
 		commitIssue = "";
-		previewExpanded = false;
 		preview.reset();
 		for (buf in [signalSearch, subjectSearch, iconSearch]) ByteUtil.clearBytes(buf, SEARCH_CAP);
 		inputs.sync(draft.condition);
@@ -86,18 +86,28 @@ class AuraQuickBuildPopup {
 		commitIssue = "";
 	}
 
+	/** Sets offered by the Scope picker; refreshed from the library each draw. */
+	var setsSource:AuraConfig;
+
 	public function draw(cfg:AuraConfig, commit:AuraQuickBuildDraft->Bool->String):Void {
+		setsSource = cfg;
 		if (draft == null) return;
 		if (requested) { ImGui.openPopup(TITLE); requested = false; }
-		var parentSize = ImGui.getWindowSize();
-		var parentPos = ImGui.getWindowPos();
-		var width:Single = Math.min(760, Math.max(520, parentSize.x - 32));
-		var height:Single = Math.min(860, Math.max(440, parentSize.y - 32));
+		// Size from the screen, not the builder window: the preview needs room even when the builder is small.
+		var screenW:Single = 1920;
+		var screenH:Single = 1080;
+		var screenCx:Single = 960;
+		var screenCy:Single = 540;
+		try {
+			var vp = ImGui.getMainViewport();
+			var center = vp != null ? ImGui.ImGuiViewport_GetCenter(vp) : null;
+			if (center != null && center.x > 160 && center.y > 120) { screenCx = center.x; screenCy = center.y; screenW = center.x * 2; screenH = center.y * 2; }
+		} catch (_:Dynamic) {}
+		var width:Single = Math.max(520, Math.min(1180, screenW - 64));
+		var height:Single = Math.max(440, Math.min(900, screenH - 80));
 		ImGui.setNextWindowSize(ImGui.vec2(width, height), ImGuiCond.Appearing);
-		ImGui.setNextWindowPos(ImGui.vec2(parentPos.x + (parentSize.x - width) * 0.5,
-			parentPos.y + (parentSize.y - height) * 0.5), ImGuiCond.Appearing);
-		ImGui.setNextWindowSizeConstraints(ImGui.vec2(520, 440),
-			ImGui.vec2(Math.max(760, parentSize.x - 32), Math.max(640, parentSize.y - 32)));
+		ImGui.setNextWindowPos(ImGui.vec2(screenCx - width * 0.5, screenCy - height * 0.5), ImGuiCond.Appearing);
+		ImGui.setNextWindowSizeConstraints(ImGui.vec2(520, 440), ImGui.vec2(Math.max(520, screenW - 32), Math.max(440, screenH - 32)));
 		if (!ImGui.beginPopupModal(TITLE, visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)) {
 			if (!visible.get()) cancel();
 			return;
@@ -107,20 +117,36 @@ class AuraQuickBuildPopup {
 				ImGui.closeCurrentPopup();
 				cancel();
 			} else {
-				// Reserve for actual font/wrapped-help height so the action row survives narrow windows.
-				var helpH = ImGui.calcTextSize(FOOTER_HELP, false, ImGui.getContentRegionAvail().x).y;
-				var footerH:Single = ImGui.getFrameHeight() + 36 + 36 + 26 + helpH + 48 + (previewExpanded ? 112 : 0);
-				var bodyH:Single = Math.max(64, ImGui.getContentRegionAvail().y - footerH);
-				UiScope.child("##ab_quick_body", ImGui.vec2(0, bodyH), function() {
-					drawIdentity();
-					card("watch", "1. What are we watching?", drawWatch);
-					card("appearance", "2. What should it look like?", function() drawAppearance(cfg));
-					card("timing", "3. When does it show?", drawTiming);
-				});
-				drawFooter(cfg, commit);
+				var finished = false;
+				var avail = ImGui.getContentRegionAvail();
+				if (avail.x >= SIDE_MIN_WIDTH) {
+					// Wide: the cards on the left, a permanent preview and the actions on the right.
+					var sideWidth:Single = Math.min(420, Math.max(320, avail.x * 0.36));
+					UiScope.child("##ab_quick_body", ImGui.vec2(avail.x - sideWidth - 8, 0), function() drawCards(cfg));
+					ImGui.sameLine(0, 8);
+					UiScope.child("##ab_quick_side", ImGui.vec2(0, 0), function() finished = drawSide(cfg, commit),
+						ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding);
+				} else {
+					// Narrow: cards on top, then the preview and actions underneath.
+					var helpH = ImGui.calcTextSize(FOOTER_HELP, false, avail.x).y;
+					var footerH:Single = 126 + ImGui.getFrameHeight() + 36 + 36 + 26 + helpH + 48;
+					var bodyH:Single = Math.max(64, avail.y - footerH);
+					UiScope.child("##ab_quick_body", ImGui.vec2(0, bodyH), function() drawCards(cfg));
+					ImGui.separator();
+					drawPreviewStage(cfg, 118);
+					finished = drawActions(cfg, commit, false);
+				}
+				if (finished) { ImGui.closeCurrentPopup(); cancel(); }
 			}
 		} catch (e:Dynamic) { ImGui.endPopup(); throw e; }
 		ImGui.endPopup();
+	}
+
+	function drawCards(cfg:AuraConfig):Void {
+		drawIdentity();
+		card("watch", "1. What are we watching?", drawWatch);
+		card("appearance", "2. What should it look like?", function() drawAppearance(cfg));
+		card("timing", "3. When does it show?", drawTiming);
 	}
 
 	function card(id:String, title:String, body:Void->Void):Void {
@@ -139,15 +165,16 @@ class AuraQuickBuildPopup {
 				if (ImGui.inputText("##ab_quick_name", a.nameBuf, AuraDef.NAME_BUF))
 					a.name = ByteUtil.readBytes(a.nameBuf, AuraDef.NAME_BUF);
 			});
-			UiLayout.propertyRow("Scope", function() {
-				if (ImGui.beginCombo("##ab_quick_scope", a.fight.length == 0 ? "Shared" : a.fight)) {
+			UiLayout.propertyRow("Aura Set", function() {
+				var currentSet = setsSource != null ? setsSource.findSet(AuraConfig.tagOf(a)) : null;
+				if (ImGui.beginCombo("##ab_quick_scope", currentSet != null ? currentSet.name : a.fight.length == 0 ? "None" : a.fight)) {
 					try {
-						for (fight in ["shared"].concat(AuraPack.FIGHTS.filter(function(f) return f != "shared"))) {
-							var value = fight == "shared" ? "" : fight;
-							if (ImGui.selectable((value == "" ? "Shared" : value) + "##ab_quick_scope_" + fight, a.fight == value)) {
-								a.fight = value; a.syncFightBuf();
+						var options:Array<{id:String, name:String}> = [{id: "", name: "None"}];
+						if (setsSource != null) for (set in setsSource.sets) if (set != null) options.push({id: set.id, name: set.name});
+						for (option in options)
+							if (ImGui.selectable(option.name + "##ab_quick_scope_" + option.id, AuraConfig.tagOf(a) == option.id)) {
+								a.fight = option.id; a.syncFightBuf();
 							}
-						}
 						ImGui.separator();
 						if (ImGui.inputTextWithHint("##ab_quick_custom_scope", "Custom encounter tag", a.fightBuf, AuraDef.FIGHT_BUF))
 							a.fight = ByteUtil.readBytes(a.fightBuf, AuraDef.FIGHT_BUF);
@@ -201,6 +228,10 @@ class AuraQuickBuildPopup {
 		if (group == "Scripting" || draft.condition.signal == "custom.script")
 			ImGui.textWrapped("Custom expressions are configured through Open in Advanced below.");
 		ImGui.textWrapped(draft.summary());
+		if (draft.requirements.length > 0) {
+			var needs = [for (r in draft.requirements) AuraQuickBuildRules.conditionSummary(r)];
+			ImGui.textDisabled("Also requires: " + needs.join(", "));
+		}
 	}
 
 	function drawSignalPicker():Void {
@@ -472,32 +503,53 @@ class AuraQuickBuildPopup {
 			draft.setHold(draft.aura.durRef.get());
 	}
 
-	function drawFooter(cfg:AuraConfig, commit:AuraQuickBuildDraft->Bool->String):Void {
-		ImGui.separator();
-		ImGui.setNextItemOpen(previewExpanded, ImGuiCond.Always);
-		previewExpanded = ImGui.collapsingHeader("Mini preview##ab_quick_preview_fold");
-		if (previewExpanded) {
-			UiScope.child("##ab_quick_preview", ImGui.vec2(0, 108), function() {
-				if (draft.face == "Banner") {
-					var text = StringTools.trim(draft.aura.bannerText);
-					ImGui.textWrapped(text.length > 0 ? text : draft.aura.displayLabel());
-				} else {
-					var oldAll = AuraVisualRenderer.countdownAll;
-					var oldMax = AuraVisualRenderer.countdownCeiling;
-					var oldScale = AuraVisualRenderer.countdownGlobalScale;
-					AuraVisualRenderer.countdownAll = cfg.countdownAll.get();
-					AuraVisualRenderer.countdownCeiling = cfg.countdownAutoMax.get();
-					AuraVisualRenderer.countdownGlobalScale = cfg.countdownScale.get();
-					var failure:Dynamic = null;
-					try { preview.draw(draft.aura, Math.min(160, ImGui.getContentRegionAvail().x), 100, false, true); }
-					catch (e:Dynamic) { failure = e; }
-					AuraVisualRenderer.countdownAll = oldAll;
-					AuraVisualRenderer.countdownCeiling = oldMax;
-					AuraVisualRenderer.countdownGlobalScale = oldScale;
-					if (failure != null) throw failure;
-				}
-			});
-		}
+	/** Right-hand column: a large live preview, its controls, the plain-words summary, then the actions. */
+	function drawSide(cfg:AuraConfig, commit:AuraQuickBuildDraft->Bool->String):Bool {
+		UiChrome.subHeader("Preview");
+		var stageHeight:Single = Math.max(150, Math.min(260, ImGui.getContentRegionAvail().y * 0.34));
+		drawPreviewStage(cfg, stageHeight);
+		if (draft.face != "Banner") preview.drawControls();
+		else ImGui.textDisabled("The banner appears over the screen when the alert fires.");
+		ImGui.spacing();
+		ImGui.pushTextWrapPos(0);
+		ImGui.textDisabled(draft.summary());
+		ImGui.popTextWrapPos();
+		// Keep the actions pinned to the bottom of the column.
+		var helpH = ImGui.calcTextSize(FOOTER_HELP, false, ImGui.getContentRegionAvail().x).y;
+		var actionsH:Single = 36 + 36 + 6 + 30 + helpH + 24;
+		var spare = ImGui.getContentRegionAvail().y - actionsH;
+		if (spare > 0) ImGui.dummy(ImGui.vec2(0, spare));
+		return drawActions(cfg, commit, true);
+	}
+
+	/** The aura as it will look, drawn from the live draft with the player's countdown settings. */
+	function drawPreviewStage(cfg:AuraConfig, height:Single):Void {
+		UiScope.child("##ab_quick_preview", ImGui.vec2(0, height), function() {
+			if (draft.face == "Banner") {
+				var text = StringTools.trim(draft.aura.bannerText);
+				ImGui.dummy(ImGui.vec2(1, Math.max(0, ImGui.getContentRegionAvail().y * 0.5 - 14)));
+				UiChrome.heading(text.length > 0 ? text : draft.aura.displayLabel(), 1.35);
+				return;
+			}
+			var oldAll = AuraVisualRenderer.countdownAll;
+			var oldMax = AuraVisualRenderer.countdownCeiling;
+			var oldScale = AuraVisualRenderer.countdownGlobalScale;
+			AuraVisualRenderer.countdownAll = cfg.countdownAll.get();
+			AuraVisualRenderer.countdownCeiling = cfg.countdownAutoMax.get();
+			AuraVisualRenderer.countdownGlobalScale = cfg.countdownScale.get();
+			var failure:Dynamic = null;
+			var area = ImGui.getContentRegionAvail();
+			try { preview.draw(draft.aura, Math.max(60, area.x), Math.max(60, area.y), false, true); }
+			catch (e:Dynamic) { failure = e; }
+			AuraVisualRenderer.countdownAll = oldAll;
+			AuraVisualRenderer.countdownCeiling = oldMax;
+			AuraVisualRenderer.countdownGlobalScale = oldScale;
+			if (failure != null) throw failure;
+		}, ImGuiChildFlags.Borders);
+	}
+
+	/** Issue line and Create / Cancel / Advanced. Returns true when the modal should close. */
+	function drawActions(cfg:AuraConfig, commit:AuraQuickBuildDraft->Bool->String, stacked:Bool):Bool {
 		var atCap = cfg.auras.length >= AuraEngine.MAX;
 		var issue = atCap ? "Aura limit reached. Delete an aura before creating another." : draft.issue(GameIcons.hasKey);
 		UiScope.child("##ab_quick_issue", ImGui.vec2(0, 36), function() {
@@ -506,19 +558,36 @@ class AuraQuickBuildPopup {
 			}
 		});
 		var finished = false;
-		UiLayout.inlinePair("##ab_quick_actions", function(w:Single) {
+		if (stacked) {
 			var clicked = false;
-			disabled(issue.length > 0, function() clicked = UiChrome.accentButton("Create & Save##ab_quick_create", ImGui.vec2(w, 36)));
+			disabled(issue.length > 0, function() clicked = UiChrome.accentButton("Create & Save##ab_quick_create", ImGui.vec2(-1, 36)));
 			if (clicked) { commitIssue = commit(draft, false); finished = commitIssue.length == 0; }
-		}, function(w:Single) {
-			if (UiChrome.ghostButton("Cancel##ab_quick_cancel", ImGui.vec2(w, 36))) finished = true;
-		});
-		if (!finished) {
-			var advanced = false;
-			disabled(atCap, function() advanced = UiChrome.ghostButton("Open in Advanced →##ab_quick_advanced", ImGui.vec2(-1, 26)));
-			ImGui.textWrapped(FOOTER_HELP);
-			if (advanced) { commitIssue = commit(draft, true); finished = commitIssue.length == 0; }
+			UiLayout.inlinePair("##ab_quick_actions", function(w:Single) {
+				if (UiChrome.ghostButton("Cancel##ab_quick_cancel", ImGui.vec2(w, 30))) finished = true;
+			}, function(w:Single) {
+				var advanced = false;
+				disabled(atCap, function() advanced = UiChrome.ghostButton("Open in Advanced##ab_quick_advanced", ImGui.vec2(w, 30)));
+				if (advanced && !finished) { commitIssue = commit(draft, true); finished = commitIssue.length == 0; }
+			});
+		} else {
+			UiLayout.inlinePair("##ab_quick_actions", function(w:Single) {
+				var clicked = false;
+				disabled(issue.length > 0, function() clicked = UiChrome.accentButton("Create & Save##ab_quick_create", ImGui.vec2(w, 36)));
+				if (clicked) { commitIssue = commit(draft, false); finished = commitIssue.length == 0; }
+			}, function(w:Single) {
+				if (UiChrome.ghostButton("Cancel##ab_quick_cancel", ImGui.vec2(w, 36))) finished = true;
+			});
+			if (!finished) {
+				var advanced = false;
+				disabled(atCap, function() advanced = UiChrome.ghostButton("Open in Advanced##ab_quick_advanced", ImGui.vec2(-1, 26)));
+				if (advanced) { commitIssue = commit(draft, true); finished = commitIssue.length == 0; }
+			}
 		}
-		if (finished) { ImGui.closeCurrentPopup(); cancel(); }
+		if (!finished) {
+			ImGui.pushTextWrapPos(0);
+			ImGui.textDisabled(FOOTER_HELP);
+			ImGui.popTextWrapPos();
+		}
+		return finished;
 	}
 }

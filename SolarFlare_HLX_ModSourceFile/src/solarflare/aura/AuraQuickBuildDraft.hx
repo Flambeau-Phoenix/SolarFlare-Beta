@@ -10,6 +10,11 @@ class AuraQuickBuildDraft {
 	public var condition(default, null):AuraConditionDef;
 	public var behavior(default, null):String = AuraEffect.WHEN_WHILE_TRUE;
 	public var face(default, null):String = "Icon";
+	/**
+	 * Extra conditions that must also hold (for example "target is this boss"). They are appended to the rule after
+	 * the main condition, so the Watch editor keeps editing only `condition`.
+	 */
+	public var requirements(default, null):Array<AuraConditionDef> = [];
 	public var cooldownReference(default, null):String = "Game time";
 	public var timerReferenceLabel(default, null):String = "Unknown";
 	var configuredHold:Float;
@@ -27,7 +32,8 @@ class AuraQuickBuildDraft {
 	/** Builds a new owned template; never adopts or mutates a library aura. */
 	public static function fromCombatLog(choice:CombatLogAuraChoices.CombatLogAuraChoice, label:String):AuraQuickBuildDraft {
 		var draft = new AuraQuickBuildDraft();
-		if (choice.preset == "enemy") draft.aura = AuraTemplates.createEnemySpellCastAlert();
+		var enemyLike = choice.preset == "enemy" || choice.preset == "countdown";
+		if (enemyLike) draft.aura = AuraTemplates.createEnemySpellCastAlert();
 		else if (choice.preset == "damage") draft.aura = AuraTemplates.createDamageTakenSpike();
 		var a = draft.aura;
 		draft.condition = choice.condition.clone();
@@ -38,7 +44,7 @@ class AuraQuickBuildDraft {
 		a.announce = label; a.syncAnnounceBuf();
 		a.bannerText = label; a.syncBannerBuf();
 		a.showLabel.set(true);
-		if (choice.preset == "enemy") {
+		if (enemyLike) {
 			// Adopt the preset without setFace(), which would clear its independent banner.
 			draft.face = "Icon";
 			draft.behavior = AuraEffect.WHEN_ON_RISE_HOLD;
@@ -60,7 +66,63 @@ class AuraQuickBuildDraft {
 		draft.face = "Icon";
 		draft.configuredHold = a.duration;
 		draft.briefHold = 1.5;
+		if (choice.preset == "countdown") draft.applyCountdown(solarflare.cdb.CdbAuraTable.castDuration(choice.condition.subject));
 		return draft;
+	}
+
+	/** Appends a "must also be true" condition to the rule. */
+	public function addRequirement(signal:String, subject:String, subjectLabel:String):Void {
+		var c = new AuraConditionDef();
+		c.signal = signal; c.subject = subject; c.subjectLabel = subjectLabel;
+		c.op = "is"; c.boolValue = true; c.numberValue = 1;
+		requirements.push(c);
+		aura.rule.conditions.push(c);
+	}
+
+	/** "When this enemy is at or below X% health" - needs the enemy targeted. Unit id may be empty for any boss. */
+	public static function forBossHealth(unitId:String, unitName:String, ratio:Float, icon:String):AuraQuickBuildDraft {
+		var choice = new CombatLogAuraChoices.CombatLogAuraChoice("boss_health", "Health alert",
+			"Watches your current target's health.", "target.hpRatio", "lte", "", "", Math.max(0.01, Math.min(1, ratio)), "enemy");
+		var pct = Std.int(Math.round(choice.condition.numberValue * 100));
+		var draft = fromCombatLog(choice, unitName);
+		draft.aura.name = unitName + " at " + pct + "% health";
+		draft.aura.syncNameBuf();
+		draft.aura.bannerText = unitName + " at " + pct + "%";
+		draft.aura.syncBannerBuf();
+		draft.aura.announce = draft.aura.bannerText;
+		draft.aura.syncAnnounceBuf();
+		if (unitId.length > 0) draft.addRequirement("target.kindMatches", unitId, unitName);
+		else draft.addRequirement("target.isBoss", "", "");
+		if (icon.length > 0) { draft.aura.iconId = icon; draft.aura.syncIconBuf(); }
+		return draft;
+	}
+
+	/** Boss Mods batch factory: a complete, ready-to-save enemy-cast alert in one of three looks. */
+	public static function forBossAlert(choice:CombatLogAuraChoices.CombatLogAuraChoice, label:String, style:String):AuraQuickBuildDraft {
+		var draft = fromCombatLog(choice, label);
+		var a = draft.aura;
+		switch (style) {
+			case "glow":
+				draft.setFace("Glow");
+			case "countdown":
+				draft.setFace("Icon");
+				draft.applyCountdown(solarflare.cdb.CdbAuraTable.castDuration(choice.condition.subject));
+			default:
+				draft.setFace("Icon");
+				a.showBanner.set(true);
+				draft.effect(AuraEffect.KIND_ALERT).enabled.set(true);
+		}
+		return draft;
+	}
+
+	/** Counts down the skill's listed cast time from the moment the cast is seen. No-op without a usable time. */
+	function applyCountdown(seconds:Float):Void {
+		if (!(Math.isFinite(seconds) && seconds > 0.001)) return;
+		setTimerReference("CDB", seconds, "Cast time");
+		setTimerMode(AuraTimer.MODE_DOWN);
+		aura.showCountdown.set(true);
+		aura.showFuse.set(true);
+		setHold(Math.max(seconds + 0.5, 2.5));
 	}
 
 	public function setFace(value:String):Void {
@@ -144,6 +206,10 @@ class AuraQuickBuildDraft {
 		if (StringTools.trim(aura.name).length == 0) return "Give this aura a name.";
 		var problem = AuraQuickBuildRules.conditionIssue(condition);
 		if (problem.length > 0) return problem;
+		for (extra in requirements) {
+			problem = AuraQuickBuildRules.conditionIssue(extra);
+			if (problem.length > 0) return problem;
+		}
 		if (aura.timerMode != AuraTimer.MODE_OFF && aura.timerSource == AuraTimer.SRC_FIXED && !(Math.isFinite(aura.timerSeconds.get()) && aura.timerSeconds.get() > 0.001))
 			return "Timer duration is unavailable. Turn the timer off or enter an aura-only duration in Advanced.";
 		if (aura.showIcon.get() && (face == "Icon" || face == "Glow") && !hasIcon(aura.preferredIconId())) return "Choose a usable icon.";
@@ -154,6 +220,7 @@ class AuraQuickBuildDraft {
 		var problem = AuraQuickBuildRules.conditionIssue(condition);
 		if (problem.length > 0) return problem;
 		var when = AuraQuickBuildRules.conditionSummary(condition);
+		for (extra in requirements) when += " and " + AuraQuickBuildRules.conditionSummary(extra);
 		var label = face == "Icon" ? "Icon Alert" : face;
 		var result = switch (behavior) {
 			case AuraEffect.WHEN_ON_RISE_HOLD: "Show " + label + " for " + aura.duration + " seconds when " + when + " becomes true";

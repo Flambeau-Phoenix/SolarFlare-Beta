@@ -1,19 +1,23 @@
 package solarflare.ui;
 
 import imgui.ImGui;
-import imgui.ref.BoolRef;
 import solarflare.ui.HudLayoutModel.HudLayoutRow;
 
-/** UI edits enqueue geometry/clipboard work; persistence stays in SettingsStore. */
+/**
+ * Profile-owned HUD layout bank. The strip mirrors the universal Profile strip
+ * (FeatureProfiles.drawStrip): selector, Save, More menu, and one modal for names.
+ * UI edits enqueue geometry/clipboard work; persistence stays in SettingsStore.
+ */
 class UiLayouts {
- public var open=new BoolRef(false);
  public var bank=new HudLayoutModel();
  var nameBuf=new hl.Bytes(96);
- var message:String="";
  var initialized:Bool=false;
+ /** "New" or "Rename" while the name modal is wanted; empty when closed. */
  var nameAction:String="";
+ /** Strip id that opens the name modal next; set in the More menu, consumed outside the popup scope. */
+ var openFor:String="";
  public function new() { ByteUtil.clearBytes(nameBuf,96); }
- public function clearTransientState():Void { nameAction=""; ByteUtil.clearBytes(nameBuf,96); }
+ public function clearTransientState():Void { nameAction=""; openFor=""; ByteUtil.clearBytes(nameBuf,96); }
  public function retain(c:ConfigPanel):Void {
   if(!initialized) { bank=HudLayoutModel.load(null,HudLayoutBindings.capture(c)); initialized=true; }
   else bank.layouts.set(bank.active,HudLayoutBindings.capture(c));
@@ -21,8 +25,7 @@ class UiLayouts {
  public function dumpCurrent(c:ConfigPanel):Dynamic { retain(c); return bank.dump(); }
  public function load(c:ConfigPanel,data:Dynamic,fallback:Array<HudLayoutRow>):Void {
   clearTransientState(); bank=HudLayoutModel.load(data,fallback); initialized=true;
-  var missing=HudLayoutBindings.apply(c,bank.layouts.get(bank.active));
-  message=missing>0 ? missing+" unmatched widgets were left unchanged." : "Loaded "+bank.active+".";
+  HudLayoutBindings.apply(c,bank.layouts.get(bank.active));
  }
  public static function migrateSnapshot(snapshot:Dynamic):Void {
   if(snapshot==null || Reflect.field(snapshot,"uiLayouts")!=null) return;
@@ -31,25 +34,37 @@ class UiLayouts {
  public function select(c:ConfigPanel,name:String):Void {
   if(!bank.layouts.exists(name)) return;
   retain(c); bank.active=name;
-  var missing=HudLayoutBindings.apply(c,bank.layouts.get(name));
-  message="Loaded "+name+(missing>0 ? " · "+missing+" unmatched widgets." : "."); SettingsStore.markDirty();
+  var missing=HudLayoutBindings.apply(c,bank.layouts.get(name)); SettingsStore.markDirty();
+  if(missing>0) ToastManager.warn("Loaded layout \""+name+"\"; "+missing+" unmatched widgets left unchanged.");
+  else ToastManager.info("Switched to layout \""+name+"\"");
+ }
+ function save(c:ConfigPanel):Void {
+  retain(c); SettingsStore.markDirty(); SettingsStore.saveNow();
+  ToastManager.success("Layout \""+bank.active+"\" saved!");
+ }
+ function copy(c:ConfigPanel):Void {
+  retain(c); var key=bank.add(bank.active+" (Copy)",bank.layouts.get(bank.active)); SettingsStore.markDirty();
+  ToastManager.success("Created layout \""+key+"\"!");
  }
  function named(c:ConfigPanel,action:String,name:String):Void {
-  name=StringTools.trim(name).substr(0,80); if(name.length==0) { message="Enter a layout name."; return; }
   retain(c);
   switch(action) {
    case "Rename":
-    if(bank.layouts.exists(name) && name!=bank.active) { message="A layout with that name already exists."; return; }
+    if(bank.layouts.exists(name) && name!=bank.active) { ToastManager.warn("A layout named \""+name+"\" already exists."); return; }
     var old=bank.active; var rows=bank.layouts.get(old); var index=bank.order.indexOf(old);
     bank.layouts.remove(old); bank.order[index]=name; bank.layouts.set(name,rows); bank.active=name;
-   default: bank.add(name,bank.layouts.get(bank.active));
+    ToastManager.success("Renamed layout to \""+name+"\"");
+   default:
+    var key=bank.add(name,bank.layouts.get(bank.active));
+    ToastManager.success("Created layout \""+key+"\"!");
   }
-  message=action+" complete · "+bank.active; SettingsStore.markDirty();
+  SettingsStore.markDirty();
  }
  function remove(c:ConfigPanel):Void {
   if(bank.order.length<=1) return;
   var old=bank.active; bank.layouts.remove(old); bank.order.remove(old); bank.active=bank.order[0];
-  HudLayoutBindings.apply(c,bank.layouts.get(bank.active)); message="Deleted "+old+"."; SettingsStore.markDirty();
+  HudLayoutBindings.apply(c,bank.layouts.get(bank.active)); SettingsStore.markDirty();
+  ToastManager.info("Deleted layout \""+old+"\".");
  }
  function importClipboard(c:ConfigPanel):Void {
   try {
@@ -57,55 +72,80 @@ class UiLayouts {
    // Parse into a temporary bank first; invalid input cannot even save outgoing edits.
    var temporary=new HudLayoutModel(); var key=temporary.importText(text); var rows=temporary.layouts.get(key);
    retain(c); key=bank.add(key,rows);
-   var missing=HudLayoutBindings.apply(c,rows); message="Imported "+key+" · "+missing+" unmatched widgets.";
-   SettingsStore.markDirty();
-  } catch(e:Dynamic) { message="Import failed: "+Std.string(e); ToastManager.error(message); }
+   var missing=HudLayoutBindings.apply(c,rows); SettingsStore.markDirty();
+   ToastManager.success("Imported layout \""+key+"\""+(missing>0 ? "; "+missing+" unmatched widgets." : "."));
+  } catch(e:Dynamic) { ToastManager.error("Import failed: "+Std.string(e)); }
  }
- public function draw(c:ConfigPanel):Void {
-  if(!open.get()) return;
-  EditorWindow.drawMenuWindow("UI Layouts###SolarFlare.UiLayouts",open,560,420,function() {
-   FeatureProfiles.drawToolbar(c,"layouts","ui_layouts");
-   UiChrome.heading("UI Layouts");
-   ImGui.textWrapped("Positions and sizes belong to the selected profile. Skills, visibility and glow settings stay in the profile.");
-   UiLayout.propertyGrid("##ui_layout_properties",function() {
-    UiLayout.propertyRow("Selected layout",function() {
-     if(ImGui.beginCombo("##ui_layout_select",bank.active)) {
-      try { for(name in bank.order) if(ImGui.selectable(name,name==bank.active)) { var chosen=name; UiActionQueue.custom(function() select(c,chosen)); } }
-      catch(e:Dynamic) { ImGui.endCombo(); throw e; }
-      ImGui.endCombo();
-     }
-    });
+ /** Selector, Save and More; same shape as the Profile strip so the two read as one control. */
+ public function drawToolbar(c:ConfigPanel,id:String,comboWidth:Single):Void {
+  ImGui.textDisabled("Layout");
+  if(ImGui.isItemHovered()) ImGui.setTooltip("Positions and sizes of HUD windows. Stored inside the selected Profile.");
+  ImGui.sameLine(0,8);
+  ImGui.setNextItemWidth(comboWidth);
+  if(ImGui.beginCombo("##layout_select_"+id,bank.active)) {
+   try { for(name in bank.order) if(ImGui.selectable(name+"##layout_option_"+id+"_"+name,name==bank.active)) {
+    if(name!=bank.active) { var chosen=name; UiActionQueue.custom(function() select(c,chosen)); }
+   } } catch(e:Dynamic) { ImGui.endCombo(); throw e; }
+   ImGui.endCombo();
+  }
+  ImGui.sameLine(0,6);
+  if(UiChrome.ghostButton("Save##layout_save_"+id,ImGui.vec2(56,26))) UiActionQueue.custom(function() save(c));
+  ImGui.sameLine(0,6);
+  if(UiChrome.ghostButton("More##layout_more_"+id,ImGui.vec2(60,26))) ImGui.openPopup("##layout_menu_"+id);
+  drawMoreMenu(c,id);
+  if(openFor==id) {
+   openFor="";
+   if(nameAction=="Rename") ByteUtil.fillBuf(nameBuf,96,bank.active);
+   else ByteUtil.clearBytes(nameBuf,96);
+   ImGui.openPopup("Layout Name##layout_name_popup_"+id);
+  }
+  drawNameModal(c,id);
+ }
+ function drawMoreMenu(c:ConfigPanel,id:String):Void {
+  if(!ImGui.beginPopup("##layout_menu_"+id)) return;
+  try {
+   if(ImGui.menuItem("New layout...##layout_new_"+id)) { nameAction="New"; openFor=id; ImGui.closeCurrentPopup(); }
+   if(ImGui.menuItem("Copy this layout##layout_copy_"+id)) UiActionQueue.custom(function() copy(c));
+   if(ImGui.menuItem("Rename layout...##layout_rename_"+id)) { nameAction="Rename"; openFor=id; ImGui.closeCurrentPopup(); }
+   ImGui.beginDisabled(bank.order.length<=1);
+   var deleted=ImGui.menuItem("Delete this layout##layout_delete_"+id); ImGui.endDisabled();
+   if(deleted) UiActionQueue.custom(function() remove(c));
+   ImGui.separator();
+   if(ImGui.menuItem("Import from clipboard##layout_import_"+id)) UiActionQueue.custom(function() importClipboard(c));
+   if(ImGui.menuItem("Export to clipboard##layout_export_"+id)) UiActionQueue.custom(function() {
+    retain(c); ImGui.setClipboardText(bank.exportSelected()); ToastManager.success("Layout share key copied to clipboard.");
    });
-   UiLayout.inlineSplit("##ui_layout_actions",4,function(i,w) {
-    switch(i) {
-     case 0: if(UiChrome.ghostButton("New##ui_layout_new",ImGui.vec2(w,28))) { nameAction="New"; ByteUtil.clearBytes(nameBuf,96); }
-     case 1: if(UiChrome.ghostButton("Save##ui_layout_save",ImGui.vec2(w,28))) UiActionQueue.custom(function() { retain(c); SettingsStore.saveNow(); message="Saved "+bank.active+"."; });
-     case 2: if(UiChrome.ghostButton("Copy##ui_layout_copy",ImGui.vec2(w,28))) UiActionQueue.custom(function() { retain(c); bank.add(bank.active+" (Copy)",bank.layouts.get(bank.active)); SettingsStore.markDirty(); });
-     case 3: if(UiChrome.ghostButton("Rename##ui_layout_rename",ImGui.vec2(w,28))) { nameAction="Rename"; ByteUtil.clearBytes(nameBuf,96); }
-    }
-   });
-   if(nameAction.length>0) {
-    UiLayout.propertyGrid("##ui_layout_name_properties",function() UiLayout.propertyRow("Layout name",function() ImGui.inputText("##ui_layout_name",nameBuf,96)));
-    UiLayout.inlinePair("##ui_layout_name_actions",function(w) {
-     if(UiChrome.ghostButton("Apply##ui_layout_name_apply",ImGui.vec2(w,26))) {
-      var requested=ByteUtil.readBytes(nameBuf,96); var action=nameAction; nameAction="";
-      UiActionQueue.custom(function() named(c,action,requested));
+  } catch(e:Dynamic) { ImGui.endPopup(); throw e; }
+  ImGui.endPopup();
+ }
+ function drawNameModal(c:ConfigPanel,id:String):Void {
+  if(!ImGui.beginPopupModal("Layout Name##layout_name_popup_"+id,null,imgui.Enums.ImGuiWindowFlags.AlwaysAutoResize)) return;
+  try {
+   // clearTransientState (camera entry, profile load) drops nameAction: close with it.
+   if(nameAction.length==0) ImGui.closeCurrentPopup();
+   else {
+    var renaming=nameAction=="Rename";
+    UiChrome.heading(renaming ? "Rename Layout" : "New Layout",1.15);
+    ImGui.spacing();
+    ImGui.text("Enter layout name:");
+    ImGui.inputText("##layout_name_"+id,nameBuf,96);
+    ImGui.spacing();
+    UiLayout.inlinePair("##layout_name_btns_"+id,function(w:Single) {
+     if(UiChrome.accentButton((renaming ? "Rename" : "Create")+"##layout_name_ok_"+id,ImGui.vec2(w,28))) {
+      var requested=StringTools.trim(ByteUtil.readBytes(nameBuf,96)).substr(0,80);
+      if(requested.length==0) ToastManager.warn("Layout name required.");
+      else if(renaming && requested!=bank.active && bank.layouts.exists(requested)) ToastManager.warn("A layout named \""+requested+"\" already exists.");
+      else {
+       var action=nameAction; nameAction="";
+       UiActionQueue.custom(function() named(c,action,requested));
+       ImGui.closeCurrentPopup();
+      }
      }
-    },function(w) { if(UiChrome.ghostButton("Cancel##ui_layout_name_cancel",ImGui.vec2(w,26))) clearTransientState(); });
+    },function(w:Single) {
+     if(UiChrome.ghostButton("Cancel##layout_name_cancel_"+id,ImGui.vec2(w,28))) { nameAction=""; ImGui.closeCurrentPopup(); }
+    },8);
    }
-   UiLayout.inlineSplit("##ui_layout_io",3,function(i,w) {
-    if(i==0) {
-     ImGui.beginDisabled(bank.order.length<=1);
-     var clicked=UiChrome.ghostButton("Delete##ui_layout_delete",ImGui.vec2(w,28)); ImGui.endDisabled();
-     if(clicked) UiActionQueue.custom(function() remove(c));
-    } else if(i==1) {
-     if(UiChrome.ghostButton("Import##ui_layout_import",ImGui.vec2(w,28))) UiActionQueue.custom(function() importClipboard(c));
-    } else if(UiChrome.ghostButton("Export##ui_layout_export",ImGui.vec2(w,28))) UiActionQueue.custom(function() {
-     retain(c); ImGui.setClipboardText(bank.exportSelected()); message="Layout share key copied to clipboard.";
-    });
-   });
-   if(message.length>0) ImGui.textWrapped(message);
-   ImGui.textDisabled("Import accepts Base64 or JSON. Export copies a Base64 share key.");
-  });
+  } catch(e:Dynamic) { ImGui.endPopup(); throw e; }
+  ImGui.endPopup();
  }
 }

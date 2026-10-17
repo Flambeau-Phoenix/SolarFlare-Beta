@@ -62,6 +62,13 @@ class AuraEngine {
 			n = MAX;
 		var i = 0;
 		while (i < n) {
+			var current = cfg.auras[i];
+			// A disarmed Aura Set silences its auras without touching their own enabled flag.
+			if (current != null && current.fight != null && current.fight.length > 0 && !cfg.setActive(current.fight)) {
+				AuraEffects.clearPresentation(current);
+				i++;
+				continue;
+			}
 			try
 				eval(cfg.auras[i], now)
 			catch (_:Dynamic) {

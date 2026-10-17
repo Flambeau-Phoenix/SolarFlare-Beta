@@ -43,6 +43,7 @@ class RuntimeMetrics {
 
 	public static function reset():Void {
 		StatusWorkMetrics.reset();
+		solarflare.ui.NativeVisibilityWork.reset();
 		hookEdges = coalescedEdges = skillStartHooks = skillStartLocal = 0;
 		castSeen = castLive = castCaptured = castEnemy = castTracked = castWanted = 0;
 		fastPasses = heavyPasses = backgroundPasses = 0;
@@ -99,6 +100,9 @@ class RuntimeMetrics {
 				maxRebuildMs: StatusWorkMetrics.maxRebuildSeconds * 1000
 			},
 			barHudWork: {nodes: barHudNodes, lastMs: barHudMs, maxMs: barHudMaxMs},
+			nativeVisibilityWork: {lastMs: solarflare.ui.NativeVisibilityWork.lastMs, maxMs: solarflare.ui.NativeVisibilityWork.maxMs,
+				scans: solarflare.ui.NativeVisibilityWork.scans, nodes: solarflare.ui.NativeVisibilityWork.nodes,
+				lateMs: solarflare.ui.NativeVisibilityWork.lateMs, lateMaxMs: solarflare.ui.NativeVisibilityWork.lateMaxMs},
 			barterNativeWork: {samples:barterNativeSamples,entries:barterNativeEntries,lastMs:barterNativeMs,maxMs:barterNativeMaxMs},
 			events: {queued: eventQueued, drained: eventDrained, dropped: eventDropped,
 				depth: EventRing.depth(), maxDepth: maxQueueDepth}

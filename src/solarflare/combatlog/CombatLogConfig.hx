@@ -131,12 +131,13 @@ class CombatLogConfig {
 		if (ImGui.collapsingHeader("Record##clog_record")) {
 			UiLayout.propertyGrid("##clog_record_props", function() {
 				UiLayout.propertyRow("JSONL", function() {
+					var recording = CombatLogRecorder.enabled.get();
 					if (ImGui.checkbox("Record JSONL##clog_rec", CombatLogRecorder.enabled)) {
+						// The checkbox already flipped the ref; replay it through the shared switch.
+						var wanted = CombatLogRecorder.enabled.get();
+						CombatLogRecorder.enabled.set(recording);
+						CombatLogRecorder.setCapture(wanted);
 						SettingsStore.markDirty();
-						if (CombatLogRecorder.enabled.get())
-							CombatLogRecorder.newSession();
-						else
-							CombatLogRecorder.endSession();
 					}
 				});
 				UiLayout.propertyRow("World", function() {

@@ -85,7 +85,7 @@ class HudLayoutModel {
    }
    out.push(r);
   }
-  for(path in ["geaux.layout","resources.combo","resources.attackCombo","resources.target","resources.castBar","resources.chaincast","resources.conduit","statusBoard"]) {
+  for(path in ["geaux.layout","resources.combo","resources.attackCombo","resources.target","resources.castBar","resources.chaincast","resources.conduit","resources.hemorrhage","statusBoard"]) {
    var d=node(path); if(d!=null) add(path+".chrome",d.chrome,d);
   }
   var v=node("resources.vitals");

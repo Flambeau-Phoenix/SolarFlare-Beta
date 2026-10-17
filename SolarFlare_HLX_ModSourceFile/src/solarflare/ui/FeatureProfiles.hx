@@ -183,15 +183,14 @@ class FeatureProfiles {
 		var uid = currentCharacterUid();
 		var assigned = uid.length > 0 ? characterProfiles.get(uid) : null;
 		var follows = assigned != null && assigned == activeProfile;
+		var stripWidth = ImGui.getContentRegionAvail().x;
+		var paired = stripWidth >= 640;
 
-		var comboW:Single = 160;
-		if (!compact) {
-			ImGui.textDisabled("Profile");
-			ImGui.sameLine(0, 8);
-			comboW = ImGui.getContentRegionAvail().x - saveW - moreW - gap * 2;
-			if (comboW > 280) comboW = 280;
-			if (comboW < 120) comboW = 120;
-		}
+		ImGui.textDisabled("Profile");
+		ImGui.sameLine(0, 8);
+		var comboW:Single = paired ? (stripWidth - 410) / 2 : stripWidth - 190;
+		if (comboW > 210) comboW = 210;
+		if (comboW < 80) comboW = 80;
 		ImGui.setNextItemWidth(comboW);
 		if (ImGui.beginCombo("##fp_select_" + id, activeProfile)) {
 			for (key in order) {
@@ -210,10 +209,8 @@ class FeatureProfiles {
 		if (UiChrome.ghostButton("More##fp_more_" + id, ImGui.vec2(moreW, rowH)))
 			ImGui.openPopup("##fp_more_pop_" + id);
 		drawMoreMenu(cfg, id, uid, follows);
-		if (compact && statusMsg.length > 0) {
-			ImGui.sameLine(0, 10);
-			ImGui.textColored(ImGui.vec4(0.45, 0.88, 0.55, 1.0), statusMsg);
-		}
+		if (paired) ImGui.sameLine(0, 18);
+		cfg.uiLayouts.drawToolbar(cfg, id, comboW);
 		if (!compact) {
 			if (statusMsg.length > 0)
 				ImGui.textColored(ImGui.vec4(0.45, 0.88, 0.55, 1.0), statusMsg);
@@ -438,11 +435,13 @@ class FeatureProfiles {
 			target: SettingsStore.targetDump(cfg.target),
 			castBar: SettingsStore.castBarDump(cfg.castBar),
 			chaincast: SettingsStore.chaincastDump(cfg.chaincast),
-			conduit: SettingsStore.conduitDump(cfg.conduit)
+			conduit: SettingsStore.conduitDump(cfg.conduit),
+			hemorrhage: SettingsStore.hemorrhageDump(cfg.hemorrhage)
 		};
 	}
 
 	static function applyUniversal(cfg:ConfigPanel, key:String):Void {
+		solarflare.hemorrhage.HemorrhageService.interrupt("Configuration profile changed");
 		statusOwnerGen++;
 		if (cfg == null) return;
 		var snap = profiles.get(key);
@@ -479,6 +478,7 @@ class FeatureProfiles {
 			SettingsStore.applyCastBar(cfg.castBar, Reflect.field(resSnap, "castBar"));
 			SettingsStore.applyChaincast(cfg.chaincast, Reflect.field(resSnap, "chaincast"));
 			SettingsStore.applyConduit(cfg.conduit, Reflect.field(resSnap, "conduit"));
+			SettingsStore.applyHemorrhage(cfg.hemorrhage, Reflect.field(resSnap, "hemorrhage"));
 		}
 
 		cfg.uiLayouts.load(cfg,Reflect.field(snap,"uiLayouts"),HudLayoutModel.legacy(snap,HudChrome.viewportWidth,HudChrome.viewportHeight));

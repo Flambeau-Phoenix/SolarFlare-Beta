@@ -23,9 +23,10 @@ class FieldWalk {
 	/** type#name pairs with no backing `_name` / `name` field — skip repeat resolveField work. */
 	static var fieldMiss:Map<String, Bool> = new Map();
 	static var mapGetMems:Array<ResolvedMember> = null;
-	static var getDynObj:ResolvedMember;
-	static var getDynBase:ResolvedMember;
 	static var arrayLenMem:ResolvedMember;
+	#if hl
+	static var hashLinkArrayBase:hl.Type;
+	#end
 
 	static var mapTypes:Array<String> = [
 		"haxe.ds.StringMap",
@@ -153,6 +154,10 @@ class FieldWalk {
 		arr = unwrapArray(arr);
 		if (arr == null)
 			return fallback;
+		#if hl
+		// NativeArray storage is not an ArrayObj receiver and has no reflective length/getDyn.
+		if (hl.Type.getDynamic(arr).kind == hl.Type.TypeKind.HArray) return fallback;
+		#end
 		try {
 			var n:Dynamic = untyped arr.length;
 			if (n != null && Math.isFinite(n) && n >= 0) return Std.int(n);
@@ -178,24 +183,20 @@ class FieldWalk {
 		arr = unwrapArray(arr);
 		if (arr == null || i < 0)
 			return null;
+		#if hl
+		if (hl.Type.getDynamic(arr).kind == hl.Type.TypeKind.HArray) return null;
+		#end
 		try {
 			return untyped arr.getDyn(i);
 		} catch (_:Dynamic) {}
-		try {
-			if (getDynObj == null)
-				getDynObj = resolveMem("hl.types.ArrayObj", "getDyn");
-			if (getDynObj != null) {
-				var v = HlxRuntime.callResolved(getDynObj, [arr, i]);
-				if (v != null)
-					return v;
-			}
+		#if hl
+		// Resolve on the validated receiver's own type. ArrayDyn and ArrayObj have different
+		// storage layouts; an ArrayObj method must never be called on ArrayDyn or NativeArray.
+		if (isHashLinkArray(arr)) try {
+			var getter = memberOf(liveTypeName(arr), "getDyn");
+			if (getter != null) return HlxRuntime.callResolved(getter, [arr, i]);
 		} catch (_:Dynamic) {}
-		try {
-			if (getDynBase == null)
-				getDynBase = resolveMem("hl.types.ArrayBase", "getDyn");
-			if (getDynBase != null)
-				return HlxRuntime.callResolved(getDynBase, [arr, i]);
-		} catch (_:Dynamic) {}
+		#end
 		return null;
 	}
 
@@ -416,11 +417,33 @@ class FieldWalk {
 	static function unwrapArray(arr:Dynamic):Dynamic {
 		if (arr == null)
 			return null;
+		#if hl
+		// ArrayObj/ArrayDyn already own length and getDyn. Their private `array` field is
+		// capacity storage, not a proxy wrapper: unwrapping it loses the logical collection.
+		if (isHashLinkArray(arr)) return arr;
+		#end
 		var inner = resolveOneField(arr, "_array");
 		if (inner == null)
 			inner = resolveOneField(arr, "array");
 		return inner != null ? inner : arr;
 	}
+
+	#if hl
+	static function isHashLinkArray(value:Dynamic):Bool {
+		var type = hl.Type.getDynamic(value);
+		if (type == null || type.kind != hl.Type.TypeKind.HObj) return false;
+		if (hashLinkArrayBase != null && type.safeCast(hashLinkArrayBase)) return true;
+		for (depth in 0...8) {
+			if (type == null || type.kind != hl.Type.TypeKind.HObj) break;
+			if (type.getTypeName() == "hl.types.ArrayBase") {
+				hashLinkArrayBase = type;
+				return true;
+			}
+			type = type.getSuper();
+		}
+		return false;
+	}
+	#end
 
 	static function usable(v:Dynamic):Bool {
 		if (v == null)

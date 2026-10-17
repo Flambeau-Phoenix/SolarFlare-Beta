@@ -11,11 +11,13 @@ class DemandSnapshot {
 	public var lightsaber:Bool = false;
 	public var encounter:Bool = false;
 	public var diagnostics:Bool = false;
+	public var hemorrhage:Bool = false;
 
 	public function new() {}
 
 	public function capture(cfg:solarflare.ui.ConfigPanel):Void {
 		var d = solarflare.ObserveDemand;
+		hemorrhage = d.hemorrhage;
 		vitals = d.resourceBars || d.auras || d.auraBuilderOpen || d.prayers
 			|| d.comboPoints || d.chaincast || d.conduit;
 		overlays = d.prayers || d.comboPoints || d.chaincast || d.conduit || d.attackCombo;

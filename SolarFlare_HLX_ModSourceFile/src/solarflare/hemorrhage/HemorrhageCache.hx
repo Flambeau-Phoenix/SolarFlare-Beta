@@ -14,6 +14,9 @@ typedef HemorrhageInput = {
 	var crit:Bool;
 	var physical:Bool;
 	var isDoT:Bool;
+	@:optional var isDoTKnown:Bool;
+	@:optional var magic:Bool;
+	@:optional var identityGen:Int;
 	var t:Float;
 	var wallMs:Float;
 }
@@ -26,6 +29,8 @@ class HemorrhageRow {
 	public var amount:Float;
 	public var bleed:Bool;
 	public var text:String;
+	public var amountText:String;
+	public var kindText:String;
 	public function new(hit:HemorrhageInput, bleed:Bool) {
 		sequence = hit.sequence;
 		at = hit.t;
@@ -33,13 +38,17 @@ class HemorrhageRow {
 		ability = hit.skillLabel.length > 0 ? hit.skillLabel : hit.skillId;
 		amount = hit.amount;
 		this.bleed = bleed;
-		text = (bleed ? "Hemorrhage " : "Crit ") + HemorrhageCache.number(amount);
+		amountText = HemorrhageCache.number(amount);
+		kindText = bleed ? (hit.skillId == HemorrhageCache.SPARK_ID ? "Spark Hemorrhage" : "Hemorrhage")
+			: (hit.isDoTKnown != true ? "Unclassified" : (hit.isDoT ? "DoT" : (hit.crit ? "Direct crit" : "Direct")));
+		text = kindText + " " + amountText;
 	}
 }
 
 /** Scheduler-owned, primitive-only history. No simulated bleed budgets or refresh timers. */
 class HemorrhageCache {
 	public static inline var STATUS_ID:String = "Warrior_Hemorrhage_Status";
+	public static inline var SPARK_ID:String = "Warrior_Talent_InfusedWound_Status";
 	public static inline var CAPACITY:Int = 1024;
 	public static inline var MAX_FLOATING:Int = 3;
 	public static var enabled(default, null):Bool = false;
@@ -59,7 +68,6 @@ class HemorrhageCache {
 		enabled = visible;
 		floatingEnabled = visible && floatText && !suppressed;
 		if (!floatingEnabled) clearFloating();
-		if (!visible) setStats(Math.NaN, Math.NaN);
 	}
 
 	/** Called exactly once after each shared event commits, before its ring can roll over. */
@@ -69,17 +77,16 @@ class HemorrhageCache {
 		if (!enabled || hit.kind != 1 || hit.sourceRole != 1 || hit.targetRole != 3
 			|| hit.minionName.length > 0 || !Math.isFinite(hit.amount) || hit.amount <= 0
 			|| !Math.isFinite(hit.t)) return;
-		var bleed = hit.skillId == STATUS_ID;
-		if (!bleed && (!hit.crit || !hit.physical || hit.isDoT)) return;
+		var bleed = hit.skillId == STATUS_ID || hit.skillId == SPARK_ID;
 		var row = new HemorrhageRow(hit, bleed);
-		if (bleed) hemorrhageTotal += row.amount; else criticalTotal += row.amount;
+		if (bleed) hemorrhageTotal += row.amount; else if (hit.crit && hit.isDoTKnown == true && !hit.isDoT) criticalTotal += row.amount;
 		if (count < CAPACITY) {
 			history.push(row);
 			count++;
 		} else history[writeAt] = row;
 		writeAt = (writeAt + 1) % CAPACITY;
 		revision++;
-		if (floatingEnabled) {
+		if (floatingEnabled && (bleed || (hit.crit && hit.isDoTKnown == true && !hit.isDoT))) {
 			if (floating.length >= MAX_FLOATING) floating.shift();
 			floating.push(row);
 		}

@@ -44,6 +44,11 @@ class CombatLogAuraChoices {
 			out.push(new CombatLogAuraChoice("enemy_recent", "Alert after this enemy skill is cast",
 				evidence + "Watches this skill cast by ANY enemy within 5 seconds. The selected enemy is browsing context, not a trigger filter.",
 				"event.cast.recent", "within", stats.skill, label, 5, "enemy"));
+			var castTime = solarflare.cdb.CdbAuraTable.castDuration(stats.skill);
+			if (Math.isFinite(castTime) && castTime > 0.001)
+				out.push(new CombatLogAuraChoice("enemy_countdown", "Count down this skill's cast time",
+					"Watches this skill cast by ANY enemy and counts down its listed cast time of " + (Math.round(castTime * 10) / 10) + " seconds.",
+					"event.cast.recent", "within", stats.skill, label, 5, "countdown"));
 			out.push(new CombatLogAuraChoice("enemy_active", "Show while this cast or channel is active",
 				evidence + "Watches this skill running on any enemy. Very brief casts may finish before an aura evaluation.",
 				"event.cast.active", "is", stats.skill, label));
