@@ -357,6 +357,8 @@ class AuraConditionEditor {
 				ImGui.textDisabled("Count is full character status container length. Overflow means > " + AuraSignalFrame.MAX_STATUSES + " entries.");
 			else if (d.id == "skill.instantReady")
 				ImGui.textDisabled("Skill script shouldPlayInstantly (e.g. Staff_Craft_S1). For buffs, prefer Statuses.");
+			else if (d.id == "equipment.weaponEquipped")
+				ImGui.textWrapped("Matches either equipped weapon slot or the active offhand, including the inactive weapon. Items only in your bag do not match.");
 			else if (d.id == "event.cast.recent" || d.id == "event.playerCast.recent")
 				ImGui.textDisabled("Seconds since cast. Use 'within' operator for windows (e.g. within 5s).");
 			else if (AuraConditionValidator.isCombatEvent(d.id))
@@ -431,6 +433,12 @@ class AuraConditionEditor {
 			ImGui.text("Search " + kind + " catalog");
 			if (ImGui.inputText("##cond_subj_search_" + tag, ui.searchBuf, AuraConditionUiState.SEARCH_BUF))
 				ui.search = ByteUtil.readString(ui.searchBuf, AuraConditionUiState.SEARCH_BUF, true).toLowerCase();
+			if (kind == "weapon" && ui.search.length > 0 && ImGui.smallButton("Use typed weapon ID##cond_weapon_id_" + tag)) {
+				if (a.snapshot != null) a.snapshot();
+				c.subject = solarflare.cdb.WeaponCatalog.canonicalId(ByteUtil.readString(ui.searchBuf, AuraConditionUiState.SEARCH_BUF, true));
+				c.subjectLabel = solarflare.cdb.AuraCatalog.label(c.subject);
+				ui.sync(c); ui.flashContext(); SettingsStore.markDirty(); ImGui.closeCurrentPopup();
+			}
 			ImGui.separator();
 
 			// Child begin always pairs with end (AGENTS.md); content only when open.
@@ -460,6 +468,11 @@ class AuraConditionEditor {
 			for (entry in solarflare.cdb.ConsumableCatalog.entries)
 				if (solarflare.cdb.AuraCatalog.matchesSearch(entry.id, entry.name, ui.search))
 					otherSkills.push({id:entry.id, name:entry.name, kind:"consumable"});
+		}
+		if (kind == "weapon") {
+			for (entry in solarflare.cdb.WeaponCatalog.entries)
+				if (solarflare.cdb.AuraCatalog.matchesSearch(entry.id, entry.name, ui.search))
+					otherSkills.push({id:entry.id, name:entry.name, kind:"weapon"});
 		}
 		for (entry in solarflare.cdb.AuraCatalog.entries) {
 			if (!solarflare.cdb.AuraCatalog.matchesSubject(entry.kind, kind)) continue;
@@ -505,7 +518,7 @@ class AuraConditionEditor {
 			shown += drawSubjectSection(c, ui, tag + "_recent", "Recent targets", recent, kind, beforeEdit);
 			shown += drawSubjectSection(c, ui, tag, "Units", units, kind, beforeEdit);
 		} else {
-			shown += drawSubjectSection(c, ui, tag, kind == "consumable" ? "Consumables / usable items" : "Skills", otherSkills, kind, beforeEdit);
+			shown += drawSubjectSection(c, ui, tag, kind == "weapon" ? "Weapons / offhands" : kind == "consumable" ? "Consumables / usable items" : "Skills", otherSkills, kind, beforeEdit);
 		}
 		ImGui.textDisabled(shown + " matching");
 	}

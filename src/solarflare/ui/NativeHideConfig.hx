@@ -34,6 +34,7 @@ class NativeHideConfig {
 
 	public function new() {
 		elements = [
+			new NativeHideElement("xpBar", "XP bar", GROUP_ACTION, "The native experience bar. Nearby actions and resources stay visible."),
 			new NativeHideElement("skills", "Weapon skills", GROUP_ACTION, "Native weapon, passive and vehicle skills on keyboard or controller."),
 			new NativeHideElement("baseActions", "Basic actions (2x2)", GROUP_ACTION, "Attack, dash, mount and block on the native keyboard bar."),
 			new NativeHideElement("statuses", "Statuses", GROUP_ACTION, "Both native buff and debuff bars above the bottom bar."),

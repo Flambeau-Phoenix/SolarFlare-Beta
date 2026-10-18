@@ -20,7 +20,7 @@ class AuraCanvasElement {
 	public static var SHAPES:Array<String> = ["rect", "rounded", "circle", "diamond", "hex", "triangle", "line"];
 
 	/** Icon content with this prefix names a PNG in the user's custom image folder. */
-	public static inline var CUSTOM_PREFIX:String = "custom:";
+	public static inline var CUSTOM_PREFIX:String = solarflare.ui.CustomImageKey.PREFIX;
 
 	public var kind:String;
 	/** Text content (supports {time} / {name}), icon texture id, or shape name. */

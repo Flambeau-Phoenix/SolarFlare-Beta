@@ -35,10 +35,18 @@ class AuraEngine {
 	/** Last frozen signal frame for read-only builder pickers/value display. */
 	public static function signalFrame():AuraSignalFrame return frame;
 
+	public static function resetWeaponEquipment():Void {
+		WeaponEquipmentCache.reset();
+		if (frame == null) return;
+		for (i in 0...frame.weaponCount) frame.weapons[i].reset();
+		frame.weaponCount = 0;
+	}
+
 	public static function tick(cfg:AuraConfig):Void {
 		if (cfg == null || cfg.auras == null)
 			return;
 		if (!cfg.enabled.get() && !solarflare.ObserveDemand.auraBuilderOpen) {
+			resetWeaponEquipment();
 			solarflare.aura.signal.CombatStateTracker.reset();
 			clearAllPresentation(cfg);
 			return;

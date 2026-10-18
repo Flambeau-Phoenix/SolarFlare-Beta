@@ -47,8 +47,13 @@ class WindowAutoHideSampler {
     var kind=found>=0 ? kindA[found] : source.classify(window);
     objB.push(window); kindB.push(kind);
     if((kind & options)==0 || !source.isOpen(window)) continue;
-    if((kind!=WindowAutoHidePolicy.TRAVEL || source.travelMode(window))
-     && (kind!=WindowAutoHidePolicy.OBELISK || source.obeliskDialog(window))) next |= kind;
+    var selected=kind & options;
+    // General Map/Dialogue can match without querying their narrower travel/obelisk subset.
+    if((selected & WindowAutoHidePolicy.MAP)!=0) selected &= ~WindowAutoHidePolicy.TRAVEL;
+    else if((selected & WindowAutoHidePolicy.TRAVEL)!=0 && !source.travelMode(window)) selected &= ~WindowAutoHidePolicy.TRAVEL;
+    if((selected & WindowAutoHidePolicy.DIALOGUE)!=0) selected &= ~WindowAutoHidePolicy.OBELISK;
+    else if((selected & WindowAutoHidePolicy.OBELISK)!=0 && !source.obeliskDialog(window)) selected &= ~WindowAutoHidePolicy.OBELISK;
+    next |= selected;
    }
    var objects=objA; objA=objB; objB=objects; objB.resize(0);
    var kinds=kindA; kindA=kindB; kindB=kinds; kindB.resize(0);

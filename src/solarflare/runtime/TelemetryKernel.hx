@@ -37,6 +37,7 @@ class TelemetryKernel {
 
 	public static function observeAssets():Void {
 		var pending = !brandingRequested || GameIcons.hasPending()
+			|| solarflare.ui.CustomImages.hasPending()
 			|| solarflare.attackcombo.AttackComboArt.hasPending();
 		if (!pending)
 			return;
@@ -44,6 +45,7 @@ class TelemetryKernel {
 		if (now - lastAsset < ASSET_S)
 			return;
 		lastAsset = now;
+		solarflare.ui.CustomImages.observe();
 		if (!brandingRequested) {
 			brandingRequested = true;
 			GameIcons.get(GameIcons.CHROME_SUN);

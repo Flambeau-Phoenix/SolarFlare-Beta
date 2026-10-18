@@ -70,6 +70,8 @@ class AuraSignalFrame {
 	public var skillCount:Int = 0;
 	public var consumables:Array<ConsumableSignalSnap> = [];
 	public var consumableCount:Int = 0;
+	public var weapons:Array<WeaponSignalSnap> = [];
+	public var weaponCount:Int = 0;
 	public var statuses:Array<StatusSignalSnap> = [];
 	public var statusCount:Int = 0;
 	public var casts:Array<EnemyCastSignalSnap> = [];
@@ -90,6 +92,7 @@ class AuraSignalFrame {
 	}
 
 	public function new() {
+		for (_ in 0...solarflare.aura.WeaponEquipmentSampler.MAX_SUBJECTS) weapons.push(new WeaponSignalSnap());
 		for (entry in solarflare.cdb.ConsumableCatalog.entries) { var snap = new ConsumableSignalSnap(); snap.id = entry.id; consumables.push(snap); }
 		for (_ in 0...MAX_SKILLS) skills.push(new SkillSignalSnap());
 		for (_ in 0...MAX_STATUSES) statuses.push(new StatusSignalSnap());
@@ -97,6 +100,8 @@ class AuraSignalFrame {
 		for (_ in 0...solarflare.aura.LocalCastHistory.MAX) playerCasts.push(new EnemyCastSignalSnap());
 	}
 	public function resetCollections():Void {
+		for (i in 0...weaponCount) weapons[i].reset();
+		weaponCount = 0;
 		for (i in 0...consumableCount) consumables[i].reset();
 		consumableCount = 0;
 		for (i in 0...skillCount) skills[i].reset();
@@ -110,6 +115,21 @@ class AuraSignalFrame {
 		damageTakenKnown = false;
 		combatKnown = false; inCombat = false; combatEnteredAge = 1e9; combatLeftAge = 1e9;
 		setStatusContainerLength(-1);
+	}
+	public function publishWeapons(snaps:Array<WeaponSignalSnap>):Void {
+		for (i in 0...weaponCount) weapons[i].reset();
+		weaponCount = 0;
+		for (src in snaps) {
+			if (weaponCount >= weapons.length) break;
+			var dst = weapons[weaponCount++];
+			dst.id = src.id; dst.known = src.known; dst.equipped = src.equipped;
+		}
+	}
+	public function findWeapon(id:String):WeaponSignalSnap {
+		if (id == null || id.length == 0) return null;
+		var key = StringTools.trim(id).toLowerCase();
+		for (i in 0...weaponCount) if (weapons[i].id.toLowerCase() == key) return weapons[i];
+		return null;
 	}
 	public function findConsumable(id:String):ConsumableSignalSnap {
 		if (id == null || id.length == 0) return null;

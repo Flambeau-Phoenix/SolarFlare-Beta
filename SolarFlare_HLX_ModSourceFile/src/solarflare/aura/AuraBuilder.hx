@@ -147,6 +147,11 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 	var canvasImportBuf = new hl.Bytes(520);
 	var canvasImportMsg:String = "";
 	var canvasImportErr:Bool = false;
+	static inline var CANVAS_FOLDER_BUF:Int = 1024;
+	var canvasFolderBuf = new hl.Bytes(CANVAS_FOLDER_BUF);
+	var canvasFolderGeneration:Int = -1;
+	var canvasFolderMsg:String = "";
+	var canvasFolderError:Bool = false;
 	var libraryCollapsed:Bool = false;
 	var buildFocusBossId:String = "";
 
@@ -193,6 +198,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		solarflare.ui.ByteUtil.clearBytes(canvasContentBuf, CANVAS_CONTENT_BUF);
 		solarflare.ui.ByteUtil.clearBytes(canvasQuickBuf, CANVAS_CONTENT_BUF);
 		solarflare.ui.ByteUtil.clearBytes(canvasImportBuf, CANVAS_IMPORT_BUF);
+		solarflare.ui.ByteUtil.clearBytes(canvasFolderBuf, CANVAS_FOLDER_BUF);
 		solarflare.ui.ByteUtil.clearBytes(wizardSubjectBuf, 128);
 		solarflare.ui.ByteUtil.clearBytes(wizardCatalogSearchBuf, 96);
 		solarflare.ui.ByteUtil.clearBytes(wizardFightBuf, 32);
@@ -2890,7 +2896,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 			addCanvasElement(a, AuraCanvasElement.icon(CustomImages.key(names.length > 0 ? names[0] : ""), 8, 8, 48, 48),
 				"Canvas Add Image", false);
 		}
-		if (ImGui.isItemHovered()) ImGui.setTooltip("Your own PNG from the custom_images folder.");
+		if (ImGui.isItemHovered()) ImGui.setTooltip("Your own PNG from the images folder configured below.");
 		ImGui.sameLine(0, 4);
 		if (ImGui.button("Shape##ab_cv_add_shape")) {
 			// Shapes start as a backplate behind everything else.
@@ -2908,6 +2914,53 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 					ImGui.endCombo();
 				}
 			}, "Live conditions use observed game state. The Stacks simulation changes display text only.");
+		});
+		drawCanvasAssetFolder();
+	}
+
+	/** Global machine-local preference, independent of the selected aura and its Undo snapshots. */
+	function drawCanvasAssetFolder():Void {
+		if (canvasFolderGeneration != CustomImages.generation) {
+			ByteUtil.fillBuf(canvasFolderBuf, CANVAS_FOLDER_BUF, CustomImages.folder);
+			canvasFolderGeneration = CustomImages.generation;
+		}
+		UiLayout.propertyGrid("##ab_canvas_asset_folder", function() {
+			UiLayout.propertyRow("Images folder", function() {
+				ImGui.setNextItemWidth(Math.max(60, ImGui.getContentRegionAvail().x - 90));
+				var enter = ImGui.inputTextWithHint("##ab_cv_folder_path", CustomImages.displayDir, canvasFolderBuf, CANVAS_FOLDER_BUF,
+					imgui.Enums.ImGuiInputTextFlags.EnterReturnsTrue);
+				ImGui.sameLine(0, 4);
+				if (UiChrome.ghostButton("Use folder##ab_cv_folder_apply", ImGui.vec2(86, 28)) || enter)
+					queueCanvasAssetFolder(readBytes(canvasFolderBuf, CANVAS_FOLDER_BUF));
+			}, "Paste a full folder path, then Use folder. This choice is saved for this PC, across all auras. Leave blank for custom_images.");
+			UiLayout.propertyRow("Folder actions", function() {
+				UiLayout.inlineSplit("##ab_cv_folder_actions", 3, function(index:Int, width:Single) {
+					if (index == 0 && UiChrome.ghostButton("Default##ab_cv_folder_default", ImGui.vec2(width, 28))) queueCanvasAssetFolder("");
+					if (index == 1 && UiChrome.ghostButton("Copy path##ab_cv_folder_copy", ImGui.vec2(width, 28))) UiActionQueue.copyText(CustomImages.displayDir, "Images folder path copied.");
+					if (index == 2 && UiChrome.ghostButton("Refresh##ab_cv_img_refresh", ImGui.vec2(width, 28))) CustomImages.requestRefresh();
+				});
+			});
+		});
+		ImGui.textWrapped(CustomImages.displayDir);
+		if (CustomImages.folderError)
+			ImGui.textColored(solarflare.ui.ThemePalette.status(solarflare.ui.ThemePalette.STATUS_WARN), CustomImages.status);
+		else ImGui.textWrapped(CustomImages.status);
+		if (canvasFolderMsg.length > 0) {
+			if (canvasFolderError) ImGui.textColored(solarflare.ui.ThemePalette.status(solarflare.ui.ThemePalette.STATUS_DANGER), canvasFolderMsg);
+			else ImGui.textWrapped(canvasFolderMsg);
+		}
+	}
+
+	function queueCanvasAssetFolder(path:String):Void {
+		UiActionQueue.custom(function() {
+			try {
+				if (CustomImages.useFolder(path)) SettingsStore.markDirty();
+				canvasFolderGeneration = -1;
+				canvasFolderMsg = "Folder selected. Choose Image to add one to the canvas.";
+				canvasFolderError = false;
+			} catch (error:Dynamic) {
+				canvasFolderMsg = Std.string(error); canvasFolderError = true;
+			}
 		});
 	}
 
@@ -3474,14 +3527,14 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		}
 	}
 
-	/** Custom image picker + import. The folder is scanned only when the picker opens or on Refresh. */
+	/** Cache-only picker. Scans/imports are requested here and executed during observation. */
 	function drawCanvasImageRows(el:AuraCanvasElement):Void {
 		UiLayout.propertyRow("Image", function() {
 			var stem = CustomImages.stemOf(el.content);
 			var opened = ImGui.beginCombo("##ab_cv_img", stem.length > 0 ? stem : "Choose an image...");
 			if (opened) {
 				try {
-					if (!canvasImgComboOpen) CustomImages.refresh();
+					if (!canvasImgComboOpen) CustomImages.requestRefresh();
 					canvasImgComboOpen = true;
 					var names = CustomImages.names();
 					if (names.length == 0) ImGui.textDisabled("No images yet. Import one below or drop PNGs in the folder.");
@@ -3491,7 +3544,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 						if (ImGui.selectable(n + "##ab_cv_img_" + n, n == stem)) {
 							snapshot("Canvas Image");
 							el.content = CustomImages.key(n);
-							GameIcons.retry(el.content);
+							GameIcons.get(el.content);
 							SettingsStore.markDirty();
 						}
 					}
@@ -3505,28 +3558,24 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 				imgui.Enums.ImGuiInputTextFlags.EnterReturnsTrue);
 			ImGui.sameLine(0, 4);
 			if (ImGui.button("Import##ab_cv_imp_go", ImGui.vec2(68, 0)) || enter) {
-				try {
-					var stem = CustomImages.importFile(readBytes(canvasImportBuf, CANVAS_IMPORT_BUF));
-					snapshot("Canvas Image");
-					el.content = CustomImages.key(stem);
-					GameIcons.retry(el.content);
-					SettingsStore.markDirty();
-					ByteUtil.clearBytes(canvasImportBuf, CANVAS_IMPORT_BUF);
-					canvasImportMsg = "Imported " + stem + ".png";
-					canvasImportErr = false;
-				} catch (e:Dynamic) {
-					canvasImportMsg = Std.string(e);
-					canvasImportErr = true;
-				}
+				var path = readBytes(canvasImportBuf, CANVAS_IMPORT_BUF);
+				var owner = selectedAura();
+				UiActionQueue.custom(function() {
+					if (!open.get() || owner == null || cfg.auras.indexOf(owner) < 0 || owner.canvasElements == null || owner.canvasElements.indexOf(el) < 0) return;
+					try {
+						var stem = CustomImages.importFile(path);
+						snapshot("Canvas Image"); el.content = CustomImages.key(stem);
+						GameIcons.get(el.content); SettingsStore.markDirty();
+						ByteUtil.clearBytes(canvasImportBuf, CANVAS_IMPORT_BUF);
+						canvasImportMsg = "Imported " + stem + ".png"; canvasImportErr = false;
+					} catch (e:Dynamic) { canvasImportMsg = Std.string(e); canvasImportErr = true; }
+				});
 			}
-			if (ImGui.smallButton("Open folder##ab_cv_img_folder")) CustomImages.openFolder();
-			ImGui.sameLine(0, 6);
-			if (ImGui.smallButton("Refresh##ab_cv_img_refresh")) CustomImages.refresh();
 			if (canvasImportMsg.length > 0) {
 				if (canvasImportErr) ImGui.textColored(ImGui.vec4(0.95, 0.45, 0.4, 1), canvasImportMsg);
 				else ImGui.textDisabled(canvasImportMsg);
 			}
-		}, "PNG up to 1024x1024. In Explorer, Shift+right-click a file > Copy as path. Images stay on this PC: share keys carry the name, so others see a placeholder until they add the same file.");
+		}, "PNG up to 1024x1024 and 4 MB. Import copies into the selected images folder. The picker lists PNGs in that folder itself. Share keys carry the filename, so others need the same image on their PC.");
 	}
 
 	function resetCanvasTransient():Void {
@@ -3538,6 +3587,8 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		canvasImgComboOpen = false;
 		lastCanvasColorEl = null;
 		canvasImportMsg = "";
+		canvasFolderGeneration = -1;
+		canvasFolderMsg = "";
 	}
 
 	function measureCanvasElementW(a:AuraDef, el:AuraCanvasElement):Float {

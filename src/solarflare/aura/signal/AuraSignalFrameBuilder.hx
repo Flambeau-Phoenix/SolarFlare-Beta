@@ -16,6 +16,8 @@ class AuraSignalFrameBuilder {
 		frame.resetCollections(); frame.generation++; frame.builtAt = now;
 		frame.castDomainKnown = true;
 		frame.heroKnown = HealthCache.localHero != null;
+		solarflare.aura.WeaponEquipmentCache.sample(now);
+		frame.publishWeapons(solarflare.aura.WeaponEquipmentCache.snaps);
 		var localCasts = solarflare.aura.LocalCastHistory.shared;
 		localCasts.bindHero(HealthCache.localHero);
 		for (r in localCasts.records) {

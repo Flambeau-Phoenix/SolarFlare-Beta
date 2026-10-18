@@ -13,8 +13,11 @@ class WindowAutoHidePolicy {
 	public static inline var TRAVEL:Int = 8;
 	/** The "Obelisk: <name>" interaction dialog (Fly to another obelisk, Set point, ...). */
 	public static inline var OBELISK:Int = 16;
-	public static inline var ALL:Int = 31;
-	/** MapWindow: hides only in the travel/portal picker modes (see hidesForMapMode). */
+	public static inline var DIALOGUE:Int = 32;
+	public static inline var MAP:Int = 64;
+	public static inline var ESC_MENU:Int = 128;
+	public static inline var ALL:Int = 255;
+	/** The narrower travel/portal subset of MapWindow, independent of the general Map category. */
 	public static inline var TRAVEL_MAP:Int = TRAVEL;
 
 	/**
@@ -27,11 +30,11 @@ class WindowAutoHidePolicy {
 			case "ui.win.BankWindow" | "ui.win.ShopUI": BANK_VENDOR;
 			case "ui.win.CraftUI" | "ui.win.GearUpgrade" | "ui.win.WeaponSkills": CRAFT_UPGRADE;
 			case "ui.win.MapWindow":
-				TRAVEL_MAP;
-			// Every NPC/interactible dialog uses DialogBar; only one opened on an obelisk counts (the
-			// sampler asks the source), so ordinary conversations never hide the overlays.
+				MAP | TRAVEL_MAP;
+			// Obelisk is a subset of Dialogue; the sampler resolves the current dialog target.
 			case "ui.win.DialogBar":
-				OBELISK;
+				DIALOGUE | OBELISK;
+			case "ui.win.EscapeMenu": ESC_MENU;
 			default:
 				OTHER;
 		}
@@ -44,6 +47,9 @@ class WindowAutoHidePolicy {
 		if ((mask & CRAFT_UPGRADE) != 0) return "Crafting or upgrade window open";
 		if ((mask & TRAVEL) != 0) return "Travel or portal picker open";
 		if ((mask & OBELISK) != 0) return "Obelisk window open";
+		if ((mask & DIALOGUE) != 0) return "Dialogue open";
+		if ((mask & MAP) != 0) return "Map open";
+		if ((mask & ESC_MENU) != 0) return "ESC Menu open";
 		return "No selected game window is open";
 	}
 	public static inline function suppress(manual:Bool, automatic:Bool):Bool return manual || automatic;

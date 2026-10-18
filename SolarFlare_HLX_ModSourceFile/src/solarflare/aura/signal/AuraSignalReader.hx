@@ -9,6 +9,9 @@ class AuraSignalReader {
 		if (d.subjectKind.length > 0 && (subject == null || subject.length == 0)) { out.code = MISSING_SUBJECT; return; }
 		if (StringTools.startsWith(signal, "consumable.")) { ConsumableSignalReader.read(frame, signal, subject, out); return; }
 		switch (signal) {
+			case "equipment.weaponEquipped":
+				var weapon = frame.findWeapon(subject);
+				bool(out, weapon != null && weapon.known, weapon != null && weapon.equipped);
 			case "resource.health.current": number(out, frame.healthKnown, frame.healthCurrent);
 			case "resource.health.ratio": percent(out, frame.healthKnown, frame.healthRatio);
 			case "resource.shield.ratio": percent(out, frame.healthKnown, frame.shieldRatio);

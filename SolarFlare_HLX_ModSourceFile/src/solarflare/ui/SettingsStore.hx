@@ -296,6 +296,7 @@ class SettingsStore {
 		assignDump(data, "customTheme", function() return ThemePalette.dumpCustom());
 		assignDump(data, "uiPack", function() return cfg.uiPack != null ? cfg.uiPack.dump() : {id: "custom"});
 		assignDump(data, "nativeHide", function() return cfg.nativeHide.dump());
+		assignDump(data, "customImages", function() return CustomImages.dump());
 		assignDump(data, "hideMove", function() return cfg.hideMove != null ? cfg.hideMove.dump() : {});
 		assignDump(data, "barter", function() return cfg.barter != null ? cfg.barter.dump() : {});
 		assignDump(data, "aimInstant", function() return cfg.aimInstant != null ? cfg.aimInstant.dump() : {});
@@ -782,6 +783,7 @@ class SettingsStore {
 		if (data == null)
 			return;
 		cfg.preventCtrlFullscreen.set(Reflect.field(data,"preventCtrlFullscreen")==true);
+		CustomImages.apply(Reflect.field(data, "customImages"));
 		if (cfg.uiPack != null)
 			cfg.uiPack.apply(Reflect.field(data, "uiPack"));
 		cfg.nativeHide.apply(Reflect.field(data, "nativeHide"));

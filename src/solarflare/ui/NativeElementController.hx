@@ -54,6 +54,7 @@ class NativeElementController {
  var late:Array<VisibilityLease>=[];
  public var scannedNodes(default,null):Int=0;
  var targets:Array<VisibilityTarget>=[
+  new VisibilityTarget("xpBar",null,["ui.hud.ExpBar"]),
   new VisibilityTarget("skills",null,["ui.hud.SkillBar","ui.hud.SkillBarPad","ui.hud.VehicleSkillBar","ui.hud.PassiveBar"]),
   new VisibilityTarget("baseActions",null,["ui.hud.BaseSkillsBar"]),
   new VisibilityTarget("statuses",null,["ui.hud.StatusBar"]),

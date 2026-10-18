@@ -29,6 +29,7 @@ class ModEntry {
 					catch (_:Dynamic) {}
 				} else {
 					if (HealthCache.localHero != null) HealthCache.clearLocalHero();
+					solarflare.aura.AuraEngine.resetWeaponEquipment();
 					panel.resetExtraBarsSession();
 					panel.flushPendingSettings();
 				}
@@ -46,6 +47,7 @@ class ModEntry {
 		solarflare.cdb.CdbSummonUnits.keep();
 		solarflare.cdb.AuraCatalog.keep();
 		solarflare.cdb.ConsumableCatalog.keep();
+		solarflare.cdb.WeaponCatalog.keep();
 		solarflare.cdb.LootCatalog.keep();
 		solarflare.cdb.AuraQuickStartCatalog.keep();
 		solarflare.cdb.CdbAuraTable.keep();

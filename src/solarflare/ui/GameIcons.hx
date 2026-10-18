@@ -442,6 +442,26 @@ class GameIcons {
 		statusAliases = new Map<String, String>();
 	}
 
+	/** Observe-phase invalidation for custom images only; official atlas/loose icons stay cached. */
+	public static function invalidateCustomImage(id:String, changed:Bool = true):Void {
+		if (id == null || !StringTools.startsWith(id, CustomImageKey.PREFIX)) return;
+		failed.remove(id); requested.remove(id);
+		if (changed) { cache.remove(id); dimW.remove(id); dimH.remove(id); }
+	}
+	/** One pass over retained custom keys also handles old/share keys with different filename casing. */
+	public static function refreshCustomImages(changes:Map<String, Bool>):Void {
+		var keys = new Map<String, Bool>();
+		for (id in cache.keys()) keys.set(id, true);
+		for (id in failed.keys()) keys.set(id, true);
+		for (id in requested.keys()) keys.set(id, true);
+		for (id in dimW.keys()) keys.set(id, true);
+		for (id in dimH.keys()) keys.set(id, true);
+		for (id in keys.keys()) {
+			var stem = CustomImageKey.stemOf(id).toLowerCase();
+			if (stem.length > 0 && changes.exists(stem)) invalidateCustomImage(id, changes.get(stem));
+		}
+	}
+
 	/** Retry one asset without discarding already registered textures. */
 	public static function retry(id:String):TextureHandle {
 		if (id == null || id.length == 0)
@@ -586,7 +606,7 @@ class GameIcons {
 	}
 
 	static function loadPng(id:String):TextureHandle {
-		if (StringTools.startsWith(id, solarflare.aura.AuraCanvasElement.CUSTOM_PREFIX))
+		if (StringTools.startsWith(id, CustomImageKey.PREFIX))
 			return loadFilePng(CustomImages.pathFor(CustomImages.stemOf(id)), id, CustomImages.MAX_DIM);
 		if (id == CHROME_SUN) {
 			var icoPath = resolvePath(id + ".ico");
@@ -640,6 +660,7 @@ class GameIcons {
 		try {
 			if (path == null || !FileSystem.exists(path))
 				return 0;
+			if (maxDim > 0 && FileSystem.stat(path).size > CustomImages.MAX_BYTES) return 0;
 			var fileBytes = File.getBytes(path);
 			if (fileBytes == null || fileBytes.length == 0)
 				return 0;

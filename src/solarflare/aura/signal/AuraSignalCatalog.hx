@@ -35,6 +35,7 @@ class AuraSignalCatalog {
 		add("skill.cooldownProgress", "Skill cooldown progress", "Skills", Percent, "skill");
 		// skill.specialReady (shouldHighlightSkill) kept in reader for legacy saves; not offered in picker.
 		add("skill.instantReady", "Instant cast ready (skill script)", "Instant cast", Boolean, "skill");
+		add("equipment.weaponEquipped", "Weapon Equipped", "Equipment", Boolean, "weapon");
 		add("consumable.owned", "Item carried / equipped", "Consumables", Boolean, "consumable");
 		add("consumable.count", "Item count / charges", "Consumables", Count, "consumable");
 		add("consumable.usable", "Item usable now", "Consumables", Boolean, "consumable");

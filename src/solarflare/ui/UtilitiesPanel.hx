@@ -61,7 +61,7 @@ class UtilitiesPanel {
 		ImGui.textWrapped(cfg.status);
 	}
 
-	/** Auto-hide while a bank, trader, crafting/upgrade, obelisk-travel or portal window is open. */
+	/** Auto-hide while a selected native game window is open. */
 	public static function drawAutoHide():Void {
 		UiLayout.propertyGrid("##util_auto_hide", function() {
 			UiLayout.propertyRow("On game windows", function() {
@@ -84,6 +84,15 @@ class UtilitiesPanel {
 			UiLayout.propertyRow("Obelisks", function() {
 				if (ImGui.checkbox("##util_ah_obelisk",WindowAutoHide.obelisk)) SettingsStore.markDirty();
 			}, "The obelisk dialog (Fly to another obelisk, Set point, View cutscene).");
+			UiLayout.propertyRow("Dialogue", function() {
+				if (ImGui.checkbox("##util_ah_dialogue", WindowAutoHide.dialogue)) SettingsStore.markDirty();
+			}, "NPC and interaction dialogues, including obelisks.");
+			UiLayout.propertyRow("Map", function() {
+				if (ImGui.checkbox("##util_ah_map", WindowAutoHide.map)) SettingsStore.markDirty();
+			}, "All map modes, including ordinary map browsing.");
+			UiLayout.propertyRow("ESC Menu", function() {
+				if (ImGui.checkbox("##util_ah_escape", WindowAutoHide.escapeMenu)) SettingsStore.markDirty();
+			});
 			ImGui.endDisabled();
 		});
 		ImGui.textWrapped(WindowAutoHide.reason);

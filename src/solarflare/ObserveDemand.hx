@@ -44,6 +44,9 @@ class ObserveDemand {
 	public static var aurasNeedConsumables:Bool = false;
 	public static var extraBarsNeedConsumables:Bool = false;
 	public static var consumableIds:Array<String> = [];
+	public static var aurasNeedWeapons:Bool = false;
+	public static var weaponIds:Array<String> = [];
+	public static var weaponDemandGeneration:Int = 0;
 	public static var statusIds:Array<String> = [];
 	public static var aurasNeedInstant:Bool = false;
 	public static var aurasNeedSpecial:Bool = false;
@@ -155,6 +158,8 @@ class ObserveDemand {
 			while (castSkillIds.length > 0)
 				castSkillIds.pop();
 			consumableIds.resize(0);
+			weaponIds.resize(0);
+			weaponDemandGeneration++;
 			if (cfg.extraBarsPrototype != null && cfg.extraBarsPrototype.model.sparkEnabled) pushStatusId("SparkSurge_Status");
 			if (cfg.stacks != null) {
 				for (tracker in cfg.stacks.config.trackers) if (tracker.enabled && tracker.statusId.length > 0) pushStatusId(tracker.statusId);
@@ -186,6 +191,7 @@ class ObserveDemand {
 					}
 				}
 			}
+			solarflare.aura.WeaponEquipmentDemand.collect(auraConditions, weaponIds);
 			auraRulesNeedStatus(cfg);
 			rawNeedInstant = auraRulesNeedInstant(cfg);
 			rawNeedSpecial = auraRulesNeedSpecial(cfg);
@@ -216,6 +222,7 @@ class ObserveDemand {
 		}
 		statusBoard = cfg.statusBoard != null && (cfg.statusBoard.demand() || cfg.statusSettingsOpen());
 		aurasNeedConsumables = (auras && consumableIds.length > 0) || auraBuilderOpen;
+		aurasNeedWeapons = (auras || auraBuilderOpen) && weaponIds.length > 0;
 		aurasNeedInstant = auras && rawNeedInstant;
 		aurasNeedSpecial = auras && rawNeedSpecial;
 		aurasNeedEnemyCast = (auras && rawNeedEnemyCast) || auraBuilderOpen;

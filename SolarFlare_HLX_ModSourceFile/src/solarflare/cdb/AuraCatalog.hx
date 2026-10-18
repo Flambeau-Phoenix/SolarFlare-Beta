@@ -21,6 +21,8 @@ class AuraCatalog {
 		}
 	}
 	public static function label(id:String):String {
+		var weapon = WeaponCatalog.find(id);
+		if (weapon != null) return weapon.name;
 		var item = ConsumableCatalog.find(id);
 		if (item != null) return item.name;
 		var cByStatus = ConsumableCatalog.findByStatus(id);
@@ -30,6 +32,7 @@ class AuraCatalog {
 	}
 	/** Status instances use skill IDs; statustype is broad category. */
 	public static function matchesSubject(entryKind:String, subjectKind:String):Bool {
+		if (subjectKind == "weapon") return entryKind == "weapon";
 		if (subjectKind == "consumable") return entryKind == "consumable";
 		if (subjectKind == "unit") return entryKind == "unit";
 		if (subjectKind.indexOf("skill") >= 0) return entryKind == "skill";
