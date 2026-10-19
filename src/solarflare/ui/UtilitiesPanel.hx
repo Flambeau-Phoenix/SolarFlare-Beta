@@ -93,6 +93,9 @@ class UtilitiesPanel {
 			UiLayout.propertyRow("ESC Menu", function() {
 				if (ImGui.checkbox("##util_ah_escape", WindowAutoHide.escapeMenu)) SettingsStore.markDirty();
 			});
+			UiLayout.propertyRow("Codex", function() {
+				if (ImGui.checkbox("##util_ah_codex", WindowAutoHide.codex)) SettingsStore.markDirty();
+			});
 			ImGui.endDisabled();
 		});
 		ImGui.textWrapped(WindowAutoHide.reason);

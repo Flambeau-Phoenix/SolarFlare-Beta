@@ -47,8 +47,8 @@ class HudLayoutBindings {
    var s=c.statusBoard.config; var b=add("statusBoard.chrome",s.chrome);
    b.sizeGet=function() return s.slotSize; b.sizeSet=function(n) s.slotSize=Std.int(Math.max(28,Math.min(72,n)));
    // StatusBoard supports independent content width and height.
-   b.readExtra=function(row) { row.w=s.contentWidth; row.h=s.contentHeight; };
-   b.applyExtra=function(row) { if(row.w!=null) s.contentWidth=cast row.w; if(row.h!=null) s.contentHeight=cast row.h; };
+   b.readExtra=function(row) { row.w=s.contentWidth; row.h=s.contentHeight; row.growthDirection=s.growthDirection; };
+   b.applyExtra=function(row) { if(row.w!=null) s.contentWidth=cast row.w; if(row.h!=null) s.contentHeight=cast row.h; s.growthDirection=solarflare.statusboard.StatusBoardLayout.direction(row.growthDirection); };
   }
   if(c.getRifty!=null) { var g=c.getRifty; var b=add("global.rifty",g.chrome,g.size); b.changed=function() g.sizeDirty=true; }
   if(c.combatLog!=null) add("global.combatLog",c.combatLog.chrome,c.combatLog.width,c.combatLog.height);

@@ -18,8 +18,12 @@ class AuraStatusSignalReader {
 			return;
 		}
 		if (subject == null || StringTools.trim(subject).length == 0) { out.code = MISSING_SUBJECT; return; }
-		var s = frame.findStatus(subject);
-		if (s != null ? !s.known : !frame.statusDomainKnown) { out.code = UNKNOWN_DOMAIN; return; }
+		var target=StringTools.startsWith(signal,"target.status.");
+		if(target && !frame.targetStatusValid) { out.code=UNKNOWN_DOMAIN; return; }
+		var s = target ? frame.findTargetStatus(subject) : frame.findStatus(subject);
+		if(target) signal=signal.substr(7);
+		var domainKnown=target ? frame.targetStatusDomainKnown : frame.statusDomainKnown;
+		if (s != null ? !s.known : !domainKnown) { out.code = UNKNOWN_DOMAIN; return; }
 		var present = s != null && s.present;
 		out.present = present;
 		if (signal == "status.present") {

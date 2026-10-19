@@ -20,6 +20,7 @@ import solarflare.aura.AuraTimingReferencePolicy;
 import solarflare.aura.AuraVisualRenderer;
 import solarflare.aura.preview.AdvancedAuraPreview;
 import solarflare.aura.signal.AuraConditionUiState;
+import solarflare.aura.signal.AuraConditionValidator;
 import solarflare.aura.signal.AuraSignalCatalog;
 import solarflare.aura.signal.AuraSignalDescriptor;
 import solarflare.cdb.AuraCatalog;
@@ -92,6 +93,7 @@ class AuraQuickBuildPopup {
 	public function draw(cfg:AuraConfig, commit:AuraQuickBuildDraft->Bool->String):Void {
 		setsSource = cfg;
 		if (draft == null) return;
+		solarflare.aura.StatusTypeDemand.requestEditor(draft.condition.signal,draft.condition.subject);
 		if (requested) { ImGui.openPopup(TITLE); requested = false; }
 		// Size from the screen, not the builder window: the preview needs room even when the builder is small.
 		var screenW:Single = 1920;
@@ -260,16 +262,23 @@ class AuraQuickBuildPopup {
 			var search = ByteUtil.readBytes(subjectSearch, SEARCH_CAP);
 			UiScope.child("##ab_quick_subject_list", ImGui.vec2(0, 240), function() {
 				var shown = 0;
-				if (d.subjectKind == "consumable") {
+				if (d.subjectKind=="statusType") {
+					for(entry in solarflare.cdb.StatusTypeCatalog.entries) if(solarflare.cdb.StatusTypeCatalog.matches(entry.id,entry.name,search)) {
+						shown++; subjectRow(entry.id,entry.name,"statustype",d.subjectKind);
+					}
+				} else if (d.subjectKind == "consumable") {
 					for (entry in ConsumableCatalog.entries) if (AuraCatalog.matchesSearch(entry.id, entry.name, search)) {
 						shown++; subjectRow(entry.id, entry.name, "consumable", d.subjectKind);
 					}
 				} else if (d.subjectKind == "status") {
 					var frame = AuraEngine.signalFrame();
 					if (frame != null) {
-						ImGui.separatorText("Currently on your character");
-						for (i in 0...frame.statusCount) {
-							var status = frame.statuses[i];
+						var enemy=AuraTimingReferencePolicy.isTargetStatus(c.signal);
+						ImGui.separatorText(enemy ? "Currently on your enemy target" : "Currently on your character");
+						var count=enemy ? frame.targetStatusCount : frame.statusCount;
+						var statuses=enemy ? frame.targetStatuses : frame.statuses;
+						for (i in 0...count) {
+							var status = statuses[i];
 							if (!status.known || !status.present) continue;
 							var name = AuraCatalog.label(status.rawId);
 							if (AuraCatalog.matchesSearch(status.rawId, name, search)) {
@@ -312,15 +321,15 @@ class AuraQuickBuildPopup {
 	function drawComparison(d:AuraSignalDescriptor):Void {
 		var c = draft.condition;
 		UiLayout.propertyRow("Comparison", function() {
-			if (ImGui.beginCombo("##ab_quick_operator", AuraQuickBuildRules.opLabel(c.op))) {
+			if (ImGui.beginCombo("##ab_quick_operator", AuraQuickBuildRules.comparisonLabel(c.signal,c.op))) {
 				try {
 					for (op in AuraQuickBuildRules.operators(d))
-						if (ImGui.selectable(AuraQuickBuildRules.opLabel(op) + "##ab_quick_operator_" + op, c.op == op)) c.op = op;
+						if (ImGui.selectable(AuraQuickBuildRules.comparisonLabel(c.signal,op) + "##ab_quick_operator_" + op, c.op == op)) c.op = op;
 				} catch (e:Dynamic) { ImGui.endCombo(); throw e; }
 				ImGui.endCombo();
 			}
 		});
-		if (d.id == "status.present") return;
+		if (AuraConditionValidator.isStatusPresence(d.id)) return;
 		UiLayout.propertyRow(d.kind == Boolean ? "Value" : "Threshold", function() {
 			switch (d.kind) {
 				case Boolean:
@@ -471,6 +480,8 @@ class AuraQuickBuildPopup {
 					ImGui.textWrapped(draft.timerReferenceLabel + (seconds > 0 ? " · " + Math.round(seconds * 1000) / 1000 + " s" : ""));
 					if (UiChrome.ghostButton("Apply current reference##ab_quick_timer_refresh")) applyTimingReference(draft.cooldownReference);
 				}, "Countdown and Fuse stay off until you enable them. Manual duration overrides are available in Advanced.");
+			} else if (AuraTimingReferencePolicy.isTargetStatus(draft.condition.signal)) {
+				UiLayout.propertyRow("Status timing",function() ImGui.textWrapped("Follows the current enemy application. Unavailable timers stay unknown."));
 			} else if (draft.aura.timerMode != AuraTimer.MODE_OFF) {
 				UiLayout.propertyRow("Fixed seconds", function() {
 					if (ImGui.inputFloat("##ab_quick_timer_seconds", draft.aura.timerSeconds, 0, 0, "%.3f s")) {
@@ -490,7 +501,8 @@ class AuraQuickBuildPopup {
 		if (!AuraTimingReferencePolicy.isCooldown(c.signal) && !AuraTimingReferencePolicy.isCast(c.signal)) return;
 		var ref = AuraTimingReferences.forSubject(c.subject, c.signal, castRank, castRankChosen);
 		castRank = ref.rank;
-		if (AuraTimingReferencePolicy.isCast(c.signal)) draft.setTimerReference("CDB", ref.castSeconds, ref.castLabel);
+		if (AuraTimingReferencePolicy.isTargetStatus(c.signal)) draft.setTimerReference("Game time",0,"Live enemy status duration");
+		else if (AuraTimingReferencePolicy.isCast(c.signal)) draft.setTimerReference("CDB", ref.castSeconds, ref.castLabel);
 		else if (choice == "Game time") draft.setTimerReference("Game time", 0, "Live cooldown");
 		else {
 			var seconds = AuraTimingReferencePolicy.seconds(choice, ref.cdbSeconds, ref.observedSeconds, ref.nativeValid);

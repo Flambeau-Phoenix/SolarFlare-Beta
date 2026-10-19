@@ -73,6 +73,17 @@ class AuraSignalFrame {
 	public var weapons:Array<WeaponSignalSnap> = [];
 	public var weaponCount:Int = 0;
 	public var statuses:Array<StatusSignalSnap> = [];
+	public var targetStatuses:Array<StatusSignalSnap> = [];
+	public var targetStatusCount:Int=0;
+	public var targetStatusDomainKnown:Bool=false;
+	public var targetStatusValid:Bool=false;
+	public var targetStatusGeneration:Int=0;
+	public var myStatusTypeKnown:Int=0;
+	public var myStatusTypePresent:Int=0;
+	public var myStatusTypeGeneration:Int=0;
+	public var enemyStatusTypeKnown:Int=0;
+	public var enemyStatusTypePresent:Int=0;
+	public var enemyStatusTypeGeneration:Int=0;
 	public var statusCount:Int = 0;
 	public var casts:Array<EnemyCastSignalSnap> = [];
 	public var castCount:Int = 0;
@@ -96,10 +107,12 @@ class AuraSignalFrame {
 		for (entry in solarflare.cdb.ConsumableCatalog.entries) { var snap = new ConsumableSignalSnap(); snap.id = entry.id; consumables.push(snap); }
 		for (_ in 0...MAX_SKILLS) skills.push(new SkillSignalSnap());
 		for (_ in 0...MAX_STATUSES) statuses.push(new StatusSignalSnap());
+		for (_ in 0...MAX_STATUSES) targetStatuses.push(new StatusSignalSnap());
 		for (_ in 0...MAX_CASTS) casts.push(new EnemyCastSignalSnap());
 		for (_ in 0...solarflare.aura.LocalCastHistory.MAX) playerCasts.push(new EnemyCastSignalSnap());
 	}
 	public function resetCollections():Void {
+		myStatusTypeKnown=myStatusTypePresent=enemyStatusTypeKnown=enemyStatusTypePresent=0;
 		for (i in 0...weaponCount) weapons[i].reset();
 		weaponCount = 0;
 		for (i in 0...consumableCount) consumables[i].reset();
@@ -108,6 +121,8 @@ class AuraSignalFrame {
 		for (i in 0...statusCount) statuses[i].reset();
 		for (i in 0...castCount) casts[i].reset();
 		for (i in 0...playerCastCount) playerCasts[i].reset();
+		for (i in 0...targetStatusCount) targetStatuses[i].reset();
+		targetStatusCount=0; targetStatusDomainKnown=false; targetStatusValid=false;
 		playerCastCount = 0;
 		skillCount = 0; statusCount = 0; castCount = 0;
 		statusDomainKnown = false;
@@ -151,6 +166,11 @@ class AuraSignalFrame {
 			var c = casts[i];
 			if (c.skillId.toLowerCase() == key) return c;
 		}
+		return null;
+	}
+	public function findTargetStatus(id:String):StatusSignalSnap {
+		var key=solarflare.aura.StatusIdentity.key(id);
+		for(i in 0...targetStatusCount) { var s=targetStatuses[i]; if(s.known && s.present && solarflare.aura.StatusIdentity.key(s.rawId)==key) return s; }
 		return null;
 	}
 	public function findStatus(id:String):StatusSignalSnap {

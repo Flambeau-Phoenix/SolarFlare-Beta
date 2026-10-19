@@ -25,6 +25,9 @@ class AuraEngine {
 	static var frame:AuraSignalFrame;
 	static var timerHero:Dynamic;
 	static var timerOwnerGeneration:Int = -1;
+	static var targetStatusGeneration:Int=-1;
+	static var myTypeGeneration:Int=-1;
+	static var enemyTypeGeneration:Int=-1;
 
 	/** Explicit runtime initialization; called by AuraConfig construction. */
 	public static function initialize():Void {
@@ -61,6 +64,15 @@ class AuraEngine {
 		if (solarflare.ObserveDemand.aurasNeedEnemyCast)
 			EnemyCastCache.tick(now);
 		AuraSignalFrameBuilder.build(frame, now);
+		if(myTypeGeneration!=frame.myStatusTypeGeneration || enemyTypeGeneration!=frame.enemyStatusTypeGeneration) {
+			for(a in cfg.auras) if(a!=null && ((myTypeGeneration!=frame.myStatusTypeGeneration && usesTypeSignal(a,"statusType.present"))
+				|| (enemyTypeGeneration!=frame.enemyStatusTypeGeneration && usesTypeSignal(a,"target.statusType.present")))) clearTargetPresentation(a);
+			myTypeGeneration=frame.myStatusTypeGeneration; enemyTypeGeneration=frame.enemyStatusTypeGeneration;
+		}
+		if (targetStatusGeneration!=frame.targetStatusGeneration) {
+		 targetStatusGeneration=frame.targetStatusGeneration;
+		 for(a in cfg.auras) if(a!=null && usesTargetStatus(a)) clearTargetPresentation(a);
+		}
 		if (!cfg.enabled.get()) {
 			clearAllPresentation(cfg);
 			return;
@@ -246,10 +258,25 @@ class AuraEngine {
 		}
 	}
 
+	static function clearTargetPresentation(a:AuraDef):Void {
+	 AuraEffects.clearPresentation(a); a.until=0; a.lastHitAt=0; a.stacks=0; a.timeLeft=Math.NaN;
+	 if(a.effects!=null) for(e in a.effects) if(e!=null) { e.until=0; e.stickyArmed=false; }
+	}
+	static function usesTargetStatus(a:AuraDef):Bool {
+	 if(a.rule!=null) for(c in a.rule.conditions) if(c!=null && StringTools.startsWith(c.signal,"target.status.")) return true;
+	 if(a.canvasElements!=null) for(el in a.canvasElements) if(el!=null && el.visibilityRule!=null) for(c in el.visibilityRule.conditions) if(c!=null && StringTools.startsWith(c.signal,"target.status.")) return true;
+	 return false;
+	}
+	static function usesTypeSignal(a:AuraDef,signal:String):Bool {
+	 if(a.rule!=null) for(c in a.rule.conditions) if(c!=null && c.signal==signal) return true;
+	 if(a.canvasElements!=null) for(el in a.canvasElements) if(el!=null && el.visibilityRule!=null) for(c in el.visibilityRule.conditions) if(c!=null && c.signal==signal) return true;
+	 return false;
+	}
 	static function evalDeclarative(a:AuraDef, now:Float):Void {
 		AuraRuleEvaluator.evaluate(a.rule, frame, a.ruleResult, AuraTimer.keepsAura(a) && a.timerSource == AuraTimer.SRC_FIXED);
 		var hit = a.ruleResult.hit;
 		var known = a.ruleResult.known;
+		if (!known && (usesTargetStatus(a) || usesTypeSignal(a,"statusType.present") || usesTypeSignal(a,"target.statusType.present"))) { clearTargetPresentation(a); return; }
 		var prog = a.ruleResult.progress;
 		if (!Math.isFinite(prog)) prog = hit ? 1 : 0;
 		var stacks = a.ruleResult.stacks > 0 ? a.ruleResult.stacks : (hit ? 1 : 0);
@@ -261,6 +288,8 @@ class AuraEngine {
 		var pi = a.rule.presentationSource;
 		if (pi < 0 || pi >= a.rule.conditions.length) pi = 0;
 		var presentation = a.rule.conditions.length > 0 ? a.rule.conditions[pi] : null;
+		if(presentation!=null && StatusTypeDemand.isTypeSignal(presentation.signal)) stacks=0;
+		if(presentation!=null && presentation.signal=="target.status.stacks" && a.ruleResult.stacks>=0) stacks=a.ruleResult.stacks;
 		var cooldownDriven = presentation != null && AuraTimingReferencePolicy.isCooldown(presentation.signal);
 		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf, restart, cooldownDriven,
 			cooldownDriven ? frame.findSkill(presentation.subject) : null);
@@ -473,6 +502,11 @@ class AuraEngine {
 		}
 	}
 
+	/** File shares must surface serialization failures instead of exporting a fallback Aura. */
+	public static function toObjStrict(a:AuraDef):Dynamic {
+		if(a==null) throw "Cannot share a missing Aura.";
+		return toObjUnsafe(a);
+	}
 	static function toObjUnsafe(a:AuraDef):Dynamic {
 		AuraEffects.ensure(a);
 		var fx:Array<Dynamic> = [];

@@ -59,6 +59,8 @@ class AuraSignalFrameBuilder {
 			dst.usable = src.usable; dst.usableKnown = src.usableKnown;
 		}
 		fillTarget(frame);
+		solarflare.aura.TargetStatusCache.publish(frame,now);
+		solarflare.aura.StatusTypeService.publish(frame);
 		var kk = CombatLogCache.consumeKillKind();
 		frame.killKind = kk;
 		frame.killKnown = kk.length > 0;

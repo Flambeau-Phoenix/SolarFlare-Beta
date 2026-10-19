@@ -2,6 +2,7 @@ package solarflare.aura;
 
 /** Pure Quick Build policy. Native provenance is explicit; derived cdMax is never an input. */
 class AuraTimingReferencePolicy {
+	public static inline function isTargetStatus(signal:String):Bool return StringTools.startsWith(signal,"target.status.");
 	public static inline function isCast(signal:String):Bool {
 		return StringTools.startsWith(signal, "event.cast.") || signal == "event.playerCast.recent";
 	}

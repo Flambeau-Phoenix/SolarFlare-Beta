@@ -48,6 +48,8 @@ class ObserveDemand {
 	public static var weaponIds:Array<String> = [];
 	public static var weaponDemandGeneration:Int = 0;
 	public static var statusIds:Array<String> = [];
+	public static var targetStatusIds:Array<String> = [];
+	public static var aurasNeedTargetStatus:Bool=false;
 	public static var aurasNeedInstant:Bool = false;
 	public static var aurasNeedSpecial:Bool = false;
 	public static var aurasNeedEnemyCast:Bool = false;
@@ -149,6 +151,7 @@ class ObserveDemand {
 			statusDemandDirty = false;
 			needsStatusContainer = false;
 			auraSkillIds.resize(0);
+			targetStatusIds.resize(0);
 			while (statusIds.length > 0)
 				statusIds.pop();
 			while (instantSkillIds.length > 0)
@@ -182,6 +185,10 @@ class ObserveDemand {
 			}
 			for (c in auraConditions) {
 				if (c.signal == null) continue;
+				if (StringTools.startsWith(c.signal,"target.status.")) {
+				 var id=solarflare.cdb.CdbAuraTable.statusSubjectId(c.subject);
+				 if (id.length>0 && targetStatusIds.indexOf(id)<0) targetStatusIds.push(id);
+				}
 				if (StringTools.startsWith(c.signal, "skill.")) pushAuraSkillId(c.subject);
 				if (StringTools.startsWith(c.signal, "consumable.")) {
 					var entry = solarflare.cdb.ConsumableCatalog.find(c.subject);
@@ -227,6 +234,9 @@ class ObserveDemand {
 		aurasNeedSpecial = auras && rawNeedSpecial;
 		aurasNeedEnemyCast = (auras && rawNeedEnemyCast) || auraBuilderOpen;
 		aurasNeedTarget = (auras && rawNeedTarget) || auraBuilderOpen;
+		solarflare.aura.StatusTypeDemand.collect(auraConditions,auras,auraBuilderOpen,haxe.Timer.stamp());
+		if(solarflare.aura.StatusTypeDemand.enemyMask!=0) aurasNeedTarget=true;
+		aurasNeedTargetStatus = solarflare.aura.TargetStatusCache.AVAILABLE && ((auras && targetStatusIds.length>0) || auraBuilderOpen);
 		aurasNeedStatus = statusIds.length > 0 || barterStatusIds.length > 0 || needsStatusContainer || auraBuilderOpen || barterBuilderOpen || statusBoard;
 		getRifty = cfg.getRifty != null && !cfg.getRifty.hidden.get();
 		var saberRift = cfg.lightsaber != null && !cfg.lightsaber.hidden.get() && cfg.lightsaber.showRiftMeter.get();

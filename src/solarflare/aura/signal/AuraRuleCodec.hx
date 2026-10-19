@@ -34,7 +34,7 @@ class AuraRuleCodec {
 				if (item.boolValue == true) c.boolValue = true;
 				if (item.stringValue != null) c.stringValue = Std.string(item.stringValue);
 				if (item.negate == true) c.negate = true;
-				if (StringTools.startsWith(c.signal, "status."))
+				if (StringTools.startsWith(c.signal, "status.") || StringTools.startsWith(c.signal, "target.status."))
 					c.subject = solarflare.cdb.CdbAuraTable.statusSubjectId(c.subject);
 				r.conditions.push(c);
 			}

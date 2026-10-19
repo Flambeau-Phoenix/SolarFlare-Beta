@@ -16,7 +16,8 @@ class WindowAutoHidePolicy {
 	public static inline var DIALOGUE:Int = 32;
 	public static inline var MAP:Int = 64;
 	public static inline var ESC_MENU:Int = 128;
-	public static inline var ALL:Int = 255;
+	public static inline var CODEX:Int = 256;
+	public static inline var ALL:Int = 511;
 	/** The narrower travel/portal subset of MapWindow, independent of the general Map category. */
 	public static inline var TRAVEL_MAP:Int = TRAVEL;
 
@@ -35,6 +36,7 @@ class WindowAutoHidePolicy {
 			case "ui.win.DialogBar":
 				DIALOGUE | OBELISK;
 			case "ui.win.EscapeMenu": ESC_MENU;
+			case "ui.win.codex.CodexWindow": CODEX;
 			default:
 				OTHER;
 		}
@@ -50,6 +52,7 @@ class WindowAutoHidePolicy {
 		if ((mask & DIALOGUE) != 0) return "Dialogue open";
 		if ((mask & MAP) != 0) return "Map open";
 		if ((mask & ESC_MENU) != 0) return "ESC Menu open";
+		if ((mask & CODEX) != 0) return "Codex open";
 		return "No selected game window is open";
 	}
 	public static inline function suppress(manual:Bool, automatic:Bool):Bool return manual || automatic;

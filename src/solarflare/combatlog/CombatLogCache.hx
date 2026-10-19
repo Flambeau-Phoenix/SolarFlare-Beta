@@ -86,6 +86,8 @@ class CombatLogCache {
 	 */
 	public static function tick(localHero:Dynamic):Void {
 		currentTarget = resolveCurrentTarget(localHero);
+		solarflare.aura.StatusTypeService.setTarget(currentTarget);
+		solarflare.aura.TargetStatusCache.observe(localHero,currentTarget,haxe.Timer.stamp());
 		if (localHero == null) {
 			// Cast observe must never abort identity cleanup.
 			try

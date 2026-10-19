@@ -67,6 +67,12 @@ class AuraSignalCatalog {
 		add("encounter.inRift", "In rift", "Encounter", Boolean);
 		add("encounter.inBossFight", "In rift boss fight", "Encounter", Boolean);
 		add("encounter.riftRemain", "Rift time remaining", "Encounter", Duration);
+		add("target.status.present", "Status on current enemy", "Enemy statuses", Boolean, "status");
+		add("target.status.stacks", "Status stacks on current enemy", "Enemy statuses", Count, "status");
+		add("target.status.durationLeft", "Status duration left on current enemy", "Enemy statuses", Duration, "status");
+		add("target.status.durationProgress", "Status duration progress on current enemy", "Enemy statuses", Percent, "status");
+		add("statusType.present", "Status type on me", "General status types", Boolean, "statusType");
+		add("target.statusType.present", "Status type on current enemy", "General status types", Boolean, "statusType");
 		add("target.valid", "Has current target", "Target", Boolean);
 		add("target.kindMatches", "Target kind matches", "Target", Boolean, "unit");
 		add("target.isBoss", "Target is boss", "Target", Boolean);

@@ -8,6 +8,7 @@ typedef HudLayoutRow = {
  var x:Float; var y:Float;
  var referenceWidth:Float; var referenceHeight:Float;
  @:optional var w:Float; @:optional var h:Float;
+ @:optional var growthDirection:String;
  @:optional var scale:Float; @:optional var cellSize:Float;
 }
 
@@ -37,6 +38,7 @@ class HudLayoutModel {
     var v=Reflect.field(r,key);
     if(v!=null) { if(!finite(v) || v<0 || v>10000 || key=="scale" && (v<0.1 || v>8)) throw "Invalid widget size."; Reflect.setField(row,key,v); }
    }
+   if(r.id=="statusBoard.chrome" && Reflect.field(r,"growthDirection")!=null) row.growthDirection=Reflect.field(r,"growthDirection")=="up" ? "up" : "down";
    rows.push(row); seen.set(r.id,true);
   }
   return rows;
@@ -141,7 +143,7 @@ class HudLayoutModel {
   var status=node("statusBoard");
   if(status!=null && status.chrome==null) {
    var n=out.length; add("statusBoard.chrome",status,null);
-   if(out.length>n) { var row=out[out.length-1]; if(finite(status.contentWidth)) row.w=status.contentWidth; if(finite(status.contentHeight)) row.h=status.contentHeight; if(finite(status.slotSize)) row.cellSize=status.slotSize; }
+   if(out.length>n) { var row=out[out.length-1]; if(finite(status.contentWidth)) row.w=status.contentWidth; if(finite(status.contentHeight)) row.h=status.contentHeight; if(finite(status.slotSize)) row.cellSize=status.slotSize; row.growthDirection=status.growthDirection=="up" ? "up" : "down"; }
   }
   if(a!=null) add("global.auraTimers",a.timerBoardChrome,a,"timerBoardW","timerBoardRowH");
   if(a!=null && Std.isOfType(a.groups,Array)) { var gl:Array<Dynamic>=a.groups; for(g in gl) if(Std.isOfType(g.id,String)) add("auraGroup:"+g.id,g,null,"__none","__none"); }

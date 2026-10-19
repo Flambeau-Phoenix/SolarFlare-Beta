@@ -8,6 +8,17 @@ class AuraSignalReader {
 		out.kind = d.kind;
 		if (d.subjectKind.length > 0 && (subject == null || subject.length == 0)) { out.code = MISSING_SUBJECT; return; }
 		if (StringTools.startsWith(signal, "consumable.")) { ConsumableSignalReader.read(frame, signal, subject, out); return; }
+		if (solarflare.aura.StatusTypeDemand.isTypeSignal(signal)) {
+			var bit=solarflare.cdb.StatusTypeCatalog.bit(subject);
+			if(bit==0) { out.code=MISSING_SUBJECT; return; }
+			var enemy=signal=="target.statusType.present";
+			var known=enemy ? frame.enemyStatusTypeKnown : frame.myStatusTypeKnown;
+			var present=enemy ? frame.enemyStatusTypePresent : frame.myStatusTypePresent;
+			out.known=(known&bit)!=0; out.boolValue=out.present=(present&bit)!=0;
+			out.code=out.known ? OK : UNKNOWN_DOMAIN;
+			return;
+		}
+		if (StringTools.startsWith(signal,"target.status.")) { AuraStatusSignalReader.read(frame,signal,subject,out); return; }
 		switch (signal) {
 			case "equipment.weaponEquipped":
 				var weapon = frame.findWeapon(subject);

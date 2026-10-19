@@ -233,16 +233,19 @@ class ExtraBarsBuilder {
   });
  }
  function drawActivation():Void {
-   UiLayout.inlinePair("##extra_mode_choices",function(w:Single) modeChoice("hold",w),function(w:Single) modeChoice("toggle",w),8);
+   ImGui.setNextItemWidth(-1);
+   var selectedMode=UiLayout.stringCombo("##extra_mode_choices",owner.model.mode,ExtraBarsActivationConfig.liveModes,ExtraBarsActivationConfig.modeLabel);
+   if(selectedMode!=null) change("Mode",function() owner.model.mode=selectedMode);
    ImGui.textWrapped(owner.model.mode=="hold"
     ? "Hold the activation modifier, then press a cell's key."
     : owner.model.mode=="toggle" ? "Press the activation modifier once, then use cell keys. Press it again to turn the bars off."
-    : "Choose Hold or Toggle to replace the retired Long-press mode.");
+    : owner.model.mode=="always" ? "Press a cell key directly. Assigned plain keys take priority during gameplay; chat, editors and modified shortcuts keep their input."
+    : "Choose Hold, Toggle or Always Active to replace the retired Long-press mode.");
    UiLayout.propertyGrid("##extra_activation",function() {
     UiLayout.propertyRow("All bars enabled",function() check("##extra_master",owner.model.enabled,function(v) owner.model.enabled=v));
     var activeBar=owner.model.find(selectedBar);
     if (activeBar!=null) UiLayout.propertyRow("This bar enabled",function() check("##bar_enabled",activeBar.enabled,function(v) activeBar.enabled=v));
-    UiLayout.propertyRow("Modifier key",function() {
+    if (owner.model.mode!="always") UiLayout.propertyRow("Modifier key",function() {
      ImGui.setNextItemWidth(Math.min(220,ImGui.getContentRegionAvail().x));
      if (ImGui.beginCombo("##extra_prefix",ExtraBarsActivationConfig.prefixLabel(owner.model.prefix))) {
       try { for (prefix in ExtraBarsActivationConfig.prefixes) if (ImGui.selectable(ExtraBarsActivationConfig.prefixLabel(prefix),owner.model.prefix==prefix)) change("Prefix",function() owner.model.prefix=prefix); }
@@ -250,7 +253,7 @@ class ExtraBarsBuilder {
      }
     });
    });
-   if (!owner.model.enabled || owner.model.prefix=="off") ImGui.textWrapped("Bars are off. Enable them and choose an activation modifier to use cell keys.");
+   if (!owner.model.enabled || !ExtraBarsActivationConfig.available(owner.model.prefix,owner.model.mode)) ImGui.textWrapped("Bars are off. Enable them and choose an activation modifier to use cell keys.");
    else { var activeBar=owner.model.find(selectedBar); if (activeBar!=null && !activeBar.enabled) ImGui.textWrapped("This bar is disabled. Enable it above to use its cells."); }
  }
  function drawKeybind(bar:ExtraBarsBarConfig):Void {
@@ -267,8 +270,7 @@ class ExtraBarsBuilder {
   },8);
   if (owner.captureMessage.length>0) ImGui.textWrapped(owner.captureMessage);
   if (frozen!=null && frozen[selectedCell].reason.length>0 && frozen[selectedCell].reason!=owner.gate) ImGui.textWrapped(frozen[selectedCell].reason);
-  if (slot.keyCode!=0 && owner.model.enabled && owner.model.prefix!="off") ImGui.textWrapped("Use "+ExtraBarsActivationConfig.prefixLabel(owner.model.prefix)
-   +(owner.model.mode=="hold"?" + ":" then ")+ExtraBarsKeyMap.label(slot.keyCode,slot.modifiers)+" ("+ExtraBarsActivationConfig.modeLabel(owner.model.mode)+").");
+  if (slot.keyCode!=0 && owner.model.enabled && ExtraBarsActivationConfig.available(owner.model.prefix,owner.model.mode)) ImGui.textWrapped("Use "+(owner.model.mode=="always" ? "" : ExtraBarsActivationConfig.prefixLabel(owner.model.prefix)+(owner.model.mode=="hold"?" + ":" then "))+ExtraBarsKeyMap.label(slot.keyCode,slot.modifiers)+" ("+ExtraBarsActivationConfig.modeLabel(owner.model.mode)+").");
   else if (slot.keyCode!=0) ImGui.textWrapped("Activation is off. This key assignment is kept.");
   else ImGui.textWrapped("Select a preview cell, then record a plain key.");
   if (owner.suggestions.length>0) ImGui.textWrapped("Unbound alternatives: "+owner.suggestions);

@@ -198,7 +198,7 @@ class AuraQuickBuildDraft {
 	}
 	public function setTimerMode(mode:Int):Void {
 		aura.timerMode = mode < 0 || mode > 2 ? AuraTimer.MODE_OFF : mode;
-		aura.timerSource = AuraTimingReferencePolicy.isCooldown(condition.signal) && cooldownReference == "Game time" ? AuraTimer.SRC_FOLLOW : AuraTimer.SRC_FIXED;
+		aura.timerSource = (AuraTimingReferencePolicy.isCooldown(condition.signal) || AuraTimingReferencePolicy.isTargetStatus(condition.signal)) && cooldownReference == "Game time" ? AuraTimer.SRC_FOLLOW : AuraTimer.SRC_FIXED;
 		aura.followBuffDuration.set(aura.timerSource == AuraTimer.SRC_FOLLOW);
 	}
 
@@ -230,7 +230,7 @@ class AuraQuickBuildDraft {
 		var overlays = [];
 		if (face != "Banner")
 			for (key in ["Stacks", "Counter", "Countdown", "Fuse", "Label"]) if (overlay(key).get()) overlays.push(key.toLowerCase());
-		var timer = aura.timerMode == AuraTimer.MODE_OFF ? "" : AuraTimingReferencePolicy.isCooldown(condition.signal)
+		var timer = aura.timerMode == AuraTimer.MODE_OFF ? "" : AuraTimingReferencePolicy.isTargetStatus(condition.signal) ? " Follows the current enemy status duration when known." : AuraTimingReferencePolicy.isCooldown(condition.signal)
 			? " Follows the skill's live cooldown after use." + (aura.timerSource == AuraTimer.SRC_FIXED ? " Uses the selected seconds only when live timing is unavailable." : "") : aura.timerSeconds.get() > 0
 			? " Starts a " + aura.timerSeconds.get() + "s " + (aura.timerMode == AuraTimer.MODE_DOWN ? "countdown" : "countup") + " when conditions become true."
 			: " Timer duration is unavailable.";

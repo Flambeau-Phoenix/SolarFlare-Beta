@@ -25,14 +25,19 @@ class AuraConditionValidator {
 		if (d == null) out.push("unknown signal");
 		else {
 			if (d.subjectKind.length > 0 && c.subject.length == 0) out.push("subject required");
+			if (d.subjectKind=="statusType") {
+				var id=solarflare.cdb.StatusTypeCatalog.canonical(c.subject);
+				if(id.length==0) out.push("unknown status type"); else c.subject=id;
+			}
 			if (!isValidOperator(c.op, d)) out.push("invalid operator");
 			c.numberValue = coerce(c.numberValue, d.kind);
 		}
 		return out;
 	}
+	public static function isStatusPresence(id:String):Bool return id=="status.present" || id=="target.status.present" || solarflare.aura.StatusTypeDemand.isTypeSignal(id);
 	public static function isValidOperator(op:String, d:AuraSignalDescriptor):Bool {
 		if (d == null || op == null) return false;
-		if (d.id == "status.present") return op == "present" || op == "absent";
+		if (isStatusPresence(d.id)) return op == "present" || op == "absent";
 		if ((d.id == "event.cast.recent" || isCombatEvent(d.id)) && op == "within") return true;
 		return switch (d.kind) {
 			case Number | Percent | Count | Duration: op == "lt" || op == "lte" || op == "eq" || op == "neq" || op == "gte" || op == "gt" || (d.kind == Duration && op == "within");
@@ -42,7 +47,7 @@ class AuraConditionValidator {
 	}
 	public static function defaultOperator(d:AuraSignalDescriptor):String {
 		if (d == null) return "";
-		if (d.id == "status.present") return "present";
+		if (isStatusPresence(d.id)) return "present";
 		if (d.id == "event.cast.recent" || d.id == "event.playerCast.recent" || isCombatEvent(d.id)) return "within";
 		return switch (d.kind) { case Boolean: "is"; case Identity: "eq"; default: "gte"; };
 	}

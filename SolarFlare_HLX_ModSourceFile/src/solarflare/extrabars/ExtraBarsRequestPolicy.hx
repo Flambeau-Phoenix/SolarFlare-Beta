@@ -7,7 +7,7 @@ class ExtraBarsRequestPolicy {
   if (!gameplay || requestGeneration != currentGeneration || (click && !cursorFree) || kind.length==0) return false;
   if (barId=="spark") return index==0 && click && model.sparkEnabled && kind=="SparkCube";
   var bar=model.find(barId);
-  return model.enabled && model.prefix!="off" && bar!=null && bar.enabled && (!click || !bar.hidden)
+  return model.enabled && ExtraBarsActivationConfig.available(model.prefix,model.mode) && bar!=null && bar.enabled && (!click || !bar.hidden)
     && index>=0 && index<bar.slotCount && bar.slots[index].itemKind==kind;
  }
 }

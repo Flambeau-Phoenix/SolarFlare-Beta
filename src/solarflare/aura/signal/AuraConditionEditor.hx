@@ -155,6 +155,7 @@ class AuraConditionEditor {
 	}
 
 	static function formatValue(c:AuraConditionDef, d:AuraSignalDescriptor):String {
+		if (AuraConditionValidator.isStatusPresence(c.signal)) return "";
 		if (d == null) return c.boolValue ? "true" : Std.string(c.numberValue);
 		return switch (d.kind) {
 			case Boolean: c.boolValue ? "active" : "inactive";
@@ -202,6 +203,7 @@ class AuraConditionEditor {
 	}
 
 	static function drawConditionCard(a:AuraRuleEditorContext, r:AuraRuleDef, c:AuraConditionDef, index:Int, bossFocusId:String):Bool {
+		solarflare.aura.StatusTypeDemand.requestEditor(c.signal,c.subject);
 		var tag = a.id + "_" + c.uiKey;
 		while (a.conditionUi.length <= index)
 			a.conditionUi.push(new AuraConditionUiState());
@@ -310,7 +312,7 @@ class AuraConditionEditor {
 			drawOperatorInline(c, ui, d, tag, a.snapshot);
 		}
 
-		if (d != null && d.id != "status.present") {
+		if (d != null && !AuraConditionValidator.isStatusPresence(d.id)) {
 			ImGui.sameLine();
 			switch (d.kind) {
 				case Boolean:
@@ -353,7 +355,11 @@ class AuraConditionEditor {
 
 		// Help tips when relevant
 		if (d != null) {
-			if (d.id == "status.count" || d.id == "status.overflow")
+			if (d.subjectKind=="statusType")
+				ImGui.textWrapped("General status category from any source. Present/absent only; skill IDs, stacks and durations are separate conditions.");
+			else if (StringTools.startsWith(d.id,"target.status."))
+				ImGui.textWrapped("Tracks the first live matching application on your current enemy, from any player. No target or incomplete observation is unknown.");
+			else if (d.id == "status.count" || d.id == "status.overflow")
 				ImGui.textDisabled("Count is full character status container length. Overflow means > " + AuraSignalFrame.MAX_STATUSES + " entries.");
 			else if (d.id == "skill.instantReady")
 				ImGui.textDisabled("Skill script shouldPlayInstantly (e.g. Staff_Craft_S1). For buffs, prefer Statuses.");
@@ -376,7 +382,7 @@ class AuraConditionEditor {
 		// accepts only present/absent for it. Without this case the generic Boolean
 		// list offers is/isNot, so opening the combo silently writes an operator the
 		// validator rejects and compareValue routes to boolValue instead of present.
-		if (d != null && d.id == "status.present")
+		if (d != null && AuraConditionValidator.isStatusPresence(d.id))
 			ops = ["present", "absent"];
 		else if (d != null && (d.id == "event.cast.recent" || d.id == "event.playerCast.recent" || AuraConditionValidator.isCombatEvent(d.id)))
 			ops = ["within", "lt", "lte", "eq", "gte", "gt"];
@@ -459,6 +465,14 @@ class AuraConditionEditor {
 	}
 
 	static function drawSubjectList(c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String, bossFocusId:String, beforeEdit:Void->Void):Void {
+		if(kind=="statusType") {
+			ImGui.separatorText("General status types");
+			var shown=0;
+			for(entry in solarflare.cdb.StatusTypeCatalog.entries) if(solarflare.cdb.StatusTypeCatalog.matches(entry.id,entry.name,ui.search)) {
+				drawSubjectRow(c,ui,entry.id,entry.name,"statustype",tag,kind,beforeEdit); shown++;
+			}
+			ImGui.textDisabled(shown+" matching"); return;
+		}
 		var statusSkills:Array<{id:String, name:String, kind:String}> = [];
 		var otherSkills:Array<{id:String, name:String, kind:String}> = [];
 		var categories:Array<{id:String, name:String, kind:String}> = [];
@@ -493,14 +507,17 @@ class AuraConditionEditor {
 		if (kind == "status") {
 			var observed:Array<{id:String, name:String, kind:String}> = [];
 			var frame = AuraEngine.signalFrame();
-			if (frame != null) for (i in 0...frame.statusCount) {
-				var status = frame.statuses[i];
+			var enemy=StringTools.startsWith(c.signal,"target.status.");
+			var statuses=frame==null ? null : enemy ? frame.targetStatuses : frame.statuses;
+			var count=frame==null ? 0 : enemy ? frame.targetStatusCount : frame.statusCount;
+			if (frame != null) for (i in 0...count) {
+				var status = statuses[i];
 				if (!status.known || !status.present) continue;
 				var label = solarflare.cdb.AuraCatalog.label(status.rawId);
 				if (solarflare.cdb.AuraCatalog.matchesSearch(status.rawId, label, ui.search))
 					observed.push({id: status.rawId, name: label, kind: "active status"});
 			}
-			shown += drawSubjectSection(c, ui, tag + "_live", "Currently on your character", observed, kind, beforeEdit);
+			shown += drawSubjectSection(c, ui, tag + "_live", enemy ? "Currently on your enemy target" : "Currently on your character", observed, kind, beforeEdit);
 			shown += drawSubjectSection(c, ui, tag, "Status / Proc IDs", statusSkills, kind, beforeEdit);
 			shown += drawSubjectSection(c, ui, tag, "Other skills", otherSkills, kind, beforeEdit);
 		} else if (kind == "unit") {

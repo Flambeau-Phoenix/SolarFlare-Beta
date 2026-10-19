@@ -46,6 +46,7 @@ class ModEntry {
 		solarflare.cdb.CdbUnitNames.keep();
 		solarflare.cdb.CdbSummonUnits.keep();
 		solarflare.cdb.AuraCatalog.keep();
+		solarflare.cdb.StatusTypeCatalog.keep();
 		solarflare.cdb.ConsumableCatalog.keep();
 		solarflare.cdb.WeaponCatalog.keep();
 		solarflare.cdb.LootCatalog.keep();

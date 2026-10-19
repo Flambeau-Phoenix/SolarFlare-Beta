@@ -52,6 +52,9 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 	public var open = new BoolRef(false);
 	var cfg:AuraConfig;
 	var host:ConfigPanel;
+	var shareService=new AuraShareService();
+	var sharePanel:solarflare.aura.ui.AuraSharePanel;
+	var shareEpoch:Int=0;
 	var selected:Int = -1;
 	var deleteArmed:Int = -1;
 	var selectedIds:Map<String, Bool> = new Map();
@@ -190,6 +193,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		solarflare.ui.ByteUtil.clearBytes(groupNameBuf, 64);
 		this.cfg = cfg;
 		this.host = host;
+		sharePanel=new solarflare.aura.ui.AuraSharePanel(shareService,queueShareScope,queueShareInspect,queueShareImport);
 		glowColBuf = ImGui.v4(1, 0.53, 0, 1);
 		canvasColBuf = ImGui.v4(1, 1, 1, 1);
 		solarflare.ui.ByteUtil.clearBytes(iconSearchBuf, 80);
@@ -206,6 +210,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 
 	function snapshotJson():String {
 		var data = AuraPack.toObj("shared", "snapshot", "undo", cfg.auras, cfg.dumpGroups());
+		Reflect.setField(data, "sets", cfg.dumpSets());
 		Reflect.setField(data, "counterState", AuraCounterState.dump(cfg.auras));
 		Reflect.setField(data, "uiLayouts", host.uiLayouts.dumpCurrent(host));
 		return Json.stringify(data);
@@ -225,6 +230,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 			var imported = AuraPack.unpackAuras(data);
 			AuraCounterState.apply(imported, data.counterState);
 			cfg.auras = imported;
+			if(data.sets!=null) cfg.applySets(data.sets); else cfg.ensureSets();
 			cfg.applyGroups(data.groups);
 			if(data.uiLayouts!=null) host.uiLayouts.load(host,data.uiLayouts,solarflare.ui.HudLayoutModel.legacy({auras:{config:{list:data.auras}}}));
 			host.uiLayouts.requestReconcile();
@@ -242,6 +248,8 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 	}
 
 	public function clearTransientState():Void {
+		StatusTypeDemand.beginEditorFrame();
+		shareEpoch++; shareService.cancel();
 		combatLogsOpen = false;
 		combatLogBrowser.suspend();
 		selectedGroupId = "";
@@ -261,6 +269,53 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		deleteArmed = -1;
 		selectedIds = new Map();
 		rangeAnchorId = "";
+	}
+
+	public function observeShares():Void { shareService.observe(); }
+	function queueShareMembers(ids:Array<String>,label:String,wholeLibrary:Bool=false):Void {
+		ioModalRequest=true;
+		var epoch=shareEpoch; var owner=cfg.auras;
+		UiActionQueue.custom(function() {
+			if(!open.get() || epoch!=shareEpoch || cfg.auras!=owner) return;
+			var members:Array<AuraDef>=[];
+			for(id in ids) { var found:AuraDef=null; for(a in cfg.auras) if(a!=null && a.id==id) { found=a; break; } if(found==null) throw "The export selection changed."; members.push(found); }
+			var data=AuraShareImport.capture(cfg,members,label,wholeLibrary);
+			shareService.requestExport(data,function() return open.get() && epoch==shareEpoch && cfg.auras==owner);
+		});
+	}
+	function queueShareScope(scope:String):Void {
+		var current=selectedAura(); var members:Array<AuraDef>=[]; var label="Aura library";
+		switch(scope) {
+		 case "Aura": if(current!=null) { members=[current]; label=current.name; }
+		 case "Selection": forEachSelected(function(a) members.push(a)); label="Selected Auras";
+		 case "Group": if(current!=null && cfg.groupOf(current)!=null) { var group=cfg.groupOf(current); members=cfg.groupMembers(group.id); label=group.name; }
+		 case "Set": if(current!=null) { var id=AuraConfig.tagOf(current); for(a in cfg.auras) if(AuraConfig.tagOf(a)==id) members.push(a); var set=cfg.findSet(id); label=set!=null ? set.name : id; }
+		 default: members=cfg.auras.copy();
+		}
+		queueShareMembers([for(a in members) a.id],label,scope=="Library");
+	}
+	function queueShareInspect(path:String):Void { queueShareFile(path,false); }
+	function queueShareImport(path:String):Void { queueShareFile(path,true); }
+	function queueShareFile(path:String,importing:Bool):Void {
+		var epoch=shareEpoch; var owner=cfg.auras;
+		UiActionQueue.custom(function() {
+			if(!open.get() || epoch!=shareEpoch || cfg.auras!=owner) return;
+			var alive=function() return open.get() && epoch==shareEpoch && cfg.auras==owner;
+			var check=function(data:Dynamic) AuraShareImport.preflight(data,cfg);
+			if(!importing) { shareService.requestInspect(path,check,alive); return; }
+			shareService.requestImport(path,check,function(data:Dynamic) {
+				var before=snapshotJson(); var transaction=new AuraShareImport(data,cfg);
+				var bank=host.uiLayouts.bank; var layout=bank.active; var oldRows=bank.layouts.get(layout);
+				var rows=solarflare.ui.HudLayoutModel.merge(oldRows,transaction.layoutRows());
+				try {
+				 transaction.commit();
+				 bank.layouts.set(layout,rows);
+				 host.uiLayouts.requestReconcile(); SettingsStore.markDirty(); solarflare.ObserveDemand.markStatusDemandDirty();
+				 undoManager.push("Import share file",before);
+				 selected=cfg.auras.length-1; selectedGroupId=""; creationHomeOpen=false; boundEditorAura=null; canvasSel=-1;
+				} catch(e:Dynamic) { bank.layouts.set(layout,oldRows); transaction.rollback(); throw e; }
+			},alive);
+		});
 	}
 
 	public function importFromClipboardQueued():Void {
@@ -289,6 +344,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 	// ----------------------------------------------------------------
 
 	public function draw():Void {
+		StatusTypeDemand.beginEditorFrame();
 		if (!open.get() || cfg == null) return;
 		if (!CursorCaptureFix.cursorFree) return;
 
@@ -2616,7 +2672,8 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		if (UiChrome.accentButton("Copy group share key##ab_grp_share", ImGui.vec2(-1, 0))) copyGroupShareKey(g);
 		ImGui.endDisabled();
 		ImGui.pushTextWrapPos(0);
-		ImGui.textDisabled("The key carries the group and all its auras; importing it rebuilds the group.");
+		ImGui.textDisabled("The key carries the group settings; the ZIP also carries custom images.");
+		if(UiChrome.ghostButton("Export with images##ab_group_files")) queueShareMembers([for(a in cfg.groupMembers(g.id)) a.id],g.name);
 		ImGui.popTextWrapPos();
 		UiChrome.gap(4);
 		if (UiChrome.ghostButton("Ungroup##ab_grp_ungroup", ImGui.vec2(-1, 0))) ungroup(g);
@@ -2702,6 +2759,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 			if (share.length > 0) UiActionQueue.copyText(share, "Set share key copied");
 		}
 		ImGui.sameLine(0, 6);
+		if(UiChrome.ghostButton("Export with images##ab_set_files")) queueShareMembers([for(a in cfg.auras) if(AuraConfig.tagOf(a)==s.id) a.id],s.name);
 		var armed = setDeleteArmed == s.id;
 		if (UiChrome.ghostButton((armed ? "Really delete? Auras go to Shared" : "Delete set") + "##ab_set_delete", ImGui.vec2(armed ? 230 : 120, 26))) {
 			if (armed) {
@@ -2766,6 +2824,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 				ImGui.endMenu();
 			}
 			drawGroupMenu(a);
+			if (ImGui.menuItem("Export with images")) queueShareMembers([a.id],a.name);
 			if (ImGui.menuItem("Copy Aura Share Key")) {
 				var share = ShareCodec.wrapJson(Json.stringify(AuraEngine.toObj(a)));
 				UiActionQueue.copyText(share, 'Copied share key for ${a.name}');
@@ -2802,6 +2861,8 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 			var share = try AuraPack.encode("shared", "selection", "export", pack) catch (_) "";
 			if (share.length > 0) UiActionQueue.enqueue(UiActionKind.ExportAuraSelection(share, n + " aura(s) exported as share key"));
 		}
+		ImGui.sameLine();
+		if (ImGui.smallButton("Export with images##ab_batch_files")) queueShareScope("Selection");
 		ImGui.sameLine();
 		if (ImGui.smallButton("Group##ab_batch_grp")) { var picked:Array<AuraDef> = []; forEachSelected(a -> picked.push(a)); createGroupFrom(picked); }
 		if (ImGui.isItemHovered()) ImGui.setTooltip("Put the selected auras in one window that packs them together");
@@ -3575,7 +3636,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 				if (canvasImportErr) ImGui.textColored(ImGui.vec4(0.95, 0.45, 0.4, 1), canvasImportMsg);
 				else ImGui.textDisabled(canvasImportMsg);
 			}
-		}, "PNG up to 1024x1024 and 4 MB. Import copies into the selected images folder. The picker lists PNGs in that folder itself. Share keys carry the filename, so others need the same image on their PC.");
+		}, "PNG up to 1024x1024 and 4 MB. Import copies into the selected images folder. The picker lists PNGs in that folder itself. Clipboard keys carry only filenames. Use Export with images to share a ZIP containing the PNGs.");
 	}
 
 	function resetCanvasTransient():Void {
@@ -3635,20 +3696,26 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 
 	function drawIoModal():Void {
 		if (ioModalRequest) { ImGui.openPopup("Aura Import / Export##ab_io_modal"); ioModalRequest = false; }
-		if (ImGui.beginPopupModal("Aura Import / Export##ab_io_modal", null, imgui.Enums.ImGuiWindowFlags.AlwaysAutoResize)) {
+		ImGui.setNextWindowSize(ImGui.vec2(620,640),ImGuiCond.FirstUseEver);
+		ImGui.setNextWindowSizeConstraints(ImGui.vec2(520,360),ImGui.vec2(Math.max(520,solarflare.ui.HudChrome.viewportWidth-32),Math.max(360,solarflare.ui.HudChrome.viewportHeight-32)));
+		if (ImGui.beginPopupModal("Aura Import / Export##ab_io_modal", null, 0)) {
+		 try {
 			var a = selectedAura();
+			sharePanel.draw(a!=null,countSelected()>0,a!=null && cfg.groupOf(a)!=null,a!=null && AuraConfig.tagOf(a).length>0);
+			ImGui.separator();
 			if (a != null) drawShare(a);
 			else {
 				ImGui.textWrapped("Select an aura to copy its share key, or import a pack into the library.");
 				if (UiChrome.ghostButton("Paste & Import from Clipboard##ab_clip_import_empty", ImGui.vec2(260, 26))) { UiActionQueue.enqueue(UiActionKind.ImportAuraClipboard); setIoStatus("Aura import queued from clipboard.", false); }
 				ImGui.sameLine();
 				if (UiChrome.ghostButton("Copy Entire Library##ab_copy_all_empty", ImGui.vec2(180, 26))) { UiActionQueue.enqueue(UiActionKind.ExportAuraPack); setIoStatus("Aura pack export queued.", false); }
-				ImGui.inputTextMultiline("##ab_import_area_empty", importBuf, JSON_BUF, ImGui.vec2(520, 120));
+				ImGui.inputTextMultiline("##ab_import_area_empty", importBuf, JSON_BUF, ImGui.vec2(-1, 120));
 				if (UiChrome.ghostButton("Import from Text Box##ab_do_import_empty", ImGui.vec2(180, 26))) importJson();
 				if (ioStatus.length > 0) ImGui.textColored(ioStatusError ? ImGui.vec4(1, 0.35, 0.35, 1) : ImGui.vec4(0.35, 0.9, 0.5, 1), ioStatus);
 			}
 			ImGui.separator();
 			if (UiChrome.ghostButton("Close##ab_io_close", ImGui.vec2(120, 28))) ImGui.closeCurrentPopup();
+		 } catch(e:Dynamic) { ImGui.endPopup(); throw e; }
 			ImGui.endPopup();
 		}
 	}
@@ -3967,6 +4034,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 
 	function drawShare(a:AuraDef):Void {
 		if (ImGui.collapsingHeader("Share or Back Up##ab_export_sec", imgui.Enums.ImGuiTreeNodeFlags.DefaultOpen)) {
+			ImGui.textWrapped("Clipboard keys contain settings only. Export with images below includes the custom PNG files.");
 			if (UiChrome.ghostButton("Copy Selected to Clipboard##ab_copy_sel", ImGui.vec2(190, 26))) {
 				exportString = ShareCodec.wrapJson(Json.stringify(AuraEngine.toObj(a)));
 				fillBuf(exportBuf, JSON_BUF, exportString);
@@ -4086,6 +4154,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 			if (c == null || AuraSignalCatalog.find(c.signal) == null) return "Choose what each condition should check.";
 			var d = AuraSignalCatalog.find(c.signal);
 			if (d != null && d.subjectKind.length > 0 && StringTools.trim(c.subject).length == 0) return "Choose a specific target for the highlighted condition.";
+			if(d!=null && d.subjectKind=="statusType" && solarflare.cdb.StatusTypeCatalog.index(c.subject)<0) return "Choose a general status type for the highlighted condition.";
 		}
 		if (a.region == "text" && StringTools.trim(a.announce).length == 0) return "Enter the text this Aura should show.";
 		if ((a.region == "icon" || a.region == "canvas") && a.preferredIconId().length == 0) return "Choose an icon or a condition with an automatic icon.";

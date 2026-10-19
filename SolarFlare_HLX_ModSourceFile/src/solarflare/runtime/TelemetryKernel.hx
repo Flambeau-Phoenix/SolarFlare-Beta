@@ -72,8 +72,11 @@ class TelemetryKernel {
 		}
 		solarflare.hemorrhage.HemorrhageService.beforeDrain(now);
 		cfg.hemorrhage.observe(HealthCache.localHero, now);
+		if(cfg.auraBuilder!=null) cfg.auraBuilder.observeShares();
 		ObserveDemand.publish(cfg);
+		if((solarflare.aura.StatusTypeDemand.meMask|solarflare.aura.StatusTypeDemand.enemyMask)==0) solarflare.aura.StatusTypeService.reset();
 		demand.capture(cfg);
+		if(!ObserveDemand.aurasNeedTargetStatus) solarflare.aura.TargetStatusCache.reset();
 		EventRing.drain(solarflare.combatlog.CombatLogCache.consumeHookEvent, 128, 0.0005);
 		solarflare.hemorrhage.HemorrhageService.afterDrain(now, !cfg.hemorrhage.hidden.get() || cfg.hemorrhage.tool.open.get());
 
@@ -104,6 +107,7 @@ class TelemetryKernel {
 			statusHeroGeneration = HealthCache.statusOwnerGen;
 			statusProfileGeneration = solarflare.ui.FeatureProfiles.statusOwnerGen;
 			solarflare.aura.AuraStatusCache.invalidateOwner();
+			solarflare.aura.StatusTypeService.reset();
 		}
 		if (demand.status && ObserveDemand.dueAuraStatus(now, false)) {
 			try {
@@ -146,6 +150,7 @@ class TelemetryKernel {
 			}
 			if (demand.auras) {
 				try {
+					solarflare.aura.StatusTypeService.observe(HealthCache.localHero,now);
 					solarflare.aura.AuraEngine.tick(cfg.auras);
 					RuntimeMetrics.auraTicks++;
 				} catch (_:Dynamic) {}
@@ -220,6 +225,7 @@ class TelemetryKernel {
 	}
 
 	public static function reset():Void {
+		solarflare.aura.StatusTypeService.reset();
 		solarflare.aura.AuraStatusCache.invalidateOwner();
 		statusHeroGeneration = statusProfileGeneration = -1;
 		lastVitals = lastIdentity = lastBackground = lastSettings = 0;

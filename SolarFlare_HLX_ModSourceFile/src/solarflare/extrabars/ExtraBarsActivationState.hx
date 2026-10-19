@@ -23,12 +23,12 @@ class ExtraBarsActivationState {
 		prefixDown:Bool, prefixPressed:Bool, keyDown:Bool, keyPressed:Bool, nativeModifiers:Int, thresholdMs:Int):Bool {
 		if (frame == lastFrame) return false;
 		lastFrame = frame;
-		if (!allowed || !prefixEnabled || ExtraBarsActivationConfig.modes.indexOf(mode) < 0 || !Math.isFinite(now)) {
+		if (!allowed || (!prefixEnabled && mode != "always") || ExtraBarsActivationConfig.modes.indexOf(mode) < 0 || !Math.isFinite(now)) {
 			active = false; toggled = false; progress = 0; elapsedMs = 0; longStart = -1;
 			recovering = true; prefixLatched = prefixDown || prefixPressed; keyLatched = keyDown || keyPressed; return false;
 		}
 		if (recovering) {
-			if (!prefixDown && !prefixPressed && !keyDown && !keyPressed && nativeModifiers == 0) {
+			if ((mode == "always" || (!prefixDown && !prefixPressed)) && !keyDown && !keyPressed && nativeModifiers == 0) {
 				recovering = false; prefixLatched = false; keyLatched = false; longFired = false;
 			}
 			return false;
@@ -44,7 +44,7 @@ class ExtraBarsActivationState {
 			active = false; progress = 0; elapsedMs = 0; longStart = -1; return false;
 		}
 		if (mode == "toggle" && prefixEdge) toggled = !toggled;
-		active = mode == "toggle" ? toggled : mode == "hold" && prefixDown;
+		active = mode == "always" || (mode == "toggle" ? toggled : mode == "hold" && prefixDown);
 		if (mode != "long_press") return active && keyEdge;
 		// Long-press is additive by user choice: native press is never buffered/delayed.
 		if (keyEdge && keyDown) { longStart = now; longFired = false; }

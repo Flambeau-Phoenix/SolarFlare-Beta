@@ -1,0 +1,484 @@
+{
+  "source": "data.cdb",
+  "format": "CastleDB curated export",
+  "count": 19,
+  "selection": [
+    {
+      "sheet": "statusType",
+      "row_index": 0,
+      "id": "Bleed",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 1,
+      "id": "Burn",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 2,
+      "id": "Poison",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 3,
+      "id": "Magic",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 4,
+      "id": "Buff",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 5,
+      "id": "Debuff",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 6,
+      "id": "State",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 7,
+      "id": "Shield",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 8,
+      "id": "Slow",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 9,
+      "id": "Silence",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 10,
+      "id": "Stun",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 11,
+      "id": "Root",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 12,
+      "id": "Grounded",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 13,
+      "id": "Invisibility",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 14,
+      "id": "Heal",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 15,
+      "id": "HealOverTime",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 16,
+      "id": "Scepter_Flamie",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 17,
+      "id": "Hemorage",
+      "name": ""
+    },
+    {
+      "sheet": "statusType",
+      "row_index": 18,
+      "id": "Poison_Dose",
+      "name": ""
+    }
+  ],
+  "categories": {
+    "statusType": [
+      {
+        "id": "Bleed",
+        "gfx": {
+          "file": "UI/icons/atlas_abilities_status_96PX.png",
+          "size": 96,
+          "x": 4,
+          "y": 0
+        },
+        "flags": 1,
+        "texts": {
+          "name": {
+            "v": "Bleed"
+          }
+        },
+        "color": 13899286,
+        "dmgIcon": {
+          "file": "UI/Placeholder/resources.png",
+          "size": 2,
+          "x": 134,
+          "y": 87,
+          "width": 8,
+          "height": 8
+        },
+        "visuals": {}
+      },
+      {
+        "color": 16750880,
+        "id": "Burn",
+        "texts": {
+          "name": {
+            "v": "Burn"
+          }
+        },
+        "flags": 1,
+        "gfx": {
+          "file": "UI/icons/atlas_abilities_status_96PX.png",
+          "size": 96,
+          "x": 9,
+          "y": 0
+        },
+        "dmgIcon": {
+          "file": "UI/Placeholder/resources.png",
+          "size": 2,
+          "x": 49,
+          "y": 25,
+          "width": 9,
+          "height": 10
+        },
+        "visuals": {}
+      },
+      {
+        "color": 9642239,
+        "id": "Poison",
+        "texts": {
+          "name": {
+            "v": "Poison"
+          }
+        },
+        "flags": 1,
+        "gfx": {
+          "file": "UI/icons/atlas_abilities_status_96PX.png",
+          "size": 96,
+          "x": 5,
+          "y": 0
+        },
+        "dmgIcon": {
+          "file": "UI/Placeholder/resources.png",
+          "size": 2,
+          "x": 147,
+          "y": 87,
+          "width": 6,
+          "height": 8
+        },
+        "visuals": {}
+      },
+      {
+        "id": "Magic",
+        "gfx": {
+          "file": "UI/Placeholder/abilitiesButton.png",
+          "size": 48,
+          "x": 38,
+          "y": 4
+        },
+        "flags": 0,
+        "texts": {
+          "name": {
+            "v": "Magic"
+          }
+        },
+        "color": 4052186,
+        "visuals": {}
+      },
+      {
+        "id": "Buff",
+        "flags": 0,
+        "gfx": {
+          "file": "UI/Placeholder/abilitiesButton.png",
+          "size": 48,
+          "x": 47,
+          "y": 1
+        },
+        "texts": {
+          "name": {
+            "v": "Buff"
+          }
+        },
+        "color": 13297949,
+        "visuals": {}
+      },
+      {
+        "id": "Debuff",
+        "gfx": {
+          "file": "UI/Placeholder/abilitiesButton.png",
+          "size": 48,
+          "x": 48,
+          "y": 1
+        },
+        "flags": 0,
+        "texts": {
+          "name": {
+            "v": "Debuff"
+          }
+        },
+        "color": 12151339,
+        "visuals": {}
+      },
+      {
+        "color": 16769976,
+        "id": "State",
+        "texts": {
+          "name": {
+            "v": "State"
+          }
+        },
+        "visuals": {},
+        "flags": 0,
+        "gfx": {
+          "file": "UI/Placeholder/abilitiesButton.png",
+          "size": 48,
+          "x": 20,
+          "y": 1
+        }
+      },
+      {
+        "color": 12703723,
+        "id": "Shield",
+        "texts": {
+          "name": {
+            "v": "Shield"
+          }
+        },
+        "flags": 0,
+        "gfx": {
+          "file": "UI/Placeholder/abilitiesButton.png",
+          "size": 48,
+          "x": 4,
+          "y": 1
+        },
+        "visuals": {}
+      },
+      {
+        "id": "Slow",
+        "gfx": {
+          "file": "UI/icons/atlas_abilities_status_96PX.png",
+          "size": 96,
+          "x": 7,
+          "y": 0
+        },
+        "flags": 2,
+        "texts": {
+          "name": {
+            "v": "Slow"
+          }
+        },
+        "color": 8290609,
+        "visuals": {}
+      },
+      {
+        "color": 5455730,
+        "id": "Silence",
+        "texts": {
+          "name": {
+            "v": "Silence"
+          }
+        },
+        "flags": 2,
+        "gfx": {
+          "file": "UI/Placeholder/abilitiesButton.png",
+          "size": 48,
+          "x": 3,
+          "y": 1
+        },
+        "visuals": {}
+      },
+      {
+        "id": "Stun",
+        "gfx": {
+          "file": "UI/Placeholder/abilitiesButton.png",
+          "size": 48,
+          "x": 40,
+          "y": 4
+        },
+        "flags": 6,
+        "texts": {
+          "name": {
+            "v": "Stun"
+          }
+        },
+        "color": 9524905,
+        "visuals": {
+          "fxs": {
+            "aboveHead": [
+              {
+                "fxSet": "Stunned_Loop",
+                "props": {
+                  "offsetZ": 0.5
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "color": 5205811,
+        "id": "Root",
+        "texts": {
+          "name": {
+            "v": "Root"
+          }
+        },
+        "flags": 6,
+        "gfx": {
+          "file": "UI/icons/atlas_abilities_status_96PX.png",
+          "size": 96,
+          "x": 8,
+          "y": 0
+        },
+        "visuals": {}
+      },
+      {
+        "color": 5789235,
+        "id": "Grounded",
+        "texts": {
+          "name": {
+            "v": "Grounded"
+          }
+        },
+        "flags": 2,
+        "gfx": {
+          "file": "UI/Placeholder/abilitiesButton.png",
+          "size": 48,
+          "x": 42,
+          "y": 1
+        },
+        "visuals": {}
+      },
+      {
+        "color": 2233904,
+        "id": "Invisibility",
+        "texts": {
+          "name": {
+            "v": "Invisibility"
+          }
+        },
+        "flags": 0,
+        "gfx": {
+          "file": "UI/Placeholder/abilitiesButton.png",
+          "size": 48,
+          "x": 1,
+          "y": 4
+        },
+        "visuals": {}
+      },
+      {
+        "color": 7199835,
+        "id": "Heal",
+        "texts": {
+          "name": {
+            "v": "Heal"
+          }
+        },
+        "flags": 0,
+        "gfx": {
+          "file": "UI/Placeholder/abilitiesButton.png",
+          "size": 48,
+          "x": 17,
+          "y": 1
+        },
+        "visuals": {}
+      },
+      {
+        "color": 7199835,
+        "id": "HealOverTime",
+        "texts": {},
+        "visuals": {},
+        "flags": 8,
+        "gfx": {
+          "file": "UI/Placeholder/abilitiesButton.png",
+          "size": 48,
+          "x": 17,
+          "y": 1
+        }
+      },
+      {
+        "color": 16750880,
+        "id": "Scepter_Flamie",
+        "texts": {
+          "name": {
+            "v": "Flamie"
+          }
+        },
+        "visuals": {},
+        "flags": 0,
+        "gfx": {
+          "file": "UI/icons/atlas_abilities_status_96PX.png",
+          "size": 96,
+          "x": 9,
+          "y": 0
+        }
+      },
+      {
+        "color": 10354688,
+        "id": "Hemorage",
+        "texts": {
+          "name": {
+            "v": "Hemorage"
+          }
+        },
+        "visuals": {},
+        "flags": 1,
+        "gfx": {
+          "file": "UI/icons/atlas_abilities_status_96PX.png",
+          "size": 96,
+          "x": 4,
+          "y": 0
+        },
+        "dmgIcon": {
+          "file": "UI/Placeholder/resources.png",
+          "size": 2,
+          "x": 134,
+          "y": 87,
+          "width": 8,
+          "height": 8
+        },
+        "parent": "Bleed"
+      },
+      {
+        "color": 1726762,
+        "id": "Poison_Dose",
+        "texts": {},
+        "visuals": {},
+        "flags": 0,
+        "gfx": {
+          "file": "UI/icons/atlas_abilities_status_96PX.png",
+          "size": 96,
+          "x": 5,
+          "y": 0
+        }
+      }
+    ]
+  }
+}

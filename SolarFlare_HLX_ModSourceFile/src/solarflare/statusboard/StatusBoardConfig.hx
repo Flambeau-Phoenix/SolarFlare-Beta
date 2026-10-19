@@ -17,6 +17,9 @@ class StatusBoardConfig {
  public var chrome=new HudChrome(40,120);
  public var slotSize:Int=40;
  public var columns:Int=12;
+ public var growthDirection:String="down";
+ static var growthModes:Array<String>=["down","up"];
+ static function growthLabel(v:String):String return v=="up" ? "Up" : "Down";
  public var contentWidth:Single=0;
  public var contentHeight:Single=0;
  public var maxIcons:Int=512;
@@ -39,6 +42,14 @@ class StatusBoardConfig {
  function copyTooltipCoverage():Void {
   solarflare.ui.UiActionQueue.copyText(haxe.Json.stringify({schema:"solarflare.status-tooltip-coverage.v1",scope:"hovered applications only",rows:StatusBoardTooltipCache.coverage()},null,"  "));
  }
+ public function setGrowthDirection(value:String):Void {
+  value=StatusBoardLayout.direction(value); if (value==growthDirection) return;
+  var before=StatusBoardLayout.size(visible.length,slotSize,columns,!chrome.locked.get(),contentWidth,contentHeight,showSeconds,growthDirection=="up");
+  var after=StatusBoardLayout.size(visible.length,slotSize,columns,!chrome.locked.get(),contentWidth,contentHeight,showSeconds,value=="up");
+  chrome.clampToViewport();
+  chrome.setDisplayPosition(chrome.screenX,chrome.screenY+StatusBoardLayout.anchorShift(before.height,after.height));
+  growthDirection=value; SettingsStore.markDirty();
+ }
  public function demand():Bool return enabled.get() && !hidden.get();
  public function hideStatus(id:String):Void { if (exclusions.hide(id)) SettingsStore.markDirty(); }
  public function setColumnsFromWidth(w:Single,gap:Int):Void {
@@ -46,7 +57,12 @@ class StatusBoardConfig {
   if (c != columns) { columns=c; SettingsStore.markDirty(); }
  }
  public function resize(w:Single,h:Single,gap:Int):Void {
+  var oldHeight=StatusBoardLayout.size(visible.length,slotSize,columns,!chrome.locked.get(),contentWidth,contentHeight,showSeconds,growthDirection=="up").height;
   contentWidth=Math.max(slotSize,w); contentHeight=Math.max(slotSize,h);
+  if(growthDirection=="up") {
+   var nextHeight=StatusBoardLayout.size(visible.length,slotSize,columns,!chrome.locked.get(),contentWidth,contentHeight,showSeconds,true).height;
+   chrome.clampToViewport(); chrome.setDisplayPosition(chrome.screenX,chrome.screenY+oldHeight-nextHeight);
+  }
   setColumnsFromWidth(contentWidth,gap); SettingsStore.markDirty();
  }
  var stabilizer=new StatusBoardStabilizer();
@@ -107,13 +123,14 @@ class StatusBoardConfig {
  }
  public function dump():Dynamic return {
   enabled:enabled.get(),hidden:hidden.get(),slotSize:slotSize,columns:columns,maxIcons:maxIcons,
-  contentWidth:contentWidth,contentHeight:contentHeight,
+  contentWidth:contentWidth,contentHeight:contentHeight,growthDirection:growthDirection,
   showSeconds:showSeconds,showStacks:showStacks,hiddenStatusIds:exclusions.hiddenIds.copy(),
   hiddenStatusLabels:[for (id in exclusions.hiddenIds) {id:id,label:labels.exists(id) ? labels.get(id) : id}],
   locked:chrome.locked.get(),transparent:chrome.transparent.get(),x:chrome.x.get(),y:chrome.y.get(),
   referenceWidth:chrome.referenceWidth,referenceHeight:chrome.referenceHeight
  };
  public function apply(data:Dynamic):Void {
+  growthDirection=StatusBoardLayout.direction(data == null ? null : data.growthDirection);
   if (data == null) return;
   enabled.set(data.enabled != false); hidden.set(data.hidden == true);
   slotSize=clamp(data.slotSize,28,72,40); columns=clamp(data.columns,1,16,12);
@@ -153,6 +170,10 @@ class StatusBoardConfig {
    chrome.drawPositionRow("sb_pos");
    UiLayout.propertyRow("Icon size",function() { intRef.set(slotSize); if (ImGui.sliderInt("##sb_size",intRef,28,72)) { slotSize=intRef.get(); contentWidth=0; SettingsStore.markDirty(); } });
    UiLayout.propertyRow("Columns",function() { intRef.set(columns); if (ImGui.sliderInt("##sb_columns",intRef,1,16)) { columns=intRef.get(); contentWidth=0; SettingsStore.markDirty(); } });
+   UiLayout.propertyRow("Growth direction",function() {
+    var picked=UiLayout.stringCombo("##sb_growth",growthDirection,growthModes,growthLabel);
+    if (picked!=null) setGrowthDirection(picked);
+   },"Up keeps the bottom row fixed and wraps additional statuses above it.");
    UiLayout.propertyRow("Badges",function() {
     UiLayout.inlinePair("##sb_badges",function(_:Single) { boolRef.set(showSeconds); if (ImGui.checkbox("Duration##sb_duration",boolRef)) { showSeconds=boolRef.get(); SettingsStore.markDirty(); } },function(_:Single) { boolRef.set(showStacks); if (ImGui.checkbox("Stacks##sb_stacks",boolRef)) { showStacks=boolRef.get(); SettingsStore.markDirty(); } });
    });

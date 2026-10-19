@@ -356,6 +356,7 @@ class SolarFlarePanel {
 	public function flushPendingSettings():Void {
 		solarflare.ui.WindowAutoHide.reset();
 		solarflare.ui.NativeHideCache.clearSession();
+		solarflare.aura.TargetStatusCache.reset();
 		try
 			solarflare.ui.HideMoveCache.clearSession()
 		catch (_:Dynamic) {}

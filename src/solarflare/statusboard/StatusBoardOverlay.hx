@@ -5,6 +5,7 @@ import solarflare.ui.HUDWidgetWindow;
 class StatusBoardOverlay {
 	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
 	var hudCfg:StatusBoardConfig;
+ var visualBounds=new solarflare.ui.HUDVisualBounds();
 	var hudColumns:Int;
 	var hudWidth:Single;
 	var hudHeight:Single;
@@ -21,11 +22,16 @@ class StatusBoardOverlay {
   var n=cfg.visible.length;
   if (n == 0 && cfg.chrome.locked.get()) return;
   var unlocked=!cfg.chrome.locked.get();
-  var size=StatusBoardLayout.size(n,cfg.slotSize,cfg.columns,unlocked,cfg.contentWidth,cfg.contentHeight,cfg.showSeconds);
+  var size=StatusBoardLayout.size(n,cfg.slotSize,cfg.columns,unlocked,cfg.contentWidth,cfg.contentHeight,cfg.showSeconds,cfg.growthDirection=="up");
   var cols=size.columns; var w=size.width; var h=size.height;
   hudCfg = cfg;
   hudColumns = cols; hudWidth = w; hudHeight = h;
-  HUDWidgetWindow.draw("SolarFlare.StatusBoard","Statuses",cfg.chrome,w,h,hudBodyFn,edit,hide,false,null,hudResizeFn);
+  visualBounds.reset(w,h);
+  if (n>0 && cfg.growthDirection=="up") {
+   var top=StatusBoardLayout.rowY(n-1,cols,cfg.slotSize,cfg.showSeconds,h,true);
+   visualBounds.include(0,top,w,cfg.slotSize+StatusBoardLayout.timerBand(cfg.slotSize,cfg.showSeconds));
+  }
+  HUDWidgetWindow.draw("SolarFlare.StatusBoard","Statuses",cfg.chrome,w,h,hudBodyFn,edit,hide,false,null,hudResizeFn,cfg.growthDirection=="up" ? visualBounds : null);
   hudCfg = null;
  }
 
@@ -38,7 +44,7 @@ class StatusBoardOverlay {
 		for (i in 0...n) {
 		 var s=cfg.visible[i]; var v=cfg.visuals[i];
 		 var x:Single=origin.x+(i%cols)*(cfg.slotSize+GAP);
-		 var y:Single=origin.y+Std.int(i/cols)*(cfg.slotSize+band+GAP);
+		 var y:Single=origin.y+StatusBoardLayout.rowY(i,cols,cfg.slotSize,cfg.showSeconds,h,cfg.growthDirection=="up");
 		 StatusBoardRenderer.draw(dl,v,x,y,cfg.slotSize,band);
 		 ImGui.setCursorScreenPos(ImGui.vec2(x,y));
 		 ImGui.invisibleButton(v.hitId,ImGui.vec2(cfg.slotSize,cfg.slotSize+band));

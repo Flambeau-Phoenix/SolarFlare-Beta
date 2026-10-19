@@ -93,7 +93,7 @@ class ExtraBarsConfig {
 		if (from == null || to == null || a < 0 || a >= from.slotCount || b < 0 || b >= to.slotCount) return false;
 		var temp = from.slots[a]; from.slots[a] = to.slots[b]; to.slots[b] = temp; return true;
 	}
-	public function demand():Bool { if (sparkEnabled) return true; if (!enabled || prefix == "off") return false; for (bar in bars) if (bar.enabled) return true; return false; }
+	public function demand():Bool { if (sparkEnabled) return true; if (!enabled || !ExtraBarsActivationConfig.available(prefix,mode)) return false; for (bar in bars) if (bar.enabled) return true; return false; }
 	public function dump():Dynamic return {version:1, enabled:enabled, prefix:prefix, mode:mode, nextId:nextId,
 		bars:[for (bar in bars) bar.dump()], sparkEnabled:sparkEnabled, sparkSize:sparkSize, sparkLocked:sparkLocked, sparkTransparent:sparkTransparent,
 		sparkShowHotkey:sparkShowHotkey, sparkHotkeyLabel:sparkHotkeyLabel};

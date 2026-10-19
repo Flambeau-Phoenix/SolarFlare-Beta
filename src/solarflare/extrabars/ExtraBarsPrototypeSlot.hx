@@ -35,7 +35,7 @@ class ExtraBarsPrototypeSlot {
 	public var triggerStrength:Float = 0;
 	public function new() {}
 	public function setInputState(active:Bool, mode:String):Void {
-		inputActive = active && (mode == "hold" || mode == "toggle");
+		inputActive = active && (mode == "hold" || mode == "toggle" || mode == "always");
 		inputLabel = (mode == "hold" ? "Hold" : "Toggle") + (inputActive ? " ON" : " OFF");
 		inputDetail = inputActive ? "ExtraBars keys active" : "Native keys active";
 	}

@@ -38,6 +38,7 @@ class AuraQuickBuildRules {
 	}
 
 	public static function subjectId(id:String, kind:String):String {
+		if(kind=="statusType") return solarflare.cdb.StatusTypeCatalog.canonical(id);
 		if (kind != "status") return id;
 		return solarflare.cdb.CdbAuraTable.statusSubjectId(id);
 	}
@@ -47,6 +48,7 @@ class AuraQuickBuildRules {
 		if (d == null) return "Choose a signal to watch.";
 		if (d.subjectKind.length > 0 && StringTools.trim(c.subject).length == 0)
 			return d.subjectKind == "script" ? "Configure the expression in Advanced." : "Choose a " + d.subjectKind + " to watch.";
+		if(d.subjectKind=="statusType" && solarflare.cdb.StatusTypeCatalog.index(c.subject)<0) return "Choose a general status type to watch.";
 		if (!AuraConditionValidator.isValidOperator(c.op, d)) return "Choose a valid comparison.";
 		if (!Math.isFinite(c.numberValue)) return "Enter a finite threshold.";
 		var checked = c.clone();
@@ -71,13 +73,17 @@ class AuraQuickBuildRules {
 			default: op;
 		};
 	}
+	public static function comparisonLabel(signal:String,op:String):String {
+		if(StatusTypeDemand.isTypeSignal(signal)) return op=="present" ? "Present" : op=="absent" ? "Absent" : opLabel(op);
+		return opLabel(op);
+	}
 
 	public static function conditionSummary(c:AuraConditionDef):String {
 		var issue = conditionIssue(c);
 		if (issue.length > 0) return issue;
 		var d = AuraSignalCatalog.find(c.signal);
 		var subject = c.subjectLabel.length > 0 ? c.subjectLabel : c.subject;
-		if (d.id == "status.present") return subject + " is " + opLabel(c.op);
+		if (AuraConditionValidator.isStatusPresence(d.id)) return subject + (d.id=="target.status.present" || d.id=="target.statusType.present" ? " on current enemy" : d.id=="statusType.present" ? " on me" : "") + " is " + opLabel(c.op);
 		var label = d.label + (subject.length > 0 ? " (" + subject + ")" : "");
 		var value = switch (d.kind) {
 			case Boolean: c.boolValue ? "true" : "false";

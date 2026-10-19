@@ -18,6 +18,10 @@ class CustomImages {
 	public static inline var MAX_BYTES:Int = 4 * 1024 * 1024;
 
 	static var cachedDir:String = null;
+	/** Optional root used by filesystem tests; otherwise follows the installed mod. */
+	public static var shareRootOverride:String=null;
+	public static function shareDir():String return shareRootOverride!=null ? shareRootOverride : Path.join([ModPaths.modDir(),"aura_shares"]);
+	public static function managedDir():String return Path.join([shareDir(),"_assets"]);
 	static var listed:Array<String> = [];
 	static var scanned = false;
 	static var refreshRequested = true;
@@ -106,13 +110,15 @@ class CustomImages {
 		var defaultPath = defaultDir();
 		displayDir = dir(); folderError = false;
 		var skipped = 0;
-		function scan(directory:String):Void {
+		function scan(directory:String,managed:Bool=false):Void {
 			var files = FileSystem.readDirectory(directory);
 			files.sort(Reflect.compare);
 			for (file in files) {
 				if (Path.extension(file).toLowerCase() != "png") continue;
 				var stem = Path.withoutExtension(file);
 				if (!validStem(stem)) { skipped++; continue; }
+				if (managed && !CustomImageKey.isManagedStem(stem)) continue;
+				if (!managed && CustomImageKey.isManagedStem(stem)) continue;
 				try {
 					var path = Path.join([directory, file]);
 					if (FileSystem.isDirectory(path)) continue;
@@ -132,6 +138,8 @@ class CustomImages {
 				scan(folder);
 			}
 		} catch (_:Dynamic) { folderError = true; }
+		// Managed, content-addressed share keys must not be shadowed by an images-folder choice.
+		try { var managed=managedDir(); if(FileSystem.exists(managed) && FileSystem.isDirectory(managed)) scan(managed,true); } catch(_:Dynamic) {}
 		for (id => label in labels) {
 			out.push(label);
 			changes.set(id, fingerprints.get(id) != nextPrints.get(id));

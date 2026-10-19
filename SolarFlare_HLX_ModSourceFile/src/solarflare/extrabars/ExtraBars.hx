@@ -153,13 +153,13 @@ class ExtraBars {
 		capture.step(down, imgui.ImGui.isKeyPressed(imgui.Enums.ImGuiKey.Escape, false), pressed, ExtraBarsKeyMap.uiModifiers()); captureMessage = capture.message;
 	}
 	public function bindingIssue(barId:String, index:Int, key:Int, mods:Int):String {
-		var details = " [Base " + bindings.describe(key) + "; prefix " + ExtraBarsActivationConfig.prefixLabel(model.prefix) + "; mode " + ExtraBarsActivationConfig.modeLabel(model.mode) + "]";
+		var details = " [Base " + bindings.describe(key) + (model.mode=="always" ? "; no modifier" : "; prefix " + ExtraBarsActivationConfig.prefixLabel(model.prefix)) + "; mode " + ExtraBarsActivationConfig.modeLabel(model.mode) + "]";
 		if (key <= 0) return "";
 		if (mods != 0) return "Ctrl/Alt/Shift remain native. Record a plain bar key." + details;
-		if (model.mode == "long_press") return "Long-press retired; choose Hold or Toggle." + details;
+		if (model.mode == "long_press") return "Long-press retired; choose Hold, Toggle or Always Active." + details;
 		var mapped = ExtraBarsKeyMap.find(key);
 		if (mapped == null) return "Unresolved key." + details;
-		if (key == ExtraBarsKeyMap.prefixCode(model.prefix) || mapped.nativeCode == 13) return "Choose a different key; prefix/chat input is reserved." + details;
+		if ((model.mode != "always" && key == ExtraBarsKeyMap.prefixCode(model.prefix)) || mapped.nativeCode == 13) return "Choose a different key; prefix/chat input is reserved." + details;
 		var native = bindings.conflict(key, 0, true); if (native.length > 0) return native + details;
 		var duplicate=assignments.conflict(barId,index,key);
 		return duplicate.length>0 ? duplicate+details : "";
@@ -215,7 +215,7 @@ class ExtraBars {
 				var issue = bindingIssue(bar.id,i,assignment.keyCode,assignment.modifiers);
 				if (entry == null && assignment.itemKind.length > 0) issue = "Unresolved item: " + assignment.itemKind;
 				var frozen = slots[i]; frozen.update(bar.enabled, entry != null ? entry.name : (assignment.itemKind.length > 0 ? assignment.itemKind + " (unresolved)" : "Empty cell " + (i+1)), entry != null ? ConsumableCatalog.iconKey(entry.id) : "",
-					ExtraBarsActivationConfig.prefixLabel(model.prefix) + " / " + ExtraBarsActivationConfig.modeLabel(model.mode) + " / " + ExtraBarsKeyMap.label(assignment.keyCode,0), issue.length > 0 ? issue : gate,
+					(model.mode == "always" ? "No modifier" : ExtraBarsActivationConfig.prefixLabel(model.prefix)) + " / " + ExtraBarsActivationConfig.modeLabel(model.mode) + " / " + ExtraBarsKeyMap.label(assignment.keyCode,0), issue.length > 0 ? issue : gate,
 					ConsumableCache.find(assignment.itemKind), ExtraBarsActivationConfig.badge(model.prefix,model.mode,ExtraBarsKeyMap.keyHint(assignment.keyCode)));
 				frozen.setInputState(false,model.mode); var until = flashes.get(bar.id + ":" + i); frozen.triggerStrength = gate.length == 0 && until != null ? Math.max(0, Math.min(1,(until-now)/0.30)) : 0;
 				if (assignment.itemKind.length > 0) {
@@ -229,10 +229,10 @@ class ExtraBars {
 			}
 		}
 		spark.observe(hero, model.sparkEnabled, now);
-		var allowed = gate.length == 0 && model.enabled && model.prefix != "off" && model.mode != "long_press" && routes.length > 0;
+		var allowed = gate.length == 0 && model.enabled && ExtraBarsActivationConfig.available(model.prefix,model.mode) && model.mode != "long_press" && routes.length > 0;
 		var requests:Array<ExtraBarsRequest> = [];
 		try {
-			var result = ExtraBarsNativeInput.configureMany(ExtraBarsNativeInput.prefixCode(model.prefix),model.mode == "hold" ? 1 : 2,allowed,generation,keyTable,1024);
+			var result = ExtraBarsNativeInput.configureMany(model.mode == "always" ? 0 : ExtraBarsNativeInput.prefixCode(model.prefix),ExtraBarsActivationConfig.nativeMode(model.mode),allowed,generation,keyTable,1024);
 			if (result < 0) { gate = "Native filter unavailable: " + (result == -1 ? "SFImGui capture API missing" : result == -2 ? "window thread mismatch" : result == -4 ? "invalid key table" : "subclass installation failed"); ExtraBarsNativeInput.reset(); }
 			if (gate.length == 0) for (_ in 0...32) { var token = ExtraBarsNativeInput.take(generation); if (token == 0) break; if (token > 0 && token <= routes.length) requests.push(routes[token-1]); }
 			inputActive = gate.length == 0 && (ExtraBarsNativeInput.status() & 1) != 0;
@@ -247,7 +247,7 @@ class ExtraBars {
 		var bar = model.find(request.barId);
 		if (request.barId == "spark") { if (!model.sparkEnabled || request.kind != SparkCubeTracker.ITEM_ID) return; }
 		else {
-			if (!model.enabled || model.prefix == "off" || bar == null || !bar.enabled || (request.click && bar.hidden) || request.index < 0 || request.index >= bar.slotCount || bar.slots[request.index].itemKind != request.kind) return;
+			if (!model.enabled || !ExtraBarsActivationConfig.available(model.prefix,model.mode) || bar == null || !bar.enabled || (request.click && bar.hidden) || request.index < 0 || request.index >= bar.slotCount || bar.slots[request.index].itemKind != request.kind) return;
 			if (!request.click) { bindings.refresh(now,true); if (bindingIssue(bar.id,request.index,bar.slots[request.index].keyCode,bar.slots[request.index].modifiers).length > 0) { clearTransientState(); return; } }
 		}
 		var outcome = ExtraBarsUsePolicy.request(request.kind,ConsumableCatalog.find(request.kind) != null,request.generation,generation,true,
@@ -285,7 +285,7 @@ class ExtraBars {
 	}
 	public function draw():Void { builder.draw(); }
 	public function drawBar():Void {
-		for (bar in model.bars) if (model.enabled && model.prefix != "off" && bar.enabled && !bar.hidden && views.exists(bar.id)) {
+		for (bar in model.bars) if (model.enabled && ExtraBarsActivationConfig.available(model.prefix,model.mode) && bar.enabled && !bar.hidden && views.exists(bar.id)) {
 			var chrome = chromeFor(bar.id); chrome.locked.set(bar.locked); chrome.transparent.set(bar.transparent);
 			hudBar = bar;
 			overlay.draw(bar,views.get(bar.id),chrome,hudEditFn,hudHideFn,hudClickFn);

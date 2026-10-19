@@ -32,6 +32,7 @@ class AuraCatalog {
 	}
 	/** Status instances use skill IDs; statustype is broad category. */
 	public static function matchesSubject(entryKind:String, subjectKind:String):Bool {
+		if (subjectKind == "statusType") return entryKind == "statustype";
 		if (subjectKind == "weapon") return entryKind == "weapon";
 		if (subjectKind == "consumable") return entryKind == "consumable";
 		if (subjectKind == "unit") return entryKind == "unit";
