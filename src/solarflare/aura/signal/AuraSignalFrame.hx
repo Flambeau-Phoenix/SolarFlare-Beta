@@ -9,6 +9,8 @@ class AuraSignalFrame {
 	public var builtAt:Float = 0;
 	/** Aura id -> is currently showing. Filled by AuraStates after the aura pass, before state rules run. */
 	public var auraShowing:Map<String, Bool> = new Map();
+	/** Aura id -> its latest rule result, so a state can watch one condition ("aura.condition", subject "id#n"). */
+	public var auraRules:Map<String, AuraRuleResult> = new Map();
 	public var heroKnown:Bool = false;
 	public var healthCurrent:Float = 0;
 	public var healthRatio:Float = 0;

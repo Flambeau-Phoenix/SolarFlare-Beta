@@ -72,6 +72,8 @@ class GameIcons {
 	static var statusAliases = new Map<String, String>();
 	static var atlasSheetCount:Int = 0;
 
+	/** Custom images only: outline loops of the visible shape, in the image's unit square (see AuraAlphaContour). */
+	static var contours = new Map<String, Array<Array<Float>>>();
 	static var dimW = new Map<String, Int>();
 	static var dimH = new Map<String, Int>();
 
@@ -446,7 +448,7 @@ class GameIcons {
 	public static function invalidateCustomImage(id:String, changed:Bool = true):Void {
 		if (id == null || !StringTools.startsWith(id, CustomImageKey.PREFIX)) return;
 		failed.remove(id); requested.remove(id);
-		if (changed) { cache.remove(id); dimW.remove(id); dimH.remove(id); }
+		if (changed) { cache.remove(id); dimW.remove(id); dimH.remove(id); contours.remove(id); }
 	}
 	/** One pass over retained custom keys also handles old/share keys with different filename casing. */
 	public static function refreshCustomImages(changes:Map<String, Bool>):Void {
@@ -653,6 +655,9 @@ class GameIcons {
 		return bytes.sub(bestOffset, bestLength);
 	}
 
+	/** Outline loops (unit square, solid side on the left) for a loaded custom image; null until it has loaded. */
+	public static function contourFor(id:String):Array<Array<Float>> return id == null ? null : contours.get(id);
+
 	static function loadFilePng(path:String, id:String, maxDim:Int = 0):TextureHandle {
 		#if !hl
 		return 0;
@@ -675,6 +680,11 @@ class GameIcons {
 			var bgra = Tools.extract32(data);
 			if (bgra == null || bgra.length < header.width * header.height * 4)
 				return 0;
+			// Found once per load, never while drawing: the outline layer effect follows the picture's visible shape.
+			if (maxDim > 0) {
+				try contours.set(id, solarflare.aura.AuraAlphaContour.trace(bgra, header.width, header.height))
+				catch (_:Dynamic) contours.remove(id);
+			}
 			var rgba = haxe.io.Bytes.alloc(bgra.length);
 			var i = 0;
 			var n = bgra.length;

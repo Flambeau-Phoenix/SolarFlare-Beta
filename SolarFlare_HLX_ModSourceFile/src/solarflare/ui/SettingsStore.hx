@@ -292,7 +292,7 @@ class SettingsStore {
 
 	static function dumpCore(cfg:ConfigPanel):Dynamic {
 		lastCaptureWarning = "";
-		var data:Dynamic = {v: VERSION, activeTheme: activeTheme,preventCtrlFullscreen:cfg.preventCtrlFullscreen.get()};
+		var data:Dynamic = {v: VERSION, activeTheme: activeTheme,preventCtrlFullscreen:cfg.preventCtrlFullscreen.get(),blockClickThrough:cfg.blockClickThrough.get()};
 		assignDump(data, "customTheme", function() return ThemePalette.dumpCustom());
 		assignDump(data, "uiPack", function() return cfg.uiPack != null ? cfg.uiPack.dump() : {id: "custom"});
 		assignDump(data, "nativeHide", function() return cfg.nativeHide.dump());
@@ -783,6 +783,7 @@ class SettingsStore {
 		if (data == null)
 			return;
 		cfg.preventCtrlFullscreen.set(Reflect.field(data,"preventCtrlFullscreen")==true);
+		cfg.blockClickThrough.set(Reflect.field(data,"blockClickThrough")!=false);
 		CustomImages.apply(Reflect.field(data, "customImages"));
 		if (cfg.uiPack != null)
 			cfg.uiPack.apply(Reflect.field(data, "uiPack"));

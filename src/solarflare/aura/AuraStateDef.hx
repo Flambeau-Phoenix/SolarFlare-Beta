@@ -10,7 +10,7 @@ import solarflare.aura.signal.AuraRuleResult;
  * may override position, size, colour, opacity and rotation per state.
  */
 class AuraStateDef {
-	public static inline var MAX_STATES:Int = 8;
+	public static inline var MAX_STATES:Int = 24;
 	public static inline var MAX_NAME:Int = 32;
 
 	public var id:String;
@@ -65,6 +65,43 @@ class AuraStateDef {
 			if (!taken) return id;
 			n++;
 		}
+	}
+
+	/** "Name copy", then "Name copy 2"... whichever no look is using, kept within MAX_NAME. */
+	public static function copyName(states:Array<AuraStateDef>, base:String):String {
+		var root = base.length > MAX_NAME - 7 ? base.substr(0, MAX_NAME - 7) : base;
+		var n = 1;
+		while (true) {
+			var candidate = root + " copy" + (n > 1 ? " " + n : "");
+			var taken = false;
+			for (s in states) if (s.name == candidate) { taken = true; break; }
+			if (!taken) return candidate;
+			n++;
+		}
+	}
+
+	/**
+	 * Copies a look: its trigger rule, plus every layer's membership and per-look overrides. The copy goes right
+	 * after the original (looks are checked in order) and shares nothing with it. Null at the look limit or when
+	 * `sourceId` is unknown.
+	 */
+	public static function duplicate(states:Array<AuraStateDef>, elements:Array<AuraCanvasElement>, sourceId:String):AuraStateDef {
+		var src = find(states, sourceId);
+		if (src == null || states.length >= MAX_STATES) return null;
+		var copy = new AuraStateDef(uniqueId(states), copyName(states, src.name));
+		var rule = AuraRuleCodec.fromDyn(AuraRuleCodec.toObj(src.rule));
+		if (rule != null) copy.rule = rule;
+		states.insert(states.indexOf(src) + 1, copy);
+		if (elements != null) for (el in elements) {
+			if (el == null) continue;
+			if (el.inStates != null && el.inStates.indexOf(sourceId) >= 0 && el.inStates.indexOf(copy.id) < 0) el.inStates.push(copy.id);
+			var o = el.ov(sourceId);
+			if (o != null && !o.isEmpty()) {
+				if (el.overrides == null) el.overrides = new Map();
+				el.overrides.set(copy.id, o.clone());
+			}
+		}
+		return copy;
 	}
 
 	public static function find(states:Array<AuraStateDef>, id:String):AuraStateDef {

@@ -32,6 +32,9 @@ class ExtraBars {
 	public var lastResult(default, null):String = "No request yet.";
 	public var generation(default, null):Int = 0;
 	public var inputActive(default, null):Bool = false;
+	/** One line saying whether the keys are live and, when not, exactly why (shown in the builder and on cells). */
+	public var armReason(default, null):String = "";
+	var firstIssue:String = "";
 	public var views(default, null):Map<String, Array<ExtraBarsPrototypeSlot>> = new Map();
 	public var catalog(default, null):Array<{id:String, name:String, category:String, icon:String, count:Int, known:Bool, owned:Bool}> = [];
 	public var spark = new SparkCubeTracker();
@@ -185,7 +188,9 @@ class ExtraBars {
 		var current = model.activationSignature();
 		if (hero != previousHero || current != signature) {
 			var retired=[for(id in views.keys()) if(model.find(id)==null) id]; for(id in retired) views.remove(id);
-			clearTransientState(); if (hero != previousHero) spark.reset(); previousHero = hero; signature = current; countChecks = []; }
+			clearTransientState(); if (hero != previousHero) spark.reset(); previousHero = hero; signature = current; countChecks = [];
+			// Changing the activation mode or keys must not wait for the periodic native binding re-read.
+			bindings.refresh(now, true); }
 		assignments.rebuild(model);
 		var captured = capture.takeKey();
 		if (captured > 0) {
@@ -206,7 +211,7 @@ class ExtraBars {
 			countChecks = remaining;
 		}
 		if (gate != previousGate) { clearTransientState(); previousGate=gate; }
-		routes = []; for (i in 0...256) keyTable.setI32(i*4,0);
+		routes = []; firstIssue = ""; for (i in 0...256) keyTable.setI32(i*4,0);
 		for (bar in model.bars) {
 			if (!views.exists(bar.id)) views.set(bar.id, [for (i in 0...10) new ExtraBarsPrototypeSlot()]);
 			var slots = views.get(bar.id);
@@ -214,6 +219,7 @@ class ExtraBars {
 				var assignment = bar.slots[i]; var entry = ConsumableCatalog.find(assignment.itemKind);
 				var issue = bindingIssue(bar.id,i,assignment.keyCode,assignment.modifiers);
 				if (entry == null && assignment.itemKind.length > 0) issue = "Unresolved item: " + assignment.itemKind;
+					if (firstIssue.length == 0 && bar.enabled && i < bar.slotCount && assignment.itemKind.length > 0 && assignment.keyCode > 0 && issue.length > 0) firstIssue = "Cell " + (i + 1) + " of " + bar.id + ": " + issue;
 				var frozen = slots[i]; frozen.update(bar.enabled, entry != null ? entry.name : (assignment.itemKind.length > 0 ? assignment.itemKind + " (unresolved)" : "Empty cell " + (i+1)), entry != null ? ConsumableCatalog.iconKey(entry.id) : "",
 					(model.mode == "always" ? "No modifier" : ExtraBarsActivationConfig.prefixLabel(model.prefix)) + " / " + ExtraBarsActivationConfig.modeLabel(model.mode) + " / " + ExtraBarsKeyMap.label(assignment.keyCode,0), issue.length > 0 ? issue : gate,
 					ConsumableCache.find(assignment.itemKind), ExtraBarsActivationConfig.badge(model.prefix,model.mode,ExtraBarsKeyMap.keyHint(assignment.keyCode)));
@@ -237,6 +243,8 @@ class ExtraBars {
 			if (gate.length == 0) for (_ in 0...32) { var token = ExtraBarsNativeInput.take(generation); if (token == 0) break; if (token > 0 && token <= routes.length) requests.push(routes[token-1]); }
 			inputActive = gate.length == 0 && (ExtraBarsNativeInput.status() & 1) != 0;
 		} catch (e:Dynamic) { gate = "Input unavailable: " + Std.string(e); inputActive = false; ExtraBarsNativeInput.reset(); }
+		var nativeBits = 0; try nativeBits = ExtraBarsNativeInput.status() catch (_:Dynamic) {}
+		armReason = ExtraBarsActivationConfig.describeArming(model.enabled, ExtraBarsActivationConfig.available(model.prefix, model.mode), gate, routes.length, firstIssue, inputActive, nativeBits, model.mode);
 		for (bar in model.bars) for (slot in views.get(bar.id)) slot.setInputState(inputActive && bar.enabled,model.mode);
 		if (gate.length > 0) { clicks = []; flashes.clear(); for (slots in views) for (slot in slots) slot.triggerStrength = 0; }
 		for (click in clicks) requests.push(click); clicks = [];

@@ -15,6 +15,7 @@ import solarflare.ui.ByteUtil;
 import solarflare.ui.SettingsStore;
 import solarflare.ui.ThemePalette;
 import solarflare.ui.UiChrome;
+import solarflare.ui.UiLayout;
 import solarflare.ui.UiScope;
 import solarflare.ui.WindowEffects;
 
@@ -313,12 +314,26 @@ class AuraConditionEditor {
 			drawSubjectInline(a, c, ui, d.subjectKind, tag, bossFocusId);
 		}
 
-		if (d != null) {
+		if (d != null && d.id == "dash.charges") {
+			UiLayout.propertyGrid("##cond_dash_properties_" + tag, function() {
+				UiLayout.propertyRow("Comparison", function() {
+					drawOperatorInline(c, ui, d, tag, a.snapshot, -1);
+				});
+				UiLayout.propertyRow("Value (dashes)", function() {
+					if (solarflare.ui.NumberField.draw("##cond_cnt_" + tag, ui.numberRef, 0, 9999, "%.0f", a.snapshot)) {
+						ui.numberRef.set(Math.round(ui.numberRef.get()));
+						ui.pull(c);
+						ui.flashContext();
+						SettingsStore.markDirty();
+					}
+				});
+			});
+		} else if (d != null) {
 			if (!compact) ImGui.sameLine();
 			drawOperatorInline(c, ui, d, tag, a.snapshot);
 		}
 
-		if (d != null && !AuraConditionValidator.isStatusPresence(d.id)) {
+		if (d != null && d.id != "dash.charges" && !AuraConditionValidator.isStatusPresence(d.id)) {
 			ImGui.sameLine();
 			switch (d.kind) {
 				case Boolean:
@@ -389,7 +404,7 @@ class AuraConditionEditor {
 		return remove;
 	}
 
-	static function drawOperatorInline(c:AuraConditionDef, ui:AuraConditionUiState, d:AuraSignalDescriptor, tag:String, beforeEdit:Void->Void):Void {
+	static function drawOperatorInline(c:AuraConditionDef, ui:AuraConditionUiState, d:AuraSignalDescriptor, tag:String, beforeEdit:Void->Void, width:Single = 104):Void {
 		var ops:Array<String>;
 		// status.present is Boolean-kinded but AuraConditionValidator.isValidOperator
 		// accepts only present/absent for it. Without this case the generic Boolean
@@ -408,7 +423,7 @@ class AuraConditionEditor {
 
 		var label = friendlyOp(c.op);
 		if (label.length == 0) label = c.op;
-		ImGui.setNextItemWidth(104);
+		ImGui.setNextItemWidth(width);
 		if (ImGui.beginCombo("##cond_op_" + tag, label)) {
 			for (op in ops) {
 				if (ImGui.selectable(friendlyOp(op) + "##op_" + tag + op, c.op == op)) {
@@ -493,6 +508,9 @@ class AuraConditionEditor {
 	/** Other auras a condition may watch (group mates first); installed by the Aura Builder. */
 	public static var auraChoices:Void->Array<{id:String, name:String}> = null;
 
+	/** Summaries of one aura's conditions, in order; installed by the Aura Builder. */
+	public static var auraConditionChoices:String->Array<String> = null;
+
 	static function auraName(id:String):String {
 		if (auraChoices != null) for (r in auraChoices()) if (r.id == id) return r.name;
 		return null;
@@ -500,6 +518,10 @@ class AuraConditionEditor {
 
 	static function subjectName(c:AuraConditionDef):String {
 		if (c.signal == "aura.active") { var n = auraName(c.subject); if (n != null) return n; }
+		if (c.signal == "aura.condition") {
+			var ref = AuraSignalReader.splitConditionSubject(c.subject);
+			if (ref != null) { var n = auraName(ref.id); return (n != null ? n : ref.id) + " #" + (ref.index + 1); }
+		}
 		// subjectLabel is the stable user-facing identity selected in the catalog.
 		// `subject` may intentionally be rewritten to an engine status id.
 		if (solarflare.cdb.AuraCatalog.validName(c.subjectLabel)) return c.subjectLabel;
@@ -511,10 +533,11 @@ class AuraConditionEditor {
 	static function drawSubjectInline(a:AuraRuleEditorContext, c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String, bossFocusId:String):Void {
 		var name = subjectName(c);
 		if (name.length > 0) c.subjectLabel = name;
+		var kindLabel = kind == "auraCondition" ? "aura condition" : kind;
 
 		// Same beginCombo pattern as AuraBuilder.drawWizardCatalogPicker / signal combo.
 		// ghostButton+popup inside AutoResizeY condition cards eats clicks and sticks.
-		var previewText = name.length > 0 ? name : "Select " + kind + "â€¦";
+		var previewText = name.length > 0 ? name : "Select " + kindLabel + "â€¦";
 		ImGui.setNextItemWidth(210);
 		ImGui.setNextWindowSize(ImGui.vec2(480, 420), ImGuiCond.Always);
 		if (!ImGui.beginCombo("##cond_subj_" + tag, previewText)) {
@@ -526,7 +549,7 @@ class AuraConditionEditor {
 			if (ImGui.isItemHovered() && c.subject != null && c.subject.length > 0)
 				ImGui.setTooltip(c.subjectLabel + " [" + c.subject + "]");
 
-			ImGui.text("Search " + kind + " catalog");
+			ImGui.text("Search " + kindLabel + " catalog");
 			if (ImGui.inputText("##cond_subj_search_" + tag, ui.searchBuf, AuraConditionUiState.SEARCH_BUF))
 				ui.search = ByteUtil.readString(ui.searchBuf, AuraConditionUiState.SEARCH_BUF, true).toLowerCase();
 			if (kind == "weapon" && ui.search.length > 0 && ImGui.smallButton("Use typed weapon ID##cond_weapon_id_" + tag)) {
@@ -555,6 +578,28 @@ class AuraConditionEditor {
 	}
 
 	static function drawSubjectList(c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String, bossFocusId:String, beforeEdit:Void->Void):Void {
+		if (kind == "auraCondition") {
+			var shown = 0;
+			for (r in (auraChoices != null ? auraChoices() : [])) {
+				var rows = auraConditionChoices != null ? auraConditionChoices(r.id) : [];
+				if (rows.length == 0) continue;
+				var matches = ui.search.length == 0 || r.name.toLowerCase().indexOf(ui.search) >= 0;
+				var header = false;
+				for (i in 0...rows.length) {
+					if (!matches && rows[i].toLowerCase().indexOf(ui.search) < 0) continue;
+					if (!header) { ImGui.separatorText(r.name); header = true; }
+					var subject = r.id + "#" + (i + 1);
+					if (ImGui.selectable("#" + (i + 1) + "  " + rows[i] + "##auracond_pick_" + r.id + "_" + i, c.subject == subject)) {
+						if (beforeEdit != null) beforeEdit();
+						c.subject = subject; c.subjectLabel = r.name + " #" + (i + 1);
+						ui.sync(c); ui.flashContext(); SettingsStore.markDirty(); ImGui.closeCurrentPopup();
+					}
+					shown++;
+				}
+			}
+			if (shown == 0) ImGui.textDisabled("No other aura has conditions yet.");
+			return;
+		}
 		if (kind == "aura") {
 			var shown = 0;
 			for (r in (auraChoices != null ? auraChoices() : [])) {

@@ -28,4 +28,16 @@ class ExtraBarsActivationConfig {
 	public static function available(prefix:String,mode:String):Bool return mode == "always" || prefix != "off";
 	public static function nativeMode(mode:String):Int return switch(mode) { case "hold": 1; case "toggle": 2; case "always": 3; default: 0; };
 	public static function threshold(value:Int):Int return Std.int(Math.max(100, Math.min(2000, value)));
+
+	/** Plain-words state of the key filter. Native-free logic lives here so it can be tested. */
+	public static function describeArming(enabled:Bool, available:Bool, gate:String, routeCount:Int, firstIssue:String, active:Bool, nativeBits:Int, mode:String):String {
+		var label = modeLabel(mode);
+		if (!enabled) return label + ": ExtraBars is switched off (All bars enabled).";
+		if (!available) return label + ": choose an activation modifier.";
+		if (gate.length > 0) return label + ": paused. " + gate;
+		if (routeCount == 0) return label + ": no key is live. " + (firstIssue.length > 0 ? firstIssue : "Assign an item and a key to a cell of an enabled bar.");
+		if (active) return label + ": live on " + routeCount + " key" + (routeCount == 1 ? "" : "s") + ".";
+		if ((nativeBits & 2) != 0) return label + ": waiting until every assigned key and modifier is released.";
+		return label + ": the native key filter is not armed yet (" + routeCount + " key" + (routeCount == 1 ? "" : "s") + " ready). If this stays, alt-tab out and back in, then check for a native key conflict.";
+	}
 }

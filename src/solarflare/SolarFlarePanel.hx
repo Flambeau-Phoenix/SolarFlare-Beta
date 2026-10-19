@@ -133,6 +133,7 @@ class SolarFlarePanel {
 	}
 
 	var prevCursorFree:Bool = true;
+	var cameraPolicy = new solarflare.ui.CameraTransitionPolicy();
 	var castTimesShutdownFlushed:Bool = false;
 
 	/** UI assets also load at the title screen, before GameApp exists. */
@@ -158,12 +159,21 @@ class SolarFlarePanel {
 
 		CursorCaptureFix.apply(app);
 		solarflare.ui.FullscreenShortcutGuard.observe(config);
+		solarflare.ui.MouseGuard.observe(config.blockClickThrough.get() && CursorCaptureFix.keyboardCaptureActive);
 		// Every independently retained editor closes on entry to camera mode.
 		// An open editor cannot exempt itself: NoMouse alone leaves its lifetime
 		// and drag/text state alive behind the hidden cursor.
-		var enteringCamera = prevCursorFree && !CursorCaptureFix.cursorFree;
+		// Alt-tabbing makes the game drop (and later retake) the free cursor too; that must not close anything.
+		var focused = true;
+		try focused = hxd.Window.getInstance().get_isFocused() catch (_:Dynamic) {}
+		var now = haxe.Timer.stamp();
+		cameraPolicy.note(now, focused);
+		var cursorLeft = prevCursorFree && !CursorCaptureFix.cursorFree;
+		var enteringCamera = cameraPolicy.closesWindows(prevCursorFree, CursorCaptureFix.cursorFree, now, focused);
 		if (enteringCamera) {
 			try config.closeInteractiveWindows() catch (_:Dynamic) {}
+		} else if (cursorLeft) {
+			try config.clearTransientState() catch (_:Dynamic) {}
 		}
 		prevCursorFree = CursorCaptureFix.cursorFree;
 

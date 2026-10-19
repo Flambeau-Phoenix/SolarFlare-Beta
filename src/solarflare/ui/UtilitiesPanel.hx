@@ -126,6 +126,16 @@ class UtilitiesPanel {
 		});
 	}
 
+	public static function drawClickThrough(enabled:imgui.ref.BoolRef):Void {
+		UiLayout.propertyGrid("##util_clickthrough_properties",function() {
+			UiLayout.propertyRow("Block click-through",function() {
+				if(ImGui.checkbox("Clicks on SolarFlare windows do not reach the game##sf_block_click",enabled)) SettingsStore.markDirty();
+			},"While a SolarFlare tool is open, clicks and scrolling over its windows stay in the window instead of also pressing game buttons underneath.");
+		});
+		if(enabled.get() && MouseGuard.status<0)
+			ImGui.textWrapped("Click guard unavailable: update sfcursor.hdll and restart Farever (code "+MouseGuard.status+").");
+	}
+
 	public static function drawFullscreenShortcut(enabled:imgui.ref.BoolRef):Void {
 		UiLayout.propertyGrid("##util_fullscreen_properties",function() {
 			UiLayout.propertyRow("Ctrl+F protection",function() {

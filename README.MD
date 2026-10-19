@@ -1,7 +1,7 @@
 
 ![solargif](solar.gif)
 
-# SolarFlare — v4.0b (Beta)
+# SolarFlare — v5.5b (Beta)
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
 ![HiddenUI](HiddenUI.png)
 ![CallToGlory](WarCallToGlory.png)
@@ -31,17 +31,18 @@
 
 ---
 
-## Solar Flare v4.1b - Quick Cast
+# ---- *** UPDATE: SFCursor.hdll !!  ----
+# Solar Flare v5.5b - Canvas Editor Improvements + UI Fixes
+[GitHub](https://github.com/Flambeau-Phoenix/SolarFlare-Beta/releases/tag/v5.5b) || [Vortex](https://www.nexusmods.com/farever/mods/12?tab=files)
 
-- Added Utilities button on the f6 panel
-- Removed NativeUI settings panel
-- Moved the native action bar toggle to Utilities f6 panel settings
-- Added Quick Cast toggle to utilities f6 panel settings
-- Fix an issue where some statuses didn't appear on the status board
-- Removed DevLog recorder from public release
-- Added multiple new chaincast designs
-- Added aura condition triggers: Entering & Leaving Combat
-- Added the Menu Visibility Toggle to the Utilities f6 panel settings
+- Increased limits for SVG assets in Canvas Builder (64 -> 512 points per node)
+- Added native binding to ExtraBars so "Always Active" setting works
+- Added click-through protection for Solar Flare windows
+- Added a fix to keep Solar Flare UI windows open upon alt tabbing back into game
+- Added "Round Whole Number" option for timer displays
+- Custom sound ques can be added and exported via the "custom_sounds" folder
+- Fixed an issue where "Dashes left" field didn't appear in the Aura condition
+
 
 ---
 

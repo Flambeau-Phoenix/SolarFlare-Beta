@@ -83,6 +83,7 @@ class AuraSignalReader {
 			case "combat.damageTakenRecent": number(out, frame.damageTakenKnown, frame.damageTakenRecent);
 			case "combat.inCombat": bool(out, frame.combatKnown, frame.inCombat);
 			case "aura.active": bool(out, frame.auraShowing.exists(subject), frame.auraShowing.get(subject) == true);
+			case "aura.condition": auraCondition(frame, subject, out);
 			case "event.combat.entered":
 				duration(out, frame.combatKnown, frame.combatEnteredAge);
 				out.timeLeft = Math.NaN; // elapsed, never buff remaining
@@ -165,6 +166,22 @@ class AuraSignalReader {
 	static function percent(o:AuraResolvedValue, known:Bool, v:Float, left:Float = -1):Void { o.kind = Percent; setNumber(o, known, v); o.progress = v; o.timeLeft = left >= 0 ? left : Math.NaN; }
 	static function duration(o:AuraResolvedValue, known:Bool, v:Float, prog:Float = -1):Void { o.kind = Duration; setNumber(o, known, v); o.timeLeft = v; o.progress = prog >= 0 ? prog : Math.NaN; }
 	static function count(o:AuraResolvedValue, known:Bool, v:Int, prog:Float = -1):Void { o.kind = Count; o.known = known; o.intValue = v; o.numberValue = v; o.progress = prog >= 0 ? prog : Math.NaN; o.code = known ? OK : UNKNOWN_DOMAIN; }
+	/** Subject "auraId#n" (n counts from 1, as the editor lists conditions). Unknown until that condition has a known answer. */
+	public static function splitConditionSubject(subject:String):{id:String, index:Int} {
+		var at = subject == null ? -1 : subject.lastIndexOf("#");
+		if (at <= 0) return null;
+		var n = Std.parseInt(subject.substr(at + 1));
+		return n == null || n < 1 ? null : {id: subject.substr(0, at), index: n - 1};
+	}
+
+	static function auraCondition(frame:AuraSignalFrame, subject:String, out:AuraResolvedValue):Void {
+		var ref = splitConditionSubject(subject);
+		if (ref == null) { out.code = MISSING_SUBJECT; return; }
+		var r = frame.auraRules.get(ref.id);
+		var c = r != null && ref.index < r.totalCount && ref.index < r.conditions.length ? r.conditions[ref.index] : null;
+		bool(out, c != null && c.known, c != null && c.hit);
+	}
+
 	static function bool(o:AuraResolvedValue, known:Bool, v:Bool):Void { o.kind = Boolean; o.known = known; o.boolValue = v; o.present = v; o.code = known ? OK : UNKNOWN_DOMAIN; }
 	static function setNumber(o:AuraResolvedValue, known:Bool, v:Float):Void { o.known = known && Math.isFinite(v); o.numberValue = v; o.code = o.known ? OK : (known ? NON_FINITE : UNKNOWN_DOMAIN); }
 }

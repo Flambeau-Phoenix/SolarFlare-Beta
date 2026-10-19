@@ -37,7 +37,15 @@ class AuraSharePlan {
  static function remapAuraConditions(rule:Dynamic,map:Map<String,String>):Void {
   if(rule==null || !Std.isOfType(rule.conditions,Array)) return;
   var cs:Array<Dynamic>=cast rule.conditions;
-  for(c in cs) if(c!=null && c.signal=="aura.active" && Std.isOfType(c.subject,String) && map.exists(c.subject)) c.subject=map.get(c.subject);
+  for(c in cs) {
+   if(c==null || !Std.isOfType(c.subject,String)) continue;
+   if(c.signal=="aura.active" && map.exists(c.subject)) c.subject=map.get(c.subject);
+   else if(c.signal=="aura.condition") {
+    // Subject is "auraId#n": only the id before the last # follows the import's id remap.
+    var ref=solarflare.aura.signal.AuraSignalReader.splitConditionSubject(c.subject);
+    if(ref!=null && map.exists(ref.id)) c.subject=map.get(ref.id)+"#"+(ref.index+1);
+   }
+  }
  }
  static function allocate(base:String,taken:Map<String,Bool>,max:Int):String {
   var root=boundedId(base,max); var id=root; var n=2;

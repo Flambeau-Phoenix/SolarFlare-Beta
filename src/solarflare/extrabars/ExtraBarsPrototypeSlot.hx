@@ -36,7 +36,7 @@ class ExtraBarsPrototypeSlot {
 	public function new() {}
 	public function setInputState(active:Bool, mode:String):Void {
 		inputActive = active && (mode == "hold" || mode == "toggle" || mode == "always");
-		inputLabel = (mode == "hold" ? "Hold" : "Toggle") + (inputActive ? " ON" : " OFF");
+		inputLabel = (mode == "hold" ? "Hold" : (mode == "always" ? "Always" : "Toggle")) + (inputActive ? " ON" : " OFF");
 		inputDetail = inputActive ? "ExtraBars keys active" : "Native keys active";
 	}
 	public function update(enabled:Bool, name:String, icon:String, binding:String, reason:String, signal:ConsumableSignalSnap, keyHint:String = "", modifierHint:String = ""):Void {

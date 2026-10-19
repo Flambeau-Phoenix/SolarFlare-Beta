@@ -155,6 +155,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		canvasEditor = new solarflare.aura.ui.CanvasEditor(this);
 		undoCoordinator = new AuraUndoCoordinator(undoManager, snapshotJson, captureCanvasById, restoreSnapshot, restoreCanvas);
 		solarflare.aura.signal.AuraConditionEditor.auraChoices = auraChoicesForConditions;
+		solarflare.aura.signal.AuraConditionEditor.auraConditionChoices = auraConditionSummaries;
 		sharePanel=new solarflare.aura.ui.AuraSharePanel(shareService,queueShareScope,queueShareInspect,queueShareImport);
 		glowColBuf = ImGui.v4(1, 0.53, 0, 1);
 		solarflare.ui.ByteUtil.clearBytes(iconSearchBuf, 80);
@@ -2877,6 +2878,12 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		var b = Std.int(Math.max(0, Math.min(1, glowColBuf.getF32(8))) * 255);
 		var al = Std.int(Math.max(0, Math.min(1, glowColBuf.getF32(12))) * 255);
 		return (al << 24) | (r << 16) | (g << 8) | b;
+	}
+
+	/** One line per condition of the aura with this id, for the "A condition of another aura" picker. */
+	function auraConditionSummaries(id:String):Array<String> {
+		for (o in cfg.auras) if (o != null && o.id == id) return o.rule == null ? [] : [for (c in o.rule.conditions) AuraConditionEditor.humanConditionSummary(c)];
+		return [];
 	}
 
 	/** Every other aura, display-group mates first, for the "Another aura is showing" condition. */

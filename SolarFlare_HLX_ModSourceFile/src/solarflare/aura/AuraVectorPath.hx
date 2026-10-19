@@ -7,7 +7,7 @@ package solarflare.aura;
 typedef PathNode = {x:Float, y:Float, ix:Float, iy:Float, ox:Float, oy:Float};
 
 /** Result of reading SVG path data. `error` is empty on success. */
-typedef SvgImport = {paths:Array<AuraVectorPath>, aspect:Float, error:String};
+typedef SvgImport = {paths:Array<AuraVectorPath>, aspect:Float, error:String, ?note:String};
 
 /**
  * Editable vector outline for the freeform canvas. Coordinates live in the unit square of the layer's box, so
@@ -15,10 +15,16 @@ typedef SvgImport = {paths:Array<AuraVectorPath>, aspect:Float, error:String};
  * saving are unit tested without the game.
  */
 class AuraVectorPath {
-	public static inline var MAX_NODES:Int = 64;
-	public static inline var MAX_SUBPATHS:Int = 16;
+	public static inline var MAX_NODES:Int = 512;
+	public static inline var MAX_SUBPATHS:Int = 32;
+	/** Longest SVG text accepted. */
+	public static inline var MAX_SVG_CHARS:Int = 200000;
+	/** Points a single shape may have while SVG text is being read; imports above MAX_NODES are simplified. */
+	public static inline var PARSE_NODES:Int = 20000;
 	/** Line segments used for each curved segment when flattening. */
 	public static inline var CURVE_STEPS:Int = 8;
+	/** Upper bound on points returned by flatPoints(): 512 nodes x 2 steps, 256 x 4, 96 x 8, plus slack. */
+	public static inline var MAX_FLAT_POINTS:Int = 1100;
 	static inline var COORD_MIN:Float = -4;
 	static inline var COORD_MAX:Float = 5;
 
@@ -51,6 +57,8 @@ class AuraVectorPath {
 		var n = nodes.length;
 		if (n > 0) out.push(nodes[0].x); if (n > 0) out.push(nodes[0].y);
 		var segments = closed ? n : n - 1;
+		// Dense outlines get fewer steps per curve so a drawn path never exceeds MAX_FLAT_POINTS.
+		var steps = n > 256 ? 2 : (n > 96 ? 4 : CURVE_STEPS);
 		for (i in 0...(segments < 0 ? 0 : segments)) {
 			var a = nodes[i], b = nodes[(i + 1) % n];
 			if (closed && i == n - 1 && n < 2) break;
@@ -59,16 +67,30 @@ class AuraVectorPath {
 				if (!(closed && i == n - 1)) { out.push(b.x); out.push(b.y); }
 				continue;
 			}
-			for (k in 1...CURVE_STEPS + 1) {
-				var t = k / CURVE_STEPS, u = 1 - t;
+			for (k in 1...steps + 1) {
+				var t = k / steps, u = 1 - t;
 				var w0 = u * u * u, w1 = 3 * u * u * t, w2 = 3 * u * t * t, w3 = t * t * t;
-				if (closed && i == n - 1 && k == CURVE_STEPS) break;
+				if (closed && i == n - 1 && k == steps) break;
 				out.push(w0 * a.x + w1 * a.ox + w2 * b.ix + w3 * b.x);
 				out.push(w0 * a.y + w1 * a.oy + w2 * b.iy + w3 * b.y);
 			}
 		}
 		flatCache = out;
 		return out;
+	}
+
+	/**
+	 * Replaces the outline with a straight-edged copy of at most `max` points when it has more. Returns the
+	 * number of points removed (0 when nothing changed).
+	 */
+	public function simplifyTo(max:Int):Int {
+		if (nodes.length <= max) return 0;
+		var before = nodes.length;
+		var red = AuraPolyline.reduceTo(flatPoints(), closed, max);
+		nodes = [for (i in 0...(red.length >> 1)) {x: red[i * 2], y: red[i * 2 + 1], ix: red[i * 2], iy: red[i * 2 + 1], ox: red[i * 2], oy: red[i * 2 + 1]}];
+		if (closed && nodes.length < 3) closed = false;
+		invalidate();
+		return before - nodes.length;
 	}
 
 	// ---- Editing -----------------------------------------------------------------------------
@@ -294,12 +316,19 @@ class AuraVectorPath {
 	public static function fromSvg(data:String):SvgImport {
 		var fail = function(msg:String):SvgImport return {paths: [], aspect: 1, error: msg};
 		if (data == null || StringTools.trim(data).length == 0) return fail("Paste SVG path data (the d=\"...\" value).");
-		if (data.length > 20000) return fail("That path is too long. Simplify it first.");
+		if (data.length > MAX_SVG_CHARS) return fail("That path is too long (over " + MAX_SVG_CHARS + " characters). Simplify it first.");
 		var parser = new SvgParser(data);
 		var subs = parser.parse();
 		if (parser.error.length > 0) return fail(parser.error);
 		var usable = [for (s in subs) if (s.nodes.length >= 2) s];
 		if (usable.length == 0) return fail("No drawable path found in that text.");
+		// A busy drawing is thinned to the point limit instead of being refused.
+		var thinned = 0, from = 0, to = 0;
+		for (s in usable) {
+			var had = s.nodes.length;
+			if (s.simplifyTo(MAX_NODES) > 0) { thinned++; from = Std.int(Math.max(from, had)); to = Std.int(Math.max(to, s.nodes.length)); }
+		}
+		var note = thinned > 0 ? "Simplified " + thinned + " shape" + (thinned == 1 ? "" : "s") + " to fit the " + MAX_NODES + " point limit (largest " + from + " -> " + to + " points)." : "";
 		var minX = 1e30, minY = 1e30, maxX = -1e30, maxY = -1e30;
 		for (s in usable) {
 			var f = s.flatPoints();
@@ -317,7 +346,7 @@ class AuraVectorPath {
 			s.invalidate();
 		}
 		var aspect = h > 1e-9 && w > 1e-9 ? w / h : (w > 1e-9 ? 20 : 1);
-		return {paths: usable, aspect: Math.max(0.05, Math.min(20, aspect)), error: ""};
+		return {paths: usable, aspect: Math.max(0.05, Math.min(20, aspect)), error: "", note: note};
 	}
 }
 
@@ -399,7 +428,7 @@ private class SvgParser {
 	function ensure():Void { if (cur == null) begin(cx, cy); }
 
 	function room():Bool {
-		if (cur.nodes.length >= AuraVectorPath.MAX_NODES) { fail("A shape has more than " + AuraVectorPath.MAX_NODES + " points. Simplify it first."); return false; }
+		if (cur.nodes.length >= AuraVectorPath.PARSE_NODES) { fail("A shape has more than " + AuraVectorPath.PARSE_NODES + " points. Simplify it first."); return false; }
 		return true;
 	}
 

@@ -20,7 +20,7 @@ class AuraCanvasElement {
 	public static inline var KIND_PATH:String = "path";
 
 	/** Cap on states an element can reference (matches AuraStateDef.MAX_STATES plus headroom for stale ids). */
-	public static inline var MAX_STATE_REFS:Int = 16;
+	public static inline var MAX_STATE_REFS:Int = 32;
 	public static inline var MAX_NAME:Int = 32;
 
 	public static var SHAPES:Array<String> = ["rect", "rounded", "circle", "diamond", "hex", "triangle", "line", "polygon", "star", "ring", "chevron"];
@@ -191,6 +191,42 @@ class AuraCanvasElement {
 	public var textAlign:Int = 0;
 	/** Text: dark outline thickness in px, 0 for none. */
 	public var outline:Float = 0;
+	// ---- Edge outline (optional; off by default) -------------------------------------------------
+	public static inline var EDGE_OUTER:Int = 0;
+	public static inline var EDGE_INNER:Int = 1;
+	public static inline var EDGE_CENTER:Int = 2;
+	public static inline var DIR_UP:Int = 0;
+	public static inline var DIR_DOWN:Int = 1;
+	public static inline var DIR_LEFT:Int = 2;
+	public static inline var DIR_RIGHT:Int = 3;
+	public static inline var MAX_EDGE:Float = 16;
+
+	/** Draw a coloured outline along the edge of the layer (an image's visible shape, a shape, or a path). */
+	public var edgeOn:Bool = false;
+	/** Outline thickness in px. */
+	public var edgeWidth:Float = 2;
+	public var edgeColor:Int = 0xFFFFFFFF;
+	/** EDGE_OUTER / EDGE_INNER: which side of the edge the outline sits on; EDGE_CENTER straddles it. */
+	public var edgeSide:Int = EDGE_OUTER;
+	/** false = always drawn; true = wiped in as the aura's timer runs (cooldown), in `edgeDir`. */
+	public var edgeCooldown:Bool = false;
+	/** Direction the wipe travels: the outline appears moving up, down, left or right. */
+	public var edgeDir:Int = DIR_UP;
+	/** With a cooldown wipe: start full and wipe away instead of wiping in. */
+	public var edgeDrain:Bool = false;
+
+	/** How much of the layer's box the outline shows (0..1), given the aura's remaining-time ratio (1 = just started). */
+	public function edgeVisible(remaining:Float):Float {
+		if (!edgeCooldown) return 1;
+		var r = remaining < 0 ? 0 : (remaining > 1 ? 1 : remaining);
+		return edgeDrain ? r : 1 - r;
+	}
+
+	/** Extra room an outline adds around the layer's box, in design px. */
+	public inline function edgePad():Float return edgeOn && edgeSide != EDGE_INNER ? (edgeSide == EDGE_OUTER ? edgeWidth : edgeWidth * 0.5) : 0;
+
+	/** Text: show {time} as whole seconds, rounded up, instead of one decimal. */
+	public var wholeTime:Bool = false;
 	/** Group this layer belongs to ("" = none). Layers sharing a name move and select together. */
 	public var group:String = "";
 	/** Layer name shown in the editor; empty falls back to the content. */
@@ -300,6 +336,13 @@ class AuraCanvasElement {
 		if (color2 != null) { o.color2 = color2; if (gradDir != 0) o.gradDir = gradDir; }
 		if (textAlign != 0) o.textAlign = textAlign;
 		if (outline > 0) o.outline = outline;
+		if (wholeTime) o.wholeTime = true;
+		if (edgeOn) {
+			var e:Dynamic = {w: edgeWidth, c: edgeColor};
+			if (edgeSide != EDGE_OUTER) e.s = edgeSide;
+			if (edgeCooldown) { e.m = 1; e.d = edgeDir; if (edgeDrain) e.h = true; }
+			o.edge = e;
+		}
 		if (name != null && name.length > 0) o.name = name;
 		if (group != null && group.length > 0) o.group = group;
 		if (inStates != null) o.inStates = inStates.copy();
@@ -354,6 +397,19 @@ class AuraCanvasElement {
 		el.textAlign = ta == 1 || ta == 2 ? ta : 0;
 		var ol:Null<Float> = d.outline;
 		el.outline = ol != null && Math.isFinite(ol) ? Math.max(0, Math.min(4, ol)) : 0;
+		el.wholeTime = d.wholeTime == true;
+		if (d.edge != null && Reflect.isObject(d.edge)) {
+			var e:Dynamic = d.edge;
+			el.edgeOn = true;
+			el.edgeWidth = clampSeconds(e.w, 0.5, MAX_EDGE, 2);
+			if (e.c != null && (Std.isOfType(e.c, Int) || Std.isOfType(e.c, Float))) el.edgeColor = Std.int(e.c);
+			var es:Null<Int> = e.s != null ? Std.int(e.s) : null;
+			el.edgeSide = es == EDGE_INNER || es == EDGE_CENTER ? es : EDGE_OUTER;
+			el.edgeCooldown = e.m != null && Std.int(e.m) == 1;
+			var ed:Null<Int> = e.d != null ? Std.int(e.d) : null;
+			el.edgeDir = ed == DIR_DOWN || ed == DIR_LEFT || ed == DIR_RIGHT ? ed : DIR_UP;
+			el.edgeDrain = e.h == true;
+		}
 		if (Std.isOfType(d.group, String)) el.group = AuraCanvasGroups.clean(d.group);
 		if (d.name != null) { var n = StringTools.trim(Std.string(d.name)); el.name = n.length > MAX_NAME ? n.substr(0, MAX_NAME) : n; }
 		if (Std.isOfType(d.inStates, Array)) {

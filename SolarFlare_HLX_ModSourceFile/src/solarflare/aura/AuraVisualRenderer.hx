@@ -65,12 +65,13 @@ class AuraVisualRenderer {
 				if (el.kind == AuraCanvasElement.KIND_ICON || el.kind == AuraCanvasElement.KIND_SHAPE || el.kind == AuraCanvasElement.KIND_PATH) {
 					if (el.kind == AuraCanvasElement.KIND_ICON && !a.showIcon.get()) continue;
 					var bw:Float = el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : w, bh:Float = el.hAt(sid) > 1 ? el.hAt(sid) * vectorScale : h;
+					var ep:Float = el.edgePad() * vectorScale;
 					if ((el.kind == AuraCanvasElement.KIND_SHAPE || el.kind == AuraCanvasElement.KIND_PATH) && el.rotationAt(sid) != 0) {
 						var ext = AuraCanvasElement.rotatedHalfExtent(bw, bh, el.rotationAt(sid));
-						out.include(el.xAt(sid) * vectorScale + bw * 0.5 - ext.hx, el.yAt(sid) * vectorScale + bh * 0.5 - ext.hy, ext.hx * 2, ext.hy * 2);
-					} else out.include(el.xAt(sid) * vectorScale, el.yAt(sid) * vectorScale, bw, bh);
+						out.include(el.xAt(sid) * vectorScale + bw * 0.5 - ext.hx - ep, el.yAt(sid) * vectorScale + bh * 0.5 - ext.hy - ep, ext.hx * 2 + ep * 2, ext.hy * 2 + ep * 2);
+					} else out.include(el.xAt(sid) * vectorScale - ep, el.yAt(sid) * vectorScale - ep, bw + ep * 2, bh + ep * 2);
 				} else {
-					var ts = textSize(formatTokens(el.content, a, stacks, counterValue),
+					var ts = textSize(formatTokens(el.content, a, stacks, counterValue, el.wholeTime),
 						(el.fontSize > 4 ? el.fontSize : 16) * vectorScale);
 					var pad:Float = el.outline > 0 ? Math.max(1, el.outline * vectorScale) : 0;
 					var boxW:Float = el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : 0;
@@ -314,7 +315,7 @@ class AuraVisualRenderer {
 				}
 			} else {
 				var raw = el.content != null ? el.content : "";
-				var formatted = formatTokens(raw, a, stacks, counter);
+				var formatted = formatTokens(raw, a, stacks, counter, el.wholeTime);
 				var fontSize:Single = (el.fontSize > 4 ? el.fontSize : 16) * vectorScale;
 				ImGui.pushFont(ImGui.getFont(), fontSize);
 				try {
@@ -340,6 +341,8 @@ class AuraVisualRenderer {
 				} catch (e:Dynamic) { ImGui.popFont(); throw e; }
 				ImGui.popFont();
 			}
+			if (el.edgeOn && el.kind != AuraCanvasElement.KIND_TEXT)
+				drawEdge(dl, el, sid, x, y, w, h, vectorScale, applyAlphaToPacked(el.edgeColor, elAlpha), progress, live);
 		}
 
 		if (faceFx && wantFuse(a, progress)) {
@@ -351,8 +354,78 @@ class AuraVisualRenderer {
 
 	}
 
-	/** Largest flattened outline drawn: 64 nodes x 8 curve steps, with headroom. */
-	static inline var PATH_PT_MAX:Int = 640;
+	static var edgePts:hl.Bytes = new hl.Bytes(8 * AuraVectorPath.MAX_FLAT_POINTS);
+	static var EDGE_BOX:Array<Float> = [0, 0, 0, 1, 1, 1, 1, 0];
+
+	/**
+	 * Coloured outline along a layer's edge: an image's visible shape (found once at load), a shape, or a path.
+	 * With a cooldown wipe the outline is clipped to the part of the layer's box the timer has uncovered.
+	 */
+	static function drawEdge(dl:Dynamic, el:AuraCanvasElement, sid:String, ox:Float, oy:Float, cw:Float, ch:Float,
+			vectorScale:Float, col:Int, remaining:Float, live:Bool):Void {
+		var ew = Math.max(1, el.edgeWidth * vectorScale);
+		var dist = el.edgeSide == AuraCanvasElement.EDGE_OUTER ? ew * 0.5 : (el.edgeSide == AuraCanvasElement.EDGE_INNER ? -ew * 0.5 : 0.0);
+		var f = live ? el.edgeVisible(remaining) : 1;
+		if (f <= 0.002) return;
+		var x = ox + el.xAt(sid) * vectorScale, y = oy + el.yAt(sid) * vectorScale;
+		var w = el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : cw, h = el.hAt(sid) > 1 ? el.hAt(sid) * vectorScale : ch;
+		var rot = el.kind == AuraCanvasElement.KIND_ICON ? 0.0 : el.rotationAt(sid);
+		var clipped = f < 0.999;
+		if (clipped) {
+			var e = AuraCanvasElement.rotatedHalfExtent(w, h, rot);
+			var mx = x + w * 0.5, my = y + h * 0.5, pad = ew + 2;
+			var x0 = mx - e.hx, x1 = mx + e.hx, y0 = my - e.hy, y1 = my + e.hy;
+			var pmin:Dynamic, pmax:Dynamic;
+			switch (el.edgeDir) {
+				case AuraCanvasElement.DIR_DOWN: pmin = ImGui.vec2(x0 - pad, y0 - pad); pmax = ImGui.vec2(x1 + pad, y0 + (y1 - y0) * f);
+				case AuraCanvasElement.DIR_LEFT: pmin = ImGui.vec2(x1 - (x1 - x0) * f, y0 - pad); pmax = ImGui.vec2(x1 + pad, y1 + pad);
+				case AuraCanvasElement.DIR_RIGHT: pmin = ImGui.vec2(x0 - pad, y0 - pad); pmax = ImGui.vec2(x0 + (x1 - x0) * f, y1 + pad);
+				default: pmin = ImGui.vec2(x0 - pad, y1 - (y1 - y0) * f); pmax = ImGui.vec2(x1 + pad, y1 + pad);
+			}
+			ImGui.ImDrawList_PushClipRect(dl, pmin, pmax, true);
+		}
+		try drawEdgeBody(dl, el, x, y, w, h, ew, dist, rot, col) catch (err:Dynamic) { if (clipped) ImGui.ImDrawList_PopClipRect(dl); throw err; }
+		if (clipped) ImGui.ImDrawList_PopClipRect(dl);
+	}
+
+	static function drawEdgeBody(dl:Dynamic, el:AuraCanvasElement, x:Float, y:Float, w:Float, h:Float, ew:Float, dist:Float, rot:Float, col:Int):Void {
+		if (el.kind == AuraCanvasElement.KIND_SHAPE) {
+			// Shapes already know how to outline themselves: grow or shrink the box by the offset.
+			var bw = w + dist * 2, bh = h + dist * 2;
+			if (bw >= 2 && bh >= 2) drawCanvasShape(dl, el.content, x - dist, y - dist, bw, bh, col, ew, rot, el.sides);
+			return;
+		}
+		var loops:Array<Array<Float>>;
+		var closed = true;
+		if (el.kind == AuraCanvasElement.KIND_PATH) {
+			if (el.path == null) return;
+			loops = [el.path.flatPoints()];
+			closed = el.path.closed;
+		} else {
+			var c = GameIcons.contourFor(el.content);
+			loops = c != null && c.length > 0 ? c : [EDGE_BOX];
+		}
+		var mx = x + w * 0.5, my = y + h * 0.5;
+		var r = rot * Math.PI / 180, cr = Math.cos(r), sr = Math.sin(r);
+		for (loop in loops) {
+			var n = loop.length >> 1;
+			if (n < 2) continue;
+			var pts:Array<Float> = [];
+			for (i in 0...n) { pts.push(x + loop[i * 2] * w); pts.push(y + loop[i * 2 + 1] * h); }
+			if (closed && n >= 3 && dist != 0) pts = AuraPolyLoop.offset(AuraPolyLoop.insideLeft(pts), dist);
+			var m = Std.int(Math.min(AuraVectorPath.MAX_FLAT_POINTS, pts.length >> 1));
+			for (i in 0...m) {
+				var px = pts[i * 2], py = pts[i * 2 + 1];
+				if (rot != 0) { var dx = px - mx, dy = py - my; px = mx + dx * cr - dy * sr; py = my + dx * sr + dy * cr; }
+				edgePts.setF32(i * 8, px);
+				edgePts.setF32(i * 8 + 4, py);
+			}
+			ImGui.ImDrawList_AddPolyline(dl, edgePts, m, col, ew, closed && m >= 3 ? imgui.Enums.ImDrawFlags.Closed : 0);
+		}
+	}
+
+	/** Largest flattened outline drawn: 512 nodes at 2 curve steps (see AuraVectorPath.flatPoints). */
+	static inline var PATH_PT_MAX:Int = AuraVectorPath.MAX_FLAT_POINTS;
 	static var pathPts:hl.Bytes = new hl.Bytes(8 * PATH_PT_MAX);
 	static inline var PATH_GRAD_STRIPS:Int = 12;
 
@@ -379,9 +452,11 @@ class AuraVisualRenderer {
 				var e = AuraCanvasElement.rotatedHalfExtent(w, h, rotation);
 				var x0 = cx - e.hx - 1, y0 = cy - e.hy - 1, x1 = cx + e.hx + 1, y1 = cy + e.hy + 1;
 				var end:Int = col2;
-				for (k in 0...PATH_GRAD_STRIPS) {
-					var c = lerpPacked(col, end, (k + 0.5) / PATH_GRAD_STRIPS);
-					var a0 = k / PATH_GRAD_STRIPS, a1 = (k + 1) / PATH_GRAD_STRIPS, over = k < PATH_GRAD_STRIPS - 1 ? 1 : 0;
+				// Every strip re-triangulates the whole outline, so busy outlines get fewer, wider strips.
+				var strips = n > 256 ? 5 : (n > 96 ? 8 : PATH_GRAD_STRIPS);
+				for (k in 0...strips) {
+					var c = lerpPacked(col, end, (k + 0.5) / strips);
+					var a0 = k / strips, a1 = (k + 1) / strips, over = k < strips - 1 ? 1 : 0;
 					var pmin = gradDir == 1 ? ImGui.vec2(x0 + (x1 - x0) * a0, y0) : ImGui.vec2(x0, y0 + (y1 - y0) * a0);
 					var pmax = gradDir == 1 ? ImGui.vec2(x0 + (x1 - x0) * a1 + over, y1) : ImGui.vec2(x1, y0 + (y1 - y0) * a1 + over);
 					ImGui.ImDrawList_PushClipRect(dl, pmin, pmax, true);
@@ -692,7 +767,7 @@ class AuraVisualRenderer {
 	}
 
 	/** Substitute independent live stack and activation count values. */
-	public static function formatTokens(content:String, a:AuraDef, stacks:Int = 0, counter:Int = 0):String {
+	public static function formatTokens(content:String, a:AuraDef, stacks:Int = 0, counter:Int = 0, wholeTime:Bool = false):String {
 		if (content == null || content.length == 0)
 			return "";
 		var s = content;
@@ -703,7 +778,7 @@ class AuraVisualRenderer {
 			if (faceInf)
 				t = "inf";
 			else if (Math.isFinite(faceLeft) && faceLeft >= 0)
-				t = Std.string(Math.max(0, Math.round(faceLeft * 10) / 10));
+				t = AuraTimeText.token(faceLeft, false, wholeTime);
 			s = s.split("{time}").join(t);
 		}
 		return AuraBadgePolicy.countTokens(s, stacks, counter);

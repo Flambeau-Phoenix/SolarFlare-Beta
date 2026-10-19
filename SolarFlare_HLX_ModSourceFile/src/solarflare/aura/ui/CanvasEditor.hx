@@ -36,6 +36,11 @@ class CanvasEditor {
 	var canvasEditH = new FloatRef(48);
 	var canvasEditFs = new FloatRef(16);
 	var canvasColBuf:hl.Bytes = ImGui.v4(1, 1, 1, 1);
+	var edgeColBuf:hl.Bytes = ImGui.v4(1, 1, 1, 1);
+	var edgeColEl:AuraCanvasElement = null;
+	var edgeColValue:Int = 0;
+	var edgeColEditing:Bool = false;
+	var canvasEditEdge = new FloatRef(2);
 	var lastCanvasColorAuraId:String = "";
 	var lastCanvasColorSel:Int = -1;
 	var canvasContentBuf = new hl.Bytes(CANVAS_CONTENT_BUF);
@@ -230,6 +235,7 @@ class CanvasEditor {
 			try {
 				if (UiChrome.beginTabItem("Layers##cv_tab_layers")) {
 					try {
+						ImGui.textDisabled("Layers are the pieces of the design.");
 						if (a.canvasElements.length == 0) {
 							UiChrome.gap(4);
 							wrappedHint("No layers yet. Use Insert in the toolbar or menu to add text, a game icon, one of your images, a shape, or a ready-made preset.");
@@ -362,9 +368,19 @@ class CanvasEditor {
 
 	function drawLookBar(a:AuraDef):Void {
 		ImGui.alignTextToFramePadding();
-		ImGui.textDisabled("Look");
+		ImGui.textDisabled("Looks");
+		if (ImGui.isItemHovered()) ImGui.setTooltip("A look is an alternate design of this canvas. Layers are the shapes, text and images; looks decide which layers show and where. Conditions pick the look in game.");
 		ImGui.sameLine(0, 8);
 		drawStateTabs(a);
+		if (editState != "") {
+			var theme = solarflare.ui.ThemePalette.current();
+			ImGui.alignTextToFramePadding();
+			ImGui.textColored(theme.accent, "Editing look: " + stateLabel(a, editState));
+			ImGui.sameLine(0, 8);
+			ImGui.textDisabled("Position, size, colour and Hidden changes apply to this look only.");
+			ImGui.sameLine(0, 8);
+			if (ImGui.smallButton("Back to Default##cv_back_default")) { editState = ""; stateDeleteArmed = ""; }
+		}
 	}
 
 	function addState(a:AuraDef):Void {
@@ -374,6 +390,18 @@ class CanvasEditor {
 		a.states.push(st);
 		editState = st.id;
 		SettingsStore.markDirty();
+	}
+
+	/** Copies the look being edited (its trigger, which layers show in it and their per-look values) and switches to the copy. */
+	function duplicateState(a:AuraDef):Void {
+		var src = AuraStateDef.find(a.states, editState);
+		if (src == null || a.states.length >= AuraStateDef.MAX_STATES) return;
+		host.canvasSnapshot("Duplicate State");
+		var copy = AuraStateDef.duplicate(a.states, a.canvasElements, src.id);
+		if (copy == null) return;
+		editState = copy.id;
+		SettingsStore.markDirty();
+		solarflare.ui.ToastManager.info("Copied \"" + src.name + "\". Change its trigger (for example the stack number) below.");
 	}
 
 	function drawStatusBar(a:AuraDef):Void {
@@ -843,7 +871,7 @@ class CanvasEditor {
 
 	var svgRequest:Bool = false;
 	var svgBuf = new hl.Bytes(SVG_BUF);
-	static inline var SVG_BUF:Int = 20480;
+	static inline var SVG_BUF:Int = AuraVectorPath.MAX_SVG_CHARS + 1024;
 	var svgText:String = "";
 	var svgParsed:SvgImport = null;
 	var svgStroke = new FloatRef(0);
@@ -857,6 +885,7 @@ class CanvasEditor {
 	function insertSvgText(a:AuraDef, data:String, label:String):Void {
 		var imp = AuraVectorPath.fromSvg(data);
 		if (imp.error.length > 0) { solarflare.ui.ToastManager.error(imp.error); return; }
+		if (imp.note != null && imp.note.length > 0) solarflare.ui.ToastManager.warn(imp.note);
 		insertImported(a, imp, label, 0);
 	}
 
@@ -888,7 +917,7 @@ class CanvasEditor {
 		ImGui.setNextWindowSize(ImGui.vec2(560, 380), imgui.Enums.ImGuiCond.FirstUseEver);
 		if (!ImGui.beginPopupModal("Insert SVG path##cv_svg", null, 0)) return;
 		try {
-			wrappedHint("Paste the d=\"...\" value of an SVG path, or the whole <path> markup. Export icons from Inkscape, Figma or an icon site as SVG, open the file in a text editor and copy its path. Supports M L H V C S Q T A Z; up to 64 points per shape.");
+			wrappedHint("Paste the d=\"...\" value of an SVG path, or the whole <path> markup. Export icons from Inkscape, Figma or an icon site as SVG, open the file in a text editor and copy its path. Supports M L H V C S Q T A Z; up to 512 points per shape (busier drawings are simplified automatically).");
 			if (ImGui.inputTextMultiline("##cv_svg_text", svgBuf, SVG_BUF, ImGui.vec2(-1, 170))) parseSvgBuffer();
 			if (UiChrome.ghostButton("Paste from clipboard##cv_svg_clip", ImGui.vec2(180, 26))) {
 				UiActionQueue.custom(function() {
@@ -906,7 +935,7 @@ class CanvasEditor {
 				var points = 0;
 				for (path in svgParsed.paths) points += path.nodes.length;
 				ImGui.textColored(solarflare.ui.ThemePalette.status(solarflare.ui.ThemePalette.STATUS_SUCCESS),
-					svgParsed.paths.length + " shape" + (svgParsed.paths.length == 1 ? "" : "s") + ", " + points + " points. Closed shapes are filled; open paths become outlines.");
+					svgParsed.paths.length + " shape" + (svgParsed.paths.length == 1 ? "" : "s") + ", " + points + " points. Closed shapes are filled; open paths become outlines." + (svgParsed.note != null && svgParsed.note.length > 0 ? " " + svgParsed.note : ""));
 			}
 			ImGui.separator();
 			var ok = svgParsed != null && svgParsed.error.length == 0 && svgParsed.paths.length > 0;
@@ -977,6 +1006,7 @@ class CanvasEditor {
 		for (st in a.states) if (ImGui.menuItem(st.name + "##cv_lm_" + st.id, null, editState == st.id)) editState = st.id;
 		ImGui.separator();
 		if (ImGui.menuItem("New look", null, false, a.states.length < AuraStateDef.MAX_STATES)) addState(a);
+		if (ImGui.menuItem("Duplicate this look", null, false, editState != "" && a.states.length < AuraStateDef.MAX_STATES)) duplicateState(a);
 	}
 
 	// ---- Toolbar -----------------------------------------------------------------------------
@@ -1000,17 +1030,32 @@ class CanvasEditor {
 		tbUsed += width;
 	}
 
+	/** A real vertical divider between groups of commands (replaces the old "|" text). */
 	function tbSeparator():Void {
-		tbPlace(10);
-		ImGui.alignTextToFramePadding();
-		ImGui.textDisabled("|");
+		tbPlace(TB_DIVIDER_W);
+		var p = ImGui.getCursorScreenPos(), h = TB_BUTTON_H;
+		var line = ImGui.colorConvertFloat4ToU32(solarflare.ui.ThemePalette.current().border);
+		ImGui.ImDrawList_AddLine(ImGui.getWindowDrawList(), ImGui.vec2(p.x + TB_DIVIDER_W * 0.5, p.y + 3), ImGui.vec2(p.x + TB_DIVIDER_W * 0.5, p.y + h - 3), line, 1.5);
+		ImGui.dummy(ImGui.vec2(TB_DIVIDER_W, h));
 	}
 
+	/** Small caption that names the group of commands that follows. */
+	function tbLabel(text:String):Void {
+		tbPlace(ImGui.calcTextSize(text).x);
+		ImGui.alignTextToFramePadding();
+		ImGui.textDisabled(text);
+	}
+
+	static inline var TB_BUTTON_H:Float = 26;
+	static inline var TB_DIVIDER_W:Float = 13;
+	static inline var TB_MIN_W:Float = 40;
+
 	function tbButton(label:String, tip:String, active:Bool = false, enabled:Bool = true):Bool {
-		tbPlace(ImGui.calcTextSize(label).x + 18);
+		var bw = Math.max(TB_MIN_W, ImGui.calcTextSize(label).x + 18);
+		tbPlace(bw);
 		if (active) ImGui.pushStyleColor(ImGuiCol.Button, solarflare.ui.ThemePalette.current().accent);
 		if (!enabled) ImGui.beginDisabled(true);
-		var clicked = ImGui.button(label + "##cvtb" + (tbIndex++));
+		var clicked = ImGui.button(label + "##cvtb" + (tbIndex++), ImGui.vec2(bw, TB_BUTTON_H));
 		if (!enabled) ImGui.endDisabled();
 		if (active) ImGui.popStyleColor();
 		if (tip != null && ImGui.isItemHovered()) {
@@ -1023,11 +1068,13 @@ class CanvasEditor {
 	function drawToolbar(a:AuraDef):Void {
 		tbBegin();
 		var any = canvasSel >= 0, several = canvasMulti.length > 0, n = a.canvasElements.length;
+		tbLabel("Tools");
 		if (tbButton("Select", "Select and move layers (V)", tool == 0)) tool = 0;
 		if (tbButton("Pan", "Drag to pan the view (H). Space+drag works in any tool.", tool == TOOL_PAN)) tool = TOOL_PAN;
 		if (tbButton("Pen", "Draw a vector path: click for corners, drag for curves, click the first point to close, Enter to finish (P)", tool == TOOL_PEN)) tool = TOOL_PEN;
 		if (tbButton("Nodes", "Edit the points and curves of the selected path (N)", tool == TOOL_NODES)) tool = TOOL_NODES;
 		tbSeparator();
+		tbLabel("Add");
 		if (tbButton("+ Text", "Add a text layer")) insertText(a);
 		if (tbButton("+ Icon", "Add a game icon layer")) insertIcon(a);
 		if (tbButton("+ Image", "Add the first image from your library; drag others from the Library tab")) insertImage(a);
@@ -1049,28 +1096,33 @@ class CanvasEditor {
 			ImGui.endPopup();
 		}
 		tbSeparator();
+		tbLabel("Edit");
 		if (tbButton("Undo", "Ctrl+Z", false, host.canvasCanUndo())) host.canvasUndo();
 		if (tbButton("Redo", "Ctrl+Y", false, host.canvasCanRedo())) host.canvasRedo();
-		tbSeparator();
 		if (tbButton("Copy", "Ctrl+C", false, any)) copySelection(a, false);
 		if (tbButton("Paste", "Ctrl+V")) pasteLayers(a);
 		if (tbButton("Duplicate", "Ctrl+D", false, any)) duplicateSelected(a);
 		if (tbButton("Delete", "Del", false, any)) removeSelected(a);
+		tbSeparator();
+		tbLabel("Layers");
 		if (tbButton("Group", "Group the selected layers so they select, move and hide together (Ctrl+G)", false, canvasMulti.length > 0)) groupSelected(a);
 		if (tbButton("Ungroup", "Release the selected layers' groups (Ctrl+Shift+G)", false, selectionHasGroup(a))) ungroupSelected(a);
 		tbSeparator();
+		tbLabel("Align");
 		for (row in ALIGN_ROWS) {
-			var short = row.label == "Center" ? "Ctr" : (row.label == "Middle" ? "Mid" : (row.label == "Bottom" ? "Bot" : row.label));
+			var short = row.label;
 			if (tbButton(short, "Align " + row.label.toLowerCase() + (several ? " (to the selection)" : " (to the aura)"), false, any)) alignAny(a, row.mode);
 		}
 		if (tbButton("Space H", "Spread three or more layers evenly across", false, canvasMulti.length >= 2)) alignSelection(a, "distH");
 		if (tbButton("Space V", "Spread three or more layers evenly down", false, canvasMulti.length >= 2)) alignSelection(a, "distV");
 		tbSeparator();
+		tbLabel("Stacking");
 		if (tbButton("Front", "Bring to front", false, any && canvasSel < n - 1 && !several)) moveCanvasElement(a, canvasSel, n - 1, "Canvas To Front");
 		if (tbButton("Up", "Bring forward", false, any && canvasSel < n - 1 && !several)) moveCanvasElement(a, canvasSel, canvasSel + 1, "Canvas Bring Forward");
 		if (tbButton("Down", "Send backward", false, any && canvasSel > 0 && !several)) moveCanvasElement(a, canvasSel, canvasSel - 1, "Canvas Send Backward");
 		if (tbButton("Back", "Send to back", false, any && canvasSel > 0 && !several)) moveCanvasElement(a, canvasSel, 0, "Canvas To Back");
 		tbSeparator();
+		tbLabel("View");
 		if (tbButton("Snap", "Snap drags to the grid (hold Alt to place freely)", canvasSnap.get())) canvasSnap.set(!canvasSnap.get());
 		if (tbButton("Grid", "Show the grid", showGrid.get())) showGrid.set(!showGrid.get());
 		if (tbButton("Guides", "Smart guides: snap to the aura's edges and centre and to other layers", showGuides.get())) showGuides.set(!showGuides.get());
@@ -1332,6 +1384,11 @@ class CanvasEditor {
 				SettingsStore.markDirty();
 			}
 			if (ImGui.isItemHovered()) ImGui.setTooltip("Add another look for this canvas. Elements can show, hide, move, resize and recolour per look; conditions decide when it is used.");
+			if (editState != "") {
+				place(ImGui.calcTextSize("Duplicate").x + 20);
+				if (ImGui.button("Duplicate##cv_state_dup")) duplicateState(a);
+				if (ImGui.isItemHovered()) ImGui.setTooltip("Copy the selected look with its trigger, layer visibility and per-look values. Handy for looks that differ only by one condition.");
+			}
 		}
 	}
 
@@ -1391,6 +1448,10 @@ class CanvasEditor {
 				ImGui.endDisabled();
 				ImGui.sameLine(0, 12);
 				var armed = stateDeleteArmed == st.id;
+				ImGui.beginDisabled(a.states.length >= AuraStateDef.MAX_STATES);
+				if (ImGui.button("Duplicate##cv_state_dup2")) duplicateState(a);
+				ImGui.endDisabled();
+				ImGui.sameLine(0, 12);
 				if (ImGui.button((armed ? "Confirm delete##cv_state_del" : "Delete state##cv_state_del"))) {
 					if (!armed) stateDeleteArmed = st.id; else deleteState(a, st);
 				}
@@ -2640,6 +2701,7 @@ class CanvasEditor {
 				} else if (!ImGui.isAnyItemActive()) canvasColorEditing = false;
 				if (ImGui.isItemDeactivatedAfterEdit()) rememberColor(el.colorAt(editState));
 			});
+			if (el.kind != AuraCanvasElement.KIND_TEXT) drawEdgeRows(el);
 			UiLayout.propertyRow("Visibility", function() {
 				var conditional = el.visibilityRule != null;
 				if (ImGui.beginCombo("##ab_cv_visibility", conditional ? "When conditions match" : "Always")) {
@@ -2676,6 +2738,71 @@ class CanvasEditor {
 		}
 	}
 
+	/** Outline effect rows: side, width, colour and an optional timer-driven wipe. */
+	function drawEdgeRows(el:AuraCanvasElement):Void {
+		UiLayout.propertyRow("Edge outline", function() {
+			canvasFlagRef.set(el.edgeOn);
+			if (ImGui.checkbox("Outline the edge##ab_cv_edge_on", canvasFlagRef)) { host.canvasSnapshot("Canvas Edge"); el.edgeOn = canvasFlagRef.get(); SettingsStore.markDirty(); }
+		}, el.kind == AuraCanvasElement.KIND_ICON ? "Traces the visible shape of a custom image (its see-through parts are ignored). Game icons use their box." : "Draws a coloured line along the edge of the layer.");
+		if (!el.edgeOn) return;
+		UiLayout.propertyRow("Side", function() {
+			UiLayout.inlineSplit("##ab_cv_edge_side", 3, function(index:Int, cellW:Single) {
+				var value = index == 0 ? AuraCanvasElement.EDGE_OUTER : (index == 1 ? AuraCanvasElement.EDGE_INNER : AuraCanvasElement.EDGE_CENTER);
+				var on = el.edgeSide == value;
+				if (on) ImGui.pushStyleColor(ImGuiCol.Button, solarflare.ui.ThemePalette.current().accent);
+				if (ImGui.button((index == 0 ? "Outside" : (index == 1 ? "Inside" : "Centred")) + "##ab_cv_es" + index, ImGui.vec2(cellW, 0)) && !on) { host.canvasSnapshot("Canvas Edge"); el.edgeSide = value; SettingsStore.markDirty(); }
+				if (on) ImGui.popStyleColor();
+			});
+		}, "Outside draws beyond the edge, Inside draws within the layer, Centred straddles the edge.");
+		canvasEditEdge.set(el.edgeWidth);
+		UiLayout.propertyRow("Edge width", function() {
+			if (NumberField.draw("##ab_cv_edge_w", canvasEditEdge, 0.5, AuraCanvasElement.MAX_EDGE, "%.1f px", preciseFn)) { el.edgeWidth = Math.max(0.5, Math.min(AuraCanvasElement.MAX_EDGE, canvasEditEdge.get())); SettingsStore.markDirty(); }
+		});
+		if (edgeColEl != el || (!edgeColEditing && edgeColValue != el.edgeColor)) {
+			edgeColEl = el; edgeColValue = el.edgeColor;
+			edgeColBuf.setF32(0, ((edgeColValue >> 16) & 0xFF) / 255.0);
+			edgeColBuf.setF32(4, ((edgeColValue >> 8) & 0xFF) / 255.0);
+			edgeColBuf.setF32(8, (edgeColValue & 0xFF) / 255.0);
+			edgeColBuf.setF32(12, ((edgeColValue >>> 24) & 0xFF) / 255.0);
+		}
+		UiLayout.propertyRow("Edge color", function() {
+			if (ImGui.colorEdit4("##ab_cv_edge_col", edgeColBuf, PICKER_FLAGS)) {
+				if (!edgeColEditing) host.canvasSnapshot("Canvas Edge Color");
+				edgeColEditing = true;
+				var r = Std.int(Math.max(0, Math.min(1, edgeColBuf.getF32(0))) * 255), g = Std.int(Math.max(0, Math.min(1, edgeColBuf.getF32(4))) * 255);
+				var b = Std.int(Math.max(0, Math.min(1, edgeColBuf.getF32(8))) * 255), al = Std.int(Math.max(0, Math.min(1, edgeColBuf.getF32(12))) * 255);
+				edgeColValue = (al << 24) | (r << 16) | (g << 8) | b;
+				el.edgeColor = edgeColValue;
+				SettingsStore.markDirty();
+			} else if (!ImGui.isAnyItemActive()) edgeColEditing = false;
+		});
+		UiLayout.propertyRow("Shown", function() {
+			UiLayout.inlineSplit("##ab_cv_edge_mode", 2, function(index:Int, cellW:Single) {
+				var on = (index == 1) == el.edgeCooldown;
+				if (on) ImGui.pushStyleColor(ImGuiCol.Button, solarflare.ui.ThemePalette.current().accent);
+				if (ImGui.button((index == 0 ? "Always" : "With timer") + "##ab_cv_em" + index, ImGui.vec2(cellW, 0)) && !on) { host.canvasSnapshot("Canvas Edge"); el.edgeCooldown = index == 1; SettingsStore.markDirty(); }
+				if (on) ImGui.popStyleColor();
+			});
+		}, "With timer wipes the outline in as the aura's timer or cooldown runs, so it is complete when the timer ends. Use Live conditions preview to see it.");
+		if (!el.edgeCooldown) return;
+		UiLayout.propertyRow("Wipe direction", function() {
+			UiLayout.inlineSplit("##ab_cv_edge_dir", 4, function(index:Int, cellW:Single) {
+				var on = el.edgeDir == index;
+				if (on) ImGui.pushStyleColor(ImGuiCol.Button, solarflare.ui.ThemePalette.current().accent);
+				if (ImGui.button(["Up", "Down", "Left", "Right"][index] + "##ab_cv_ed" + index, ImGui.vec2(cellW, 0)) && !on) { host.canvasSnapshot("Canvas Edge"); el.edgeDir = index; SettingsStore.markDirty(); }
+				if (on) ImGui.popStyleColor();
+			});
+		}, "The way the edge of the reveal moves: Up fills from the bottom to the top, Left from the right to the left.");
+		UiLayout.propertyRow("Timer effect", function() {
+			UiLayout.inlineSplit("##ab_cv_edge_drain", 2, function(index:Int, cellW:Single) {
+				var on = (index == 1) == el.edgeDrain;
+				if (on) ImGui.pushStyleColor(ImGuiCol.Button, solarflare.ui.ThemePalette.current().accent);
+				if (ImGui.button((index == 0 ? "Fills in" : "Drains away") + "##ab_cv_ex" + index, ImGui.vec2(cellW, 0)) && !on) { host.canvasSnapshot("Canvas Edge"); el.edgeDrain = index == 1; SettingsStore.markDirty(); }
+				if (on) ImGui.popStyleColor();
+			});
+		}, "Fills in: the outline appears as time passes. Drains away: it starts complete and disappears.");
+	}
+
 	function drawCanvasTextRows(el:AuraCanvasElement):Void {
 		UiLayout.propertyRow("Text", function() {
 			ByteUtil.fillBuf(canvasContentBuf, CANVAS_CONTENT_BUF, el.content != null ? el.content : "");
@@ -2700,7 +2827,15 @@ class CanvasEditor {
 		UiLayout.propertyRow("Outline", function() {
 			if (NumberField.draw("##ab_cv_toutline", canvasEditOutline, 0, 4, "%.1f px", preciseFn)) { el.outline = Math.max(0, Math.min(4, canvasEditOutline.get())); SettingsStore.markDirty(); }
 		}, "A dark edge that keeps text readable over busy icons.");
-		UiLayout.propertyRow("Insert", function() {
+		UiLayout.propertyRow("Time format", function() {
+				UiLayout.inlineSplit("##ab_cv_tfmt", 2, function(index:Int, cellW:Single) {
+					var on = (index == 1) == el.wholeTime;
+					if (on) ImGui.pushStyleColor(ImGuiCol.Button, solarflare.ui.ThemePalette.current().accent);
+					if (ImGui.button((index == 0 ? "Decimals (4.3)" : "Whole seconds (5)") + "##ab_cv_tf" + index, ImGui.vec2(cellW, 0)) && !on) { host.canvasSnapshot("Canvas Time Format"); el.wholeTime = index == 1; SettingsStore.markDirty(); }
+					if (on) ImGui.popStyleColor();
+				});
+			}, "How {time} is written. Whole seconds always round up, so a 4.3 s timer reads 5.");
+			UiLayout.propertyRow("Insert", function() {
 			for (tok in CANVAS_TOKENS) {
 				if (ImGui.smallButton(tok + "##ab_tok_" + tok)) {
 					host.canvasSnapshot("Canvas Token");
@@ -3100,7 +3235,7 @@ class CanvasEditor {
 		if (el == null) return 0;
 		if (el.kind != AuraCanvasElement.KIND_TEXT) return el.wAt(editState) > 1 ? el.wAt(editState) : 48;
 		if (el.wAt(editState) > 1) return el.wAt(editState);
-		var raw = AuraVisualRenderer.formatTokens(el.content != null ? el.content : "", a, host.canvasPreview().stacks.get(), host.canvasPreview().counter.get());
+		var raw = AuraVisualRenderer.formatTokens(el.content != null ? el.content : "", a, host.canvasPreview().stacks.get(), host.canvasPreview().counter.get(), el.wholeTime);
 		var fs:Single = el.fontSize > 4 ? el.fontSize : 16;
 		ImGui.pushFont(ImGui.getFont(), fs); var ts = ImGui.calcTextSize(raw); ImGui.popFont();
 		return ts != null ? ts.x : 0;
@@ -3109,7 +3244,7 @@ class CanvasEditor {
 	function measureCanvasElementH(a:AuraDef, el:AuraCanvasElement):Float {
 		if (el == null) return 0;
 		if (el.kind != AuraCanvasElement.KIND_TEXT) return el.hAt(editState) > 1 ? el.hAt(editState) : 48;
-		var raw = AuraVisualRenderer.formatTokens(el.content != null ? el.content : "", a, host.canvasPreview().stacks.get(), host.canvasPreview().counter.get());
+		var raw = AuraVisualRenderer.formatTokens(el.content != null ? el.content : "", a, host.canvasPreview().stacks.get(), host.canvasPreview().counter.get(), el.wholeTime);
 		var fs:Single = el.fontSize > 4 ? el.fontSize : 16;
 		ImGui.pushFont(ImGui.getFont(), fs); var ts = ImGui.calcTextSize(raw); ImGui.popFont();
 		return ts != null ? ts.y : fs;

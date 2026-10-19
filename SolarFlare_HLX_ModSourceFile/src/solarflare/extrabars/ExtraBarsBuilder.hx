@@ -253,6 +253,9 @@ class ExtraBarsBuilder {
      }
     });
    });
+   ImGui.pushStyleColor(imgui.Enums.ImGuiCol.Text,owner.inputActive ? solarflare.ui.ThemePalette.status(solarflare.ui.ThemePalette.STATUS_SUCCESS) : solarflare.ui.ThemePalette.current().textDisabled);
+   ImGui.textWrapped(owner.armReason);
+   ImGui.popStyleColor();
    if (!owner.model.enabled || !ExtraBarsActivationConfig.available(owner.model.prefix,owner.model.mode)) ImGui.textWrapped("Bars are off. Enable them and choose an activation modifier to use cell keys.");
    else { var activeBar=owner.model.find(selectedBar); if (activeBar!=null && !activeBar.enabled) ImGui.textWrapped("This bar is disabled. Enable it above to use its cells."); }
  }

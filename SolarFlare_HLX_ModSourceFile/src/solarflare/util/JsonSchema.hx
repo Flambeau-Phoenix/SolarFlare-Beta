@@ -64,6 +64,16 @@ typedef AuraPathImportModel = {
 	@:optional var c:Bool;
 }
 
+/** Layer edge outline: width, colour, side, cooldown wipe mode, direction, drain. */
+typedef AuraEdgeImportModel = {
+	@:optional var w:Float;
+	@:optional var c:Int;
+	@:optional var s:Int;
+	@:optional var m:Int;
+	@:optional var d:Int;
+	@:optional var h:Bool;
+}
+
 /** Nested canvas element — mirrors AuraCanvasElement.toObj. */
 typedef AuraCanvasImportModel = {
 	@:optional var kind:String;
@@ -95,6 +105,9 @@ typedef AuraCanvasImportModel = {
 	@:optional var color2:Int;
 	@:optional var gradDir:Int;
 	@:optional var textAlign:Int;
+	@:optional var wholeTime:Bool;
+	@:optional var edge:AuraEdgeImportModel;
+	@:optional var group:String;
 	@:optional var outline:Float;
 	@:optional var name:String;
 	@:optional var stateOverrides:Map<String, AuraElementOverrideImportModel>;

@@ -93,6 +93,7 @@ class AuraSignalCatalog {
 		add("combat.damageTakenRecent", "Recent damage taken (max hit)", "Combat", Number);
 		add("combat.inCombat", "In combat", "Combat", Boolean);
 		add("aura.active", "Another aura is showing", "Auras", Boolean, "aura");
+		add("aura.condition", "A condition of another aura is met", "Auras", Boolean, "auraCondition");
 		add("event.combat.entered", "Entered combat (seconds ago)", "Combat", Duration);
 		add("event.combat.left", "Left combat (seconds ago)", "Combat", Duration);
 		add("event.cast.recent", "Enemy cast age (seconds)", "Enemy casts", Duration, "skill");

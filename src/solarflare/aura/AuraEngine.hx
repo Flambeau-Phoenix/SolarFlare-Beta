@@ -139,7 +139,13 @@ class AuraEngine {
 			return;
 		}
 		frame.auraShowing.clear();
-		for (i in 0...n) { var a = cfg.auras[i]; if (a != null && a.id != null) frame.auraShowing.set(a.id, a.enabled.get() && a.show); }
+		frame.auraRules.clear();
+		for (i in 0...n) {
+			var a = cfg.auras[i];
+			if (a == null || a.id == null) continue;
+			frame.auraShowing.set(a.id, a.enabled.get() && a.show);
+			if (a.rule != null && a.ruleResult != null) frame.auraRules.set(a.id, a.ruleResult);
+		}
 		for (i in 0...n) {
 			var a = cfg.auras[i];
 			if (a == null) continue;

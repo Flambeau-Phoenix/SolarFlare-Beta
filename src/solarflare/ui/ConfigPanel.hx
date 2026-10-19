@@ -93,6 +93,8 @@ class ConfigPanel {
 	public var rememberHubLayout = new BoolRef(true);
 	public var uiLayouts=new UiLayouts();
 	public var preventCtrlFullscreen=new BoolRef(false);
+	/** Clicks on open SolarFlare windows stay off the game's own UI (needs the sfcursor.hdll that ships with this build). */
+	public var blockClickThrough=new BoolRef(true);
 	var lastHubX:Float = Math.NaN;
 	var lastHubY:Float = Math.NaN;
 
@@ -282,6 +284,15 @@ class ConfigPanel {
 				changed = true;
 			}
 		}
+		clearTransientState();
+		if (changed) SettingsStore.markDirty();
+	}
+
+	/**
+	 * Drops drags, text focus and armed confirmations in every tool but leaves windows open. Used when the cursor
+	 * goes away because the game lost or regained focus (alt-tab) rather than because the player locked it.
+	 */
+	public function clearTransientState():Void {
 		if (geauxBuilder != null)
 			geauxBuilder.clearTransientState();
 		if (auraBuilder != null)
@@ -293,7 +304,6 @@ class ConfigPanel {
 		if (hemorrhage != null) hemorrhage.tool.clearTransientState();
 		if (chaincast != null) chaincast.modules.clearTransientState();
 		uiLayouts.clearTransientState();
-		if (changed) SettingsStore.markDirty();
 	}
 
 	/**
@@ -1049,6 +1059,8 @@ class ConfigPanel {
 		AlignmentGrid.drawSettings("utilities");
 		UiChrome.subHeader("Fullscreen shortcut");
 		UtilitiesPanel.drawFullscreenShortcut(preventCtrlFullscreen);
+		UiChrome.subHeader("Window clicks");
+		UtilitiesPanel.drawClickThrough(blockClickThrough);
 		UiChrome.subHeader("Ground skills");
 		UiLayout.propertyGrid("##hub_res_aim", function() {
 			UiLayout.propertyRow("Instant cast", function() {
