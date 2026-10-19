@@ -7,6 +7,13 @@ class AuraSignalReader {
 		if (d == null) { out.code = UNKNOWN_SIGNAL; return; }
 		out.kind = d.kind;
 		if (d.subjectKind.length > 0 && (subject == null || subject.length == 0)) { out.code = MISSING_SUBJECT; return; }
+		if (StringTools.startsWith(signal,"event.skill.") || StringTools.startsWith(signal,"event.status.") || StringTools.startsWith(signal,"event.dash.")) {
+			if(StringTools.startsWith(signal,"event.skill.")) { var sk=frame.findSkill(subject); if(sk!=null) subject=sk.rawId; }
+			if(StringTools.startsWith(signal,"event.status.")) subject=solarflare.cdb.CdbAuraTable.statusSubjectId(subject);
+			var e=frame.events.get(AuraChangeTracker.eventKey(signal,subject));
+			duration(out,e!=null && e.known,e==null ? 1e9 : e.age);
+			out.timeLeft=Math.NaN; out.eventSerial=e==null ? 0 : e.serial; return;
+		}
 		if (StringTools.startsWith(signal, "consumable.")) { ConsumableSignalReader.read(frame, signal, subject, out); return; }
 		if (solarflare.aura.StatusTypeDemand.isTypeSignal(signal)) {
 			var bit=solarflare.cdb.StatusTypeCatalog.bit(subject);
@@ -20,6 +27,22 @@ class AuraSignalReader {
 		}
 		if (StringTools.startsWith(signal,"target.status.")) { AuraStatusSignalReader.read(frame,signal,subject,out); return; }
 		switch (signal) {
+			case "resource.mana.current": number(out,frame.manaKnown,frame.manaCurrent);
+			case "resource.rage.current": number(out,frame.rageKnown,frame.rageCurrent);
+			case "resource.spark.current": number(out,frame.sparkKnown,frame.sparkCurrent);
+			case "resource.shield.current": number(out,frame.healthKnown,frame.shieldCurrent);
+			case "player.alive": bool(out,frame.aliveKnown,frame.alive);
+			case "dash.charges": count(out,frame.dashKnown,frame.dashCharges);
+			case "dash.available": bool(out,frame.dashKnown,frame.dashCharges>0);
+			case "dash.full": bool(out,frame.dashKnown,frame.dashMax>0 && frame.dashCharges>=frame.dashMax);
+			case "dash.rechargeLeft": duration(out,frame.dashKnown,frame.dashRecharge);
+			case "target.distance": number(out,frame.targetKnown && frame.targetValid,frame.targetDistance);
+			case "combat.damageTakenAge":
+				duration(out,frame.heroKnown && frame.damageAgeKnown,frame.damageTakenAge); out.timeLeft=Math.NaN;
+			case "event.combat.critical", "event.combat.block":
+				var critical=signal=="event.combat.critical";
+				duration(out,frame.heroKnown,critical ? frame.critAge : frame.blockAge);
+				out.timeLeft=Math.NaN; out.eventSerial=critical ? frame.critSerial : frame.blockSerial;
 			case "equipment.weaponEquipped":
 				var weapon = frame.findWeapon(subject);
 				bool(out, weapon != null && weapon.known, weapon != null && weapon.equipped);
@@ -59,6 +82,7 @@ class AuraSignalReader {
 			case "combat.killKindMatches": bool(out, frame.killKnown, kindEq(frame.killKind, subject));
 			case "combat.damageTakenRecent": number(out, frame.damageTakenKnown, frame.damageTakenRecent);
 			case "combat.inCombat": bool(out, frame.combatKnown, frame.inCombat);
+			case "aura.active": bool(out, frame.auraShowing.exists(subject), frame.auraShowing.get(subject) == true);
 			case "event.combat.entered":
 				duration(out, frame.combatKnown, frame.combatEnteredAge);
 				out.timeLeft = Math.NaN; // elapsed, never buff remaining
@@ -81,7 +105,11 @@ class AuraSignalReader {
 						break;
 					}
 				}
-			case "custom.script": bool(out, true, solarflare.scripting.ScriptEngine.evalBool(subject, frame));
+			case "custom.script":
+				var r=solarflare.scripting.ScriptEngine.evaluate(subject,frame);
+				bool(out,r.known,r.value);
+				out.eventSerial=r.eventSerial;
+				if(!r.known) out.code=r.state=="Waiting for data" ? UNKNOWN_DOMAIN : INVALID_RULE;
 			default: out.code = UNKNOWN_SIGNAL;
 		}
 	}

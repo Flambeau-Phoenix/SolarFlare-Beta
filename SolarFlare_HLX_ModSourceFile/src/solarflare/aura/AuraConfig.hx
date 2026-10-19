@@ -35,7 +35,7 @@ class AuraConfig {
 	public var auras:Array<AuraDef> = [];
 	/** Aura Sets (an aura's `fight` tag is its set id). Edit through the methods below so the gate rebuilds. */
 	public var sets:Array<AuraSetDef> = [];
-	public static inline var MAX_SETS:Int = 32;
+	public static inline var MAX_SETS:Int = AuraLimits.MAX_SETS;
 	/** Dynamic display groups (an aura's `group` tag is its group id). Window chrome is keyed by group id. */
 	public var groups:Array<AuraGroupDef> = [];
 	var groupChromes:Map<String, HudChrome> = new Map();
@@ -546,6 +546,17 @@ class AuraConfig {
 						a.canvasElements.push(el);
 					}
 					ci++;
+				}
+			}
+		} catch (_:Dynamic) {}
+		a.states = [];
+		try {
+			if (Std.isOfType(d.states, Array)) {
+				var sarr:Array<Dynamic> = cast d.states;
+				for (raw in sarr) {
+					if (a.states.length >= AuraStateDef.MAX_STATES) break;
+					var st = AuraStateDef.fromDyn(raw);
+					if (st != null && AuraStateDef.find(a.states, st.id) == null) a.states.push(st);
 				}
 			}
 		} catch (_:Dynamic) {}

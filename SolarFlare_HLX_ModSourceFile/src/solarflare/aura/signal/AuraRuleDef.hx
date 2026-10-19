@@ -1,7 +1,7 @@
 package solarflare.aura.signal;
 
 class AuraRuleDef {
-	public static inline var MAX_CONDITIONS:Int = 8;
+	public static inline var MAX_CONDITIONS:Int = 32;
 	public static inline var CURRENT_VERSION:Int = 1;
 	public var mode:String = "all";
 	public var conditions:Array<AuraConditionDef> = [];

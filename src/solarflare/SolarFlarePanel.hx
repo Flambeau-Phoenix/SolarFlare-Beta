@@ -170,6 +170,8 @@ class SolarFlarePanel {
 		try
 			solarflare.ui.UiActionQueue.drain()
 		catch (_:Dynamic) {}
+		solarflare.ui.ImageDrop.observe();
+		solarflare.ui.JpegBridge.install();
 
 		solarflare.runtime.TelemetryKernel.observe(app, config, restoreNativeChat);
 		// Character-owned widgets must exist before applying a profile/layout.

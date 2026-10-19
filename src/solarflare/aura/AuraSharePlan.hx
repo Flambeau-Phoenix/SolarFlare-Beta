@@ -5,9 +5,9 @@ class AuraSharePlan {
  public static function prepare(pack:Dynamic,auraIds:Array<String>,groupIds:Array<String>,setIds:Array<String>):Dynamic {
   AuraSharePackage.validatePack(pack);
   var auras:Array<Dynamic>=cast pack.auras; var groups:Array<Dynamic>=cast pack.groups; var sets:Array<Dynamic>=cast pack.sets;
-  if(auras.length+auraIds.length>32) throw "Import needs "+auras.length+" free Aura slots; "+(32-auraIds.length)+" available.";
-  if(groups.length+groupIds.length>32) throw "Not enough free display-group slots for the complete package.";
-  if(sets.length+setIds.length>32) throw "Not enough free set slots for the complete package.";
+  if(auras.length+auraIds.length>AuraLimits.MAX_AURAS) throw "Import needs "+auras.length+" free Aura slots; "+(AuraLimits.MAX_AURAS-auraIds.length)+" available.";
+  if(groups.length+groupIds.length>AuraLimits.MAX_GROUPS) throw "Not enough free display-group slots for the complete package.";
+  if(sets.length+setIds.length>AuraLimits.MAX_SETS) throw "Not enough free set slots for the complete package.";
   var copy=AuraSharePackage.clone(pack);
   var takenAuras=new Map<String,Bool>(); for(id in auraIds) takenAuras.set(id,true);
   var takenGroups=new Map<String,Bool>(); for(id in groupIds) takenGroups.set(id,true);
@@ -18,12 +18,26 @@ class AuraSharePlan {
   rows=cast copy.sets;
   for(row in rows) { var prior:String=row.id; row.id=allocate(prior,takenSets,31); setMap.set(prior,row.id); }
   rows=cast copy.auras;
+  var auraMap=new Map<String,String>();
   for(row in rows) {
+   var prior:String=row.id;
    row.id=allocate(row.id,takenAuras,160);
+   auraMap.set(prior,row.id);
    row.group=row.group==null || row.group=="" ? "" : groupMap.get(row.group);
    row.fight=row.fight==null || row.fight=="" ? "" : setMap.get(row.fight);
   }
+  // "Another aura is showing" conditions name auras by id, so they follow the ids this import allocated.
+  for(row in rows) {
+   remapAuraConditions(row.rule,auraMap);
+   if(Std.isOfType(row.states,Array)) { var sts:Array<Dynamic>=cast row.states; for(st in sts) if(st!=null) remapAuraConditions(st.rule,auraMap); }
+   if(Std.isOfType(row.canvasElements,Array)) { var els:Array<Dynamic>=cast row.canvasElements; for(el in els) if(el!=null) remapAuraConditions(el.visibilityRule,auraMap); }
+  }
   return copy;
+ }
+ static function remapAuraConditions(rule:Dynamic,map:Map<String,String>):Void {
+  if(rule==null || !Std.isOfType(rule.conditions,Array)) return;
+  var cs:Array<Dynamic>=cast rule.conditions;
+  for(c in cs) if(c!=null && c.signal=="aura.active" && Std.isOfType(c.subject,String) && map.exists(c.subject)) c.subject=map.get(c.subject);
  }
  static function allocate(base:String,taken:Map<String,Bool>,max:Int):String {
   var root=boundedId(base,max); var id=root; var n=2;

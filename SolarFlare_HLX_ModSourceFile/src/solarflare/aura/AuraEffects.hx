@@ -48,7 +48,7 @@ class AuraEffects {
 			i++;
 			if (e == null || !e.enabled.get())
 				continue;
-			var active = evalWhen(e, hit, known, now, a);
+			var active = evalWhen(e, hit, known, now, a,timerRestart);
 			if (!active)
 				continue;
 			var kind = e.kind;
@@ -117,7 +117,7 @@ class AuraEffects {
 		a.progress = drawProg;
 		a.timeLeft = drawLeft;
 		a.timerInfinite = drawInf;
-		var rise = hit && !a.condWas;
+		var rise = AuraEffectEdges.rise(known,hit,a.condWas,timerRestart);
 		// Must run while condWas still holds the previous frame's edge.
 		var timerEdge = AuraTimerClock.trigger(known, hit, a.condWas, a.timerStartEdge);
 		if (cooldownDriven) AuraTimer.tickCooldown(a, cooldown, now);
@@ -217,14 +217,14 @@ class AuraEffects {
 		clearAlertRuntime(a);
 	}
 
-	static function evalWhen(e:AuraEffect, hit:Bool, known:Bool, now:Float, a:AuraDef):Bool {
+	static function evalWhen(e:AuraEffect, hit:Bool, known:Bool, now:Float, a:AuraDef,eventRestart:Bool=false):Bool {
 		if (!known && e.when != AuraEffect.WHEN_ON_RISE_HOLD && e.when != AuraEffect.WHEN_ON_FALL_HOLD
 			&& e.when != AuraEffect.WHEN_STICKY) {
 			if (e.when == AuraEffect.WHEN_WHILE_TRUE || e.when == AuraEffect.WHEN_WHILE_FALSE)
 				return false;
 		}
-		var rise = hit && !a.condWas;
-		var fall = !hit && a.condWas;
+		var rise = AuraEffectEdges.rise(known,hit,a.condWas,eventRestart);
+		var fall = AuraEffectEdges.fall(known,hit,a.condWas);
 		var hold = e.hold > 0.05 ? e.hold : catalogHold(a, 1.5);
 
 		switch (e.when) {

@@ -6,6 +6,7 @@ import imgui.Enums.ImGuiCol;
 import imgui.Enums.ImGuiCond;
 import imgui.Enums.ImGuiKey;
 import imgui.Enums.ImGuiStyleVar;
+import imgui.Enums.ImGuiInputTextFlags;
 import solarflare.aura.AuraDef;
 import solarflare.aura.AuraEngine;
 import solarflare.aura.signal.AuraSignalDescriptor;
@@ -126,6 +127,11 @@ class AuraConditionEditor {
 
 	public static function humanConditionSummary(c:AuraConditionDef):String {
 		if (c == null) return "Empty condition";
+		if(c.signal=="custom.script") {
+			var excerpt=StringTools.trim(c.subject).split("\n").join(" ");
+			if(excerpt.length>64) excerpt=excerpt.substr(0,61)+"...";
+			return (c.negate ? "not " : "")+"Haxe expression: "+(excerpt=="" ? "(empty)" : excerpt)+" "+friendlyOp(c.op)+" "+(c.boolValue ? "true" : "false");
+		}
 		var d = AuraSignalCatalog.find(c.signal);
 		var sigLabel = d != null ? d.label : (c.signal.length > 0 ? c.signal : "Signal");
 		var subLabel = subjectName(c);
@@ -302,7 +308,7 @@ class AuraConditionEditor {
 		}
 
 		d = AuraSignalCatalog.find(c.signal);
-		if (d != null && d.subjectKind.length > 0) {
+		if (d != null && d.subjectKind.length > 0 && d.subjectKind!="script") {
 			if (!compact) ImGui.sameLine();
 			drawSubjectInline(a, c, ui, d.subjectKind, tag, bossFocusId);
 		}
@@ -331,21 +337,21 @@ class AuraConditionEditor {
 					}
 				case Count:
 					ImGui.setNextItemWidth(90);
-					if (solarflare.ui.NumberField.draw("##cond_cnt_" + tag, ui.numberRef, 0, 100, "%.0f", a.snapshot)) {
+					if (solarflare.ui.NumberField.draw("##cond_cnt_" + tag, ui.numberRef, 0, 9999, "%.0f", a.snapshot)) {
 						ui.pull(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
 					}
 				case Duration:
 					ImGui.setNextItemWidth(100);
-					if (solarflare.ui.NumberField.draw("##cond_dur_" + tag, ui.numberRef, 0, 60, "%.1fs", a.snapshot)) {
+					if (solarflare.ui.NumberField.draw("##cond_dur_" + tag, ui.numberRef, 0, 3600, "%.1fs", a.snapshot)) {
 						ui.pull(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
 					}
 				default:
 					ImGui.setNextItemWidth(90);
-					if (solarflare.ui.NumberField.draw("##cond_num_" + tag, ui.numberRef, 0, 100, "%.1f", a.snapshot)) {
+					if (solarflare.ui.NumberField.draw("##cond_num_" + tag, ui.numberRef, 0, 1e12, "%.1f", a.snapshot)) {
 						ui.pull(c);
 						ui.flashContext();
 						SettingsStore.markDirty();
@@ -354,6 +360,7 @@ class AuraConditionEditor {
 		}
 
 		// Help tips when relevant
+		if(c.signal=="custom.script") drawScriptEditor(a,c,ui,tag,bossFocusId);
 		if (d != null) {
 			if (d.subjectKind=="statusType")
 				ImGui.textWrapped("General status category from any source. Present/absent only; skill IDs, stacks and durations are separate conditions.");
@@ -369,6 +376,12 @@ class AuraConditionEditor {
 				ImGui.textDisabled("Seconds since cast. Use 'within' operator for windows (e.g. within 5s).");
 			else if (AuraConditionValidator.isCombatEvent(d.id))
 				ImGui.textWrapped("Use 'within' to choose how long the combat trigger stays active (e.g. 3s). For a countdown, choose a fixed timer duration.");
+			else if(StringTools.startsWith(d.id,"event.status."))
+				ImGui.textWrapped("Observed changes on your character. Refresh means a timed effect restarted or its instance changed; short transitions between samples may be missed. Untimed effects cannot report refreshes.");
+			else if(d.group=="Movement")
+				ImGui.textWrapped("Follows your equipped dash. Available means a charge is ready; temporary movement restrictions may still prevent dashing. Recharge is time until the next charge.");
+			else if(AuraConditionValidator.isElapsedEvent(d.id))
+				ImGui.textWrapped("Seconds since the observed event. Use within to choose the alert window; loading or observation gaps establish a new baseline.");
 		}
 
 		ImGui.dummy(ImGui.vec2(0, 2));
@@ -384,7 +397,7 @@ class AuraConditionEditor {
 		// validator rejects and compareValue routes to boolValue instead of present.
 		if (d != null && AuraConditionValidator.isStatusPresence(d.id))
 			ops = ["present", "absent"];
-		else if (d != null && (d.id == "event.cast.recent" || d.id == "event.playerCast.recent" || AuraConditionValidator.isCombatEvent(d.id)))
+		else if (d != null && AuraConditionValidator.isElapsedEvent(d.id))
 			ops = ["within", "lt", "lte", "eq", "gte", "gt"];
 		else
 			ops = switch (d.kind) {
@@ -409,7 +422,84 @@ class AuraConditionEditor {
 		}
 	}
 
+	static function drawScriptEditor(a:AuraRuleEditorContext,c:AuraConditionDef,ui:AuraConditionUiState,tag:String,bossFocusId:String):Void {
+		ui.syncScript(c);
+		ImGui.spacing();
+		ImGui.textDisabled("Haxe expression / small block - return true or false");
+		if(ImGui.inputTextMultiline("##cond_script_"+tag,ui.scriptBuf,AuraConditionUiState.SCRIPT_BUF,
+			ImGui.vec2(-1,150),ImGuiInputTextFlags.AllowTabInput)) {
+			if(!ui.scriptEditing && a.snapshot!=null) a.snapshot();
+			c.subject=ByteUtil.readString(ui.scriptBuf,AuraConditionUiState.SCRIPT_BUF,false); c.subjectLabel="";
+			ui.scriptSource=c.subject; ui.scriptBytes=haxe.io.Bytes.ofString(c.subject).length;
+			ui.scriptEditing=true;
+			ui.scriptSession.request(c.subject,haxe.Timer.stamp()); SettingsStore.markDirty();
+		}
+		if(!ImGui.isItemActive()) ui.scriptEditing=false;
+		ImGui.textDisabled(ui.scriptBytes+" / 4096 UTF-8 bytes");
+		if(ImGui.smallButton("Check##script_check_"+tag)) ui.scriptSession.request(c.subject,0,true,false);
+		ImGui.sameLine();
+		if(ImGui.smallButton("Test##script_test_"+tag)) ui.scriptSession.request(c.subject,0,true,true);
+		ImGui.setNextItemWidth(-1);
+		if(ImGui.beginCombo("##script_example_"+tag,"Insert example...")) {
+			try {
+			if(ImGui.selectable("Low health, no dash##script_ex_dash_"+tag)) setScript(a,c,ui,'hp < 35 && !signal("dash.available")');
+			if(ImGui.selectable("Missing buff in combat##script_ex_status_"+tag)) setScript(a,c,ui,
+				'signal("combat.inCombat") && !hasStatus("Staff_SummonDemon_Skill1_Status")');
+			if(ImGui.selectable("Local variables and if/else##script_ex_block_"+tag)) setScript(a,c,ui,
+				'{\n  var low = hp < 35;\n  if (low) return signal("dash.available");\n  return false;\n}');
+			} catch(e:Dynamic) { ImGui.endCombo(); throw e; }
+			ImGui.endCombo();
+		}
+		var session=ui.scriptSession;
+		ImGui.textColored(ThemePalette.status(session.state=="Error" ? ThemePalette.STATUS_DANGER :
+			session.state=="True" || session.state=="Valid" ? ThemePalette.STATUS_SUCCESS : ThemePalette.STATUS_INFO),session.state);
+		if(session.message!="") ImGui.textWrapped(session.message);
+		if(UiChrome.groupHeader("Insert signal##script_insert_"+tag,false)) {
+			var insert=ui.scriptInsert; var insertUi=ui.scriptInsertUi;
+			ImGui.setNextItemWidth(-1);
+			if(ImGui.beginCombo("##script_signal_"+tag,AuraSignalCatalog.find(insert.signal).label)) {
+				try {
+				for(d in AuraSignalCatalog.all()) if(d.id!="custom.script" && ImGui.selectable(d.label+"##script_sig_"+tag+d.id,insert.signal==d.id)) {
+					insert.signal=d.id; insert.subject=insert.subjectLabel=""; insertUi.sync(insert);
+				}
+				} catch(e:Dynamic) { ImGui.endCombo(); throw e; }
+				ImGui.endCombo();
+			}
+			var descriptor=AuraSignalCatalog.find(insert.signal);
+			if(descriptor.subjectKind!="") drawSubjectInline(a,insert,insertUi,descriptor.subjectKind,"script_"+tag,bossFocusId);
+			ImGui.textDisabled("Inserts at the end. Combine the value with a comparison, && or ||.");
+			ImGui.textDisabled(descriptor.kind==Percent ? "Percent: 0..1 (legacy hp/mana/rage/spark variables use 0..100)." :
+				descriptor.kind==Duration ? "Seconds. Event signals are elapsed age; recharge/status signals are remaining time." :
+				insert.signal=="target.distance" ? "Horizontal distance in game units." : "Boolean, count, or current amount as named above.");
+			if(ImGui.smallButton("Insert signal##script_add_"+tag)) {
+				if(descriptor.subjectKind=="" || insert.subject!="") {
+					var subject=StringTools.replace(StringTools.replace(insert.subject,"\\","\\\\"),'"','\\"');
+					var expression='signal("'+insert.signal+'"'+(subject=="" ? "" : ', "'+subject+'"')+')';
+					setScript(a,c,ui,c.subject+(StringTools.trim(c.subject)=="" ? "" : "\n")+expression);
+				}
+			}
+		}
+		if(UiChrome.groupHeader("Expression reference##script_ref_"+tag,false)) {
+			ImGui.textWrapped("Use &&, ||, !, comparisons, arithmetic, local var, return, and if/else. Loops and functions are unavailable. Each evaluation starts fresh.");
+			ImGui.textWrapped('signal("id", "subject") reads an Aura signal; known("id", "subject") checks availability. IDs must be quoted literals. Missing data waits instead of becoming zero.');
+			ImGui.textWrapped("hp, shield, mana, rage, spark: 0..100; hpRatio: 0..1; hpCur: amount. combo/comboMax, prayers, prayerLife/Shield/Smite, chaincast/Ready, conduit/Power, step, comboWithin/Final, inRift, damageTaken.");
+			ImGui.textWrapped("Helpers: hasSkill, skillCd, skillReady, hasStatus, statusStacks, statusDuration (one quoted ID). Math: min/max, abs, floor/ceil/round, sqrt/pow, sin/cos/tan, asin/acos/atan/atan2, exp/log, isFinite/isNaN, Math.PI. Times are seconds. Numeric results > 0 remain true for compatibility.");
+		}
+	}
+	static function setScript(a:AuraRuleEditorContext,c:AuraConditionDef,ui:AuraConditionUiState,source:String):Void {
+		if(a.snapshot!=null) a.snapshot(); c.subject=source; c.subjectLabel=""; ui.syncScript(c); SettingsStore.markDirty();
+	}
+
+	/** Other auras a condition may watch (group mates first); installed by the Aura Builder. */
+	public static var auraChoices:Void->Array<{id:String, name:String}> = null;
+
+	static function auraName(id:String):String {
+		if (auraChoices != null) for (r in auraChoices()) if (r.id == id) return r.name;
+		return null;
+	}
+
 	static function subjectName(c:AuraConditionDef):String {
+		if (c.signal == "aura.active") { var n = auraName(c.subject); if (n != null) return n; }
 		// subjectLabel is the stable user-facing identity selected in the catalog.
 		// `subject` may intentionally be rewritten to an engine status id.
 		if (solarflare.cdb.AuraCatalog.validName(c.subjectLabel)) return c.subjectLabel;
@@ -465,6 +555,20 @@ class AuraConditionEditor {
 	}
 
 	static function drawSubjectList(c:AuraConditionDef, ui:AuraConditionUiState, kind:String, tag:String, bossFocusId:String, beforeEdit:Void->Void):Void {
+		if (kind == "aura") {
+			var shown = 0;
+			for (r in (auraChoices != null ? auraChoices() : [])) {
+				if (ui.search.length > 0 && r.name.toLowerCase().indexOf(ui.search) < 0) continue;
+				if (ImGui.selectable(r.name + "##aura_pick_" + r.id, c.subject == r.id)) {
+					if (beforeEdit != null) beforeEdit();
+					c.subject = r.id; c.subjectLabel = r.name;
+					ui.sync(c); ui.flashContext(); SettingsStore.markDirty(); ImGui.closeCurrentPopup();
+				}
+				shown++;
+			}
+			if (shown == 0) ImGui.textDisabled("No other auras match.");
+			return;
+		}
 		if(kind=="statusType") {
 			ImGui.separatorText("General status types");
 			var shown=0;

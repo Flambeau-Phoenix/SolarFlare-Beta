@@ -12,6 +12,7 @@ import solarflare.getrifty.GetRifty;
 import solarflare.combatlog.CombatLogCache;
 
 class AuraSignalFrameBuilder {
+	static var changes=new AuraChangeTracker();
 	public static function build(frame:AuraSignalFrame, now:Float):Void {
 		frame.resetCollections(); frame.generation++; frame.builtAt = now;
 		frame.castDomainKnown = true;
@@ -30,6 +31,12 @@ class AuraSignalFrameBuilder {
 			dst.statusKnown = r.statusKnown;
 		}
 		frame.healthKnown = HealthCache.valid; frame.healthCurrent = HealthCache.current;
+		frame.manaCurrent=HealthCache.mana; frame.rageCurrent=HealthCache.rage;
+		frame.sparkCurrent=HealthCache.spark; frame.shieldCurrent=HealthCache.shield;
+		frame.aliveKnown=frame.heroKnown && HealthCache.deadKnown; frame.alive=!HealthCache.dead;
+		solarflare.aura.AuraMovementObserver.sample(frame);
+		AuraCombatEvents.bind(HealthCache.identityGen,HealthCache.statusOwnerGen);
+		AuraCombatEvents.publish(frame,now);
 		frame.healthRatio = HealthCache.valid ? HealthCache.ratio() : 0;
 		frame.shieldRatio = HealthCache.valid ? clamp01(HealthCache.shield / (HealthCache.max > 0 ? HealthCache.max : 1)) : 0;
 		frame.rageKnown = HealthCache.rageValid; frame.rageRatio = frame.rageKnown ? HealthCache.rageRatio() : 0;
@@ -105,13 +112,17 @@ class AuraSignalFrameBuilder {
 			var dst = frame.statuses[frame.statusCount++]; dst.rawId = src.id; dst.label = "";
 			dst.instanceId = src.instanceId; dst.sourceItemId = src.sourceItemId; dst.sourceItemKnown = src.sourceItemKnown;
 			dst.ids = src.ids.copy(); dst.present = src.present; dst.durationKnown = src.durationKnown;
+			dst.durationNative=src.stampSource=="live";
 			dst.stacks = src.stacks; dst.stacksKnown = src.stacksKnown; dst.durationLeft = src.left; dst.durationProgress = clamp01(src.progress);
 			dst.infinite = src.infinite;
 			dst.known = src.known && AuraStatusCache.isCurrent(HealthCache.localHero);
 		}
+		changes.observe(frame,now,HealthCache.identityGen,HealthCache.statusOwnerGen,solarflare.ObserveDemand.auraEventStatusIds,solarflare.ObserveDemand.auraEventSkillIds);
+		solarflare.scripting.ScriptEditorSession.observe(frame,now);
 	}
 
 	static function fillTarget(frame:AuraSignalFrame):Void {
+		frame.targetDistance=CombatLogCache.targetDistance;
 		var snap = CombatLogCache.currentTargetSnap();
 		frame.targetKnown = true;
 		frame.targetValid = snap != null && snap.valid;

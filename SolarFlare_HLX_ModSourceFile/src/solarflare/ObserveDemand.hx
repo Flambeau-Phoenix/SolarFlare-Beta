@@ -55,6 +55,9 @@ class ObserveDemand {
 	public static var aurasNeedEnemyCast:Bool = false;
 	/** Target snap for auras even when Target HUD is hidden. */
 	public static var aurasNeedTarget:Bool = false;
+	public static var aurasNeedDash:Bool=false;
+	public static var auraEventStatusIds:Array<String>=[];
+	public static var auraEventSkillIds:Array<String>=[];
 	/** Skill subjects for skill.instantReady (sanitized IDs, rebuilt each publish). */
 	public static var instantSkillIds:Array<String> = [];
 	/** Skill subjects for skill.specialReady (sanitized IDs, rebuilt each publish). */
@@ -140,6 +143,14 @@ class ObserveDemand {
 			&& (cfg.extraBarsPrototype.model.demand() || cfg.extraBarsPrototype.open.get()))
 			|| barterNeedsItems;
 		auras = cfg.auras != null && cfg.auras.enabled.get() && cfg.auras.auras != null && cfg.auras.auras.length > 0;
+		// Cached condition dependencies must participate before the shared class/status demand is computed.
+		if(auras || (cfg.auraBuilder!=null && cfg.auraBuilder.open.get())) for(c in auraConditions) {
+			if(StringTools.startsWith(c.signal,"prayer.")) prayers=true;
+			if(StringTools.startsWith(c.signal,"resource.combo.")) comboPoints=true;
+			if(StringTools.startsWith(c.signal,"chaincast.")) chaincast=true;
+			if(StringTools.startsWith(c.signal,"conduit.")) conduit=true;
+			if(StringTools.startsWith(c.signal,"attackCombo.")) attackCombo=true;
+		}
 		// Mage overlays read statuses from the one status owner; their ids join the demand set.
 		var mageStatus = (chaincast || conduit) && solarflare.HealthHooks.localIsMage;
 		if (mageStatus != mageStatusDemanded) {
@@ -176,20 +187,33 @@ class ObserveDemand {
 					for (id in solarflare.conduit.Conduit.ConduitCache.lookupIds()) pushStatusId(id);
 			}
 			auraConditions.resize(0);
+			auraEventStatusIds.resize(0); auraEventSkillIds.resize(0);
+			var scriptCodes:Array<String>=[];
 			if (cfg.auras != null) {
 				for (a in cfg.auras.auras) if (a != null && a.enabled.get()) {
-					solarflare.aura.signal.AuraRuleDemand.append(a.rule, a.canvasElements, auraConditions);
+					solarflare.aura.signal.AuraRuleDemand.append(a.rule, a.canvasElements, auraConditions, a.states);
+					if(a.rule==null && (a.trigger=="script" || a.trigger=="custom")) scriptCodes.push(a.skillId);
 					if (a.rule == null && a.trigger == "cooldown") pushAuraSkillId(a.skillId);
 					if (a.trigger == "status") addStatusId(a.skillId);
 				}
 			}
+			if(auraBuilderOpen) solarflare.scripting.ScriptEditorSession.appendCodes(scriptCodes);
+			solarflare.scripting.ScriptDemand.expand(auraConditions,scriptCodes);
 			for (c in auraConditions) {
 				if (c.signal == null) continue;
+				if(StringTools.startsWith(c.signal,"event.status.")) {
+					var id=solarflare.cdb.CdbAuraTable.statusSubjectId(c.subject);
+					if(id!="" && auraEventStatusIds.indexOf(id)<0) auraEventStatusIds.push(id);
+				}
+				if(StringTools.startsWith(c.signal,"event.skill.")) {
+					var id=solarflare.geaux.GeauxCache.sanitizeSkillId(c.subject);
+					if(id!="" && auraEventSkillIds.indexOf(id)<0) auraEventSkillIds.push(id);
+				}
 				if (StringTools.startsWith(c.signal,"target.status.")) {
 				 var id=solarflare.cdb.CdbAuraTable.statusSubjectId(c.subject);
 				 if (id.length>0 && targetStatusIds.indexOf(id)<0) targetStatusIds.push(id);
 				}
-				if (StringTools.startsWith(c.signal, "skill.")) pushAuraSkillId(c.subject);
+				if (StringTools.startsWith(c.signal, "skill.") || StringTools.startsWith(c.signal,"event.skill.") || c.signal=="event.playerCast.recent") pushAuraSkillId(c.subject);
 				if (StringTools.startsWith(c.signal, "consumable.")) {
 					var entry = solarflare.cdb.ConsumableCatalog.find(c.subject);
 					if (entry != null && consumableIds.indexOf(entry.id) < 0) {
@@ -213,6 +237,18 @@ class ObserveDemand {
 				}
 			}
 		}
+		if(auras || auraBuilderOpen) for(c in auraConditions) {
+			if(StringTools.startsWith(c.signal,"prayer.")) prayers=true;
+			if(StringTools.startsWith(c.signal,"resource.combo.")) comboPoints=true;
+			if(StringTools.startsWith(c.signal,"chaincast.")) chaincast=true;
+			if(StringTools.startsWith(c.signal,"conduit.")) conduit=true;
+			if(StringTools.startsWith(c.signal,"attackCombo.")) attackCombo=true;
+		}
+		aurasNeedDash=false;
+		if(auras || auraBuilderOpen) for(c in auraConditions)
+			if(StringTools.startsWith(c.signal,"dash.") || StringTools.startsWith(c.signal,"event.dash.")) aurasNeedDash=true;
+		if(!aurasNeedDash) solarflare.aura.AuraMovementObserver.reset();
+		if(!auraBuilderOpen) solarflare.scripting.ScriptEditorSession.clear();
 		// BarTer subjects: bounded rebuild (three active bars × 64 cells), own poll path.
 		barterSkillIds.resize(0);
 		barterStatusIds.resize(0);
@@ -288,7 +324,7 @@ class ObserveDemand {
 	static function auraRulesNeedStatus(cfg:ConfigPanel):Bool {
 		for (c in auraConditions) {
 			if (c.signal == "status.count" || c.signal == "status.overflow") needsStatusContainer = true;
-			else if (c.signal != null && StringTools.startsWith(c.signal, "status.")) addStatusId(c.subject);
+			else if (c.signal != null && (StringTools.startsWith(c.signal, "status.") || StringTools.startsWith(c.signal,"event.status."))) addStatusId(c.subject);
 		}
 		return statusIds.length > 0 || needsStatusContainer;
 	}

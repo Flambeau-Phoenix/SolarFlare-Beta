@@ -20,7 +20,10 @@ class AuraConditionValidator {
 		var out:Array<String> = [];
 		if (c.signal == null) c.signal = ""; if (c.subject == null) c.subject = ""; if (c.subjectLabel == null) c.subjectLabel = "";
 		if (c.op == null) c.op = ""; if (c.stringValue == null) c.stringValue = "";
-		c.signal = limit(c.signal); c.subject = limit(c.subject); c.subjectLabel = limit(c.subjectLabel); c.stringValue = limit(c.stringValue);
+		c.signal = limit(c.signal);
+		if(c.signal!="custom.script") c.subject=limit(c.subject);
+		else if(haxe.io.Bytes.ofString(c.subject).length>4096) out.push("Expression exceeds 4,096 UTF-8 bytes; source preserved.");
+		c.subjectLabel = limit(c.subjectLabel); c.stringValue = limit(c.stringValue);
 		var d = AuraSignalCatalog.find(c.signal);
 		if (d == null) out.push("unknown signal");
 		else {
@@ -48,11 +51,12 @@ class AuraConditionValidator {
 	public static function defaultOperator(d:AuraSignalDescriptor):String {
 		if (d == null) return "";
 		if (isStatusPresence(d.id)) return "present";
-		if (d.id == "event.cast.recent" || d.id == "event.playerCast.recent" || isCombatEvent(d.id)) return "within";
+		if (isElapsedEvent(d.id)) return "within";
 		return switch (d.kind) { case Boolean: "is"; case Identity: "eq"; default: "gte"; };
 	}
 	/** Enter/leave combat triggers: elapsed-seconds events evaluated with the `within` window like enemy casts. */
 	public static function isCombatEvent(id:String):Bool return id == "event.combat.entered" || id == "event.combat.left";
+	public static function isElapsedEvent(id:String):Bool return id!=null && StringTools.startsWith(id,"event.") && id!="event.cast.active";
 	public static function isEventOperator(op:String):Bool {
 		return op == "within";
 	}

@@ -83,6 +83,7 @@ class AuraQuickBuildRules {
 		if (issue.length > 0) return issue;
 		var d = AuraSignalCatalog.find(c.signal);
 		var subject = c.subjectLabel.length > 0 ? c.subjectLabel : c.subject;
+		if(c.signal=="custom.script") return "Haxe expression: "+StringTools.trim(c.subject).split("\n").join(" ").substr(0,64);
 		if (AuraConditionValidator.isStatusPresence(d.id)) return subject + (d.id=="target.status.present" || d.id=="target.statusType.present" ? " on current enemy" : d.id=="statusType.present" ? " on me" : "") + " is " + opLabel(c.op);
 		var label = d.label + (subject.length > 0 ? " (" + subject + ")" : "");
 		var value = switch (d.kind) {

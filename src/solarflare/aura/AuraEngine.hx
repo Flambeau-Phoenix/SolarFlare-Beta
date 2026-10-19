@@ -20,7 +20,7 @@ import imgui.ref.BoolRef;
 import imgui.ref.FloatRef;
 
 class AuraEngine {
-	public static inline var MAX:Int = 32;
+	public static inline var MAX:Int = AuraLimits.MAX_AURAS;
 	static inline var STATUS_HOLD:Float = 0.18;
 	static var frame:AuraSignalFrame;
 	static var timerHero:Dynamic;
@@ -98,6 +98,53 @@ class AuraEngine {
 			}
 			i++;
 		}
+		try observeStates(cfg, n) catch (_:Dynamic) {}
+		try observeLayers(cfg, n, now) catch (_:Dynamic) {}
+	}
+
+	/**
+	 * Canvas layers with animation: note when each one appears or goes away (restarting fades when the whole
+	 * aura reappears) and fire its sound cue. The renderer turns these timestamps into fades.
+	 */
+	static function observeLayers(cfg:AuraConfig, n:Int, now:Float):Void {
+		for (i in 0...n) {
+			var a = cfg.auras[i];
+			if (a == null || a.canvasElements == null) continue;
+			var showing = a.enabled.get() && a.show;
+			if (showing != a.layersShowing) {
+				a.layersShowing = showing;
+				for (el in a.canvasElements) if (el != null) el.resetAnimation();
+			}
+			if (!showing) continue;
+			var sid = a.activeState;
+			for (el in a.canvasElements) {
+				if (el == null || !el.hasAnimation()) continue;
+				var event = el.trackVisibility(el.visible(false, sid), now);
+				if (event == 1 && el.soundShow.length > 0) AuraSoundPlayer.play(el.soundShow, el.soundVolume);
+				else if (event == -1 && el.soundHide.length > 0) AuraSoundPlayer.play(el.soundHide, el.soundVolume);
+			}
+		}
+	}
+
+	/**
+	 * Second pass, after every aura has settled this tick: publish which auras are showing, then let each
+	 * stateful canvas aura pick its look. States never change `show`, so auras that depend on each other
+	 * cannot feed back into one another.
+	 */
+	static function observeStates(cfg:AuraConfig, n:Int):Void {
+		var any = false;
+		for (i in 0...n) { var a = cfg.auras[i]; if (a != null && a.states != null && a.states.length > 0) { any = true; break; } }
+		if (!any) {
+			for (i in 0...n) { var a = cfg.auras[i]; if (a != null && a.activeState != "") a.activeState = ""; }
+			return;
+		}
+		frame.auraShowing.clear();
+		for (i in 0...n) { var a = cfg.auras[i]; if (a != null && a.id != null) frame.auraShowing.set(a.id, a.enabled.get() && a.show); }
+		for (i in 0...n) {
+			var a = cfg.auras[i];
+			if (a == null) continue;
+			a.activeState = a.states != null && a.states.length > 0 && a.enabled.get() ? AuraStateSelect.pick(a.states, frame) : "";
+		}
 	}
 
 	static function clearAllPresentation(cfg:AuraConfig):Void {
@@ -127,6 +174,7 @@ class AuraEngine {
 		}
 		var hit = false;
 		var known = false;
+		var scriptSerial=0;
 		var prog:Float = 1;
 		var stacks = 1;
 		// Seconds remaining published by triggers that know one; NaN leaves the aura timerless.
@@ -223,8 +271,10 @@ class AuraEngine {
 				stacks = stacksNow;
 			}
 		} else if (t == "script" || t == "custom") {
-			known = true;
-			hit = solarflare.scripting.ScriptEngine.evalBool(a.skillId, frame);
+			var scriptResult=solarflare.scripting.ScriptEngine.evaluate(a.skillId,frame);
+			known = scriptResult.known;
+			hit = scriptResult.value;
+			scriptSerial=scriptResult.eventSerial;
 			prog = hit ? 1.0 : 0.0;
 		}
 		if (!known)
@@ -245,7 +295,9 @@ class AuraEngine {
 		// Status-hold fallback keeps a countdown alive while the catalog hold drains.
 		if (!Math.isFinite(buffLeft) && hit && !a.dormant.get() && a.until > now)
 			buffLeft = a.until - now;
-		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf, false, t == "cooldown",
+		var scriptRestart=known && hit && !a.invert.get() && scriptSerial>0 && scriptSerial!=a.timerEventSerial;
+		if(scriptSerial>0) a.timerEventSerial=scriptSerial;
+		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf, scriptRestart, t == "cooldown",
 			t == "cooldown" ? frame.findSkill(a.skillId) : null);
 		a.stacks = stacks < 1 ? 1 : stacks;
 		if (a.resolvedIcon.length == 0) {
@@ -253,7 +305,7 @@ class AuraEngine {
 				a.resolvedIcon = a.iconId;
 			else if (a.plate != null && a.plate.length > 0)
 				a.resolvedIcon = a.plate;
-			else if (a.skillId != null && a.skillId.length > 0)
+			else if (a.skillId != null && a.skillId.length > 0 && t!="script" && t!="custom")
 				a.resolvedIcon = a.skillId;
 		}
 	}
@@ -593,6 +645,8 @@ class AuraEngine {
 			}
 			Reflect.setField(obj, "canvasElements", canvas);
 		}
+		if (a.states != null && a.states.length > 0)
+			Reflect.setField(obj, "states", [for (st in a.states) if (st != null) st.toObj()]);
 		if (a.chrome != null) {
 			Reflect.setField(obj, "referenceWidth", a.chrome.referenceWidth);
 			Reflect.setField(obj, "referenceHeight", a.chrome.referenceHeight);

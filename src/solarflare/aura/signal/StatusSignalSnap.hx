@@ -9,6 +9,8 @@ class StatusSignalSnap {
 	public var ids:Array<String> = [];
 	public var present:Bool = true;
 	public var durationKnown:Bool = false;
+	/** Refresh events require native timing; an estimate becoming readable is not a restart. */
+	public var durationNative:Bool = false;
 	public var label:String = "";
 	public var stacks:Int = 0;
 	public var stacksKnown:Bool = false;
@@ -17,5 +19,5 @@ class StatusSignalSnap {
 	public var infinite:Bool = false;
 	public var known:Bool = false;
 	public function new() {}
-	public function reset():Void { observedAt=0; instanceId = ""; rawId = ""; sourceItemId = ""; sourceItemKnown = false; ids.resize(0); present = true; durationKnown = false; label = ""; stacks = 0; stacksKnown = false; durationLeft = 0; durationProgress = 0; infinite = false; known = false; }
+	public function reset():Void { observedAt=0; instanceId = ""; rawId = ""; sourceItemId = ""; sourceItemKnown = false; ids.resize(0); present = true; durationKnown = durationNative = false; label = ""; stacks = 0; stacksKnown = false; durationLeft = 0; durationProgress = 0; infinite = false; known = false; }
 }

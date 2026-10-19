@@ -5,7 +5,7 @@ class AuraRuleEvaluator {
 	public static function evaluate(rule:AuraRuleDef, frame:AuraSignalFrame, result:AuraRuleResult, statusesAtCast:Bool = false):Void {
 		result.reset();
 		if (rule == null || frame == null || rule.conditions == null || rule.conditions.length == 0 || rule.version != AuraRuleDef.CURRENT_VERSION) { result.code = EMPTY_RULE; return; }
-		var n = rule.conditions.length; if (n > AuraRuleDef.MAX_CONDITIONS) n = AuraRuleDef.MAX_CONDITIONS; result.totalCount = n;
+		var n = rule.conditions.length; if (n > AuraRuleDef.MAX_CONDITIONS) n = AuraRuleDef.MAX_CONDITIONS; result.totalCount = n; result.ensure(n);
 		var castEvent:EnemyCastSignalSnap = null;
 		if (statusesAtCast && rule.mode == "all") {
 			for (c in rule.conditions) {
@@ -22,8 +22,8 @@ class AuraRuleEvaluator {
 		aggregate(result, rule.mode == "all");
 		for (i in 0...n) {
 			var c = rule.conditions[i];
-			if (c != null && (c.signal == "event.playerCast.recent" || AuraConditionValidator.isCombatEvent(c.signal))
-				&& c.op == "within" && !c.negate && result.conditions[i].hit)
+			if (c != null && ((AuraConditionValidator.isElapsedEvent(c.signal) && c.op == "within") || c.signal=="custom.script")
+				&& !c.negate && result.conditions[i].hit)
 				result.eventSerial = Std.int(Math.max(result.eventSerial, result.resolved[i].eventSerial));
 		}
 		var pi = rule.presentationSource; if (pi < 0 || pi >= n) pi = 0;

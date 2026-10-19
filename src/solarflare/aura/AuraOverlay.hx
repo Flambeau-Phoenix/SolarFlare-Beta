@@ -89,7 +89,7 @@ class AuraOverlay {
 		// Unlocked windows in layout mode stay visible as a ghost so the author can
 		// see and reposition them even when the condition is not active.
 		if (!a.show && !layout) return;
-		var sc:Single = Math.max(0.4, Math.min(2.5, a.scale.get()));
+		var sc:Single = a.displayScale();
 		var w:Single = Math.max(24, a.w.get() * sc);
 		var h:Single = Math.max(24, a.h.get() * sc);
 		AuraVisualRenderer.measureBounds(a, w, h, a.stacks, a.counterValue, visualBounds, sc);
@@ -143,7 +143,7 @@ class AuraOverlay {
 	}
 
 	static inline function memberScale(a:AuraDef, g:AuraGroupDef):Single {
-		return Math.max(0.4, Math.min(2.5, a.scale.get())) * g.scale;
+		return a.displayScale() * g.scale;
 	}
 
 	static function byTime(a:AuraDef, b:AuraDef):Int {
@@ -230,7 +230,7 @@ class AuraOverlay {
 
 	function hudBody(size:imgui.Structs.ImVec2):Void {
 		var a = hudAura;
-		var sc:Single = Math.max(0.4, Math.min(2.5, a.scale.get()));
+		var sc:Single = a.displayScale();
 		var layout = a.chrome == null || !a.chrome.locked.get();
 		var p = ImGui.getCursorScreenPos();
 		ImGui.dummy(size);
@@ -255,7 +255,13 @@ class AuraOverlay {
 
 	function hudResize(newW:Single, newH:Single):Void {
 		var a = hudAura;
-		var sc:Single = Math.max(0.4, Math.min(2.5, a.scale.get()));
+		if (a.region == "canvas") {
+			// A canvas keeps its layout and grows as a whole: dragging the window changes the Scale, not the design size.
+			a.scale.set(AuraCanvasScale.fromResize(a.displayScale(), newW, newH, a.w.get(), a.h.get()));
+			SettingsStore.markDirty();
+			return;
+		}
+		var sc:Single = a.displayScale();
 		a.w.set(Math.max(24, newW) / sc);
 		a.h.set(Math.max(24, newH) / sc);
 		SettingsStore.markDirty();

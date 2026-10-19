@@ -6,7 +6,7 @@ package solarflare.aura;
  * which decide when auras are armed. Pure settings: the window chrome lives on AuraConfig.
  */
 class AuraGroupDef {
-	public static inline var MAX:Int = 32;
+	public static inline var MAX:Int = AuraLimits.MAX_GROUPS;
 
 	public static var GROWS:Array<String> = ["right", "left", "down", "up"];
 	public static var ALIGNS:Array<String> = ["start", "center", "end"];

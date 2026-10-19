@@ -48,7 +48,7 @@ import haxe.Json;
  * All existing condition/effect/canvas/icon/undo/import-export capability is preserved.
  * Creation mode wizard (Boss / Skill / Utility / Free) adds guided entry without new engine.
  */
-class AuraBuilder implements solarflare.aura.ui.BossModsHost {
+class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarflare.aura.ui.CanvasHost {
 	public var open = new BoolRef(false);
 	var cfg:AuraConfig;
 	var host:ConfigPanel;
@@ -61,6 +61,8 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 	var rangeAnchorId:String = "";
 
 	var undoManager = new UndoManager<String>(40);
+	var undoCoordinator:AuraUndoCoordinator;
+	public var canvasEditor:solarflare.aura.ui.CanvasEditor;
 	var auraSearch = new SearchBar("Filter auras by name, signal, or target...", 128);
 	var consumableSearch = new SearchBar("Search potions, elixirs, and boons...", 128);
 	var consumableTrack:String = "consumable.active";
@@ -91,45 +93,14 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 	var homeCategory:String = "utility";
 	var creationScrollToGallery:Bool = false;
 
-	var canvasSel:Int = -1;
-	var canvasEditX = new FloatRef(0);
-	var canvasEditY = new FloatRef(0);
-	var canvasEditW = new FloatRef(48);
-	var canvasEditH = new FloatRef(48);
-	var canvasEditFs = new FloatRef(16);
-	var canvasColBuf:hl.Bytes;
-	var lastCanvasColorAuraId:String = "";
-	var lastCanvasColorSel:Int = -1;
 	var glowColBuf:hl.Bytes;
 	var lastGlowAuraId:String = "";
-	var canvasContentBuf = new hl.Bytes(160);
 	/** Separate buffer so the Display card's inline field never aliases the Canvas Elements field. */
 	var canvasQuickBuf = new hl.Bytes(160);
 	static inline var CANVAS_CONTENT_BUF:Int = 160;
-	var canvasEditStroke = new FloatRef(0);
-	var canvasFlagRef = new BoolRef(false);
-	var canvasSnap = new BoolRef(true);
-	var canvasRuleContexts = new haxe.ds.ObjectMap<AuraCanvasElement, solarflare.aura.signal.AuraRuleEditorContext>();
-	var nextCanvasRuleId:Int = 1;
-	var lastCanvasColorEl:AuraCanvasElement = null;
-	var lastCanvasColorValue:Int = 0;
-	var canvasColorEditing:Bool = false;
 	/** Stage drag: mode, element start box, and the pre-drag undo state (pushed on release if moved). */
-	var canvasDragMode:Int = 0;
-	var canvasDragX:Float = 0;
-	var canvasDragY:Float = 0;
-	var canvasDragW:Float = 0;
-	var canvasDragH:Float = 0;
-	var canvasDragMoved:Bool = false;
-	var canvasDragUndo:String = null;
 	var canvasFieldUndoState:String = null;
-	var canvasNudgeStamp:Float = 0;
 	/** Scratch box written by canvasBox(); avoids a per-hit-test allocation. */
-	var cvBoxX:Float = 0;
-	var cvBoxY:Float = 0;
-	var cvBoxW:Float = 0;
-	var cvBoxH:Float = 0;
-	var canvasImgComboOpen:Bool = false;
 	/** Group editor owns the workspace while `selected` still equals `groupOpenedAt`. */
 	var selectedGroupId:String = "";
 	var groupOpenedAt:Int = -2;
@@ -146,15 +117,6 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 	var groupSnapshotFn:Void->Void;
 	/** Groups from the pack being imported; added after its auras land. */
 	var pendingImportGroups:Array<AuraGroupDef> = null;
-	static inline var CANVAS_IMPORT_BUF:Int = 520;
-	var canvasImportBuf = new hl.Bytes(520);
-	var canvasImportMsg:String = "";
-	var canvasImportErr:Bool = false;
-	static inline var CANVAS_FOLDER_BUF:Int = 1024;
-	var canvasFolderBuf = new hl.Bytes(CANVAS_FOLDER_BUF);
-	var canvasFolderGeneration:Int = -1;
-	var canvasFolderMsg:String = "";
-	var canvasFolderError:Bool = false;
 	var libraryCollapsed:Bool = false;
 	var buildFocusBossId:String = "";
 
@@ -182,9 +144,6 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 	var wizardOpenRequest:Bool = false;
 
 	var preciseSnapshotFn:Void->Void;
-	var canvasRowIds=new haxe.ds.ObjectMap<AuraCanvasElement,Int>();
-	var canvasRowOwner:AuraDef;
-	var nextCanvasRowId:Int=1;
 	function preciseSnapshot():Void snapshot("Adjust Aura value");
 
 	public function new(cfg:AuraConfig, host:ConfigPanel) {
@@ -193,16 +152,15 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		solarflare.ui.ByteUtil.clearBytes(groupNameBuf, 64);
 		this.cfg = cfg;
 		this.host = host;
+		canvasEditor = new solarflare.aura.ui.CanvasEditor(this);
+		undoCoordinator = new AuraUndoCoordinator(undoManager, snapshotJson, captureCanvasById, restoreSnapshot, restoreCanvas);
+		solarflare.aura.signal.AuraConditionEditor.auraChoices = auraChoicesForConditions;
 		sharePanel=new solarflare.aura.ui.AuraSharePanel(shareService,queueShareScope,queueShareInspect,queueShareImport);
 		glowColBuf = ImGui.v4(1, 0.53, 0, 1);
-		canvasColBuf = ImGui.v4(1, 1, 1, 1);
 		solarflare.ui.ByteUtil.clearBytes(iconSearchBuf, 80);
 		solarflare.ui.ByteUtil.clearBytes(exportBuf, JSON_BUF);
 		solarflare.ui.ByteUtil.clearBytes(importBuf, JSON_BUF);
-		solarflare.ui.ByteUtil.clearBytes(canvasContentBuf, CANVAS_CONTENT_BUF);
 		solarflare.ui.ByteUtil.clearBytes(canvasQuickBuf, CANVAS_CONTENT_BUF);
-		solarflare.ui.ByteUtil.clearBytes(canvasImportBuf, CANVAS_IMPORT_BUF);
-		solarflare.ui.ByteUtil.clearBytes(canvasFolderBuf, CANVAS_FOLDER_BUF);
 		solarflare.ui.ByteUtil.clearBytes(wizardSubjectBuf, 128);
 		solarflare.ui.ByteUtil.clearBytes(wizardCatalogSearchBuf, 96);
 		solarflare.ui.ByteUtil.clearBytes(wizardFightBuf, 32);
@@ -235,10 +193,9 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 			if(data.uiLayouts!=null) host.uiLayouts.load(host,data.uiLayouts,solarflare.ui.HudLayoutModel.legacy({auras:{config:{list:data.auras}}}));
 			host.uiLayouts.requestReconcile();
 			boundEditorAura = null;
-			canvasSel = -1;
+			canvasEditor.canvasSel = -1;
 			lastGlowAuraId = "";
-			lastCanvasColorAuraId = "";
-			lastCanvasColorSel = -1;
+			canvasEditor.invalidateColor();
 			selected = cfg.auras.length > 0 ? 0 : -1;
 			creationHomeOpen = selected < 0 && selectedGroupId.length == 0;
 			groupOpenedAt = selected;
@@ -248,6 +205,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 	}
 
 	public function clearTransientState():Void {
+		if (canvasEditor != null) canvasEditor.clearTransientState();
 		StatusTypeDemand.beginEditorFrame();
 		shareEpoch++; shareService.cancel();
 		combatLogsOpen = false;
@@ -257,13 +215,12 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		setDeleteArmed = "";
 		quickBuild.cancel();
 		advancedPreview.reset();
-		canvasRuleContexts = new haxe.ds.ObjectMap();
+		canvasEditor.resetRuleContexts();
 		boundEditorAura = null;
-		canvasSel = -1;
+		canvasEditor.canvasSel = -1;
 		lastGlowAuraId = "";
-		lastCanvasColorAuraId = "";
-		lastCanvasColorSel = -1;
-		resetCanvasTransient();
+		canvasEditor.invalidateColor();
+		canvasEditor.resetCanvasTransient();
 		selected = -1;
 		creationHomeOpen = true;
 		deleteArmed = -1;
@@ -312,7 +269,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 				 bank.layouts.set(layout,rows);
 				 host.uiLayouts.requestReconcile(); SettingsStore.markDirty(); solarflare.ObserveDemand.markStatusDemandDirty();
 				 undoManager.push("Import share file",before);
-				 selected=cfg.auras.length-1; selectedGroupId=""; creationHomeOpen=false; boundEditorAura=null; canvasSel=-1;
+				 selected=cfg.auras.length-1; selectedGroupId=""; creationHomeOpen=false; boundEditorAura=null; canvasEditor.canvasSel=-1;
 				} catch(e:Dynamic) { bank.layouts.set(layout,oldRows); transaction.rollback(); throw e; }
 			},alive);
 		});
@@ -422,18 +379,8 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		if (ImGui.beginMenu("Edit")) {
 			var canUndo = undoManager.canUndo();
 			var canRedo = undoManager.canRedo();
-			if (ImGui.menuItem("Undo", "Ctrl+Z", false, canUndo)) {
-				var currentJson = try snapshotJson() catch (_) "";
-				var snap = undoManager.undo(currentJson);
-				if (snap != null)
-					restoreSnapshot(snap);
-			}
-			if (ImGui.menuItem("Redo", "Ctrl+Y", false, canRedo)) {
-				var currentJson = try snapshotJson() catch (_) "";
-				var snap = undoManager.redo(currentJson);
-				if (snap != null)
-					restoreSnapshot(snap);
-			}
+			if (ImGui.menuItem("Undo", "Ctrl+Z", false, canUndo)) performUndo();
+			if (ImGui.menuItem("Redo", "Ctrl+Y", false, canRedo)) performRedo();
 			ImGui.endMenu();
 		}
 		if (ImGui.beginMenu("View")) {
@@ -461,8 +408,13 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		ImGui.sameLine(0, 12);
 		drawStatusPill();
 		ImGui.sameLine(0, 12);
-		var currentJson = try snapshotJson() catch (_) "";
-		undoManager.drawButtons(currentJson, restoreSnapshot);
+		ImGui.beginDisabled(!undoManager.canUndo());
+		if (ImGui.button("Undo##ab_undo")) performUndo();
+		ImGui.endDisabled();
+		ImGui.sameLine();
+		ImGui.beginDisabled(!undoManager.canRedo());
+		if (ImGui.button("Redo##ab_redo")) performRedo();
+		ImGui.endDisabled();
 		if (SettingsStore.isDirty()) { ImGui.sameLine(0, 12); ImGui.textColored(ImGui.vec4(0.95, 0.72, 0.25, 1), "* Unsaved"); }
 
 		// Resolve after profile and Undo/Redo actions, which may replace cfg.auras.
@@ -521,11 +473,10 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		if (boundEditorAura != a) {
 			advancedPreview.reset();
 			boundEditorAura = a;
-			canvasSel = -1;
+			canvasEditor.canvasSel = -1;
 			lastGlowAuraId = "";
-			lastCanvasColorAuraId = "";
-			lastCanvasColorSel = -1;
-			resetCanvasTransient();
+			canvasEditor.invalidateColor();
+			canvasEditor.resetCanvasTransient();
 		}
 		drawAuraIdentityBar(a);
 		if (creationHomeOpen) return;
@@ -777,7 +728,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 			selectedIds = new Map();
 			selectedIds.set(id, true);
 			rangeAnchorId = id;
-			canvasSel = -1;
+			canvasEditor.canvasSel = -1;
 			lastGlowAuraId = "";
 			return;
 		}
@@ -1077,8 +1028,6 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		drawThenPreview(a);
 		drawSectionCard("Display", "Style, timer, counter, alert", false, function() drawAppearance(a));
 		drawSectionCard("Window", "", false, function() drawWindowLayout(a));
-		if (a.region == "canvas")
-			drawSectionCard("Canvas Elements", "", false, function() drawCanvasElements(a));
 		drawSectionCard("Alerts and Actions", "", false, function() {
 			cfg.drawEffects(a, true);
 		});
@@ -1288,7 +1237,14 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		if (ImGui.isItemHovered() && isMixed)
 			ImGui.setTooltip("Mixed across selection — click to enable all");
 	}
-	function drawAppearanceFxStrip(a:AuraDef):Void {
+	function drawAppearanceFxStrip(a:AuraDef, tiles:Bool = true):Void {
+		if (a == null) return;
+		if (tiles) drawFxTiles(a);
+		drawFxStripRest(a);
+	}
+
+	/** The six shortcut toggles; shown beside the preview, or under it for freeform canvas auras. */
+	function drawFxTiles(a:AuraDef):Void {
 		if (a == null) return;
 		var selectionCount = countSelected();
 		if (selectionCount > 1) ImGui.textDisabled("Selection shortcuts — " + selectionCount + " auras");
@@ -1315,6 +1271,9 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 			}, 6);
 			if (row + 1 < rows) ImGui.dummy(ImGui.vec2(0, 6));
 		}
+	}
+
+	function drawFxStripRest(a:AuraDef):Void {
 		UiChrome.subHeader("Timer");
 		drawTimerRows(a);
 		if (a.stackCounter.get() || a.isCounter.get()) {
@@ -1595,7 +1554,9 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 
 	function drawThenPreview(a:AuraDef):Void {
 		var width = ImGui.getContentRegionAvail().x;
-		var previewW:Single = Math.max(160, Math.min(220, width * 0.38));
+		var isCanvas = a.region == "canvas";
+		// A canvas aura keeps its looks and shortcuts under the preview, so that column gets more room.
+		var previewW:Single = isCanvas ? Math.max(240, Math.min(340, width * 0.46)) : Math.max(160, Math.min(220, width * 0.38));
 		UiScope.table("##ab_preview_controls", 2, function() {
 			ImGui.tableSetupColumn("##preview", imgui.Enums.ImGuiTableColumnFlags.WidthFixed, previewW);
 			ImGui.tableSetupColumn("##controls", imgui.Enums.ImGuiTableColumnFlags.WidthStretch, 1);
@@ -1607,9 +1568,15 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 			advancedPreview.draw(a, previewW, previewW, false, true);
 			if (ImGui.isItemHovered()) ImGui.setTooltip("Live preview of the current settings.");
 			drawSummaryBlock(a, previewW);
+			drawCanvasLauncher(a, previewW);
+			if (isCanvas) {
+				ImGui.spacing();
+				drawSectionCard("Looks", "States", false, function() canvasEditor.drawStatesPanel(a));
+				drawSectionCard("Display shortcuts", "", false, function() drawFxTiles(a));
+			}
 			ImGui.tableSetColumnIndex(1);
-			UiChrome.subHeader("Display shortcuts");
-			drawAppearanceFxStrip(a);
+			if (!isCanvas) UiChrome.subHeader("Display shortcuts");
+			drawAppearanceFxStrip(a, !isCanvas);
 		}, imgui.Enums.ImGuiTableFlags.SizingStretchProp | imgui.Enums.ImGuiTableFlags.NoSavedSettings);
 		drawBehavior(a);
 		ImGui.separator();
@@ -2199,7 +2166,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 				combatLogsOpen = false;
 				applyManagedSelect(a.id, visibleIds);
 				selectedGroupId = "";
-				if (selected != i) { canvasSel = -1; lastGlowAuraId = ""; }
+				if (selected != i) { canvasEditor.canvasSel = -1; lastGlowAuraId = ""; }
 				selected = i;
 				creationHomeOpen = false;
 				deleteArmed = -1;
@@ -2255,7 +2222,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		selectedIds.set(a.id, true);
 		rangeAnchorId = a.id;
 		creationHomeOpen = false;
-		canvasSel = -1;
+		canvasEditor.canvasSel = -1;
 	}
 
 	function groupSnapshot():Void snapshot("Group setting");
@@ -2473,7 +2440,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 			} else {
 				for (i in 0...n) {
 					var a = members[i];
-					var sc = Math.max(0.4, Math.min(2.5, a.scale.get())) * g.scale;
+					var sc = a.displayScale() * g.scale;
 					setPreviewAt(groupPreviewW, i, Math.max(24, a.w.get() * sc));
 					setPreviewAt(groupPreviewH, i, Math.max(24, a.h.get() * sc));
 				}
@@ -2485,7 +2452,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 				var oy:Single = pos.y + (height - th * fit) * 0.5;
 				for (i in 0...n) {
 					var a = members[i];
-					var sc = Math.max(0.4, Math.min(2.5, a.scale.get())) * g.scale * fit;
+					var sc = a.displayScale() * g.scale * fit;
 					var x:Single = ox + groupPreviewLayout.xs[i] * fit;
 					var y:Single = oy + groupPreviewLayout.ys[i] * fit;
 					var w:Single = groupPreviewW[i] * fit;
@@ -2912,466 +2879,78 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		return (al << 24) | (r << 16) | (g << 8) | b;
 	}
 
-	// ---- Freeform canvas editor -------------------------------------------------------------
-	// Stage (drag / resize / nudge / context menu) + Layers list + typed properties.
-	// Coordinates are aura-local and unscaled; the stage fits them, the live HUD multiplies by Scale.
-
-	static inline var CANVAS_STAGE_MAX_H:Single = 280;
-	static inline var CANVAS_STAGE_PAD:Single = 18;
-	static inline var CANVAS_HANDLE_PX:Single = 7;
-	static inline var CANVAS_GRID:Float = 4;
-	static inline var CANVAS_DRAG_NONE:Int = 0;
-	static inline var CANVAS_DRAG_MOVE:Int = 1;
-	static inline var CANVAS_DRAG_SIZE:Int = 2;
-
-	function drawCanvasElements(a:AuraDef):Void {
-		if (a.canvasElements == null) a.canvasElements = [];
-		if (canvasSel >= a.canvasElements.length) canvasSel = -1;
-		drawCanvasToolbar(a);
-		drawCanvasStage(a);
-		drawCanvasLayers(a);
-		var el = canvasSel >= 0 ? a.canvasElements[canvasSel] : null;
-		if (el == null) {
-			ImGui.textDisabled(a.canvasElements.length == 0
-				? "Add text, a game icon, your own image, or a shape to start."
-				: "Select an element on the stage or in Layers to edit it.");
-			return;
+	/** Every other aura, display-group mates first, for the "Another aura is showing" condition. */
+	function auraChoicesForConditions():Array<{id:String, name:String}> {
+		var current = selectedAura();
+		var mates:Array<{id:String, name:String}> = [], others:Array<{id:String, name:String}> = [];
+		for (o in cfg.auras) {
+			if (o == null || o == current) continue;
+			var inGroup = current != null && current.group != null && current.group.length > 0 && o.group == current.group;
+			(inGroup ? mates : others).push({id: o.id, name: (inGroup ? "[group] " : "") + o.displayLabel()});
 		}
-		drawCanvasProperties(a, el);
+		return mates.concat(others);
 	}
 
-	function drawCanvasToolbar(a:AuraDef):Void {
-		ImGui.alignTextToFramePadding();
-		ImGui.textDisabled("Add");
-		ImGui.sameLine(0, 8);
-		if (ImGui.button("Text##ab_cv_add_txt"))
-			addCanvasElement(a, AuraCanvasElement.text("{name}", 8, 8, 16), "Canvas Add Text", false);
-		ImGui.sameLine(0, 4);
-		if (ImGui.button("Icon##ab_cv_add_ico")) {
-			var id = a.preferredIconId();
-			addCanvasElement(a, AuraCanvasElement.icon(id.length > 0 ? id : "icon", 8, 8, 48, 48), "Canvas Add Icon", false);
-		}
-		ImGui.sameLine(0, 4);
-		if (ImGui.button("Image##ab_cv_add_img")) {
-			var names = CustomImages.names();
-			addCanvasElement(a, AuraCanvasElement.icon(CustomImages.key(names.length > 0 ? names[0] : ""), 8, 8, 48, 48),
-				"Canvas Add Image", false);
-		}
-		if (ImGui.isItemHovered()) ImGui.setTooltip("Your own PNG from the images folder configured below.");
-		ImGui.sameLine(0, 4);
-		if (ImGui.button("Shape##ab_cv_add_shape")) {
-			// Shapes start as a backplate behind everything else.
-			addCanvasElement(a, AuraCanvasElement.shape("rounded", 0, 0, a.w.get() > 1 ? a.w.get() : 96,
-				a.h.get() > 1 ? a.h.get() : 96), "Canvas Add Shape", true);
-		}
-		ImGui.sameLine(0, 12);
-		ImGui.checkbox("Snap##ab_cv_snap", canvasSnap);
-		if (ImGui.isItemHovered()) ImGui.setTooltip("Drags snap to a 4 px grid. Hold Alt while dragging to place freely.");
-		UiLayout.propertyGrid("##ab_canvas_preview_mode", function() {
-			UiLayout.propertyRow("Canvas preview", function() {
-				if (ImGui.beginCombo("##ab_canvas_conditions", advancedPreview.liveCanvasConditions ? "Live conditions" : "Edit all layers")) {
-					if (ImGui.selectable("Edit all layers", !advancedPreview.liveCanvasConditions)) advancedPreview.liveCanvasConditions = false;
-					if (ImGui.selectable("Live conditions", advancedPreview.liveCanvasConditions)) advancedPreview.liveCanvasConditions = true;
-					ImGui.endCombo();
-				}
-			}, "Live conditions use observed game state. The Stacks simulation changes display text only.");
-		});
-		drawCanvasAssetFolder();
+	// ---- CanvasHost: the Canvas Editor window edits this builder's selected aura -------------
+	public function canvasSelectedAura():AuraDef return selectedAura();
+	public function canvasSnapshot(name:String):Void {
+		var a = selectedAura();
+		if (a == null) { snapshot(name); return; }
+		undoManager.push(name, canvasDump(a));
+	}
+	public function canvasSnapshotAll(name:String):Void snapshot(name);
+	public function canvasSnapshotJson():String {
+		var a = selectedAura();
+		return a == null ? snapshotJson() : canvasDump(a);
+	}
+	public function canvasUndo():Void performUndo();
+	public function canvasRedo():Void performRedo();
+	public function canvasCanUndo():Bool return undoManager.canUndo();
+	public function canvasCanRedo():Bool return undoManager.canRedo();
+
+	// ---- Scoped (single-aura canvas) undo ---------------------------------------------------
+	// Logic lives in AuraCanvasSnapshot / AuraUndoCoordinator so it can be tested without the game.
+
+	function canvasDump(a:AuraDef):String return AuraCanvasSnapshot.dump(a.id, a.canvasElements, a.states, a.w.get(), a.h.get());
+
+	function auraById(id:String):AuraDef {
+		for (o in cfg.auras) if (o != null && o.id == id) return o;
+		return null;
 	}
 
-	/** Global machine-local preference, independent of the selected aura and its Undo snapshots. */
-	function drawCanvasAssetFolder():Void {
-		if (canvasFolderGeneration != CustomImages.generation) {
-			ByteUtil.fillBuf(canvasFolderBuf, CANVAS_FOLDER_BUF, CustomImages.folder);
-			canvasFolderGeneration = CustomImages.generation;
-		}
-		UiLayout.propertyGrid("##ab_canvas_asset_folder", function() {
-			UiLayout.propertyRow("Images folder", function() {
-				ImGui.setNextItemWidth(Math.max(60, ImGui.getContentRegionAvail().x - 90));
-				var enter = ImGui.inputTextWithHint("##ab_cv_folder_path", CustomImages.displayDir, canvasFolderBuf, CANVAS_FOLDER_BUF,
-					imgui.Enums.ImGuiInputTextFlags.EnterReturnsTrue);
-				ImGui.sameLine(0, 4);
-				if (UiChrome.ghostButton("Use folder##ab_cv_folder_apply", ImGui.vec2(86, 28)) || enter)
-					queueCanvasAssetFolder(readBytes(canvasFolderBuf, CANVAS_FOLDER_BUF));
-			}, "Paste a full folder path, then Use folder. This choice is saved for this PC, across all auras. Leave blank for custom_images.");
-			UiLayout.propertyRow("Folder actions", function() {
-				UiLayout.inlineSplit("##ab_cv_folder_actions", 3, function(index:Int, width:Single) {
-					if (index == 0 && UiChrome.ghostButton("Default##ab_cv_folder_default", ImGui.vec2(width, 28))) queueCanvasAssetFolder("");
-					if (index == 1 && UiChrome.ghostButton("Copy path##ab_cv_folder_copy", ImGui.vec2(width, 28))) UiActionQueue.copyText(CustomImages.displayDir, "Images folder path copied.");
-					if (index == 2 && UiChrome.ghostButton("Refresh##ab_cv_img_refresh", ImGui.vec2(width, 28))) CustomImages.requestRefresh();
-				});
-			});
-		});
-		ImGui.textWrapped(CustomImages.displayDir);
-		if (CustomImages.folderError)
-			ImGui.textColored(solarflare.ui.ThemePalette.status(solarflare.ui.ThemePalette.STATUS_WARN), CustomImages.status);
-		else ImGui.textWrapped(CustomImages.status);
-		if (canvasFolderMsg.length > 0) {
-			if (canvasFolderError) ImGui.textColored(solarflare.ui.ThemePalette.status(solarflare.ui.ThemePalette.STATUS_DANGER), canvasFolderMsg);
-			else ImGui.textWrapped(canvasFolderMsg);
-		}
+	function captureCanvasById(id:String):String {
+		var a = auraById(id);
+		return a != null ? canvasDump(a) : null;
 	}
 
-	function queueCanvasAssetFolder(path:String):Void {
-		UiActionQueue.custom(function() {
-			try {
-				if (CustomImages.useFolder(path)) SettingsStore.markDirty();
-				canvasFolderGeneration = -1;
-				canvasFolderMsg = "Folder selected. Choose Image to add one to the canvas.";
-				canvasFolderError = false;
-			} catch (error:Dynamic) {
-				canvasFolderMsg = Std.string(error); canvasFolderError = true;
-			}
-		});
-	}
+	function performUndo():Void undoCoordinator.undo();
 
-	function addCanvasElement(a:AuraDef, el:AuraCanvasElement, action:String, atBottom:Bool):Void {
-		snapshot(action);
-		if (atBottom) {
-			a.canvasElements.insert(0, el);
-			canvasSel = 0;
-		} else {
-			a.canvasElements.push(el);
-			canvasSel = a.canvasElements.length - 1;
-		}
+	function performRedo():Void undoCoordinator.redo();
+
+	function restoreCanvas(state:String):Bool {
+		var parsed = AuraCanvasSnapshot.parse(state);
+		var a = parsed != null ? auraById(parsed.id) : null;
+		if (a == null) { ToastManager.warn("That aura no longer exists."); return false; }
+		a.canvasElements = parsed.elements;
+		a.states = parsed.states;
+		if (parsed.w > 0) a.w.set(parsed.w);
+		if (parsed.h > 0) a.h.set(parsed.h);
+		a.sizeDirty = true;
+		selected = cfg.auras.indexOf(a);
+		creationHomeOpen = false;
+		canvasEditor.afterExternalRestore();
 		SettingsStore.markDirty();
+		return true;
 	}
 
-	function removeCanvasElement(a:AuraDef, index:Int):Void {
-		if (index < 0 || index >= a.canvasElements.length) return;
-		snapshot("Canvas Delete");
-		canvasSel = CanvasSelection.afterRemoval(canvasSel,index,a.canvasElements.length);
-		canvasRuleContexts.remove(a.canvasElements[index]);
-		canvasRowIds.remove(a.canvasElements[index]);
-		a.canvasElements.splice(index, 1); a.sizeDirty=true;
-		SettingsStore.markDirty();
-	}
-
-	function duplicateCanvasElement(a:AuraDef, index:Int):Void {
-		if (index < 0 || index >= a.canvasElements.length || a.canvasElements[index] == null) return;
-		snapshot("Canvas Duplicate");
-		var copy = AuraCanvasElement.fromDyn(a.canvasElements[index].toObj());
-		copy.x += 8;
-		copy.y += 8;
-		copy.locked = false;
-		a.canvasElements.insert(index + 1, copy);
-		canvasSel = index + 1;
-		SettingsStore.markDirty();
-	}
-
-	/** Move one layer; draw order is array order, so a higher index draws on top. */
-	function moveCanvasElement(a:AuraDef, from:Int, to:Int, action:String):Void {
-		var n = a.canvasElements.length;
-		if (from < 0 || from >= n) return;
-		if (to < 0) to = 0;
-		if (to >= n) to = n - 1;
-		if (to == from) return;
-		snapshot(action);
-		var el = a.canvasElements.splice(from, 1)[0];
-		a.canvasElements.insert(to, el);
-		canvasSel = to;
-		SettingsStore.markDirty();
-	}
-
-	/** Aura-local box of an element into cvBox*; text is measured with the preview's token values. */
-	function canvasBox(a:AuraDef, el:AuraCanvasElement):Void {
-		cvBoxX = el.x;
-		cvBoxY = el.y;
-		if (el.kind == AuraCanvasElement.KIND_TEXT) {
-			cvBoxW = measureCanvasElementW(a, el);
-			cvBoxH = measureCanvasElementH(a, el);
-		} else {
-			cvBoxW = el.w > 1 ? el.w : (a.w.get() > 1 ? a.w.get() : 96);
-			cvBoxH = el.h > 1 ? el.h : (a.h.get() > 1 ? a.h.get() : 96);
-		}
-		if (cvBoxW < 4) cvBoxW = 4;
-		if (cvBoxH < 4) cvBoxH = 4;
-	}
-
-	/** Topmost visible, unlocked element under an aura-local point, or -1. */
-	function canvasHitTest(a:AuraDef, mx:Float, my:Float):Int {
-		var i = a.canvasElements.length - 1;
-		while (i >= 0) {
-			var el = a.canvasElements[i];
-			if (el != null && el.visible(!advancedPreview.liveCanvasConditions) && !el.locked) {
-				canvasBox(a, el);
-				if (mx >= cvBoxX && mx <= cvBoxX + cvBoxW && my >= cvBoxY && my <= cvBoxY + cvBoxH) return i;
-			}
-			i--;
-		}
-		return -1;
-	}
-
-	function canvasHandleHit(a:AuraDef, el:AuraCanvasElement, mx:Float, my:Float, s:Float):Bool {
-		if (el == null || el.locked || !el.visible(!advancedPreview.liveCanvasConditions) || el.kind == AuraCanvasElement.KIND_TEXT) return false;
-		canvasBox(a, el);
-		var r = (CANVAS_HANDLE_PX + 2) / s;
-		return Math.abs(mx - (cvBoxX + cvBoxW)) <= r && Math.abs(my - (cvBoxY + cvBoxH)) <= r;
-	}
-
-	inline function canvasSnapValue(v:Float, snap:Bool):Float {
-		return snap ? Math.round(v / CANVAS_GRID) * CANVAS_GRID : Math.round(v);
-	}
+	public function canvasUndoPush(name:String, state:String):Void undoManager.push(name, state);
+	public function canvasPreview():solarflare.aura.preview.AdvancedAuraPreview return advancedPreview;
+	public function canvasAuras():Array<AuraDef> return cfg.auras;
+	public function canvasPrecise():Void canvasSnapshot("Adjust canvas value");
+	public function canvasHostOpen():Bool return open.get();
 
 	function canvasUndoBase():String {
 		try return snapshotJson() catch (_:Dynamic) return null;
-	}
-
-	function drawCanvasStage(a:AuraDef):Void {
-		var els = a.canvasElements;
-		var theme = solarflare.ui.ThemePalette.current();
-		var auraW:Float = a.w.get() > 1 ? a.w.get() : 96;
-		var auraH:Float = a.h.get() > 1 ? a.h.get() : 96;
-		var availW:Single = Math.max(140, ImGui.getContentRegionAvail().x);
-		var pad = CANVAS_STAGE_PAD;
-		var s:Single = Math.min((availW - pad * 2) / auraW, (CANVAS_STAGE_MAX_H - pad * 2) / auraH);
-		s = Math.max(0.2, Math.min(3, s));
-		var stageH:Single = auraH * s + pad * 2;
-		var origin = ImGui.getCursorScreenPos();
-		var ox:Single = origin.x + (availW - auraW * s) * 0.5;
-		var oy:Single = origin.y + pad;
-		ImGui.invisibleButton("##ab_cv_stage", ImGui.vec2(availW, stageH));
-		var hovered = ImGui.isItemHovered();
-		var active = ImGui.isItemActive();
-		var activated = ImGui.isItemActivated();
-		var focused = ImGui.isItemFocused();
-		var mouse = ImGui.getMousePos();
-		var mx:Float = (mouse.x - ox) / s;
-		var my:Float = (mouse.y - oy) / s;
-		var shift = ImGui.isKeyDown(ImGuiKey.LeftShift) || ImGui.isKeyDown(ImGuiKey.RightShift);
-		var ctrl = ImGui.isKeyDown(ImGuiKey.LeftCtrl) || ImGui.isKeyDown(ImGuiKey.RightCtrl);
-
-		// Press: resize handle of the selection first, then the topmost element, else clear.
-		if (activated) {
-			var sel = canvasSel >= 0 && canvasSel < els.length ? els[canvasSel] : null;
-			canvasDragMode = CANVAS_DRAG_NONE;
-			if (canvasHandleHit(a, sel, mx, my, s)) {
-				canvasDragMode = CANVAS_DRAG_SIZE;
-			} else {
-				canvasSel = canvasHitTest(a, mx, my);
-				if (canvasSel >= 0) canvasDragMode = CANVAS_DRAG_MOVE;
-			}
-			if (canvasDragMode != CANVAS_DRAG_NONE) {
-				var el = els[canvasSel];
-				canvasBox(a, el);
-				canvasDragX = el.x;
-				canvasDragY = el.y;
-				canvasDragW = cvBoxW;
-				canvasDragH = cvBoxH;
-				canvasDragMoved = false;
-				canvasDragUndo = canvasUndoBase();
-			}
-		}
-		if (active && canvasDragMode != CANVAS_DRAG_NONE && canvasSel >= 0 && canvasSel < els.length
-				&& ImGui.isMouseDragging(0, 0)) {
-			var el = els[canvasSel];
-			var d = ImGui.getMouseDragDelta(0, 0);
-			var dx:Float = d.x / s;
-			var dy:Float = d.y / s;
-			var snap = canvasSnap.get() && !ImGui.isKeyDown(ImGuiKey.LeftAlt) && !ImGui.isKeyDown(ImGuiKey.RightAlt);
-			if (canvasDragMode == CANVAS_DRAG_MOVE) {
-				el.x = canvasSnapValue(canvasDragX + dx, snap);
-				el.y = canvasSnapValue(canvasDragY + dy, snap);
-			} else {
-				var nw = Math.max(4, canvasSnapValue(canvasDragW + dx, snap));
-				var nh = Math.max(4, canvasSnapValue(canvasDragH + dy, snap));
-				if (shift && canvasDragW > 0 && canvasDragH > 0) {
-					var k = Math.max(nw / canvasDragW, nh / canvasDragH);
-					nw = Math.max(4, Math.round(canvasDragW * k));
-					nh = Math.max(4, Math.round(canvasDragH * k));
-				}
-				el.w = nw;
-				el.h = nh;
-			}
-			canvasDragMoved = true;
-		}
-		if (!active && canvasDragMode != CANVAS_DRAG_NONE) {
-			if (canvasDragMoved && canvasDragUndo != null) {
-				undoManager.push(canvasDragMode == CANVAS_DRAG_MOVE ? "Canvas Move" : "Canvas Resize", canvasDragUndo);
-				SettingsStore.markDirty();
-			}
-			canvasDragMode = CANVAS_DRAG_NONE;
-			canvasDragUndo = null;
-			canvasDragMoved = false;
-		}
-
-		// Keyboard while the stage has focus or the pointer: arrows nudge, Del removes, Ctrl+D duplicates.
-		if ((focused || hovered) && !active && canvasSel >= 0 && canvasSel < els.length
-				&& els[canvasSel] != null && (focused || !ImGui.isAnyItemActive())) {
-			var el = els[canvasSel];
-			var step:Float = shift ? 10 : 1;
-			var nx:Float = 0;
-			var ny:Float = 0;
-			if (ImGui.isKeyPressed(ImGuiKey.LeftArrow)) nx -= step;
-			if (ImGui.isKeyPressed(ImGuiKey.RightArrow)) nx += step;
-			if (ImGui.isKeyPressed(ImGuiKey.UpArrow)) ny -= step;
-			if (ImGui.isKeyPressed(ImGuiKey.DownArrow)) ny += step;
-			if ((nx != 0 || ny != 0) && !el.locked) {
-				// One undo step per burst of nudges.
-				var now = haxe.Timer.stamp();
-				if (now - canvasNudgeStamp > 0.75) snapshot("Canvas Nudge");
-				canvasNudgeStamp = now;
-				el.x += nx;
-				el.y += ny;
-				SettingsStore.markDirty();
-			}
-			if (ImGui.isKeyPressed(ImGuiKey.Delete, false)) removeCanvasElement(a, canvasSel);
-			else if (ctrl && ImGui.isKeyPressed(ImGuiKey.D, false)) duplicateCanvasElement(a, canvasSel);
-		}
-
-		var hoverIndex = -1;
-		var onHandle = false;
-		if (hovered && !active) {
-			var sel = canvasSel >= 0 && canvasSel < els.length ? els[canvasSel] : null;
-			onHandle = canvasHandleHit(a, sel, mx, my, s);
-			hoverIndex = onHandle ? canvasSel : canvasHitTest(a, mx, my);
-		}
-		if (onHandle || (active && canvasDragMode == CANVAS_DRAG_SIZE)) ImGui.setMouseCursor(imgui.Enums.ImGuiMouseCursor.ResizeNWSE);
-		else if (hoverIndex >= 0 || (active && canvasDragMode == CANVAS_DRAG_MOVE)) ImGui.setMouseCursor(imgui.Enums.ImGuiMouseCursor.ResizeAll);
-		if (hovered && ImGui.isMouseClicked(1)) {
-			canvasSel = canvasHitTest(a, mx, my);
-			if (canvasSel >= 0) ImGui.openPopup("##ab_cv_ctx");
-		}
-
-		var dl = ImGui.getWindowDrawList();
-		var stageMax = ImGui.vec2(origin.x + availW, origin.y + stageH);
-		ImGui.ImDrawList_PushClipRect(dl, origin, stageMax, true);
-		try {
-			ImGui.ImDrawList_AddRectFilled(dl, origin, stageMax, ImGui.colorConvertFloat4ToU32(theme.windowBg), 4);
-			// Light 16 px grid inside the aura bounds when it is readable at this zoom.
-			var gridStep:Float = 16;
-			if (gridStep * s >= 8) {
-				var gridCol = ImGui.colorConvertFloat4ToU32(ImGui.vec4(theme.border.x, theme.border.y, theme.border.z, 0.35));
-				var gx = gridStep;
-				while (gx < auraW) {
-					ImGui.ImDrawList_AddLineV(dl, ox + gx * s, oy, oy + auraH * s, gridCol);
-					gx += gridStep;
-				}
-				var gy = gridStep;
-				while (gy < auraH) {
-					ImGui.ImDrawList_AddLineH(dl, ox, ox + auraW * s, oy + gy * s, gridCol);
-					gy += gridStep;
-				}
-			}
-			ImGui.ImDrawList_AddRect(dl, ImGui.vec2(ox, oy), ImGui.vec2(ox + auraW * s, oy + auraH * s),
-				ImGui.colorConvertFloat4ToU32(theme.border), 0, 1);
-			AuraVisualRenderer.draw(dl, a, ox, oy, auraW * s, auraH * s, advancedPreview.gaugeProgress(a),
-				advancedPreview.stacks.get(), advancedPreview.counter.get(), false, 1, s, null, null, !advancedPreview.liveCanvasConditions);
-			var accent = ImGui.colorConvertFloat4ToU32(theme.accent);
-			if (hoverIndex >= 0 && hoverIndex != canvasSel && els[hoverIndex] != null) {
-				canvasBox(a, els[hoverIndex]);
-				ImGui.ImDrawList_AddRect(dl, ImGui.vec2(ox + cvBoxX * s - 1, oy + cvBoxY * s - 1),
-					ImGui.vec2(ox + (cvBoxX + cvBoxW) * s + 1, oy + (cvBoxY + cvBoxH) * s + 1),
-					ImGui.colorConvertFloat4ToU32(ImGui.vec4(theme.accent.x, theme.accent.y, theme.accent.z, 0.45)), 2, 1);
-			}
-			var sel = canvasSel >= 0 && canvasSel < els.length ? els[canvasSel] : null;
-			if (sel != null) {
-				canvasBox(a, sel);
-				var x0:Single = ox + cvBoxX * s - 1;
-				var y0:Single = oy + cvBoxY * s - 1;
-				var x1:Single = ox + (cvBoxX + cvBoxW) * s + 1;
-				var y1:Single = oy + (cvBoxY + cvBoxH) * s + 1;
-				ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x0, y0), ImGui.vec2(x1, y1), accent, 2, 1.5);
-				if (!sel.locked && sel.visible(!advancedPreview.liveCanvasConditions) && sel.kind != AuraCanvasElement.KIND_TEXT) {
-					var hs:Single = CANVAS_HANDLE_PX * 0.5;
-					ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x1 - hs, y1 - hs), ImGui.vec2(x1 + hs, y1 + hs), accent, 1);
-				}
-			}
-		} catch (e:Dynamic) { ImGui.ImDrawList_PopClipRect(dl); throw e; }
-		ImGui.ImDrawList_PopClipRect(dl);
-
-		if (ImGui.beginPopup("##ab_cv_ctx")) {
-			try drawCanvasContextMenu(a) catch (e:Dynamic) { ImGui.endPopup(); throw e; }
-			ImGui.endPopup();
-		}
-		ImGui.pushTextWrapPos(0);
-		ImGui.textDisabled("Drag to move. Corner handle resizes (Shift keeps the ratio). Arrows nudge, Shift x10. Del removes. Right-click for more.");
-		ImGui.popTextWrapPos();
-	}
-
-	function drawCanvasContextMenu(a:AuraDef):Void {
-		var n = a.canvasElements.length;
-		if (canvasSel < 0 || canvasSel >= n || a.canvasElements[canvasSel] == null) {
-			ImGui.closeCurrentPopup();
-			return;
-		}
-		var el = a.canvasElements[canvasSel];
-		if (ImGui.menuItem("Duplicate", "Ctrl+D")) duplicateCanvasElement(a, canvasSel);
-		ImGui.separator();
-		if (ImGui.menuItem("Bring to front", null, false, canvasSel < n - 1)) moveCanvasElement(a, canvasSel, n - 1, "Canvas To Front");
-		if (ImGui.menuItem("Bring forward", null, false, canvasSel < n - 1)) moveCanvasElement(a, canvasSel, canvasSel + 1, "Canvas Bring Forward");
-		if (ImGui.menuItem("Send backward", null, false, canvasSel > 0)) moveCanvasElement(a, canvasSel, canvasSel - 1, "Canvas Send Backward");
-		if (ImGui.menuItem("Send to back", null, false, canvasSel > 0)) moveCanvasElement(a, canvasSel, 0, "Canvas To Back");
-		ImGui.separator();
-		if (ImGui.menuItem(el.hidden ? "Show" : "Hide")) { snapshot("Canvas Visibility"); el.hidden = !el.hidden; SettingsStore.markDirty(); }
-		if (ImGui.menuItem(el.locked ? "Unlock" : "Lock")) { snapshot("Canvas Lock"); el.locked = !el.locked; SettingsStore.markDirty(); }
-		ImGui.separator();
-		if (ImGui.menuItem("Delete", "Del")) removeCanvasElement(a, canvasSel);
-	}
-
-	function canvasLayerLabel(el:AuraCanvasElement):String {
-		var kind = el.kind == AuraCanvasElement.KIND_SHAPE ? "Shape"
-			: (el.kind == AuraCanvasElement.KIND_ICON ? (el.isCustomImage() ? "Image" : "Icon") : "Text");
-		var body = el.isCustomImage() ? CustomImages.stemOf(el.content) : el.content;
-		if (body == null || body.length == 0) body = "(empty)";
-		if (body.length > 28) body = body.substr(0, 27) + "...";
-		return kind + "  " + body + (el.visibilityRule != null ? (el.visibilityResult.known ? (el.visibilityResult.hit ? "  (condition true)" : "  (condition false)") : "  (condition unknown)") : "") + (el.hidden ? "  (hidden)" : "") + (el.locked ? "  (locked)" : "");
-	}
-
-	/** Topmost layer first. The remove button gets its own fixed cell so the row never covers it. */
-	function drawCanvasLayers(a:AuraDef):Void {
-		if(canvasRowOwner!=a) { canvasRowOwner=a; canvasRowIds=new haxe.ds.ObjectMap<AuraCanvasElement,Int>(); canvasRuleContexts = new haxe.ds.ObjectMap(); }
-		var els = a.canvasElements;
-		if (els.length == 0) return;
-		UiChrome.gap(4);
-		builderSectionHeader("Layers");
-		var rowH:Single = ImGui.getTextLineHeight() + 4;
-		var delW:Single = 24;
-		var removeAt = -1;
-		var i = els.length - 1;
-		while (i >= 0) {
-			var el = els[i];
-			if (el != null) {
-				if(!canvasRowIds.exists(el)) canvasRowIds.set(el,nextCanvasRowId++);
-				ImGui.pushID_Int(canvasRowIds.get(el));
-				var w:Single = Math.max(1, ImGui.getContentRegionAvail().x - delW - 4);
-				if (el.hidden) ImGui.pushStyleColor(ImGuiCol.Text, solarflare.ui.ThemePalette.current().textDisabled);
-				var picked = ImGui.selectable(canvasLayerLabel(el) + "###ab_cv_row", canvasSel == i, 0, ImGui.vec2(w, rowH));
-				if (el.hidden) ImGui.popStyleColor();
-				if (picked) canvasSel = i;
-				ImGui.sameLine(0, 4);
-				if (UiChrome.ghostButton("x##ab_cv_delete", ImGui.vec2(delW, rowH))) removeAt = i;
-				if (ImGui.isItemHovered()) ImGui.setTooltip("Remove this element");
-				ImGui.popID();
-			}
-			i--;
-		}
-		if (removeAt >= 0) removeCanvasElement(a, removeAt);
-		var n = els.length;
-		if (canvasSel < 0 || canvasSel >= n) return;
-		UiLayout.inlineSplit("##ab_cv_order", 5, function(index:Int, cellW:Single) {
-			var size = ImGui.vec2(cellW, 0);
-			switch (index) {
-				case 0:
-					if (ImGui.button("Duplicate##ab_cv_dup", size)) duplicateCanvasElement(a, canvasSel);
-				case 1:
-					ImGui.beginDisabled(canvasSel >= n - 1);
-					if (ImGui.button("To front##ab_cv_top", size)) moveCanvasElement(a, canvasSel, n - 1, "Canvas To Front");
-					ImGui.endDisabled();
-				case 2:
-					ImGui.beginDisabled(canvasSel >= n - 1);
-					if (ImGui.button("Forward##ab_cv_fwd", size)) moveCanvasElement(a, canvasSel, canvasSel + 1, "Canvas Bring Forward");
-					ImGui.endDisabled();
-				case 3:
-					ImGui.beginDisabled(canvasSel <= 0);
-					if (ImGui.button("Backward##ab_cv_back", size)) moveCanvasElement(a, canvasSel, canvasSel - 1, "Canvas Send Backward");
-					ImGui.endDisabled();
-				default:
-					ImGui.beginDisabled(canvasSel <= 0);
-					if (ImGui.button("To back##ab_cv_bottom", size)) moveCanvasElement(a, canvasSel, 0, "Canvas To Back");
-					ImGui.endDisabled();
-			}
-		});
 	}
 
 	/** Push one undo step per typed edit: capture on activation, commit when the edit lands. */
@@ -3383,313 +2962,33 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		}
 	}
 
-	function drawCanvasProperties(a:AuraDef, el:AuraCanvasElement):Void {
-		UiChrome.gap(4);
-		builderSectionHeader(el.kind == AuraCanvasElement.KIND_SHAPE ? "Shape"
-			: (el.kind == AuraCanvasElement.KIND_ICON ? (el.isCustomImage() ? "Custom image" : "Game icon") : "Text"));
-		canvasEditX.set(el.x);
-		canvasEditY.set(el.y);
-		canvasEditW.set(el.w > 1 ? el.w : 48);
-		canvasEditH.set(el.h > 1 ? el.h : 48);
-		canvasEditFs.set(el.fontSize);
-		canvasEditStroke.set(el.stroke);
-		syncCanvasElementColor(a, el);
-		UiLayout.propertyGrid("##ab_cv_props", function() {
-			if (el.kind == AuraCanvasElement.KIND_TEXT) drawCanvasTextRows(el);
-			else if (el.kind == AuraCanvasElement.KIND_SHAPE) {
-				UiLayout.propertyRow("Shape", function() {
-					var picked = UiLayout.stringCombo("ab_cv_shape", el.content, AuraCanvasElement.SHAPES, canvasShapeLabel);
-					if (picked != null) {
-						snapshot("Canvas Shape");
-						el.content = picked;
-						SettingsStore.markDirty();
-					}
-				});
-			} else drawCanvasIconRows(a, el);
-			UiLayout.propertyRow("Position", function() {
-				UiLayout.inlinePair("##ab_cv_xy",
-					function(_:Single) {
-						if (NumberField.draw("##ab_cv_x", canvasEditX, -2000, 2000, "X  %.0f", preciseSnapshotFn)) { el.x = canvasEditX.get(); SettingsStore.markDirty(); }
-
-					},
-					function(_:Single) {
-						if (NumberField.draw("##ab_cv_y", canvasEditY, -2000, 2000, "Y  %.0f", preciseSnapshotFn)) { el.y = canvasEditY.get(); SettingsStore.markDirty(); }
-
-					});
-			}, "Pixels from the aura's top-left corner, before Scale.");
-			if (el.kind == AuraCanvasElement.KIND_TEXT) {
-				UiLayout.propertyRow("Font size", function() {
-					if (NumberField.draw("##ab_cv_fs", canvasEditFs, 6, 120, "%.0f px", preciseSnapshotFn)) { el.fontSize = canvasEditFs.get(); SettingsStore.markDirty(); }
-
-				});
-				UiLayout.propertyRow("Shadow", function() {
-					canvasFlagRef.set(el.shadow);
-					if (ImGui.checkbox("Drop shadow##ab_cv_shadow", canvasFlagRef)) { snapshot("Canvas Shadow"); el.shadow = canvasFlagRef.get(); SettingsStore.markDirty(); }
-				});
-			} else {
-				UiLayout.propertyRow("Size", function() {
-					UiLayout.inlinePair("##ab_cv_wh",
-						function(_:Single) {
-							if (NumberField.draw("##ab_cv_w", canvasEditW, 4, 1024, "W  %.0f", preciseSnapshotFn)) { el.w = canvasEditW.get(); SettingsStore.markDirty(); }
-
-						},
-						function(_:Single) {
-							if (NumberField.draw("##ab_cv_h", canvasEditH, 4, 1024, "H  %.0f", preciseSnapshotFn)) { el.h = canvasEditH.get(); SettingsStore.markDirty(); }
-
-						});
-				});
-			}
-			if (el.kind == AuraCanvasElement.KIND_SHAPE) {
-				UiLayout.propertyRow("Outline", function() {
-					if (NumberField.draw("##ab_cv_stroke", canvasEditStroke, 0, 16, "%.0f px", preciseSnapshotFn)) { el.stroke = canvasEditStroke.get(); SettingsStore.markDirty(); }
-				}, "0 fills the shape; any other value draws only its outline at that thickness.");
-			}
-			UiLayout.propertyRow(el.kind == AuraCanvasElement.KIND_ICON ? "Tint" : "Color", function() {
-				if (ImGui.colorEdit4("##ab_cv_col", canvasColBuf, imgui.Enums.ImGuiColorEditFlags.AlphaBar)) {
-					if (!canvasColorEditing) snapshot("Canvas Color");
-					canvasColorEditing = true;
-					el.color = packCanvasColor();
-					SettingsStore.markDirty();
-				} else if (!ImGui.isAnyItemActive()) canvasColorEditing = false;
-			});
-			UiLayout.propertyRow("Visibility", function() {
-				var conditional = el.visibilityRule != null;
-				if (ImGui.beginCombo("##ab_cv_visibility", conditional ? "When conditions match" : "Always")) {
-					if (ImGui.selectable("Always", !conditional) && conditional) {
-						snapshot("Canvas visibility rule"); el.visibilityRule = null; el.clearVisibility(); SettingsStore.markDirty();
-					}
-					if (ImGui.selectable("When conditions match", conditional) && !conditional) {
-						snapshot("Canvas visibility rule"); el.visibilityRule = new solarflare.aura.signal.AuraRuleDef(); el.clearVisibility(); SettingsStore.markDirty();
-					}
-					ImGui.endCombo();
-				}
-			});
-			UiLayout.propertyRow("State", function() {
-				canvasFlagRef.set(el.hidden);
-				if (ImGui.checkbox("Hidden##ab_cv_hidden", canvasFlagRef)) { snapshot("Canvas Visibility"); el.hidden = canvasFlagRef.get(); SettingsStore.markDirty(); }
-				ImGui.sameLine(0, 16);
-				canvasFlagRef.set(el.locked);
-				if (ImGui.checkbox("Locked##ab_cv_locked", canvasFlagRef)) { snapshot("Canvas Lock"); el.locked = canvasFlagRef.get(); SettingsStore.markDirty(); }
-			}, "Locked elements ignore stage clicks and drags, so plates behind text stay put.");
-			UiLayout.propertyRow("Align", function() drawCanvasAlignRow(a, el));
-		});
-		if (el.visibilityRule != null) {
-			var context = canvasRuleContexts.get(el);
-			if (context == null) {
-				var ui:Array<solarflare.aura.signal.AuraConditionUiState> = [];
-				for (_ in 0...solarflare.aura.signal.AuraRuleDef.MAX_CONDITIONS) ui.push(new solarflare.aura.signal.AuraConditionUiState());
-				context = new solarflare.aura.signal.AuraRuleEditorContext(a.id + "_canvas_" + nextCanvasRuleId++, el.visibilityRule, el.visibilityResult, ui, false);
-				canvasRuleContexts.set(el, context);
-			}
-			context.rule = el.visibilityRule;
-			context.snapshot = preciseSnapshotFn;
-			ImGui.textDisabled(el.visibilityResult.known ? (el.visibilityResult.hit ? "Conditions match" : "Conditions do not match") : "Conditions unavailable or incomplete");
-			solarflare.aura.signal.AuraConditionEditor.drawContext(context);
-		}
-	}
-
-	function drawCanvasTextRows(el:AuraCanvasElement):Void {
-		UiLayout.propertyRow("Text", function() {
-			ByteUtil.fillBuf(canvasContentBuf, CANVAS_CONTENT_BUF, el.content != null ? el.content : "");
-			if (ImGui.inputText("##ab_cv_content", canvasContentBuf, CANVAS_CONTENT_BUF)) {
-				el.content = StringTools.trim(readBytes(canvasContentBuf, CANVAS_CONTENT_BUF));
-				SettingsStore.markDirty();
-			}
-			canvasFieldUndo("Canvas Text");
-		});
-		UiLayout.propertyRow("Insert", function() {
-			for (tok in CANVAS_TOKENS) {
-				if (ImGui.smallButton(tok + "##ab_tok_" + tok)) {
-					snapshot("Canvas Token");
-					el.content += tok;
-					SettingsStore.markDirty();
-				}
-				if (tok != "{name}") ImGui.sameLine(0, 4);
-			}
-		});
-	}
-
-	static var CANVAS_TOKENS:Array<String> = ["{time}", "{stacks}", "{counter}", "{name}"];
-
-	function drawCanvasIconRows(a:AuraDef, el:AuraCanvasElement):Void {
-		UiLayout.propertyRow("Source", function() {
-			var custom = el.isCustomImage();
-			if (ImGui.radioButton("Game icon##ab_cv_src_game", !custom) && custom) {
-				snapshot("Canvas Source");
-				var id = a.preferredIconId();
-				el.content = id.length > 0 ? id : "icon";
-				SettingsStore.markDirty();
-			}
-			ImGui.sameLine(0, 12);
-			if (ImGui.radioButton("Custom image##ab_cv_src_custom", custom) && !custom) {
-				snapshot("Canvas Source");
-				var names = CustomImages.names();
-				el.content = CustomImages.key(names.length > 0 ? names[0] : "");
-				SettingsStore.markDirty();
-			}
-		});
-		if (el.isCustomImage()) {
-			drawCanvasImageRows(el);
+	/** Under the preview: turn this aura into a freeform canvas, or open the editor for the one it already is. */
+	function drawCanvasLauncher(a:AuraDef, w:Single):Void {
+		ImGui.spacing();
+		if (a.region != "canvas") {
+			if (UiChrome.ghostButton("Freeform Canvas...##ab_canvas_launcher", ImGui.vec2(w, 30))) { enableCanvas(a); canvasEditor.open.set(true); }
+			if (ImGui.isItemHovered()) ImGui.setTooltip("Design this aura's look freely with text, icons, your own images and shapes. Pick another Style to go back.");
 			return;
 		}
-		UiLayout.propertyRow("Icon ID", function() {
-			ByteUtil.fillBuf(canvasContentBuf, CANVAS_CONTENT_BUF, el.content != null ? el.content : "");
-			ImGui.setNextItemWidth(Math.max(60, ImGui.getContentRegionAvail().x - 96));
-			if (ImGui.inputText("##ab_cv_content", canvasContentBuf, CANVAS_CONTENT_BUF)) {
-				el.content = StringTools.trim(readBytes(canvasContentBuf, CANVAS_CONTENT_BUF));
-				SettingsStore.markDirty();
-			}
-			canvasFieldUndo("Canvas Icon");
-			ImGui.sameLine(0, 4);
-			if (ImGui.button("Aura icon##ab_cv_use_aura_icon", ImGui.vec2(92, 0))) {
-				snapshot("Canvas Icon");
-				el.content = a.preferredIconId();
-				SettingsStore.markDirty();
-			}
-			if (ImGui.isItemHovered()) ImGui.setTooltip("Use this aura's own icon.");
+		var n = a.canvasElements != null ? a.canvasElements.length : 0;
+		drawSectionCard("Freeform Canvas", n + " element" + (n == 1 ? "" : "s"), true, function() {
+			ImGui.pushStyleColor(ImGuiCol.Text, solarflare.ui.ThemePalette.current().textDisabled);
+			ImGui.textWrapped("Text, icons, your images and shapes, laid out freely. Looks (states) below change what shows.");
+			ImGui.popStyleColor();
+			if (UiChrome.ghostButton((canvasEditor.open.get() ? "Canvas Editor is open" : "Open Canvas Editor") + "##ab_canvas_launcher", ImGui.vec2(-1, 30))) canvasEditor.open.set(true);
+			if (ImGui.isItemHovered()) ImGui.setTooltip("Full-size stage, layers, properties and your image library in a separate window.");
 		});
 	}
 
-	function drawCanvasAlignRow(a:AuraDef, el:AuraCanvasElement):Void {
-		var auraW = a.w.get() > 1 ? a.w.get() : 96;
-		var auraH = a.h.get() > 1 ? a.h.get() : 96;
-		UiLayout.inlineSplit("##ab_cv_align_h", 3, function(index:Int, cellW:Single) {
-			var size = ImGui.vec2(cellW, 0);
-			if (index == 0 && ImGui.button("Left##ab_cv_al", size)) { snapshot("Canvas Align"); el.x = 0; SettingsStore.markDirty(); }
-			else if (index == 1 && ImGui.button("Center##ab_cv_ach", size)) { snapshot("Canvas Align"); el.x = Math.round((auraW - measureCanvasElementW(a, el)) * 0.5); SettingsStore.markDirty(); }
-			else if (index == 2 && ImGui.button("Right##ab_cv_ar", size)) { snapshot("Canvas Align"); el.x = Math.round(auraW - measureCanvasElementW(a, el)); SettingsStore.markDirty(); }
-		});
-		UiLayout.inlineSplit("##ab_cv_align_v", 3, function(index:Int, cellW:Single) {
-			var size = ImGui.vec2(cellW, 0);
-			if (index == 0 && ImGui.button("Top##ab_cv_at", size)) { snapshot("Canvas Align"); el.y = 0; SettingsStore.markDirty(); }
-			else if (index == 1 && ImGui.button("Middle##ab_cv_acv", size)) { snapshot("Canvas Align"); el.y = Math.round((auraH - measureCanvasElementH(a, el)) * 0.5); SettingsStore.markDirty(); }
-			else if (index == 2 && ImGui.button("Bottom##ab_cv_ab", size)) { snapshot("Canvas Align"); el.y = Math.round(auraH - measureCanvasElementH(a, el)); SettingsStore.markDirty(); }
-		});
-		if (el.kind != AuraCanvasElement.KIND_TEXT && ImGui.button("Fill aura##ab_cv_fill", ImGui.vec2(-1, 0))) {
-			snapshot("Canvas Fill");
-			el.x = 0;
-			el.y = 0;
-			el.w = auraW;
-			el.h = auraH;
-			SettingsStore.markDirty();
-		}
-	}
-
-	static function canvasShapeLabel(id:String):String {
-		return switch (id) {
-			case "rect": "Rectangle";
-			case "rounded": "Rounded rectangle";
-			case "circle": "Circle / ellipse";
-			case "diamond": "Diamond";
-			case "hex": "Hexagon";
-			case "triangle": "Triangle";
-			case "line": "Line";
-			default: id;
-		}
-	}
-
-	/** Cache-only picker. Scans/imports are requested here and executed during observation. */
-	function drawCanvasImageRows(el:AuraCanvasElement):Void {
-		UiLayout.propertyRow("Image", function() {
-			var stem = CustomImages.stemOf(el.content);
-			var opened = ImGui.beginCombo("##ab_cv_img", stem.length > 0 ? stem : "Choose an image...");
-			if (opened) {
-				try {
-					if (!canvasImgComboOpen) CustomImages.requestRefresh();
-					canvasImgComboOpen = true;
-					var names = CustomImages.names();
-					if (names.length == 0) ImGui.textDisabled("No images yet. Import one below or drop PNGs in the folder.");
-					for (n in names) {
-						if (!GameIcons.imageKey(CustomImages.key(n), 20, 20)) ImGui.dummy(ImGui.vec2(20, 20));
-						ImGui.sameLine(0, 6);
-						if (ImGui.selectable(n + "##ab_cv_img_" + n, n == stem)) {
-							snapshot("Canvas Image");
-							el.content = CustomImages.key(n);
-							GameIcons.get(el.content);
-							SettingsStore.markDirty();
-						}
-					}
-				} catch (e:Dynamic) { ImGui.endCombo(); throw e; }
-				ImGui.endCombo();
-			} else canvasImgComboOpen = false;
-		});
-		UiLayout.propertyRow("Import", function() {
-			ImGui.setNextItemWidth(Math.max(60, ImGui.getContentRegionAvail().x - 72));
-			var enter = ImGui.inputTextWithHint("##ab_cv_imp", "Paste a .png path", canvasImportBuf, CANVAS_IMPORT_BUF,
-				imgui.Enums.ImGuiInputTextFlags.EnterReturnsTrue);
-			ImGui.sameLine(0, 4);
-			if (ImGui.button("Import##ab_cv_imp_go", ImGui.vec2(68, 0)) || enter) {
-				var path = readBytes(canvasImportBuf, CANVAS_IMPORT_BUF);
-				var owner = selectedAura();
-				UiActionQueue.custom(function() {
-					if (!open.get() || owner == null || cfg.auras.indexOf(owner) < 0 || owner.canvasElements == null || owner.canvasElements.indexOf(el) < 0) return;
-					try {
-						var stem = CustomImages.importFile(path);
-						snapshot("Canvas Image"); el.content = CustomImages.key(stem);
-						GameIcons.get(el.content); SettingsStore.markDirty();
-						ByteUtil.clearBytes(canvasImportBuf, CANVAS_IMPORT_BUF);
-						canvasImportMsg = "Imported " + stem + ".png"; canvasImportErr = false;
-					} catch (e:Dynamic) { canvasImportMsg = Std.string(e); canvasImportErr = true; }
-				});
-			}
-			if (canvasImportMsg.length > 0) {
-				if (canvasImportErr) ImGui.textColored(ImGui.vec4(0.95, 0.45, 0.4, 1), canvasImportMsg);
-				else ImGui.textDisabled(canvasImportMsg);
-			}
-		}, "PNG up to 1024x1024 and 4 MB. Import copies into the selected images folder. The picker lists PNGs in that folder itself. Clipboard keys carry only filenames. Use Export with images to share a ZIP containing the PNGs.");
-	}
-
-	function resetCanvasTransient():Void {
-		canvasRowOwner=null; canvasRowIds=new haxe.ds.ObjectMap<AuraCanvasElement,Int>();
-		canvasDragMode = CANVAS_DRAG_NONE;
-		canvasDragUndo = null;
-		canvasFieldUndoState = null;
-		canvasColorEditing = false;
-		canvasImgComboOpen = false;
-		lastCanvasColorEl = null;
-		canvasImportMsg = "";
-		canvasFolderGeneration = -1;
-		canvasFolderMsg = "";
-	}
-
-	function measureCanvasElementW(a:AuraDef, el:AuraCanvasElement):Float {
-		if (el == null) return 0;
-		if (el.kind != AuraCanvasElement.KIND_TEXT) return el.w > 1 ? el.w : 48;
-		var raw = AuraVisualRenderer.formatTokens(el.content != null ? el.content : "", a, advancedPreview.stacks.get(), advancedPreview.counter.get());
-		var fs:Single = el.fontSize > 4 ? el.fontSize : 16;
-		ImGui.pushFont(ImGui.getFont(), fs); var ts = ImGui.calcTextSize(raw); ImGui.popFont();
-		return ts != null ? ts.x : 0;
-	}
-
-	function measureCanvasElementH(a:AuraDef, el:AuraCanvasElement):Float {
-		if (el == null) return 0;
-		if (el.kind != AuraCanvasElement.KIND_TEXT) return el.h > 1 ? el.h : 48;
-		var raw = AuraVisualRenderer.formatTokens(el.content != null ? el.content : "", a, advancedPreview.stacks.get(), advancedPreview.counter.get());
-		var fs:Single = el.fontSize > 4 ? el.fontSize : 16;
-		ImGui.pushFont(ImGui.getFont(), fs); var ts = ImGui.calcTextSize(raw); ImGui.popFont();
-		return ts != null ? ts.y : fs;
-	}
-
-	function syncCanvasElementColor(a:AuraDef, el:AuraCanvasElement):Void {
-		if (a == null || el == null || (a.id == lastCanvasColorAuraId && el == lastCanvasColorEl && el.color == lastCanvasColorValue)) return;
-		lastCanvasColorAuraId = a.id;
-		lastCanvasColorSel = canvasSel;
-		lastCanvasColorEl = el;
-		var c = el.color;
-		lastCanvasColorValue = c;
-		canvasColBuf.setF32(0, ((c >> 16) & 0xFF) / 255.0);
-		canvasColBuf.setF32(4, ((c >> 8) & 0xFF) / 255.0);
-		canvasColBuf.setF32(8, (c & 0xFF) / 255.0);
-		canvasColBuf.setF32(12, ((c >>> 24) & 0xFF) / 255.0);
-	}
-
-	function packCanvasColor():Int {
-		var r = Std.int(Math.max(0, Math.min(1, canvasColBuf.getF32(0))) * 255);
-		var g = Std.int(Math.max(0, Math.min(1, canvasColBuf.getF32(4))) * 255);
-		var b = Std.int(Math.max(0, Math.min(1, canvasColBuf.getF32(8))) * 255);
-		var al = Std.int(Math.max(0, Math.min(1, canvasColBuf.getF32(12))) * 255);
-		lastCanvasColorValue = (al << 24) | (r << 16) | (g << 8) | b;
-		return lastCanvasColorValue;
+	/** Switch to the canvas face, seeding it with this aura's current icon so the preview never goes blank. */
+	function enableCanvas(a:AuraDef):Void {
+		snapshot("Use Freeform Canvas");
+		a.region = "canvas";
+		if (a.canvasElements == null) a.canvasElements = [];
+		if (a.canvasElements.length == 0) a.canvasElements.push(AuraCanvasElement.icon(a.preferredIconId(), 0, 0, 0, 0));
+		a.sizeDirty = true;
+		canvasEditor.canvasSel = -1;
+		SettingsStore.markDirty();
 	}
 
 	inline function formLabel(label:String):Void { ImGui.alignTextToFramePadding(); ImGui.text(label); }
@@ -3724,7 +3023,8 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 		UiLayout.propertyGrid("##ab_appear_props", function() {
 			UiLayout.propertyRow("Style", function() {
 				if (ImGui.beginCombo("##ab_region", regionLabel(a.region))) {
-					for (rKey in ["bar", "ring", "text", "icon", "canvas"])
+					// Freeform Canvas has its own button under the preview; it still shows here while active.
+					for (rKey in ["bar", "ring", "text", "icon"])
 						if (ImGui.selectable(regionLabel(rKey) + "##ab_reg_" + rKey, a.region == rKey)) {
 							a.region = rKey;
 							SettingsStore.markDirty();
@@ -3828,7 +3128,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 				);
 			});
 			UiLayout.propertyRow("Scale", function() {
-				if (NumberField.draw("##ab_scale", a.scale, 0.5, 2.5, "%.2f", preciseSnapshotFn)) {
+				if (NumberField.draw("##ab_scale", a.scale, 0.5, a.region == "canvas" ? 6 : 2.5, "%.2f", preciseSnapshotFn)) {
 					a.sizeDirty = true;
 					SettingsStore.markDirty();
 				}
@@ -3981,7 +3281,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost {
 				if (ImGui.smallButton("+ Add text##ab_cv_quick_add")) {
 					snapshot("Canvas Add Text");
 					a.canvasElements.push(AuraCanvasElement.text("{name}", 8, 8, 16));
-					canvasSel = a.canvasElements.length - 1;
+					canvasEditor.canvasSel = a.canvasElements.length - 1;
 					SettingsStore.markDirty();
 				}
 				return;

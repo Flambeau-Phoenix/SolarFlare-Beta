@@ -20,6 +20,17 @@ class AuraSignalCatalog {
 		groupNames = [];
 		add("resource.health.current", "Health current", "Resources", Number);
 		add("resource.health.ratio", "Health percent", "Resources", Percent);
+		add("resource.mana.current", "Mana current", "Resources", Number);
+		add("resource.rage.current", "Rage current", "Resources", Number);
+		add("resource.spark.current", "Spark current", "Resources", Number);
+		add("resource.shield.current", "Shield current", "Resources", Number);
+		add("player.alive", "Player alive", "Player", Boolean);
+		add("dash.charges", "Dashes left", "Movement", Count);
+		add("dash.available", "Dash charge available", "Movement", Boolean);
+		add("dash.rechargeLeft", "Next dash recharge (seconds)", "Movement", Duration);
+		add("dash.full", "Dash charges full", "Movement", Boolean);
+		add("event.dash.gained", "Dash gained (seconds ago)", "Movement", Duration);
+		add("event.dash.used", "Dash used (seconds ago)", "Movement", Duration);
 		add("resource.shield.ratio", "Shield percent", "Resources", Percent);
 		add("resource.rage.ratio", "Rage percent", "Resources", Percent);
 		add("resource.mana.ratio", "Mana percent", "Resources", Percent);
@@ -81,12 +92,24 @@ class AuraSignalCatalog {
 		add("combat.killKindMatches", "Kill of unit kind", "Combat", Boolean, "unit");
 		add("combat.damageTakenRecent", "Recent damage taken (max hit)", "Combat", Number);
 		add("combat.inCombat", "In combat", "Combat", Boolean);
+		add("aura.active", "Another aura is showing", "Auras", Boolean, "aura");
 		add("event.combat.entered", "Entered combat (seconds ago)", "Combat", Duration);
 		add("event.combat.left", "Left combat (seconds ago)", "Combat", Duration);
 		add("event.cast.recent", "Enemy cast age (seconds)", "Enemy casts", Duration, "skill");
 		add("event.cast.active", "Enemy cast/channel active", "Enemy casts", Boolean, "skill");
 		add("skill.charges", "Skill charges remaining", "Skills", Count, "skill");
 		add("skill.chargesMax", "Skill charges max", "Skills", Count, "skill");
+		add("event.skill.chargeGained", "Skill charge gained (seconds ago)", "Skills", Duration, "skill");
+		add("event.skill.chargeSpent", "Skill charge spent (seconds ago)", "Skills", Duration, "skill");
+		add("event.status.gained", "Buff/debuff gained (seconds ago)", "Status changes", Duration, "status");
+		add("event.status.lost", "Buff/debuff lost (seconds ago)", "Status changes", Duration, "status");
+		add("event.status.refreshed", "Buff/debuff refreshed (seconds ago)", "Status changes", Duration, "status");
+		add("event.status.stacksGained", "Status stacks gained (seconds ago)", "Status changes", Duration, "status");
+		add("event.status.stacksLost", "Status stacks lost (seconds ago)", "Status changes", Duration, "status");
+		add("combat.damageTakenAge", "Time since taking damage (seconds)", "Combat", Duration);
+		add("event.combat.critical", "My critical hit (seconds ago)", "Combat", Duration);
+		add("event.combat.block", "My block (seconds ago)", "Combat", Duration);
+		add("target.distance", "Target distance (game units)", "Target", Number);
 		add("custom.script", "Custom Haxe Expression", "Scripting", Boolean, "script");
 	}
 	static function add(id:String, label:String, group:String, kind:AuraValueKind, subjectKind:String = ""):Void {

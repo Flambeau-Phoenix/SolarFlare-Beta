@@ -59,16 +59,22 @@ class AuraVisualRenderer {
 			out.include(fx - reach, fy - reach, fw + reach * 2, fh + reach * 2);
 		}
 		if (a.region == "canvas" && !icon) {
+			var sid = a.stateForDraw();
 			for (el in (a.canvasElements != null ? a.canvasElements : [])) {
-				if (el == null || !el.visible(editAllCanvas)) continue;
-				if (el.kind == AuraCanvasElement.KIND_ICON || el.kind == AuraCanvasElement.KIND_SHAPE) {
+				if (el == null || !el.visible(editAllCanvas, sid)) continue;
+				if (el.kind == AuraCanvasElement.KIND_ICON || el.kind == AuraCanvasElement.KIND_SHAPE || el.kind == AuraCanvasElement.KIND_PATH) {
 					if (el.kind == AuraCanvasElement.KIND_ICON && !a.showIcon.get()) continue;
-					out.include(el.x * vectorScale, el.y * vectorScale,
-						el.w > 1 ? el.w * vectorScale : w, el.h > 1 ? el.h * vectorScale : h);
+					var bw:Float = el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : w, bh:Float = el.hAt(sid) > 1 ? el.hAt(sid) * vectorScale : h;
+					if ((el.kind == AuraCanvasElement.KIND_SHAPE || el.kind == AuraCanvasElement.KIND_PATH) && el.rotationAt(sid) != 0) {
+						var ext = AuraCanvasElement.rotatedHalfExtent(bw, bh, el.rotationAt(sid));
+						out.include(el.xAt(sid) * vectorScale + bw * 0.5 - ext.hx, el.yAt(sid) * vectorScale + bh * 0.5 - ext.hy, ext.hx * 2, ext.hy * 2);
+					} else out.include(el.xAt(sid) * vectorScale, el.yAt(sid) * vectorScale, bw, bh);
 				} else {
 					var ts = textSize(formatTokens(el.content, a, stacks, counterValue),
 						(el.fontSize > 4 ? el.fontSize : 16) * vectorScale);
-					out.include(el.x * vectorScale, el.y * vectorScale, ts.x, ts.y);
+					var pad:Float = el.outline > 0 ? Math.max(1, el.outline * vectorScale) : 0;
+					var boxW:Float = el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : 0;
+					out.include(el.xAt(sid) * vectorScale - pad, el.yAt(sid) * vectorScale - pad, Math.max(ts.x, boxW) + pad * 2, ts.y + pad * 2);
 				}
 			}
 		}
@@ -251,35 +257,60 @@ class AuraVisualRenderer {
 		faceGlow = previewGlow != null ? previewGlow : a.iconGlow;
 	}
 
+	/** When true, pulses also play in the editor and previews (fades only run in game or with Live conditions). */
+	public static var animateInEditor:Bool = false;
+
 	/** Freeform element placements + optional glow / fuse / countdown overlays. */
 	static function drawCanvas(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single,
 			progress:Float, stacks:Int, counter:Int, alpha:Float, vectorScale:Float, editAllCanvas:Bool):Void {
 		// Empty canvas has no portrait until an icon element is explicitly added.
 		var els = a.canvasElements != null ? a.canvasElements : [];
+		var sid = a.stateForDraw();
+		var live = !editAllCanvas;
+		var animNow = haxe.Timer.stamp();
 		if (faceFx && faceGlow) drawGlowRect(dl, x, y, w, h, a, alpha);
 
 		var i = 0;
 		while (i < els.length) {
 			var el = els[i];
 			i++;
-			if (el == null || !el.visible(editAllCanvas))
+			if (el == null) continue;
+			// A layer that is fading out keeps drawing after it stops being visible.
+			if (!el.visible(editAllCanvas, sid) && !(live && el.dissolving(animNow)))
 				continue;
+			var elAlpha = alpha * el.opacityAt(sid);
+			var elCol = el.colorAt(sid);
+			if (live && el.hasFade()) elAlpha *= el.fadeAlpha(animNow);
+			if (el.pulseKind != AuraCanvasElement.PULSE_NONE && (live || animateInEditor)) {
+				var wave = el.pulseWave(animNow);
+				if (el.pulseKind == AuraCanvasElement.PULSE_FADE) elAlpha *= 1 - el.pulseDepth * wave;
+				else elCol = lerpPacked(elCol, el.pulseColor, el.pulseDepth * wave);
+			}
+			if (elAlpha <= 0.002) continue;
 			if (el.kind == AuraCanvasElement.KIND_SHAPE) {
-				drawCanvasShape(dl, el.content, x + el.x * vectorScale, y + el.y * vectorScale,
-					el.w > 1 ? el.w * vectorScale : w, el.h > 1 ? el.h * vectorScale : h,
-					applyAlphaToPacked(el.color, alpha), el.stroke * vectorScale);
+				drawCanvasShape(dl, el.content, x + el.xAt(sid) * vectorScale, y + el.yAt(sid) * vectorScale,
+					el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : w, el.hAt(sid) > 1 ? el.hAt(sid) * vectorScale : h,
+					applyAlphaToPacked(elCol, elAlpha), el.stroke * vectorScale, el.rotationAt(sid), el.sides,
+					el.color2 != null ? applyAlphaToPacked(el.color2, elAlpha) : null, el.gradDir);
+			} else if (el.kind == AuraCanvasElement.KIND_PATH) {
+				if (el.path != null)
+					drawVectorPath(dl, el.path, x + el.xAt(sid) * vectorScale, y + el.yAt(sid) * vectorScale,
+						el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : w, el.hAt(sid) > 1 ? el.hAt(sid) * vectorScale : h,
+						el.fill, applyAlphaToPacked(elCol, elAlpha),
+						el.color2 != null ? applyAlphaToPacked(el.color2, elAlpha) : null, el.gradDir,
+						el.stroke * vectorScale, applyAlphaToPacked(el.strokeColor != null ? el.strokeColor : elCol, elAlpha), el.rotationAt(sid));
 			} else if (el.kind == AuraCanvasElement.KIND_ICON) {
 				if (!a.showIcon.get()) continue;
-				var iw:Single = el.w > 1 ? el.w * vectorScale : w;
-				var ih:Single = el.h > 1 ? el.h * vectorScale : h;
-				var ex:Single = x + el.x * vectorScale;
-				var ey:Single = y + el.y * vectorScale;
+				var iw:Single = el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : w;
+				var ih:Single = el.hAt(sid) > 1 ? el.hAt(sid) * vectorScale : h;
+				var ex:Single = x + el.xAt(sid) * vectorScale;
+				var ey:Single = y + el.yAt(sid) * vectorScale;
 				var id = el.content != null && el.content.length > 0 ? el.content : a.preferredIconId();
-				var tint = applyAlphaToPacked(el.color, alpha);
+				var tint = applyAlphaToPacked(elCol, elAlpha);
 				if (!GameIcons.drawKey(dl, id, ex, ey, iw, ih, tint)) {
 					ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(ex, ey),
 						ImGui.vec2(ex + iw, ey + ih),
-						ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.1, 0.12, 0.16, alpha * 0.85)), 6);
+						ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.1, 0.12, 0.16, elAlpha * 0.85)), 6);
 				}
 			} else {
 				var raw = el.content != null ? el.content : "";
@@ -287,12 +318,23 @@ class AuraVisualRenderer {
 				var fontSize:Single = (el.fontSize > 4 ? el.fontSize : 16) * vectorScale;
 				ImGui.pushFont(ImGui.getFont(), fontSize);
 				try {
-					var col = applyAlphaToPacked(el.color, alpha);
-					var tx:Single = x + el.x * vectorScale;
-					var ty:Single = y + el.y * vectorScale;
+					var col = applyAlphaToPacked(elCol, elAlpha);
+					var tx:Single = x + el.xAt(sid) * vectorScale;
+					var ty:Single = y + el.yAt(sid) * vectorScale;
+					var boxW:Float = el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : 0;
+					if (boxW > 0 && el.textAlign != 0) {
+						var tw = ImGui.calcTextSize(formatted).x;
+						tx += el.textAlign == 1 ? (boxW - tw) * 0.5 : boxW - tw;
+					}
+					if (el.outline > 0) {
+						var o:Single = Math.max(1, el.outline * vectorScale);
+						var oc = applyAlphaToPacked(0xFF000000, elAlpha);
+						for (dx in [-1, 0, 1]) for (dy in [-1, 0, 1]) if (dx != 0 || dy != 0)
+							ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + dx * o, ty + dy * o), oc, formatted);
+					}
 					if (el.shadow) {
 						var off:Single = Math.max(1, fontSize / 16);
-						ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + off, ty + off), applyAlphaToPacked(0xE0000000, alpha), formatted);
+						ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx + off, ty + off), applyAlphaToPacked(0xE0000000, elAlpha), formatted);
 					}
 					ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(tx, ty), col, formatted);
 				} catch (e:Dynamic) { ImGui.popFont(); throw e; }
@@ -309,35 +351,170 @@ class AuraVisualRenderer {
 
 	}
 
-	/** Six points max (hex); allocated once, filled per shape. */
-	static var polyPts:hl.Bytes = new hl.Bytes(8 * 6);
+	/** Largest flattened outline drawn: 64 nodes x 8 curve steps, with headroom. */
+	static inline var PATH_PT_MAX:Int = 640;
+	static var pathPts:hl.Bytes = new hl.Bytes(8 * PATH_PT_MAX);
+	static inline var PATH_GRAD_STRIPS:Int = 12;
+
+	/**
+	 * Vector layer: the cached outline is scaled into the box, rotated about its centre and drawn as a concave
+	 * fill plus an optional stroke. A fade (`col2`) clips the fill into strips, as for plain shapes.
+	 */
+	static function drawVectorPath(dl:Dynamic, path:AuraVectorPath, x:Float, y:Float, w:Float, h:Float, fill:Bool, col:Int,
+			col2:Null<Int>, gradDir:Int, strokeW:Float, strokeCol:Int, rotation:Float):Void {
+		var flat = path.flatPoints();
+		var n = Std.int(Math.min(PATH_PT_MAX, flat.length >> 1));
+		if (n < 2) return;
+		var cx = x + w * 0.5, cy = y + h * 0.5;
+		var r = rotation * Math.PI / 180, cr = Math.cos(r), sr = Math.sin(r);
+		for (i in 0...n) {
+			var px = x + flat[i * 2] * w, py = y + flat[i * 2 + 1] * h;
+			if (rotation != 0) { var dx = px - cx, dy = py - cy; px = cx + dx * cr - dy * sr; py = cy + dx * sr + dy * cr; }
+			pathPts.setF32(i * 8, px);
+			pathPts.setF32(i * 8 + 4, py);
+		}
+		if (fill && n >= 3) {
+			if (col2 == null) ImGui.ImDrawList_AddConcavePolyFilled(dl, pathPts, n, col);
+			else {
+				var e = AuraCanvasElement.rotatedHalfExtent(w, h, rotation);
+				var x0 = cx - e.hx - 1, y0 = cy - e.hy - 1, x1 = cx + e.hx + 1, y1 = cy + e.hy + 1;
+				var end:Int = col2;
+				for (k in 0...PATH_GRAD_STRIPS) {
+					var c = lerpPacked(col, end, (k + 0.5) / PATH_GRAD_STRIPS);
+					var a0 = k / PATH_GRAD_STRIPS, a1 = (k + 1) / PATH_GRAD_STRIPS, over = k < PATH_GRAD_STRIPS - 1 ? 1 : 0;
+					var pmin = gradDir == 1 ? ImGui.vec2(x0 + (x1 - x0) * a0, y0) : ImGui.vec2(x0, y0 + (y1 - y0) * a0);
+					var pmax = gradDir == 1 ? ImGui.vec2(x0 + (x1 - x0) * a1 + over, y1) : ImGui.vec2(x1, y0 + (y1 - y0) * a1 + over);
+					ImGui.ImDrawList_PushClipRect(dl, pmin, pmax, true);
+					ImGui.ImDrawList_AddConcavePolyFilled(dl, pathPts, n, c);
+					ImGui.ImDrawList_PopClipRect(dl);
+				}
+			}
+		}
+		if (strokeW > 0) ImGui.ImDrawList_AddPolyline(dl, pathPts, n, strokeCol, Math.max(1, strokeW), path.closed ? imgui.Enums.ImDrawFlags.Closed : 0);
+	}
+
+	/** Scratch polygon for shapes: 8 bytes per point, sized for a rotated rounded rectangle, ellipse or 12-point star. */
+	static inline var POLY_MAX:Int = 96;
+	static var polyPts:hl.Bytes = new hl.Bytes(8 * POLY_MAX);
+	static var polySub:hl.Bytes = new hl.Bytes(8 * 8);
 	static var polyN:Int = 0;
+	static inline var GRAD_STRIPS:Int = 24;
+	static var CHEVRON_UPPER:Array<Int> = [0, 1, 2, 5];
+	static var CHEVRON_LOWER:Array<Int> = [5, 2, 3, 4];
+
 	static inline function polyPoint(px:Single, py:Single):Void {
+		if (polyN >= POLY_MAX) return;
 		polyPts.setF32(polyN * 8, px);
 		polyPts.setF32(polyN * 8 + 4, py);
 		polyN++;
 	}
 
-	/** Canvas plate in the element box. stroke 0 fills, otherwise outlines at that thickness. */
+	/** Rotate the buffered polygon about (cx, cy) by `deg` degrees clockwise (screen y points down). */
+	static function polyRotate(cx:Float, cy:Float, deg:Float):Void {
+		var r = deg * Math.PI / 180, c = Math.cos(r), sn = Math.sin(r);
+		for (i in 0...polyN) {
+			var dx = polyPts.getF32(i * 8) - cx, dy = polyPts.getF32(i * 8 + 4) - cy;
+			polyPts.setF32(i * 8, cx + dx * c - dy * sn);
+			polyPts.setF32(i * 8 + 4, cy + dx * sn + dy * c);
+		}
+	}
+
+	static function polyRoundedRect(x:Float, y:Float, w:Float, h:Float, rad:Float):Void {
+		var corners = [[x + w - rad, y + rad, -90.0], [x + w - rad, y + h - rad, 0.0], [x + rad, y + h - rad, 90.0], [x + rad, y + rad, 180.0]];
+		for (cn in corners) for (k in 0...6) {
+			var t = (cn[2] + k * 15) * Math.PI / 180;
+			polyPoint(cn[0] + Math.cos(t) * rad, cn[1] + Math.sin(t) * rad);
+		}
+	}
+
+	/** Convex fill of a subset of the buffered points (chevron halves). */
+	static function fillSubset(dl:Dynamic, idx:Array<Int>, col:Int):Void {
+		for (k in 0...idx.length) {
+			polySub.setF32(k * 8, polyPts.getF32(idx[k] * 8));
+			polySub.setF32(k * 8 + 4, polyPts.getF32(idx[k] * 8 + 4));
+		}
+		ImGui.ImDrawList_AddConvexPolyFilled(dl, polySub, idx.length, col);
+	}
+
+	static inline function lerpChannel(a:Int, b:Int, t:Float):Int return Std.int(a + (b - a) * t + 0.5);
+
+	/** Component-wise blend of two packed colours; channel order does not matter. */
+	static function lerpPacked(a:Int, b:Int, t:Float):Int {
+		return (lerpChannel((a >>> 24) & 0xFF, (b >>> 24) & 0xFF, t) << 24) | (lerpChannel((a >>> 16) & 0xFF, (b >>> 16) & 0xFF, t) << 16)
+			| (lerpChannel((a >>> 8) & 0xFF, (b >>> 8) & 0xFF, t) << 8) | lerpChannel(a & 0xFF, b & 0xFF, t);
+	}
+
+	/**
+	 * Canvas plate in the element box. stroke 0 fills, otherwise outlines at that thickness (rings use it as their
+	 * thickness). rotation is degrees. `col2` blends a fill from `col` to `col2` along the screen axis `gradDir`
+	 * (0 down, 1 across) by clipping the shape into thin strips.
+	 */
 	public static function drawCanvasShape(dl:Dynamic, shape:String, x:Single, y:Single, w:Single, h:Single,
-			col:Int, stroke:Float):Void {
+			col:Int, stroke:Float, rotation:Float = 0, sides:Int = 5, col2:Null<Int> = null, gradDir:Int = 0):Void {
+		var gradient = col2 != null && shape != "line" && (stroke <= 0 || shape == "ring");
+		if (!gradient) {
+			drawShapeBody(dl, shape, x, y, w, h, col, stroke, rotation, sides);
+			return;
+		}
+		var e = AuraCanvasElement.rotatedHalfExtent(w, h, rotation);
+		var cx = x + w * 0.5, cy = y + h * 0.5;
+		var x0 = cx - e.hx - 1, y0 = cy - e.hy - 1, x1 = cx + e.hx + 1, y1 = cy + e.hy + 1;
+		var end:Int = col2;
+		for (k in 0...GRAD_STRIPS) {
+			var c = lerpPacked(col, end, (k + 0.5) / GRAD_STRIPS);
+			var a0 = k / GRAD_STRIPS, a1 = (k + 1) / GRAD_STRIPS;
+			// One pixel of overlap hides seams between neighbouring strips.
+			var pmin = gradDir == 1 ? ImGui.vec2(x0 + (x1 - x0) * a0, y0) : ImGui.vec2(x0, y0 + (y1 - y0) * a0);
+			var pmax = gradDir == 1 ? ImGui.vec2(x0 + (x1 - x0) * a1 + (k < GRAD_STRIPS - 1 ? 1 : 0), y1) : ImGui.vec2(x1, y0 + (y1 - y0) * a1 + (k < GRAD_STRIPS - 1 ? 1 : 0));
+			ImGui.ImDrawList_PushClipRect(dl, pmin, pmax, true);
+			try drawShapeBody(dl, shape, x, y, w, h, c, stroke, rotation, sides) catch (err:Dynamic) { ImGui.ImDrawList_PopClipRect(dl); throw err; }
+			ImGui.ImDrawList_PopClipRect(dl);
+		}
+	}
+
+	static function drawShapeBody(dl:Dynamic, shape:String, x:Single, y:Single, w:Single, h:Single,
+			col:Int, stroke:Float, rotation:Float, sides:Int):Void {
 		var outline = stroke > 0;
 		var t:Single = outline ? stroke : 1;
 		var cx:Single = x + w * 0.5;
 		var cy:Single = y + h * 0.5;
+		var rotated = rotation != 0;
+		var radians = rotation * Math.PI / 180;
+		var star = false;
+		var chevron = false;
 		switch (shape) {
 			case "circle":
-				var r = ImGui.vec2(w * 0.5, h * 0.5);
-				if (outline) ImGui.ImDrawList_AddEllipse(dl, ImGui.vec2(cx, cy), r, col, 0, t);
-				else ImGui.ImDrawList_AddEllipseFilled(dl, ImGui.vec2(cx, cy), r, col);
+				if (!rotated) {
+					var r = ImGui.vec2(w * 0.5, h * 0.5);
+					if (outline) ImGui.ImDrawList_AddEllipse(dl, ImGui.vec2(cx, cy), r, col, 0, 0, t);
+					else ImGui.ImDrawList_AddEllipseFilled(dl, ImGui.vec2(cx, cy), r, col);
+					return;
+				}
+				polyN = 0;
+				for (k in 0...48) { var a = k * Math.PI * 2 / 48; polyPoint(cx + Math.cos(a) * w * 0.5, cy + Math.sin(a) * h * 0.5); }
+			case "ring":
+				var thick:Single = outline ? stroke : Math.max(1, Math.min(w, h) * 0.18);
+				ImGui.ImDrawList_AddEllipse(dl, ImGui.vec2(cx, cy), ImGui.vec2(Math.max(1, w * 0.5 - thick * 0.5), Math.max(1, h * 0.5 - thick * 0.5)), col, radians, 0, thick);
 				return;
 			case "rounded":
 				var rr:Single = Math.min(w, h) * 0.22;
-				if (outline) ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col, rr, t);
-				else ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col, rr);
-				return;
+				if (!rotated) {
+					if (outline) ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col, rr, t);
+					else ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col, rr);
+					return;
+				}
+				polyN = 0;
+				polyRoundedRect(x, y, w, h, rr);
 			case "line":
-				ImGui.ImDrawList_AddLine(dl, ImGui.vec2(x, cy), ImGui.vec2(x + w, cy), col, Math.max(1, outline ? t : h));
+				var lineW:Single = Math.max(1, outline ? t : h);
+				if (!rotated) {
+					ImGui.ImDrawList_AddLine(dl, ImGui.vec2(x, cy), ImGui.vec2(x + w, cy), col, lineW);
+					return;
+				}
+				polyN = 0;
+				polyPoint(x, cy); polyPoint(x + w, cy);
+				polyRotate(cx, cy, rotation);
+				ImGui.ImDrawList_AddLine(dl, ImGui.vec2(polyPts.getF32(0), polyPts.getF32(4)), ImGui.vec2(polyPts.getF32(8), polyPts.getF32(12)), col, lineW);
 				return;
 			case "diamond":
 				polyN = 0;
@@ -350,13 +527,47 @@ class AuraVisualRenderer {
 			case "triangle":
 				polyN = 0;
 				polyPoint(cx, y); polyPoint(x + w, y + h); polyPoint(x, y + h);
+			case "polygon":
+				polyN = 0;
+				var n = AuraCanvasElement.clampSides(sides);
+				for (k in 0...n) { var a = -Math.PI * 0.5 + k * Math.PI * 2 / n; polyPoint(cx + Math.cos(a) * w * 0.5, cy + Math.sin(a) * h * 0.5); }
+			case "star":
+				polyN = 0;
+				star = true;
+				var pts = AuraCanvasElement.clampSides(sides);
+				for (k in 0...pts * 2) {
+					var a = -Math.PI * 0.5 + k * Math.PI / pts, rad = k % 2 == 0 ? 0.5 : 0.22;
+					polyPoint(cx + Math.cos(a) * w * rad, cy + Math.sin(a) * h * rad * (k % 2 == 0 ? 1 : 1));
+				}
+			case "chevron":
+				polyN = 0;
+				chevron = true;
+				polyPoint(x, y); polyPoint(x + w * 0.6, y); polyPoint(x + w, cy);
+				polyPoint(x + w * 0.6, y + h); polyPoint(x, y + h); polyPoint(x + w * 0.4, cy);
 			default:
-				if (outline) ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col, 0, t);
-				else ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col);
-				return;
+				if (!rotated) {
+					if (outline) ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col, 0, t);
+					else ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), col);
+					return;
+				}
+				polyN = 0;
+				polyPoint(x, y); polyPoint(x + w, y); polyPoint(x + w, y + h); polyPoint(x, y + h);
 		}
-		if (outline) ImGui.ImDrawList_AddPolyline(dl, polyPts, polyN, col, t, imgui.Enums.ImDrawFlags.Closed);
-		else ImGui.ImDrawList_AddConvexPolyFilled(dl, polyPts, polyN, col);
+		if (rotated) polyRotate(cx, cy, rotation);
+		if (outline) {
+			ImGui.ImDrawList_AddPolyline(dl, polyPts, polyN, col, t, imgui.Enums.ImDrawFlags.Closed);
+		} else if (star) {
+			// Star-shaped around its centre, so a triangle fan fills it without a concave tessellator.
+			var c = ImGui.vec2(cx, cy);
+			for (k in 0...polyN) {
+				var j = (k + 1) % polyN;
+				ImGui.ImDrawList_AddTriangleFilled(dl, ImGui.vec2(polyPts.getF32(k * 8), polyPts.getF32(k * 8 + 4)),
+					ImGui.vec2(polyPts.getF32(j * 8), polyPts.getF32(j * 8 + 4)), c, col);
+			}
+		} else if (chevron) {
+			fillSubset(dl, CHEVRON_UPPER, col);
+			fillSubset(dl, CHEVRON_LOWER, col);
+		} else ImGui.ImDrawList_AddConvexPolyFilled(dl, polyPts, polyN, col);
 	}
 
 	static function drawIcon(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single,

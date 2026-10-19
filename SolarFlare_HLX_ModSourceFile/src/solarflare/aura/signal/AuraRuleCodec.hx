@@ -6,7 +6,7 @@ class AuraRuleCodec {
 		var cs:Array<Dynamic> = [];
 		if (rule.conditions != null) for (c in rule.conditions) if (c != null) cs.push({
 			signal: c.signal,
-			subject: solarflare.EngineText.cleanId(c.subject),
+			subject: c.signal=="custom.script" ? c.subject : solarflare.EngineText.cleanId(c.subject),
 			subjectLabel: solarflare.EngineText.cleanId(c.subjectLabel),
 			op: c.op,
 			numberValue: c.numberValue, boolValue: c.boolValue, stringValue: c.stringValue, negate: c.negate
@@ -27,14 +27,14 @@ class AuraRuleCodec {
 				if (item == null) continue;
 				var c = new AuraConditionDef();
 				if (item.signal != null) c.signal = Std.string(item.signal);
-				if (item.subject != null) c.subject = solarflare.EngineText.cleanId(item.subject);
+				if (item.subject != null) c.subject = c.signal=="custom.script" ? Std.string(item.subject) : solarflare.EngineText.cleanId(item.subject);
 				if (item.subjectLabel != null) c.subjectLabel = solarflare.EngineText.cleanId(item.subjectLabel);
 				if (item.op != null) c.op = Std.string(item.op);
 				if (item.numberValue != null) c.numberValue = item.numberValue;
 				if (item.boolValue == true) c.boolValue = true;
 				if (item.stringValue != null) c.stringValue = Std.string(item.stringValue);
 				if (item.negate == true) c.negate = true;
-				if (StringTools.startsWith(c.signal, "status.") || StringTools.startsWith(c.signal, "target.status."))
+				if (StringTools.startsWith(c.signal, "status.") || StringTools.startsWith(c.signal, "target.status.") || StringTools.startsWith(c.signal,"event.status."))
 					c.subject = solarflare.cdb.CdbAuraTable.statusSubjectId(c.subject);
 				r.conditions.push(c);
 			}

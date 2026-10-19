@@ -7,6 +7,8 @@ import haxe.io.Path;
 import sys.FileSystem;
 import sys.io.File;
 
+typedef ImportReport = {imported:Array<String>, errors:Array<String>};
+
 /**
  * User-supplied PNGs from a saved folder, with `<mod>/custom_images/` as a legacy fallback.
  * Elements keep portable `custom:<stem>` keys. Scans/imports run during observation only.
@@ -16,6 +18,11 @@ class CustomImages {
 	public static inline var PREFIX:String = CustomImageKey.PREFIX;
 	public static inline var MAX_DIM:Int = 1024;
 	public static inline var MAX_BYTES:Int = 4 * 1024 * 1024;
+	/** Largest file accepted for import or conversion: it is scaled and re-encoded, so it may exceed MAX_BYTES. */
+	public static inline var MAX_SOURCE_BYTES:Int = 32 * 1024 * 1024;
+	static var CONVERTIBLE:Array<String> = ["jpg", "jpeg", "gif", "bmp", "tga"];
+	/** Files in the active folders that cannot be used as they are (other formats, or too big), shown as a fix-it offer. */
+	public static var fixable(default, null):Int = 0;
 
 	static var cachedDir:String = null;
 	/** Optional root used by filesystem tests; otherwise follows the installed mod. */
@@ -110,11 +117,16 @@ class CustomImages {
 		var defaultPath = defaultDir();
 		displayDir = dir(); folderError = false;
 		var skipped = 0;
+		fixable = 0;
 		function scan(directory:String,managed:Bool=false):Void {
 			var files = FileSystem.readDirectory(directory);
 			files.sort(Reflect.compare);
 			for (file in files) {
-				if (Path.extension(file).toLowerCase() != "png") continue;
+				var ext = Path.extension(file).toLowerCase();
+				if (ext != "png") {
+					if (!managed && CONVERTIBLE.indexOf(ext) >= 0 && !converted(directory, Path.withoutExtension(file), ext)) fixable++;
+					continue;
+				}
 				var stem = Path.withoutExtension(file);
 				if (!validStem(stem)) { skipped++; continue; }
 				if (managed && !CustomImageKey.isManagedStem(stem)) continue;
@@ -123,7 +135,11 @@ class CustomImages {
 					var path = Path.join([directory, file]);
 					if (FileSystem.isDirectory(path)) continue;
 					var stat = FileSystem.stat(path);
-					if (stat.size > MAX_BYTES) { skipped++; continue; }
+					if (stat.size > MAX_BYTES) { skipped++; if (!managed && !converted(directory, stem, "png")) fixable++; continue; }
+					if (!managed && !converted(directory, stem, "png")) {
+						var dims = pngSize(path);
+						if (dims != null && (dims.w > MAX_DIM || dims.h > MAX_DIM)) fixable++;
+					}
 					var id = stem.toLowerCase();
 					nextPaths.set(id, path); labels.set(id, stem);
 					nextPrints.set(id, path + "|" + stat.size + "|" + stat.mtime.getTime());
@@ -153,6 +169,65 @@ class CustomImages {
 			: listed.length + " PNG image(s) available. Original custom_images files remain available.";
 		if (skipped > 0) status += " Skipped " + skipped + " unsupported, unreadable or oversized file(s).";
 	}
+	/** Width and height from a PNG header without decoding it, or null. */
+	static function pngSize(path:String):{w:Int, h:Int} {
+		var f:sys.io.FileInput = null;
+		try {
+			f = File.read(path, true);
+			var b = haxe.io.Bytes.alloc(24);
+			var got = f.readBytes(b, 0, 24);
+			f.close(); f = null;
+			if (got < 24 || b.get(0) != 0x89 || b.get(1) != 0x50 || b.get(2) != 0x4E || b.get(3) != 0x47) return null;
+			return {w: (b.get(16) << 24) | (b.get(17) << 16) | (b.get(18) << 8) | b.get(19), h: (b.get(20) << 24) | (b.get(21) << 16) | (b.get(22) << 8) | b.get(23)};
+		} catch (_:Dynamic) {
+			// Always release the handle: a leaked one blocks deleting or replacing the file on Windows.
+			if (f != null) try f.close() catch (_:Dynamic) {}
+			return null;
+		}
+	}
+
+	/** A usable PNG already exists for this source, so it no longer needs converting. */
+	static function converted(directory:String, stem:String, ext:String):Bool {
+		return ext == "png" ? FileSystem.exists(Path.join([directory, stem + "_resized.png"]))
+			: FileSystem.exists(Path.join([directory, stem + ".png"])) || FileSystem.exists(Path.join([directory, sanitize(stem) + ".png"]));
+	}
+
+	/**
+	 * Make unusable files in the images folder usable: other formats become PNG, and PNGs over the size or
+	 * 1024 px limits are scaled down into a new `_resized` copy. Originals are never touched.
+	 */
+	public static function convertFolder():ImportReport {
+		var report:ImportReport = {imported: [], errors: []};
+		var d = dir();
+		var files = try FileSystem.readDirectory(d) catch (_:Dynamic) [];
+		files.sort(Reflect.compare);
+		for (file in files) {
+			var ext = Path.extension(file).toLowerCase(), stem = Path.withoutExtension(file), path = Path.join([d, file]);
+			try {
+				if (FileSystem.isDirectory(path) || CustomImageKey.isManagedStem(stem)) continue;
+				var base:String;
+				if (ext == "png") {
+					var oversized = FileSystem.stat(path).size > MAX_BYTES;
+					if (!oversized) { var dims = pngSize(path); oversized = dims != null && (dims.w > MAX_DIM || dims.h > MAX_DIM); }
+					if (!oversized || converted(d, stem, "png")) continue;
+					base = stem + "_resized";
+				} else if (CONVERTIBLE.indexOf(ext) >= 0) {
+					if (converted(d, stem, ext)) continue;
+					base = sanitize(stem);
+				} else continue;
+				if (FileSystem.stat(path).size > MAX_SOURCE_BYTES) throw "larger than 32 MB";
+				var png = ImageConvert.toPng(File.getBytes(path), ext, MAX_DIM);
+				if (png.length > MAX_BYTES) throw "still larger than 4 MB after resizing";
+				var name = base, n = 2;
+				while (FileSystem.exists(Path.join([d, name + ".png"]))) name = base + "_" + (n++);
+				File.saveBytes(Path.join([d, name + ".png"]), png);
+				report.imported.push(name);
+			} catch (e:Dynamic) report.errors.push(file + ": " + Std.string(e));
+		}
+		refresh();
+		return report;
+	}
+
 	static function validStem(stem:String):Bool return stem != null && stem.length > 0 && stem.indexOf("/") < 0 && stem.indexOf("\\") < 0 && stem.indexOf("..") < 0 && stem.indexOf("\x00") < 0;
 
 	/**
@@ -160,25 +235,89 @@ class CustomImages {
 	 * Never overwrites: a taken name gets a numeric suffix, so cached textures stay valid.
 	 */
 	public static function importFile(rawPath:String):String {
-		var src = rawPath != null ? StringTools.trim(rawPath) : "";
-		// Explorer's "Copy as path" wraps the path in quotes.
-		if (src.length >= 2 && src.charAt(0) == '"' && src.charAt(src.length - 1) == '"') src = src.substr(1, src.length - 2);
-		if (src.length == 0) throw "Paste the full path to a .png file.";
-		if (Path.extension(src).toLowerCase() != "png") throw "Only .png images are supported.";
+		var stem = copyIn(rawPath);
+		refresh();
+		return stem;
+	}
+
+	/** Delete a user image from the active images folder. Managed share copies are never touched. */
+	public static function deleteImage(stem:String):Void {
+		var path = editablePath(stem);
+		FileSystem.deleteFile(path);
+		refresh();
+	}
+
+	/** Rename within the same folder; returns the new stem. Callers rewrite aura references to `custom:<stem>`. */
+	public static function renameImage(stem:String, requested:String):String {
+		var path = editablePath(stem);
+		var next = sanitize(StringTools.trim(requested));
+		if (next.toLowerCase() == stem.toLowerCase() && next == stem) return stem;
+		var target = Path.join([Path.directory(path), next + ".png"]);
+		// A case-only change targets the same file on Windows; anything else must not replace another image.
+		if (next.toLowerCase() != stem.toLowerCase() && (FileSystem.exists(target) || paths.exists(next.toLowerCase()))) throw "An image named " + next + " already exists.";
+		FileSystem.rename(path, target);
+		refresh();
+		return next;
+	}
+
+	static function editablePath(stem:String):String {
+		if (!validStem(stem) || CustomImageKey.isManagedStem(stem)) throw "This image is managed by an imported share and cannot be changed.";
+		var path = pathFor(stem);
+		if (path == null) throw "Image not found: " + stem;
+		return path;
+	}
+
+	/**
+	 * Imports every path in `raw` (one per line, Explorer-quoted paths, or several quoted paths on a line).
+	 * One bad file never blocks the rest. Observe-phase only.
+	 */
+	public static function importMany(raw:String):ImportReport {
+		var report:ImportReport = {imported: [], errors: []};
+		for (p in splitPaths(raw)) {
+			try report.imported.push(copyIn(p)) catch (e:Dynamic) report.errors.push(Path.withoutDirectory(p) + ": " + Std.string(e));
+		}
+		if (report.imported.length > 0) refresh();
+		return report;
+	}
+
+	public static function splitPaths(raw:String):Array<String> {
+		var out:Array<String> = [];
+		if (raw == null) return out;
+		for (line in raw.split("\n")) {
+			var t = StringTools.trim(line);
+			if (t.length == 0) continue;
+			if (t.indexOf('"') < 0) { out.push(t); continue; }
+			var i = 0;
+			while (i < t.length) {
+				var open = t.indexOf('"', i);
+				if (open < 0) break;
+				var close = t.indexOf('"', open + 1);
+				if (close < 0) break;
+				var part = StringTools.trim(t.substring(open + 1, close));
+				if (part.length > 0) out.push(part);
+				i = close + 1;
+			}
+		}
+		return out;
+	}
+
+	/** Validate, convert to PNG and copy one file into the images folder; returns the new stem. */
+	static function copyIn(rawPath:String):String {
+		var src = cleanPath(rawPath);
+		if (src.length == 0) throw "Paste the full path to an image file.";
+		var ext = Path.extension(src).toLowerCase();
+		if (!ImageConvert.isSupportedExtension(ext)) throw "Unsupported file type. Use " + ImageConvert.EXTENSIONS.join(", ") + ".";
 		if (!FileSystem.exists(src) || FileSystem.isDirectory(src)) throw "File not found: " + src;
 		var stat = FileSystem.stat(src);
-		if (stat.size > MAX_BYTES) throw "Image is larger than 4 MB.";
+		if (stat.size > MAX_SOURCE_BYTES) throw "Image is larger than 32 MB.";
 		var bytes = File.getBytes(src);
-		var header = try Tools.getHeader(new Reader(new BytesInput(bytes)).read()) catch (_:Dynamic) null;
-		if (header == null) throw "Not a readable PNG file.";
-		if (header.width > MAX_DIM || header.height > MAX_DIM)
-			throw "Image is " + header.width + "x" + header.height + "; the limit is " + MAX_DIM + "x" + MAX_DIM + ".";
+		var png = try ImageConvert.toPng(bytes, ext, MAX_DIM) catch (e:String) throw e catch (_:Dynamic) throw "Not a readable " + ext.toUpperCase() + " image.";
+		if (png.length > MAX_BYTES) throw "Converted image is larger than 4 MB.";
 		var base = sanitize(Path.withoutExtension(Path.withoutDirectory(src)));
 		var stem = base;
 		var n = 2;
 		while (FileSystem.exists(Path.join([dir(), stem + ".png"]))) stem = base + "_" + (n++);
-		File.saveBytes(Path.join([dir(), stem + ".png"]), bytes);
-		refresh();
+		File.saveBytes(Path.join([dir(), stem + ".png"]), png);
 		return stem;
 	}
 

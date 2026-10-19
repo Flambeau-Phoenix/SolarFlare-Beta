@@ -62,6 +62,17 @@ class AuraDef {
 	public var followBuffDuration:BoolRef;
 	/** Freeform canvas placements when region == "canvas". */
 	public var canvasElements:Array<AuraCanvasElement>;
+	/** Named looks for the canvas, checked in order; empty means a single Default look. */
+	public var states:Array<AuraStateDef> = [];
+	/** Runtime: id of the matching state, "" for the Default look. Set by AuraStates, never saved. */
+	public var activeState:String = "";
+	/** Runtime: the aura was showing at the last layer-animation tick, so it can restart fades when it reappears. */
+	public var layersShowing:Bool = false;
+	/** Canvas auras are allowed to scale up much further than other faces (the HUD window resizes the whole canvas). */
+	public inline function displayScale():Float return Math.max(0.4, Math.min(region == "canvas" ? 6.0 : 2.5, scale.get()));
+	/** Editor only: draw this state instead of the live one. null follows the live state. */
+	public var previewState:String = null;
+	public inline function stateForDraw():String return previewState != null ? previewState : activeState;
 	/** Packed 0xAARRGGBB glow accent (used when iconGlow is active). */
 	public var glowColor:Int;
 	public var glowStyle:String = "proc";
@@ -218,7 +229,6 @@ class AuraDef {
 		rule = null;
 		ruleResult = new AuraRuleResult();
 		conditionUi = [];
-		for (_ in 0...AuraRuleDef.MAX_CONDITIONS) conditionUi.push(new AuraConditionUiState());
 		ruleEditor = new solarflare.aura.signal.AuraRuleEditorContext(id, rule, ruleResult, conditionUi, true);
 		w = new FloatRef(96);
 		h = new FloatRef(96);
@@ -351,14 +361,14 @@ class AuraDef {
 	}
 
 	public function timingSubjectId():String {
-		if (skillId != null && skillId.length > 0)
+		if (skillId != null && skillId.length > 0 && trigger!="script" && trigger!="custom")
 			return skillId;
 		if (rule != null && rule.conditions != null && rule.conditions.length > 0) {
 			var pi = rule.presentationSource;
 			if (pi < 0 || pi >= rule.conditions.length)
 				pi = 0;
 			var c = rule.conditions[pi];
-			if (c != null && c.subject != null && c.subject.length > 0)
+			if (c != null && c.signal!="custom.script" && c.subject != null && c.subject.length > 0)
 				return c.subject;
 		}
 		return "";
@@ -385,7 +395,7 @@ class AuraDef {
 			if (pi < 0 || pi >= rule.conditions.length)
 				pi = 0;
 			var c = rule.conditions[pi];
-			if (c != null) {
+			if (c != null && c.signal!="custom.script") {
 				key = iconKeyFor(c.subject);
 				if (key.length > 0) {
 					if (solarflare.ui.GameIcons.hasKey(key)) return key;
@@ -398,7 +408,7 @@ class AuraDef {
 			if (solarflare.ui.GameIcons.hasKey(key)) return key;
 			if (fallback.length == 0) fallback = key;
 		}
-		key = iconKeyFor(skillId);
+		key = trigger=="script" || trigger=="custom" ? "" : iconKeyFor(skillId);
 		if (key.length > 0) {
 			if (solarflare.ui.GameIcons.hasKey(key)) return key;
 			if (fallback.length == 0) fallback = key;

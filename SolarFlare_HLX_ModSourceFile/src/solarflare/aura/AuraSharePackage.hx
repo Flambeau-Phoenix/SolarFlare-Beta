@@ -48,7 +48,7 @@ class AuraSharePackage {
  public static function validateRule(rule:Dynamic):Void {
   if(rule==null) return;
   if(rule.version!=1 || (rule.mode!="all" && rule.mode!="any")) throw "Unsupported Aura rule version or mode.";
-  var conditions=list(rule.conditions,"Rule conditions",8);
+  var conditions=list(rule.conditions,"Rule conditions",solarflare.aura.signal.AuraRuleDef.MAX_CONDITIONS);
   if(conditions.length>0 && (!Std.isOfType(rule.presentationSource,Int) || rule.presentationSource<0 || rule.presentationSource>=conditions.length)) throw "Invalid rule presentation source.";
   for(c in conditions) {
    if(c==null || !Std.isOfType(c.signal,String)) throw "Invalid Aura condition.";
@@ -57,14 +57,15 @@ class AuraSharePackage {
    if(!AuraConditionValidator.isValidOperator(c.op,descriptor)) throw "Unsupported comparison for "+c.signal;
    if(descriptor.subjectKind.length>0 && (!Std.isOfType(c.subject,String) || StringTools.trim(c.subject).length==0)) throw "Missing subject for "+c.signal;
    if(descriptor.subjectKind=="statusType" && solarflare.cdb.StatusTypeCatalog.index(c.subject)<0) throw "Unsupported status type: "+c.subject;
+   if(c.signal=="custom.script" && haxe.io.Bytes.ofString(c.subject).length>4096) throw "Expression exceeds 4,096 UTF-8 bytes; source was not truncated.";
    if(c.numberValue!=null && ((!Std.isOfType(c.numberValue,Float) && !Std.isOfType(c.numberValue,Int)) || !Math.isFinite(c.numberValue))) throw "Invalid condition threshold.";
   }
  }
  public static function validatePack(pack:Dynamic):Void {
   if(pack==null || pack.kind!="solarflare.aura_pack" || pack.v!=1) throw "Unsupported Aura definitions.";
   if(!Std.isOfType(pack.name,String) || pack.name.length>256) throw "Invalid share package name.";
-  var auras=records(pack.auras,"Auras",32); if(auras.length==0) throw "The package contains no Auras.";
-  var groups=records(pack.groups,"Groups",32); var sets=records(pack.sets,"Sets",32);
+  var auras=records(pack.auras,"Auras",AuraLimits.MAX_AURAS); if(auras.length==0) throw "The package contains no Auras.";
+  var groups=records(pack.groups,"Groups",AuraLimits.MAX_GROUPS); var sets=records(pack.sets,"Sets",AuraLimits.MAX_SETS);
   var groupIds=new Map<String,Bool>(); for(g in groups) groupIds.set(g.id,true);
   var setIds=new Map<String,Bool>(); for(s in sets) setIds.set(s.id,true);
   for(g in groups) {
@@ -87,9 +88,16 @@ class AuraSharePackage {
    if(a.effects!=null) for(e in list(a.effects,"Effects",8)) {
     if(e==null || ["window","alert","icon","audio"].indexOf(e.kind)<0 || ["whileTrue","whileFalse","onRise","onFall","onRiseHold","onFallHold","sticky"].indexOf(e.when)<0) throw "Unsupported Aura effect.";
    }
+   var stateIds=new Map<String,Bool>();
+   if(a.states!=null) for(st in list(a.states,"States",AuraStateDef.MAX_STATES)) {
+    if(st==null || !Std.isOfType(st.id,String) || StringTools.trim(st.id).length==0 || stateIds.exists(st.id)) throw "Unsupported Aura state.";
+    stateIds.set(st.id,true); validateRule(st.rule);
+   }
    if(a.canvasElements!=null) for(el in list(a.canvasElements,"Canvas elements",4096)) {
-    if(el==null || ["text","icon","shape"].indexOf(el.kind)<0 || !Std.isOfType(el.content,String)) throw "Unsupported canvas element.";
+    if(el==null || ["text","icon","shape","path"].indexOf(el.kind)<0 || !Std.isOfType(el.content,String)) throw "Unsupported canvas element.";
     validateRule(el.visibilityRule);
+    if(el.kind=="path" && el.path!=null) { if(!Std.isOfType(el.path.n,Array)) throw "Unsupported vector path."; var rows:Array<Dynamic>=cast el.path.n; if(rows.length>AuraVectorPath.MAX_NODES) throw "Vector path has too many points."; }
+    if(el.inStates!=null) { if(!Std.isOfType(el.inStates,Array)) throw "Unsupported canvas element states."; var refs:Array<Dynamic>=cast el.inStates; if(refs.length>AuraCanvasElement.MAX_STATE_REFS) throw "Too many state references."; }
    }
   }
  }

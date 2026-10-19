@@ -229,7 +229,7 @@ class ConfigPanel {
 		if (resourceTracker != null) registerInteractive(resourceTracker.open);
 		if (hemorrhage != null) registerInteractive(hemorrhage.tool.open);
 		if (geauxBuilder != null) registerInteractive(geauxBuilder.open);
-		if (auraBuilder != null) registerInteractive(auraBuilder.open);
+		if (auraBuilder != null) { registerInteractive(auraBuilder.open); registerInteractive(auraBuilder.canvasEditor.open); }
 		if (stacks != null) registerInteractive(stacks.open);
 		if (extraBarsPrototype != null) registerInteractive(extraBarsPrototype.open);
 		if (barter != null && barter.config != null) registerInteractive(barter.config.open);
@@ -453,7 +453,7 @@ class ConfigPanel {
 		if (geauxBuilder != null)
 			UiScope.guard("Geaux Builder", geauxBuilder.draw);
 		if (auraBuilder != null)
-			UiScope.guard("Aura Builder", auraBuilder.draw);
+			{ UiScope.guard("Aura Builder", auraBuilder.draw); UiScope.guard("Canvas Editor", auraBuilder.canvasEditor.draw); }
 		if (extraBarsPrototype != null)
 			UiScope.guard("ExtraBars", extraBarsPrototype.draw);
 		if (stacks != null) UiScope.guard("StacksBuilder", stacks.builder.draw);

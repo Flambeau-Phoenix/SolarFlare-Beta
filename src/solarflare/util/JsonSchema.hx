@@ -38,6 +38,32 @@ typedef AuraRuleImportModel = {
 	@:optional var conditions:Array<AuraConditionImportModel>;
 }
 
+/** Per-state replacement values for one canvas element. */
+typedef AuraElementOverrideImportModel = {
+	@:optional var x:Float;
+	@:optional var y:Float;
+	@:optional var w:Float;
+	@:optional var h:Float;
+	@:optional var color:Int;
+	@:optional var opacity:Float;
+	@:optional var rotation:Float;
+	@:optional var hidden:Bool;
+}
+
+/** Named canvas look and the rule that selects it. */
+typedef AuraStateImportModel = {
+	@:optional var id:String;
+	@:optional var name:String;
+	@:optional var group:String;
+	@:optional var rule:AuraRuleImportModel;
+}
+
+/** Vector path layer: nodes as [x, y] or [x, y, inX, inY, outX, outY]. */
+typedef AuraPathImportModel = {
+	@:optional var n:Array<Array<Float>>;
+	@:optional var c:Bool;
+}
+
 /** Nested canvas element — mirrors AuraCanvasElement.toObj. */
 typedef AuraCanvasImportModel = {
 	@:optional var kind:String;
@@ -52,6 +78,28 @@ typedef AuraCanvasImportModel = {
 	@:optional var locked:Bool;
 	@:optional var shadow:Bool;
 	@:optional var stroke:Float;
+	@:optional var path:AuraPathImportModel;
+	@:optional var fill:Bool;
+	@:optional var strokeColor:Int;
+	@:optional var fadeIn:Float;
+	@:optional var fadeOut:Float;
+	@:optional var pulseKind:Int;
+	@:optional var pulsePeriod:Float;
+	@:optional var pulseDepth:Float;
+	@:optional var pulseColor:Int;
+	@:optional var soundShow:String;
+	@:optional var soundHide:String;
+	@:optional var soundVolume:Float;
+	@:optional var inStates:Array<String>;
+	@:optional var sides:Int;
+	@:optional var color2:Int;
+	@:optional var gradDir:Int;
+	@:optional var textAlign:Int;
+	@:optional var outline:Float;
+	@:optional var name:String;
+	@:optional var stateOverrides:Map<String, AuraElementOverrideImportModel>;
+	@:optional var rotation:Float;
+	@:optional var opacity:Float;
 }
 
 /**
@@ -125,6 +173,7 @@ typedef AuraImportExportModel = {
 	@:optional var transparent:Bool;
 	@:optional var rule:AuraRuleImportModel;
 	@:optional var canvasElements:Array<AuraCanvasImportModel>;
+	@:optional var states:Array<AuraStateImportModel>;
 	/** Legacy alias some packs still emit. */
 	@:optional var key:String;
 	@:optional var fxPulse:Bool;

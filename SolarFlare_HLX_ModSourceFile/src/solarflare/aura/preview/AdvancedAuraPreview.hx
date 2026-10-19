@@ -49,7 +49,7 @@ class AdvancedAuraPreview {
 		if (autoPlay) progress.set((progress.get() - dt * animSpeed.get() + 1) % 1);
 		var pos = ImGui.getCursorScreenPos();
 		ImGui.dummy(ImGui.vec2(width, height));
-		var sc:Single = Math.max(0.4, Math.min(2.5, a.scale.get()));
+		var sc:Single = a.displayScale();
 		var baseW:Single = Math.max(24, a.w.get() * sc);
 		var baseH:Single = Math.max(24, a.h.get() * sc);
 		var simLeft:Null<Float> = -1;
@@ -76,6 +76,9 @@ class AdvancedAuraPreview {
 		var cx:Single = pos.x + (width - bounds.width()) * 0.5 - bounds.minX;
 		var cy:Single = pos.y + (height - bounds.height()) * 0.5 - bounds.minY;
 		var dl = ImGui.getWindowDrawList();
+		// A visible frame, so the preview reads as a preview and the aura's real extent is clear.
+		ImGui.ImDrawList_AddRectFilled(dl, pos, ImGui.vec2(pos.x + width, pos.y + height), ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.04, 0.05, 0.08, 0.7)), 4);
+		ImGui.ImDrawList_AddRect(dl, pos, ImGui.vec2(pos.x + width, pos.y + height), ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.3, 0.36, 0.48, 0.9)), 4, 1);
 		ImGui.ImDrawList_PushClipRect(dl, pos, ImGui.vec2(pos.x + width, pos.y + height), true);
 		try {
 			AuraVisualRenderer.draw(dl, a, cx, cy, drawW, drawH, gaugeProgress(a), stacks.get(), counter.get(),
