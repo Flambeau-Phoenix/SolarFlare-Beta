@@ -235,10 +235,10 @@ class CanvasEditor {
 			try {
 				if (UiChrome.beginTabItem("Layers##cv_tab_layers")) {
 					try {
-						ImGui.textDisabled("Layers are the pieces of the design.");
+						solarflare.ui.UiHints.note("Layers are the pieces of the design.");
 						if (a.canvasElements.length == 0) {
 							UiChrome.gap(4);
-							wrappedHint("No layers yet. Use Insert in the toolbar or menu to add text, a game icon, one of your images, a shape, or a ready-made preset.");
+							wrappedStatus("No layers yet. Use Insert in the toolbar or menu to add text, a game icon, one of your images, a shape, or a ready-made preset.");
 						} else drawCanvasLayers(a);
 					} catch (e:Dynamic) { ImGui.endTabItem(); throw e; }
 					ImGui.endTabItem();
@@ -303,7 +303,7 @@ class CanvasEditor {
 		wrappedHint(a.canvasElements.length == 0
 			? "Start with Insert: Text, Icon, Image, Shape or a Preset. Everything you add can be moved, resized, aligned and recoloured here."
 			: "Click a layer on the stage or in Layers to edit its position, size, colour, visibility and per-look overrides.");
-		UiChrome.subHeader("Quick start");
+		if (solarflare.ui.UiHints.show.get()) UiChrome.subHeader("Quick start");
 		for (row in ["Drag to move; drag empty space to box-select", "Ctrl+click adds to the selection", "Corner and edge handles resize; Shift keeps the ratio",
 				"The round handle rotates shapes", "Arrows nudge (Shift = 10 px)", "Space+drag or middle-drag pans; + / - zoom; 0 resets"])
 			wrappedHint("- " + row);
@@ -377,7 +377,7 @@ class CanvasEditor {
 			ImGui.alignTextToFramePadding();
 			ImGui.textColored(theme.accent, "Editing look: " + stateLabel(a, editState));
 			ImGui.sameLine(0, 8);
-			ImGui.textDisabled("Position, size, colour and Hidden changes apply to this look only.");
+			solarflare.ui.UiHints.note("Position, size, colour and Hidden changes apply to this look only.");
 			ImGui.sameLine(0, 8);
 			if (ImGui.smallButton("Back to Default##cv_back_default")) { editState = ""; stateDeleteArmed = ""; }
 		}
@@ -489,6 +489,8 @@ class CanvasEditor {
 				ImGui.endMenu();
 			}
 			if (ImGui.beginMenu("Help")) {
+				if (ImGui.menuItem("Show explanations##cv_m_hints", null, solarflare.ui.UiHints.show.get(), true)) { solarflare.ui.UiHints.show.set(!solarflare.ui.UiHints.show.get()); SettingsStore.markDirty(); }
+				ImGui.separator();
 				for (row in [["Move / box-select", "Drag"], ["Add to selection", "Ctrl+click"], ["Resize (keep ratio)", "Handles (Shift)"], ["Nudge", "Arrows (Shift x10)"],
 						["Select all / none", "Ctrl+A / Esc"], ["Copy / Cut / Paste", "Ctrl+C / X / V"], ["Duplicate / Delete", "Ctrl+D / Del"], ["Group / Ungroup", "Ctrl+G / Ctrl+Shift+G"], ["Select one layer of a group", "Alt+click"], ["Undo / Redo", "Ctrl+Z / Ctrl+Y"],
 						["Layer forward / backward", "] / [  (Ctrl = ends)"], ["Select / Pan / Pen / Nodes tool", "V / H / P / N"], ["Add a path point on a line", "Ctrl+click (Nodes)"], ["Zoom / Reset view", "+ - / 0"], ["Pan", "Space+drag, middle-drag"], ["Place freely", "Hold Alt"]])
@@ -929,7 +931,7 @@ class CanvasEditor {
 			ImGui.sameLine(0, 8);
 			ImGui.setNextItemWidth(160);
 			NumberField.draw("##cv_svg_outline", svgStroke, 0, 16, "Outline %.0f px", null);
-			if (svgParsed == null) wrappedHint("Nothing pasted yet.");
+			if (svgParsed == null) wrappedStatus("Nothing pasted yet.");
 			else if (svgParsed.error.length > 0) ImGui.textColored(solarflare.ui.ThemePalette.status(solarflare.ui.ThemePalette.STATUS_DANGER), svgParsed.error);
 			else {
 				var points = 0;
@@ -1392,7 +1394,14 @@ class CanvasEditor {
 		}
 	}
 
+	/** Explanatory sentence: only shown while "Show explanations" is on. */
 	function wrappedHint(text:String):Void {
+		if (!solarflare.ui.UiHints.show.get()) return;
+		wrappedStatus(text);
+	}
+
+	/** Status or empty-state sentence: always shown. */
+	function wrappedStatus(text:String):Void {
 		ImGui.pushStyleColor(ImGuiCol.Text, solarflare.ui.ThemePalette.current().textDisabled);
 		ImGui.textWrapped(text);
 		ImGui.popStyleColor();
@@ -1408,7 +1417,7 @@ class CanvasEditor {
 			return;
 		}
 		var live = a.activeState == "" ? "Default" : stateLabel(a, a.activeState);
-		wrappedHint("Previewing " + stateLabel(a, editState) + ". In the game right now: " + live + ".");
+		wrappedStatus("Previewing " + stateLabel(a, editState) + ". In the game right now: " + live + ".");
 	}
 
 	/** Builder card: tabs, hints and the selected look's settings, all in one column. */
@@ -1475,7 +1484,7 @@ class CanvasEditor {
 		var mates:Array<AuraDef> = [];
 		if (a.group != null && a.group.length > 0) for (o in host.canvasAuras()) if (o != null && o != a && o.group == a.group) mates.push(o);
 		if (mates.length > 0) {
-			ImGui.textDisabled("Use this look when a group member is showing:");
+			solarflare.ui.UiHints.note("Use this look when a group member is showing:");
 			for (m in mates) {
 				ImGui.sameLine(0, 6);
 				if (ImGui.smallButton(m.displayLabel() + "##cv_state_mate_" + m.id)) {
@@ -1486,7 +1495,7 @@ class CanvasEditor {
 					SettingsStore.markDirty();
 				}
 			}
-		} else if (a.group == null || a.group.length == 0) ImGui.textDisabled("Put this aura in a display group to tie a state to its members, or use any condition below.");
+		} else if (a.group == null || a.group.length == 0) solarflare.ui.UiHints.note("Put this aura in a display group to tie a state to its members, or use any condition below.");
 		var context = stateRuleContexts.get(st);
 		if (context == null) {
 			context = new solarflare.aura.signal.AuraRuleEditorContext(a.id + "_state_" + nextStateRuleId++, st.rule, st.result, [], false);
@@ -1551,7 +1560,7 @@ class CanvasEditor {
 					});
 			}, "Resizes the selected layers together about their shared centre: positions, sizes, text and outlines. Available in the Default look.");
 		});
-		ImGui.textDisabled("Properties below edit the last-clicked layer. Move, nudge, duplicate and delete act on all.");
+		solarflare.ui.UiHints.note("Properties below edit the last-clicked layer. Move, nudge, duplicate and delete act on all.");
 		UiLayout.inlineSplit("##ab_cv_align_a", 3, function(index:Int, cellW:Single) {
 			var size = ImGui.vec2(cellW, 0);
 			if (index == 0 && ImGui.button("Align left##ab_cv_msl", size)) alignSelection(a, "left");

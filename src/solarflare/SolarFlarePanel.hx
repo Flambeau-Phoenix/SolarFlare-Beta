@@ -45,7 +45,6 @@ class SolarFlarePanel {
 		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
 		| ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoSavedSettings;
 	static inline var BAR_GAP:Single = 4;
-	static inline var PRAYER_ICON:Single = 30;
 
 	var config:ConfigPanel;
 	var geauxBar:GeauxBar;
@@ -429,6 +428,11 @@ class SolarFlarePanel {
 		var compact = VitalsConfig.compactRow(resourceStyle(v, kind), resourceVertical(v, kind));
 		var h:Single = Math.max(compact ? 38 : 28, height.get());
 		var w:Single = Math.max(80, width.get());
+		if (kind == 3) {
+			// Prayers fit their icons: the row sets the size, not a stored height.
+			h = solarflare.resourcetracker.PrayerRenderer.rowHeight(v.prayersLook, false) + 8;
+			w = Math.max(w, solarflare.resourcetracker.PrayerRenderer.rowWidth(v.prayersLook, false) + 8);
+		}
 		solarflare.ui.HUDWidgetWindow.draw(id, caption, chrome, w, h, resourceBodyFns[kind], openResourceTrackerFn,
 			resourceHideFns[kind], false, null, resourceResizeFns[kind]);
 	}
@@ -460,7 +464,9 @@ class SolarFlarePanel {
 			case 0: drawVital(true, false, false, VitalsConfig.normalizeStyle(style, true, true), rowW, rowH, vertical);
 			case 1: drawVital(false, true, false, VitalsConfig.normalizeStyle(style, true, false), rowW, rowH, vertical);
 			case 2: drawVital(false, false, true, VitalsConfig.normalizeStyle(style, true, !HealthCache.sparkValid), rowW, rowH, vertical);
-			default: drawPrayerIcons(rowW, false);
+			default:
+				solarflare.resourcetracker.PrayerRenderer.draw(v.prayersLook, solarflare.resourcetracker.ResourceArtwork.forWindow("SolarFlare Prayers"),
+					PrayerCache.smiteReady, PrayerCache.lifeReady, PrayerCache.shieldReady, rowW, false);
 		}
 	}
 
@@ -487,7 +493,9 @@ class SolarFlarePanel {
 	function drawVital(isHp:Bool, isRage:Bool, isMana:Bool, style:Int, w:Single, h:Single, vertical:Bool,
 			thesdRight:Bool = false):Void {
 		var origin = ImGui.getCursorScreenPos();
-		VitalsRenderer.draw(cacheSnap(isHp, isRage), style, w, h, vertical, thesdRight);
+		var v = config.vitals;
+		VitalsRenderer.draw(cacheSnap(isHp, isRage), style, w, h, vertical, thesdRight,
+			v == null ? null : (isHp ? v.hpLook : (isRage ? v.rageLook : v.manaLook)));
 		if (isRage && HealthCache.rageAlertActive())
 			solarflare.ui.ResourceMaxAlert.drawOver(origin.x, origin.y, w, h);
 	}
@@ -529,46 +537,4 @@ class SolarFlarePanel {
 		return s;
 	}
 
-	static function drawPrayerIcons(rowSpan:Single, vertical:Bool):Void {
-		var size:Single = PRAYER_ICON;
-		var gap:Single = 3;
-		var origin = ImGui.getCursorScreenPos();
-		if (vertical) {
-			drawPrayerIcon(origin.x, origin.y, size, "smite", PrayerCache.smiteReady);
-			drawPrayerIcon(origin.x, origin.y + size + gap, size, "life", PrayerCache.lifeReady);
-			drawPrayerIcon(origin.x, origin.y + (size + gap) * 2, size, "shield", PrayerCache.shieldReady);
-			ImGui.dummy(ImGui.vec2(size, size * 3 + gap * 2));
-		} else {
-			var total:Single = size * 3 + gap * 2;
-			var startX:Single = origin.x;
-			if (rowSpan > total)
-				startX = origin.x + (rowSpan - total) * 0.5;
-			drawPrayerIcon(startX, origin.y, size, "smite", PrayerCache.smiteReady);
-			drawPrayerIcon(startX + size + gap, origin.y, size, "life", PrayerCache.lifeReady);
-			drawPrayerIcon(startX + (size + gap) * 2, origin.y, size, "shield", PrayerCache.shieldReady);
-			ImGui.dummy(ImGui.vec2(rowSpan > 1 ? rowSpan : total, size));
-		}
-	}
-
-	static function prayerGlow(kind:String):Dynamic {
-		if (kind == "smite")
-			return ImGui.vec4(0.95, 0.22, 0.18, 0.95); // red
-		if (kind == "life")
-			return ImGui.vec4(0.95, 0.78, 0.22, 0.95); // yellow/gold
-		return ImGui.vec4(0.28, 0.55, 0.98, 0.95); // shield blue
-	}
-
-	static function drawPrayerIcon(x:Single, y:Single, size:Single, kind:String, ready:Bool):Void {
-		var dl = ImGui.getWindowDrawList();
-		var tex = GameIcons.get(GameIcons.prayerId(kind));
-		// Dim until prayer is ready; full tint when active. No colored border chrome.
-		if (!GameIcons.draw(dl, tex, x, y, size, GameIcons.tintReady(ready))) {
-			var glow = prayerGlow(kind);
-			var fill = ready
-				? ImGui.vec4(glow.x * 0.55, glow.y * 0.55, glow.z * 0.55, 1)
-				: ImGui.vec4(0.16, 0.17, 0.19, 0.85);
-			ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + size, y + size),
-				ImGui.colorConvertFloat4ToU32(fill), 6);
-		}
-	}
 }

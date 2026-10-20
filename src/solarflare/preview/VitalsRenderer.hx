@@ -2,6 +2,7 @@ package solarflare.preview;
 
 import imgui.ImGui;
 import imgui.Structs.ImVec4;
+import solarflare.resourcetracker.BarLook;
 import solarflare.ui.PipShapes;
 import solarflare.ui.VitalsConfig;
 
@@ -54,7 +55,17 @@ class VitalsRenderer {
 			+ (snap.valid ? " | health valid" : " | health unavailable: empty fill");
 		return ImGui.colorConvertU32ToFloat4(col);
 	}
-	public static function draw(snap:VitalSnap, style:Int, w:Single, h:Single, vertical:Bool, thesdRight:Bool = false):Void {
+	/** Look for the draw in flight; set by draw() so the style helpers need no extra parameter. */
+	static var look:BarLook = null;
+
+	public static function draw(snap:VitalSnap, style:Int, w:Single, h:Single, vertical:Bool, thesdRight:Bool = false,
+			barLook:BarLook = null):Void {
+		look = barLook;
+		drawStyle(snap, style, w, h, vertical, thesdRight);
+		look = null;
+	}
+
+	static function drawStyle(snap:VitalSnap, style:Int, w:Single, h:Single, vertical:Bool, thesdRight:Bool):Void {
 		var useSegs = style == VitalsConfig.STYLE_BAR_2X50 || style == VitalsConfig.STYLE_BAR_2X10;
 		if (useSegs) {
 			drawValueSegments(snap, w, h, style, vertical);
@@ -86,6 +97,9 @@ class VitalsRenderer {
 
 	/** Primary fill tint per resource, mirrored from the live vitals palette. */
 	static function fillColor(snap:VitalSnap):ImVec4 {
+		var custom = look != null ? look.userFill() : null;
+		if (custom != null)
+			return snap.kind == VitalSnap.HP ? healthTint(snap, custom) : custom;
 		if (snap.kind == VitalSnap.RAGE)
 			return ImGui.vec4(0.88, 0.38, 0.12, 1);
 		if (snap.kind == VitalSnap.MANA)
@@ -155,7 +169,10 @@ class VitalsRenderer {
 		var overlay = snap.valid ? overlayValid(snap) : overlayInvalid(snap);
 		var fraction:Single = snap.valid ? snap.ratio : (0.0 : Single);
 		var main:ImVec4;
-		if (snap.kind == VitalSnap.HP) {
+		var custom = look != null ? look.userFill() : null;
+		if (custom != null) {
+			main = snap.kind == VitalSnap.HP ? healthTint(snap, custom) : custom;
+		} else if (snap.kind == VitalSnap.HP) {
 			main = healthTint(snap, ImGui.vec4(0.22, 0.72, 0.38, 1));
 		} else if (snap.kind == VitalSnap.RAGE) {
 			main = ImGui.vec4(0.88, 0.38, 0.12, 1);
@@ -164,8 +181,32 @@ class VitalsRenderer {
 		}
 		var origin = ImGui.getCursorScreenPos();
 		var dl = ImGui.getWindowDrawList();
-		solarflare.ui.VitalsConfig.HorizontalBarGauge.draw(dl, origin.x, origin.y, w, h, fraction, main, overlay, shieldRatio(snap));
+		if (look != null)
+			look.paint(dl, origin.x, origin.y, w, h, fraction, main, false, barText(snap, overlay), shieldRatio(snap), isLow(snap));
+		else
+			solarflare.ui.VitalsConfig.HorizontalBarGauge.draw(dl, origin.x, origin.y, w, h, fraction, main, overlay, shieldRatio(snap));
 		ImGui.dummy(ImGui.vec2(w, h));
+	}
+
+	/** Label for a look-styled bar: the look's text mode over the style's automatic text. */
+	static function barText(snap:VitalSnap, auto:String):String {
+		if (look == null)
+			return auto;
+		return switch (look.textMode.get()) {
+			case BarLook.TEXT_NONE: "";
+			case BarLook.TEXT_VALUE: snap.valid ? compactValid(snap) : auto;
+			case BarLook.TEXT_PERCENT: snap.valid ? percentText(snap) : auto;
+			case BarLook.TEXT_BOTH: snap.valid ? compactValid(snap) + "  " + percentText(snap) : auto;
+			default: auto;
+		};
+	}
+
+	static function percentText(snap:VitalSnap):String return Std.string(Std.int(snap.ratio * 100 + 0.5)) + "%";
+
+	/** Low-health pulse: living Health bars only, never on unknown or dead/tapped data. */
+	static function isLow(snap:VitalSnap):Bool {
+		return look != null && snap.kind == VitalSnap.HP && look.lowPulse.get() && snap.valid
+			&& !(snap.deadKnown && snap.dead) && !snap.tapped && snap.ratio < look.lowPercent.get() / 100;
 	}
 
 	/** Full-value segmented bars (2×50 / 2×10). */
@@ -191,7 +232,13 @@ class VitalsRenderer {
 		var ratio:Single = snap.valid ? snap.ratio : 0;
 		var text = snap.valid ? compactValid(snap) : compactInvalid(snap);
 		var col = snap.kind == VitalSnap.HP ? healthTint(snap, ImGui.vec4(0.22, 0.72, 0.38, 1)) : fillColor(snap);
-		VerticalBarGauge.draw(dl, origin.x, origin.y, w, h, ratio, col, text, shieldRatio(snap));
+		var custom = look != null ? look.userFill() : null;
+		if (custom != null)
+			col = fillColor(snap);
+		if (look != null)
+			look.paint(dl, origin.x, origin.y, w, h, ratio, col, true, barText(snap, text), shieldRatio(snap), isLow(snap));
+		else
+			VerticalBarGauge.draw(dl, origin.x, origin.y, w, h, ratio, col, text, shieldRatio(snap));
 		ImGui.dummy(ImGui.vec2(w, h));
 	}
 
@@ -211,6 +258,8 @@ class VitalsRenderer {
 				? ImGui.vec4(0.45, 0.72, 0.98, 1)
 				: ImGui.vec4(0.22, 0.42, 0.92, 1);
 		}
+		if (look != null && look.userFill() != null)
+			col = fillColor(snap);
 		ThesdGauge.draw(dl, origin.x, origin.y, w, h, ratio, col, text, flip, -1, null, shieldRatio(snap));
 		ImGui.dummy(ImGui.vec2(w, h));
 	}

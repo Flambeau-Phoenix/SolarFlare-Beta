@@ -805,7 +805,7 @@ class ConfigPanel {
 			case TAB_ATTACK:
 				if (drawModuleHeader("Attack Combo", attackCombo.hidden.get() ? "Overlay hidden" : "Overlay shown", "Open settings", "tab_attack_open"))
 					resourceTracker.openFor("attack");
-				ImGui.textWrapped("Weapon attack-chain overlay.");
+				UiHints.noteWrapped("Weapon attack-chain overlay.");
 				drawOverlayBasics("attack", attackCombo.hidden, attackCombo.chrome);
 			case TAB_AURAS:
 				drawAurasModule();
@@ -813,14 +813,14 @@ class ConfigPanel {
 				var saved = !notebook.hasUnsavedChanges();
 				if (drawModuleHeader("Notebook", Std.string(notebook.pageCount()) + " page(s) / " + (saved ? "saved" : "saving..."), "Open notebook", "tab_notebook_open"))
 					notebook.open.set(true);
-				ImGui.textWrapped("Pages auto-save while you type and are stored separately in notebook.json.");
+				UiHints.noteWrapped("Pages auto-save while you type and are stored separately in notebook.json.");
 			case TAB_LIGHTSABER:
 				if (drawModuleHeader("Lightsaber", lightsaber.hidden.get() ? "Meter hidden" : "Meter shown", "Open options", "tab_saber_open"))
 					lightsaber.open.set(true);
-				ImGui.textWrapped("Local combat-log DPS meter.");
+				UiHints.noteWrapped("Local combat-log DPS meter.");
 				drawOverlayBasics("saber", lightsaber.hidden, lightsaber.chrome);
 			case TAB_COMBAT_LOG:
-				ImGui.textWrapped("Skill casts and resolved combat events.");
+				UiHints.noteWrapped("Skill casts and resolved combat events.");
 				combatLog.drawEditorContents();
 			case TAB_EXTRABARS:
 				drawExtraBarsModule();
@@ -846,7 +846,7 @@ class ConfigPanel {
 			case TAB_LOOT:
 				if (drawModuleHeader("Loot Browser", solarflare.cdb.LootCatalog.tables.length + " loot tables / " + solarflare.cdb.LootCatalog.items.length + " items", "Open browser", "tab_loot_open"))
 					lootBrowser.open.set(true);
-				ImGui.textWrapped("Search every CDB loot table and item, with thumbnails, drop chances and which units use each table.");
+				UiHints.noteWrapped("Search every CDB loot table and item, with thumbnails, drop chances and which units use each table.");
 			case TAB_SETTINGS:
 				drawHubSettings();
 			default:
@@ -905,7 +905,7 @@ class ConfigPanel {
 		var cfg = extraBarsPrototype.model;
 		if (drawModuleHeader("ExtraBars", Std.string(cfg.bars.length) + " bar(s) configured", "Open editor", "extra_open"))
 			extraBarsPrototype.open.set(true);
-		ImGui.textWrapped("Consumable bars and the optional Spark Cube tracker. Settings are remembered across all characters and gear builds.");
+		UiHints.noteWrapped("Consumable bars and the optional Spark Cube tracker. Settings are remembered across all characters and gear builds.");
 		UiLayout.propertyGrid("##hub_extra_bars", function() {
 			for (bar in cfg.bars) {
 				UiLayout.propertyRow(bar.name, function() {
@@ -958,6 +958,9 @@ class ConfigPanel {
 				if (ImGui.checkbox("Remember F6 position/size##hub_remember", rememberHubLayout))
 					SettingsStore.markDirty();
 			});
+			UiLayout.propertyRow("Help text", function() {
+				UiHints.drawToggle("hub_show_hints");
+			}, "Shows a short sentence under options in the builders. Off by default.");
 			UiLayout.propertyRow("Mode", function() {
 				ImGui.text(solarflare.ui.DockingHelper.isWindowDocked() ? "Docked into another window" : "Floating windows");
 			}, "Drag one tool window onto another to tab or split. No screen-edge dock anchors.");
@@ -1048,7 +1051,7 @@ class ConfigPanel {
 	/** Utilities: switches that apply across every overlay. Settings are remembered across characters. */
 	function drawUtilities():Void {
 		UiChrome.sectionHeader("Utilities");
-		ImGui.textWrapped("Quality-of-life switches that apply to all SolarFlare overlays.");
+		UiHints.noteWrapped("Quality-of-life switches that apply to all SolarFlare overlays.");
 		UiChrome.subHeader("Hide All");
 		solarflare.ui.UtilitiesPanel.drawHideAll();
 		UiChrome.subHeader("Auto-hide on game windows");
@@ -1076,7 +1079,7 @@ class ConfigPanel {
 	function drawGeauxHubSummary():Void {
 		if (drawModuleHeader("Geaux", geaux.enabled.get() ? "Grid visible" : "Grid hidden", "Open builder", "tab_geaux_open"))
 			geauxBuilder.open.set(true);
-		ImGui.textWrapped("TellMeWhen-style floating cooldown grid (not the skill action bar; use BarTer for that).");
+		UiHints.noteWrapped("TellMeWhen-style floating cooldown grid (not the skill action bar; use BarTer for that).");
 		UiLayout.propertyGrid("##hub_geaux_properties", function() {
 			UiLayout.propertyRow("Visible", function() {
 				if (UiChrome.toggleTileRef("##tab_geaux_show", "Visible", geaux.enabled, 108, 28)) {

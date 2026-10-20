@@ -65,6 +65,11 @@ class VitalsConfig {
 	public var rageVertical = new BoolRef(false);
 	public var manaVertical = new BoolRef(false);
 	public var layout = new IntRef(LAYOUT_STACKED);
+	/** Bar finish options (color, border, rounding, ticks, text). Built in the constructor: native-backed. */
+	public var hpLook:solarflare.resourcetracker.BarLook;
+	public var rageLook:solarflare.resourcetracker.BarLook;
+	public var manaLook:solarflare.resourcetracker.BarLook;
+	public var prayersLook:solarflare.resourcetracker.PrayerLook;
 	public var chrome:HudChrome;
 	public var rageChrome:HudChrome;
 	public var manaChrome:HudChrome;
@@ -75,6 +80,10 @@ class VitalsConfig {
 	}
 
 	public function new() {
+		hpLook = new solarflare.resourcetracker.BarLook(solarflare.resourcetracker.BarLook.GLASS, true, 1.5, true);
+		rageLook = new solarflare.resourcetracker.BarLook(solarflare.resourcetracker.BarLook.GRADIENT, false, 1, false);
+		manaLook = new solarflare.resourcetracker.BarLook(solarflare.resourcetracker.BarLook.GRADIENT, false, 1, false);
+		prayersLook = new solarflare.resourcetracker.PrayerLook();
 		chrome = new HudChrome(80, 232);
 		rageChrome = new HudChrome(40, 210);
 		manaChrome = new HudChrome(40, 270);

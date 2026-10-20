@@ -60,9 +60,13 @@ class PipShapes {
 		}
 	}
 
-	/** Integer-filled slots (combo / conduits). Optional skill PNG per pip. */
+	/**
+	 * Integer-filled slots (combo / conduits). Optional skill PNG per pip. `skin` + `slotBase` draw the user's
+	 * per-point images (slot `slotBase + i` when lit, `emptySlot` when not); `look` is the light color/border/glow.
+	 */
 	public static function drawCount(rowW:Single, rowH:Single, n:Int, filled:Int, vertical:Bool, shape:Int,
-			label:String, iconId:String = null):Void {
+			label:String, iconId:String = null, look:solarflare.resourcetracker.PipLook = null,
+			skin:solarflare.resourcetracker.ResourceSkin = null, slotBase:Int = 0, emptySlot:Int = -1):Void {
 		if (n < 1)
 			n = SLOTS;
 		var f = filled;
@@ -73,8 +77,15 @@ class PipShapes {
 		var amounts = new Array<Float>();
 		for (i in 0...n)
 			amounts.push(i < f ? 1 : 0);
-		drawInternal(rowW, rowH, n, amounts, vertical, shape, label, iconId, defaultLit(), defaultDim(),
-			defaultLitBorder(), defaultDimBorder());
+		var lit = defaultLit();
+		var litBorder = defaultLitBorder();
+		var custom = look != null ? look.lit() : null;
+		if (custom != null) {
+			lit = custom;
+			litBorder = ImGui.vec4(custom.x * 0.7 + 0.3, custom.y * 0.7 + 0.3, custom.z * 0.7 + 0.3, 0.7);
+		}
+		drawInternal(rowW, rowH, n, amounts, vertical, shape, label, iconId, lit, defaultDim(),
+			litBorder, defaultDimBorder(), 0, look, skin, slotBase, emptySlot);
 	}
 
 	/** Value split across equal box segments (for example 2×10 or 2×50). */
@@ -141,7 +152,9 @@ class PipShapes {
 	}
 
 	static function drawInternal(rowW:Single, rowH:Single, n:Int, amounts:Array<Float>, vertical:Bool, shape:Int,
-			label:String, iconId:String, lit:ImVec4, dim:ImVec4, litBorder:ImVec4, dimBorder:ImVec4, shield:Float = 0):Void {
+			label:String, iconId:String, lit:ImVec4, dim:ImVec4, litBorder:ImVec4, dimBorder:ImVec4, shield:Float = 0,
+			look:solarflare.resourcetracker.PipLook = null, skin:solarflare.resourcetracker.ResourceSkin = null,
+			slotBase:Int = 0, emptySlot:Int = -1):Void {
 		shape = normalize(shape);
 		var origin = ImGui.getCursorScreenPos();
 		var dl = ImGui.getWindowDrawList();
@@ -173,6 +186,9 @@ class PipShapes {
 		if (iconId != null && iconId.length > 0)
 			tex = GameIcons.get(iconId);
 		var hasTex = tex != (0 : hl.I64);
+		var thick:Single = look != null ? look.border.get() : -1;
+		var glow = look != null && look.glowFull.get() && amounts.length >= n && amounts[n - 1] >= 1;
+		var glowCol = ImGui.colorConvertFloat4ToU32(ImGui.vec4(lit.x, lit.y, lit.z, 0.30));
 
 		if (vertical) {
 			var blockH:Single = (pipH - gap * (n - 1)) / n;
@@ -185,7 +201,10 @@ class PipShapes {
 				var idx = n - 1 - i;
 				var y:Single = origin.y + (blockH + gap) * i;
 				var amt = idx < amounts.length ? amounts[idx] : 0;
-				drawOne(dl, origin.x, y, blockW, blockH, shape, amt, lit, dim, litBorder, dimBorder, tex, hasTex);
+				if (glow)
+					glowAround(dl, shape, origin.x, y, blockW, blockH, glowCol);
+				if (!drawSlot(dl, skin, amt, idx, slotBase, emptySlot, origin.x, y, blockW, blockH))
+					drawOne(dl, origin.x, y, blockW, blockH, shape, amt, lit, dim, litBorder, dimBorder, tex, hasTex, thick);
 				ShieldFill.pip(dl,origin.x,y,blockW,blockH,shape,solarflare.preview.ShieldPolicy.cell(shield,idx,n),true);
 			}
 		} else {
@@ -198,7 +217,10 @@ class PipShapes {
 			for (i in 0...n) {
 				var x:Single = origin.x + (blockW + gap) * i;
 				var amt = i < amounts.length ? amounts[i] : 0;
-				drawOne(dl, x, origin.y, blockW, blockH, shape, amt, lit, dim, litBorder, dimBorder, tex, hasTex);
+				if (glow)
+					glowAround(dl, shape, x, origin.y, blockW, blockH, glowCol);
+				if (!drawSlot(dl, skin, amt, i, slotBase, emptySlot, x, origin.y, blockW, blockH))
+					drawOne(dl, x, origin.y, blockW, blockH, shape, amt, lit, dim, litBorder, dimBorder, tex, hasTex, thick);
 				ShieldFill.pip(dl,x,origin.y,blockW,blockH,shape,solarflare.preview.ShieldPolicy.cell(shield,i,n),false);
 			}
 		}
@@ -211,7 +233,7 @@ class PipShapes {
 	}
 
 	static function drawOne(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, shape:Int, amount:Float, lit:ImVec4,
-			dim:ImVec4, litBorder:ImVec4, dimBorder:ImVec4, tex:hl.I64, hasTex:Bool):Void {
+			dim:ImVec4, litBorder:ImVec4, dimBorder:ImVec4, tex:hl.I64, hasTex:Bool, thick:Single = -1):Void {
 		var a = amount;
 		if (a < 0)
 			a = 0;
@@ -241,21 +263,47 @@ class PipShapes {
 		switch (shape) {
 			case CIRCLE:
 				ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 28);
-				ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 28, 2.2);
+				ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 28, thick >= 0 ? thick : 2.2);
 			case RING:
-				var thick:Single = Math.max(2.8, rad * 0.34);
-				ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 28, thick);
+				var ringThick:Single = Math.max(2.8, rad * 0.34);
+				ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 28, ringThick);
 				if (a > 0.02)
 					ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad * (0.28 + 0.52 * a), fillU, 28);
 			case HEX:
 				ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 6);
-				ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 6, 2.2);
+				ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 6, thick >= 0 ? thick : 2.2);
 			case DIAMOND:
 				ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 4);
-				ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 4, 2.2);
+				ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 4, thick >= 0 ? thick : 2.2);
 			default:
 				ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), fillU, 4);
-				ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), borderU, 4, 1.8);
+				ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), borderU, 4, thick >= 0 ? thick : 1.8);
+		}
+	}
+
+	/** Per-point custom image: lit points use `slotBase + index`, unlit ones the empty slot. */
+	static function drawSlot(dl:Dynamic, skin:solarflare.resourcetracker.ResourceSkin, amount:Float, index:Int, slotBase:Int,
+			emptySlot:Int, x:Single, y:Single, w:Single, h:Single):Bool {
+		if (skin == null)
+			return false;
+		if (amount > 0.5)
+			return skin.drawSlot(dl, slotBase + index, x, y, w, h);
+		return emptySlot >= 0 && skin.drawSlot(dl, emptySlot, x, y, w, h);
+	}
+
+	static function glowAround(dl:Dynamic, shape:Int, x:Single, y:Single, w:Single, h:Single, col:Int):Void {
+		var cx:Single = x + w * 0.5;
+		var cy:Single = y + h * 0.5;
+		var rad:Single = Math.min(w, h) * 0.42 + 3;
+		switch (shape) {
+			case CIRCLE, RING:
+				ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad, col, 28);
+			case HEX:
+				ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, col, 6);
+			case DIAMOND:
+				ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, col, 4);
+			default:
+				ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x - 2, y - 2), ImGui.vec2(x + w + 2, y + h + 2), col, 6);
 		}
 	}
 

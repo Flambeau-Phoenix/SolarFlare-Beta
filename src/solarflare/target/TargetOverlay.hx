@@ -19,8 +19,9 @@ import imgui.Theme;
 /**
  * Current-target HUD. Draws frozen TargetSnap only — no live unit reads.
  * Portrait via GameIcons.get(snap.kind) after observe preload (same as skill icons).
- * HP widget uses cfg.width/height only (backup geometry). Cast strip is a sibling
- * window under the chrome — never grows the HP widget.
+ * Layout: a square portrait with an HP bar exactly as tall as the portrait beside it. Name,
+ * classification and HP text sit inside the bar; an active target cast draws as a smaller strip
+ * inside the bottom of the bar (XPerl style), so nothing outside the window ever grows.
  */
 class TargetOverlay {
 	/** Cached callbacks; current UI configuration and frozen snaps are refreshed per draw. */
@@ -31,30 +32,20 @@ class TargetOverlay {
 	var hudWindowFn:Void->Void;
 
 	static inline var EMPTY_LABEL:String = "No target";
-	static inline var PORTRAIT_GAP:Single = 6;
+	static inline var PORTRAIT_GAP:Single = 8;
 	static inline var PAD:Single = 4;
-	static inline var NAME_H:Single = 18;
-	static inline var SUB_H:Single = 16;
-	/** The bar is a bar, not a slab: it never grows to fill a tall frame. */
+	/** Below this bar height, name and HP text share one row instead of stacking. */
+	static inline var TWO_ROW_MIN:Single = 40;
 	static inline var BAR_MIN:Single = 12;
-	static inline var BAR_MAX:Single = 30;
+	/** Portrait side and bar height cap; both always equal. */
+	static inline var SIDE_MAX:Single = 160;
 	static inline var PORTRAIT_MIN:Single = 24;
-	static inline var PORTRAIT_MAX:Single = 128;
-	/** First-frame guess for chrome overhead above content (strip + padding). */
-	static inline var CHROME_OVERHEAD:Single = HudChrome.STRIP + 28;
-	static inline var CAST_GAP:Single = 3;
-	static inline var CAST_FLAGS:Int = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse
-		| ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
-		| ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove
-		| ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoDocking
-		| ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav;
+	static inline var TEXT_PAD:Single = 5;
+	static inline var CAST_INSET:Single = 3;
 
 	var theme:Theme;
 	var snap:TargetSnap;
 	var castSnap:CastSnap;
-	/** Last drawn HP window height (content + chrome), for cast sibling placement. */
-	var lastHpWinH:Single = 0;
-	var lastHpWinW:Single = 0;
 	var lastBodyW:Single = 0;
 	var lastBodyH:Single = 0;
 
@@ -93,10 +84,10 @@ class TargetOverlay {
 		theme.wrap(hudWindowFn);
 	}
 
-	public function drawPreview(cfg:TargetConfig, sample:TargetSnap, w:Single, h:Single):Void {
+	public function drawPreview(cfg:TargetConfig, sample:TargetSnap, w:Single, h:Single, castSample:CastSnap = null):Void {
 		var diagnostic = lastHealthDiagnostic;
 		snap.copyFrom(sample);
-		castSnap.clear();
+		castSnap.copyFrom(castSample);
 		drawBody(cfg, w, h);
 		lastHealthDiagnostic = diagnostic;
 	}
@@ -109,43 +100,6 @@ class TargetOverlay {
 		hudCfg = cfg;
 		solarflare.ui.HUDWidgetWindow.draw("SolarFlare Target", "Target", cfg.chrome, w, h, hudBodyFn, openBuilder, hudHideFn, false, null, hudResizeFn);
 		hudCfg = null;
-		// chrome.winH is set inside HUDWidgetWindow while the window is open.
-		if (cfg.chrome != null && cfg.chrome.winH > 0) {
-			lastHpWinH = cfg.chrome.winH;
-			lastHpWinW = cfg.chrome.winW > 0 ? cfg.chrome.winW : w;
-		} else if (lastHpWinH <= 0) {
-			lastHpWinH = h + CHROME_OVERHEAD;
-			lastHpWinW = w;
-		}
-		drawCastSibling(cfg, w);
-	}
-
-	/** Plain cast strip under the HP chrome — never resizes the HP widget. */
-	function drawCastSibling(cfg:TargetConfig, contentW:Single):Void {
-		if (cfg == null || !cfg.showCastBar.get() || !snap.valid || !castSnap.active)
-			return;
-		if (cfg.chrome == null || cfg.chrome.collapsed.get())
-			return;
-		var castH:Single = Math.max(12, Math.min(28, cfg.castBarHeight.get()));
-		// Anchor to where the HP window really is (projected and clamped), not to the raw stored coordinates.
-		var placed = cfg.chrome.winH > 0;
-		var wx:Single = placed ? cfg.chrome.winX : cfg.chrome.x.get();
-		var wy:Single = placed ? cfg.chrome.winY : cfg.chrome.y.get();
-		var hpH:Single = lastHpWinH > 0 ? lastHpWinH : (contentW > 0 ? cfg.height.get() + CHROME_OVERHEAD : cfg.height.get() + CHROME_OVERHEAD);
-		var winW:Single = lastHpWinW > 0 ? lastHpWinW : contentW;
-		ImGui.setNextWindowPos(ImGui.vec2(wx, wy + hpH + CAST_GAP), ImGuiCond.Always);
-		ImGui.setNextWindowSize(ImGui.vec2(Math.max(80, winW), castH + 8), ImGuiCond.Always);
-		ImGui.setNextWindowBgAlpha(cfg.chrome.isTransparent() ? 0 : 0.90);
-		var began = ImGui.begin("##SolarFlare TargetCast", null, CAST_FLAGS);
-		try {
-			if (began) {
-				var origin = ImGui.getCursorScreenPos();
-				var pad:Single = 4;
-				CastBarRenderer.drawPlainCompact(castSnap, origin.x + pad, origin.y + 2,
-					Math.max(1, ImGui.getContentRegionAvail().x - pad * 2), castH);
-			}
-		} catch (_:Dynamic) {}
-		ImGui.end();
 	}
 
 	static inline function touchDraw(method:String, name:String, kind:String, hasIcon:Bool, bw:Single, bh:Single):Void {
@@ -168,47 +122,29 @@ class TargetOverlay {
 		var contentX:Single = origin.x + PAD;
 		var contentW:Single = Math.max(1, w - PAD * 2);
 
+		// One square decides both heights: the HP bar is exactly as tall as the portrait.
+		var side:Single = Math.min(contentH, SIDE_MAX);
 		if (cfg.showPortrait.get()) {
-			var side:Single = contentH;
-			if (side > PORTRAIT_MAX)
-				side = PORTRAIT_MAX;
 			if (side > contentW * 0.5)
 				side = contentW * 0.5;
 			if (side < PORTRAIT_MIN)
 				side = PORTRAIT_MIN;
-			drawPortrait(cfg, dl, contentX, origin.y + PAD, side);
+		} else if (side < BAR_MIN)
+			side = BAR_MIN;
+		var barY:Single = origin.y + PAD + Math.max(0, (contentH - side) * 0.5);
+		var barH:Single = side;
+		if (cfg.showPortrait.get()) {
+			drawPortrait(cfg, dl, contentX, barY, side);
 			ImGui.setCursorScreenPos(origin);
 			ImGui.dummy(ImGui.vec2(w, h));
 			contentX = contentX + side + PORTRAIT_GAP;
 			contentW = Math.max(1, origin.x + w - PAD - contentX);
 		}
-
-		var nameH:Single = cfg.showName.get() ? NAME_H : 0;
-		var classification = snap.valid ? badgeText(snap) : "";
-		var subH:Single = (cfg.showBadge.get() && classification.length > 0) ? SUB_H : 0;
-		var headerH:Single = nameH + subH;
-		var gap:Single = headerH > 0 ? 3 : 0;
-		var barH:Single = contentH - headerH - gap;
-		if (barH > BAR_MAX)
-			barH = BAR_MAX;
-		if (barH < BAR_MIN)
-			barH = BAR_MIN;
-		var blockH:Single = headerH + gap + barH;
-		var blockY:Single = origin.y + PAD + Math.max(0, (contentH - blockH) * 0.5);
-		var barY:Single = blockY + headerH + gap;
 		var rounding:Single = Math.max(0, cfg.barRounding.get());
 
 		if (!snap.valid) {
-			drawEmptyFrame(cfg, dl, contentX, blockY, contentW, nameH, barY, barH, rounding);
+			drawEmptyFrame(cfg, dl, contentX, barY, contentW, barH, rounding);
 			return;
-		}
-
-		if (cfg.showName.get()) {
-			var name = fitText(snap.name.length > 0 ? snap.name : "Target", contentW);
-			EnhancedText.shadowed(dl, ImGui.vec2(contentX, blockY), name, 0xFFFFF0D8, 0xAA000000, 1, 1);
-		}
-		if (cfg.showBadge.get() && classification.length > 0) {
-			EnhancedText.shadowed(dl, ImGui.vec2(contentX, blockY + nameH), fitText(classification, contentW), UiCol.rgb(0xD6AD55), 0xAA000000, 1, 1);
 		}
 
 		var ratio = snap.healthValid ? snap.ratio : 0;
@@ -251,12 +187,77 @@ class TargetOverlay {
 		var border = snap.healthValid && ratio < low ? UiCol.rgb(0xFF5555) : UiCol.rgba(255, 255, 255, 0x88);
 		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(contentX, barY), ImGui.vec2(contentX + contentW, barY + barH), border, rounding, 1.5);
 
+		// Target cast: a smaller strip inside the bottom of the bar, over the fill.
+		var castH:Single = 0;
+		if (cfg.showCastBar.get() && castSnap.active) {
+			castH = Math.min(Math.max(12, Math.min(28, cfg.castBarHeight.get())), barH * 0.45);
+			if (castH < 8)
+				castH = 0;
+		}
+		var castTop:Single = barY + barH - CAST_INSET - castH;
+		drawBarText(cfg, dl, contentX, barY, contentW, barH, ratio, castH > 0 ? castTop : barY + barH);
+		if (castH > 0)
+			CastBarRenderer.drawPlainCompact(castSnap, contentX + CAST_INSET, castTop, Math.max(1, contentW - CAST_INSET * 2), castH);
+	}
+
+	/**
+	 * Name, classification and HP numbers inside the bar. Tall bars stack two rows (name and badge on
+	 * top, HP text centered in what is left above any cast strip); short bars share one row.
+	 * `textBottom` is where the text area ends (the cast strip top while casting, else the bar bottom).
+	 */
+	function drawBarText(cfg:TargetConfig, dl:Dynamic, x:Single, y:Single, w:Single, barH:Single, ratio:Float, textBottom:Single):Void {
+		var lineH = ImGui.getTextLineHeight();
+		var innerX:Single = x + TEXT_PAD;
+		var innerW:Single = Math.max(1, w - TEXT_PAD * 2);
+		var showName = cfg.showName.get();
+		var cls = cfg.showBadge.get() ? badgeText(snap) : "";
 		var label = snap.healthValid ? buildHpLabel(cfg, snap.health, snap.maxHealth, ratio) : "HP --";
+		var clsW:Single = cls.length > 0 ? ImGui.calcTextSize(cls).x : 0;
+		var labelW:Single = label.length > 0 ? ImGui.calcTextSize(label).x : 0;
+		var gold = UiCol.rgb(0xD6AD55);
+		if (barH >= TWO_ROW_MIN) {
+			var headerY:Single = y + 4;
+			var hasHeader = showName || cls.length > 0;
+			var regionTop:Single = hasHeader ? headerY + lineH + 2 : y + 3;
+			var regionBot:Single = textBottom - 2;
+			var labelFits = regionBot - regionTop >= lineH;
+			var headerRight:Single = innerX + innerW;
+			if (label.length > 0 && !labelFits) {
+				// Not enough room for a second row: the numbers take the header row's right side.
+				EnhancedText.shadowed(dl, ImGui.vec2(headerRight - labelW, headerY), label, 0xFFFFFFFF, 0xAA000000, 1, 1);
+				headerRight -= labelW + 6;
+				cls = "";
+			} else if (label.length > 0) {
+				EnhancedText.shadowed(dl, ImGui.vec2(innerX + (innerW - labelW) * 0.5, regionTop + (regionBot - regionTop - lineH) * 0.5),
+					label, 0xFFFFFFFF, 0xAA000000, 1, 1);
+			}
+			if (cls.length > 0) {
+				EnhancedText.shadowed(dl, ImGui.vec2(headerRight - clsW, headerY), cls, gold, 0xAA000000, 1, 1);
+				headerRight -= clsW + 6;
+			}
+			if (showName) {
+				var name = fitText(snap.name.length > 0 ? snap.name : "Target", Math.max(1, headerRight - innerX));
+				EnhancedText.shadowed(dl, ImGui.vec2(innerX, headerY), name, 0xFFFFF0D8, 0xAA000000, 1, 1);
+			}
+			return;
+		}
+		// One row: name left, numbers right, classification between them when it fits.
+		var rowY:Single = y + Math.max(1, (textBottom - y - lineH) * 0.5);
+		var right = innerX + innerW;
 		if (label.length > 0) {
-			var ts = ImGui.calcTextSize(label);
-			EnhancedText.shadowed(dl,
-				ImGui.vec2(contentX + (contentW - ts.x) * 0.5, barY + (barH - ts.y) * 0.5),
-				label, 0xFFFFFFFF, 0xAA000000, 1, 1);
+			EnhancedText.shadowed(dl, ImGui.vec2(right - labelW, rowY), label, 0xFFFFFFFF, 0xAA000000, 1, 1);
+			right -= labelW + 8;
+		}
+		if (showName) {
+			var name = fitText(snap.name.length > 0 ? snap.name : "Target", Math.max(1, right - innerX));
+			EnhancedText.shadowed(dl, ImGui.vec2(innerX, rowY), name, 0xFFFFF0D8, 0xAA000000, 1, 1);
+			if (cls.length > 0) {
+				var after = innerX + ImGui.calcTextSize(name).x + 8;
+				if (after + clsW <= right)
+					EnhancedText.shadowed(dl, ImGui.vec2(after, rowY), cls, gold, 0xAA000000, 1, 1);
+			}
+		} else if (cls.length > 0 && innerX + clsW <= right) {
+			EnhancedText.shadowed(dl, ImGui.vec2(innerX, rowY), cls, gold, 0xAA000000, 1, 1);
 		}
 	}
 
@@ -346,14 +347,9 @@ class TargetOverlay {
 		}
 	}
 
-	function drawEmptyFrame(cfg:TargetConfig, dl:Dynamic, x:Single, blockY:Single, w:Single,
-			nameH:Single, barY:Single, barH:Single, rounding:Single):Void {
-		if (nameH > 0)
-			EnhancedText.shadowed(dl, ImGui.vec2(x, blockY), EMPTY_LABEL, 0x99AAAAAA, 0x66000000, 1, 1);
-
+	function drawEmptyFrame(cfg:TargetConfig, dl:Dynamic, x:Single, barY:Single, w:Single, barH:Single, rounding:Single):Void {
 		if (!cfg.showEmptyBar.get()) {
-			if (nameH == 0)
-				EnhancedText.shadowed(dl, ImGui.vec2(x, barY), EMPTY_LABEL, 0x99AAAAAA, 0x66000000, 1, 1);
+			EnhancedText.shadowed(dl, ImGui.vec2(x, barY + 2), EMPTY_LABEL, 0x99AAAAAA, 0x66000000, 1, 1);
 			return;
 		}
 
@@ -364,13 +360,19 @@ class TargetOverlay {
 			0x22FFFFFF, 2);
 		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, barY), ImGui.vec2(x + w, barY + barH), 0x66888888, rounding, 1.5);
 
+		var showName = cfg.showName.get();
+		if (showName)
+			EnhancedText.shadowed(dl, ImGui.vec2(x + TEXT_PAD, barY + 4), EMPTY_LABEL, 0x99AAAAAA, 0x66000000, 1, 1);
 		var emptyLabel = "";
 		if (cfg.showHpText.get())
 			emptyLabel = "— / —";
 		if (cfg.showPercent.get())
 			emptyLabel = emptyLabel.length > 0 ? emptyLabel + "  —%" : "—%";
-		if (emptyLabel.length == 0)
+		if (emptyLabel.length == 0) {
+			if (showName)
+				return;
 			emptyLabel = EMPTY_LABEL;
+		}
 		var ts = ImGui.calcTextSize(emptyLabel);
 		ImGui.ImDrawList_AddText_Vec2(dl,
 			ImGui.vec2(x + (w - ts.x) * 0.5, barY + (barH - ts.y) * 0.5),
@@ -406,16 +408,7 @@ class TargetOverlay {
 		return UiCol.rgb(0xE04545);
 	}
 
-	static function lighten(color:Int, amount:Float):Int {
-		var a = (color >>> 24) & 0xFF;
-		var b = (color >>> 16) & 0xFF;
-		var g = (color >>> 8) & 0xFF;
-		var r = color & 0xFF;
-		r = Std.int(Math.min(255, r + (255 - r) * amount));
-		g = Std.int(Math.min(255, g + (255 - g) * amount));
-		b = Std.int(Math.min(255, b + (255 - b) * amount));
-		return UiCol.rgba(r, g, b, a);
-	}
+	static inline function lighten(color:Int, amount:Float):Int return UiCol.lighten(color, amount);
 
 	static function formatHp(v:Float):String {
 		if (v >= 1000000)

@@ -15,13 +15,23 @@ import solarflare.conduit.Conduit.ConduitCache;
 class ResourceArtwork {
 	public static var active(default,null):ResourceArtwork;
 	public static final IDS=["health","rage","mana","prayers","combo","attack","target","castbar","chaincast","conduit","dash","hemorrhage"];
+	/** Image slots that fit each element. Elements not listed use only Background / Fill / Frame. */
+	public static final SLOT_LABELS:Map<String,Array<String>>=[
+		"attack"=>["Idle","Hit 1","Hit 2","Hit 3","Finisher"],
+		"combo"=>["Point 1","Point 2","Point 3","Point 4","Point 5","Point 6","Empty point"],
+		"conduit"=>["Empty slot","Filled slot","Power slot"],
+		"prayers"=>["Smite","Life","Shield"],
+		"dash"=>["Charge ready","Charge empty","Marker"]
+	];
+	/** Pip and icon elements have no meaningful progress fill, so the fill rows are hidden for them. */
+	static final NO_FILL=["attack","combo","conduit","prayers"];
 	static final DIRECTIONS=["Left to right","Right to left","Bottom to top","Top to bottom"];
 	var skins:Map<String,ResourceSkin>=new Map();
 	var folderBuf=new hl.Bytes(1024);
 	var importBuf=new hl.Bytes(2048);
 	var folderGeneration:Int=-1;
 	var message:String="";
-	public function new() { for(id in IDS) skins.set(id,new ResourceSkin()); solarflare.ui.ByteUtil.clearBytes(folderBuf,1024); solarflare.ui.ByteUtil.clearBytes(importBuf,2048); active=this; }
+	public function new() { for(id in IDS) skins.set(id,new ResourceSkin(SLOT_LABELS.exists(id) ? SLOT_LABELS.get(id).length : 0)); solarflare.ui.ByteUtil.clearBytes(folderBuf,1024); solarflare.ui.ByteUtil.clearBytes(importBuf,2048); active=this; }
 	public function get(id:String):ResourceSkin return skins.get(id);
 	public static function forWindow(id:String):ResourceSkin {
 		if(active==null) return null;
@@ -56,17 +66,23 @@ class ResourceArtwork {
 		if(folderGeneration!=CustomImages.generation) { solarflare.ui.ByteUtil.fillBuf(folderBuf,1024,CustomImages.folder); folderGeneration=CustomImages.generation; }
 		UiLayout.propertyGrid("##rt_art_props_"+id,function() {
 			UiLayout.propertyRow("Artwork",function() { if(ImGui.checkbox("Use custom images##rt_art_enabled_"+id,s.enabled)) SettingsStore.markDirty(); });
-			UiLayout.propertyRow("Background",function() { s.background=pick("##rt_art_bg_"+id,s.background); });
-			UiLayout.propertyRow("Resource fill",function() { s.fill=pick("##rt_art_fill_"+id,s.fill); });
-			UiLayout.propertyRow("Frame",function() { s.frame=pick("##rt_art_frame_"+id,s.frame); });
-			UiLayout.propertyRow("Fill direction",function() {
-				if(ImGui.beginCombo("##rt_art_direction_"+id,DIRECTIONS[s.direction.get()])) {
-					for(i in 0...DIRECTIONS.length) if(ImGui.selectable(DIRECTIONS[i],s.direction.get()==i)) { s.direction.set(i); SettingsStore.markDirty(); }
-					ImGui.endCombo();
+				var labels=SLOT_LABELS.get(id);
+				if(labels!=null) for(i in 0...labels.length) {
+					var slot=i;
+					UiLayout.propertyRow(labels[i],function() { s.slots[slot]=pick("##rt_art_slot_"+id+"_"+slot,s.slots[slot]); });
 				}
-			});
-			UiLayout.propertyRow("Fill inset",function() { UiLayout.inlinePair("##rt_art_insets_"+id,function(_) { if(ImGui.sliderFloat("X##rt_art_ix_"+id,s.insetX,0,200,"%.0f px")) SettingsStore.markDirty(); },function(_) { if(ImGui.sliderFloat("Y##rt_art_iy_"+id,s.insetY,0,200,"%.0f px")) SettingsStore.markDirty(); }); });
-			UiLayout.propertyRow("Opacity",function() { if(ImGui.sliderFloat("##rt_art_opacity_"+id,s.opacity,0,1,"%.2f")) SettingsStore.markDirty(); });
+				UiLayout.propertyRow("Background",function() { s.background=pick("##rt_art_bg_"+id,s.background); });
+				var hasFill=NO_FILL.indexOf(id)<0;
+				if(hasFill) UiLayout.propertyRow("Resource fill",function() { s.fill=pick("##rt_art_fill_"+id,s.fill); });
+				UiLayout.propertyRow("Frame",function() { s.frame=pick("##rt_art_frame_"+id,s.frame); });
+				if(hasFill) UiLayout.propertyRow("Fill direction",function() {
+					if(ImGui.beginCombo("##rt_art_direction_"+id,DIRECTIONS[s.direction.get()])) {
+						for(i in 0...DIRECTIONS.length) if(ImGui.selectable(DIRECTIONS[i],s.direction.get()==i)) { s.direction.set(i); SettingsStore.markDirty(); }
+						ImGui.endCombo();
+					}
+				});
+				if(hasFill) UiLayout.propertyRow("Fill inset",function() { UiLayout.inlinePair("##rt_art_insets_"+id,function(_) { if(solarflare.ui.NumberField.draw("##rt_art_ix_"+id,s.insetX,0,200,"X  %.0f px")) SettingsStore.markDirty(); },function(_) { if(solarflare.ui.NumberField.draw("##rt_art_iy_"+id,s.insetY,0,200,"Y  %.0f px")) SettingsStore.markDirty(); }); });
+			UiLayout.propertyRow("Opacity",function() { if(solarflare.ui.NumberField.draw("##rt_art_opacity_"+id,s.opacity,0,1,"%.2f")) SettingsStore.markDirty(); });
 			UiLayout.propertyRow("Built-in display",function() { if(ImGui.checkbox("Keep built-in content##rt_art_content_"+id,s.keepContent)) SettingsStore.markDirty(); });
 			UiLayout.propertyRow("Images folder",function() {
 				ImGui.setNextItemWidth(Math.max(60,ImGui.getContentRegionAvail().x-90));
@@ -89,12 +105,12 @@ class ResourceArtwork {
 		});
 		if(solarflare.ui.UiChrome.ghostButton("Refresh images##rt_art_refresh_"+id)) CustomImages.requestRefresh();
 		ImGui.sameLine(); if(solarflare.ui.UiChrome.ghostButton("Copy folder path##rt_art_folder_"+id)) solarflare.ui.UiActionQueue.copyText(CustomImages.displayDir,"Images folder path copied.");
-		ImGui.textWrapped("Use transparent PNGs from custom_images or your selected images folder. Layers stretch to the resource's size; the fill is cropped to its current value. Dash follows the next-charge fuse; Hemorrhage follows bleed share. Missing images keep the built-in display available.");
+		solarflare.ui.UiHints.noteWrapped("Use transparent PNGs from custom_images or your selected images folder. Layers stretch to the resource's size; the fill is cropped to its current value. Dash follows the next-charge fuse; Hemorrhage follows bleed share. Missing images keep the built-in display available.");
 		ImGui.textDisabled(CustomImages.status);
 		if(message.length>0) ImGui.textWrapped(message);
-		if(s.enabled.get()) for(k in [s.background,s.fill,s.frame]) if(k.length>0 && GameIcons.get(k)==0) ImGui.textDisabled("Image unavailable: "+k);
+		if(s.enabled.get()) for(k in [s.background,s.fill,s.frame].concat(s.slots)) if(k.length>0 && GameIcons.get(k)==0) ImGui.textDisabled("Image unavailable: "+k);
 	}
-	static function pick(id:String,current:String):String {
+	public static function pick(id:String,current:String):String {
 		var next=current;
 		if(ImGui.beginCombo(id,current.length>0 ? current : "None")) {
 			if(ImGui.selectable("None##rt_art_none",current.length==0)) next="";

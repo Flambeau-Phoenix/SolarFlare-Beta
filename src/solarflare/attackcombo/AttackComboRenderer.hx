@@ -24,6 +24,8 @@ class AttackComboRenderer {
 			slot:Int = LIVE):Void {
 		if (cfg == null)
 			return;
+		if (drawSlotArt(step, flashFinal, rowW, rowH))
+			return;
 		if (cfg.comboType.get() == 1 && drawCustom(cfg, step, rowW, rowH, flashFinal))
 			return;
 		var tracker = trackers[slot >= 0 && slot < trackers.length ? slot : LIVE];
@@ -36,6 +38,25 @@ class AttackComboRenderer {
 		tracker.animationSpeed = cfg.animationSpeed != null ? cfg.animationSpeed.get() : 1.0;
 
 		tracker.draw(step, length, flashFinal, withinCombo, rowW, rowH);
+	}
+
+	/** User-chosen image for this state (Resource Tracker > Custom artwork). False keeps the built-in look. */
+	static function drawSlotArt(step:Int, flashFinal:Bool, rowW:Single, rowH:Single):Bool {
+		var art = solarflare.resourcetracker.ResourceArtwork.active;
+		var skin = art != null ? art.get("attack") : null;
+		if (skin == null || !skin.enabled.get())
+			return false;
+		var n = flashFinal ? 4 : step;
+		if (n < 0) n = 0;
+		if (n > 4) n = 4;
+		if (skin.slotKey(n).length == 0)
+			return false;
+		var p = ImGui.getCursorScreenPos();
+		var vw:Single = rowW > 1 ? rowW : 1;
+		var vh:Single = rowH > 1 ? rowH : 1;
+		skin.drawSlot(ImGui.getWindowDrawList(), n, p.x, p.y, vw, vh);
+		ImGui.dummy(ImGui.vec2(vw, vh));
+		return true;
 	}
 
 	public static function drawCustom(cfg:AttackComboConfig, step:Int, rowW:Single, rowH:Single, flashFinal:Bool = false):Bool {

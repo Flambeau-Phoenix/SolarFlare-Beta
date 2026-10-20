@@ -55,7 +55,7 @@ class ResourceTrackerBuilder {
 		if (!CursorCaptureFix.cursorFree) return;
 		EditorWindow.drawMenuWindow("Resource Tracker Builder###SolarFlare.ResourceTracker", open, 1240, 860, function() {
 			drawMenuBar();
-			ImGui.textWrapped("Pick a resource on the left to edit it on the right. The Showing toggle takes effect on the live HUD straight away.");
+			solarflare.ui.UiHints.noteWrapped("Pick a resource on the left to edit it on the right. The Showing toggle takes effect on the live HUD straight away.");
 			ImGui.separator();
 			HudChrome.safeChild("##rt_builder_left", ImGui.vec2(320, 0), 0, drawNavigation, imgui.Enums.ImGuiChildFlags.Borders | imgui.Enums.ImGuiChildFlags.AlwaysUseWindowPadding);
 			ImGui.sameLine(0, 24);
@@ -64,7 +64,7 @@ class ResourceTrackerBuilder {
 				section("Settings — " + selectedLabel());
 				drawSelectedSettings();
 				ImGui.separator();
-				ImGui.textDisabled("Saved with the active Resources profile.");
+				solarflare.ui.UiHints.note("Saved with the active Resources profile.");
 			}, imgui.Enums.ImGuiChildFlags.Borders | imgui.Enums.ImGuiChildFlags.AlwaysUseWindowPadding);
 		}, false, true);
 	}
@@ -81,6 +81,13 @@ class ResourceTrackerBuilder {
 				host.geauxBuilder.open.set(true);
 			if (ImGui.menuItem("Notebook") && host != null && host.notebook != null)
 				host.notebook.open.set(true);
+			ImGui.endMenu();
+		}
+		if (ImGui.beginMenu("View")) {
+			if (ImGui.menuItem("Show explanations##rt_hints", null, solarflare.ui.UiHints.show.get(), true)) {
+				solarflare.ui.UiHints.show.set(!solarflare.ui.UiHints.show.get());
+				SettingsStore.markDirty();
+			}
 			ImGui.endMenu();
 		}
 		if (ImGui.beginMenu("File")) {
@@ -202,21 +209,21 @@ class ResourceTrackerBuilder {
 				section("Dash recharge"); host.dash.drawSettings();
 			case "health":
 				drawWindow(v.hpHidden, v.chrome, v.hpWidth, v.hpHeight, "health");
-				drawVitalAppearance("Health", v.hpStyle, v.hpVertical, true, "health");
+				drawVitalAppearance("Health", v.hpStyle, v.hpVertical, true, "health", v.hpLook, true);
 				drawBehaviorText("Health shows current/max health and shield using the selected presentation.");
 				ImGui.textWrapped("Color: " + solarflare.ui.HealthColorPolicy.source(solarflare.HealthCache.deadKnown && solarflare.HealthCache.dead, false, solarflare.HealthCache.valid)
 					+ (solarflare.HealthCache.valid ? " | health valid" : " | health unavailable: empty fill"));
 			case "rage":
 				drawWindow(v.rageHidden, v.rageChrome, v.rageWidth, v.rageHeight, "rage");
-				drawVitalAppearance("Rage", v.rageStyle, v.rageVertical, false, "rage");
+				drawVitalAppearance("Rage", v.rageStyle, v.rageVertical, false, "rage", v.rageLook);
 				drawBehaviorText("Rage uses the authoritative rage snapshot and maximum-resource alert.");
 			case "mana":
 				drawWindow(v.manaHidden, v.manaChrome, v.manaWidth, v.manaHeight, "mana");
-				drawVitalAppearance("Mana/Spark", v.manaStyle, v.manaVertical, true, "mana");
+				drawVitalAppearance("Mana/Spark", v.manaStyle, v.manaVertical, !solarflare.HealthCache.sparkValid, "mana", v.manaLook);
 				drawBehaviorText("This window presents Spark when Spark is authoritative; otherwise it presents Mana.");
 			case "prayers":
 				drawWindow(v.prayersHidden, v.prayersChrome, v.prayersWidth, v.prayersHeight, "prayers");
-				section("Appearance"); ImGui.textDisabled("Prayer readiness uses the three semantic prayer colors.");
+				section("Appearance"); v.prayersLook.drawEditor("prayers");
 				drawBehaviorText("Smite, Life, and Shield readiness are observed independently.");
 			case "combo":
 				drawWindow(host.combo.hidden, host.combo.chrome, host.combo.width, host.combo.height, "combo");
@@ -224,6 +231,7 @@ class ResourceTrackerBuilder {
 				host.combo.drawPointCount("builder");
 				if (solarflare.ui.UiChrome.toggleTileRef("##rt_combo_vertical", "Vertical", host.combo.vertical, 108, 28)) SettingsStore.markDirty();
 				PipShapes.drawShapeCombo("Pip shape##rt_combo_shape", host.combo.shape);
+				host.combo.look.drawEditor("combo");
 				drawBehaviorText("Choose five or six combo points to match your Rogue. The full-resource alert uses the selected maximum.");
 			case "attack":
 				drawWindow(host.attackCombo.hidden, host.attackCombo.chrome, host.attackCombo.width, host.attackCombo.height, "attack");
@@ -244,6 +252,7 @@ class ResourceTrackerBuilder {
 				section("Appearance");
 				if (solarflare.ui.UiChrome.toggleTileRef("##rt_conduit_vertical", "Vertical", host.conduit.vertical, 108, 28)) SettingsStore.markDirty();
 				PipShapes.drawShapeCombo("Pip shape##rt_conduit_shape", host.conduit.shape);
+				host.conduit.look.drawEditor("conduit");
 				drawBehaviorText("Shows Sparkmaster conduit slots and Power stacks from 0 through 20.");
 			case "hemorrhage": host.hemorrhage.drawEditorContents();
 			default: ImGui.textDisabled("Select a resource from the left pane.");
@@ -283,7 +292,7 @@ class ResourceTrackerBuilder {
 		});
 	}
 
-	function drawVitalAppearance(label:String, style:IntRef, vertical:BoolRef, allowPips:Bool, id:String):Void {
+	function drawVitalAppearance(label:String, style:IntRef, vertical:BoolRef, allowPips:Bool, id:String, ?look:BarLook, lowRows:Bool = false):Void {
 		section("Appearance");
 		UiLayout.propertyGrid("##rt_" + id + "_appearance", function() {
 			UiLayout.propertyRow("Style", function() {
@@ -294,9 +303,13 @@ class ResourceTrackerBuilder {
 					SettingsStore.markDirty();
 			});
 		});
+		if (look != null) {
+			section("Bar look");
+			look.drawEditor(id, lowRows);
+		}
 	}
 
-	function drawBehaviorText(text:String):Void { section("Behavior"); ImGui.textWrapped(text); }
+	function drawBehaviorText(text:String):Void { if (!solarflare.ui.UiHints.on()) return; section("Behavior"); ImGui.textWrapped(text); }
 
 	function markSizeDirty(id:String):Void switch (id) {
 		case "health": host.vitals.hpSizeDirty = true;

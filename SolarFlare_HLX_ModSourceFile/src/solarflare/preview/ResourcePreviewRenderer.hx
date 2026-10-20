@@ -63,7 +63,7 @@ class ResourcePreviewRenderer {
 		if(id=="dash" && cfg!=null) return Math.max(cfg.dash.minHeight(),cfg.dash.height.get());
 		if (id == "chaincast" && cfg != null && cfg.chaincast != null)
 			return ChaincastRenderer.headHeight(cfg.chaincast.style.get(), cfg.chaincast.width.get());
-		if (id == "target") return 64;
+		if (id == "target") return cfg != null && cfg.target != null ? Math.max(solarflare.target.TargetConfig.MIN_H, Math.min(solarflare.target.TargetConfig.MAX_H, cfg.target.height.get())) : 72;
 		if (id == "castbar" && cfg != null && cfg.castBar != null)
 			return Math.max(solarflare.castbar.CastBarConfig.MIN_H,
 				Math.min(solarflare.castbar.CastBarConfig.MAX_H, cfg.castBar.height.get()));
@@ -73,6 +73,7 @@ class ResourcePreviewRenderer {
 			case "health": VitalsConfig.compactRow(v.hpStyle.get(), v.hpVertical.get()) ? 30 : Math.max(30, v.hpHeight.get()-8);
 			case "rage": VitalsConfig.compactRow(v.rageStyle.get(), v.rageVertical.get()) ? 30 : Math.max(30, v.rageHeight.get()-8);
 			case "mana": VitalsConfig.compactRow(v.manaStyle.get(), v.manaVertical.get()) ? 30 : Math.max(30, v.manaHeight.get()-8);
+			case "prayers": solarflare.resourcetracker.PrayerRenderer.rowHeight(v.prayersLook, false);
 			case "attack": Math.max(30, cfg.attackCombo.height.get()-8);
 			case "combo": Math.max(30, cfg.combo.height.get()-8);
 			case "conduit": Math.max(30, cfg.conduit.height.get()-8);
@@ -91,6 +92,7 @@ class ResourcePreviewRenderer {
 		if (width < 40)
 			width = 40;
 		if(id=="dash") width=Math.min(width,Math.max(cfg.dash.minWidth(),cfg.dash.width.get()));
+		if(id=="target" && cfg.target!=null) width=Math.min(width,Math.max(solarflare.target.TargetConfig.MIN_W,Math.min(solarflare.target.TargetConfig.MAX_W,cfg.target.width.get())));
 		var left = ImGui.getCursorPosX();
 		ImGui.setCursorPosX(left + Math.max(0, (ImGui.getContentRegionAvail().x - width) * 0.5));
 		var art=cfg.resourceArtwork.get(id);
@@ -116,21 +118,21 @@ class ResourcePreviewRenderer {
 				solarflare.resourcetracker.DashTracker.render(cfg.dash,dashSample,width,height);
 			case "health":
 				syncHp(s);
-				VitalsRenderer.draw(hp, cfg.vitals.hpStyle.get(), width, height, cfg.vitals.hpVertical.get());
+				VitalsRenderer.draw(hp, cfg.vitals.hpStyle.get(), width, height, cfg.vitals.hpVertical.get(), false, cfg.vitals.hpLook);
 			case "rage":
 				syncRage(s);
-				VitalsRenderer.draw(rage, cfg.vitals.rageStyle.get(), width, height, cfg.vitals.rageVertical.get());
+				VitalsRenderer.draw(rage, cfg.vitals.rageStyle.get(), width, height, cfg.vitals.rageVertical.get(), false, cfg.vitals.rageLook);
 			case "mana":
 				syncMana(s);
-				VitalsRenderer.draw(mana, cfg.vitals.manaStyle.get(), width, height, cfg.vitals.manaVertical.get());
+				VitalsRenderer.draw(mana, cfg.vitals.manaStyle.get(), width, height, cfg.vitals.manaVertical.get(), false, cfg.vitals.manaLook);
 			case "prayers":
-				PipShapes.drawCount(width, height, 3, s.prayersCharged, false, PipShapes.RING,
-					Std.string(s.prayersCharged), null);
+				solarflare.resourcetracker.PrayerRenderer.draw(cfg.vitals.prayersLook, art, s.prayersCharged >= 1, s.prayersCharged >= 2,
+					s.prayersCharged >= 3, width, false);
 			case "combo":
 				var points = cfg.combo.points();
 				var filled = s.comboCurrent >= s.comboMax ? points : Std.int(Math.min(points, s.comboCurrent));
 				PipShapes.drawCount(width, height, points, filled, cfg.combo.vertical.get(), cfg.combo.shape.get(),
-					s.comboAlert ? "MAX" : Std.string(filled), null);
+					s.comboAlert ? "MAX" : Std.string(filled), null, cfg.combo.look, art, 0, solarflare.combo.Combo.ComboConfig.EMPTY_SLOT);
 			case "attack":
 				AttackComboRenderer.draw(s.attackStep, s.attackLength, s.attackFlashFinal, s.attackWithinCombo, cfg.attackCombo, width, height,
 					AttackComboRenderer.RESOURCE_PREVIEW);
@@ -144,7 +146,7 @@ class ResourcePreviewRenderer {
 				targetSample.targetLevelValid = true; targetSample.playerLevelValid = true;
 				targetSample.targetLevel = 12; targetSample.playerLevel = 10;
 				targetSample.isElite = true;
-				targetRenderer.drawPreview(cfg.target, targetSample, width, Math.max(64, height));
+				targetRenderer.drawPreview(cfg.target, targetSample, width, height, castSample);
 			case "castbar":
 				var p = ImGui.getCursorScreenPos();
 				ImGui.dummy(ImGui.vec2(width, height));
@@ -179,6 +181,7 @@ class ResourcePreviewRenderer {
 		var amounts = new Array<Float>();
 		var iconIds = new Array<String>();
 		var stackLabels = new Array<String>();
+		var powers = new Array<Bool>();
 		var i = 0;
 		while (i < n) {
 			var slot = s.conduitSlots != null && i < s.conduitSlots.length ? s.conduitSlots[i] : null;
@@ -189,6 +192,7 @@ class ResourcePreviewRenderer {
 			var amt:Float = filled ? 1 : 0;
 			amounts.push(amt);
 			iconIds.push(id);
+			powers.push(power);
 			if (power && stacks > 0)
 				stackLabels.push(Std.string(stacks));
 			else
@@ -196,7 +200,7 @@ class ResourcePreviewRenderer {
 			i++;
 		}
 		ConduitOverlay.drawSlotRow(width, height, n, amounts, iconIds, stackLabels, cfg.conduit.vertical.get(),
-			cfg.conduit.shape.get(), s.conduitLabel());
+			cfg.conduit.shape.get(), s.conduitLabel(), cfg.conduit.look, cfg.resourceArtwork.get("conduit"), powers);
 	}
 
 	function syncHp(s:PreviewState):Void {

@@ -23,4 +23,28 @@ class UiCol {
 	public static inline function fromArgb(argb:Int):Int {
 		return rgba((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF, (argb >>> 24) & 0xFF);
 	}
+
+	/** Move a packed ABGR color toward white by `amount` (0..1), alpha kept. */
+	public static function lighten(color:Int, amount:Float):Int {
+		var a = (color >>> 24) & 0xFF;
+		var b = (color >>> 16) & 0xFF;
+		var g = (color >>> 8) & 0xFF;
+		var r = color & 0xFF;
+		r = Std.int(Math.min(255, r + (255 - r) * amount));
+		g = Std.int(Math.min(255, g + (255 - g) * amount));
+		b = Std.int(Math.min(255, b + (255 - b) * amount));
+		return rgba(r, g, b, a);
+	}
+
+	/** Move a packed ABGR color toward black by `amount` (0..1), alpha kept. */
+	public static function darken(color:Int, amount:Float):Int {
+		var keep = 1 - amount;
+		return rgba(Std.int((color & 0xFF) * keep), Std.int(((color >>> 8) & 0xFF) * keep),
+			Std.int(((color >>> 16) & 0xFF) * keep), (color >>> 24) & 0xFF);
+	}
+
+	/** Replace the alpha channel of a packed ABGR color (0..255). */
+	public static inline function withAlpha(color:Int, a:Int):Int {
+		return (color & 0x00FFFFFF) | (a << 24);
+	}
 }

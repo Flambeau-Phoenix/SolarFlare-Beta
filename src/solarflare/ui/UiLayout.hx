@@ -107,7 +107,7 @@ class UiLayout {
 		}
 		ImGui.popItemWidth();
 
-		if (help != null && help.length > 0) {
+		if (UiHints.show.get() && help != null && help.length > 0) {
 			ImGui.tableNextRow();
 			ImGui.tableSetColumnIndex(1);
 			ImGui.pushTextWrapPos(0);

@@ -257,12 +257,14 @@ class ConduitConfig {
 	public var hidden = new BoolRef(false);
 	public var vertical = new BoolRef(false);
 	public var shape = new IntRef(PipShapes.DIAMOND);
+	public var look:solarflare.resourcetracker.PipLook;
 	public var width = new FloatRef(220);
 	public var height = new FloatRef(36);
 	public var sizeDirty = true;
 	public var chrome:HudChrome;
 
 	public function new() {
+		look = new solarflare.resourcetracker.PipLook();
 		chrome = new HudChrome(40, 250);
 	}
 
@@ -364,6 +366,7 @@ class ConduitOverlay {
 		var amounts = new Array<Float>();
 		var iconIds = new Array<String>();
 		var stackLabels = new Array<String>();
+		var powers = new Array<Bool>();
 		var i = 0;
 		while (i < n) {
 			var snap:ConduitSlotSnap = null;
@@ -376,6 +379,7 @@ class ConduitOverlay {
 			var amt:Float = id.length > 0 ? 1 : 0;
 			amounts.push(amt);
 			iconIds.push(id);
+			powers.push(power);
 			if (power && stacks > 0)
 				stackLabels.push(Std.string(stacks));
 			else
@@ -389,12 +393,15 @@ class ConduitOverlay {
 			else
 				label = Std.string(ConduitCache.filledCount);
 		}
-		drawSlotRow(rowW, rowH, n, amounts, iconIds, stackLabels, cfg.vertical.get(), cfg.shape.get(), label);
+		drawSlotRow(rowW, rowH, n, amounts, iconIds, stackLabels, cfg.vertical.get(), cfg.shape.get(), label, cfg.look,
+			solarflare.resourcetracker.ResourceArtwork.forWindow("SolarFlare Conduits"), powers);
 	}
 
 	/** Shared live + Resource Tracker Builder presentation. */
 	public static function drawSlotRow(rowW:Single, rowH:Single, n:Int, amounts:Array<Float>, iconIds:Array<String>,
-			stackLabels:Array<String>, vertical:Bool, shape:Int, label:String):Void {
+			stackLabels:Array<String>, vertical:Bool, shape:Int, label:String,
+			look:solarflare.resourcetracker.PipLook = null, skin:solarflare.resourcetracker.ResourceSkin = null,
+			powers:Array<Bool> = null):Void {
 		shape = PipShapes.normalize(shape);
 		var origin = ImGui.getCursorScreenPos();
 		var dl = ImGui.getWindowDrawList();
@@ -424,6 +431,18 @@ class ConduitOverlay {
 		var dim = ImGui.vec4(0.10, 0.12, 0.16, 0.95);
 		var litBorder = ImGui.vec4(0.70, 0.88, 1.0, 0.55);
 		var dimBorder = ImGui.vec4(0.22, 0.26, 0.32, 1);
+		var custom = look != null ? look.lit() : null;
+		if (custom != null) {
+			lit = custom;
+			litBorder = ImGui.vec4(custom.x * 0.7 + 0.3, custom.y * 0.7 + 0.3, custom.z * 0.7 + 0.3, 0.7);
+		}
+		var thick:Single = look != null ? look.border.get() : -1;
+		var allLit = n > 0 && amounts.length >= n;
+		if (allLit)
+			for (k in 0...n)
+				if (amounts[k] < 1)
+					allLit = false;
+		var glowCol = look != null && look.glowFull.get() && allLit ? ImGui.colorConvertFloat4ToU32(ImGui.vec4(lit.x, lit.y, lit.z, 0.30)) : 0;
 		if (vertical) {
 			var blockH:Single = (pipH - gap * (n - 1)) / n;
 			if (blockH < 4)
@@ -439,7 +458,7 @@ class ConduitOverlay {
 					idx < amounts.length ? amounts[idx] : 0,
 					idx < iconIds.length ? iconIds[idx] : "",
 					idx < stackLabels.length ? stackLabels[idx] : "",
-					lit, dim, litBorder, dimBorder);
+					lit, dim, litBorder, dimBorder, skin, powers != null && idx < powers.length && powers[idx], thick, glowCol);
 				i++;
 			}
 		} else {
@@ -456,7 +475,7 @@ class ConduitOverlay {
 					i < amounts.length ? amounts[i] : 0,
 					i < iconIds.length ? iconIds[i] : "",
 					i < stackLabels.length ? stackLabels[i] : "",
-					lit, dim, litBorder, dimBorder);
+					lit, dim, litBorder, dimBorder, skin, powers != null && i < powers.length && powers[i], thick, glowCol);
 				i++;
 			}
 		}
@@ -469,7 +488,8 @@ class ConduitOverlay {
 
 	static function drawOneSlot(dl:Dynamic, x:Single, y:Single, w:Single, h:Single, shape:Int, amount:Float,
 			iconId:String, stackText:String, lit:imgui.Structs.ImVec4, dim:imgui.Structs.ImVec4,
-			litBorder:imgui.Structs.ImVec4, dimBorder:imgui.Structs.ImVec4):Void {
+			litBorder:imgui.Structs.ImVec4, dimBorder:imgui.Structs.ImVec4,
+			skin:solarflare.resourcetracker.ResourceSkin = null, power:Bool = false, thick:Single = -1, glowCol:Int = 0):Void {
 		var a = amount;
 		if (a < 0)
 			a = 0;
@@ -489,24 +509,43 @@ class ConduitOverlay {
 			dimBorder.w + (litBorder.w - dimBorder.w) * bt);
 		var fillU = ImGui.colorConvertFloat4ToU32(fill);
 		var borderU = ImGui.colorConvertFloat4ToU32(border);
-		switch (shape) {
-			case PipShapes.CIRCLE:
-				ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 24);
-				ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 24, 1.25);
-			case PipShapes.RING:
-				var thick:Single = Math.max(1.5, rad * 0.22);
-				ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 24, thick);
-				if (a > 0.02)
-					ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad * (0.35 + 0.55 * a), fillU, 24);
-			case PipShapes.HEX:
-				ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 6);
-				ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 6, 1.25);
-			case PipShapes.DIAMOND:
-				ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 4);
-				ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 4, 1.25);
-			default:
-				ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), fillU, 3);
-				ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), borderU, 3, 1);
+		if (glowCol != 0) {
+			switch (shape) {
+				case PipShapes.CIRCLE, PipShapes.RING:
+					ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad + 3, glowCol, 24);
+				case PipShapes.HEX:
+					ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad + 3, glowCol, 6);
+				case PipShapes.DIAMOND:
+					ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad + 3, glowCol, 4);
+				default:
+					ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x - 2, y - 2), ImGui.vec2(x + w + 2, y + h + 2), glowCol, 5);
+			}
+		}
+		var imageDrawn = false;
+		if (skin != null) {
+			var slot = a > 0.5 ? (power && skin.slotKey(2).length > 0 ? 2 : 1) : 0;
+			imageDrawn = skin.drawSlot(dl, slot, x, y, w, h);
+		}
+		if (!imageDrawn) {
+			switch (shape) {
+				case PipShapes.CIRCLE:
+					ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 24);
+					ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 24, (thick >= 0 ? thick : 1.25));
+				case PipShapes.RING:
+					var thick:Single = Math.max(1.5, rad * 0.22);
+					ImGui.ImDrawList_AddCircle(dl, ImGui.vec2(cx, cy), rad, borderU, 24, thick);
+					if (a > 0.02)
+						ImGui.ImDrawList_AddCircleFilled(dl, ImGui.vec2(cx, cy), rad * (0.35 + 0.55 * a), fillU, 24);
+				case PipShapes.HEX:
+					ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 6);
+					ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 6, (thick >= 0 ? thick : 1.25));
+				case PipShapes.DIAMOND:
+					ImGui.ImDrawList_AddNgonFilled(dl, ImGui.vec2(cx, cy), rad, fillU, 4);
+					ImGui.ImDrawList_AddNgon(dl, ImGui.vec2(cx, cy), rad, borderU, 4, (thick >= 0 ? thick : 1.25));
+				default:
+					ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), fillU, 3);
+					ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, y), ImGui.vec2(x + w, y + h), borderU, 3, (thick >= 0 ? thick : 1));
+			}
 		}
 		if (iconId != null && iconId.length > 0) {
 			var tex:hl.I64 = GameIcons.get(iconId);

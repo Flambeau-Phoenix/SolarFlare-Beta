@@ -39,7 +39,7 @@ class TargetConfig {
 	public var lowHpPercent = new FloatRef(25);
 	public var barRounding = new FloatRef(3);
 	public var width = new FloatRef(320);
-	public var height = new FloatRef(96);
+	public var height = new FloatRef(72);
 	public var sizeDirty = true;
 	public var chrome:HudChrome;
 
@@ -52,7 +52,7 @@ class TargetConfig {
 			return;
 		ImGui.setNextWindowSize(ImGui.vec2(380, 0), ImGuiCond.FirstUseEver);
 		if (HudChrome.beginPanel("Current Target##solarflare_tgtcfg", open, "Current Target")) {
-			ImGui.textWrapped("Local hero current target HP from the combat observe path. Draw uses a frozen snap only.");
+			solarflare.ui.UiHints.noteWrapped("Local hero current target HP from the combat observe path. Draw uses a frozen snap only.");
 			drawSettings("tgt");
 		}
 		HudChrome.endPanel();

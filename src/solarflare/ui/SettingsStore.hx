@@ -400,6 +400,7 @@ class SettingsStore {
 		assignDump(data, "auras", function() return aurasDump(cfg.auras));
 		assignDump(data, "hideAll", hideAllDump);
 		assignDump(data, "alignGrid", AlignmentGrid.dump);
+		assignDump(data, "uiHints", UiHints.dump);
 		assignDump(data, "universalProfiles", function() return FeatureProfiles.dump(true, migrationBackupExists()));
 		assignDump(data, "hub", function() return {
 			w: cfg.hubW != null ? cfg.hubW.get() : 360,
@@ -459,6 +460,10 @@ class SettingsStore {
 			rageVert: v.rageVertical.get(),
 			manaVert: v.manaVertical.get(),
 			layout: v.layout.get(),
+			hpLook: v.hpLook.dump(),
+			rageLook: v.rageLook.dump(),
+			manaLook: v.manaLook.dump(),
+			prayersLook: v.prayersLook.dump(),
 			chrome: chromeDump(v.chrome),
 			rageChrome: chromeDump(v.rageChrome),
 			manaChrome: chromeDump(v.manaChrome),
@@ -480,6 +485,11 @@ class SettingsStore {
 			bannerH: c.bannerH.get(),
 			mode: c.comboType.get() == 1 ? 2 : (c.shape.get() == PipShapes.BOX ? 1 : 0),
 			art: c.customStyle.get() == 0 ? 0 : 1,
+			pipMode: c.displayMode.get(),
+			pipColors: c.colorScheme.get(),
+			pipGlow: c.showGlow.get(),
+			pipLabels: c.showLabels.get(),
+			pipSpeed: c.animationSpeed.get(),
 			chrome: chromeDump(c.chrome)
 		};
 	}
@@ -602,6 +612,7 @@ class SettingsStore {
 			hidden: c.hidden.get(),
 			vertical: c.vertical.get(),
 			shape: c.shape.get(),
+			look: c.look.dump(),
 			w: c.width.get(),
 			h: c.height.get(),
 			chrome: chromeDump(c.chrome)
@@ -615,6 +626,7 @@ class SettingsStore {
 			hidden: c.hidden.get(),
 			vertical: c.vertical.get(),
 			shape: c.shape.get(),
+			look: c.look.dump(),
 			w: c.width.get(),
 			h: c.height.get(),
 			chrome: chromeDump(c.chrome)
@@ -926,6 +938,7 @@ class SettingsStore {
 		// Saves written earlier today carry the binding under the old `smartHide` key.
 		applyHideAll(data.hideAll != null ? data.hideAll : data.smartHide);
 		AlignmentGrid.apply(Reflect.field(data, "alignGrid"));
+		UiHints.apply(Reflect.field(data, "uiHints"));
 		if (cfg.launchers != null)
 			cfg.launchers.apply(data.launchers);
 		applyHub(cfg, data.hub);
@@ -958,6 +971,10 @@ class SettingsStore {
 		setBool(v.rageVertical, data.rageVert);
 		setBool(v.manaVertical, data.manaVert);
 		setInt(v.layout, data.layout);
+		v.hpLook.apply(data.hpLook);
+		v.rageLook.apply(data.rageLook);
+		v.manaLook.apply(data.manaLook);
+		v.prayersLook.apply(data.prayersLook);
 
 		v.hpSizeDirty = true;
 		applyChrome(v.chrome, data.chrome != null ? data.chrome : data);
@@ -983,6 +1000,11 @@ class SettingsStore {
 		setFloat(c.width, migrated.w);
 		setFloat(c.height, migrated.h);
 		setFloat(c.bannerH, migrated.bannerH);
+		setInt(c.displayMode, migrated.pipMode);
+		setInt(c.colorScheme, migrated.pipColors);
+		setBool(c.showGlow, migrated.pipGlow);
+		setBool(c.showLabels, migrated.pipLabels);
+		setFloat(c.animationSpeed, migrated.pipSpeed);
 		c.sizeDirty = true;
 		applyChrome(c.chrome, migrated.chrome);
 	}
@@ -1026,6 +1048,7 @@ class SettingsStore {
 		setBool(c.hidden, data.hidden);
 		setBool(c.vertical, data.vertical);
 		setInt(c.shape, data.shape);
+		c.look.apply(data.look);
 		setFloat(c.width, data.w);
 		setFloat(c.height, data.h);
 		c.sizeDirty = true;
@@ -1093,6 +1116,7 @@ class SettingsStore {
 		setBool(c.hidden, data.hidden);
 		setBool(c.vertical, data.vertical);
 		setInt(c.shape, data.shape);
+		c.look.apply(data.look);
 		setFloat(c.width, data.w);
 		setFloat(c.height, data.h);
 		c.sizeDirty = true;

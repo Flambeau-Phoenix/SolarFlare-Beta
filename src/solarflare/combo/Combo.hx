@@ -181,18 +181,22 @@ class ComboConfig {
 	public static inline var MAX_W:Single = 720;
 	public static inline var MIN_H:Single = 28;
 	public static inline var MAX_H:Single = 420;
+	/** Artwork slot used for an unlit point (slots 0-5 are the lit points). */
+	public static inline var EMPTY_SLOT:Int = 6;
 
 	public var open = new BoolRef(false);
 	public var hidden = new BoolRef(false);
 	public var vertical = new BoolRef(false);
 	public var shape = new IntRef(PipShapes.DIAMOND);
 	public var pointCount = new IntRef(5);
+	public var look:solarflare.resourcetracker.PipLook;
 	public var width = new FloatRef(220);
 	public var height = new FloatRef(36);
 	public var sizeDirty = true;
 	public var chrome:HudChrome;
 
 	public function new() {
+		look = new solarflare.resourcetracker.PipLook();
 		chrome = new HudChrome(40, 160);
 	}
 
@@ -315,7 +319,8 @@ class ComboOverlay {
 			filled = 0;
 		if (filled > n)
 			filled = n;
-			PipShapes.drawCount(rowW, rowH, n, filled, cfg.vertical.get(), cfg.shape.get(), Std.string(filled), null);
+		PipShapes.drawCount(rowW, rowH, n, filled, cfg.vertical.get(), cfg.shape.get(), Std.string(filled), null, cfg.look,
+			solarflare.resourcetracker.ResourceArtwork.forWindow("SolarFlare Combo"), 0, ComboConfig.EMPTY_SLOT);
 	}
 
 	function hudBody(size:imgui.Structs.ImVec2):Void {

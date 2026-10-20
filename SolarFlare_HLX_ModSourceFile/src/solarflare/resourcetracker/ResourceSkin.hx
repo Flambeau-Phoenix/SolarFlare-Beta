@@ -19,20 +19,42 @@ class ResourceSkin {
 	public var fill:String="";
 	public var frame:String="";
 	public var progress:Float=0;
+	/** Element-specific image keys (attack states, combo points, prayers...). "" = built-in drawing. */
+	public var slots:Array<String>;
 	var clipBox={x:0.0,y:0.0,w:0.0,h:0.0};
-	public function new() {}
-	public function dump():Dynamic return {enabled:enabled.get(),content:keepContent.get(),opacity:opacity.get(),direction:direction.get(),insetX:insetX.get(),insetY:insetY.get(),background:background,fill:fill,frame:frame};
+	public function new(slotCount:Int=0) { slots=[for(_ in 0...slotCount) ""]; }
+	public function dump():Dynamic return {enabled:enabled.get(),content:keepContent.get(),opacity:opacity.get(),direction:direction.get(),insetX:insetX.get(),insetY:insetY.get(),background:background,fill:fill,frame:frame,slots:slots.copy()};
 	public function apply(d:Dynamic):Void {
 		enabled.set(d!=null && d.enabled==true); keepContent.set(d==null || d.content!=false);
 		opacity.set(number(d,"opacity",1,0,1)); direction.set(Std.int(number(d,"direction",0,0,3)));
 		insetX.set(number(d,"insetX",0,0,200)); insetY.set(number(d,"insetY",0,0,200));
 		background=key(d,"background"); fill=key(d,"fill"); frame=key(d,"frame");
+		var saved:Array<Dynamic>=d!=null && Std.isOfType(Reflect.field(d,"slots"),Array) ? Reflect.field(d,"slots") : [];
+		for(i in 0...slots.length) {
+			var k:Dynamic=i<saved.length ? saved[i] : null;
+			slots[i]=Std.isOfType(k,String) && solarflare.ui.CustomImages.stemOf(k).length>0 ? k : "";
+		}
 	}
 	static function number(d:Dynamic,k:String,f:Float,lo:Float,hi:Float):Float { var v=d==null ? null : Reflect.field(d,k); return solarflare.ui.HudLayoutModel.finite(v) ? Math.max(lo,Math.min(hi,v)) : f; }
 	static function key(d:Dynamic,k:String):String { var v=d==null ? null : Reflect.field(d,k); return Std.isOfType(v,String) && solarflare.ui.CustomImages.stemOf(v).length>0 ? v : ""; }
 	public function ready():Bool return enabled.get() && opacity.get()>0 && (background.length>0 || fill.length>0 || frame.length>0)
 		&& (background.length==0 || loaded(background)) && (fill.length==0 || loaded(fill)) && (frame.length==0 || loaded(frame));
 	static function loaded(k:String):Bool return k.length>0 && GameIcons.get(k)!=(0:TextureHandle);
+	/** Key of slot `i` when artwork is on and that image is ready, otherwise "" (use the built-in look). */
+	public function slotKey(i:Int):String {
+		if(!enabled.get() || i<0 || i>=slots.length) return "";
+		var k=slots[i];
+		return k.length>0 && loaded(k) ? k : "";
+	}
+	/** Draws slot `i` aspect-fit and centered in the rect. False (nothing drawn) when the slot is empty or not loaded. */
+	public function drawSlot(dl:Dynamic,i:Int,x:Single,y:Single,w:Single,h:Single,alpha:Float=1):Bool {
+		var k=slotKey(i); if(k.length==0) return false;
+		var tw=GameIcons.texW(k); var th=GameIcons.texH(k);
+		var fw:Single=w; var fh:Single=h;
+		if(tw>0 && th>0) { var aspect=tw/th; fh=w/aspect; if(fh>h) { fh=h; fw=h*aspect; } }
+		var tint=(Std.int(Math.max(0,Math.min(1,alpha*opacity.get()))*255)<<24)|0xFFFFFF;
+		return GameIcons.drawKey(dl,k,x+(w-fw)*0.5,y+(h-fh)*0.5,fw,fh,tint);
+	}
 	public function paint(x:Single,y:Single,w:Single,h:Single,amount:Float,top:Bool):Void {
 		if(!enabled.get()) return;
 		var dl=ImGui.getWindowDrawList();
