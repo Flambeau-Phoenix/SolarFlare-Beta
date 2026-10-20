@@ -31,10 +31,12 @@ class NativeElementController {
  static inline var MAX_DEPTH:Int=4;
  static inline var HUD_DEPTH:Int=3;
  /** Safety net only: a hidden/probed HUD-scan row with nothing found is searched again this often. */
- static inline var HUD_RETRY_S:Float=3.0;
+ static inline var HUD_RETRY_S:Float=15.0;
  /** HUD children that hold windows, unit widgets or overlays: huge, and never home to the cast bar. */
  static var HUD_SKIP:Array<String>=["widgets","windows","overlays","modals","popups","dragContainer","chat","deathCard","spectator"];
  var hudRetry:Float=-1e9;
+ /** Child count of the HUD at the last retry check; a change means a widget was added or removed. */
+ var hudChildCount:Int=-1;
  var source:NativeVisibilitySource;
  var hud:Dynamic;
  var keyboard:Dynamic;
@@ -108,7 +110,7 @@ class NativeElementController {
    for(lease in target.leases) if(attachedHud) try { release(lease); } catch(_:Dynamic) {}
    target.leases.resize(0); target.row=null; target.failed=false;
   }
-  hud=null; keyboard=null; pad=null; config=null; nextScan=-1e9; hudRetry=-1e9; previousTime=-1e9; source.reset();
+  hud=null; keyboard=null; pad=null; config=null; nextScan=-1e9; hudRetry=-1e9; hudChildCount=-1; previousTime=-1e9; source.reset();
  }
  function add(target:VisibilityTarget,node:Dynamic,root:Dynamic):Void {
   if(node==null) return;
@@ -197,8 +199,14 @@ class NativeElementController {
   var chatExternal=false;
   try { chatExternal=source.externalChat(); } catch(_:Dynamic) {}
   // Named trigger for the HUD walk: a wanted HUD-scan row that found nothing retries on a slow safety-net interval.
-  if(now>=hudRetry) for(target in targets) if(target.hudScan && target.row!=null && target.leases.length==0
-   && (probe || target.row.hidden.get())) { discoveryDirty=true; hudRetry=now+HUD_RETRY_S; break; }
+  // Fingerprint edge: a new HUD child (the widget being created) rescans now; otherwise only the long safety net does.
+  for(target in targets) if(target.hudScan && target.row!=null && target.leases.length==0
+   && (probe || target.row.hidden.get())) {
+   var hudChildren=-1; if(hud!=null) try { hudChildren=source.childCount(hud); } catch(_:Dynamic) {}
+   if(hudChildren!=hudChildCount) { hudChildCount=hudChildren; discoveryDirty=true; hudRetry=now+HUD_RETRY_S; }
+   else if(now>=hudRetry) { discoveryDirty=true; hudRetry=now+HUD_RETRY_S; }
+   break;
+  }
   var scan=needBars && discoveryDirty && now>=nextScan;
   if(scan) {
    discoveryDirty=false;

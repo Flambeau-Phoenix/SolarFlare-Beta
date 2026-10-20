@@ -60,19 +60,26 @@ class ScriptEngine {
 	public static function evaluate(code:String,frame:AuraSignalFrame):ScriptResult {
 		var p=prepare(code); var r=p.result; r.reset();
 		if(p.error!="") { r.state="Error"; r.message=p.error; return r; }
-		runtime.frame=frame; runtime.steps=0; runtime.eventSerial=0;
+		runtime.frame=frame; runtime.steps=0; runtime.eventSerial=0; runtime.clearWaiting();
 		try {
 			var v:Dynamic=runtime.execute(p.expr);
-			if(Std.isOfType(v,Bool)) { r.known=true; r.value=v; }
-			else if(Std.isOfType(v,Int) || Std.isOfType(v,Float)) {
-				var n:Float=v;
-				if(!Math.isFinite(n)) throw "The expression returned a non-finite number.";
-				r.known=true; r.value=n>0; r.numeric=true; r.number=n;
-			} else throw "Return true or false (or a number for legacy compatibility).";
-			r.state=r.value ? "True" : "False";
-			if(r.numeric) r.message="Numeric compatibility: values greater than zero are true. Prefer a Boolean result.";
-		} catch(e:ScriptWaiting) { r.state="Waiting for data"; r.message=e.message; }
-		catch(e:Dynamic) { r.state="Error"; r.message=Std.string(e); }
+			// Missing data is recorded, not thrown (HashLink exceptions capture stack traces on a 20 Hz path).
+			if(runtime.isWaiting()) { r.state="Waiting for data"; r.message=runtime.waitingMessage(); }
+			else {
+				if(Std.isOfType(v,Bool)) { r.known=true; r.value=v; }
+				else if(Std.isOfType(v,Int) || Std.isOfType(v,Float)) {
+					var n:Float=v;
+					if(!Math.isFinite(n)) throw "The expression returned a non-finite number.";
+					r.known=true; r.value=n>0; r.numeric=true; r.number=n;
+				} else throw "Return true or false (or a number for legacy compatibility).";
+				r.state=r.value ? "True" : "False";
+				if(r.numeric) r.message="Numeric compatibility: values greater than zero are true. Prefer a Boolean result.";
+			}
+		} catch(e:Dynamic) {
+			// A neutral placeholder value may trip a later error; the first missing signal still decides the outcome.
+			if(runtime.isWaiting()) { r.known=r.value=r.numeric=false; r.state="Waiting for data"; r.message=runtime.waitingMessage(); }
+			else { r.state="Error"; r.message=Std.string(e); }
+		}
 		r.eventSerial=r.known ? runtime.eventSerial : 0;
 		runtime.frame=null; return r;
 	}
@@ -137,11 +144,6 @@ class ScriptResult {
 	public function new() {}
 	public function reset():Void { known=value=numeric=false; eventSerial=0; number=0; state="Unchecked"; message=""; }
 }
-private class ScriptWaiting {
-	public var message:String;
-	public function new(message:String) this.message=message;
-}
-
 private class ScriptValidator {
 	var program:ScriptProgram;
 	var nodes=0;
@@ -223,6 +225,15 @@ private class SignalInterp extends hscript.Interp {
 	public var steps=0;
 	public var eventSerial=0;
 	var value=new AuraResolvedValue();
+	/** First missing signal of this evaluation; message built only if the evaluation ends waiting. */
+	var waitKind=0;
+	var waitSignal="";
+	var waitSubject="";
+	static var PERCENT_IDS=["hp","shield","rage","mana","spark"];
+	public function clearWaiting():Void waitKind=0;
+	public function isWaiting():Bool return waitKind!=0;
+	public function waitingMessage():String return waitKind==1 ? "No current player snapshot." : "Unavailable: "+waitSignal+(waitSubject=="" ? "" : " ["+waitSubject+"]");
+	function waitNoPlayer():Dynamic { if(waitKind==0) waitKind=1; return 0.0; }
 	public function new() {
 		super(); variables.set("Math",Math);
 		variables.set("min",Math.min); variables.set("max",Math.max); variables.set("abs",Math.abs);
@@ -233,10 +244,10 @@ private class SignalInterp extends hscript.Interp {
 		variables.set("exp",Math.exp); variables.set("log",Math.log); variables.set("isFinite",Math.isFinite); variables.set("isNaN",Math.isNaN);
 	}
 	function query(signal:String,subject:String="",knownOnly:Bool=false):Dynamic {
-		if(frame==null || !frame.heroKnown) { if(knownOnly) return false; throw new ScriptWaiting("No current player snapshot."); }
+		if(frame==null || !frame.heroKnown) { if(knownOnly) return false; return waitNoPlayer(); }
 		AuraSignalReader.read(frame,signal,subject,value);
 		if(knownOnly) return value.known;
-		if(!value.known) throw new ScriptWaiting("Unavailable: "+signal+(subject=="" ? "" : " ["+subject+"]"));
+		if(!value.known) { if(waitKind==0) { waitKind=2; waitSignal=signal; waitSubject=subject; } return 0.0; }
 		if(value.eventSerial>eventSerial) eventSerial=value.eventSerial;
 		return switch(value.kind) { case Boolean: value.boolValue; case Identity: value.stringValue; default: value.numberValue; };
 	}
@@ -248,7 +259,7 @@ private class SignalInterp extends hscript.Interp {
 				if(s!="") {
 					var v=query(s);
 					if(n=="comboMax") return frame.comboMax;
-					if(["hp","shield","rage","mana","spark"].indexOf(n)>=0) return v*100.0;
+					if(PERCENT_IDS.indexOf(n)>=0) return v*100.0;
 					return v;
 				}
 			case ECall(fn,args):
@@ -257,7 +268,7 @@ private class SignalInterp extends hscript.Interp {
 						var id:String=expr(args[0]);
 						if(n=="signal" || n=="known") return query(id,args.length==2 ? expr(args[1]) : "",n=="known");
 						if(n=="hasSkill") {
-							if(frame==null || !frame.heroKnown) throw new ScriptWaiting("No current player snapshot.");
+							if(frame==null || !frame.heroKnown) { waitNoPlayer(); return false; }
 							var sk=frame.findSkill(id); return sk!=null && sk.known;
 						}
 						return query(ScriptEngine.helperSignal(n),id);

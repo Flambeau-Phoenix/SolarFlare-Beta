@@ -17,7 +17,6 @@ import imgui.ImGui;
 class SettingsStore {
 	static inline var VERSION:Int = 35;
 	static inline var TMP_SUFFIX:String = ".tmp";
-	static inline var PREV_SUFFIX:String = ".prev";
 	static var dirty = false;
 	static var saveBlocked = false;
 	/** Consecutive failed saves; automatic retries back off (1s doubling to 30s) instead of hammering the disk. */
@@ -28,6 +27,10 @@ class SettingsStore {
 	static var lastEditMs:Float = 0;
 	/** First unsaved edit since the last good save; bounds how long a debounce can defer a write. */
 	static var dirtySinceMs:Float = 0;
+	/** First lazy (gameplay counter) edit not yet promoted to `dirty`; 0 when none. */
+	static var lazyDirtySinceMs:Float = 0;
+	/** Safety net: lazy state reaches disk at least this often even without a flush edge. */
+	static inline var LAZY_MS:Float = 60000;
 	/** A save is synchronous on the render thread (stringify, write, re-parse, rename): wait for edits to settle. */
 	static inline var QUIET_MS:Float = 1500;
 	static inline var MIN_GAP_MS:Float = 4000;
@@ -93,8 +96,29 @@ class SettingsStore {
 		catch (_:Dynamic) {}
 	}
 
+	/**
+	 * Gameplay-driven state that is captured from live objects at save time (aura counters): remembered here,
+	 * promoted to a real dirty flag only after LAZY_MS or when a flush path (logout/title/explicit) runs.
+	 * Does not touch the status-demand dirty bit, so no demand rebuild and no save inside a fight.
+	 */
+	public static function markDirtyLazy():Void {
+		if (lazyDirtySinceMs <= 0)
+			lazyDirtySinceMs = haxe.Timer.stamp() * 1000;
+	}
+
+	static function promoteLazy():Void {
+		if (lazyDirtySinceMs <= 0)
+			return;
+		lazyDirtySinceMs = 0;
+		var stamp = haxe.Timer.stamp() * 1000;
+		if (!dirty || dirtySinceMs <= 0)
+			dirtySinceMs = stamp;
+		dirty = true;
+		lastEditMs = stamp;
+	}
+
 	public static function isDirty():Bool {
-		return dirty;
+		return dirty || lazyDirtySinceMs > 0;
 	}
 
 	public static function captureWarning():String return lastCaptureWarning;
@@ -136,10 +160,22 @@ class SettingsStore {
 			if (oldVersion > VERSION) { blockSaving("Settings belong to a newer mod version; original files preserved."); return; }
    var savedProfiles=Reflect.field(data,"universalProfiles");
    if(oldVersion<VERSION || savedProfiles==null || !Reflect.hasField(savedProfiles,"version")) ProfileMigrationBackup.ensure(source);
+			// One-time format conversion: back the file up first, then let the first save after login rewrite it. No backup, no conversion.
+			var convert = SettingsFormat.needsConversion(data);
+			if (convert) {
+				try {
+					var kept = SettingsFormat.backup(source);
+					formatConversionPending = true;
+					ProfileTrace.note("format", "converting settings to format " + SettingsFormat.CURRENT + "; backup " + haxe.io.Path.withoutDirectory(kept));
+				} catch (e:Dynamic) {
+					convert = false;
+					blockSaving("Could not back up settings before the one-time format conversion (" + Std.string(e) + ").");
+				}
+			}
 			apply(cfg, data);
 			FeatureProfiles.load(cfg, data);
 				ProfileTrace.note("load","settings v"+oldVersion+" -> "+VERSION+"; "+FeatureProfiles.summary());
-			if (oldVersion < VERSION) dirty = true;
+			if (oldVersion < VERSION || convert) dirty = true;
 			// v24: the first cast-bar build persisted the new overlay as hidden,
 			// including in the active universal profile, so no telemetry was demanded.
 			if (oldVersion < 24) {
@@ -158,29 +194,6 @@ class SettingsStore {
 			ToastManager.error("SolarFlare settings could not be loaded (" + Std.string(e)
 				+ "). Saving is off this session so the file is left as it is.", 8.0);
 		}
-	}
-
-	/** Earlier builds left `<file>.prev`, `<file>.unreadable-*.bak` and `<file>.v<N>.bak` beside the settings; nothing writes them now. */
-	static function deleteLegacyBackups(path:String):Void {
-		try {
-			var dir = haxe.io.Path.directory(path);
-			var scan = dir == "" ? "." : dir;
-			var stem = haxe.io.Path.withoutDirectory(path);
-			var removed = 0;
-			for (name in sys.FileSystem.readDirectory(scan)) {
-				if (removed >= 100)
-					break;
-				if (!StringTools.startsWith(name, stem + "."))
-					continue;
-				var tail = name.substr(stem.length);
-				var legacy = tail == PREV_SUFFIX
-					|| StringTools.endsWith(tail, ".bak") && (StringTools.startsWith(tail, ".unreadable-") || ~/^\.v[0-9]+\.bak$/.match(tail));
-				if (!legacy)
-					continue;
-				try sys.FileSystem.deleteFile(dir == "" ? name : dir + "/" + name) catch (_:Dynamic) {}
-				removed++;
-			}
-		} catch (_:Dynamic) {}
 	}
 
 	static function readText(path:String):String {
@@ -206,6 +219,8 @@ class SettingsStore {
 	public static function tick(?cfg:ConfigPanel):Void {
 		tryLoadIni();
 		var target = cfg != null ? cfg : lastCfg;
+		if (lazyDirtySinceMs > 0 && haxe.Timer.stamp() * 1000 - lazyDirtySinceMs >= LAZY_MS)
+			promoteLazy();
 		if (!dirty || target == null)
 			return;
 		var now = haxe.Timer.stamp() * 1000;
@@ -219,11 +234,13 @@ class SettingsStore {
 
 	/** Dirty flush for per-frame callers (title screen / logout) that must respect the failure backoff. */
 	public static function saveIfDue(cfg:ConfigPanel):Void {
+		promoteLazy();
 		if (dirty && haxe.Timer.stamp() * 1000 >= retryAtMs)
 			save(cfg);
 	}
 
 	public static function flushDirty():Void {
+		promoteLazy();
 		if (dirty && lastCfg != null) {
 			save(lastCfg);
 		}
@@ -232,7 +249,11 @@ class SettingsStore {
 	/** Explicit saves always attempt; returns whether the file was replaced. */
 	public static function save(cfg:ConfigPanel):Bool {
 		if (cfg == null || saveBlocked || !FeatureProfiles.ready) {
-			ProfileTrace.note("save","SKIPPED blocked="+saveBlocked+" ready="+FeatureProfiles.ready);
+			// Back off: otherwise the 4 Hz tick retries (and appends a trace line to disk) until profiles are ready.
+			if (cfg != null && haxe.Timer.stamp() * 1000 >= retryAtMs) {
+				ProfileTrace.note("save","SKIPPED blocked="+saveBlocked+" ready="+FeatureProfiles.ready);
+				retryAtMs = haxe.Timer.stamp() * 1000 + 2000;
+			}
 			return false;
 		}
 		try {
@@ -242,7 +263,7 @@ class SettingsStore {
 			ensureDir(haxe.io.Path.directory(path));
 			var data=dump(cfg);
    if(lastCaptureWarning.length>0) throw lastCaptureWarning;
-   var jsonText = haxe.Json.stringify(data, null, "  ");
+   var jsonText = haxe.Json.stringify(data);
 			// Never write the live file in place: a crash mid-write would truncate it.
 			var tmp = path + TMP_SUFFIX;
 			sys.io.File.saveContent(tmp, jsonText);
@@ -250,11 +271,18 @@ class SettingsStore {
    var stagedText=sys.io.File.getContent(tmp);
    if(stagedText!=jsonText) throw "Settings verification failed";
    var verified=haxe.Json.parse(stagedText);
-   var validation=new ProfileBank({}); validation.load(verified.universalProfiles,null);
-			replaceWith(tmp, path);
+   // Throwaway bank over the parsed text: references, not deep copies of every profile.
+   var validation=new ProfileBank({}); validation.load(verified.universalProfiles,null,null,null,1920,1080,true);
+			replaceWith(tmp, path, verified);
 			ProfileTrace.note("save","OK "+jsonText.length+" bytes; "+FeatureProfiles.summary());
+			if (formatConversionPending) {
+				formatConversionPending = false;
+				ProfileTrace.note("format", "settings converted to format " + SettingsFormat.CURRENT);
+				ToastManager.info("Settings file converted to the new format. The original is kept as a .bak beside it.", 6.0);
+			}
 			dirty = false;
 			dirtySinceMs = 0;
+			lazyDirtySinceMs = 0;
 			lastSaveMs = haxe.Timer.stamp() * 1000;
 			failCount = 0;
 			retryAtMs = 0;
@@ -279,8 +307,8 @@ class SettingsStore {
 	 * Rename can't overwrite on Windows, so the old file is deleted once the verified .tmp is on disk.
 	 * Every crash point leaves the old file or the verified .tmp; load() checks both. No backup file is kept.
 	 */
-	static function replaceWith(tmp:String, path:String):Void {
-  VerifiedSettingsWrite.replace(tmp,path);
+	static function replaceWith(tmp:String, path:String, verified:Dynamic = null):Void {
+  VerifiedSettingsWrite.replace(tmp,path,null,verified);
 	}
 
 	static function tryLoadIni():Void {
@@ -298,11 +326,35 @@ class SettingsStore {
 	static function dump(cfg:ConfigPanel):Dynamic {
 		FeatureProfiles.storeAll(cfg);
 		var data = dumpCore(cfg);
-		Reflect.setField(data, "geaux", geauxDump(cfg.geaux));
-		Reflect.setField(data, "auras", aurasDump(cfg.auras));
-		Reflect.setField(data, "featureProfiles", FeatureProfiles.dump());
+		// dumpCore already produced geaux, auras and the profile bank; reuse them instead of dumping (and deep-copying) again.
+		// A section that failed there is absent and also sets lastCaptureWarning, which aborts the save.
+		if (!Reflect.hasField(data, "geaux")) Reflect.setField(data, "geaux", geauxDump(cfg.geaux));
+		if (!Reflect.hasField(data, "auras")) Reflect.setField(data, "auras", aurasDump(cfg.auras));
+		// The old `featureProfiles` alias of the bank is no longer written: it duplicated universalProfiles byte for byte and the
+		// loader reads it only from files that predate universalProfiles.
 		Reflect.setField(data, "uiState", dumpUiState(cfg));
 		return data;
+	}
+
+	static var backupSeen = false;
+	/** Set on load when an old-format file was backed up; cleared by the first successful save, which performs the conversion. */
+	static var formatConversionPending = false;
+
+	/**
+	 * True once a byte-exact copy of the old file sits beside the settings: either the pre-migration copy
+	 * (`solarflare.json.profiles-v35-*.bak`) or the pre-format-conversion copy (`solarflare.json.pre-format*.bak`).
+	 * Either one holds everything the migration recovery payloads would.
+	 */
+	static function migrationBackupExists():Bool {
+		if (backupSeen) return true;
+		try {
+			var path = jsonPath();
+			var dir = haxe.io.Path.directory(path);
+			for (name in sys.FileSystem.readDirectory(dir))
+				if (StringTools.startsWith(name, "solarflare.json.profiles-v35-") && StringTools.endsWith(name, ".bak")) { backupSeen = true; break; }
+			if (!backupSeen && SettingsFormat.backupExists(path)) backupSeen = true;
+		} catch (_:Dynamic) {}
+		return backupSeen;
 	}
 
  public static function captureProfileAuxiliary(cfg:ConfigPanel):Dynamic return {
@@ -318,7 +370,7 @@ class SettingsStore {
 
 	static function dumpCore(cfg:ConfigPanel):Dynamic {
 		lastCaptureWarning = "";
-		var data:Dynamic = {v: VERSION, activeTheme: activeTheme,preventCtrlFullscreen:cfg.preventCtrlFullscreen.get(),blockClickThrough:cfg.blockClickThrough.get()};
+		var data:Dynamic = {v: VERSION, format: SettingsFormat.CURRENT, activeTheme: activeTheme,preventCtrlFullscreen:cfg.preventCtrlFullscreen.get(),blockClickThrough:cfg.blockClickThrough.get()};
 		assignDump(data, "customTheme", function() return ThemePalette.dumpCustom());
 		assignDump(data, "uiPack", function() return cfg.uiPack != null ? cfg.uiPack.dump() : {id: "custom"});
 		assignDump(data, "nativeHide", function() return cfg.nativeHide.dump());
@@ -348,7 +400,7 @@ class SettingsStore {
 		assignDump(data, "auras", function() return aurasDump(cfg.auras));
 		assignDump(data, "hideAll", hideAllDump);
 		assignDump(data, "alignGrid", AlignmentGrid.dump);
-		assignDump(data, "universalProfiles", function() return FeatureProfiles.dump());
+		assignDump(data, "universalProfiles", function() return FeatureProfiles.dump(true, migrationBackupExists()));
 		assignDump(data, "hub", function() return {
 			w: cfg.hubW != null ? cfg.hubW.get() : 360,
 			h: cfg.hubH != null ? cfg.hubH.get() : 480,

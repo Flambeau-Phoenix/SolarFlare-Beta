@@ -3007,7 +3007,7 @@ class CanvasEditor {
 			var raw = ByteUtil.readBytes(soundImportBuf, 520);
 			UiActionQueue.custom(function() {
 				try {
-					var stem = CustomSounds.importFile(raw);
+					var stem = CustomSounds.importFile(raw); AuraSoundPlayer.clearCache();
 					ByteUtil.clearBytes(soundImportBuf, 520);
 					soundMsg = "Imported " + stem; soundMsgError = false;
 				} catch (e:Dynamic) { soundMsg = Std.string(e); soundMsgError = true; }

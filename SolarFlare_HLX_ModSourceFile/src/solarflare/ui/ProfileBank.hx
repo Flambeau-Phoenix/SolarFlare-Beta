@@ -119,7 +119,9 @@ class ProfileBank {
   }
   return out;
  }
- public function load(data:Dynamic,lastSaved:Dynamic,extra:Dynamic=null,legacyRoot:Dynamic=null,width:Float=1920,height:Float=1080):Void {
+ /** `share` keeps references into `data` (no deep copies): only for a throwaway bank used to validate parsed text. */
+ public function load(data:Dynamic,lastSaved:Dynamic,extra:Dynamic=null,legacyRoot:Dynamic=null,width:Float=1920,height:Float=1080,share:Bool=false):Void {
+  var own=function(v:Dynamic):Dynamic return share ? v : copy(v);
   profiles.clear(); defaults.clear(); order=[]; active=""; nextId=1;
   compatibilityAssigned=[]; compatibilityPending=false; compatibilitySnapshot=null; legacyRecovery=null; extraRecovery=null;
   if(data!=null && Reflect.hasField(data,"version")) {
@@ -128,7 +130,7 @@ class ProfileBank {
    for(r in rows) {
     if(r==null || !Std.isOfType(r.id,String) || r.id.length==0 || profiles.exists(r.id) || !Std.isOfType(r.name,String)
      || !Std.isOfType(r.ownerHeroId,String) || (r.ownerHeroId!="" && heroId(r.ownerHeroId)=="") || r.snapshot==null) throw "Invalid profile record";
-    var p:OwnedProfile={id:r.id,name:r.name,ownerHeroId:r.ownerHeroId,sourceId:Std.isOfType(r.sourceId,String) ? r.sourceId : "",snapshot:copy(r.snapshot)};
+    var p:OwnedProfile={id:r.id,name:r.name,ownerHeroId:r.ownerHeroId,sourceId:Std.isOfType(r.sourceId,String) ? r.sourceId : "",snapshot:own(r.snapshot)};
     profiles.set(p.id,p); order.push(p.id);
     if(~/^p[0-9]+$/.match(p.id)) { var number=Std.parseInt(p.id.substr(1)); if(number!=null && number>=nextId && number<2147483646) nextId=number+1; }
    }
@@ -141,9 +143,9 @@ class ProfileBank {
    }
    active=Std.isOfType(data.active,String) ? data.active : "";
    if(active!="" && !profiles.exists(active)) throw "Invalid active profile";
-   compatibilityPending=data.compatibilityPending==true; compatibilitySnapshot=copy(data.compatibilitySnapshot);
-   compatibilityAssigned=Std.isOfType(data.compatibilityAssigned,Array) ? copy(data.compatibilityAssigned) : [for(h in defaults.keys()) h];
-   legacyRecovery=copy(data.legacyRecovery); extraRecovery=copy(data.extraRecovery);
+   compatibilityPending=data.compatibilityPending==true; compatibilitySnapshot=own(data.compatibilitySnapshot);
+   compatibilityAssigned=Std.isOfType(data.compatibilityAssigned,Array) ? own(data.compatibilityAssigned) : [for(h in defaults.keys()) h];
+   legacyRecovery=own(data.legacyRecovery); extraRecovery=own(data.extraRecovery);
    if(compatibilityPending && compatibilitySnapshot==null) throw "Missing compatibility snapshot";
   } else {
    legacyRecovery=copy(data); extraRecovery=copy(extra);
@@ -204,10 +206,18 @@ class ProfileBank {
   }
   for(hero in defaults.keys()) { var p=profiles.get(defaults.get(hero)); if(p==null || p.ownerHeroId!=hero) throw "Invalid profile assignment"; }
  }
- public function dump():Dynamic {
+ /**
+  * `share` returns references to the live records instead of deep copies. Use it only when the result is serialized
+  * immediately and never mutated (the settings save): a copy of 20 profiles is a JSON stringify+parse of megabytes.
+  */
+ public function dump(share:Bool=false,pruneRecovery:Bool=false):Dynamic {
   validate(); var heroes=[for(h in defaults.keys()) h]; heroes.sort(Reflect.compare);
-  return {version:VERSION,factoryVersion:FACTORY_VERSION,nextId:nextId,active:active,records:[for(id in order) copy(profiles.get(id))],
-   characterDefaults:[for(h in heroes) {heroId:h,profileId:defaults.get(h)}],legacyRecovery:copy(legacyRecovery),extraRecovery:copy(extraRecovery),
-   compatibilityPending:compatibilityPending,compatibilitySnapshot:copy(compatibilitySnapshot),compatibilityAssigned:compatibilityAssigned.copy()};
+  var own=function(v:Dynamic):Dynamic return share ? v : copy(v);
+  // Migration recovery payloads are write-only once migration has finished (nothing reads them back), and the caller
+  // vouches that a byte-exact .bak of the pre-migration file exists. They stay while a compatibility login is pending.
+  var drop=pruneRecovery && !compatibilityPending;
+  return {version:VERSION,factoryVersion:FACTORY_VERSION,nextId:nextId,active:active,records:[for(id in order) own(profiles.get(id))],
+   characterDefaults:[for(h in heroes) {heroId:h,profileId:defaults.get(h)}],legacyRecovery:drop ? null : own(legacyRecovery),extraRecovery:drop ? null : own(extraRecovery),
+   compatibilityPending:compatibilityPending,compatibilitySnapshot:drop ? null : own(compatibilitySnapshot),compatibilityAssigned:compatibilityAssigned.copy()};
  }
 }

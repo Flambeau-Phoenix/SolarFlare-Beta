@@ -378,12 +378,17 @@ class GameIcons {
 	public static function tickPreload(maxPerTick:Int = 24):Void {
 		initAtlas();
 		var count = 0;
+		var start = haxe.Timer.stamp();
 		while (pending.length > 0 && count < maxPerTick) {
 			var id = pending.shift();
 			preload(id);
 			count++;
+			// Each id is a file read + PNG decode on the render thread: spend a bounded slice per tick, finish next tick.
+			if (haxe.Timer.stamp() - start >= PRELOAD_BUDGET_S) break;
 		}
 	}
+	/** Time slice for one preload tick; remaining ids stay queued (always at least one id per tick). */
+	static inline var PRELOAD_BUDGET_S:Float = 0.004;
 
 	public static function texW(id:String):Int {
 		get(id);

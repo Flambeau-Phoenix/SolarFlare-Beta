@@ -13,8 +13,24 @@ import solarflare.combatlog.CombatLogCache;
 
 class AuraSignalFrameBuilder {
 	static var changes=new AuraChangeTracker();
+	/**
+	 * Keys of skills already in this frame, so adding N skills is N lookups rather than N rescans.
+	 * Same rule as AuraSignalFrame.findSkill: exact raw/alias match, else sanitized lower-case match.
+	 */
+	static var skillExact:Map<String,Bool> = [];
+	static var skillLower:Map<String,Bool> = [];
+	static function hasSkill(id:String):Bool {
+		if (skillExact.exists(id)) return true;
+		return skillLower.exists(GeauxCache.sanitizeSkillId(id).toLowerCase());
+	}
+	static function noteSkill(raw:String, alias:String):Void {
+		if (alias == null) alias = "";
+		skillExact.set(raw, true); skillExact.set(alias, true);
+		skillLower.set(raw.toLowerCase(), true); skillLower.set(alias.toLowerCase(), true);
+	}
 	public static function build(frame:AuraSignalFrame, now:Float):Void {
 		frame.resetCollections(); frame.generation++; frame.builtAt = now;
+		skillExact.clear(); skillLower.clear();
 		frame.castDomainKnown = true;
 		frame.heroKnown = HealthCache.localHero != null;
 		solarflare.aura.WeaponEquipmentCache.sample(now);
@@ -146,7 +162,8 @@ class AuraSignalFrameBuilder {
 		if (list == null) return;
 		for (src in list) {
 			if (src == null || !src.present || src.id == null || src.id.length == 0 || frame.skillCount >= AuraSignalFrame.MAX_SKILLS) continue;
-			if (frame.findSkill(src.id) != null) continue;
+			if (hasSkill(src.id)) continue;
+			noteSkill(src.id, src.iconId);
 			var dst = frame.skills[frame.skillCount++]; dst.rawId = src.id; dst.aliasId = src.iconId; dst.label = src.label;
 			dst.ready = src.ready; dst.affordable = src.affordable; dst.cooldownLeft = src.cdLeft;
 			dst.cooldownKnown = src.cooldownValid;
@@ -161,7 +178,8 @@ class AuraSignalFrameBuilder {
 		if (ids == null) return;
 		for (id in ids) {
 			if (id == null || id.length == 0 || frame.skillCount >= AuraSignalFrame.MAX_SKILLS) continue;
-			if (frame.findSkill(id) != null) continue;
+			if (hasSkill(id)) continue;
+			noteSkill(id, "");
 			var dst = frame.skills[frame.skillCount++];
 			dst.rawId = id;
 			dst.aliasId = "";

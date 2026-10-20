@@ -60,7 +60,7 @@ class FeatureProfiles {
   if(cfg!=null && ready && owner==currentCharacterUid()) bank.store(owner,captureAll(cfg));
  }
  public static function storeAll(cfg:ConfigPanel):Void storeCurrent(cfg);
- public static function dump():Dynamic return bank.dump();
+ public static function dump(share:Bool=false,pruneRecovery:Bool=false):Dynamic return bank.dump(share,pruneRecovery);
  public static function migrateCastBarVisible(cfg:ConfigPanel):Void {
   if(cfg!=null) cfg.castBar.hidden.set(false);
  }

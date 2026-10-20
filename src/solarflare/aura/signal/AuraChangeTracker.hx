@@ -9,6 +9,9 @@ class AuraChangeTracker {
 	var last:Float = -1;
 	var skills:Map<String, ChangeBaseline> = [];
 	var statuses:Map<String, ChangeBaseline> = [];
+	/** Reused every observe so an idle tracker allocates no per-tick maps. */
+	var seenScratch:Map<String,Bool> = [];
+	var wantScratch:Map<String,Bool> = [];
 	var dash:ChangeBaseline = new ChangeBaseline();
 	var dashId:String = "";
 	var dashGeneration:Int=-1;
@@ -22,13 +25,15 @@ class AuraChangeTracker {
 		}
 		last = now;
 		f.events.clear();
-		var seen:Map<String,Bool> = [];
-		for (i in 0...f.skillCount) {
-			var s=f.skills[i]; var key=keyOf(s.rawId); seen.set(key,true);
-			if(skillIds!=null) {
-				var wanted=false; for(id in skillIds) if(keyOf(id)==key || keyOf(id)==keyOf(s.aliasId)) { wanted=true; break; }
-				if(!wanted) { seen.remove(key); continue; }
-			}
+		var seen = seenScratch; seen.clear();
+		// No event.skill.* demand: skip the per-skill key work entirely (null means "every skill").
+		var scanSkills = skillIds == null || skillIds.length > 0;
+		var want:Map<String,Bool> = null;
+		if (scanSkills && skillIds != null) { want = wantScratch; want.clear(); for (id in skillIds) want.set(keyOf(id), true); }
+		if (scanSkills) for (i in 0...f.skillCount) {
+			var s=f.skills[i]; var key=keyOf(s.rawId);
+			if(want!=null && !want.exists(key) && !want.exists(keyOf(s.aliasId))) continue;
+			seen.set(key,true);
 			var b=skills.get(key); if(b==null) { b=new ChangeBaseline(); skills.set(key,b); }
 			var valid=f.heroKnown && s.known && (s.chargesMax>0 || s.cooldownKnown);
 			var count=s.chargesMax>0 ? s.charges : (s.ready ? 1 : 0);

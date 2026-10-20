@@ -12,8 +12,12 @@ class ExtraBarsNativeBindings {
 	inline function get_error():String return index.error;
 	var lastRead:Float = -1;
 	public function new() {}
-	public function refresh(now:Float, force:Bool = false):Void {
-		if (!force && now - lastRead < 1) return;
+	/**
+	 * `interval` is the safety-net period for the unforced call. Edges (signature change, key capture, key request)
+	 * pass force=true, so a long interval only delays noticing a native rebind made while nothing of ours is happening.
+	 */
+	public function refresh(now:Float, force:Bool = false, interval:Float = 1):Void {
+		if (!force && now - lastRead < interval) return;
 		lastRead = now; index.begin();
 		try {
 			var defaults = lib.Input.defaultBinds;

@@ -42,22 +42,26 @@ class TelemetryKernel {
 		if (!pending)
 			return;
 		var now = stamp();
-		if (now - lastAsset < ASSET_S)
+		var due = now - lastAsset >= ASSET_S;
+		// Icon decoding is time-budgeted per call (GameIcons.PRELOAD_BUDGET_S), so it may run every observe while work is queued.
+		if (!due && !GameIcons.hasPending())
 			return;
-		lastAsset = now;
-		solarflare.ui.CustomImages.observe();
-		if (!brandingRequested) {
-			brandingRequested = true;
-			GameIcons.get(GameIcons.CHROME_SUN);
-			GameIcons.get(GameIcons.RIFT_SUN);
-			GameIcons.get(GameIcons.HUB_LOGO);
-			GameIcons.get("castbar_solar");
-			GameIcons.get("castbar_obsidian");
-			GameIcons.get("castbar_gilded");
+		if (due) {
+			lastAsset = now;
+			solarflare.ui.CustomImages.observe();
+			if (!brandingRequested) {
+				brandingRequested = true;
+				GameIcons.get(GameIcons.CHROME_SUN);
+				GameIcons.get(GameIcons.RIFT_SUN);
+				GameIcons.get(GameIcons.HUB_LOGO);
+				GameIcons.get("castbar_solar");
+				GameIcons.get("castbar_obsidian");
+				GameIcons.get("castbar_gilded");
+			}
 		}
 		if (GameIcons.hasPending())
 			GameIcons.tickPreload();
-		if (solarflare.attackcombo.AttackComboArt.hasPending())
+		if (due && solarflare.attackcombo.AttackComboArt.hasPending())
 			solarflare.attackcombo.AttackComboArt.tickPreload();
 	}
 

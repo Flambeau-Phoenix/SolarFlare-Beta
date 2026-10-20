@@ -10,6 +10,8 @@ import solarflare.aura.ConsumableCache;
 import solarflare.extrabars.ExtraBarsConfig.ExtraBarsBarConfig;
 import solarflare.extrabars.ExtraBarsConfig.ExtraBarsSlotConfig;
 import solarflare.extrabars.ExtraBarsUsePolicy.ExtraBarsUseCandidate;
+import solarflare.extrabars.ExtraBarsSnapshots.ExtraBarsActivationSnapshot;
+import solarflare.extrabars.ExtraBarsSnapshots.ExtraBarsAssignmentSnapshot;
 
 typedef ExtraBarsRequest = {var barId:String; var index:Int; var kind:String; var generation:Int; var click:Bool;}
 
@@ -52,7 +54,12 @@ class ExtraBars {
 	public var captureMessage:String = "";
 	var previousHero:Dynamic;
 	var wasEditorOpen=false;
-	var signature:String = "";
+	var signature = new ExtraBarsActivationSnapshot();
+	var assignSignature = new ExtraBarsAssignmentSnapshot();
+	/** True once an inactive pass has disarmed native input; idle frames then return before any work. */
+	var idled = false;
+	/** Safety-net period for re-reading native bindings when the editor is closed (edges force a read anyway). */
+	static inline var BINDING_IDLE_S:Float = 30;
 	var previousGate:String = "Waiting for gameplay.";
 	public var suggestions(default,null):String = "";
 	var lastSuggestions:Float = -1;
@@ -85,7 +92,7 @@ class ExtraBars {
  public function dumpCharacterSettings():Dynamic return solarflare.ui.ProfileBank.copy(characterRecovery);
  public function applyProfile(config:Dynamic,placement:Dynamic):Void {
   applyConfig(config); placements.clear(); applyPlacement(placement);
-  views.clear(); countChecks=[]; signature=""; lastSample=-1;
+  views.clear(); countChecks=[]; signature.invalidate(); assignSignature.invalidate(); idled=false; lastSample=-1;
   builder.selectBar(model.bars.length>0 ? model.bars[0].id : "");
   if(host.uiLayouts!=null) host.uiLayouts.requestReconcile();
  }
@@ -129,7 +136,7 @@ class ExtraBars {
 	}
 	public function clearSession():Void {
 		solarflare.input.NativeConsumableBindings.reset();
-		clearTransientState(); ExtraBarsNativeInput.shutdown(); previousHero = null; signature = ""; views.clear(); countChecks = []; spark.reset();
+		clearTransientState(); ExtraBarsNativeInput.shutdown(); previousHero = null; signature.invalidate(); assignSignature.invalidate(); idled = false; views.clear(); countChecks = []; spark.reset();
 		for (item in catalog) { item.count = 0; item.known = false; item.owned = false; }
 	}
 	public function startCapture(barId:String, index:Int):Void {
@@ -143,8 +150,8 @@ class ExtraBars {
 		capture.step(down, imgui.ImGui.isKeyPressed(imgui.Enums.ImGuiKey.Escape, false), pressed, ExtraBarsKeyMap.uiModifiers()); captureMessage = capture.message;
 	}
 	public function bindingIssue(barId:String, index:Int, key:Int, mods:Int):String {
-		var details = " [Base " + bindings.describe(key) + (model.mode=="always" ? "; no modifier" : "; prefix " + ExtraBarsActivationConfig.prefixLabel(model.prefix)) + "; mode " + ExtraBarsActivationConfig.modeLabel(model.mode) + "]";
 		if (key <= 0) return "";
+		var details = " [Base " + bindings.describe(key) + (model.mode=="always" ? "; no modifier" : "; prefix " + ExtraBarsActivationConfig.prefixLabel(model.prefix)) + "; mode " + ExtraBarsActivationConfig.modeLabel(model.mode) + "]";
 		if (mods != 0) return "Ctrl/Alt/Shift remain native. Record a plain bar key." + details;
 		if (model.mode == "long_press") return "Long-press retired; choose Hold, Toggle or Always Active." + details;
 		var mapped = ExtraBarsKeyMap.find(key);
@@ -154,6 +161,7 @@ class ExtraBars {
 		var duplicate=assignments.conflict(barId,index,key);
 		return duplicate.length>0 ? duplicate+details : "";
 	}
+	function anyBarEnabled():Bool { for (bar in model.bars) if (bar.enabled) return true; return false; }
 	public function queueClick(barId:String, index:Int):Void {
 		if (!CursorCaptureFix.cursorFree || gate.length > 0 || host.anyInteractiveOpen() || clicks.length >= 32) return;
 		var kind = barId == "spark" ? SparkCubeTracker.ITEM_ID : (model.find(barId) != null && index >= 0 && index < 10 ? model.find(barId).slots[index].itemKind : "");
@@ -162,8 +170,13 @@ class ExtraBars {
 	public function observe(app:GameApp):Void {
 		observeLayoutCharacter();
 		if (wasEditorOpen && !open.get()) clearTransientState(); wasEditorOpen=open.get();
-		var now = haxe.Timer.stamp(); ExtraBarsKeyMap.initialize(); bindings.refresh(now);
-		if (now-lastSuggestions >= 1) {
+		// Rung 1: nothing enabled, no Spark Cube, editor closed -> one disarming pass, then zero work until that changes.
+		var active = open.get() || model.sparkEnabled || anyBarEnabled();
+		if (!active && idled) return;
+		idled = !active;
+		var now = haxe.Timer.stamp(); ExtraBarsKeyMap.initialize(); bindings.refresh(now, false, open.get() ? 1 : BINDING_IDLE_S);
+		// Suggestions are only shown in the editor.
+		if (open.get() && now-lastSuggestions >= 1) {
 			lastSuggestions=now; var free:Array<String>=[];
 			for (key in ExtraBarsKeyMap.keys) if (["F7","F8","F9","F10","F11","K","L","P"].indexOf(key.label)>=0 && key.code!=ExtraBarsKeyMap.prefixCode(model.prefix) && bindings.conflict(key.code,0).length==0) {
 				var used=false; for (bar in model.bars) for (slot in bar.slots) if(slot.keyCode==key.code) used=true;
@@ -172,13 +185,13 @@ class ExtraBars {
 		}
 		var hero:ent.Hero = null; var controller:client.PlayerController = null;
 		try { controller = client.PlayerController.inst; if (controller != null) hero = controller.get_hero(); } catch (_:Dynamic) {}
-		var current = model.activationSignature();
-		if (hero != previousHero || current != signature) {
+		var sameConfig = signature.matches(model);
+		if (hero != previousHero || !sameConfig) {
 			var retired=[for(id in views.keys()) if(model.find(id)==null) id]; for(id in retired) views.remove(id);
-			clearTransientState(); if (hero != previousHero) spark.reset(); previousHero = hero; signature = current; countChecks = [];
+			clearTransientState(); if (hero != previousHero) spark.reset(); previousHero = hero; signature.capture(model); countChecks = [];
 			// Changing the activation mode or keys must not wait for the periodic native binding re-read.
 			bindings.refresh(now, true); }
-		assignments.rebuild(model);
+		if (!assignSignature.matches(model)) { assignments.rebuild(model); assignSignature.capture(model); }
 		var captured = capture.takeKey();
 		if (captured > 0) {
 			bindings.refresh(now, true); var bar = model.find(captureOwner);
@@ -187,7 +200,7 @@ class ExtraBars {
 				var selected = bar.slots[captureIndex]; builder.change("Bind cell", function() { selected.keyCode = captured; selected.modifiers = 0; }); captureMessage = "Assigned " + ExtraBarsKeyMap.label(captured,0) + ".";
 			} else captureMessage = "Rejected: " + issue + " Make sure this binding is free before assigning it. Try a different plain key.";
 		}
-		assignments.rebuild(model);
+		if (captured > 0 && !assignSignature.matches(model)) { assignments.rebuild(model); assignSignature.capture(model); }
 		gate = blockReason(app, controller, hero); if (ExtraBarsKeyMap.error.length > 0) gate = "Key resolution failed: " + ExtraBarsKeyMap.error;
 		ConsumableCache.sample(hero, now);
 		solarflare.input.NativeConsumableBindings.sample(hero, now);
@@ -202,7 +215,8 @@ class ExtraBars {
 		for (bar in model.bars) {
 			if (!views.exists(bar.id)) views.set(bar.id, [for (i in 0...10) new ExtraBarsPrototypeSlot()]);
 			var slots = views.get(bar.id);
-			for (i in 0...10) {
+			// Cells beyond slotCount are neither drawn nor routed; they catch up on the frame slotCount grows.
+			for (i in 0...bar.slotCount) {
 				var assignment = bar.slots[i]; var entry = ConsumableCatalog.find(assignment.itemKind);
 				var issue = bindingIssue(bar.id,i,assignment.keyCode,assignment.modifiers);
 				if (entry == null && assignment.itemKind.length > 0) issue = "Unresolved item: " + assignment.itemKind;

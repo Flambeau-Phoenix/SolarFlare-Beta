@@ -156,7 +156,7 @@ class AuraEffects {
 		if (rise && a.isCounter != null && a.isCounter.get()) {
 			if (a.counterValue < 2147483647) {
 				a.counterValue++;
-				solarflare.ui.SettingsStore.markDirty();
+				solarflare.ui.SettingsStore.markDirtyLazy();
 			}
 		}
 

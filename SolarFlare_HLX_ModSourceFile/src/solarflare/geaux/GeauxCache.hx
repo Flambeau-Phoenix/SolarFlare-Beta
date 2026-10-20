@@ -127,6 +127,8 @@ class GeauxCache {
 	public static var barTerSkills:Array<GeauxSlotSnap> = [];
 	static var barTerSeedAt:Float = 0;
 	static inline var BARTER_SEED_S:Float = 1.0;
+	/** Consecutive action-bar walks that found nothing; drives the seed back-off. */
+	static var emptySeedStreak:Int = 0;
 	public static var count:Int = 0;
 	public static var bookIds:Array<String> = [];
 	/** Cached PNG stem parallel to bookIds; resolved during observation, never in a picker draw. */
@@ -824,6 +826,12 @@ class GeauxCache {
 				try
 					sampleActionBar(heroDyn)
 				catch (_:Dynamic) {}
+				// A walk that finds nothing (no weapons / empty loadout key) stays "stale" forever and would repeat at 1 Hz:
+				// back off 1,2,4,8 s while it keeps coming back empty, and return to 1 s on the first real result.
+				if (weapons == null || weapons.length == 0 || actionBarLoadoutKey == "") {
+					if (emptySeedStreak < 3) emptySeedStreak++;
+					barTerSeedAt = now + BARTER_SEED_S * (1 << emptySeedStreak);
+				} else emptySeedStreak = 0;
 			}
 		}
 		barTerSkills.resize(0);
