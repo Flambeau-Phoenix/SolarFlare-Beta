@@ -80,6 +80,8 @@ class ConfigPanel {
 	public var auras:solarflare.aura.AuraConfig;
 	public var lightsaber:LightsaberConfig;
 	public var resourceTracker:ResourceTrackerBuilder;
+	public var dash=new solarflare.resourcetracker.DashTracker();
+	public var resourceArtwork=new solarflare.resourcetracker.ResourceArtwork();
 	/** Ground-target skills cast on the first press (one event-only hook; default off). */
 	public var aimInstant:solarflare.aimcast.AimInstantConfig;
 	public var geauxBuilder:GeauxBuilder;
@@ -1019,6 +1021,7 @@ class ConfigPanel {
 		if (hemorrhage != null) items.push({id: "hemorrhage", label: "Hemorrhage", hidden: hemorrhage.hidden});
 		if (target != null) items.push({id: "target", label: "Target Frame", hidden: target.hidden});
 		if (castBar != null) items.push({id: "castbar", label: "Player Cast Bar", hidden: castBar.hidden});
+		items.push({id:"dash",label:"Dash / Recharge",hidden:dash.hidden});
 		if (statusBoard != null) items.push({id: "statuses", label: "Status Board", hidden: statusBoard.config.hidden});
 
 		var avail = ImGui.getContentRegionAvail().x;

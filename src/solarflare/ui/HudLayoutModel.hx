@@ -113,6 +113,7 @@ class HudLayoutModel {
   }
   function global(path:String):Dynamic {
    var d=root!=null ? root : snapshot;
+   if(root==null && snapshot.auxiliary!=null && Reflect.hasField(snapshot.auxiliary,path.split(".")[0])) d=snapshot.auxiliary;
    for(part in path.split(".")) { if(d==null) return null; d=Reflect.field(d,part); } return d;
   }
   function add(id:String,c:Dynamic,d:Dynamic,w:String="w",h:String="h"):Void {
@@ -125,9 +126,10 @@ class HudLayoutModel {
    }
    out.push(r);
   }
-  for(path in ["geaux.layout","resources.combo","resources.attackCombo","resources.target","resources.castBar","resources.chaincast","resources.conduit","resources.hemorrhage","statusBoard"]) {
+  for(path in ["geaux.layout","resources.combo","resources.attackCombo","resources.target","resources.castBar","resources.chaincast","resources.conduit","resources.hemorrhage","resources.resourceTracker.dash","statusBoard"]) {
    var d=node(path); if(d!=null) add(path+".chrome",d.chrome,d);
   }
+  if(node("resources.resourceTracker.dash")==null) { var tracker=global("resourceTracker"); if(tracker!=null && tracker.dash!=null) add("resources.resourceTracker.dash.chrome",tracker.dash.chrome,tracker.dash); }
   var v=node("resources.vitals");
   if(v==null && root!=null) v=global("vitals");
   if(v!=null) for(p in [{c:"chrome",w:"hpW",h:"hpH"},{c:"rageChrome",w:"rageW",h:"rageH"},{c:"manaChrome",w:"manaW",h:"manaH"},{c:"prayersChrome",w:"prayersW",h:"prayersH"}])

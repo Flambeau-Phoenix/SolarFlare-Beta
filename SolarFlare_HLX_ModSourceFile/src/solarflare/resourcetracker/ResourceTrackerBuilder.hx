@@ -100,6 +100,7 @@ class ResourceTrackerBuilder {
 		var v = host.vitals;
 		if (host.target != null) navRow("target", "Current Target", host.target.hidden);
 		if (host.castBar != null) navRow("castbar", "Player Cast Bar", host.castBar.hidden);
+		navRow("dash", "Dash / Recharge", host.dash.hidden);
 		if (v != null) navRow("health", "Health", v.hpHidden);
 		if (host.attackCombo != null) navRow("attack", "Combo Tracker", host.attackCombo.hidden);
 		section("Class Resources");
@@ -196,6 +197,9 @@ class ResourceTrackerBuilder {
 	function drawSelectedSettings():Void {
 		var v = host.vitals;
 		switch (selected) {
+			case "dash":
+				drawWindow(host.dash.hidden,host.dash.chrome,host.dash.width,host.dash.height,"dash");
+				section("Dash recharge"); host.dash.drawSettings();
 			case "health":
 				drawWindow(v.hpHidden, v.chrome, v.hpWidth, v.hpHeight, "health");
 				drawVitalAppearance("Health", v.hpStyle, v.hpVertical, true, "health");
@@ -244,6 +248,7 @@ class ResourceTrackerBuilder {
 			case "hemorrhage": host.hemorrhage.drawEditorContents();
 			default: ImGui.textDisabled("Select a resource from the left pane.");
 		}
+		host.resourceArtwork.drawEditor(selected);
 	}
 
 	function drawWindow(hidden:BoolRef, chrome:HudChrome, width:FloatRef, height:FloatRef, id:String):Void {
@@ -254,7 +259,7 @@ class ResourceTrackerBuilder {
 				UiLayout.inlinePair(
 					"##rt_" + id + "_size",
 					function(_:Single) {
-						if (ImGui.sliderFloat("Width##rt_" + id + "_w", width, minWidth(id), maxWidth(id), "%.0f px")) {
+						if (ImGui.sliderFloat("Width##rt_" + id + "_w", width, id=="dash" ? host.dash.minWidth() : minWidth(id), maxWidth(id), "%.0f px")) {
 							markSizeDirty(id);
 							SettingsStore.markDirty();
 						}
@@ -268,7 +273,7 @@ class ResourceTrackerBuilder {
 							default: false;
 						};
 						if (autoHeight) ImGui.textDisabled("Content fit");
-						else if (ImGui.sliderFloat("Height##rt_" + id + "_h", height, minHeight(id), maxHeight(id), "%.0f px")) {
+						else if (ImGui.sliderFloat("Height##rt_" + id + "_h", height, id=="dash" ? host.dash.minHeight() : minHeight(id), id=="dash" ? 400 : maxHeight(id), "%.0f px")) {
 							markSizeDirty(id);
 							SettingsStore.markDirty();
 						}
@@ -307,6 +312,7 @@ class ResourceTrackerBuilder {
 	}
 
 	static function minWidth(id:String):Single return switch (id) {
+		case "dash": 48;
 		case "combo": ComboConfig.MIN_W; case "attack": AttackComboConfig.MIN_W; case "target": TargetConfig.MIN_W;
 		case "castbar": solarflare.castbar.CastBarConfig.MIN_W;
 		case "chaincast": ChaincastConfig.MIN_W;
@@ -319,6 +325,7 @@ class ResourceTrackerBuilder {
 		case "conduit": ConduitConfig.MAX_W; default: VitalsConfig.HP_MAX_W;
 	};
 	static function minHeight(id:String):Single return switch (id) {
+		case "dash": 24;
 		case "combo": ComboConfig.MIN_H; case "attack": AttackComboConfig.MIN_H; case "target": TargetConfig.MIN_H;
 		case "castbar": solarflare.castbar.CastBarConfig.MIN_H;
 		case "chaincast": ChaincastConfig.MIN_H;
@@ -335,6 +342,7 @@ class ResourceTrackerBuilder {
 	static function scenarioLabel(i:Int):String return PreviewState.scenarioLabel(scenarioOf(i));
 
 	function selectedLabel():String return switch (selected) {
+		case "dash": "Dash / Recharge";
 		case "health": "Health"; case "rage": "Rage"; case "mana": "Mana/Spark"; case "prayers": "Prayers";
 		case "combo": "Combo Points"; case "attack": "Combo Tracker"; case "target": "Current Target";
 		case "castbar": "Player Cast Bar";
@@ -342,6 +350,6 @@ class ResourceTrackerBuilder {
 		case "conduit": "Conduits"; case "hemorrhage": "Hemorrhage"; default: "Resource";
 	};
 
-	static function isResourceId(id:String):Bool return id == "health" || id == "rage" || id == "mana" || id == "prayers"
+	static function isResourceId(id:String):Bool return id == "dash" || id == "health" || id == "rage" || id == "mana" || id == "prayers"
 		|| id == "combo" || id == "attack" || id == "target" || id == "castbar" || id == "chaincast" || id == "conduit" || id == "hemorrhage";
 }

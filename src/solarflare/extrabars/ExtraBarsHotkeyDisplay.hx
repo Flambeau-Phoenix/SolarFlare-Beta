@@ -2,10 +2,10 @@ package solarflare.extrabars;
 
 /** Display preference only. Never changes activation routes or captured bindings. */
 class ExtraBarsHotkeyDisplay {
- public static var options(default,null):Array<String> = ["native","extrabars","both"];
- public static function clean(value:String):String return options.indexOf(value) >= 0 ? value : "native";
+ public static var options(default,null):Array<String> = ["auto","native","extrabars","both"];
+ public static function clean(value:String):String return options.indexOf(value) >= 0 ? value : "auto";
  public static function label(value:String):String return switch(value) {
-  case "extrabars": "ExtraBars"; case "both": "Both"; default: "Native";
+  case "auto": "Automatic"; case "extrabars": "ExtraBars"; case "both": "Both"; default: "Native";
  };
  public static function apply(slot:ExtraBarsPrototypeSlot, mode:String, nativeText:String, nativeState:String, action:String, extra:String):Void {
   mode=clean(mode);
@@ -20,6 +20,7 @@ class ExtraBarsHotkeyDisplay {
   slot.extraKeyHint=extra;
   slot.secondaryKeyHint="";
   switch(clean(mode)) {
+   case "auto": slot.keyHint=nativeState=="bound" ? nativeHint : extra;
    case "extrabars": slot.keyHint=extra;
    case "both":
     slot.keyHint=nativeHint.length > 0 ? "N:"+nativeHint : "";

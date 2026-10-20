@@ -36,7 +36,7 @@ class ExtraBarsPrototypeBar {
   HUDWidgetWindow.draw("SolarFlare.ExtraBarsPrototypeSlot", "ExtraBars", chrome, contentW, contentH, hudBodyFn, edit, null, false, null, hudResizeFn);
   hudSlot = null; hudOnResize = null;
  }
- public static function drawItem(dl:Dynamic, slot:ExtraBarsPrototypeSlot, x:Single, y:Single, pixels:Int):Void {
+ public static function drawItem(dl:Dynamic, slot:ExtraBarsPrototypeSlot, x:Single, y:Single, pixels:Int,bar:solarflare.extrabars.ExtraBarsConfig.ExtraBarsBarConfig=null):Void {
   var theme = ThemePalette.current();
   var edge = slot.ready ? theme.accent : theme.border;
   ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, y), ImGui.vec2(x + pixels, y + pixels),
@@ -61,15 +61,18 @@ class ExtraBarsPrototypeBar {
      -Math.PI * 0.5 + Math.PI * 2 * slot.progress, 32);
    ImGui.ImDrawList_PathStroke(dl, ImGui.colorConvertFloat4ToU32(theme.accent), 3);
   }
-  drawKeyBadge(dl, slot.keyHint, x + 3, y + 2, ImGui.colorConvertFloat4ToU32(edge), pixels - 6);
-  drawKeyBadge(dl, slot.secondaryKeyHint, x + 3, y + pixels - Math.min(12,ImGui.getFontSize()) - 3,
-    ImGui.colorConvertFloat4ToU32(edge), pixels * 0.60 - 5);
-  var count = slot.known ? Std.string(slot.count) : "?";
-  var textSize = ImGui.calcTextSize(count);
-  var countX:Single = x + pixels - 3 - textSize.x;
-  var countY:Single = y + pixels - textSize.y - 2;
-  ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(countX + 1, countY + 1), 0xFF000000, count);
-  ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(countX, countY), ImGui.colorConvertFloat4ToU32(theme.text), count);
+  var keyFont=solarflare.ui.SlotBadgeMetrics.font(Math.min(12,ImGui.getFontSize()),bar!=null ? bar.bindingScale : 1,pixels);
+  var countFont=solarflare.ui.SlotBadgeMetrics.font(ImGui.getFontSize(),bar!=null ? bar.chargeScale : 1,pixels);
+  var text=ImGui.colorConvertFloat4ToU32(theme.text);
+  if(bar==null || bar.showBindings) {
+   solarflare.ui.SlotBadgeRenderer.draw(dl,slot.keyHint,x+1,y+1,pixels-2,pixels*0.45,keyFont,text);
+   solarflare.ui.SlotBadgeRenderer.draw(dl,slot.secondaryKeyHint,x+1,y+pixels*0.55,pixels*0.60-2,pixels*0.45-1,keyFont,text,false,true);
+  }
+  if(bar==null || bar.showCounts) {
+   var count=slot.known ? Std.string(slot.count) : "?";
+   var split=(bar==null || bar.showBindings) && slot.secondaryKeyHint.length>0;
+   solarflare.ui.SlotBadgeRenderer.draw(dl,count,x+(split ? pixels*0.60 : 1),y+pixels*0.55,split ? pixels*0.40-1 : pixels-2,pixels*0.45-1,countFont,text,true,true);
+  }
  }
 	/** Geaux-style contrast plate, top-left so counts remain clear at bottom-right. */
 	public static function drawKeyBadge(dl:Dynamic, label:String, x:Single, y:Single, border:Int, width:Single, centered:Bool = false):Void {

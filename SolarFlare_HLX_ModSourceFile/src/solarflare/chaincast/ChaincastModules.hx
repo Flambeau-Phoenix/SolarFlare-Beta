@@ -471,6 +471,7 @@ class ChaincastModules {
 
 	/** Called every frame from ChaincastOverlay.draw; draws each switched-on module in its own window. */
 	public function draw():Void {
+  if(!solarflare.ResourceCapabilities.current.chaincast) return;
 		var any = false;
 		for (m in all)
 			if (!m.hidden.get()) {

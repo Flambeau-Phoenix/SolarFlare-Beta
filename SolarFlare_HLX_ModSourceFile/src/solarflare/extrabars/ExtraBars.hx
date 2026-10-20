@@ -39,6 +39,7 @@ class ExtraBars {
 	public var catalog(default, null):Array<{id:String, name:String, category:String, icon:String, count:Int, known:Bool, owned:Bool}> = [];
 	public var spark = new SparkCubeTracker();
 	var characters = new ExtraBarsCharacters();
+ var characterRecovery:Dynamic=null;
 	public var characterLabel(default,null):String = "";
 	public var characterAvailable(default,null):Bool = false;
 	public var host(default,null):ConfigPanel;
@@ -80,33 +81,19 @@ class ExtraBars {
 		if (data == null) model.applyLegacy(legacy); else model.apply(data);
 		solarflare.ObserveDemand.markStatusDemandDirty();
 	}
-	public function loadCharacterSettings(data:Dynamic):Void {
-		var saved = characters.load(data);
-		if (saved != null) restoreCharacter(saved);
-	}
-	function characterSnapshot():solarflare.extrabars.ExtraBarsCharacters.ExtraBarsCharacterSettings
-		return {config:model.dump(),placement:dumpPlacement()};
-	public function dumpCharacterSettings():Dynamic return characters.dump(characterSnapshot());
-	function restoreCharacter(saved:solarflare.extrabars.ExtraBarsCharacters.ExtraBarsCharacterSettings):Void {
-		applyConfig(saved.config);
-		placements.clear(); applyPlacement(saved.placement);
-		views.clear(); countChecks=[]; signature=""; lastSample=-1;
-		builder.selectBar(model.bars.length > 0 ? model.bars[0].id : "");
-		if(host.uiLayouts!=null) host.uiLayouts.requestReconcile();
-	}
-	/** Consumes telemetry's frozen heroID after observe; never scans native identity. */
-	public function observeLayoutCharacter():Void {
-		var id=ExtraBarsCharacters.normalizeId(solarflare.HealthCache.characterId);
-		characterAvailable=id.length>0;
-		if (!characterAvailable) return;
-		characterLabel=solarflare.HealthCache.heroName==null ? "" : StringTools.trim(solarflare.HealthCache.heroName);
-		if (characterLabel.length==0) characterLabel="Current character";
-		if (id==characters.activeId) return;
-		// Retain the outgoing layout before character-owned chromes are replaced.
-		if(host.uiLayouts!=null) host.uiLayouts.retain(host);
-		var saved=characters.observe(id,characterSnapshot());
-		if (saved != null) { restoreCharacter(saved); SettingsStore.markDirty(); }
-	}
+ public function loadCharacterSettings(data:Dynamic):Void { characterRecovery=solarflare.ui.ProfileBank.copy(data); }
+ public function dumpCharacterSettings():Dynamic return solarflare.ui.ProfileBank.copy(characterRecovery);
+ public function applyProfile(config:Dynamic,placement:Dynamic):Void {
+  applyConfig(config); placements.clear(); applyPlacement(placement);
+  views.clear(); countChecks=[]; signature=""; lastSample=-1;
+  builder.selectBar(model.bars.length>0 ? model.bars[0].id : "");
+  if(host.uiLayouts!=null) host.uiLayouts.requestReconcile();
+ }
+ /** Identity labels only. The complete configuration is now owned by FeatureProfiles. */
+ public function observeLayoutCharacter():Void {
+  characterAvailable=solarflare.ui.FeatureProfiles.ready;
+  characterLabel=solarflare.HealthCache.heroName;
+ }
 	public function chromeFor(id:String):HudChrome {
 		if (!placements.exists(id)) {
 			var index = 0; for (bar in model.bars) { if (bar.id == id) break; index++; }

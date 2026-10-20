@@ -38,6 +38,9 @@ class HealthCache {
 	public static var playerUid:String = "";
 	/** Per-character `GameApp.connectionInfo.heroID`, unlike account-level playerUid. */
 	public static var characterId:String = "";
+ public static var identityConfirmed:Bool=false;
+ public static var identityReason:String="Waiting for local hero";
+ public static var characterKind:String="";
 	/** Bumped on rage / spark / mana writes so Geaux affordability can skip unchanged frames. */
 	public static var resourceGen:Int = 0;
 
@@ -63,6 +66,7 @@ class HealthCache {
 	/** Drop pinned hero on zone unload / null Player.hero so HL can collect the prior stage. */
 	public static function clearLocalHero():Void {
 		statusOwnerGen++;
+  identityConfirmed=false; characterKind=""; HealthHooks.resetCharacterResources();
 		localHero = null;
 		heroName = "";
 		serverRegion = "";
@@ -114,12 +118,11 @@ class HealthCache {
 			playerUid = uid;
 	}
 
-	public static function setCharacterId(id:String):Void {
-		if (id != null && id.length > 0 && id != "0") {
-			if (id != characterId) statusOwnerGen++;
-			characterId = id;
-		}
-	}
+ public static function setCharacterId(id:String):Void {
+  if(id==null) id="";
+  if(id!=characterId) { statusOwnerGen++; HealthHooks.resetCharacterResources(); }
+  characterId=id;
+ }
 
 	/**
 	 * Hot path: called up to six times per status / skill hook, for every entity in the

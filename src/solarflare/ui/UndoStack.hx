@@ -36,6 +36,8 @@ class UndoStack<T> {
 	public function canUndo():Bool return history.length > 0;
 
 	public function canRedo():Bool return redoStack.length > 0;
+ /** An editor's history belongs to the restored profile, never the next character. */
+ public function clear():Void { history=[]; redoStack=[]; }
 
 	/** Pops the latest entry, remembers `currentState` for redo and returns the entry, or null when empty. */
 	public function takeUndo(currentState:T):UndoItem<T> {

@@ -104,6 +104,7 @@ class SolarFlarePanel {
 		targetOverlay = new TargetOverlay();
 		playerCastOverlay = new PlayerCastOverlay();
 		launchers = config.launchers;
+		config.dash.openBuilder=function() config.resourceTracker.openFor("dash");
 		auraOverlay = new solarflare.aura.AuraOverlay(config.auras);
 		auraOverlay.openBuilder = function() { config.auraBuilder.open.set(true); };
 		geauxBar.openBuilder = function() { config.geauxBuilder.open.set(true); };
@@ -149,8 +150,12 @@ class SolarFlarePanel {
 
 	/** Layer 1: cursor + caches. Reactionary polling driven by state change & visibility. */
 	public function observe(app:GameApp):Void {
-		if (app == null)
+		if (app == null) {
+   if(HealthCache.localHero!=null) HealthCache.clearLocalHero();
+   HealthCache.identityConfirmed=false; HealthCache.setCharacterId("");
+   solarflare.ui.FeatureProfiles.observeCharacter(config);
 			return;
+  }
 		castTimesShutdownFlushed = false;
 
 		try
@@ -177,23 +182,16 @@ class SolarFlarePanel {
 		}
 		prevCursorFree = CursorCaptureFix.cursorFree;
 
+		HealthHooks.observeLocalPlayer(app);
+  solarflare.ui.FeatureProfiles.observeCharacter(config);
 		try
 			solarflare.ui.UiActionQueue.drain()
 		catch (_:Dynamic) {}
 		solarflare.ui.ImageDrop.observe();
 		solarflare.ui.JpegBridge.install();
 
+  if(!solarflare.ui.FeatureProfiles.ready) { config.extraBarsPrototype.clearTransientState(); return; }
 		solarflare.runtime.TelemetryKernel.observe(app, config, restoreNativeChat);
-		// Character-owned widgets must exist before applying a profile/layout.
-		if (config.extraBarsPrototype != null) {
-			try config.extraBarsPrototype.observeLayoutCharacter() catch (_:Dynamic) {}
-			try config.uiLayouts.reconcile(config) catch (_:Dynamic) {}
-		}
-		// Profile switching consumes the frozen identity only after telemetry has
-		// refreshed it; no live game objects are touched from the profile system.
-		try
-			solarflare.ui.FeatureProfiles.observeCharacter(config)
-		catch (_:Dynamic) {}
 		// A character/profile restore in this observation can restore open refs.
 		if (enteringCamera && config.anyInteractiveOpen()) {
 			try config.closeInteractiveWindows() catch (_:Dynamic) {}
@@ -205,6 +203,7 @@ class SolarFlarePanel {
 		if (config.barter != null) {
 			try config.barter.observe() catch (_:Dynamic) {}
 		}
+		try solarflare.geaux.GeauxBindingLabels.observe(config,now) catch(_:Dynamic) {}
 		if (config.statusBoard != null) {
 			try config.statusBoard.observe() catch (_:Dynamic) {}
 		}
@@ -215,6 +214,7 @@ class SolarFlarePanel {
 			try config.lootBrowser.observe() catch (_:Dynamic) {}
 		}
 		try config.uiLayouts.reconcile(config) catch (_:Dynamic) {}
+		config.resourceArtwork.observe(config);
 		solarflare.ui.NativeHideCache.apply(app, config.nativeHide);
 		try
 			solarflare.ui.HideMoveCache.apply(config.hideMove)
@@ -239,6 +239,8 @@ class SolarFlarePanel {
 	}
 
 	function drawOverlays():Void {
+		// Nothing is drawn (hub included) until a local hero is in the world; observation still runs.
+		if (HealthCache.localHero == null) return;
 		// Overlays are siblings: each must leave the panel stack where it found it.
 		var panelBase = HudChrome.panelDepth();
 		try {
@@ -263,7 +265,7 @@ class SolarFlarePanel {
 		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 
 		// Only draw in-game HUD elements when the hero/world is active:
-		if (!HealthCache.valid && HealthCache.localHero == null) {
+		if (!solarflare.ui.FeatureProfiles.ready || !HealthCache.identityConfirmed || (!HealthCache.valid && HealthCache.localHero == null)) {
 			return;
 		}
 
@@ -291,6 +293,7 @@ class SolarFlarePanel {
 		try {
 			if (!suppressed && config.stacks != null) config.stacks.draw();
 		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
+		try { if(!suppressed) config.dash.draw(); } catch(_:Dynamic) HudChrome.unwindPanels(panelBase);
 		// Each overlay isolated — a Geaux throw must not skip Lightsaber / Auras.
 		try {
 			if (!suppressed) hemorrhageOverlay.draw(config.hemorrhage);
@@ -408,15 +411,15 @@ class SolarFlarePanel {
 		// or restored from save. Never re-anchor per-frame — that would overwrite user drags.
 		if (!v.hpHidden.get())
 			drawResourceWindow(v, 0, "SolarFlare HP", "HP", v.chrome, v.hpWidth, v.hpHeight);
-		if (!v.rageHidden.get())
+		if (!v.rageHidden.get() && ResourceCapabilities.current.rage && HealthCache.rageValid)
 			drawResourceWindow(v, 1, "SolarFlare Rage", "Rage", v.rageChrome, v.rageWidth, v.rageHeight);
-		if (!v.manaHidden.get() && HealthCache.resourceValid()) {
+		if (!v.manaHidden.get() && ResourceCapabilities.current.mana && HealthCache.resourceValid()) {
 			if (HealthCache.sparkValid)
 				drawResourceWindow(v, 2, "SolarFlare Spark", "Spark", v.manaChrome, v.manaWidth, v.manaHeight);
 			else
 				drawResourceWindow(v, 2, "SolarFlare Mana", "Mana", v.manaChrome, v.manaWidth, v.manaHeight);
 		}
-		if (!v.prayersHidden.get() && PrayerCache.active)
+		if (!v.prayersHidden.get() && ResourceCapabilities.current.prayers && PrayerCache.active)
 			drawResourceWindow(v, 3, "SolarFlare Prayers", "Prayers", v.prayersChrome, v.prayersWidth, v.prayersHeight);
 	}
 

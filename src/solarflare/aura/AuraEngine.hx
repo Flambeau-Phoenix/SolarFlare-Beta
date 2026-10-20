@@ -348,9 +348,10 @@ class AuraEngine {
 		var presentation = a.rule.conditions.length > 0 ? a.rule.conditions[pi] : null;
 		if(presentation!=null && StatusTypeDemand.isTypeSignal(presentation.signal)) stacks=0;
 		if(presentation!=null && presentation.signal=="target.status.stacks" && a.ruleResult.stacks>=0) stacks=a.ruleResult.stacks;
+		if(presentation!=null && presentation.signal=="dash.charges" && a.ruleResult.stacks>=0) stacks=a.ruleResult.stacks;
 		var cooldownDriven = presentation != null && AuraTimingReferencePolicy.isCooldown(presentation.signal);
 		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf, restart, cooldownDriven,
-			cooldownDriven ? frame.findSkill(presentation.subject) : null);
+			cooldownDriven ? (StringTools.startsWith(presentation.signal,"dash.") ? AuraMovementObserver.cooldown : frame.findSkill(presentation.subject)) : null);
 		a.stacks = stacks;
 		if (a.iconId != null && a.iconId.length > 0) {
 			a.resolvedIcon = a.iconId;
@@ -358,7 +359,8 @@ class AuraEngine {
 			var pi = a.rule.presentationSource;
 			if (pi < 0 || pi >= a.rule.conditions.length) pi = 0;
 			var c = a.rule.conditions[pi];
-			if (c != null && c.subject != null && c.subject.length > 0) a.resolvedIcon = c.subject;
+			if(c!=null && StringTools.startsWith(c.signal,"dash.")) a.resolvedIcon=frame.dashId;
+			else if (c != null && c.subject != null && c.subject.length > 0) a.resolvedIcon = c.subject;
 		}
 		resolveIconFallback(a);
 	}

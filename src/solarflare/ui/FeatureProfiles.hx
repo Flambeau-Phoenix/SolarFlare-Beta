@@ -1,160 +1,69 @@
 package solarflare.ui;
 
-import haxe.Json;
 import imgui.ImGui;
 import solarflare.HealthCache;
-import solarflare.ui.ToastManager;
 import solarflare.ui.ByteUtil;
 
 /**
- * Universal Profile Architecture for Solar Flare 2.
- * Captures, manages, and switches the entire HUD loadout (Geaux Bar + Resource Trackers + Auras + Theme)
- * in a single, atomic operation with 100% clean string persistence.
+ * Observation-owned coordinator for a complete HUD profile and its geometry-only layout bank.
+ * Native identity discovery stays in HealthHooks; the persistence policy is pure ProfileBank.
  */
 class FeatureProfiles {
 	public static inline var DEFAULT_KEY:String = "Default";
 
-	public static var activeProfile:String = DEFAULT_KEY;
-	public static var statusOwnerGen:Int = 0;
-	public static var profiles:Map<String, Dynamic> = new Map();
-	public static var order:Array<String> = [DEFAULT_KEY];
-	/** One universal profile per observed GameApp.connectionInfo.heroID. */
-	public static var characterProfiles:Map<String, String> = new Map();
-
-	static var nameBuf:hl.Bytes;
-	static var statusMsg:String = "";
-	static var statusTimer:Float = 0;
-	static var observedCharacterUid:String = "";
-
-	public static function init(cfg:ConfigPanel):Void {
-		ensureBuffer();
-		if (!profiles.exists(DEFAULT_KEY)) {
-			profiles.set(DEFAULT_KEY, clone(captureAll(cfg)));
-			if (order.indexOf(DEFAULT_KEY) < 0)
-				order.unshift(DEFAULT_KEY);
-		}
-		if (!profiles.exists(activeProfile))
-			activeProfile = DEFAULT_KEY;
-	}
-
-	public static var activeKey(get, never):String;
-	static function get_activeKey():String return activeProfile;
-
-	public static function activeName(domain:String = ""):String return activeProfile;
-
-	public static function load(cfg:ConfigPanel, data:Dynamic):Void {
-		profiles = new Map();
-		order = [];
-		characterProfiles = new Map();
-		observedCharacterUid = "";
-
-		if (data != null) {
-			// 1. Check for modern universal profiles
-			var universal = Reflect.field(data, "universalProfiles");
-			if (universal != null) {
-				var proms = Reflect.field(universal, "profiles");
-				if (proms != null) {
-					for (k in Reflect.fields(proms)) {
-						var name = normalizeName(k);
-						if (name.length > 0 && !profiles.exists(name)) {
-							order.push(name);
-							profiles.set(name, clone(Reflect.field(proms, k)));
-						}
-					}
-				}
-				var act = normalizeName(Reflect.field(universal, "active"));
-				if (act.length > 0)
-					activeProfile = act;
-
-				// Character bindings are rows instead of object fields so every UID
-				// remains safe to round-trip through JSON regardless of its contents.
-				var bindings = Reflect.field(universal, "characterProfiles");
-				if (bindings != null && Std.isOfType(bindings, Array)) {
-					var rows:Array<Dynamic> = cast bindings;
-					for (row in rows) {
-						var uid = normalizeUid(Reflect.field(row, "uid"));
-						var profile = normalizeName(Reflect.field(row, "profile"));
-						if (uid.length > 0 && profile.length > 0)
-							characterProfiles.set(uid, profile);
-					}
-				}
-			}
-
-			// 2. Backward compatibility & Migration: check legacy domain banks
-			var legacy = Reflect.field(data, "featureProfiles");
-			if (legacy != null) {
-				// Migrate and back up any legacy geaux/auras/resources profiles
-				var geauxBank = Reflect.field(legacy, "geaux");
-				if (geauxBank != null) {
-					var gProfs = Reflect.field(geauxBank, "profiles");
-					if (gProfs != null) {
-						for (k in Reflect.fields(gProfs)) {
-							var name = normalizeName(k);
-							if (name.length > 0 && !profiles.exists(name)) {
-								order.push(name);
-								var migratedSnap = {
-									geaux: {layout: Reflect.field(Reflect.field(gProfs, k), "layout")},
-									auras: cfg != null ? {config: SettingsStore.aurasDump(cfg.auras)} : {},
-									resources: cfg != null ? captureResources(cfg) : {}
-								};
-								profiles.set(name, migratedSnap);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		for(snap in profiles) UiLayouts.migrateSnapshot(snap,data);
-		init(cfg);
-		applyUniversal(cfg, activeProfile);
-	}
-
-	public static function storeCurrent(cfg:ConfigPanel, domain:String = ""):Void {
-		if (cfg == null) return;
-		profiles.set(activeProfile, clone(captureAll(cfg)));
-
-	}
-
-	public static function storeAll(cfg:ConfigPanel):Void {
-		storeCurrent(cfg);
-	}
-
-	/** One-time v24 repair: the initial cast-bar release saved every new block hidden. */
-	public static function migrateCastBarVisible(cfg:ConfigPanel):Void {
-		if (cfg != null && cfg.castBar != null)
-			cfg.castBar.hidden.set(false);
-		for (key in profiles.keys()) {
-			var snap = profiles.get(key);
-			var resources = snap != null ? Reflect.field(snap, "resources") : null;
-			var castBar = resources != null ? Reflect.field(resources, "castBar") : null;
-			if (castBar != null)
-				Reflect.setField(castBar, "hidden", false);
-		}
-	}
-
-	public static function dump():Dynamic {
-		var profsObj:Dynamic = {};
-		for (key in order) {
-			if (profiles.exists(key))
-				Reflect.setField(profsObj, key, solarflare.extrabars.ExtraBarsSettings.withoutBars(profiles.get(key)));
-		}
-		var bindings:Array<Dynamic> = [];
-		var uids:Array<String> = [];
-		for (uid in characterProfiles.keys())
-			uids.push(uid);
-		uids.sort(function(a:String, b:String):Int return Reflect.compare(a, b));
-		for (uid in uids) {
-			var profile = characterProfiles.get(uid);
-			if (profile != null && profiles.exists(profile))
-				bindings.push({uid: uid, profile: profile});
-		}
-		return {
-			active: activeProfile,
-			profiles: profsObj,
-			characterProfiles: bindings
-		};
-	}
+	public static var activeProfile:String="";
+ public static var statusOwnerGen(get,never):Int;
+ static function get_statusOwnerGen():Int return transition.generation;
+ public static var transition(default,null)=new ProfileTransition();
+ public static var bank:ProfileBank;
+ public static var ready(get,never):Bool;
+ static function get_ready():Bool return transition.ready;
+ static var factory:Dynamic;
+ static var owner:String="";
+ static var nameBuf:hl.Bytes;
+ public static var activeKey(get,never):String;
+ static function get_activeKey():String return activeProfile;
+ public static function activeName(domain:String=""):String return label(activeProfile);
+ static function label(id:String):String {
+  var p=bank==null || id==null ? null : bank.profiles.get(id); return p==null ? "Character unavailable" : p.name;
+ }
+ public static function captureFactory(cfg:ConfigPanel):Void {
+  if(factory==null) factory=ProfileBank.copy(captureAll(cfg));
+ }
+ public static function init(cfg:ConfigPanel):Void {
+  ensureBuffer(); captureFactory(cfg); if(bank==null) bank=new ProfileBank(factory);
+ }
+ public static function load(cfg:ConfigPanel,data:Dynamic):Void {
+  init(cfg); bank=new ProfileBank(factory); owner=""; transition=new ProfileTransition(transition.generation+1);
+  var universal=Reflect.field(data,"universalProfiles");
+  // Retain domain banks without mixing them with the outgoing/live configuration.
+  if(universal==null) {
+   var legacy=Reflect.field(data,"featureProfiles");
+   if(legacy!=null && legacy.profiles!=null) universal=legacy;
+   else if(legacy!=null && legacy.geaux!=null && legacy.geaux.profiles!=null) {
+    var snapshots:Dynamic={};
+    for(name in Reflect.fields(legacy.geaux.profiles)) Reflect.setField(snapshots,name,{geaux:ProfileBank.copy(Reflect.field(legacy.geaux.profiles,name))});
+    universal={active:legacy.geaux.active,profiles:snapshots};
+   }
+  }
+  var saved=captureAll(cfg);
+  // Pure migration shares the same policy used by the preservation replay tests.
+  bank.load(universal,saved,Reflect.field(data,"extraBarsCharacters"),data,HudChrome.viewportWidth,HudChrome.viewportHeight);
+  activeProfile=bank.active;
+ }
+ public static function summary():String {
+  if(bank==null) return "no bank";
+  var d=[for(h in bank.defaults.keys()) h+"="+bank.defaults.get(h)];
+  return "profiles="+bank.order.length+" owner="+owner+" active="+activeProfile+" ready="+ready+" gen="+statusOwnerGen+" defaults{"+d.join(",")+"}";
+ }
+ public static function storeCurrent(cfg:ConfigPanel,domain:String=""):Void {
+  if(cfg!=null && ready && owner==currentCharacterUid()) bank.store(owner,captureAll(cfg));
+ }
+ public static function storeAll(cfg:ConfigPanel):Void storeCurrent(cfg);
+ public static function dump():Dynamic return bank.dump();
+ public static function migrateCastBarVisible(cfg:ConfigPanel):Void {
+  if(cfg!=null) cfg.castBar.hidden.set(false);
+ }
 
 	/**
 	 * Profile Strip shared by the hub and every builder: selector, Save, and a More menu holding
@@ -172,6 +81,7 @@ class FeatureProfiles {
 
 	/** Set from the More menu, consumed outside the popup scope so the modal's ID stack matches. */
 	static var openNewFor:String = "";
+ static var modalGeneration:Int=-1;
 
 	static function drawStrip(cfg:ConfigPanel, id:String, compact:Bool):Void {
 		if (cfg == null) return;
@@ -181,7 +91,7 @@ class FeatureProfiles {
 		var saveW:Single = 56;
 		var moreW:Single = 60;
 		var uid = currentCharacterUid();
-		var assigned = uid.length > 0 ? characterProfiles.get(uid) : null;
+		var assigned = uid.length > 0 ? bank.defaults.get(uid) : null;
 		var follows = assigned != null && assigned == activeProfile;
 		var stripWidth = ImGui.getContentRegionAvail().x;
 		var paired = stripWidth >= 640;
@@ -192,19 +102,20 @@ class FeatureProfiles {
 		if (comboW > 210) comboW = 210;
 		if (comboW < 80) comboW = 80;
 		ImGui.setNextItemWidth(comboW);
-		if (ImGui.beginCombo("##fp_select_" + id, activeProfile)) {
-			for (key in order) {
-				var label = key + (key == assigned ? "  (this character)" : "");
+		if (ImGui.beginCombo("##fp_select_" + id, label(activeProfile))) {
+			for (key in bank.order) {
+				var p=bank.profiles.get(key);
+				var label = p.name + (p.ownerHeroId=="" ? "  (retained setup; copy)" : p.ownerHeroId!=uid ? "  (copy from hero "+p.ownerHeroId+")" : key == assigned ? "  (character default)" : "");
 				if (ImGui.selectable(label + "##fp_opt_" + id + "_" + key, key == activeProfile)) {
 					if (key != activeProfile)
-						switchTo(cfg, key);
+						{ var chosen=key; UiActionQueue.custom(function() switchTo(cfg,chosen)); }
 				}
 			}
 			ImGui.endCombo();
 		}
 		ImGui.sameLine(0, gap);
 		if (UiChrome.ghostButton("Save##fp_save_" + id, ImGui.vec2(saveW, rowH)))
-			save(cfg);
+			UiActionQueue.custom(function() save(cfg));
 		ImGui.sameLine(0, gap);
 		if (UiChrome.ghostButton("More##fp_more_" + id, ImGui.vec2(moreW, rowH)))
 			ImGui.openPopup("##fp_more_pop_" + id);
@@ -212,20 +123,13 @@ class FeatureProfiles {
 		if (paired) ImGui.sameLine(0, 18);
 		cfg.uiLayouts.drawToolbar(cfg, id, comboW);
 		if (!compact) {
-			if (statusMsg.length > 0)
-				ImGui.textColored(ImGui.vec4(0.45, 0.88, 0.55, 1.0), statusMsg);
-			else if (uid.length == 0)
-				ImGui.textDisabled("Enter the world to link a profile to your character.");
-			else if (follows)
-				ImGui.textColored(ImGui.vec4(0.45, 0.88, 0.55, 1.0), "Auto-loads for " + currentCharacterLabel());
-			else
-				ImGui.textDisabled("Not auto-loading for " + currentCharacterLabel());
-			if (ImGui.isItemHovered())
-				ImGui.setTooltip("More > Use this profile for your character loads it automatically when you log in.");
+   ImGui.textDisabled(ready ? currentCharacterLabel()+" | Active: "+label(activeProfile)+" | Default: "+label(assigned)+" | Layout: "+cfg.uiLayouts.bank.active : HealthCache.identityReason+". Character HUD and saving suspended.");
+
 		}
 		if (openNewFor == id) {
 			openNewFor = "";
 			ByteUtil.clearBytes(nameBuf, 49);
+   modalGeneration=statusOwnerGen;
 			ImGui.openPopup("New Universal Profile##fp_new_popup_" + id);
 		}
 		drawNewProfileModal(cfg, id);
@@ -240,21 +144,19 @@ class FeatureProfiles {
 				ImGui.closeCurrentPopup();
 			}
 			if (ImGui.menuItem("Copy this profile##fp_copy_" + id))
-				duplicateCurrent(cfg);
-			ImGui.beginDisabled(activeProfile == DEFAULT_KEY);
+				UiActionQueue.custom(function() duplicateCurrent(cfg));
+			ImGui.beginDisabled(!ready || bank.profiles.get(activeProfile)==null || bank.profiles.get(activeProfile).ownerHeroId!=uid);
 			var deleteClicked = ImGui.menuItem("Delete this profile##fp_del_" + id);
 			ImGui.endDisabled();
 			if (deleteClicked)
-				delete(cfg, activeProfile);
+				{ var chosen=activeProfile; UiActionQueue.custom(function() delete(cfg,chosen)); }
 			ImGui.separator();
 			if (uid.length == 0) {
 				ImGui.textDisabled("Character unavailable");
-			} else if (follows) {
-				if (ImGui.menuItem("Stop auto-loading for " + currentCharacterLabel() + "##fp_unassign_" + id))
-					unassignCurrentCharacter(cfg);
 			} else {
-				if (ImGui.menuItem("Use this profile for " + currentCharacterLabel() + "##fp_assign_" + id))
-					assignCurrentCharacter(cfg);
+				if (!follows && ImGui.menuItem("Set as character default##fp_assign_" + id))
+					UiActionQueue.custom(function() assignCurrentCharacter(cfg));
+    if(ImGui.menuItem("Reset character default##fp_unassign_"+id)) UiActionQueue.custom(function() unassignCurrentCharacter(cfg));
 			}
 		} catch (e:Dynamic) {
 			ImGui.endPopup();
@@ -266,6 +168,7 @@ class FeatureProfiles {
 	static function drawNewProfileModal(cfg:ConfigPanel, id:String):Void {
 		if (!ImGui.beginPopupModal("New Universal Profile##fp_new_popup_" + id, null, imgui.Enums.ImGuiWindowFlags.AlwaysAutoResize))
 			return;
+  if(!ready || modalGeneration!=statusOwnerGen) { ImGui.closeCurrentPopup(); ImGui.endPopup(); return; }
 		try {
 			UiChrome.heading("New Profile", 1.15);
 			ImGui.spacing();
@@ -275,8 +178,7 @@ class FeatureProfiles {
 			UiLayout.inlinePair("##fp_modal_btns_" + id, function(w:Single) {
 				if (UiChrome.accentButton("Create##fp_create_" + id, ImGui.vec2(w, 28))) {
 					var requested = ByteUtil.readBytes(nameBuf, 49);
-					if (create(cfg, requested))
-						ImGui.closeCurrentPopup();
+					if(normalizeName(requested).length>0 && ready) { UiActionQueue.custom(function() create(cfg,requested)); ImGui.closeCurrentPopup(); }
 				}
 			}, function(w:Single) {
 				if (UiChrome.ghostButton("Cancel##fp_cancel_" + id, ImGui.vec2(w, 28)))
@@ -289,130 +191,41 @@ class FeatureProfiles {
 		ImGui.endPopup();
 	}
 
-	public static function save(cfg:ConfigPanel):Void {
-		storeCurrent(cfg);
-		setStatus('Profile "$activeProfile" saved.');
-		SettingsStore.markDirty();
-		SettingsStore.saveNow();
-		ToastManager.success('Universal Profile "$activeProfile" saved!');
-	}
-
-	public static function switchTo(cfg:ConfigPanel, key:String, automatic:Bool = false):Void {
-		if (cfg == null || key == null || !profiles.exists(key)) return;
-		storeCurrent(cfg);
-		activeProfile = key;
-		applyUniversal(cfg, key);
-		setStatus(automatic ? 'Auto-loaded "$key".' : 'Loaded profile "$key".');
-		SettingsStore.markDirty();
-		if (automatic)
-			SettingsStore.save(cfg);
-		else
-			SettingsStore.saveNow();
-		ToastManager.info(automatic
-			? 'Loaded character profile "$key"'
-			: 'Switched to profile "$key"');
-	}
-
-	/** Called from the observe layer after HealthCache has frozen the current identity. */
-	public static function observeCharacter(cfg:ConfigPanel):Void {
-		var uid = currentCharacterUid();
-		if (uid.length == 0) {
-			observedCharacterUid = "";
-			return;
-		}
-		var migrated = migrateLegacyCharacterAssignment(cfg, uid);
-		if (uid == observedCharacterUid && !migrated)
-			return;
-		observedCharacterUid = uid;
-		var assigned = characterProfiles.get(uid);
-		if (assigned != null && profiles.exists(assigned) && assigned != activeProfile)
-			switchTo(cfg, assigned, true);
-	}
-
-	public static function assignCurrentCharacter(cfg:ConfigPanel):Void {
-		var uid = currentCharacterUid();
-		if (uid.length == 0) {
-			setStatus("Character unavailable.");
-			ToastManager.warn("Current character is not available yet.");
-			return;
-		}
-		characterProfiles.set(uid, activeProfile);
-		observedCharacterUid = uid;
-		setStatus('Assigned ${currentCharacterLabel()} to "$activeProfile".');
-		SettingsStore.markDirty();
-		SettingsStore.save(cfg);
-		ToastManager.success('${currentCharacterLabel()} now defaults to "$activeProfile".');
-	}
-
-	public static function unassignCurrentCharacter(cfg:ConfigPanel):Void {
-		var uid = currentCharacterUid();
-		if (uid.length == 0)
-			return;
-		characterProfiles.remove(uid);
-		observedCharacterUid = uid;
-		setStatus('Unassigned ${currentCharacterLabel()}.');
-		SettingsStore.markDirty();
-		SettingsStore.save(cfg);
-		ToastManager.info('${currentCharacterLabel()} no longer has a default profile.');
-	}
-
-	public static function create(cfg:ConfigPanel, requested:String):Bool {
-		var name = normalizeName(requested);
-		if (name.length == 0) {
-			setStatus("Name required.");
-			ToastManager.warn("Profile name required.");
-			return false;
-		}
-		if (profiles.exists(name)) {
-			setStatus("Profile already exists.");
-			ToastManager.warn('Profile "$name" already exists.');
-			return false;
-		}
-		storeCurrent(cfg);
-		profiles.set(name, clone(captureAll(cfg)));
-		order.push(name);
-		activeProfile = name;
-		setStatus('Created "$name".');
-		SettingsStore.markDirty();
-		SettingsStore.saveNow();
-		ToastManager.success('Created Universal Profile "$name"!');
-		return true;
-	}
-
-	public static function duplicateCurrent(cfg:ConfigPanel):Void {
-		if (cfg == null) return;
-		var base = activeProfile + " (Copy)";
-		var name = base;
-		var counter = 2;
-		while (profiles.exists(name)) {
-			name = base + " " + counter;
-			counter++;
-		}
-		create(cfg, name);
-	}
-
-	public static function delete(cfg:ConfigPanel, key:String):Void {
-		if (key == DEFAULT_KEY) {
-			setStatus("Default profile cannot be deleted.");
-			ToastManager.warn("Default profile cannot be deleted.");
-			return;
-		}
-		profiles.remove(key);
-		order.remove(key);
-		var staleBindings:Array<String> = [];
-		for (uid in characterProfiles.keys()) {
-			if (characterProfiles.get(uid) == key)
-				staleBindings.push(uid);
-		}
-		for (uid in staleBindings)
-			characterProfiles.remove(uid);
-		activeProfile = DEFAULT_KEY;
-		applyUniversal(cfg, DEFAULT_KEY);
-		setStatus('Deleted "$key".');
-		SettingsStore.markDirty();
-		SettingsStore.saveNow();
-		ToastManager.info('Deleted profile "$key".');
-	}
+ public static function save(cfg:ConfigPanel):Void {
+  if(!ready) return; storeCurrent(cfg); SettingsStore.markDirty(); SettingsStore.saveNow();
+ }
+ public static function switchTo(cfg:ConfigPanel,key:String,automatic:Bool=false):Void {
+  if(!ready || cfg==null) return;
+  storeCurrent(cfg); ProfileTrace.note("profile","SELECT requested="+describe(key)+" hero="+owner); activeProfile=bank.select(owner,key); applyUniversal(cfg,activeProfile); SettingsStore.markDirty();
+ }
+ /** Identity is sampled before any configuration queue or module observer can run. */
+ public static function observeCharacter(cfg:ConfigPanel):Void {
+  var id=currentCharacterUid();
+  var confirmed=id!="" && HealthCache.localHero!=null && HealthCache.identityConfirmed;
+  if(!transition.begin(id,confirmed,HealthCache.statusOwnerGen,function(outgoing) bank.store(outgoing,captureAll(cfg)),function() { cfg.clearTransientState(); ImageDrop.disarm(); })) return;
+  owner=id; activeProfile=bank.login(id);
+  ProfileTrace.note("profile","LOGIN hero="+id+" -> "+describe(activeProfile)+" (default="+describe(bank.defaults.get(id))+")");
+  applyUniversal(cfg,activeProfile); SettingsStore.markDirty();
+ }
+ public static function assignCurrentCharacter(cfg:ConfigPanel):Void {
+  if(!ready) return; bank.setDefault(owner); ProfileTrace.note("profile","SET DEFAULT hero="+owner+" -> "+describe(bank.active)); SettingsStore.markDirty();
+ }
+ public static function unassignCurrentCharacter(cfg:ConfigPanel):Void {
+  if(!ready) return; var reset=bank.resetDefault(owner); ProfileTrace.note("profile","RESET DEFAULT hero="+owner+" -> "+describe(reset)); SettingsStore.markDirty();
+ }
+ public static function create(cfg:ConfigPanel,requested:String):Bool {
+  if(!ready || normalizeName(requested)=="") return false;
+  storeCurrent(cfg); activeProfile=bank.create(owner,normalizeName(requested)); bank.active=activeProfile;
+  applyUniversal(cfg,activeProfile); SettingsStore.markDirty(); return true;
+ }
+ public static function duplicateCurrent(cfg:ConfigPanel):Void {
+  if(!ready) return; storeCurrent(cfg);
+  activeProfile=bank.create(owner,label(activeProfile)+" (Copy)",bank.profiles.get(activeProfile).snapshot); bank.active=activeProfile;
+  applyUniversal(cfg,activeProfile); SettingsStore.markDirty();
+ }
+ public static function delete(cfg:ConfigPanel,key:String):Void {
+  if(!ready) return; activeProfile=bank.remove(owner,key); applyUniversal(cfg,activeProfile); SettingsStore.markDirty();
+ }
 
 	static function captureAll(cfg:ConfigPanel):Dynamic {
 		if (cfg == null) return {};
@@ -424,13 +237,16 @@ class FeatureProfiles {
 			auras: {config: SettingsStore.aurasDump(cfg.auras)},
 			resources: captureResources(cfg),
 			uiLayouts: cfg.uiLayouts.dumpCurrent(cfg),
-			theme: SettingsStore.currentTheme()
+			theme: SettingsStore.currentTheme(),
+   extraBars:cfg.extraBarsPrototype.model.dump(),extraBarsPlacement:cfg.extraBarsPrototype.dumpPlacement(),
+   auxiliary:SettingsStore.captureProfileAuxiliary(cfg)
 		};
 	}
 
 	static function captureResources(cfg:ConfigPanel):Dynamic {
 		return {
 			vitals: SettingsStore.vitalsDump(cfg.vitals),
+			resourceTracker:SettingsStore.resourceTrackerDump(cfg),
 			combo: SettingsStore.comboDump(cfg.combo),
 			attackCombo: SettingsStore.attackComboDump(cfg.attackCombo),
 			target: SettingsStore.targetDump(cfg.target),
@@ -441,12 +257,28 @@ class FeatureProfiles {
 		};
 	}
 
+	static function describe(id:String):String {
+  var p=bank==null || id==null ? null : bank.profiles.get(id);
+  return p==null ? "none" : id+"\""+p.name+"\" owner="+p.ownerHeroId+(p.sourceId!="" ? " copyOf="+p.sourceId : "");
+ }
+
 	static function applyUniversal(cfg:ConfigPanel, key:String):Void {
+		ProfileTrace.note("profile","APPLY "+describe(key)+" snapshotKeys="+(bank.profiles.get(key)==null ? "MISSING" : Reflect.fields(bank.profiles.get(key).snapshot).join(",")));
 		solarflare.hemorrhage.HemorrhageService.interrupt("Configuration profile changed");
-		statusOwnerGen++;
+		transition.restoring();
 		if (cfg == null) return;
-		var snap = profiles.get(key);
+  cfg.clearTransientState(); cfg.extraBarsPrototype.clearTransientState();
+  openNewFor=""; modalGeneration=-1; ImageDrop.disarm();
+  if(cfg.geauxBuilder!=null) cfg.geauxBuilder.resetProfileState();
+  if(cfg.auraBuilder!=null) cfg.auraBuilder.resetProfileState();
+		var snap = bank.normalized(key);
 		if (snap == null) return;
+  // Reset schema defaults first, including fields omitted inside collection entries.
+  applySnapshot(cfg,ProfileBank.copy(factory));
+  applySnapshot(cfg,snap);
+  transition.complete();
+ }
+ static function applySnapshot(cfg:ConfigPanel,snap:Dynamic):Void {
 		if (cfg.barter != null) { cfg.barter.clearTransientState(); cfg.barter.builder.history.clear(); }
 
 		// 1. Geaux Layout
@@ -473,6 +305,9 @@ class FeatureProfiles {
 		// 3. Resources
 		var resSnap = Reflect.field(snap, "resources");
 		if (resSnap != null) {
+			var tracker=Reflect.field(resSnap,"resourceTracker");
+			cfg.dash.apply(tracker==null ? null : Reflect.field(tracker,"dash"));
+			cfg.resourceArtwork.apply(tracker==null ? null : Reflect.field(tracker,"artwork"));
 			SettingsStore.applyVitals(cfg.vitals, Reflect.field(resSnap, "vitals"));
 			SettingsStore.applyCombo(cfg.combo, Reflect.field(resSnap, "combo"));
 			SettingsStore.applyAttackCombo(cfg.attackCombo, Reflect.field(resSnap, "attackCombo"));
@@ -483,17 +318,17 @@ class FeatureProfiles {
 			SettingsStore.applyHemorrhage(cfg.hemorrhage, Reflect.field(resSnap, "hemorrhage"));
 		}
 
+  cfg.extraBarsPrototype.applyProfile(snap.extraBars,snap.extraBarsPlacement);
+  SettingsStore.applyProfileAuxiliary(cfg,snap.auxiliary);
+  HUDWidgetWindow.invalidateGeometry();
 		cfg.uiLayouts.load(cfg,Reflect.field(snap,"uiLayouts"),HudLayoutModel.legacy(snap,HudChrome.viewportWidth,HudChrome.viewportHeight));
 
+		solarflare.ObserveDemand.markStatusDemandDirty();
 		// 4. Theme
 		var themeSnap = Reflect.field(snap, "theme");
 		if (themeSnap != null && Std.isOfType(themeSnap, String)) {
 			SettingsStore.setActiveTheme(cast themeSnap);
 		}
-	}
-
-	static function setStatus(msg:String):Void {
-		statusMsg = msg;
 	}
 
 	static function ensureBuffer():Void {
@@ -512,43 +347,11 @@ class FeatureProfiles {
 		return s;
 	}
 
-	static function currentCharacterUid():String {
-		var id = normalizeUid(HealthCache.characterId);
-		return id.length > 0 ? "hero:" + id : "";
-	}
-
-	/** Move the prior account-wide binding onto the first actual character observed. */
-	static function migrateLegacyCharacterAssignment(cfg:ConfigPanel, uid:String):Bool {
-		if (uid.length == 0 || characterProfiles.exists(uid))
-			return false;
-		var legacyUid = normalizeUid(HealthCache.playerUid);
-		if (legacyUid.length == 0 || !characterProfiles.exists(legacyUid))
-			return false;
-		var assigned = characterProfiles.get(legacyUid);
-		if (assigned == null || !profiles.exists(assigned))
-			return false;
-		characterProfiles.set(uid, assigned);
-		characterProfiles.remove(legacyUid);
-		SettingsStore.markDirty();
-		SettingsStore.save(cfg);
-		return true;
-	}
+ static function currentCharacterUid():String return ProfileBank.heroId(HealthCache.characterId);
 
 	static function currentCharacterLabel():String {
 		var name = HealthCache.heroName != null ? StringTools.trim(HealthCache.heroName) : "";
-		return name.length > 0 ? name : "Current character";
+		return (name.length > 0 ? name : "Current character")+" ["+currentCharacterUid()+"]";
 	}
 
-	static function normalizeUid(v:Dynamic):String {
-		if (v == null) return "";
-		var s = StringTools.trim(Std.string(v));
-		if (s == "null" || s == "undefined") return "";
-		if (s.length > 256) s = s.substr(0, 256);
-		return s;
-	}
-
-	static function clone(v:Dynamic):Dynamic {
-		if (v == null) return {};
-		try return Json.parse(Json.stringify(v)) catch (_:Dynamic) return {};
-	}
 }

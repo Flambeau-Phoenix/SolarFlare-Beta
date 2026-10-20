@@ -2,6 +2,13 @@ package solarflare.ui;
 
 /** Pure projection: never writes the preferred anchor or configured dimensions. */
 class HudCoordinates {
+ /** Project a host anchor using the measured visible content box. Padding/footer may leave the viewport. */
+ public static function projectContent(value:Float,reference:Float,extent:Float,visible:Float,inset:Float,leading:Float):Float {
+  var scaled=value*(reference>0 ? extent/reference : 1);
+  var lo=inset-Math.max(0,leading);
+  var hi=Math.max(lo,extent-Math.max(1,visible)+lo);
+  return Math.max(lo,Math.min(hi,scaled));
+ }
  /**
   * `overhang` is invisible chrome (resize footer, padding) allowed to hang past the far edge, so art placed flush
   * with the screen edge stays put when the window is locked.

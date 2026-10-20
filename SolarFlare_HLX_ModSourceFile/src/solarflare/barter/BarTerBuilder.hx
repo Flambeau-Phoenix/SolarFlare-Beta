@@ -329,6 +329,9 @@ class BarTerBuilder {
    }
    UiLayout.propertyRow("Empty cells",function() { boolRef.set(b.showEmptyCells); if (ImGui.checkbox("Show on HUD##bt_empty",boolRef)) { b.showEmptyCells=boolRef.get(); owner.changed(); } });
    UiLayout.propertyRow("Key chips",function() { if (ImGui.checkbox("Show##bt_chips",owner.config.showHotkeys)) owner.changed(); });
+   UiLayout.propertyRow("Binding text size",function() b.bindingScale=glowNumber("##bt_binding_scale",b.bindingScale,3,0.5));
+   UiLayout.propertyRow("Charges / counts",function() { boolRef.set(b.showCounts); if(ImGui.checkbox("Show##bt_counts",boolRef)) { recordChange(); b.showCounts=boolRef.get(); owner.changed(); } });
+   UiLayout.propertyRow("Charge text size",function() b.chargeScale=glowNumber("##bt_charge_scale",b.chargeScale,3,0.5));
    UiLayout.propertyRow("Weapon layouts",function() {
     if (ImGui.checkbox("Follow native skills##bt_follow",owner.config.autoSeedOnWeaponSwap)) owner.changed();
     if (ImGui.isItemHovered()) ImGui.setTooltip("Restore remembered weapon positions and fill missing native actions on weapon changes. Native-action cells show their current skill; assign from the catalog to pin a specific skill.");

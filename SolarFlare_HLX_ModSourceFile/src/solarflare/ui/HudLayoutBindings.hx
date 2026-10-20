@@ -10,6 +10,7 @@ class HudLayoutBindings {
   function add(id:String,ch:HudChrome,w:FloatRef=null,h:FloatRef=null,scale:FloatRef=null):HudLayoutBinding {
    var b=new HudLayoutBinding(id,ch,w,h,scale); if(ch!=null) out.push(b); return b;
   }
+  add("resources.resourceTracker.dash.chrome",c.dash.chrome,c.dash.width,c.dash.height);
   var v=c.vitals;
   if(v!=null) {
    var hp=add("resources.vitals.chrome",v.chrome,v.hpWidth,v.hpHeight); hp.changed=function() v.hpSizeDirty=true;

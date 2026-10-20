@@ -514,6 +514,9 @@ class GeauxStyle {
 	public var showCdText = new BoolRef(true);
 	public var showPinwheel = new BoolRef(true);
 	public var showHotkeys = new BoolRef(true);
+	public var bindingMode:String="auto";
+	public var bindingScale=new FloatRef(1);
+	public var chargeScale=new FloatRef(1);
 	public var showCharges = new BoolRef(true);
 	/** SkillScript stacks badge (when stacks > 1). Independent of charge pools. */
 	public var showStacks = new BoolRef(true);
@@ -655,6 +658,7 @@ class GeauxStyle {
 			showCdText: showCdText.get(),
 			showPinwheel: showPinwheel.get(),
 			showHotkeys: showHotkeys.get(),
+			bindingMode:bindingMode,bindingScale:bindingScale.get(),chargeScale:chargeScale.get(),
 			showCharges: showCharges.get(),
 			showStacks: showStacks.get(),
 			dimOnCd: dimOnCd.get(),
@@ -696,6 +700,9 @@ class GeauxStyle {
 		setBool(showCdText, data.showCdText);
 		setBool(showPinwheel, data.showPinwheel);
 		setBool(showHotkeys, data.showHotkeys);
+		bindingMode=GeauxBindingPolicy.clean(data.bindingMode);
+		bindingScale.set(solarflare.ui.SlotBadgeMetrics.scale(data.bindingScale));
+		chargeScale.set(solarflare.ui.SlotBadgeMetrics.scale(data.chargeScale));
 		setBool(showCharges, data.showCharges);
 		setBool(showStacks, data.showStacks);
 		setBool(dimOnCd, data.dimOnCd);

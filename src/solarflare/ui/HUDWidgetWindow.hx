@@ -16,6 +16,7 @@ import imgui.Structs.ImVec2;
  * `onResize`.
  */
 class HUDWidgetWindow {
+	public static function invalidateGeometry():Void { lastW.clear(); lastH.clear(); ovW.clear(); ovH.clear(); reassert.clear(); lastVisualW.clear(); lastVisualH.clear(); }
 	public static inline var PADDING:Single = 10;
 	public static inline var ROW:Single = 30;
 	static inline var RESIZE_FOOTER:Single = HudChrome.RESIZE_GRIP + PADDING + 4;
@@ -205,13 +206,27 @@ class HUDWidgetWindow {
 					var bodyH:Single = Math.min(Math.max(0, avail.y - extraH), h);
 					if (bodyW > 1 && bodyH > 1 && drawBody != null) {
 						var clipMin = ImGui.getCursorScreenPos();
+						// Clamp the actual artwork allocation, not the parent/child padding or resize footer.
+						// Measurements are identical for locked/unlocked and opaque/transparent windows.
+						chrome.contentLeadX=clipMin.x-winPos.x;
+						chrome.contentLeadY=clipMin.y-winPos.y;
+						chrome.contentWidth=bodyW+extraW;
+						chrome.contentHeight=bodyH+extraH;
 						ImGui.pushClipRect(clipMin,
 							ImGui.vec2(clipMin.x + bodyW + extraW, clipMin.y + bodyH + extraH), true);
 						var drawFailed = false;
 						var drawFailure:Dynamic = null;
 						try {
 							if (visualBounds != null) ImGui.setCursorScreenPos(ImGui.vec2(clipMin.x + left, clipMin.y + top));
-							drawBody(ImGui.vec2(bodyW, bodyH));
+							var skin=solarflare.resourcetracker.ResourceArtwork.forWindow(id);
+							var face=ImGui.getCursorScreenPos();
+							if(skin!=null) skin.paint(face.x,face.y,bodyW,bodyH,skin.progress,false);
+							ImGui.setCursorScreenPos(face);
+							if(skin==null || skin.keepContent.get() || !skin.ready()) drawBody(ImGui.vec2(bodyW, bodyH));
+							else ImGui.dummy(ImGui.vec2(bodyW,bodyH));
+							if(skin!=null) { var end=ImGui.getCursorScreenPos(); skin.paint(face.x,face.y,bodyW,bodyH,skin.progress,true); ImGui.setCursorScreenPos(end); }
+								// Bodies that only use the draw list leave the cursor moved without an item; submit one so the parent can grow.
+								if(visualBounds==null) { ImGui.setCursorScreenPos(face); ImGui.dummy(ImGui.vec2(bodyW,bodyH)); }
 						} catch (e:Dynamic) {
 							drawFailed = true;
 							drawFailure = e;

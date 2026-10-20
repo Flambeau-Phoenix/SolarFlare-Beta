@@ -89,6 +89,11 @@ class HudChrome {
 	/** Invisible chrome (footer, padding) that may hang past the far screen edge; set by the window wrapper. */
 	public var overhangX:Single = 0;
 	public var overhangY:Single = 0;
+	/** Runtime widget wrapper measures the visible allocation; tool windows retain the legacy clamp. */
+	public var contentLeadX:Single=0;
+	public var contentLeadY:Single=0;
+	public var contentWidth:Single=0;
+	public var contentHeight:Single=0;
 	/** Draw-only expansion around an Aura face; persisted x/y keep their legacy anchor. */
 	public var visualOffsetX:Single = 0;
 	public var visualOffsetY:Single = 0;
@@ -317,9 +322,16 @@ class HudChrome {
    positionEpoch=viewportEpoch; posDirty=true;
   }
   if(referenceWidth<320 || referenceHeight<240) { referenceWidth=viewportWidth; referenceHeight=viewportHeight; }
-  screenX=originX+HudCoordinates.project(x.get(),referenceWidth,viewportWidth,winW,visualOffsetX,overhangX);
-  screenY=originY+HudCoordinates.project(y.get(),referenceHeight,viewportHeight,winH,visualOffsetY,overhangY);
+  screenX=originX+projectX(x.get(),referenceWidth);
+  screenY=originY+projectY(y.get(),referenceHeight);
  }
+
+ function projectX(value:Float,reference:Float):Float return contentWidth>0 && !collapsed.get()
+  ? HudCoordinates.projectContent(value,reference,viewportWidth,contentWidth,visualOffsetX,contentLeadX)
+  : HudCoordinates.project(value,reference,viewportWidth,winW,visualOffsetX,overhangX);
+ function projectY(value:Float,reference:Float):Float return contentHeight>0 && !collapsed.get()
+  ? HudCoordinates.projectContent(value,reference,viewportHeight,contentHeight,visualOffsetY,contentLeadY)
+  : HudCoordinates.project(value,reference,viewportHeight,winH,visualOffsetY,overhangY);
 
  /**
   * Window position kept inside the exact bounds the locked projection uses, so a spot reached by dragging can
@@ -329,8 +341,8 @@ class HudChrome {
   if(!bindPos) return ImGui.vec2(nx,ny);
   var ax=HUDVisualBounds.anchorCoordinate(nx,visualOffsetX)-originX;
   var ay=HUDVisualBounds.anchorCoordinate(ny,visualOffsetY)-originY;
-  var cx=HudCoordinates.project(ax,0,viewportWidth,winW,visualOffsetX,overhangX);
-  var cy=HudCoordinates.project(ay,0,viewportHeight,winH,visualOffsetY,overhangY);
+  var cx=projectX(ax,0);
+  var cy=projectY(ay,0);
   return ImGui.vec2(HUDVisualBounds.hostCoordinate(cx+originX,visualOffsetX),HUDVisualBounds.hostCoordinate(cy+originY,visualOffsetY));
  }
 

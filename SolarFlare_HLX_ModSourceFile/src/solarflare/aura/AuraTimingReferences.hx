@@ -20,6 +20,12 @@ typedef AuraTimingReference = {
 class AuraTimingReferences {
 	public static function forSubject(id:String, signal:String, chosenRank:Null<Int> = null, hasChosenRank:Bool = false):AuraTimingReference {
 		var out:AuraTimingReference = {cdbSeconds:0, observedSeconds:0, nativeValid:false, rank:null, castSeconds:0, castLabel:"Unknown"};
+		if(StringTools.startsWith(signal,"dash.")) {
+			var dash=solarflare.aura.AuraMovementObserver.state;
+			out.nativeValid=dash.known && Math.isFinite(dash.total) && dash.total>0;
+			out.observedSeconds=out.nativeValid ? dash.total : 0;
+			return out;
+		}
 		if (id == null || id.length == 0) return out;
 		if (StatusTypeDemand.isTypeSignal(signal)) return out;
 		// Enemy status timers come exclusively from the observed application, never local skill ranks/CD.

@@ -127,6 +127,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	var ioStatus:String = "";
 	var ioStatusError:Bool = false;
 	var ioModalRequest:Bool = false;
+ var ioOwnerGeneration:Int=-1;
 
 	// Wizard state
 	var wizardMode:String = "";
@@ -142,6 +143,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	var wizardCatalogSearchBuf = new hl.Bytes(96);
 	var wizardFightBuf = new hl.Bytes(32);
 	var wizardOpenRequest:Bool = false;
+ var wizardOwnerGeneration:Int=-1;
 
 	var preciseSnapshotFn:Void->Void;
 	function preciseSnapshot():Void snapshot("Adjust Aura value");
@@ -228,6 +230,10 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		selectedIds = new Map();
 		rangeAnchorId = "";
 	}
+ public function resetProfileState():Void {
+  clearTransientState(); undoManager.clear(); pendingImportGroups=null; canvasFieldUndoState=null;
+  ioModalRequest=false; wizardOpenRequest=false; wizardMode="";
+ }
 
 	public function observeShares():Void { shareService.observe(); }
 	function queueShareMembers(ids:Array<String>,label:String,wholeLibrary:Bool=false):Void {
@@ -1681,8 +1687,9 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	}
 
 	function drawWizardModal():Void {
-		if (wizardOpenRequest) { ImGui.openPopup("New Aura###ab_wizard_modal"); wizardOpenRequest = false; }
+		if (wizardOpenRequest) { wizardOwnerGeneration=FeatureProfiles.statusOwnerGen; ImGui.openPopup("New Aura###ab_wizard_modal"); wizardOpenRequest = false; }
 		if (!ImGui.beginPopupModal("New Aura###ab_wizard_modal", null, imgui.Enums.ImGuiWindowFlags.AlwaysAutoResize)) return;
+  if(wizardOwnerGeneration!=FeatureProfiles.statusOwnerGen) { ImGui.closeCurrentPopup(); ImGui.endPopup(); return; }
 		try {
 			switch (wizardMode) {
 				case "tutorial": drawTutorial();
@@ -3001,10 +3008,11 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	inline function formLabel(label:String):Void { ImGui.alignTextToFramePadding(); ImGui.text(label); }
 
 	function drawIoModal():Void {
-		if (ioModalRequest) { ImGui.openPopup("Aura Import / Export##ab_io_modal"); ioModalRequest = false; }
+		if (ioModalRequest) { ioOwnerGeneration=FeatureProfiles.statusOwnerGen; ImGui.openPopup("Aura Import / Export##ab_io_modal"); ioModalRequest = false; }
 		ImGui.setNextWindowSize(ImGui.vec2(620,640),ImGuiCond.FirstUseEver);
 		ImGui.setNextWindowSizeConstraints(ImGui.vec2(520,360),ImGui.vec2(Math.max(520,solarflare.ui.HudChrome.viewportWidth-32),Math.max(360,solarflare.ui.HudChrome.viewportHeight-32)));
 		if (ImGui.beginPopupModal("Aura Import / Export##ab_io_modal", null, 0)) {
+   if(ioOwnerGeneration!=FeatureProfiles.statusOwnerGen) { ImGui.closeCurrentPopup(); ImGui.endPopup(); return; }
 		 try {
 			var a = selectedAura();
 			sharePanel.draw(a!=null,countSelected()>0,a!=null && cfg.groupOf(a)!=null,a!=null && AuraConfig.tagOf(a).length>0);

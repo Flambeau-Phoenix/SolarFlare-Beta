@@ -292,7 +292,7 @@ class ComboOverlay {
 	public function draw(cfg:ComboConfig):Void {
 		if (cfg == null || cfg.hidden.get())
 			return;
-		if (!ComboPointsCache.active)
+		if (!solarflare.ResourceCapabilities.current.combo || !ComboPointsCache.active)
 			return;
 		hudCfg = cfg;
 		theme.wrap(hudWindowFn);

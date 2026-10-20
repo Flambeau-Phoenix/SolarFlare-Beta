@@ -45,7 +45,7 @@ class ExtraBarsOverlay {
 		 var y:Single = origin.y+Std.int(i/bar.columns)*(bar.slotSize+4);
 		 ImGui.setCursorScreenPos(ImGui.vec2(x,y));
 		 var pressed = ImGui.invisibleButton("##use_"+bar.id+"_"+i,ImGui.vec2(bar.slotSize,bar.slotSize));
-		 ExtraBarsPrototypeBar.drawItem(dl,slots[i],x,y,bar.slotSize);
+		 ExtraBarsPrototypeBar.drawItem(dl,slots[i],x,y,bar.slotSize,bar);
 		 if (ImGui.isItemHovered()) ImGui.setTooltip(slots[i].name+"\n"+slots[i].binding+"\n"+(slots[i].reason.length>0?slots[i].reason:"Click to request use."));
 		 if (pressed && click != null) click(i);
 		}

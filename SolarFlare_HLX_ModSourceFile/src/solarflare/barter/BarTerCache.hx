@@ -181,6 +181,9 @@ class BarTerCache {
 		snap.label = entry != null ? entry.name : kind;
 		snap.iconId = entry != null ? ConsumableCatalog.iconKey(entry.id) : ("consumable_" + kind);
 		var inv = ConsumableCache.find(kind);
+		var binding=solarflare.input.NativeConsumableBindings.find(kind);
+		snap.nativeActionId=binding.actionId; snap.bindingKnown=binding.known;
+		snap.keyLabel=binding.state=="bound" || binding.state=="unbound" ? binding.text : "";
 		if (inv == null) {
 			snap.count = 0;
 			snap.usable = false;

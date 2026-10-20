@@ -15,7 +15,7 @@ import imgui.ImGui;
  * Persist SolarFlare layout + toggles next to the installed mod.
  */
 class SettingsStore {
-	static inline var VERSION:Int = 34;
+	static inline var VERSION:Int = 35;
 	static inline var TMP_SUFFIX:String = ".tmp";
 	static inline var PREV_SUFFIX:String = ".prev";
 	static var dirty = false;
@@ -37,7 +37,7 @@ class SettingsStore {
 
 	/** A partially recovered/newer layout must never be autosaved over its source. */
 	public static function blockSaving(reason:String):Void {
-		if (!saveBlocked) ToastManager.error(reason + " Saving is off this session.", 8.0);
+		ProfileTrace.note("save","BLOCKED: "+reason); if (!saveBlocked) ToastManager.error(reason + " Saving is off this session.", 8.0);
 		saveBlocked=true;
 	}
 	public static function ensureEditorLayout():Void tryLoadIni();
@@ -104,6 +104,7 @@ class SettingsStore {
 			return;
 		lastCfg = cfg;
 		cfg.uiLayouts.captureDefaults(cfg);
+  FeatureProfiles.captureFactory(cfg);
 		var path = jsonPath();
 		if (path == null)
 			return;
@@ -130,10 +131,14 @@ class SettingsStore {
 			ToastManager.info("SolarFlare settings restored from " + haxe.io.Path.withoutDirectory(source) + ".", 4.0);
 		}
 		try {
+			if(!Reflect.isObject(data) || Std.isOfType(data,Array) || Std.isOfType(data,String)) throw "Invalid settings root";
 			var oldVersion = readVersion(data);
-			if (oldVersion > VERSION) blockSaving("Settings belong to a newer mod version; original files preserved.");
+			if (oldVersion > VERSION) { blockSaving("Settings belong to a newer mod version; original files preserved."); return; }
+   var savedProfiles=Reflect.field(data,"universalProfiles");
+   if(oldVersion<VERSION || savedProfiles==null || !Reflect.hasField(savedProfiles,"version")) ProfileMigrationBackup.ensure(source);
 			apply(cfg, data);
 			FeatureProfiles.load(cfg, data);
+				ProfileTrace.note("load","settings v"+oldVersion+" -> "+VERSION+"; "+FeatureProfiles.summary());
 			if (oldVersion < VERSION) dirty = true;
 			// v24: the first cast-bar build persisted the new overlay as hidden,
 			// including in the active universal profile, so no telemetry was demanded.
@@ -146,6 +151,8 @@ class SettingsStore {
 				solarflare.ObserveDemand.markStatusDemandDirty()
 			catch (_:Dynamic) {}
 		} catch (e:Dynamic) {
+				IdentityLog.note("settings load failed: " + Std.string(e) + " | " + haxe.CallStack.toString(haxe.CallStack.exceptionStack()).split("
+").join(" <- "));
 			// A partial apply would be saved over the user's file on the next edit; leave the file untouched.
 			saveBlocked = true;
 			ToastManager.error("SolarFlare settings could not be loaded (" + Std.string(e)
@@ -224,20 +231,28 @@ class SettingsStore {
 
 	/** Explicit saves always attempt; returns whether the file was replaced. */
 	public static function save(cfg:ConfigPanel):Bool {
-		if (cfg == null || saveBlocked)
+		if (cfg == null || saveBlocked || !FeatureProfiles.ready) {
+			ProfileTrace.note("save","SKIPPED blocked="+saveBlocked+" ready="+FeatureProfiles.ready);
 			return false;
+		}
 		try {
 			var path = jsonPath();
 			if (path == null)
 				return false;
 			ensureDir(haxe.io.Path.directory(path));
-			var jsonText = haxe.Json.stringify(dump(cfg), null, "  ");
+			var data=dump(cfg);
+   if(lastCaptureWarning.length>0) throw lastCaptureWarning;
+   var jsonText = haxe.Json.stringify(data, null, "  ");
 			// Never write the live file in place: a crash mid-write would truncate it.
 			var tmp = path + TMP_SUFFIX;
 			sys.io.File.saveContent(tmp, jsonText);
 			// Do not replace anything until the bytes on disk parse.
-			haxe.Json.parse(sys.io.File.getContent(tmp));
+   var stagedText=sys.io.File.getContent(tmp);
+   if(stagedText!=jsonText) throw "Settings verification failed";
+   var verified=haxe.Json.parse(stagedText);
+   var validation=new ProfileBank({}); validation.load(verified.universalProfiles,null);
 			replaceWith(tmp, path);
+			ProfileTrace.note("save","OK "+jsonText.length+" bytes; "+FeatureProfiles.summary());
 			dirty = false;
 			dirtySinceMs = 0;
 			lastSaveMs = haxe.Timer.stamp() * 1000;
@@ -249,7 +264,9 @@ class SettingsStore {
 					ImGui.saveIniSettingsToDisk(ini);
 			} catch (_:Dynamic) {}
 			return true;
-		} catch (_:Dynamic) {
+		} catch (e:Dynamic) {
+			ProfileTrace.note("save","FAILED: "+Std.string(e)+" | "+haxe.CallStack.toString(haxe.CallStack.exceptionStack()).split("
+").join(" <- "));
 			failCount++;
 			retryAtMs = haxe.Timer.stamp() * 1000 + Math.min(30000.0, 1000.0 * Math.pow(2, failCount - 1));
 			if (failCount == 1)
@@ -263,9 +280,7 @@ class SettingsStore {
 	 * Every crash point leaves the old file or the verified .tmp; load() checks both. No backup file is kept.
 	 */
 	static function replaceWith(tmp:String, path:String):Void {
-		if (sys.FileSystem.exists(path))
-			sys.FileSystem.deleteFile(path);
-		sys.FileSystem.rename(tmp, path);
+  VerifiedSettingsWrite.replace(tmp,path);
 	}
 
 	static function tryLoadIni():Void {
@@ -289,6 +304,17 @@ class SettingsStore {
 		Reflect.setField(data, "uiState", dumpUiState(cfg));
 		return data;
 	}
+
+ public static function captureProfileAuxiliary(cfg:ConfigPanel):Dynamic return {
+  nativeHide:cfg.nativeHide.dump(),hideMove:cfg.hideMove.dump(),aimInstant:cfg.aimInstant.dump(),
+  rifty:riftyDump(cfg.getRifty),clog:clogDump(cfg.combatLog),saber:saberDump(cfg.lightsaber),launchers:cfg.launchers.dump(),
+  customTheme:ThemePalette.dumpCustom(),uiPack:cfg.uiPack.dump()
+ };
+ public static function applyProfileAuxiliary(cfg:ConfigPanel,d:Dynamic):Void {
+  cfg.nativeHide.apply(d.nativeHide); cfg.hideMove.apply(d.hideMove); cfg.aimInstant.apply(d.aimInstant);
+  applyRifty(cfg.getRifty,d.rifty); applyClog(cfg.combatLog,d.clog); applySaber(cfg.lightsaber,d.saber); cfg.launchers.apply(d.launchers);
+  ThemePalette.applyCustomDump(d.customTheme); cfg.uiPack.apply(d.uiPack);
+ }
 
 	static function dumpCore(cfg:ConfigPanel):Dynamic {
 		lastCaptureWarning = "";
@@ -481,7 +507,7 @@ class SettingsStore {
 	}
 
 	public static function resourceTrackerDump(cfg:ConfigPanel):Dynamic {
-		return {};
+		return {dash:cfg.dash.dump(),artwork:cfg.resourceArtwork.dump()};
 	}
 
 	static function riftyDump(r:GetRiftyConfig):Dynamic {
@@ -764,7 +790,7 @@ class SettingsStore {
 		WindowAutoHide.applyCategories(Reflect.field(data,"autoHideCategories"));
 	}
 
-	static function chromeDump(c:HudChrome):Dynamic {
+	public static function chromeDump(c:HudChrome):Dynamic {
 		if (c == null)
 			return {};
 		return {
@@ -1028,8 +1054,9 @@ class SettingsStore {
 		try
 			rt = Reflect.field(data, "resourceTracker")
 		catch (_:Dynamic) {}
-		if (rt == null)
-			return;
+		if (rt == null) { cfg.dash.apply(null); cfg.resourceArtwork.apply(null); return; }
+		cfg.dash.apply(Reflect.field(rt,"dash"));
+		cfg.resourceArtwork.apply(Reflect.field(rt,"artwork"));
 		// Compatibility for old files whose only resource values lived in a nested bank.
 		if (data.vitals == null) {
 			var legacy = ProfileMigration.flatOrSelectedLegacy(rt, "vitals");
@@ -1139,7 +1166,7 @@ class SettingsStore {
 		applyChrome(s.riftChrome, data.riftChrome);
 	}
 
-	static function applyChrome(c:HudChrome, data:Dynamic):Void {
+	public static function applyChrome(c:HudChrome, data:Dynamic):Void {
 		if (c == null || data == null)
 			return;
 		c.restoreReference(data);

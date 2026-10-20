@@ -18,6 +18,7 @@ class ImageDrop {
 
 	/** Call from draw while an image panel is visible. */
 	public static function arm():Void armedAt = haxe.Timer.stamp();
+ public static function disarm():Void { armedAt=-100; onImported=null; }
 
 	public static function available():Bool return !failed;
 

@@ -54,7 +54,7 @@ class BarTerOverlay {
    return StatusIcon.tooltip(s.status)+"\nDisplay only";
   }
   var tip=s.label.length > 0 ? s.label : s.isItem ? s.itemKind : s.skillId;
-  if (s.isItem) return tip+"\nStack "+s.count+(s.usable ? "\nClick / key to use." : "\nNot currently usable.");
+  if (s.isItem) return tip+"\nStack "+s.count+(s.keyLabel.length>0 ? "\nBinding: "+s.keyLabel : "\nNo equipped native binding")+(s.usable ? "\nClick / key to use." : "\nNot currently usable.");
   tip+="\nBinding: "+s.keyLabel+(s.nativeActionId.length > 0 ? " ("+s.nativeActionId+")" : " (no native action matched)");
   if (!s.available) tip+="\nUnavailable in the current native actions.";
   else tip+="\nActivate with the native keyboard binding.";
@@ -106,19 +106,15 @@ class BarTerOverlay {
    ImGui.ImDrawList_PathFillConvex(dl,0x99000000);
   }
   if (active && s.cdLeft > 0.05) badge(dl,x+size/2,y+size-3,Std.string(Std.int(Math.ceil(s.cdLeft))),true);
-  if (s.isItem && s.count > 0) badge(dl,x+size-3,y+size-3,Std.string(s.count),false);
-  else if (active && s.chargesMax > 1) badge(dl,x+size-3,y+ImGui.getFontSize()+3,Std.string(s.charges),false);
-  else if (active && s.stacks > 1) badge(dl,x+size-3,y+ImGui.getFontSize()+3,Std.string(s.stacks),false);
+  var counts=bar==null || bar.showCounts;
+  var countFont=solarflare.ui.SlotBadgeMetrics.font(ImGui.getFontSize(),bar!=null ? bar.chargeScale : 1,size);
+  var count=counts ? (s.isItem && s.count>0 ? Std.string(s.count) : active && s.chargesMax>1 ? Std.string(s.charges) : active && s.stacks>1 ? Std.string(s.stacks) : "") : "";
+  if(count.length>0) solarflare.ui.SlotBadgeRenderer.draw(dl,count,x+size*0.58,y+1,size*0.42-2,size*0.45,countFont,ImGui.colorConvertFloat4ToU32(theme.text),true);
   if (s.flashUntil > now) ImGui.ImDrawList_AddRect(dl,ImGui.vec2(x+1,y+1),ImGui.vec2(x+size-1,y+size-1),accent,4,2);
   if (showHotkeys && s.keyLabel.length > 0 && s.keyLabel!="Unknown") {
    var key=BarTerBindingResolver.badgeLabel(s.keyLabel);
-   if (ImGui.calcTextSize(key).x > size-6) {
-    while (key.length > 1 && ImGui.calcTextSize(key+"…").x > size-6) key=key.substr(0,key.length-1);
-    key+="…";
-   }
-   var ts=ImGui.calcTextSize(key);
-   ImGui.ImDrawList_AddRectFilled(dl,ImGui.vec2(x+1,y+1),ImGui.vec2(x+ts.x+5,y+ts.y+3),0xDD000000,3);
-   ImGui.ImDrawList_AddText_Vec2(dl,ImGui.vec2(x+3,y+2),ImGui.colorConvertFloat4ToU32(theme.text),key);
+   var font=solarflare.ui.SlotBadgeMetrics.font(ImGui.getFontSize(),bar!=null ? bar.bindingScale : 1,size);
+   solarflare.ui.SlotBadgeRenderer.draw(dl,key,x+1,y+1,count.length>0 ? size*0.58-2 : size-2,size*0.45,font,ImGui.colorConvertFloat4ToU32(theme.text));
   }
  }
  static function badge(dl:Dynamic,x:Single,y:Single,value:String,center:Bool):Void {

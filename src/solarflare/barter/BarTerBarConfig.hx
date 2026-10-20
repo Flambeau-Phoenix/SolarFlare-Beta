@@ -23,6 +23,9 @@ class BarTerBarConfig {
 	public var rows(get,never):Int;
 	function get_rows():Int return Std.int(Math.ceil(slotCount / columns));
 	public var slotSize:Int = 64;
+	public var bindingScale:Float=1;
+	public var chargeScale:Float=1;
+	public var showCounts:Bool=true;
 	public var slots:Array<BarTerSlotConfig> = [];
 
 	public function new(id:String, name:String) {
@@ -66,6 +69,7 @@ class BarTerBarConfig {
 			slotCount: slotCount,
 			columns: columns,
 			slotSize: slotSize,
+			bindingScale:bindingScale,chargeScale:chargeScale,showCounts:showCounts,
 			slots: [for (s in slots) s.dump()]
 		};
 	}
@@ -78,6 +82,9 @@ class BarTerBarConfig {
 		locked = Reflect.field(data, "locked") == true;
 		transparent = Reflect.field(data, "transparent") == true;
 		opacity = number(data, "opacity", 1, 0.15, 1);
+		bindingScale=solarflare.ui.SlotBadgeMetrics.scale(Reflect.field(data,"bindingScale"));
+		chargeScale=solarflare.ui.SlotBadgeMetrics.scale(Reflect.field(data,"chargeScale"));
+		showCounts=Reflect.field(data,"showCounts")!=false;
 		colorMode = text(data,"colorMode","neutral");
 		if (colorMode != "theme" && colorMode != "custom") colorMode="neutral";
 		fillColor = integer(data,"fillColor",0x181B20,0,0xFFFFFF);

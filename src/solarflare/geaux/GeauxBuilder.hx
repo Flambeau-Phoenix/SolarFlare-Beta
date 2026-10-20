@@ -64,6 +64,9 @@ class GeauxBuilder {
 		selected = -1;
 		swapMode = false;
 	}
+ public function resetProfileState():Void {
+  clearTransientState(); undoMgr.clear(); glowEditBefore=null; assignPopupCell=-1; bumpRevision();
+ }
 
 	public function applyExternalLayout(snap:Dynamic, actionName:String):Void {
 		if (cfg == null || snap == null)
@@ -368,7 +371,13 @@ class GeauxBuilder {
 				UiLayout.propertyRow("Pinwheel", function() { if (ImGui.checkbox("##gb_st_pin", style.showPinwheel)) SettingsStore.markDirty(); });
 				UiLayout.propertyRow("Seconds", function() { if (ImGui.checkbox("##gb_st_cd", style.showCdText)) SettingsStore.markDirty(); });
 				UiLayout.propertyRow("Keybind chips", function() { if (ImGui.checkbox("##gb_st_hk", style.showHotkeys)) SettingsStore.markDirty(); });
+				UiLayout.propertyRow("Binding source",function() {
+					var picked=UiLayout.stringCombo("##gb_binding_mode",style.bindingMode,GeauxBindingPolicy.MODES,GeauxBindingPolicy.label);
+					if(picked!=null) { style.bindingMode=picked; SettingsStore.markDirty(); }
+				},"Automatic preserves a typed custom reminder, otherwise follows the native skill key. Custom text does not register a key.");
+				UiLayout.propertyRow("Binding text size",function() { if(ImGui.sliderFloat("##gb_binding_scale",style.bindingScale,0.5,3,"%.2fx")) SettingsStore.markDirty(); });
 				UiLayout.propertyRow("Charges", function() { if (ImGui.checkbox("##gb_st_ch", style.showCharges)) SettingsStore.markDirty(); });
+				UiLayout.propertyRow("Charge / stack size",function() { if(ImGui.sliderFloat("##gb_charge_scale",style.chargeScale,0.5,3,"%.2fx")) SettingsStore.markDirty(); });
 				UiLayout.propertyRow("Stacks", function() { if (ImGui.checkbox("##gb_st_stacks", style.showStacks)) SettingsStore.markDirty(); }, "SkillScript stack count when > 1 (corner badge).");
 				UiLayout.propertyRow("Group tags", function() { if (ImGui.checkbox("##gb_st_tags", style.showGroupTags)) SettingsStore.markDirty(); });
 			}, 0, ImGui.getContentRegionAvail().x * 0.4, 24);

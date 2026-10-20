@@ -42,7 +42,8 @@ class HealthHooks {
 
 	/** Present-loop identity authority; no per-frame player trampoline is installed. */
 	public static function observeLocalPlayer(app:GameApp):Void {
-		sampleCharacterId(app);
+		HealthCache.identityConfirmed=false;
+  HealthCache.identityReason="Waiting for local hero";
 		var heroDyn:Dynamic = app == null ? null : app.hero;
 		if (heroDyn == null) {
 			if (HealthCache.localHero != null) HealthCache.clearLocalHero();
@@ -50,12 +51,41 @@ class HealthHooks {
 		}
 		if (HealthCache.localHero != heroDyn) {
 			// Use the same local-player authority as hooks; never adopt an arbitrary unit.
-			if (!HealthCache.isLocalHero(heroDyn)) return;
+			if (!HealthCache.isLocalHero(heroDyn)) { solarflare.ui.IdentityLog.note("app.hero present but isLocalHero=false"); return; }
 			adoptLocalHero(heroDyn, "present", "isMyHero", "HealthHooks.observeLocalPlayer");
 		} else if (ObserveDemand.dueIdentity(haxe.Timer.stamp())) {
 			sampleIdentity(heroDyn);
 		}
+  sampleCharacterId(app);
+  if(HealthCache.identityConfirmed) observeCapabilities(heroDyn);
+  solarflare.ui.IdentityLog.note(HealthCache.identityConfirmed ? "confirmed "+HealthCache.characterId+" kind="+HealthCache.characterKind : HealthCache.identityReason);
 	}
+
+
+ /** Observation runs independently of enabled trackers and never reads Geaux's previous skill book. */
+ static var capabilityAt:Float=-1;
+ static function observeCapabilities(heroDyn:Dynamic):Void {
+  var now=haxe.Timer.stamp();
+  if(now<capabilityAt && ResourceCapabilities.current.heroId==HealthCache.characterId) return;
+  capabilityAt=now+0.5;
+  var chain=false;
+  localIsMage=HealthCache.characterKind=="Mage"; mageGen=HealthCache.identityGen;
+  if(localIsMage) try {
+   var hero:ent.Hero=cast heroDyn; var spec=hero.specialization;
+   if(spec!=null && (spec.hero==null || spec.hero==hero)) chain=spec.hasTalent(ChaincastCache.talentId());
+  } catch(_:Dynamic) {}
+  var old=ResourceCapabilities.current;
+  ResourceCapabilities.publish(HealthCache.characterId,HealthCache.characterKind,chain);
+  if(old!=ResourceCapabilities.current) ObserveDemand.markStatusDemandDirty();
+ }
+ public static function resetCharacterResources():Void {
+  HealthCache.rage=0; HealthCache.rageValid=false; HealthCache.rageAlertUntil=0;
+  HealthCache.clearMana(); HealthCache.clearSpark(); HealthCache.shield=0;
+  localIsMage=false; mageGen=-1; capabilityAt=-1; ResourceCapabilities.reset();
+  PrayerCache.clear(); ComboPointsCache.clear(); ChaincastCache.clear(); ConduitCache.clear();
+  solarflare.aura.AuraMovementObserver.reset(); solarflare.aura.AuraStatusCache.invalidateOwner();
+  solarflare.geaux.GeauxCache.sample(null,0); ObserveDemand.markOverlayDirty(); ObserveDemand.markStatusDemandDirty();
+ }
 
 	/**
 	 * Idempotent: re-adopting the already-pinned hero must not re-mark the overlay dirty,
@@ -256,6 +286,7 @@ class HealthHooks {
 	}
 
 	static function samplePrayers(heroDyn:Dynamic):Void {
+  if(!ResourceCapabilities.current.prayers) { PrayerCache.clear(); return; }
 		try {
 			var hero:ent.Hero = cast heroDyn;
 			var priest = hero.get_priest();
@@ -327,6 +358,7 @@ class HealthHooks {
 	}
 
 	static function sampleRage(heroDyn:Dynamic):Void {
+  if(!ResourceCapabilities.current.rage) { HealthCache.rageValid=false; return; }
 		var attr = heroAttr(heroDyn);
 		if (attr == null)
 			return;
@@ -349,6 +381,7 @@ class HealthHooks {
 	}
 
 	static function sampleMana(heroDyn:Dynamic):Void {
+  if(!ResourceCapabilities.current.mana) { HealthCache.clearMana(); return; }
 		var attr = heroAttr(heroDyn);
 		if (attr == null) {
 			HealthCache.clearMana();
@@ -390,6 +423,7 @@ class HealthHooks {
 	static var sparkMaxMissing:Bool = false;
 
 	static function sampleSpark(heroDyn:Dynamic):Void {
+  if(!ResourceCapabilities.current.spark) { HealthCache.clearSpark(); return; }
 		var isMage = false;
 		try {
 			var hero:ent.Hero = cast heroDyn;
@@ -452,7 +486,7 @@ class HealthHooks {
 	}
 
 	static function sampleComboPoints(heroDyn:Dynamic):Void {
-		if (!detectRogue(heroDyn) && !ComboPointsCache.active) {
+		if (!ResourceCapabilities.current.combo) {
 			ComboPointsCache.clear();
 			return;
 		}
@@ -613,9 +647,25 @@ class HealthHooks {
 			}
 			id = lastHeroIdText;
 		} catch (_:Dynamic) {}
-		if (id == null || id.length == 0 || id == "0")
-			return;
-		HealthCache.setCharacterId(id);
+		if (id == null || id.length == 0 || id == "0") { HealthCache.identityReason="Waiting for connection hero ID"; HealthCache.setCharacterId(""); return; }
+  try {
+   var hero:ent.Hero=cast HealthCache.localHero;
+   if(hero==null) { HealthCache.setCharacterId(""); return; }
+   var player=hero.getPlayer();
+   if(player==null || player.hero!=hero) { HealthCache.identityReason="Waiting for matching local player"; HealthCache.setCharacterId(""); return; }
+   // heroData is not replicated to the client (null in game); the hero unit's own kind is the class id (unit sheet: Warrior/Mage/Priest/Rogue).
+   var unit:ent.Unit=cast hero;
+   var kind=unit.kind;
+   var data=player.heroData;
+   if(data!=null) {
+    var dbId=data.databaseID;
+    if(!haxe.Int64.isZero(dbId) && dbId!=lastHeroId) { HealthCache.identityReason="Character data belongs to another hero (db "+haxe.Int64.toStr(dbId)+" vs "+id+")"; HealthCache.setCharacterId(""); return; }
+    if(kind==null || kind.length==0) kind=data.kind;
+   }
+   if(kind==null || kind.length==0) { HealthCache.identityReason="Waiting for hero class"; HealthCache.setCharacterId(""); return; }
+   HealthCache.setCharacterId(id); HealthCache.characterKind=kind;
+   HealthCache.identityConfirmed=true; HealthCache.identityReason="";
+  } catch(e:Dynamic) { HealthCache.identityReason="Character data not readable yet ("+Std.string(e)+")"; HealthCache.setCharacterId(""); return; }
 		#if solarflare_telemetry
 		if (solarflare.debug.ResolutionLedger.armed()) {
 			var L = solarflare.debug.ResolutionLedger;
@@ -640,7 +690,7 @@ class HealthHooks {
 	}
 
 	static function sampleChaincast(heroDyn:Dynamic):Void {
-		if (!detectMageChaincast(heroDyn) && !ChaincastCache.active) {
+		if (!ResourceCapabilities.current.chaincast) {
 			ChaincastCache.clear();
 			return;
 		}
@@ -691,36 +741,7 @@ class HealthHooks {
 		return localIsMage;
 	}
 
-	static function detectMageChaincast(heroDyn:Dynamic):Bool {
-		if (heroDyn == null)
-			return false;
-		try {
-			var hero:ent.Hero = cast heroDyn;
-			if (!refreshLocalMage(heroDyn))
-				return false;
-			if (hero.getSkillOverride(ChaincastCache.talentId()) != null) {
-				ChaincastCache.noteMage();
-				return true;
-			}
-			var th = ChaincastCache.talentHashId();
-			if (th.length > 0 && hero.getSkillOverride(th) != null) {
-				ChaincastCache.noteMage();
-				return true;
-			}
-			if (solarflare.aura.AuraStatusCache.isCurrent(heroDyn)
-					&& (chaincastStatus(true) != null || chaincastStatus(false) != null)) {
-				ChaincastCache.noteMage();
-				return true;
-			}
-		} catch (_:Dynamic) {}
-		for (id in solarflare.geaux.GeauxCache.bookIds) {
-			if (ChaincastCache.isChaincastKind(id)) {
-				ChaincastCache.noteMage();
-				return true;
-			}
-		}
-		return ChaincastCache.active;
-	}
+ static function detectMageChaincast(heroDyn:Dynamic):Bool return ResourceCapabilities.current.chaincast;
 
 	/*
 	 * Status reads for the mage overlays. AuraStatusCache is the single status owner: these ids
@@ -759,7 +780,7 @@ class HealthHooks {
 	}
 
 	static function sampleConduit(heroDyn:Dynamic):Void {
-		if (!detectMageConduit(heroDyn) && !ConduitCache.active) {
+		if (!ResourceCapabilities.current.conduits) {
 			ConduitCache.clear();
 			return;
 		}
@@ -916,21 +937,7 @@ class HealthHooks {
 		ChaincastCache.setRemain(row.left, row.progress, row.durationKnown);
 	}
 
-	static function detectMageConduit(heroDyn:Dynamic):Bool {
-		if (heroDyn == null)
-			return false;
-		if (!refreshLocalMage(heroDyn))
-			return false;
-		ConduitCache.noteMage();
-		return true;
-		for (id in solarflare.geaux.GeauxCache.bookIds) {
-			if (ConduitCache.isConduitKind(id)) {
-				ConduitCache.noteMage();
-				return true;
-			}
-		}
-		return ConduitCache.active;
-	}
+ static function detectMageConduit(heroDyn:Dynamic):Bool return ResourceCapabilities.current.conduits;
 
 	// Thin public surface for domain-specific hook adapter classes.
 	public static inline function hookHeroSkillUse(self:Dynamic, skill:Dynamic):Void onHeroSkillUse(self, skill);

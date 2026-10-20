@@ -21,9 +21,12 @@ enum UiActionKind {
 
 class UiAction {
 	public var kind:UiActionKind;
+ public var ownerGeneration:Int;
+ public var ownerReady:Bool;
 
 	public function new(kind:UiActionKind) {
 		this.kind = kind;
+  ownerGeneration=FeatureProfiles.statusOwnerGen; ownerReady=FeatureProfiles.ready;
 	}
 }
 
@@ -70,8 +73,11 @@ class UiActionQueue {
 	}
 
 	static function runOne(action:UiAction):Void {
-		if (action == null || action.kind == null)
+		if (action == null || action.kind == null) return;
+		if (!FeatureProfiles.transition.accepts(action.ownerGeneration,action.ownerReady)) {
+			ProfileTrace.note("queue","DROPPED stale action "+Type.enumConstructor(action.kind)+" gen="+action.ownerGeneration+" ready="+action.ownerReady+" now gen="+FeatureProfiles.statusOwnerGen+" ready="+FeatureProfiles.ready);
 			return;
+		}
 		switch (action.kind) {
 			case SaveSettings:
 				SettingsStore.saveNow();

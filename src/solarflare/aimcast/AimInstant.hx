@@ -18,7 +18,7 @@ class AimInstant {
 	/** Called after `UnitController.startSkillAim(skill, callback, action)` returned. */
 	public static function onAimStart(controller:Dynamic, skill:Dynamic):Void {
 		var cfg = config;
-		if (cfg == null || !cfg.enabled.get() || busy) return; // cheapest check first: everything else is skipped when off
+		if (cfg == null || !cfg.enabled.get() || busy || !solarflare.ui.FeatureProfiles.ready || !solarflare.HealthCache.identityConfirmed) return;
 		busy = true;
 		var why:String = "";
 		var ok = false;
@@ -34,6 +34,7 @@ class AimInstant {
 			var job = pc.currentJob;
 			var aiming = job != null && job.isAiming();
 			var unit:ent.Unit = pc.unit;
+   if(unit==null || (cast unit:Dynamic)!=solarflare.HealthCache.localHero) { busy=false; return; }
 			var base:st.skill.BaseSkill = null;
 			var step:st.skill.SkillStep = null;
 			var allow = false;

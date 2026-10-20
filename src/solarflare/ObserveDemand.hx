@@ -247,7 +247,7 @@ class ObserveDemand {
 		aurasNeedDash=false;
 		if(auras || auraBuilderOpen) for(c in auraConditions)
 			if(StringTools.startsWith(c.signal,"dash.") || StringTools.startsWith(c.signal,"event.dash.")) aurasNeedDash=true;
-		if(!aurasNeedDash) solarflare.aura.AuraMovementObserver.reset();
+
 		if(!auraBuilderOpen) solarflare.scripting.ScriptEditorSession.clear();
 		// BarTer subjects: bounded rebuild (three active bars × 64 cells), own poll path.
 		barterSkillIds.resize(0);

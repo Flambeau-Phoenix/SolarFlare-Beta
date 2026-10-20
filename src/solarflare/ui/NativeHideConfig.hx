@@ -3,7 +3,7 @@ package solarflare.ui;
 import imgui.ref.BoolRef;
 
 /**
- * Global presentation preferences; never part of a character/gear profile.
+ * Native HUD presentation preferences, captured with the character-owned HUD profile.
  *
  * Supported controls: hiding the native bottom action bar (Utilities page and the Native UI page share
  * `hideBottomBar`) and the per-widget rows in `elements` (Native UI page). Full-root hiding hid the entire

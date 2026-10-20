@@ -32,10 +32,10 @@ class AuraSignalReader {
 			case "resource.spark.current": number(out,frame.sparkKnown,frame.sparkCurrent);
 			case "resource.shield.current": number(out,frame.healthKnown,frame.shieldCurrent);
 			case "player.alive": bool(out,frame.aliveKnown,frame.alive);
-			case "dash.charges": count(out,frame.dashKnown,frame.dashCharges);
-			case "dash.available": bool(out,frame.dashKnown,frame.dashCharges>0);
-			case "dash.full": bool(out,frame.dashKnown,frame.dashMax>0 && frame.dashCharges>=frame.dashMax);
-			case "dash.rechargeLeft": duration(out,frame.dashKnown,frame.dashRecharge);
+			case "dash.charges": count(out,frame.dashKnown,frame.dashCharges); out.progress=frame.dashRechargeProgress; out.timeLeft=frame.dashKnown ? frame.dashRecharge : Math.NaN;
+			case "dash.available": bool(out,frame.dashKnown,frame.dashCharges>0); out.progress=frame.dashRechargeProgress; out.timeLeft=frame.dashKnown ? frame.dashRecharge : Math.NaN;
+			case "dash.full": bool(out,frame.dashKnown,frame.dashMax>0 && frame.dashCharges>=frame.dashMax); out.progress=frame.dashRechargeProgress; out.timeLeft=frame.dashKnown ? frame.dashRecharge : Math.NaN;
+			case "dash.rechargeLeft": duration(out,frame.dashKnown,frame.dashRecharge); out.progress=frame.dashRechargeProgress; out.timeLeft=frame.dashKnown ? frame.dashRecharge : Math.NaN;
 			case "target.distance": number(out,frame.targetKnown && frame.targetValid,frame.targetDistance);
 			case "combat.damageTakenAge":
 				duration(out,frame.heroKnown && frame.damageAgeKnown,frame.damageTakenAge); out.timeLeft=Math.NaN;

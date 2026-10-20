@@ -7,7 +7,7 @@ class AuraTimingReferencePolicy {
 		return StringTools.startsWith(signal, "event.cast.") || signal == "event.playerCast.recent";
 	}
 	public static inline function isCooldown(signal:String):Bool return switch (signal) {
-		case "skill.ready", "skill.affordable", "skill.inCooldown", "skill.cooldownLeft", "skill.cooldownProgress", "skill.charges", "skill.chargesMax": true;
+		case "skill.ready", "skill.affordable", "skill.inCooldown", "skill.cooldownLeft", "skill.cooldownProgress", "skill.charges", "skill.chargesMax", "dash.charges", "dash.available", "dash.full", "dash.rechargeLeft": true;
 		default: false;
 	};
 	public static inline function seconds(choice:String, cdb:Float, observed:Float, nativeValid:Bool):Float {

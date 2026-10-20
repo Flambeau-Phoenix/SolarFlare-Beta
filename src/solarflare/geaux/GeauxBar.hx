@@ -141,7 +141,7 @@ class GeauxBar {
 				snap = fallback;
 			}
 			var glyph = idx < cfg.slotGlyphs.length ? cfg.slotGlyphs[idx] : "";
-			var hotkey = idx < cfg.slotHotkeys.length ? cfg.slotHotkeys[idx] : "";
+			var binding=GeauxBindingLabels.at(idx); var hotkey=binding.primary;
 			var cellX = origin.x + c * (cell + gap);
 			var cellY = origin.y + r * (cell + gap);
 			// Hit-test + DnD must run before GameIcons.image() steals LastItem.
@@ -156,7 +156,7 @@ class GeauxBar {
 						onCellSwap(drop.fromCell, idx);
 					if (drop.skillId != null && drop.skillId.length > 0 && onSkillDrop != null)
 						onSkillDrop(idx, drop.skillId);
-				} : null);
+				} : null,binding.secondary);
 
 			var dl = ImGui.getWindowDrawList();
 
@@ -227,7 +227,7 @@ class GeauxBar {
 	 * @return Click state captured before GameIcons.image() replaces LastItem.
 	 */
 	function drawSnap(style:GeauxStyle, x:Single, y:Single, size:Single, rounding:Single, borderW:Single, snap:Dynamic, id:String, pickable:Bool, glyph:String = "", hotkey:String = "",
-			onHitStillActive:Void->Void = null):{clicked:Bool, rightClicked:Bool, hovered:Bool} {
+			onHitStillActive:Void->Void = null,secondaryHotkey:String=""):{clicked:Bool, rightClicked:Bool, hovered:Bool} {
 		ImGui.setCursorScreenPos(ImGui.vec2(x, y));
 		var clicked = false;
 		var hovered = false;
@@ -241,6 +241,7 @@ class GeauxBar {
 				onHitStillActive();
 		} else {
 			ImGui.dummy(ImGui.vec2(size, size));
+			hovered=ImGui.isItemHovered();
 		}
 
 		var dl = ImGui.getWindowDrawList();
@@ -385,32 +386,18 @@ class GeauxBar {
 				ImGui.colorConvertFloat4ToU32(style.cdTextCol()), num);
 		}
 
-		if (present && style.showCharges.get() && snap.chargesMax > 0) {
-			var ch = Std.string(snap.charges);
-			var cs = ImGui.calcTextSize(ch);
-			var cx:Single = x + size - cs.x - 3;
-			var cy:Single = y + size - cs.y - 2;
-			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(cx + 1, cy + 1),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 1)), ch);
-			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(cx, cy),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.95, 0.98, 1.0, 1)), ch);
-		} else if (present && style.showStacks.get() && snap.stacks > 1) {
-			var st = Std.string(snap.stacks);
-			var ss = ImGui.calcTextSize(st);
-			var sx:Single = x + size - ss.x - 3;
-			var sy:Single = y + size - ss.y - 2;
-			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(sx + 1, sy + 1),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(0, 0, 0, 1)), st);
-			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(sx, sy),
-				ImGui.colorConvertFloat4ToU32(ImGui.vec4(1.0, 0.92, 0.55, 1)), st);
+		var count=present && style.showCharges.get() && snap.chargesMax>0 ? Std.string(snap.charges)
+			: present && style.showStacks.get() && snap.stacks>1 ? Std.string(snap.stacks) : "";
+		var countFont=solarflare.ui.SlotBadgeMetrics.font(ImGui.getFontSize(),style.chargeScale.get(),size);
+		var keyFont=solarflare.ui.SlotBadgeMetrics.font(Math.max(12,Math.min(22,size*0.28)),style.bindingScale.get(),size);
+		var text=ImGui.colorConvertFloat4ToU32(solarflare.ui.ThemePalette.current().text);
+		var split=style.showHotkeys.get() && secondaryHotkey.length>0;
+		if(count.length>0) solarflare.ui.SlotBadgeRenderer.draw(dl,count,x+(split ? size*0.60 : 1),y+size*0.55,split ? size*0.40-1 : size-2,size*0.45-1,countFont,text,true,true);
+		if(style.showHotkeys.get()) {
+			solarflare.ui.SlotBadgeRenderer.draw(dl,hotkey,x+1,y+1,size-2,size*0.45,keyFont,text);
+			solarflare.ui.SlotBadgeRenderer.draw(dl,secondaryHotkey,x+1,y+size*0.55,size*0.60-2,size*0.45-1,keyFont,text,false,true);
 		}
-
-		// User-defined keybind reminder (Key##hk fields) — not the skill name.
-		if (style.showHotkeys.get() && hotkey != null) {
-			var hk = GeauxConfig.sanitizeHotkey(hotkey);
-			if (hk.length > 0)
-				drawKeyOverlay(dl, x, y, size, hk, present && lit);
-		}
+		if(hovered && present) ImGui.setTooltip(snap.label+(hotkey.length>0 ? "\nBinding: "+hotkey : "")+(secondaryHotkey.length>0 ? "\n"+secondaryHotkey : "")+(snap.chargesMax>0 ? "\nCharges: "+snap.charges+" / "+snap.chargesMax : ""));
 		return {clicked: clicked, rightClicked: rightClicked, hovered: hovered};
 	}
 
@@ -525,8 +512,8 @@ class GeauxBar {
 					snap = fallback;
 				}
 				var glyph = (cfg.slotGlyphs != null && idx < cfg.slotGlyphs.length) ? cfg.slotGlyphs[idx] : "";
-				var hotkey = (cfg.slotHotkeys != null && idx < cfg.slotHotkeys.length) ? cfg.slotHotkeys[idx] : "";
-				drawSnap(style, x, y, cell, rounding, borderW, snap, "geaux_cell_" + idx, false, glyph, hotkey);
+				var binding=GeauxBindingLabels.at(idx); var hotkey=binding.primary;
+				drawSnap(style, x, y, cell, rounding, borderW, snap, "geaux_cell_" + idx, false, glyph, hotkey,null,binding.secondary);
 				idx++;
 			}
 		}

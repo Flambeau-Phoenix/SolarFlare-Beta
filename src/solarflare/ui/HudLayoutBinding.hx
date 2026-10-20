@@ -26,7 +26,7 @@ class HudLayoutBinding {
  }
  public function apply(r:HudLayoutRow):Void {
   chrome.x.set(r.x*r.referenceWidth); chrome.y.set(r.y*r.referenceHeight);
-  chrome.referenceWidth=r.referenceWidth; chrome.referenceHeight=r.referenceHeight; chrome.posDirty=true;
+  chrome.referenceWidth=r.referenceWidth; chrome.referenceHeight=r.referenceHeight; chrome.posDirty=true; chrome.expandSizeDirty=true;
   if(w!=null && r.w!=null) w.set(Math.max(1,r.w)); if(h!=null && r.h!=null) h.set(Math.max(1,r.h));
   if(scale!=null && r.scale!=null) scale.set(cast r.scale);
   if(sizeSet!=null && r.cellSize!=null) sizeSet(r.cellSize*1.);

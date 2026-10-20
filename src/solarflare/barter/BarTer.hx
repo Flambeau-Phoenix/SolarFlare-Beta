@@ -120,6 +120,7 @@ class BarTer {
   if (!config.enabled.get() && !config.open.get()) return;
   var hero:Dynamic=solarflare.HealthCache.localHero;
   var now=haxe.Timer.stamp();
+  if(BarTerCache.hasAnyItem(config) || config.open.get()) solarflare.input.NativeConsumableBindings.sample(hero,now);
   observeStatusChoices();
   if (BarTerCache.hasAnyItem(config) || config.open.get()) try ConsumableCache.sample(hero,now) catch (_:Dynamic) {}
   if (now-lastWeaponReadAt >= 0.1) {

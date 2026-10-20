@@ -15,7 +15,8 @@ class UiLayouts {
  var defaults:Array<HudLayoutRow>=[];
  var applied=new Map<String,HudChrome>();
  var reconcileWanted:Bool=false;
- public function requestReconcile():Void reconcileWanted=true;
+ var generation:Int=-1;
+ public function requestReconcile():Void { reconcileWanted=true; generation=FeatureProfiles.statusOwnerGen; }
  /** Snapshot constructor geometry before settings/profile loading changes any widget. */
  public function captureDefaults(c:ConfigPanel):Void defaults=HudLayoutBindings.capture(c);
  /** "New" or "Rename" while the name modal is wanted; empty when closed. */
@@ -30,7 +31,7 @@ class UiLayouts {
  }
  public function dumpCurrent(c:ConfigPanel):Dynamic { retain(c); return bank.dump(); }
  public function load(c:ConfigPanel,data:Dynamic,fallback:Array<HudLayoutRow>):Void {
-  clearTransientState();
+  clearTransientState(); generation=FeatureProfiles.statusOwnerGen;
   bank=HudLayoutModel.load(data,HudLayoutModel.merge(defaults,fallback)); initialized=true;
   applySelected(c);
   if(!bank.saveSafe) SettingsStore.blockSaving(bank.loadWarning);
@@ -46,19 +47,30 @@ class UiLayouts {
   reconcileWanted=false;
   applied.clear();
   var bindings=HudLayoutBindings.build(c);
-  var missing=HudLayoutBinding.applyRows(bindings,bank.layouts.get(bank.active));
+  var rows=bank.layouts.get(bank.active);
+  var missing=HudLayoutBinding.applyRows(bindings,rows);
   for(b in bindings) applied.set(b.id,b.chrome);
+  traceApply("apply",bindings,rows,missing);
   return missing;
+ }
+ function traceApply(tag:String,bindings:Array<HudLayoutBinding>,rows:Array<HudLayoutRow>,missing:Int):Void {
+  var rowIds=new Map<String,Bool>(); for(r in rows) rowIds.set(r.id,true);
+  var noRow=[for(b in bindings) if(!rowIds.exists(b.id)) b.id];
+  var state=[for(b in bindings) b.id+"@"+Std.int(b.chrome.x.get())+","+Std.int(b.chrome.y.get())];
+  ProfileTrace.note("layout",tag+" layout=\""+bank.active+"\" "+FeatureProfiles.summary()+" rows="+rows.length+" bindings="+bindings.length+" rowsWithoutBinding="+missing+" bindingsWithoutRow["+noRow.length+"]="+noRow.join("|"));
+  ProfileTrace.note("layout",tag+" positions "+state.join(" "));
  }
  /** Observe-only: character restores can replace dynamic chromes after profile loading. */
  public function reconcile(c:ConfigPanel):Void {
-  if(!initialized || !reconcileWanted) return;
+  if(!initialized || !reconcileWanted || !FeatureProfiles.ready || generation!=FeatureProfiles.statusOwnerGen) return;
   reconcileWanted=false;
   var rows=bank.layouts.get(bank.active); var bindings=HudLayoutBindings.build(c);
+  var fixed=[];
   for(b in bindings) if(applied.get(b.id)!=b.chrome) {
-   for(row in rows) if(row.id==b.id) { b.apply(row); break; }
+   for(row in rows) if(row.id==b.id) { b.apply(row); fixed.push(b.id); break; }
    applied.set(b.id,b.chrome);
   }
+  ProfileTrace.note("layout","reconcile layout=\""+bank.active+"\" reapplied["+fixed.length+"]="+fixed.join("|"));
  }
  /** Explicit deletion only; absence during loading never removes a saved row. */
  public function forgetWidget(id:String):Void {

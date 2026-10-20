@@ -61,6 +61,14 @@ class ExtraBarsBuilder {
   boolRef.set(value); if (ImGui.checkbox(label,boolRef)) change(label,function() set(boolRef.get()));
  }
  // A drag or typed slider edit is one undo step, even when it spans many frames.
+ function labelScale(id:String,value:Float,set:Float->Void):Void {
+  floatRef.set(value); var before=owner.model.dump();
+  if(ImGui.sliderFloat(id,floatRef,0.5,3,"%.2fx")) {
+   if(gestureBefore==null) { gestureBefore=before; gestureAction="Label size"; }
+   set(floatRef.get()); SettingsStore.markDirty();
+  }
+  if(gestureBefore!=null && !ImGui.isAnyItemActive()) { history.push(gestureAction,gestureBefore); gestureBefore=null; changed(); }
+ }
  function slider(label:String,value:Int,min:Int,max:Int,set:Int->Void):Void {
   intRef.set(value); var before = owner.model.dump();
   ImGui.setNextItemWidth(Math.min(260,ImGui.getContentRegionAvail().x));
@@ -394,10 +402,14 @@ class ExtraBarsBuilder {
    });
    UiLayout.propertyRow("Visibility",function() check("Hidden##bar_hidden",bar.hidden,function(v) bar.hidden=v),"Keybinds still activate while this bar is hidden.");
    UiLayout.propertyRow("Cell size",function() slider("##bar_size",bar.slotSize,24,96,function(v) bar.slotSize=v));
+   UiLayout.propertyRow("Show bindings",function() check("##bar_show_bindings",bar.showBindings,function(v) bar.showBindings=v));
    UiLayout.propertyRow("Hotkey display",function() {
     var selected=UiLayout.stringCombo("extra_hotkey_display",bar.hotkeyDisplay,ExtraBarsHotkeyDisplay.options,ExtraBarsHotkeyDisplay.label);
     if (selected != null) change("Hotkey display",function() bar.hotkeyDisplay=selected);
-   },"Native keys follow equipped consumables. The tooltip always includes the ExtraBars binding.");
+   },"Automatic uses the native key when equipped, otherwise the ExtraBars binding. Both shows each source. Activation is unchanged.");
+   UiLayout.propertyRow("Binding text size",function() labelScale("##bar_binding_scale",bar.bindingScale,function(v) bar.bindingScale=v));
+   UiLayout.propertyRow("Show charges / counts",function() check("##bar_show_counts",bar.showCounts,function(v) bar.showCounts=v));
+   UiLayout.propertyRow("Charge text size",function() labelScale("##bar_charge_scale",bar.chargeScale,function(v) bar.chargeScale=v));
    UiLayout.propertyRow("Lock position",function() check("##bar_lock",bar.locked,function(v) bar.locked=v));
    owner.chromeFor(bar.id).drawPositionRow("extra_pos");
    UiLayout.propertyRow("Transparent",function() check("##bar_trans",bar.transparent,function(v) bar.transparent=v));
@@ -425,7 +437,7 @@ class ExtraBarsBuilder {
    // Bind drag/drop and context actions to the cell before icon decorations replace LastItem.
    dragCell(bar,i);
    drawCellContext(bar,i,popup);
-   if (slots!=null) ExtraBarsPrototypeBar.drawItem(dl,slots[i],x,y,px);
+   if (slots!=null) ExtraBarsPrototypeBar.drawItem(dl,slots[i],x,y,px,bar);
    else { ImGui.ImDrawList_AddRect(dl,ImGui.vec2(x,y),ImGui.vec2(x+px,y+px),0xFF777777,4,1); ExtraBarsPrototypeBar.drawLabel(dl,Std.string(i+1),x,y+12,px,0xFFFFFFFF); }
    if (selectedBar==bar.id && selectedCell==i) ImGui.ImDrawList_AddRect(dl,ImGui.vec2(x-1,y-1),ImGui.vec2(x+px+1,y+px+1),0xFF37AFD4,4,2);
    if (hovered) ImGui.setTooltip("Cell "+(i+1)+": select to edit; right-click for actions; drag to swap item and binding.");

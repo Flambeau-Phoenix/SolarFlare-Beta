@@ -101,6 +101,7 @@ class TelemetryKernel {
 			}
 		}
 
+		solarflare.aura.AuraMovementObserver.observe(now,ObserveDemand.aurasNeedDash || !cfg.dash.hidden.get());
 		// One status owner for Aura, Board, Spark Cube and BarTer. Consumers never resample.
 		if (statusHeroGeneration != HealthCache.statusOwnerGen
 			|| statusProfileGeneration != solarflare.ui.FeatureProfiles.statusOwnerGen) {

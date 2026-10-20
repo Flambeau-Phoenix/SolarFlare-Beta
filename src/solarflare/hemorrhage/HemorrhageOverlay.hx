@@ -55,15 +55,25 @@ class HemorrhageOverlay {
   var failure:Dynamic=null;
   try {
    if(began) {
-    var size=ImGui.getWindowSize(); chrome.winW=size.x; chrome.winH=size.y;
+    var size=ImGui.getWindowSize(); var parentPos=ImGui.getWindowPos(); chrome.winW=size.x; chrome.winH=size.y;
     if(!chrome.isLocked()) chrome.capturePos();
     if(chrome.beginBody(hideAction,null,"Hemorrhage",false,ImGuiWindowFlags.NoScrollWithMouse,0,FOOTER)) {
+     var start=ImGui.getCursorScreenPos(); var available=ImGui.getContentRegionAvail();
+     var art=solarflare.resourcetracker.ResourceArtwork.active;
+     var skin=art!=null ? art.get("hemorrhage") : null;
+     if(skin!=null) skin.paint(start.x,start.y,available.x,available.y,skin.progress,false);
+     ImGui.setCursorScreenPos(start);
+     if(skin==null || skin.keepContent.get() || !skin.ready()) {
      ImGui.textUnformatted(HemorrhageService.hudStatus);
      ImGui.sameLine(); ImGui.textDisabled(HemorrhageService.hudElapsed);
      ImGui.textUnformatted(HemorrhageService.hudCrit);
      ImGui.textUnformatted(HemorrhageService.hudBleed);
      ImGui.textUnformatted(HemorrhageService.hudShare);
      if(cfg.floatingText.get()) drawFloating();
+     } else ImGui.dummy(available);
+     if(skin!=null) { var end=ImGui.getCursorScreenPos(); skin.paint(start.x,start.y,available.x,available.y,skin.progress,true); ImGui.setCursorScreenPos(end); }
+     chrome.contentLeadX=start.x-parentPos.x; chrome.contentLeadY=start.y-parentPos.y;
+     chrome.contentWidth=available.x; chrome.contentHeight=available.y;
     }
     chrome.closeBodyChild();
     if(!chrome.isCollapsed()) chrome.captureSize(cfg.width,cfg.height);

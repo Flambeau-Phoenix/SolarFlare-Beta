@@ -340,7 +340,7 @@ class ConduitOverlay {
 	public function draw(cfg:ConduitConfig):Void {
 		if (cfg == null || cfg.hidden.get())
 			return;
-		if (!ConduitCache.active)
+		if (!solarflare.ResourceCapabilities.current.conduits || !ConduitCache.active)
 			return;
 		hudCfg = cfg;
 		theme.wrap(hudWindowFn);

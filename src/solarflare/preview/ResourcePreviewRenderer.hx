@@ -20,7 +20,9 @@ import solarflare.ui.VitalsConfig;
  * their live overlays.
  */
 class ResourcePreviewRenderer {
-	static var ALL_IDS = ["target", "castbar", "health", "attack", "rage", "mana", "prayers", "combo", "chaincast", "conduit"];
+	static var ALL_IDS = ["target", "castbar", "dash", "health", "attack", "rage", "mana", "prayers", "combo", "chaincast", "conduit"];
+	var dashSample=new solarflare.resourcetracker.DashState();
+	var dashPreviewSource:PreviewState;
 	var hp = new VitalSnap();
 	var rage = new VitalSnap();
 	var mana = new VitalSnap();
@@ -58,6 +60,7 @@ class ResourcePreviewRenderer {
 	}
 
 	public function elementHeight(id:String, cfg:ConfigPanel):Single {
+		if(id=="dash" && cfg!=null) return Math.max(cfg.dash.minHeight(),cfg.dash.height.get());
 		if (id == "chaincast" && cfg != null && cfg.chaincast != null)
 			return ChaincastRenderer.headHeight(cfg.chaincast.style.get(), cfg.chaincast.width.get());
 		if (id == "target") return 64;
@@ -87,9 +90,30 @@ class ResourcePreviewRenderer {
 			return;
 		if (width < 40)
 			width = 40;
+		if(id=="dash") width=Math.min(width,Math.max(cfg.dash.minWidth(),cfg.dash.width.get()));
 		var left = ImGui.getCursorPosX();
 		ImGui.setCursorPosX(left + Math.max(0, (ImGui.getContentRegionAvail().x - width) * 0.5));
-		switch (id) {
+		var art=cfg.resourceArtwork.get(id);
+		var face=ImGui.getCursorScreenPos();
+		var artProgress:Float=s.hpRatio();
+		switch(id) {
+			case "rage": artProgress=s.rageMax>0 ? s.rage/s.rageMax : 0;
+			case "mana": artProgress=s.sparkValid ? (s.sparkMax>0 ? s.spark/s.sparkMax : 0) : s.manaMax>0 ? s.mana/s.manaMax : 0;
+			case "prayers": artProgress=s.prayersCharged/3;
+			case "combo": artProgress=s.comboMax>0 ? s.comboCurrent/s.comboMax : 0;
+			case "attack": artProgress=s.attackLength>0 ? s.attackStep/s.attackLength : 0;
+			case "chaincast": artProgress=s.chainReady ? 1 : s.chainMax>0 ? s.chainCurrent/s.chainMax : 0;
+			case "conduit": artProgress=s.conduitSlotCount>0 ? s.conduitFilled/s.conduitSlotCount : 0;
+			case "castbar": artProgress=castSample.progress;
+			case "dash": artProgress=s.comboCurrent==0 ? 0.8 : s.comboCurrent>=s.comboMax ? 1 : 0.45;
+			default:
+		}
+		if(art!=null) art.paint(face.x,face.y,width,height,artProgress,false);
+		ImGui.setCursorScreenPos(face);
+		if(art==null || art.keepContent.get() || !art.ready()) switch (id) {
+			case "dash":
+				if(dashPreviewSource!=s) { dashPreviewSource=s; dashSample.update("Dash_Base",s.comboCurrent==0 ? 0 : s.comboCurrent>=s.comboMax ? 2 : 1,2,s.comboCurrent>=s.comboMax ? 0 : artProgress*8,8); }
+				solarflare.resourcetracker.DashTracker.render(cfg.dash,dashSample,width,height);
 			case "health":
 				syncHp(s);
 				VitalsRenderer.draw(hp, cfg.vitals.hpStyle.get(), width, height, cfg.vitals.hpVertical.get());
@@ -138,6 +162,8 @@ class ResourcePreviewRenderer {
 			default:
 				ImGui.textDisabled("Select a resource to preview.");
 		}
+		else ImGui.dummy(ImGui.vec2(width,height));
+		if(art!=null) { var end=ImGui.getCursorScreenPos(); art.paint(face.x,face.y,width,height,artProgress,true); ImGui.setCursorScreenPos(end); }
 		ImGui.setCursorPosX(left);
 		// Register the restored cursor (including trailing item spacing) before EndChild.
 		ImGui.pushStyleVar(imgui.Enums.ImGuiStyleVar.ItemSpacing, ImGui.vec2(0, 0));
@@ -198,6 +224,7 @@ class ResourcePreviewRenderer {
 
 	static function labelOf(id:String):String {
 		return switch (id) {
+			case "dash": "Dash / Recharge";
 			case "health": "Health";
 			case "rage": "Rage";
 			case "mana": "Mana / Spark";

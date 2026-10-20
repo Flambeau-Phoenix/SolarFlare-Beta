@@ -557,6 +557,7 @@ class ChaincastOverlay {
 	public function draw(cfg:ChaincastConfig):Void {
 		if (cfg == null)
 			return;
+		if(!solarflare.ResourceCapabilities.current.chaincast) return;
 		// Modules own their windows and visibility; the combined window below is just one more consumer.
 		if (cfg.modules != null)
 			cfg.modules.draw();
