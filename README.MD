@@ -1,10 +1,12 @@
+![CanvasEditor](canvaseditor.png)
+
+
+# SolarFlare — v6.1b (Beta)
+> **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
+![HiddenUI](HiddenUI.png)
 
 ![solargif](solar.gif)
 
-# SolarFlare — v5.5b (Beta)
-> **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
-![HiddenUI](HiddenUI.png)
-![CanvasEditor](canvaseditor.png)
 
 ---
 
