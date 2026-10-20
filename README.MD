@@ -4,7 +4,7 @@
 # SolarFlare — v5.5b (Beta)
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
 ![HiddenUI](HiddenUI.png)
-![CallToGlory](WarCallToGlory.png)
+![CanvasEditor](canvaseditor.png)
 
 ---
 
@@ -34,7 +34,7 @@
 
 # Solar Flare v6.1b - Stutter Fix
 [!GitHub](https://github.com/Flambeau-Phoenix/SolarFlare-Beta/releases/tag/v6.1b) || [!Vortex](https://www.nexusmods.com/farever/mods/12?tab=files)
-```
+
 - Fixed an issue where multiple settings stores & BarTer polling caused the game to stutter.
 - Condensed the solarflare.json settings schema (mod will backup your current legacy settings + create a converted new version)
 - Added the ability to use "custom_images" folder assets in ResourceTracker UI elements (polish per-resource to come later)
