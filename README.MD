@@ -31,17 +31,15 @@
 
 ---
 
-# ---- *** UPDATE: SFCursor.hdll !!  ----
-# Solar Flare v5.5b - Canvas Editor Improvements + UI Fixes
-[GitHub](https://github.com/Flambeau-Phoenix/SolarFlare-Beta/releases/tag/v5.5b) || [Vortex](https://www.nexusmods.com/farever/mods/12?tab=files)
 
-- Increased limits for SVG assets in Canvas Builder (64 -> 512 points per node)
-- Added native binding to ExtraBars so "Always Active" setting works
-- Added click-through protection for Solar Flare windows
-- Added a fix to keep Solar Flare UI windows open upon alt tabbing back into game
-- Added "Round Whole Number" option for timer displays
-- Custom sound ques can be added and exported via the "custom_sounds" folder
-- Fixed an issue where "Dashes left" field didn't appear in the Aura condition
+# Solar Flare v6.1b - Stutter Fix
+[!GitHub](https://github.com/Flambeau-Phoenix/SolarFlare-Beta/releases/tag/v6.1b) || [!Vortex](https://www.nexusmods.com/farever/mods/12?tab=files)
+```
+- Fixed an issue where multiple settings stores & BarTer polling caused the game to stutter.
+- Condensed the solarflare.json settings schema (mod will backup your current legacy settings + create a converted new version)
+- Added the ability to use "custom_images" folder assets in ResourceTracker UI elements (polish per-resource to come later)
+- Added the ability to scale Binding and Charges keys on BarTer action bars
+- Fixed some edge cases where UI element's settings would bleed between characters/profiles
 
 
 ---
