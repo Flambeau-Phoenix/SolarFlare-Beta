@@ -21,6 +21,15 @@ class ImageConvert {
 	/** JPEG decoder installed at runtime by JpegBridge (the game's own decoder); unset in tests and headless builds. */
 	public static var jpegDecoder:Bytes->BgraImage = null;
 
+	/** libpng decoder installed at runtime by PngBridge (the game's own); handles interlaced, 16-bit and odd greyscale PNGs. */
+	public static var pngDecoder:Bytes->BgraImage = null;
+
+	/** Formats the pure-Haxe reader gets wrong: interlaced, or anything but 8-bit outside palette images. */
+	static function pngNeedsNative(b:Bytes):Bool {
+		if (b.length < 29) return false;
+		return b.get(28) == 1 || (b.get(25) != 3 && b.get(24) != 8);
+	}
+
 	/** Width/height from the first start-of-frame marker, or null when the file is not a readable JPEG. */
 	public static function jpegSize(b:Bytes):{w:Int, h:Int} {
 		var i = 2;
@@ -58,10 +67,23 @@ class ImageConvert {
 	public static function decode(b:Bytes, ext:String):BgraImage {
 		switch (sniff(b, ext)) {
 			case "png":
-				var data = new format.png.Reader(new BytesInput(b)).read();
-				var h = format.png.Tools.getHeader(data);
-				guard(h.width, h.height);
-				return {w: h.width, h: h.height, bgra: format.png.Tools.extract32(data)};
+				if (pngDecoder != null && pngNeedsNative(b)) {
+					var img = pngDecoder(b);
+					guard(img.w, img.h);
+					return img;
+				}
+				try {
+					var data = new format.png.Reader(new BytesInput(b)).read();
+					var h = format.png.Tools.getHeader(data);
+					guard(h.width, h.height);
+					return {w: h.width, h: h.height, bgra: format.png.Tools.extract32(data)};
+				} catch (e:Dynamic) {
+					// The pure reader rejects some valid PNGs; the game's decoder gets a second try.
+					if (pngDecoder == null) throw e;
+					var img = pngDecoder(b);
+					guard(img.w, img.h);
+					return img;
+				}
 			case "gif":
 				var data = new format.gif.Reader(new BytesInput(b)).read();
 				var w = data.logicalScreenDescriptor.width, h = data.logicalScreenDescriptor.height;

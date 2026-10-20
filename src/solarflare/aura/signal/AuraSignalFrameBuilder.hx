@@ -35,6 +35,11 @@ class AuraSignalFrameBuilder {
 		frame.heroKnown = HealthCache.localHero != null;
 		solarflare.aura.WeaponEquipmentCache.sample(now);
 		frame.publishWeapons(solarflare.aura.WeaponEquipmentCache.snaps);
+		if (solarflare.ObserveDemand.aurasNeedEquipped) {
+			solarflare.aura.SkillEquipmentCache.sample(now);
+			frame.publishEquipped(solarflare.aura.SkillEquipmentCache.known, solarflare.aura.SkillEquipmentCache.complete,
+				solarflare.aura.SkillEquipmentCache.keys, solarflare.aura.SkillEquipmentCache.count);
+		}
 		var localCasts = solarflare.aura.LocalCastHistory.shared;
 		localCasts.bindHero(HealthCache.localHero);
 		for (r in localCasts.records) {

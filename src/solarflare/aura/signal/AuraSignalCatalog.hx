@@ -39,6 +39,7 @@ class AuraSignalCatalog {
 		add("resource.combo.count", "Combo points", "Resources", Count);
 		add("resource.combo.atMax", "Combo points at max", "Resources", Boolean);
 		add("skill.ready", "Skill ready", "Skills", Boolean, "skill");
+		add("skill.equipped", "Skill equipped (on my action bars)", "Skills", Boolean, "skill");
 		add("event.playerCast.recent", "My skill cast age (seconds)", "Skills", Duration, "skill");
 		add("skill.affordable", "Skill affordable", "Skills", Boolean, "skill");
 		add("skill.inCooldown", "Skill in cooldown", "Skills", Boolean, "skill");

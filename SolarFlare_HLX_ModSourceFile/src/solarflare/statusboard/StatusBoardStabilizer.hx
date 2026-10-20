@@ -123,5 +123,6 @@ class StatusBoardStabilizer {
   dst.durationKnown = src.durationKnown;
   dst.progress = src.progress; dst.left = src.left; dst.infinite = src.infinite;
   dst.endsAt = src.endsAt; dst.totalDur = src.totalDur; dst.stampSource = src.stampSource;
+  dst.debuff = src.debuff; dst.polarityKnown = src.polarityKnown;
  }
 }

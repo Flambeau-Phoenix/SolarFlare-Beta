@@ -13,11 +13,14 @@ class StatusBoardOverlay {
 	var hudResizeFn:Single->Single->Void;
 
  static inline var GAP:Int = 4;
- public function new() {
+ var windowId:String;
+ var windowTitle:String;
+ public function new(windowId:String = "SolarFlare.StatusBoard", windowTitle:String = "Statuses") {
+		this.windowId = windowId; this.windowTitle = windowTitle;
 		hudBodyFn = hudBody;
 		hudResizeFn = hudResize;
 	}
- public function draw(cfg:StatusBoardConfig, edit:Void->Void, hide:Void->Void):Void {
+ public function draw(cfg:StatusBoardConfig, edit:Void->Void, hide:Void->Void, title:String = null):Void {
   if (cfg == null || !cfg.demand()) return;
   var n=cfg.visible.length;
   if (n == 0 && cfg.chrome.locked.get()) return;
@@ -31,7 +34,7 @@ class StatusBoardOverlay {
    var top=StatusBoardLayout.rowY(n-1,cols,cfg.slotSize,cfg.showSeconds,h,true);
    visualBounds.include(0,top,w,cfg.slotSize+StatusBoardLayout.timerBand(cfg.slotSize,cfg.showSeconds));
   }
-  HUDWidgetWindow.draw("SolarFlare.StatusBoard","Statuses",cfg.chrome,w,h,hudBodyFn,edit,hide,false,null,hudResizeFn,cfg.growthDirection=="up" ? visualBounds : null);
+  HUDWidgetWindow.draw(windowId,title != null ? title : windowTitle,cfg.chrome,w,h,hudBodyFn,edit,hide,false,null,hudResizeFn,cfg.growthDirection=="up" ? visualBounds : null);
   hudCfg = null;
  }
 

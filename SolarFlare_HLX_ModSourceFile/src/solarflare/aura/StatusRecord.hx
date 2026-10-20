@@ -6,6 +6,7 @@ class StatusRecord {
 	public var generation:Int;
 	public var identity = new AuraStatusSnap();
 	public var sourceResolved:Bool = false;
+	public var polarityResolved:Bool = false;
 	public var lastReadAt:Float = 0;
 	public var seenSweep:Int = -1;
 	public var stacks:Int = 0;

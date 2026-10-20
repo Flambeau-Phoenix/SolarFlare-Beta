@@ -29,6 +29,9 @@ class AuraStatusSnap {
 	public var totalDur:Float = 0;
 	/** Which resolver won the stamp: "live", "cdb", or "" while unstamped. */
 	public var stampSource:String = "";
+	/** Harmful: a Debuff-type or crowd-control status. Resolved once per application while the Status Board is on. */
+	public var debuff:Bool = false;
+	public var polarityKnown:Bool = false;
 
 	public function new() {}
 
@@ -48,5 +51,7 @@ class AuraStatusSnap {
 		endsAt = 0;
 		totalDur = 0;
 		stampSource = "";
+		debuff = false;
+		polarityKnown = false;
 	}
 }

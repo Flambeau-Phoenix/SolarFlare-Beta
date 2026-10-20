@@ -43,6 +43,11 @@ class AuraSignalReader {
 				var critical=signal=="event.combat.critical";
 				duration(out,frame.heroKnown,critical ? frame.critAge : frame.blockAge);
 				out.timeLeft=Math.NaN; out.eventSerial=critical ? frame.critSerial : frame.blockSerial;
+			case "skill.equipped":
+				// A listed skill is equipped. An unlisted one is only "not equipped" once every slot was readable;
+				// while the bars are rebuilding the answer is unknown and the condition keeps its last state.
+				var equipped = frame.isEquipped(subject);
+				bool(out, frame.equippedKnown && (equipped || frame.equippedComplete), equipped);
 			case "equipment.weaponEquipped":
 				var weapon = frame.findWeapon(subject);
 				bool(out, weapon != null && weapon.known, weapon != null && weapon.equipped);

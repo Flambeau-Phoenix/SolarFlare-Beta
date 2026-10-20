@@ -98,6 +98,13 @@ class AuraSignalFrame {
 	public var consumableCount:Int = 0;
 	public var weapons:Array<WeaponSignalSnap> = [];
 	public var weaponCount:Int = 0;
+	/** Skills on the hero's action bars: a native read has completed / every slot was readable / lower-case keys. */
+	public var equippedKnown:Bool = false;
+	public var equippedComplete:Bool = false;
+	public var equippedKeys:Array<String> = [for (_ in 0...MAX_EQUIPPED) ""];
+	/** Capacity of equippedKeys; SkillEquipmentCache publishes at most this many. */
+	public static inline var MAX_EQUIPPED:Int = 64;
+	public var equippedCount:Int = 0;
 	public var statuses:Array<StatusSignalSnap> = [];
 	public var targetStatuses:Array<StatusSignalSnap> = [];
 	public var targetStatusCount:Int=0;
@@ -141,6 +148,7 @@ class AuraSignalFrame {
 		myStatusTypeKnown=myStatusTypePresent=enemyStatusTypeKnown=enemyStatusTypePresent=0;
 		for (i in 0...weaponCount) weapons[i].reset();
 		weaponCount = 0;
+		equippedKnown = false; equippedComplete = false; equippedCount = 0;
 		for (i in 0...consumableCount) consumables[i].reset();
 		consumableCount = 0;
 		for (i in 0...skillCount) skills[i].reset();
@@ -165,6 +173,19 @@ class AuraSignalFrame {
 			var dst = weapons[weaponCount++];
 			dst.id = src.id; dst.known = src.known; dst.equipped = src.equipped;
 		}
+	}
+	public function publishEquipped(known:Bool, complete:Bool, keys:Array<String>, count:Int):Void {
+		equippedKnown = known;
+		equippedComplete = complete;
+		equippedCount = Std.int(Math.min(count, equippedKeys.length));
+		for (i in 0...equippedCount) equippedKeys[i] = keys[i];
+	}
+	public function isEquipped(id:String):Bool {
+		if (id == null || id.length == 0) return false;
+		var key = solarflare.geaux.GeauxCache.sanitizeSkillId(id).toLowerCase();
+		if (key.length == 0) return false;
+		for (i in 0...equippedCount) if (equippedKeys[i] == key) return true;
+		return false;
 	}
 	public function findWeapon(id:String):WeaponSignalSnap {
 		if (id == null || id.length == 0) return null;

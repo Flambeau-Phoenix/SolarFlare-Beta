@@ -828,7 +828,7 @@ class ConfigPanel {
 				if (stacks != null && drawModuleHeader("Stacks", stacks.config.trackers.length+" tracker(s)", "Open builder", "stacks_open")) stacks.open.set(true);
 			case TAB_STATUS:
 				if (statusBoard != null)
-					statusBoard.config.drawContents();
+					statusBoard.drawContents();
 			case TAB_BARTER:
 				if (barter != null)
 					barter.config.drawHubSummary();

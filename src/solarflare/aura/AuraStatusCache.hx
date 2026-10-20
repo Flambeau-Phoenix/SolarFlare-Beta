@@ -645,6 +645,15 @@ class AuraStatusCache {
 				}
 			}
 		}
+		if ((record == null || !record.polarityResolved) && solarflare.ObserveDemand.statusBoard) {
+			// Once per application: the engine's own type test, so Hemorrhage-style children of Debuff count too.
+			try {
+				var typed:st.skill.Status = item;
+				snap.debuff = typed.isType("Debuff") || typed.isCC();
+				snap.polarityKnown = true;
+				if (record != null) record.polarityResolved = true;
+			} catch (_:Dynamic) {}
+		}
 		if (record != null) copySnap(record.identity, snap);
 		if (stateRefreshEnabled && record != null) readState(record, snap);
 		else {
@@ -946,6 +955,7 @@ class AuraStatusCache {
 		dst.endsAt = src.endsAt;
 		dst.totalDur = src.totalDur;
 		dst.stampSource = src.stampSource;
+		dst.debuff = src.debuff; dst.polarityKnown = src.polarityKnown;
 	}
 
 	static var queryScratch = new AuraStatusSnap();

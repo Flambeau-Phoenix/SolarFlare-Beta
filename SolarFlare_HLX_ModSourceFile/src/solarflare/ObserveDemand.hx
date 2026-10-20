@@ -56,6 +56,8 @@ class ObserveDemand {
 	/** Target snap for auras even when Target HUD is hidden. */
 	public static var aurasNeedTarget:Bool = false;
 	public static var aurasNeedDash:Bool=false;
+	/** Some aura condition asks whether a skill is on the action bars (samples the native slot observer). */
+	public static var aurasNeedEquipped:Bool=false;
 	public static var auraEventStatusIds:Array<String>=[];
 	public static var auraEventSkillIds:Array<String>=[];
 	/** Skill subjects for skill.instantReady (sanitized IDs, rebuilt each publish). */
@@ -245,8 +247,11 @@ class ObserveDemand {
 			if(StringTools.startsWith(c.signal,"attackCombo.")) attackCombo=true;
 		}
 		aurasNeedDash=false;
-		if(auras || auraBuilderOpen) for(c in auraConditions)
+		aurasNeedEquipped=false;
+		if(auras || auraBuilderOpen) for(c in auraConditions) {
 			if(StringTools.startsWith(c.signal,"dash.") || StringTools.startsWith(c.signal,"event.dash.")) aurasNeedDash=true;
+			if(c.signal=="skill.equipped") aurasNeedEquipped=true;
+		}
 
 		if(!auraBuilderOpen) solarflare.scripting.ScriptEditorSession.clear();
 		// BarTer subjects: bounded rebuild (three active bars × 64 cells), own poll path.

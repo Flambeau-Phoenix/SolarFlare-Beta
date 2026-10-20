@@ -86,7 +86,7 @@ class CastCache {
 			var duration = episode.frozen.seconds;
 			out.active = true;
 			out.skillId = id;
-			out.label = pretty(id);
+			out.label = displayName(id);
 			out.elapsed = elapsed;
 			out.remaining = remaining;
 			out.duration = duration;
@@ -103,6 +103,15 @@ class CastCache {
 			out.clear();
 			// A transient getter failure must not turn the next frame into a second episode.
 		}
+	}
+
+	/** The game's own spell name when the catalog knows it; otherwise the id's last segment, spaced out. */
+	static function displayName(id:String):String {
+		if (id != null && id.length > 0) {
+			var name = solarflare.cdb.AuraCatalog.label(id);
+			if (name != null && name.length > 0) return name;
+		}
+		return pretty(id);
 	}
 
 	static function pretty(id:String):String {

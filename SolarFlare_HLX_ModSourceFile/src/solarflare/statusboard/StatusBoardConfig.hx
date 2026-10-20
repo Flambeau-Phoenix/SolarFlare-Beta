@@ -14,7 +14,10 @@ import solarflare.ui.SearchBar;
 class StatusBoardConfig {
  public var enabled=new BoolRef(true);
  public var hidden=new BoolRef(false);
- public var chrome=new HudChrome(40,120);
+ public var chrome:HudChrome;
+ /** 0 = every status, 1 = buffs only, 2 = debuffs only (harmful statuses). */
+ public var view:Int=0;
+ static var viewNames:Array<String>=["All statuses","Buffs only","Debuffs only"];
  public var slotSize:Int=40;
  public var columns:Int=12;
  public var growthDirection:String="down";
@@ -38,7 +41,8 @@ class StatusBoardConfig {
  var labels:Map<String,String>=new Map();
  var lastRevision:Int=-1;
  var copyTooltipCoverageFn:Void->Void;
- public function new() { copyTooltipCoverageFn=copyTooltipCoverage; }
+ public function new(y:Int=120) { chrome=new HudChrome(40,y); copyTooltipCoverageFn=copyTooltipCoverage; }
+ inline function inView(s:AuraStatusSnap):Bool return view==0 || (view==2)==s.debuff;
  function copyTooltipCoverage():Void {
   solarflare.ui.UiActionQueue.copyText(haxe.Json.stringify({schema:"solarflare.status-tooltip-coverage.v1",scope:"hovered applications only",rows:StatusBoardTooltipCache.coverage()},null,"  "));
  }
@@ -66,14 +70,17 @@ class StatusBoardConfig {
   setColumnsFromWidth(contentWidth,gap); SettingsStore.markDirty();
  }
  var stabilizer=new StatusBoardStabilizer();
+ var viewShown:Array<AuraStatusSnap>=[];
  public function observe():Void {
   if (stabilizer.syncOwner(AuraStatusCache.ownerGeneration)) lastRevision=-1;
   if (lastRevision != AuraStatusCache.revision) {
    lastRevision=AuraStatusCache.revision;
    stabilizer.update(AuraStatusCache.snaps,AuraStatusCache.count,describe,maxIcons);
-   active=stabilizer.shown;
   }
-  exclusions.pack(stabilizer.shown,stabilizer.shown.length,visible,maxIcons);
+  viewShown.resize(0);
+  for (s in stabilizer.shown) if (inView(s)) viewShown.push(s);
+  active=viewShown;
+  exclusions.pack(viewShown,viewShown.length,visible,maxIcons);
   for (v in visualByKey) v.seen=false;
   var now=haxe.Timer.stamp();
   for (i in 0...active.length) {
@@ -122,7 +129,7 @@ class StatusBoardConfig {
   labels.set(StatusBoardState.key(s.id),s.label);
  }
  public function dump():Dynamic return {
-  enabled:enabled.get(),hidden:hidden.get(),slotSize:slotSize,columns:columns,maxIcons:maxIcons,
+  enabled:enabled.get(),hidden:hidden.get(),view:view,slotSize:slotSize,columns:columns,maxIcons:maxIcons,
   contentWidth:contentWidth,contentHeight:contentHeight,growthDirection:growthDirection,
   showSeconds:showSeconds,showStacks:showStacks,hiddenStatusIds:exclusions.hiddenIds.copy(),
   hiddenStatusLabels:[for (id in exclusions.hiddenIds) {id:id,label:labels.exists(id) ? labels.get(id) : id}],
@@ -132,7 +139,7 @@ class StatusBoardConfig {
  public function apply(data:Dynamic):Void {
   growthDirection=StatusBoardLayout.direction(data == null ? null : data.growthDirection);
   if (data == null) return;
-  enabled.set(data.enabled != false); hidden.set(data.hidden == true);
+  enabled.set(data.enabled != false); hidden.set(data.hidden == true); view=clamp(data.view,0,2,0);
   slotSize=clamp(data.slotSize,28,72,40); columns=clamp(data.columns,1,16,12);
   contentWidth=dimension(data.contentWidth); contentHeight=dimension(data.contentHeight);
   // Legacy boards silently truncated at 24/48; migration displays the whole list.
@@ -141,7 +148,7 @@ class StatusBoardConfig {
   exclusions.apply(data.hiddenStatusIds);
   visualByKey.clear(); visuals.resize(0);
   visualBySnapshot.clear(); StatusBoardTooltipCache.clear();
-  labels.clear(); lastRevision=-1; stabilizer.reset(); active=stabilizer.shown; visible.resize(0);
+  labels.clear(); lastRevision=-1; stabilizer.reset(); viewShown.resize(0); active=viewShown; visible.resize(0);
   if (Std.isOfType(data.hiddenStatusLabels,Array)) {
    var saved:Array<Dynamic>=cast data.hiddenStatusLabels;
    for (row in saved) if (row != null && Std.isOfType(row.id,String) && Std.isOfType(row.label,String)) labels.set(StatusBoardState.key(row.id),row.label);
@@ -155,9 +162,9 @@ class StatusBoardConfig {
   if ((!Std.isOfType(v,Float) && !Std.isOfType(v,Int)) || !Math.isFinite(v) || v <= 0) return 0;
   return Math.min(10000,v);
  }
- public function drawContents():Void {
-  UiChrome.heading("Status Board",1.15);
-  ImGui.textWrapped("Your character's active statuses. Empty boards disappear during gameplay. Hidden statuses remain available to Auras and BarTer.");
+ public function drawContents(title:String="Status Board",extraRows:Void->Void=null):Void {
+  UiChrome.heading(title,1.15);
+  solarflare.ui.UiHints.noteWrapped("Your character's active statuses. Empty boards disappear during gameplay. Hidden statuses remain available to Auras and BarTer.");
   UiLayout.propertyGrid("##sb_properties",function() {
    UiLayout.propertyRow("Window",function() {
     UiLayout.inlineSplit("##sb_window",4,function(i:Int,_:Single) {
@@ -168,7 +175,12 @@ class StatusBoardConfig {
     });
    });
    chrome.drawPositionRow("sb_pos");
-   UiLayout.propertyRow("Icon size",function() { intRef.set(slotSize); if (ImGui.sliderInt("##sb_size",intRef,28,72)) { slotSize=intRef.get(); contentWidth=0; SettingsStore.markDirty(); } });
+   UiLayout.propertyRow("Show",function() {
+    var picked=UiLayout.stringCombo("##sb_view",viewNames[view],viewNames,function(v:String) return v);
+    if (picked!=null) { var next=viewNames.indexOf(picked); if (next>=0 && next!=view) { view=next; SettingsStore.markDirty(); } }
+   });
+   if (extraRows!=null) extraRows();
+   UiLayout.propertyRow(view==1 ? "Buff icon size" : view==2 ? "Debuff icon size" : "Icon size",function() { intRef.set(slotSize); if (ImGui.sliderInt("##sb_size",intRef,28,72)) { slotSize=intRef.get(); contentWidth=0; SettingsStore.markDirty(); } });
    UiLayout.propertyRow("Columns",function() { intRef.set(columns); if (ImGui.sliderInt("##sb_columns",intRef,1,16)) { columns=intRef.get(); contentWidth=0; SettingsStore.markDirty(); } });
    UiLayout.propertyRow("Growth direction",function() {
     var picked=UiLayout.stringCombo("##sb_growth",growthDirection,growthModes,growthLabel);

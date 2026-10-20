@@ -141,7 +141,7 @@ class CanvasEditor {
 	public function draw():Void {
 		if (!open.get()) { if (haxe.Timer.stamp() - lastPreviewSync > 0.3) releasePreview(); return; }
 		if (!CursorCaptureFix.cursorFree) return;
-		EditorWindow.drawMenuWindow("Canvas Editor###SolarFlare.CanvasEditor", open, 1180, 780, drawBody);
+		EditorWindow.drawMenuWindow("Canvas Editor###SolarFlare.CanvasEditor", open, 1360, 860, drawBody);
 	}
 
 
@@ -177,7 +177,7 @@ class CanvasEditor {
 	var tbIndex:Int = 0;
 	static var STAGE_BACKGROUNDS:Array<String> = ["Dark", "Mid grey", "Light", "Checker"];
 	static var SNAP_STEPS:Array<Float> = [1, 2, 4, 8, 16];
-	static var SIZE_PRESETS:Array<Int> = [48, 64, 96, 128, 160, 192, 256];
+	static var SIZE_PRESETS:Array<Int> = [48, 64, 96, 128, 160, 192, 256, 384, 512];
 
 	function drawBody():Void {
 		var a = host.canvasSelectedAura();
@@ -202,8 +202,8 @@ class CanvasEditor {
 		var avail = ImGui.getContentRegionAvail();
 		var statusH:Single = 24;
 		var paneH:Single = Math.max(280, avail.y - statusH);
-		var leftW:Single = Math.max(200, Math.min(280, avail.x * 0.2));
-		var rightW:Single = Math.max(280, Math.min(380, avail.x * 0.28));
+		var leftW:Single = Math.max(200, Math.min(250, avail.x * 0.18));
+		var rightW:Single = Math.max(280, Math.min(340, avail.x * 0.25));
 		var centreW:Single = Math.max(260, avail.x - leftW - rightW - 16);
 		var borders = imgui.Enums.ImGuiChildFlags.Borders;
 
@@ -281,7 +281,7 @@ class CanvasEditor {
 					try {
 						UiChrome.gap(4);
 						imageLibrary.draw("cv_lib", function(stem) {
-							addCanvasElement(a, AuraCanvasElement.icon(CustomImages.key(stem), 8, 8, 48, 48), "Canvas Add Image", false);
+							addCanvasElement(a, imageLayer(a, stem), "Canvas Add Image", false);
 						}, "Add to canvas");
 						ImGui.separator();
 						drawCanvasAssetFolder();
@@ -314,8 +314,8 @@ class CanvasEditor {
 		UiLayout.propertyGrid("##cv_canvas_props", function() {
 			UiLayout.propertyRow("Size", function() {
 				UiLayout.inlinePair("##cv_size",
-					function(_:Single) { if (NumberField.draw("##cv_aw", a.w, 24, 720, "W  %.0f", preciseFn)) { a.sizeDirty = true; SettingsStore.markDirty(); } },
-					function(_:Single) { if (NumberField.draw("##cv_ah", a.h, 24, 480, "H  %.0f", preciseFn)) { a.sizeDirty = true; SettingsStore.markDirty(); } });
+					function(_:Single) { if (NumberField.draw("##cv_aw", a.w, 24, 1024, "W  %.0f", preciseFn)) { a.sizeDirty = true; SettingsStore.markDirty(); } },
+					function(_:Single) { if (NumberField.draw("##cv_ah", a.h, 24, 1024, "H  %.0f", preciseFn)) { a.sizeDirty = true; SettingsStore.markDirty(); } });
 			}, "The aura's width and height in pixels, before Scale. Layers are positioned inside this box.");
 			UiLayout.propertyRow("Presets", function() {
 				if (ImGui.beginCombo("##cv_size_preset", "Square sizes")) {
@@ -1147,9 +1147,27 @@ class CanvasEditor {
 		addCanvasElement(a, AuraCanvasElement.icon(id.length > 0 ? id : "icon", 8, 8, 48, 48), "Canvas Add Icon", false);
 	}
 
+	/**
+	 * New image layer sized from the picture's own proportions: its long side is about 60% of the canvas, centered.
+	 * An image whose shape is not known yet becomes a centered square.
+	 */
+	function imageLayer(a:AuraDef, stem:String):AuraCanvasElement {
+		var box = imageBox(a, stem);
+		return AuraCanvasElement.icon(CustomImages.key(stem), Math.round((auraBoxW(a) - box.w) * 0.5), Math.round((auraBoxH(a) - box.h) * 0.5), box.w, box.h);
+	}
+
+	function imageBox(a:AuraDef, stem:String):{w:Float, h:Float} {
+		var side = Math.max(16, Math.min(auraBoxW(a), auraBoxH(a)) * 0.6);
+		var aspect = CustomImages.aspectOf(stem);
+		if (!(aspect > 0.01 && aspect < 100)) aspect = 1;
+		var w = aspect >= 1 ? side : side * aspect;
+		var h = aspect >= 1 ? side / aspect : side;
+		return {w: Math.max(4, Math.round(w)), h: Math.max(4, Math.round(h))};
+	}
+
 	function insertImage(a:AuraDef):Void {
 		var names = CustomImages.names();
-		addCanvasElement(a, AuraCanvasElement.icon(CustomImages.key(names.length > 0 ? names[0] : ""), 8, 8, 48, 48), "Canvas Add Image", false);
+		addCanvasElement(a, imageLayer(a, names.length > 0 ? names[0] : ""), "Canvas Add Image", false);
 	}
 
 	/** Shapes start as a backplate behind everything else. */
@@ -1338,6 +1356,7 @@ class CanvasEditor {
 		if (previewOwner != a) {
 			if (previewOwner != null) previewOwner.previewState = null;
 			previewOwner = a;
+			resetView();
 			editState = "";
 			stateDeleteArmed = "";
 			stateNameFor = null;
@@ -1598,7 +1617,7 @@ class CanvasEditor {
 	// Stage (drag / resize / nudge / context menu) + Layers list + typed properties.
 	// Coordinates are aura-local and unscaled; the stage fits them, the live HUD multiplies by Scale.
 
-	static inline var CANVAS_STAGE_PAD:Single = 18;
+	static inline var CANVAS_STAGE_PAD:Single = 10;
 	static inline var CANVAS_HANDLE_PX:Single = 7;
 	static inline var CANVAS_GRID:Float = 4;
 	static inline var CANVAS_DRAG_NONE:Int = 0;
@@ -2146,8 +2165,8 @@ class CanvasEditor {
 
 	/** New image layer centred on the drop point. */
 	function dropImage(a:AuraDef, stem:String, mx:Float, my:Float, snap:Bool):Void {
-		var size = 48.0;
-		var el = AuraCanvasElement.icon(CustomImages.key(stem), canvasSnapValue(mx - size * 0.5, snap), canvasSnapValue(my - size * 0.5, snap), size, size);
+		var box = imageBox(a, stem);
+		var el = AuraCanvasElement.icon(CustomImages.key(stem), canvasSnapValue(mx - box.w * 0.5, snap), canvasSnapValue(my - box.h * 0.5, snap), box.w, box.h);
 		// Dropping onto a look other than Default still creates a layer shared by every look.
 		addCanvasElement(a, el, "Canvas Add Image", false);
 		GameIcons.get(el.content);

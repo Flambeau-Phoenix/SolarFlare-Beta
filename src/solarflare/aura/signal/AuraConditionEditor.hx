@@ -385,6 +385,8 @@ class AuraConditionEditor {
 				ImGui.textDisabled("Count is full character status container length. Overflow means > " + AuraSignalFrame.MAX_STATUSES + " entries.");
 			else if (d.id == "skill.instantReady")
 				ImGui.textDisabled("Skill script shouldPlayInstantly (e.g. Staff_Craft_S1). For buffs, prefer Statuses.");
+			else if (d.id == "skill.equipped")
+				solarflare.ui.UiHints.noteWrapped("True while the skill is on your action bars: your active weapon's skills, class skills, or the signature slot (an arsenal weapon's skill). Unknown while the bars are rebuilding, such as during a weapon swap.");
 			else if (d.id == "equipment.weaponEquipped")
 				ImGui.textWrapped("Matches either equipped weapon slot or the active offhand, including the inactive weapon. Items only in your bag do not match.");
 			else if (d.id == "event.cast.recent" || d.id == "event.playerCast.recent")

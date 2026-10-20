@@ -8,6 +8,7 @@ import sys.FileSystem;
 import sys.io.File;
 
 typedef ImportReport = {imported:Array<String>, errors:Array<String>};
+typedef ConformJob = {id:String, stem:String, src:String, dest:String, sig:String};
 
 /**
  * User-supplied PNGs from a saved folder, with `<mod>/custom_images/` as a legacy fallback.
@@ -32,8 +33,18 @@ class CustomImages {
 	static var listed:Array<String> = [];
 	static var scanned = false;
 	static var refreshRequested = true;
+	/** Loadable file per id: the user's PNG, or its conformed copy when the original is too big or unreadable. */
 	static var paths = new Map<String, String>();
+	/** The user's real file per id, used for rename and delete. */
+	static var originals = new Map<String, String>();
+	/** Width / height per id, read from the PNG header during the scan. */
+	static var aspects = new Map<String, Float>();
 	static var fingerprints = new Map<String, String>();
+	/** PNGs waiting to be shrunk, one per observe tick. Originals are never touched. */
+	static var conformQueue:Array<ConformJob> = [];
+	/** id -> {signature of the file that failed, reason}. A changed file is tried again. */
+	static var conformFailed = new Map<String, {sig:String, reason:String}>();
+	static var conformedNow:Int = 0;
 	public static var folder(default, null):String = "";
 	public static var generation(default, null):Int = 0;
 	public static var displayDir(default, null):String = FOLDER;
@@ -87,8 +98,65 @@ class CustomImages {
 		return path.charAt(1) != ":" || path.charAt(2) == "/" || path.charAt(2) == "\\";
 	}
 	public static function requestRefresh():Void refreshRequested = true;
-	public static function hasPending():Bool return refreshRequested;
-	public static function observe():Void { if (refreshRequested) refresh(); }
+	public static function hasPending():Bool return refreshRequested || conformQueue.length > 0;
+	public static function observe():Void {
+		if (refreshRequested) refresh();
+		else if (conformQueue.length > 0) conformNext();
+	}
+	/** Images still being optimised in the background (for status text). */
+	public static function conforming():Int return conformQueue.length;
+	/** True when the id is known (listed), even if its optimised copy is still being made. Cache-only. */
+	public static function has(stem:String):Bool return stem != null && originals.exists(stem.toLowerCase());
+	/** Width / height of the image, or 0 when unknown. Cache-only, so it is safe while drawing or adding layers. */
+	public static function aspectOf(stem:String):Float {
+		if (stem == null) return 0;
+		var a = aspects.get(stem.toLowerCase());
+		return a == null ? 0 : a;
+	}
+
+	/** "ready", "conforming" or a failure reason. Cache-only. */
+	public static function stateOf(stem:String):String {
+		if (stem == null) return "";
+		var id = stem.toLowerCase();
+		if (!originals.exists(id)) return "";
+		if (paths.get(id) != null) return "ready";
+		for (j in conformQueue) if (j.id == id) return "conforming";
+		var f = conformFailed.get(id);
+		return f != null ? f.reason : "conforming";
+	}
+
+	/** Cache directory for shrunk copies; never scanned as a user folder. */
+	static function conformDir():String return Path.join([shareDir(), "_conformed"]);
+
+	static function conformedPath(id:String, stat:sys.FileStat):String {
+		return Path.join([conformDir(), sanitize(id) + "__" + stat.size + "_" + Std.int(stat.mtime.getTime() / 1000) + ".png"]);
+	}
+
+	/** 16-bit, interlaced and sub-8-bit greyscale PNGs decode wrongly (or not at all) in the pure reader. */
+	static function risky(h:{w:Int, h:Int, depth:Int, ctype:Int, interlace:Int}):Bool {
+		return h.interlace == 1 || (h.ctype != 3 && h.depth != 8);
+	}
+
+	/** Shrinks one queued PNG into the cache folder. A failure is remembered against the file's signature. */
+	static function conformNext():Void {
+		var job = conformQueue.shift();
+		if (job == null) return;
+		try {
+			var img = ImageConvert.decode(File.getBytes(job.src), "png");
+			var dim = MAX_DIM;
+			var png = ImageConvert.encodePng(ImageConvert.fit(img, dim));
+			while (png.length > MAX_BYTES && dim > 64) {
+				dim = Std.int(dim * 0.75);
+				png = ImageConvert.encodePng(ImageConvert.fit(img, dim));
+			}
+			if (png.length > MAX_BYTES) throw "still over 4 MB after shrinking";
+			var d = conformDir();
+			if (!FileSystem.exists(d)) FileSystem.createDirectory(d);
+			File.saveBytes(job.dest, png);
+			conformedNow++;
+		} catch (e:Dynamic) conformFailed.set(job.id, {sig: job.sig, reason: Std.string(e)});
+		refreshRequested = true;
+	}
 
 	public static inline function key(stem:String):String return CustomImageKey.key(stem);
 
@@ -96,7 +164,7 @@ class CustomImages {
 		return CustomImageKey.stemOf(key);
 	}
 
-	/** Absolute path for a stem, or null when the file is gone. Observe-phase only. */
+	/** Absolute path of the file to load for a stem (the optimised copy when one exists), or null. Observe-phase only. */
 	public static function pathFor(stem:String):String {
 		if (!validStem(stem)) return null;
 		if (!scanned || refreshRequested) refresh();
@@ -110,6 +178,10 @@ class CustomImages {
 	public static function refresh():Void {
 		refreshRequested = false;
 		var nextPaths = new Map<String, String>();
+		var nextOriginals = new Map<String, String>();
+		var nextAspects = new Map<String, Float>();
+		var jobs = new Map<String, ConformJob>();
+		var failedSeen = new Map<String, Bool>();
 		var nextPrints = new Map<String, String>();
 		var changes = new Map<String, Bool>();
 		var labels = new Map<String, String>();
@@ -135,14 +207,28 @@ class CustomImages {
 					var path = Path.join([directory, file]);
 					if (FileSystem.isDirectory(path)) continue;
 					var stat = FileSystem.stat(path);
-					if (stat.size > MAX_BYTES) { skipped++; if (!managed && !converted(directory, stem, "png")) fixable++; continue; }
-					if (!managed && !converted(directory, stem, "png")) {
-						var dims = pngSize(path);
-						if (dims != null && (dims.w > MAX_DIM || dims.h > MAX_DIM)) fixable++;
-					}
 					var id = stem.toLowerCase();
-					nextPaths.set(id, path); labels.set(id, stem);
-					nextPrints.set(id, path + "|" + stat.size + "|" + stat.mtime.getTime());
+					// A later folder overrides an earlier one, so it also cancels the earlier file's pending job.
+					jobs.remove(id);
+					var loadPath = path;
+					var hdr = pngHeader(path);
+					if (hdr != null && hdr.w > 0 && hdr.h > 0) nextAspects.set(id, hdr.w / hdr.h);
+					if (!managed) {
+						var needs = stat.size > MAX_BYTES || (hdr != null && (hdr.w > MAX_DIM || hdr.h > MAX_DIM || risky(hdr)));
+						if (needs) {
+							var sig = stat.size + "|" + stat.mtime.getTime();
+							var dest = conformedPath(id, stat);
+							var sibling = Path.join([directory, stem + "_resized.png"]);
+							var failure = conformFailed.get(id);
+							if (stat.size > MAX_SOURCE_BYTES) { conformFailed.set(id, {sig: sig, reason: "larger than 32 MB"}); failedSeen.set(id, true); skipped++; continue; }
+							if (FileSystem.exists(dest)) loadPath = dest;
+							else if (FileSystem.exists(sibling)) loadPath = sibling;
+							else if (failure != null && failure.sig == sig) { failedSeen.set(id, true); skipped++; continue; }
+							else { loadPath = null; jobs.set(id, {id: id, stem: stem, src: path, dest: dest, sig: sig}); }
+						}
+					}
+					nextPaths.set(id, loadPath); nextOriginals.set(id, path); labels.set(id, stem);
+					nextPrints.set(id, path + "|" + stat.size + "|" + stat.mtime.getTime() + "|" + (loadPath == null ? "pending" : loadPath));
 				} catch (_:Dynamic) { skipped++; }
 			}
 		}
@@ -161,24 +247,36 @@ class CustomImages {
 			changes.set(id, fingerprints.get(id) != nextPrints.get(id));
 		}
 		for (id in paths.keys()) if (!nextPaths.exists(id)) changes.set(id, true);
+		for (id in [for (k in conformFailed.keys()) k]) if (!failedSeen.exists(id)) conformFailed.remove(id);
+		var queue:Array<ConformJob> = [for (j in jobs) j];
+		queue.sort(function(a, b) return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
+		conformQueue = queue;
+		originals = nextOriginals;
+		aspects = nextAspects;
 		GameIcons.refreshCustomImages(changes);
 		out.sort(function(a, b) return a.toLowerCase() < b.toLowerCase() ? -1 : (a.toLowerCase() > b.toLowerCase() ? 1 : 0));
 		listed = out; paths = nextPaths; fingerprints = nextPrints; scanned = true;
 		status = folderError ? (folder.length == 0 ? "The default custom_images folder could not be read. Choose another images folder."
 			: "Selected folder is unavailable. Images from the default custom_images folder remain available.")
 			: listed.length + " PNG image(s) available. Original custom_images files remain available.";
-		if (skipped > 0) status += " Skipped " + skipped + " unsupported, unreadable or oversized file(s).";
+		if (conformQueue.length > 0) status += " Optimizing " + conformQueue.length + " large image(s)...";
+		var failedReason = "";
+		var failedCount = 0;
+		for (id => f in conformFailed) { failedCount++; if (failedReason.length == 0) failedReason = id + ": " + f.reason; }
+		if (failedCount > 0) status += " Could not use " + failedCount + " image(s) (" + failedReason + ").";
+		if (skipped > 0) status += " Skipped " + skipped + " unsupported or unreadable file(s).";
 	}
-	/** Width and height from a PNG header without decoding it, or null. */
-	static function pngSize(path:String):{w:Int, h:Int} {
+	/** Width, height and format flags from the PNG header without decoding it, or null. */
+	static function pngHeader(path:String):{w:Int, h:Int, depth:Int, ctype:Int, interlace:Int} {
 		var f:sys.io.FileInput = null;
 		try {
 			f = File.read(path, true);
-			var b = haxe.io.Bytes.alloc(24);
-			var got = f.readBytes(b, 0, 24);
+			var b = haxe.io.Bytes.alloc(29);
+			var got = f.readBytes(b, 0, 29);
 			f.close(); f = null;
-			if (got < 24 || b.get(0) != 0x89 || b.get(1) != 0x50 || b.get(2) != 0x4E || b.get(3) != 0x47) return null;
-			return {w: (b.get(16) << 24) | (b.get(17) << 16) | (b.get(18) << 8) | b.get(19), h: (b.get(20) << 24) | (b.get(21) << 16) | (b.get(22) << 8) | b.get(23)};
+			if (got < 29 || b.get(0) != 0x89 || b.get(1) != 0x50 || b.get(2) != 0x4E || b.get(3) != 0x47) return null;
+			return {w: (b.get(16) << 24) | (b.get(17) << 16) | (b.get(18) << 8) | b.get(19), h: (b.get(20) << 24) | (b.get(21) << 16) | (b.get(22) << 8) | b.get(23),
+				depth: b.get(24), ctype: b.get(25), interlace: b.get(28)};
 		} catch (_:Dynamic) {
 			// Always release the handle: a leaked one blocks deleting or replacing the file on Windows.
 			if (f != null) try f.close() catch (_:Dynamic) {}
@@ -208,7 +306,7 @@ class CustomImages {
 				var base:String;
 				if (ext == "png") {
 					var oversized = FileSystem.stat(path).size > MAX_BYTES;
-					if (!oversized) { var dims = pngSize(path); oversized = dims != null && (dims.w > MAX_DIM || dims.h > MAX_DIM); }
+					if (!oversized) { var dims = pngHeader(path); oversized = dims != null && (dims.w > MAX_DIM || dims.h > MAX_DIM || risky(dims)); }
 					if (!oversized || converted(d, stem, "png")) continue;
 					base = stem + "_resized";
 				} else if (CONVERTIBLE.indexOf(ext) >= 0) {
@@ -262,7 +360,7 @@ class CustomImages {
 
 	static function editablePath(stem:String):String {
 		if (!validStem(stem) || CustomImageKey.isManagedStem(stem)) throw "This image is managed by an imported share and cannot be changed.";
-		var path = pathFor(stem);
+		var path = originals.get(stem.toLowerCase());
 		if (path == null) throw "Image not found: " + stem;
 		return path;
 	}

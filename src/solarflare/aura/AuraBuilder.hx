@@ -854,6 +854,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		drawHomeRow("Cooldown time left", "home_sk_left", function() createFromHome("skill", "skill.cooldownLeft", ""));
 		drawHomeRow("Instant cast ready", "home_sk_inst", function() createFromHome("skill", "skill.instantReady", ""));
 		drawHomeRow("Skill affordable", "home_sk_aff", function() createFromHome("skill", "skill.affordable", ""));
+		drawHomeRow("Skill equipped (on my bars)", "home_sk_eq", function() createFromHome("skill", "skill.equipped", ""));
 		drawHomeRow("Charges remaining", "home_sk_chg", function() createFromHome("skill", "skill.charges", ""));
 	}
 
@@ -1849,6 +1850,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 				if (ImGui.selectable("Cooldown time left", false)) { wizardSignal = "skill.cooldownLeft"; wizardStep = 1; }
 				if (ImGui.selectable("Instant cast ready (script)", false)) { wizardSignal = "skill.instantReady"; wizardStep = 1; }
 				if (ImGui.selectable("Skill affordable", false)) { wizardSignal = "skill.affordable"; wizardStep = 1; }
+				if (ImGui.selectable("Skill equipped (on my bars)", false)) { wizardSignal = "skill.equipped"; wizardStep = 1; }
 				if (ImGui.selectable("Charges remaining", false)) { wizardSignal = "skill.charges"; wizardStep = 1; }
 			}
 		}
@@ -2999,7 +3001,16 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		snapshot("Use Freeform Canvas");
 		a.region = "canvas";
 		if (a.canvasElements == null) a.canvasElements = [];
-		if (a.canvasElements.length == 0) a.canvasElements.push(AuraCanvasElement.icon(a.preferredIconId(), 0, 0, 0, 0));
+		if (a.canvasElements.length == 0) {
+			// A new canvas starts roomy (256 x 256). Scale is lowered to match, so the aura keeps about the size it had on screen.
+			var w0 = a.w.get(), h0 = a.h.get();
+			if (w0 > 1 && h0 > 1 && w0 <= 192 && h0 <= 192 && Math.max(w0, h0) <= Math.min(w0, h0) * 1.5) {
+				var shown = Math.max(w0, h0) * a.displayScale();
+				a.w.set(256); a.h.set(256);
+				a.scale.set(Math.max(0.4, Math.min(6, shown / 256)));
+			}
+			a.canvasElements.push(AuraCanvasElement.icon(a.preferredIconId(), 0, 0, 0, 0));
+		}
 		a.sizeDirty = true;
 		canvasEditor.canvasSel = -1;
 		SettingsStore.markDirty();
@@ -3124,7 +3135,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 					"##ab_wh",
 					function(_:Single) {
 						var changed = a.region == "text" ? ImGui.inputFloat("##ab_w", a.w, 0, 0, "W  %.0f px")
-							: NumberField.draw("##ab_w", a.w, 32, 720, "W  %.0f px", preciseSnapshotFn);
+							: NumberField.draw("##ab_w", a.w, 32, 1024, "W  %.0f px", preciseSnapshotFn);
 						if (changed) {
 							if (a.region == "text") a.w.set(Math.isFinite(a.w.get()) ? Math.max(24, Math.min(10000, a.w.get())) : 320);
 							a.sizeDirty = true;
@@ -3133,7 +3144,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 					},
 					function(_:Single) {
 						var changed = a.region == "text" ? ImGui.inputFloat("##ab_h", a.h, 0, 0, "H  %.0f px")
-							: NumberField.draw("##ab_h", a.h, 24, 480, "H  %.0f px", preciseSnapshotFn);
+							: NumberField.draw("##ab_h", a.h, 24, 1024, "H  %.0f px", preciseSnapshotFn);
 						if (changed) {
 							if (a.region == "text") a.h.set(Math.isFinite(a.h.get()) ? Math.max(24, Math.min(10000, a.h.get())) : 120);
 							a.sizeDirty = true;

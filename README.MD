@@ -34,15 +34,33 @@
 ---
 
 
-# Solar Flare v6.1b - Stutter Fix
-[!GitHub](https://github.com/Flambeau-Phoenix/SolarFlare-Beta/releases/tag/v6.1b) || [!Vortex](https://www.nexusmods.com/farever/mods/12?tab=files)
+# Solar Flare v6.3b - Misc QoL
+[GitHub](https://github.com/Flambeau-Phoenix/SolarFlare-Beta/releases/tag/v6.3b) || [Vortex](https://www.nexusmods.com/farever/mods/12?tab=files)
 
-- Fixed an issue where multiple settings stores & BarTer polling caused the game to stutter.
-- Condensed the solarflare.json settings schema (mod will backup your current legacy settings + create a converted new version)
-- Added the ability to use "custom_images" folder assets in ResourceTracker UI elements (polish per-resource to come later)
-- Added the ability to scale Binding and Charges keys on BarTer action bars
-- Fixed some edge cases where UI element's settings would bleed between characters/profiles
+**Custom images**
+- Large or unusual PNGs (over 4 MB or 1024 px, interlaced, 16-bit) are now optimized automatically in the background.
+- Your original files are never touched, and designs that already use those images start showing.
+- The image library shows "Optimizing this image..." or the real failure reason instead of "Loading..." forever.
+- Sharing auras that use large images now works.
 
+**Freeform canvas**
+- New canvases start at 256×256, and the size limit is raised to 1024×1024 with 384 and 512 presets.
+- The stage fills more of the editor window: a larger default window, narrower side panels, and the view fits to the canvas when you open it.
+- Added images keep their real proportions and are centered at a sensible size.
+
+**Auras**
+- New "Skill equipped (on my action bars)" condition. It covers your active weapon's skills, class skills, and the signature slot (arsenal weapons).
+- It holds its last state during weapon swaps so it doesn't flicker.
+- It's also available from the Aura Builder's quick-start list and wizard.
+
+**Status Board**
+- New "Show" option: All statuses, Buffs only, or Debuffs only.
+- New "Separate window" option puts debuffs in their own window with its own position, columns and lock.
+- The debuff window has its own icon size, right under the checkbox.
+- The main window is titled "Buffs" when split, to match "Debuffs".
+
+**Cast bars**
+- Cast bars now show the game's actual spell name instead of a shortened version of the skill id.
 
 ---
 

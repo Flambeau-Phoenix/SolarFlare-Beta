@@ -152,7 +152,7 @@ class ImageLibraryPanel {
 		ImGui.dummy(ImGui.vec2(w, h));
 		ImGui.ImDrawList_AddRectFilled(dl, p, ImGui.vec2(p.x + w, p.y + h), ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.05, 0.06, 0.09, 1)), 4);
 		ImGui.ImDrawList_AddRect(dl, p, ImGui.vec2(p.x + w, p.y + h), ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.3, 0.38, 0.5, 1)), 4, 1);
-		var present = selected.length > 0 && CustomImages.pathFor(selected) != null;
+		var present = selected.length > 0 && CustomImages.has(selected);
 		if (!present) {
 			var msg = "Select an image to preview it";
 			var ts = ImGui.calcTextSize(msg);
@@ -162,7 +162,9 @@ class ImageLibraryPanel {
 		var key = CustomImages.key(selected);
 		var iw = GameIcons.texW(key), ih = GameIcons.texH(key);
 		if (iw <= 0 || ih <= 0) {
-			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(p.x + 10, p.y + 10), ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.55, 0.6, 0.7, 1)), "Loading...");
+			var state = CustomImages.stateOf(selected);
+			var note = state == "conforming" ? "Optimizing this image..." : (state == "ready" || state == "" ? "Loading..." : "Could not use this image: " + state);
+			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(p.x + 10, p.y + 10), ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.55, 0.6, 0.7, 1)), note);
 			return;
 		}
 		var fit = Math.min((w - 12) / iw, (h - 12) / ih);
@@ -176,7 +178,7 @@ class ImageLibraryPanel {
 	/** Offer to convert or shrink files the picker cannot list as they are. */
 	function drawFixOffer(id:String):Void {
 		if (CustomImages.fixable <= 0) return;
-		wrappedNote(CustomImages.fixable + " file" + (CustomImages.fixable == 1 ? "" : "s") + " in your images folder can't be used as they are (JPG, GIF, BMP or TGA, or larger than 1024 px or 4 MB).");
+		wrappedNote(CustomImages.fixable + " file" + (CustomImages.fixable == 1 ? "" : "s") + " in your images folder can't be used as they are (JPG, GIF, BMP or TGA). Large PNGs are optimized automatically.");
 		if (UiChrome.ghostButton("Convert and resize them##" + id + "_fix", ImGui.vec2(-1, 28))) {
 			UiActionQueue.custom(function() {
 				var report = CustomImages.convertFolder();
@@ -211,7 +213,7 @@ class ImageLibraryPanel {
 	}
 
 	function drawSelectionRow(id:String, onPick:String->Void, pickLabel:String):Void {
-		if (selected.length == 0 || CustomImages.pathFor(selected) == null) {
+		if (selected.length == 0 || !CustomImages.has(selected)) {
 			ImGui.textDisabled("Select an image to rename, delete or use it.");
 			return;
 		}

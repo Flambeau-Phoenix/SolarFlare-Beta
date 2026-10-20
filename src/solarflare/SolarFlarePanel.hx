@@ -188,6 +188,7 @@ class SolarFlarePanel {
 		catch (_:Dynamic) {}
 		solarflare.ui.ImageDrop.observe();
 		solarflare.ui.JpegBridge.install();
+		solarflare.ui.PngBridge.install();
 
   if(!solarflare.ui.FeatureProfiles.ready) { config.extraBarsPrototype.clearTransientState(); return; }
 		solarflare.runtime.TelemetryKernel.observe(app, config, restoreNativeChat);
