@@ -1,0 +1,65 @@
+name: Bug report
+description: Something in SolarFlare is broken, glitchy or confusing
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping make SolarFlare better. Please do not post account details or
+        personal information. For a crash, mention whether it happens right away or after
+        a specific action.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Press F6, open Auras
+        2. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of SolarFlare
+      options:
+        - ResourceTracker
+        - Auras / Aura Builder
+        - Geaux Grid
+        - BarTer / ExtraBars
+        - Status Board
+        - Lightsaber DPS / Combat Log
+        - Freeform Canvas / custom images
+        - Hub / profiles / themes
+        - Installation or startup
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: sf_version
+    attributes:
+      label: SolarFlare version
+      placeholder: v6.3b
+    validations:
+      required: true
+  - type: input
+    id: game_version
+    attributes:
+      label: Farever version
+      placeholder: 0.2.4
+    validations:
+      required: true
+  - type: input
+    id: loadout
+    attributes:
+      label: Class and weapon (if relevant)
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots, other mods installed, anything else

@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest an improvement or a new option
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What are you trying to do in game?
+      description: Describe the situation (for example "I want an aura when X happens"), not only the feature.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of SolarFlare
+      options:
+        - ResourceTracker
+        - Auras / Aura Builder
+        - Geaux Grid
+        - BarTer / ExtraBars
+        - Status Board
+        - Lightsaber DPS / Combat Log
+        - Freeform Canvas / custom images
+        - Hub / profiles / themes
+        - New system
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Suggested behavior
+      description: Optional. Mockups or screenshots welcome.
