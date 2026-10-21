@@ -1,7 +1,7 @@
 ![CanvasEditor](canvaseditor.png)
 
 
-# SolarFlare — v6.1b (Beta)
+# SolarFlare — Custom UI - Auras - Action Bars
 > **The complete customizable HUD, Aura alert, and combat tracking suite for Farever.**
 ![HiddenUI](HiddenUI.png)
 
