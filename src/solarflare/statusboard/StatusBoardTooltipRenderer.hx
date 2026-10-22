@@ -18,7 +18,10 @@ class StatusBoardTooltipRenderer {
  }
  public static function draw(instanceId:String,fallback:String):Void {
   StatusBoardTooltipCache.request(instanceId,haxe.Timer.stamp(),fallback);
-  var row=StatusBoardTooltipCache.get(instanceId);
+  drawRow(StatusBoardTooltipCache.get(instanceId),fallback);
+ }
+ /** Draws one prepared row; the caller owns the hover request and the cache the row came from. */
+ public static function drawRow(row:StatusBoardTooltipCache.StatusBoardTooltip,fallback:String):Void {
   if (!ImGui.beginTooltip()) return;
   try {
    var title=row != null && row.title.length>0 ? row.title : fallback;

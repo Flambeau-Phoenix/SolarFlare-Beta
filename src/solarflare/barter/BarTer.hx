@@ -28,6 +28,10 @@ class BarTer {
  var rawWeaponKey:String = "";
  var lastSnapAt:Float = -1;
  var snapshotsDirty:Bool = true;
+ /** Assignments changed: drop cached tooltip rows no cell references (edge, not a timer). */
+ var tipsDirty:Bool = false;
+ var tipSkillFn:String->Dynamic = GeauxCache.liveSkill;
+ var tipItemFn:String->Dynamic->Dynamic = BarTerItemAccess.find;
  var character = "";
  var identityGeneration:Int = -1;
  public var statusChoices:Array<{id:String,label:String,icon:String,active:Bool}> = [];
@@ -54,6 +58,7 @@ class BarTer {
 		hudClickFn = hudClick;
 		hudContextFn = hudContext;
 		hudMenuFn = hudMenu;
+		BarTerNativeKeys.skillSeen = offerTipSkill;
  config=new BarTerConfig(); builder=new BarTerBuilder(this); overlay=new BarTerOverlay(); }
  public function demand():Bool return config != null && config.demand();
  public function snapsFor(id:String):Array<BarTerSnap> {
@@ -71,6 +76,20 @@ class BarTer {
    }
   }
  }
+ function offerTipSkill(id:String,skill:Dynamic,hero:Dynamic):Void BarTerTipCache.offerSkill(id,skill,hero,BarTerNativeKeys.epoch,haxe.Timer.stamp());
+ /** Hover-driven cell descriptions: idle cost is the compares inside BarTerTipCache.service. */
+ function serviceTips(hero:Dynamic,now:Float):Void {
+  if (tipsDirty) {
+   tipsDirty=false;
+   var keys:Array<String>=[];
+   for (b in config.activeBars()) for (s in snapsFor(b.id)) if (BarTerTipCache.eligible(s)) keys.push(BarTerTipCache.keyOf(s));
+   BarTerTipCache.prune(keys);
+  }
+  BarTerTipCache.beginPass();
+  BarTerTipCache.service(now,hero,tipSkillFn,BarTerNativeKeys.epoch,tipItemFn);
+  var row=BarTerTipCache.hovered(now);
+  if (row != null) solarflare.statusboard.StatusBoardTooltipRenderer.prepare(row);
+ }
  function recordGlowDiagnostics():Void {
   if(!config.glowDiagnostics.get()) { glowDiagnosticReport=""; return; }
   var now=haxe.Timer.stamp(); if(now<glowDiagnosticAt) return; glowDiagnosticAt=now+1;
@@ -81,7 +100,7 @@ class BarTer {
   glowDiagnosticReport=haxe.Json.stringify({at:now,owner:character,loadout:loadout.currentKey,skills:rows},null,"  ");
  }
  public function changed(contentEdit:Bool=false):Void {
-  loadout.changed(config.bars,config.weaponLayouts,contentEdit); snapshotsDirty=true;
+  loadout.changed(config.bars,config.weaponLayouts,contentEdit); snapshotsDirty=true; tipsDirty=true;
   SettingsStore.markDirty(); solarflare.ObserveDemand.markStatusDemandDirty();
  }
  public function reserve(id:String,index:Int):Void { config.weaponLayouts.reserve(id,index); }
@@ -115,7 +134,7 @@ class BarTer {
    clearTransientState(); builder.history.clear(); character=next; loadout.reset(); BarTerNativeKeys.reset(); rawWeaponKey=""; lastWeaponReadAt=-1;
    identityGeneration=solarflare.HealthCache.identityGen; repairedGeneration=reconciledGeneration=-1; statusChoices.resize(0); statusChoiceMap.clear(); statusRevision=-1;
    GeauxCache.actionBarLoadoutKey=""; GeauxCache.actionBarCharacterId="";
-   GeauxCache.invalidateBarRoots();
+   GeauxCache.invalidateBarRoots(); BarTerTipCache.clear();
   }
   if (!config.enabled.get() && !config.open.get()) return;
   var hero:Dynamic=solarflare.HealthCache.localHero;
@@ -174,6 +193,7 @@ class BarTer {
    else { pendingPopulation=""; replacePopulation=false; nativeCoherent=false; managedEditsReady=false; lastStatus="Weapon combination changed; request the edit again."; }
   }
   if (snapshotsDirty || now-lastSnapAt >= 0.05) { refreshSnaps(); snapshotsDirty=false; lastSnapAt=now; }
+  serviceTips(hero,now);
   recordGlowDiagnostics();
   // Same eligibility the ExtraBars policy enforces before any native use request.
   var block=BarTerCache.pendingClicks.length > 0 ? BarTerCache.gameplayBlockReason(hero) : "";
@@ -196,7 +216,7 @@ class BarTer {
  function reconcileLoadout(key:String,now:Float):Void {
   var revision=loadout.revision;
   if (!loadout.reconcile(key,BarTerNativeKeys.records,BarTerNativeKeys.observationGeneration,now,config.bars,config.weaponLayouts,config.autoSeedOnWeaponSwap.get(),BarTerNativeKeys.weaponReadable)) return;
-  if (revision != loadout.revision) { snapshotsDirty=true; SettingsStore.markDirty(); }
+  if (revision != loadout.revision) { snapshotsDirty=true; SettingsStore.markDirtyDeferred(); }
  }
  function populateRequestedBar():Void {
   if (BarTerNativeKeys.skills.length == 0) return;

@@ -20,6 +20,8 @@ class ProfileBank {
  public var extraRecovery:Dynamic=null;
  public var compatibilityPending:Bool=false;
  public var compatibilitySnapshot:Dynamic=null;
+ /** Runtime selections survive maps/reconnects, but never override defaults after a restart. */
+ var sessionActive:Map<String,String>=new Map();
  var compatibilityAssigned:Array<String>=[];
  var factory:Dynamic;
  var nextId:Int=1;
@@ -77,7 +79,7 @@ class ProfileBank {
   for(key in order) if(profiles.get(key).ownerHeroId==hero) { defaults.set(hero,key); return key; }
   id=create(hero,"Default"); defaults.set(hero,id); return id;
  }
- /** Called once per confirmed login, including already assigned heroes: fallback is never deferred to a later hero. */
+ /** First login per hero uses its default; later visits in this process retain its selected profile. */
  public function login(hero:String):String {
   if(heroId(hero)=="") throw "Invalid hero ID";
   if(compatibilityPending) {
@@ -86,9 +88,11 @@ class ProfileBank {
     var id=create(hero,"Recovered active setup",compatibilitySnapshot); importExtra(hero,id); defaults.set(hero,id);
    }
   }
-  active=ensureDefault(hero); return active;
+  var selected=sessionActive.get(hero); var p=selected==null ? null : profiles.get(selected);
+  active=p!=null && p.ownerHeroId==hero ? selected : ensureDefault(hero);
+  sessionActive.set(hero,active); return active;
  }
- public function select(hero:String,id:String):String { active=ownedCopy(hero,id); return active; }
+ public function select(hero:String,id:String):String { active=ownedCopy(hero,id); sessionActive.set(hero,active); return active; }
  public function setDefault(hero:String):Void {
   var p=profiles.get(active); if(p==null || p.ownerHeroId!=hero) throw "Profile owner mismatch";
   defaults.set(hero,active);
@@ -101,12 +105,14 @@ class ProfileBank {
   profiles.remove(id); order.remove(id);
   if(defaults.get(hero)==id) { defaults.remove(hero); ensureDefault(hero); }
   if(active==id) active=ensureDefault(hero);
+  sessionActive.set(hero,active);
   return active;
  }
  public function store(hero:String,snapshot:Dynamic):Void {
   var p=profiles.get(active); if(p==null || p.ownerHeroId!=hero) throw "Profile owner mismatch";
   // Retain unknown fields for forward compatible round trips.
   p.snapshot=retainUnknown(snapshot,p.snapshot);
+  sessionActive.set(hero,active);
  }
  static function retainUnknown(value:Dynamic,old:Dynamic):Dynamic {
   if(value==null || old==null || Std.isOfType(value,Array) || Std.isOfType(old,Array)
@@ -122,7 +128,7 @@ class ProfileBank {
  /** `share` keeps references into `data` (no deep copies): only for a throwaway bank used to validate parsed text. */
  public function load(data:Dynamic,lastSaved:Dynamic,extra:Dynamic=null,legacyRoot:Dynamic=null,width:Float=1920,height:Float=1080,share:Bool=false):Void {
   var own=function(v:Dynamic):Dynamic return share ? v : copy(v);
-  profiles.clear(); defaults.clear(); order=[]; active=""; nextId=1;
+  profiles.clear(); defaults.clear(); sessionActive.clear(); order=[]; active=""; nextId=1;
   compatibilityAssigned=[]; compatibilityPending=false; compatibilitySnapshot=null; legacyRecovery=null; extraRecovery=null;
   if(data!=null && Reflect.hasField(data,"version")) {
    if(data.version!=VERSION || data.factoryVersion!=FACTORY_VERSION || !Std.isOfType(data.records,Array) || !Std.isOfType(data.characterDefaults,Array)) throw "Unsupported or damaged profile bank";

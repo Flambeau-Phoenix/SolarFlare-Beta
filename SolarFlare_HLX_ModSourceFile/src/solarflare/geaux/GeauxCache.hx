@@ -147,6 +147,12 @@ class GeauxCache {
 
 	/** Identity-only Skill instances keyed by script/HASH id. Observe polls getters; draw never reads this. */
 	static var liveById:Map<String, Dynamic> = new Map();
+	/** Advances whenever liveById changes. A skill already remembered under an id at this generation needs no second pass. */
+	static var liveGen:Int = 0;
+	static var rememberedSkill:Map<String, Dynamic> = new Map();
+	static var rememberedGen:Map<String, Int> = new Map();
+	/** Set when a put was withheld to protect an in-cooldown skill; such a pass is never memoized, so it retries as before. */
+	static var rememberDeferred:Bool = false;
 	/** Static `inf.props.costs` per layout pass; affordability still evaluates live resource values. */
 	static var costsById:Map<String, Dynamic> = new Map();
 	static var costsKnown:Map<String, Bool> = new Map();
@@ -157,8 +163,9 @@ class GeauxCache {
 	static inline var LAYOUT_FORCED_S:Float = 120.0;
 	static var layoutCheckAt:Float = 0;
 	static var layoutPrint:String = "";
-	/** BarTer's seed walk only re-runs on change; this is its slow safety net. */
-	static inline var BARTER_RECOVERY_S:Float = 60.0;
+	/** BarTer's seed walk only re-runs on change (weapon key, slot counts); this is its slow safety net. */
+	static inline var BARTER_RECOVERY_S:Float = 300.0;
+	static var actionBarCountPrint:String = "";
 	static var barTerWalkAt:Float = 0;
 	static inline var TELEMETRY_IDLE_S:Float = 0.12; // ~8 Hz idle
 	static inline var TELEMETRY_HOT_S:Float = 0.05; // ~20 Hz while CD/drag/builder/dirty
@@ -168,7 +175,13 @@ class GeauxCache {
 	static var layoutCount:Int = -1;
 	static var layoutOverrideKey:String = "";
 	static inline var EQUIP_S:Float = 0.35;
+	/** Safety net for what the source fingerprint cannot see (talent ranks, gear stats): the full re-read is forced this often. */
+	static inline var EQUIP_FORCED_S:Float = 2.0;
 	static var equipAt:Float = 0;
+	static var equipForcedAt:Float = 0;
+	/** References of every equipped skill source at the last read; the fingerprint is "same references, same order". */
+	static var equipSources:Array<Dynamic> = [];
+	static var equipSourcesNext:Array<Dynamic> = [];
 	static var equipDirty:Bool = true;
 	static var telemetryAt:Float = 0;
 	static var telemetryDirty:Bool = true;
@@ -396,6 +409,8 @@ class GeauxCache {
 			bookLabels = [];
 			bookGroups = [];
 			liveById = new Map();
+			resetRemembered();
+			clearEquipSources();
 			barSkillById = new Map();
 			barBtnById = new Map();
 			costsById = new Map();
@@ -419,6 +434,7 @@ class GeauxCache {
 		catch (_:Dynamic)
 			heroChanged = true;
 		if (heroChanged) {
+			clearEquipSources();
 			cachedBarRoots = null;
 			auraSkills = [];
 			clearReadyFlashes();
@@ -463,15 +479,21 @@ class GeauxCache {
 	}
 
 	/** Weapons plus the skill-list lengths the layout is built from. A few field reads, no HUD walk. */
-	static function layoutFingerprint(hero:Dynamic):String {
+	/** Slot-list lengths: the cheap part of the layout fingerprint, also watched by the BarTer action-bar walk. */
+	static function slotCountPrint(hero:Dynamic):String {
 		if (hero == null)
 			return "";
-		var print = solarflare.barter.BarTerCache.weaponLoadoutKey(hero);
-		print += "|" + arrayLen(field(hero, "skillSlots")) + "|" + arrayLen(field(hero, "weaponSkills"));
+		var print = arrayLen(field(hero, "skillSlots")) + "|" + arrayLen(field(hero, "weaponSkills"));
 		try {
 			print += "|" + arrayLen(field(field(hero, "specialization"), "skillSlots"));
 		} catch (_:Dynamic) {}
 		return print;
+	}
+
+	static function layoutFingerprint(hero:Dynamic):String {
+		if (hero == null)
+			return "";
+		return solarflare.barter.BarTerCache.weaponLoadoutKey(hero) + "|" + slotCountPrint(hero);
 	}
 
 	static function telemetryInterval():Float {
@@ -505,6 +527,7 @@ class GeauxCache {
 	/** HUD walk + slot identity. Throttled. Not for draw(). */
 	static function refreshLayout(heroDyn:Dynamic, visibleCount:Int, overrides:Array<String>):Void {
 		liveById = new Map();
+		resetRemembered();
 		barSkillById = new Map();
 		barBtnById = new Map();
 		costsById = new Map();
@@ -536,11 +559,19 @@ class GeauxCache {
 	static function tickTelemetry(heroDyn:Dynamic):Void {
 		var now = nowStamp();
 		if (equipDirty || now >= equipAt) {
-			rememberEquipped(heroDyn);
+			// Comparing references is cheap; the full re-read (parse, pin, alias and input-skill lookups) runs on an edge,
+			// when a source moved, or on the forced safety net.
+			var moved = equipSourcesMoved(heroDyn);
+			if (equipDirty || moved || now >= equipForcedAt) {
+				// Recheck aliases/prayer classification even when the skill object survived a metadata change.
+				resetRemembered();
+				rememberEquipped(heroDyn);
+				equipForcedAt = now + EQUIP_FORCED_S;
+				// Gear / talents may have changed, so re-read static skill metadata once.
+				staticGen++;
+			}
 			equipDirty = false;
 			equipAt = now + EQUIP_S;
-			// Gear / talents may have changed, so re-read static skill metadata once.
-			staticGen++;
 		}
 		tickSlots(heroDyn);
 		tickAuraSkills(heroDyn);
@@ -567,12 +598,10 @@ class GeauxCache {
 	/** Reused by rememberEquipped (runs on the equip timer; was a new array of arrays each time). */
 	static var equipListsBuf:Array<Dynamic> = [];
 
-	static function rememberEquipped(heroDyn:Dynamic):Void {
-		if (heroDyn == null)
-			return;
+	/** The skill lists the equipped set is read from. Typed GameLib reads first; the generic field walk only when a typed read yields nothing. */
+	static function collectEquipLists(heroDyn:Dynamic):Array<Dynamic> {
 		var lists = equipListsBuf;
 		lists.resize(0);
-		// Typed GameLib reads first; the generic field walk only when a typed read yields nothing.
 		var hero:ent.Hero = null;
 		try
 			hero = cast heroDyn
@@ -592,6 +621,55 @@ class GeauxCache {
 			var spec = field(heroDyn, "specialization");
 			lists.push(field(spec, "skillSlots"));
 		} catch (_:Dynamic) {}
+		return lists;
+	}
+
+	/** Drop observation-only engine references when their hero leaves. */
+	static function clearEquipSources():Void {
+		equipSources.resize(0);
+		equipSourcesNext.resize(0);
+		equipListsBuf.resize(0);
+		equipAt = 0;
+		equipForcedAt = 0;
+		equipDirty = true;
+	}
+
+	/** True when any equipped skill reference (or list length) differs from the previous call. References only: no parsing, no allocation per skill. */
+	static function equipSourcesMoved(heroDyn:Dynamic):Bool {
+		if (heroDyn == null)
+			return true;
+		var next = equipSourcesNext;
+		next.resize(0);
+		for (arr in collectEquipLists(heroDyn)) {
+			var n = arrayLen(arr);
+			next.push(n);
+			if (n <= 0 || n > 64)
+				continue;
+			for (i in 0...n)
+				next.push(arrayAt(arr, i));
+		}
+		next.push(field(heroDyn, "dashSkill"));
+		next.push(field(heroDyn, "secondarySkill"));
+		next.push(field(heroDyn, "attackComboSkill"));
+		var prev = equipSources;
+		var moved = prev.length != next.length;
+		if (!moved) {
+			for (i in 0...next.length) {
+				if (prev[i] != next[i]) {
+					moved = true;
+					break;
+				}
+			}
+		}
+		equipSources = next;
+		equipSourcesNext = prev;
+		return moved;
+	}
+
+	static function rememberEquipped(heroDyn:Dynamic):Void {
+		if (heroDyn == null)
+			return;
+		var lists = collectEquipLists(heroDyn);
 		for (arr in lists) {
 			var n = arrayLen(arr);
 			if (n <= 0 || n > 64)
@@ -674,28 +752,44 @@ class GeauxCache {
 		barInputSkills.push(skill);
 	}
 
+	static function resetRemembered():Void {
+		liveGen++;
+		rememberedSkill.clear();
+		rememberedGen.clear();
+	}
+
 	static function rememberSkill(skill:Dynamic, ?id:String):Void {
 		if (skill == null)
 			return;
-		if (id != null && id.length > 0) {
+		var memo = id != null && id.length > 0;
+		// Same skill, same id, liveById untouched since: the previous pass already wrote every alias.
+		if (memo && rememberedSkill.get(id) == skill && rememberedGen.get(id) == liveGen)
+			return;
+		var prayer = skillIsPrayer(skill);
+		rememberDeferred = false;
+		if (memo) {
 			try {
 				var typed:st.skill.Skill = skill;
 				if (typed != null && !skillMatches(typed, id))
 					return;
 			} catch (_:Dynamic) {}
-			bindLiveId(id, skill);
+			bindLiveId(id, skill, prayer);
 		}
 		try {
 			for (a in skillIdAliases(skill))
-				bindLiveId(a, skill);
+				bindLiveId(a, skill, prayer);
 		} catch (_:Dynamic) {}
+		if (memo && !rememberDeferred) {
+			rememberedSkill.set(id, skill);
+			rememberedGen.set(id, liveGen);
+		}
 	}
 
-	static function bindLiveId(id:String, skill:Dynamic):Void {
+	static function bindLiveId(id:String, skill:Dynamic, prayer:Bool):Void {
 		var k = sanitizeSkillId(id);
 		if (k.length == 0 || skill == null)
 			return;
-		if (skillIsPrayer(skill) || solarflare.PrayerCache.isPrayerId(k)) {
+		if (prayer || solarflare.PrayerCache.isPrayerId(k)) {
 			if (isKnownClassSignature(k) || classSignatureScriptId(k).length > 0)
 				return;
 			putLiveId(k, skill);
@@ -727,10 +821,15 @@ class GeauxCache {
 	static function putLiveId(k:String, skill:Dynamic):Void {
 		if (liveById.exists(k)) {
 			var have = liveById.get(k);
-			if (skillCdActive(have) && !skillCdActive(skill))
+			if (have == skill)
 				return;
+			if (skillCdActive(have) && !skillCdActive(skill)) {
+				rememberDeferred = true;
+				return;
+			}
 		}
 		liveById.set(k, skill);
+		liveGen++;
 	}
 
 	static function skillCdActive(skill:Dynamic):Bool {
@@ -814,6 +913,8 @@ class GeauxCache {
 			return true;
 		if (solarflare.barter.BarTerCache.weaponLoadoutKey(hero) != actionBarLoadoutKey)
 			return true;
+		if (slotCountPrint(hero) != actionBarCountPrint)
+			return true;
 		return now - barTerWalkAt >= BARTER_RECOVERY_S;
 	}
 
@@ -850,8 +951,11 @@ class GeauxCache {
 			availWeaponsLen = weapons.length;
 			availStaticGen = staticGen;
 		}
-		var demanded=solarflare.ObserveDemand.barterSkillIds.copy();
-		for (native in solarflare.barter.BarTerNativeKeys.skills) if (native.fresh!=false && native.id.length>0 && demanded.indexOf(native.id)<0) demanded.push(native.id);
+		var demanded=barTerDemandBuf; demanded.resize(0); barTerDemandSet.clear();
+        for(id in solarflare.ObserveDemand.barterSkillIds) { demanded.push(id); barTerDemandSet.set(id,true); }
+        for(native in solarflare.barter.BarTerNativeKeys.skills) if(native.fresh!=false && native.id.length>0 && !barTerDemandSet.exists(native.id)) {
+            demanded.push(native.id); barTerDemandSet.set(native.id,true);
+        }
 		for (id in demanded) {
 			if (id == null || id.length == 0) continue;
 			// Large grids may contain the entire catalog. Only observed native actions
@@ -892,6 +996,8 @@ class GeauxCache {
 
 	/** BarTer cell snaps by id; barTerSkills is rebuilt in place from it each poll. */
 	static var barTerPool:Map<String, GeauxSlotSnap> = new Map();
+    static var barTerDemandBuf:Array<String>=[];
+    static var barTerDemandSet:Map<String,Bool>=new Map();
 	/** id -> on the native action bar; valid for availWeapons / availWeaponsLen / availStaticGen. */
 	static var availMemo:Map<String, Bool> = new Map();
 	static var availWeapons:Array<GeauxSlotSnap> = null;
@@ -1044,6 +1150,7 @@ class GeauxCache {
 
 		trustHudSkills = false;
 		actionBarLoadoutKey = solarflare.barter.BarTerCache.weaponLoadoutKey(hero);
+		actionBarCountPrint = slotCountPrint(hero);
 		actionBarCharacterId = solarflare.HealthCache.characterId;
 		actionBarGeneration++;
 		barTerWalkAt = nowStamp();
@@ -2473,8 +2580,22 @@ class GeauxCache {
 		return out;
 	}
 
-	static function skillIdAliases(skill:Dynamic):Array<String> {
-		var out:Array<String> = [];
+	static var identityScope=false;
+    static var identityObjects:Array<Dynamic>=[];
+    static var identityAliases:Array<Array<String>>=[];
+    static var identityUsed=0;
+    static function clearIdentityScope():Void {
+        identityObjects.resize(0); identityUsed=0; identityScope=false;
+    }
+    static function skillIdAliases(skill:Dynamic):Array<String> {
+        var out:Array<String>;
+        if(identityScope) {
+            var index=identityObjects.indexOf(skill);
+            if(index>=0) return identityAliases[index];
+            index=identityUsed++;
+            if(index>=identityAliases.length) identityAliases.push([]);
+            out=identityAliases[index]; out.resize(0); identityObjects.push(skill);
+        } else out=[];
 		addAlias(out, dynString(field(skill, "id")));
 		addAlias(out, dynString(field(skill, "kind")));
 		addAlias(out, dynString(field(field(skill, "inf"), "id")));
@@ -2844,6 +2965,11 @@ class GeauxCache {
 	}
 
 	static function tickSlot(hero:ent.Hero, heroDyn:Dynamic, snap:GeauxSlotSnap):Void {
+        identityScope=true;
+        try { tickSlotCandidate(hero,heroDyn,snap); clearIdentityScope(); }
+        catch(e:Dynamic) { clearIdentityScope(); throw e; }
+    }
+    static function tickSlotCandidate(hero:ent.Hero, heroDyn:Dynamic, snap:GeauxSlotSnap):Void {
 		if (snap == null)
 			return;
 		var tickAt = haxe.Timer.stamp();
@@ -3000,16 +3126,17 @@ class GeauxCache {
 	}
 
 	static function bindSlotSkill(hero:ent.Hero, snap:GeauxSlotSnap):Dynamic {
+		var signatureCandidate=isKnownClassSignature(snap.id);
 		var skill:Dynamic = ownerGetSkill(hero, snap.id);
 		if (skill == null && snap.iconId != null && snap.iconId != snap.id)
 			skill = ownerGetSkill(hero, snap.iconId);
-		if (skill != null && skillIsPrayer(skill) && isKnownClassSignature(snap.id))
+		if (skill != null && signatureCandidate && skillIsPrayer(skill))
 			skill = ownerGetSkill(hero, PRIEST_SIG_SCRIPT);
 		if (skill == null)
 			skill = pinnedSkill(snap.id);
 		if (skill == null && snap.iconId != null && snap.iconId != snap.id)
 			skill = pinnedSkill(snap.iconId);
-		if (skill != null && skillIsPrayer(skill) && isKnownClassSignature(snap.id))
+		if (skill != null && signatureCandidate && skillIsPrayer(skill))
 			skill = pinnedSkill(PRIEST_SIG_SCRIPT);
 		if (skill == null)
 			skill = equippedSkillByInput(hero, snap.id);
@@ -3017,7 +3144,7 @@ class GeauxCache {
 			skill = cachedSkill(snap.id);
 		if (skill == null && hero != null)
 			skill = resolveLiveSkill(hero, snap.id);
-		if (skill != null && skillIsPrayer(skill) && isKnownClassSignature(snap.id))
+		if (skill != null && signatureCandidate && skillIsPrayer(skill))
 			return pinnedSkill(PRIEST_SIG_SCRIPT);
 		if (skill != null)
 			rememberSkill(skill, snap.id);
@@ -3438,6 +3565,8 @@ class GeauxCache {
 				return;
 			}
 		}
+		// A skill handed in by the slot tick was just remembered under this id by the bind; only a fallback lookup needs it.
+		var resolvedHere = skill == null;
 		if (skill == null)
 			skill = cachedSkill(snap.id);
 		if (skill == null && hero != null) {
@@ -3445,7 +3574,7 @@ class GeauxCache {
 				skill = resolveLiveSkill(hero, snap.id)
 			catch (_:Dynamic) {}
 		}
-		if (skill != null)
+		if (skill != null && resolvedHere)
 			rememberSkill(skill, snap.id);
 		snap.affordable = skillAffordable(hero, skill, snap.id);
 		#if solarflare_telemetry
@@ -3503,7 +3632,7 @@ class GeauxCache {
 	}
 
 	static function liveCosts(skill:Dynamic, typed:st.skill.Skill, snapId:String):Dynamic {
-		var key = sanitizeSkillId(snapId);
+		var key = snapId;
 		if (key.length > 0 && costsKnown.exists(key))
 			return costsById.exists(key) ? costsById.get(key) : null;
 		var costs:Dynamic = null;
@@ -3536,7 +3665,7 @@ class GeauxCache {
 	}
 
 	static function liveCostsAffordable(snapId:String, costs:Dynamic, n:Int):Bool {
-		var key = sanitizeSkillId(snapId);
+		var key = snapId;
 		if (key.length == 0)
 			return walkCostsAffordable(costs, n);
 		var specs = costSpecsById.get(key);
@@ -3583,19 +3712,37 @@ class GeauxCache {
 		return true;
 	}
 
+	/** 1 rage, 2 spark, 3 mana, 4 combo, 0 unmetered. Classified once per attribute name. */
+	static var atbKinds:Map<String, Int> = new Map();
+
+	static function atbKind(atb:String):Int {
+		var kind = atbKinds.get(atb);
+		if (kind != null)
+			return kind;
+		var a = atb.toLowerCase();
+		var k = 0;
+		if (a == "rage")
+			k = 1;
+		else if (a == "spark")
+			k = 2;
+		else if (a.indexOf("mana") >= 0 || a == "mp")
+			k = 3;
+		else if (a.indexOf("combo") >= 0)
+			k = 4;
+		atbKinds.set(atb, k);
+		return k;
+	}
+
 	static function cacheHasAtb(atb:String, amount:Float):Bool {
 		if (atb == null || atb.length == 0)
 			return true;
-		var a = atb.toLowerCase();
-		if (a == "rage")
-			return HealthCache.rage + 0.01 >= amount;
-		if (a == "spark")
-			return !HealthCache.sparkValid || HealthCache.spark + 0.01 >= amount;
-		if (a.indexOf("mana") >= 0 || a == "mp")
-			return !HealthCache.manaValid || HealthCache.mana + 0.01 >= amount;
-		if (a.indexOf("combo") >= 0)
-			return ComboPointsCache.current + 0.01 >= amount;
-		return true;
+		return switch (atbKind(atb)) {
+			case 1: HealthCache.rage + 0.01 >= amount;
+			case 2: !HealthCache.sparkValid || HealthCache.spark + 0.01 >= amount;
+			case 3: !HealthCache.manaValid || HealthCache.mana + 0.01 >= amount;
+			case 4: ComboPointsCache.current + 0.01 >= amount;
+			default: true;
+		};
 	}
 
 	static function trackedUntil(id:String):Float {
@@ -3679,21 +3826,6 @@ class GeauxCache {
 	}
 
 
-	static function gameNow():Float {
-		try {
-			var t = hxd.Timer.lastTimeStamp;
-			if (t > 0)
-				return t;
-		} catch (_:Dynamic) {}
-		try {
-			var t = hxd.Timer.elapsedTime;
-			if (t > 0)
-				return t;
-		} catch (_:Dynamic) {}
-		return 0;
-	}
-
-
 	static function readMaxCdField(skill:Dynamic):Float {
 		if (cdMaxFieldWin.length > 0) {
 			var cached = maxCdFromWin(skill, cdMaxFieldWin);
@@ -3732,10 +3864,9 @@ class GeauxCache {
 
 
 	static function nowStamp():Float {
-		var t = gameNow();
-		if (t > 0)
-			return t;
-		return Date.now().getTime() / 1000.0;
+		// Observer deadlines and observedAt/liveAt must use the same live clock.
+		// The engine's lastTimeStamp is frame-latched; elapsedTime is a frame delta.
+		return haxe.Timer.stamp();
 	}
 
 	static function normalizeSeconds(v:Float, max:Float):Float {

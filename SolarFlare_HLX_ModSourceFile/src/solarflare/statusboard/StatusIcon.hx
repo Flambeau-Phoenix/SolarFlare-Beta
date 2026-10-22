@@ -26,8 +26,8 @@ class StatusIcon {
    ImGui.ImDrawList_PathArcTo(dl, ImGui.vec2(x+size/2,y+size/2), size*0.47, -Math.PI/2, -Math.PI/2+(1-remaining)*Math.PI*2, 24);
    ImGui.ImDrawList_PathFillConvex(dl, 0x88000000);
   }
-  if (active && seconds && s.durationKnown && !s.infinite) badge(dl,x+size/2,y+size-3,(s.stampSource == "cdb" ? "~" : "")+Std.string(Std.int(Math.ceil(left))),color,true);
-  if (active && stacks && s.stacksKnown) badge(dl,x+size-3,y+3,Std.string(s.stacks),color,false);
+  if (active && seconds && s.durationKnown && !s.infinite) badge(dl,x+size/2,y+size-3,(s.stampSource == "cdb" ? "~" : "")+solarflare.util.IntText.of(Std.int(Math.ceil(left))),color,true);
+  if (active && stacks && s.stacksKnown) badge(dl,x+size-3,y+3,solarflare.util.IntText.of(s.stacks),color,false);
  }
  static function badge(dl:Dynamic, x:Single, y:Single, value:String, color:Int, bottom:Bool):Void {
   var ts=ImGui.calcTextSize(value);

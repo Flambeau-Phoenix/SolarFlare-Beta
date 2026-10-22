@@ -79,8 +79,6 @@ class ResourceTrackerBuilder {
 				host.auraBuilder.open.set(true);
 			if (ImGui.menuItem("Geaux Builder") && host != null && host.geauxBuilder != null)
 				host.geauxBuilder.open.set(true);
-			if (ImGui.menuItem("Notebook") && host != null && host.notebook != null)
-				host.notebook.open.set(true);
 			ImGui.endMenu();
 		}
 		if (ImGui.beginMenu("View")) {

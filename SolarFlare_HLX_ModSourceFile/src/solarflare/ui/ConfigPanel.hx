@@ -11,7 +11,6 @@ import solarflare.geaux.GeauxBuilder;
 import solarflare.getrifty.GetRifty;
 import solarflare.lightsaber.Lightsaber;
 import solarflare.loot.LootBrowser;
-import solarflare.notebook.Notebook;
 import solarflare.resourcetracker.ResourceTrackerBuilder;
 import solarflare.target.TargetConfig;
 import solarflare.ui.HudLaunchers;
@@ -26,7 +25,7 @@ import imgui.ref.BoolRef;
 import imgui.ref.FloatRef;
 
 /**
- * F6 hub for SolarFlare: Auras, Geaux, Resource Tracker, Notebook, Lightsaber, Combat Log, Theme.
+ * F6 hub for SolarFlare: Auras, Geaux, Resource Tracker, Lightsaber, Combat Log, Theme.
  * GetRifty is opt-in via the hub sun button (opens settings; overlay stays hidden until enabled).
  * Local Time remains a hidden settings field for persistence.
  */
@@ -42,7 +41,8 @@ class ConfigPanel {
 	static inline var TAB_GEAUX:Int = 1;
 	static inline var TAB_ATTACK:Int = 2;
 	static inline var TAB_AURAS:Int = 3;
-	static inline var TAB_NOTEBOOK:Int = 4;
+	/** Retired notebook tab id; saved selections map to Resources. */
+	static inline var TAB_RETIRED_NOTEBOOK:Int = 4;
 	static inline var TAB_LIGHTSABER:Int = 5;
 	static inline var TAB_COMBAT_LOG:Int = 6;
 	static inline var TAB_THEME:Int = 7;
@@ -74,7 +74,6 @@ class ConfigPanel {
 	public var combatLog:CombatLogConfig;
 	public var target:TargetConfig;
 	public var castBar:CastBarConfig;
-	public var notebook:Notebook;
 	public var lootBrowser:LootBrowser;
 	public var launchers:HudLaunchers;
 	public var auras:solarflare.aura.AuraConfig;
@@ -170,7 +169,6 @@ class ConfigPanel {
 		combatLog = new CombatLogConfig();
 		target = new TargetConfig();
 		castBar = new CastBarConfig();
-		notebook = new Notebook();
 		lootBrowser = new LootBrowser();
 		launchers = new HudLaunchers();
 		auras = new solarflare.aura.AuraConfig();
@@ -237,7 +235,6 @@ class ConfigPanel {
 		if (stacks != null) registerInteractive(stacks.open);
 		if (extraBarsPrototype != null) registerInteractive(extraBarsPrototype.open);
 		if (barter != null && barter.config != null) registerInteractive(barter.config.open);
-		if (notebook != null) registerInteractive(notebook.open);
 		if (lootBrowser != null) registerInteractive(lootBrowser.open);
 		if (vitals != null) registerInteractive(vitals.open);
 		if (geaux != null) registerInteractive(geaux.open);
@@ -353,7 +350,7 @@ class ConfigPanel {
 		}
 		if (hit) {
 			open.set(!open.get());
-			SettingsStore.markDirty();
+			SettingsStore.markDirtyDeferred();
 			toggleCooldownUntil = now + 0.25;
 		}
 
@@ -474,8 +471,6 @@ class ConfigPanel {
 			UiScope.guard("Target Frame", target.draw);
 		if (castBar != null)
 			UiScope.guard("Player Cast Bar", castBar.draw);
-		if (notebook != null)
-			UiScope.guard("Notebook", notebook.draw);
 		if (lootBrowser != null)
 			UiScope.guard("Loot Browser", lootBrowser.draw);
 		if (lightsaber != null)
@@ -501,8 +496,6 @@ class ConfigPanel {
 				resourceTracker.open.set(true);
 			if (ImGui.menuItem("Player Cast Bar"))
 				castBar.open.set(true);
-			if (ImGui.menuItem("Notebook"))
-				notebook.open.set(true);
 			if (ImGui.menuItem("Loot Browser"))
 				lootBrowser.open.set(true);
 			if (ImGui.menuItem("Lightsaber"))
@@ -574,7 +567,7 @@ class ConfigPanel {
 	static var NAV_GROUPS:Array<Array<Int>> = [
 		[TAB_RESOURCES, TAB_GEAUX, TAB_BARTER, TAB_EXTRABARS, TAB_ATTACK, TAB_STATUS, TAB_STACKS, TAB_NATIVE_UI],
 		[TAB_AURAS, TAB_COMBAT_LOG],
-		[TAB_NOTEBOOK, TAB_LOOT, TAB_LIGHTSABER, TAB_THEME, TAB_GETRIFTY, TAB_UTILITIES, TAB_SETTINGS]
+		[TAB_LOOT, TAB_LIGHTSABER, TAB_THEME, TAB_GETRIFTY, TAB_UTILITIES, TAB_SETTINGS]
 	];
 
 	static function tabLabel(id:Int):String {
@@ -583,7 +576,6 @@ class ConfigPanel {
 			case TAB_GEAUX: "Geaux";
 			case TAB_ATTACK: "Attack Combo";
 			case TAB_AURAS: "Auras";
-			case TAB_NOTEBOOK: "Notebook";
 			case TAB_LIGHTSABER: "Lightsaber";
 			case TAB_COMBAT_LOG: "Combat Log";
 			case TAB_THEME: "Theme";
@@ -657,7 +649,6 @@ class ConfigPanel {
 
 	/** Selecting a module also opens the editors that are their own window. */
 	function onModuleChosen(id:Int):Void {
-		if (id == TAB_NOTEBOOK) notebook.open.set(true);
 		if (id == TAB_LOOT) lootBrowser.open.set(true);
 		if (id == TAB_EXTRABARS) extraBarsPrototype.open.set(true);
 		if (id == TAB_STACKS && stacks != null) stacks.open.set(true);
@@ -746,7 +737,7 @@ class ConfigPanel {
 			case TAB_AURAS: if (auraBuilder != null) auraBuilder.open.set(true);
 			case TAB_LIGHTSABER: if (lightsaber != null) lightsaber.open.set(true);
 			case TAB_ATTACK: if (resourceTracker != null) resourceTracker.openFor("attack");
-			case TAB_NOTEBOOK | TAB_LOOT | TAB_EXTRABARS | TAB_BARTER | TAB_STACKS:
+			case TAB_LOOT | TAB_EXTRABARS | TAB_BARTER | TAB_STACKS:
 			default: setRail(false);
 		}
 	}
@@ -809,11 +800,6 @@ class ConfigPanel {
 				drawOverlayBasics("attack", attackCombo.hidden, attackCombo.chrome);
 			case TAB_AURAS:
 				drawAurasModule();
-			case TAB_NOTEBOOK:
-				var saved = !notebook.hasUnsavedChanges();
-				if (drawModuleHeader("Notebook", Std.string(notebook.pageCount()) + " page(s) / " + (saved ? "saved" : "saving..."), "Open notebook", "tab_notebook_open"))
-					notebook.open.set(true);
-				UiHints.noteWrapped("Pages auto-save while you type and are stored separately in notebook.json.");
 			case TAB_LIGHTSABER:
 				if (drawModuleHeader("Lightsaber", lightsaber.hidden.get() ? "Meter hidden" : "Meter shown", "Open options", "tab_saber_open"))
 					lightsaber.open.set(true);
@@ -1109,7 +1095,7 @@ class ConfigPanel {
 	public function profileUiTab():Int return activeHubTab;
 	public function statusSettingsOpen():Bool return open.get() && activeHubTab == TAB_STATUS;
 	public function applyProfileUiTab(value:Int):Void {
-		if (value == TAB_NATIVE)
+		if (value == TAB_NATIVE || value == TAB_RETIRED_NOTEBOOK)
 			activeHubTab = TAB_RESOURCES;
 		else if (value >= TAB_RESOURCES && value <= TAB_STACKS)
 			activeHubTab = value;
@@ -1120,7 +1106,7 @@ class ConfigPanel {
 		var g = geauxBuilder != null && geauxBuilder.open.get();
 		var a = auraBuilder != null && auraBuilder.open.get();
 		if (savedHubOpen != open.get() || savedResourceBuilderOpen != r || savedGeauxBuilderOpen != g || savedAuraBuilderOpen != a)
-			SettingsStore.markDirty();
+			SettingsStore.markDirtyDeferred();
 		savedHubOpen = open.get(); savedResourceBuilderOpen = r; savedGeauxBuilderOpen = g; savedAuraBuilderOpen = a;
 	}
 

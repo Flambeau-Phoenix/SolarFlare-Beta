@@ -29,6 +29,31 @@ class StatusBoardNativeText {
  public static function fallback(label:String,id:String=""):String {
   return meaningful(label,id) && label != id ? label : StatusBoardTooltipLabels.status;
  }
+ #if (hl || status_tooltip_native_test)
+ /** Name/Desc/rank through the game's own skill formatter; shared by the status board and BarTer cell tooltips. */
+ public static function skillText(base:st.skill.BaseSkill,inf:Dynamic,info:Dynamic,source:Dynamic,heroic:Bool=false):{name:String,description:String,caption:String,failed:Bool,sourceItem:Dynamic} {
+  var definition:Dynamic={inf:inf,rank:info.rank,maxRank:info.maxRank,masteries:info.masteries,heroic:heroic};
+  var sourceItem:Dynamic=info.sourceItem;
+  if (sourceItem == null) try { sourceItem=base.getSourceItem(); } catch (_:Dynamic) {}
+  #if hl
+  var hasDetails=false;
+  var details=new hl.Ref<Bool>(hasDetails);
+  #else
+  var details:Dynamic=null;
+  #end
+  var name=""; var failed=false;
+  try { name=solarflare.ui.ByteUtil.materialize(HText.skill(cast definition,ETextKind.Name,cast source,details,base,cast sourceItem)); } catch (_:Dynamic) { failed=true; }
+  #if hl
+  details.set(false);
+  #end
+  var description="";
+  try { description=solarflare.ui.ByteUtil.materialize(HText.skill(cast definition,ETextKind.Desc,cast source,details,base,cast sourceItem)); } catch (_:Dynamic) { failed=true; }
+  var caption="";
+  if (info.rank>1) try { caption=solarflare.ui.ByteUtil.materialize(Texts.skill_rank({rank:info.rank})); } catch (_:Dynamic) {}
+  return {name:name,description:description,caption:caption,failed:failed,sourceItem:sourceItem};
+ }
+ #end
+
  static function escaped(text:String):String return StringTools.htmlEscape(text);
  public static function read(item:Dynamic,hero:Dynamic,fallbackTitle:String=""):{title:String,description:String,caption:String,statusId:String,sourceItemId:String,resolution:String,failed:Bool,locale:String} {
   try {
@@ -48,25 +73,10 @@ class StatusBoardNativeText {
    #end
    var inf:Dynamic=solarflare.FieldWalk.extractObject(item,"inf");
    if (inf == null || info == null) return null;
-   var definition:Dynamic={inf:inf,rank:info.rank,maxRank:info.maxRank,masteries:info.masteries,heroic:false};
    var base:st.skill.BaseSkill=item;
-   var sourceItem:Dynamic=info.sourceItem;
-   if (sourceItem == null) try { sourceItem=base.getSourceItem(); } catch (_:Dynamic) {}
-   #if hl
-   var hasDetails=false;
-   var details=new hl.Ref<Bool>(hasDetails);
-   #else
-   var details:Dynamic=null;
-   #end
-   var name=""; var failed=false;
-   try { name=solarflare.ui.ByteUtil.materialize(HText.skill(cast definition,ETextKind.Name,cast source,details,base,cast sourceItem)); } catch (_:Dynamic) { failed=true; }
-   #if hl
-   details.set(false);
-   #end
-   var description="";
-   try { description=solarflare.ui.ByteUtil.materialize(HText.skill(cast definition,ETextKind.Desc,cast source,details,base,cast sourceItem)); } catch (_:Dynamic) { failed=true; }
-   var caption="";
-   if (info.rank>1) try { caption=solarflare.ui.ByteUtil.materialize(Texts.skill_rank({rank:info.rank})); } catch (_:Dynamic) {}
+   var skill=skillText(base,inf,info,source);
+   var sourceItem:Dynamic=skill.sourceItem;
+   var name=skill.name; var description=skill.description; var caption=skill.caption; var failed=skill.failed;
    #else
    if (source == null) source=hero;
    var inf:Dynamic=status.inf;

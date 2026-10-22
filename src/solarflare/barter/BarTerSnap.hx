@@ -23,6 +23,10 @@ class BarTerSnap {
 	public var procValid:Bool=false;
 	public var procSource:String="unknown";
 	public var glow:solarflare.geaux.SkillAttentionStyle=null;
+	/** BarTerTipCache hover key, memoized against the id it was built from; survives clear(). */
+	public var tipKey:String = "";
+	public var tipKeyId:String = "";
+	public var tipKeyItem:Bool = false;
 	public var affordable:Bool = true;
 	public var procReady:Bool = false;
 	/** Monotonic stamp when procReady last turned on; drives the glimmer. */

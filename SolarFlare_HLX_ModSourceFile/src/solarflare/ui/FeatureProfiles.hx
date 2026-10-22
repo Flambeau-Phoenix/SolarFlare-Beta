@@ -202,7 +202,13 @@ class FeatureProfiles {
  public static function observeCharacter(cfg:ConfigPanel):Void {
   var id=currentCharacterUid();
   var confirmed=id!="" && HealthCache.localHero!=null && HealthCache.identityConfirmed;
-  if(!transition.begin(id,confirmed,HealthCache.statusOwnerGen,function(outgoing) bank.store(outgoing,captureAll(cfg)),function() { cfg.clearTransientState(); ImageDrop.disarm(); })) return;
+  if(!transition.begin(id,confirmed,HealthCache.statusOwnerGen,function(outgoing) bank.store(outgoing,captureAll(cfg)),function() { cfg.clearTransientState(); ImageDrop.disarm(); })) {
+   if(transition.resumed) {
+    HUDWidgetWindow.invalidateGeometry(); cfg.uiLayouts.requestReconcile();
+    ProfileTrace.note("profile","RESUME hero="+id+" -> "+describe(activeProfile)+" (live profile/layout retained)");
+   }
+   return;
+  }
   owner=id; activeProfile=bank.login(id);
   ProfileTrace.note("profile","LOGIN hero="+id+" -> "+describe(activeProfile)+" (default="+describe(bank.defaults.get(id))+")");
   applyUniversal(cfg,activeProfile); SettingsStore.markDirty();

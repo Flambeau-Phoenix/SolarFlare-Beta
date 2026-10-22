@@ -9,6 +9,8 @@ import imgui.ImGui;
  */
 @:build(hlx.runtime.Mod.build())
 class ModEntry {
+	/** Disk and session work requested while drawing is deferred to the service phase. */
+	public static var inDraw(default, null):Bool = false;
 	public static function main():Void {
 		keepRoots();
 		var panel:SolarFlarePanel = null;
@@ -33,10 +35,12 @@ class ModEntry {
 					panel.resetExtraBarsSession();
 					panel.flushPendingSettings();
 				}
+				inDraw = true;
 				try
 					panel.draw()
 				catch (_:Dynamic) {}
-			} catch (_:Dynamic) {}
+				inDraw = false;
+			} catch (_:Dynamic) { inDraw = false; }
 		});
 	}
 

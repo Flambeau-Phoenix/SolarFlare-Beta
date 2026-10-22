@@ -36,7 +36,7 @@ import solarflare.debug.ResolutionLedgerOverlay;
 import solarflare.HealthCache;
 
 /**
- * SolarFlare panel: Resource Tracker vitals, Geaux, Auras, Notebook, Lightsaber.
+ * SolarFlare panel: Resource Tracker vitals, Geaux, Auras, Lightsaber.
  * observe() = Layer 1 cache tick; draw() = Layer 2 ImGui from snaps only.
  * GetRifty overlay draws only when the user unhides it (opt-in).
  */
