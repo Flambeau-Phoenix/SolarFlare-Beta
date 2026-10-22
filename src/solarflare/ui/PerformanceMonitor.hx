@@ -9,7 +9,10 @@ import hl.Bytes;
  */
 class PerformanceMonitor {
 	public static var open = new BoolRef(false);
-	static var frameTimes:Array<Float> = [];
+	static var frameTimes=new solarflare.util.SampleRing(MAX_SAMPLES);
+	static var fpsGeneration=-1;
+	static var statsGeneration=-1;
+	static var cachedStats:Dynamic=null;
 	/** Roughly ten seconds at 60 FPS: enough for stable p95/p99 inspection. */
 	static inline var MAX_SAMPLES:Int = 600;
 	static var fps:Float = 60.0;
@@ -22,15 +25,14 @@ class PerformanceMonitor {
 		lastTime = now;
 		if (dt < 0) dt = 0;
 
-		frameTimes.push(dt);
-		if (frameTimes.length > MAX_SAMPLES)
-			frameTimes.shift();
+        frameTimes.push(dt);
+    }
 
-		var sum:Float = 0.0;
-		for (t in frameTimes)
-			sum += t;
-		var avg = sum / frameTimes.length;
-		fps = avg > 0.0001 ? (1.0 / avg) : 60.0;
+    static function refreshFps():Void {
+        if(fpsGeneration==frameTimes.generation) return;
+        fpsGeneration=frameTimes.generation;
+        var avg=frameTimes.length>0 ? frameTimes.sumChronological()/frameTimes.length : 0;
+        fps=avg>0.0001 ? 1.0/avg : 60.0;
 	}
 
 	static function percentile(sorted:Array<Float>, p:Float):Float {
@@ -43,6 +45,8 @@ class PerformanceMonitor {
 	}
 
 	public static function frameStats():Dynamic {
+		if(statsGeneration==frameTimes.generation && cachedStats!=null) return cachedStats;
+		statsGeneration=frameTimes.generation;
 		if (frameTimes.length == 0)
 			return {samples: 0, averageMs: 0.0, medianMs: 0.0, p95Ms: 0.0, p99Ms: 0.0, maxMs: 0.0};
 		var sorted = frameTimes.copy();
@@ -50,7 +54,7 @@ class PerformanceMonitor {
 		var sum = 0.0;
 		for (value in sorted)
 			sum += value;
-		return {
+		cachedStats = {
 			samples: sorted.length,
 			averageMs: sum * 1000.0 / sorted.length,
 			medianMs: percentile(sorted, 0.50),
@@ -58,6 +62,7 @@ class PerformanceMonitor {
 			p99Ms: percentile(sorted, 0.99),
 			maxMs: sorted[sorted.length - 1] * 1000
 		};
+		return cachedStats;
 	}
 
 	public static function toJson():String {
@@ -67,7 +72,7 @@ class PerformanceMonitor {
 	}
 
 	public static function reset():Void {
-		frameTimes.resize(0);
+		frameTimes.clear(); fpsGeneration=-1; statsGeneration=-1; cachedStats=null;
 		fps = 60.0;
 		lastTime = 0.0;
 	}
@@ -76,6 +81,7 @@ class PerformanceMonitor {
 		if (!open.get())
 			return;
 
+		refreshFps();
 		if (HudChrome.beginPanel("Performance & Telemetry##sf_perf", open, "Performance Monitor")) {
 			var ms:Float = fps > 0 ? (1000.0 / fps) : 0;
 			var stats:Dynamic = frameStats();
@@ -83,7 +89,7 @@ class PerformanceMonitor {
 			ImGui.separator();
 
 			for (i in 0...frameTimes.length) {
-				plotValues.setF32(i * 4, frameTimes[i] * 1000.0);
+				plotValues.setF32(i * 4, frameTimes.at(i) * 1000.0);
 			}
 
 			ImGui.plotLines("Frametime (ms)", plotValues, frameTimes.length, 0, null, 0.0,

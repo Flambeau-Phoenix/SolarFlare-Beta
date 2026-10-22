@@ -159,8 +159,6 @@ class GeauxBuilder {
 				host.auraBuilder.open.set(true);
 			if (ImGui.menuItem("Resource Tracker") && host != null && host.resourceTracker != null)
 				host.resourceTracker.open.set(true);
-			if (ImGui.menuItem("Notebook") && host != null && host.notebook != null)
-				host.notebook.open.set(true);
 			ImGui.endMenu();
 		}
 		if (ImGui.beginMenu("File")) {

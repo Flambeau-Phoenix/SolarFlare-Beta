@@ -13,6 +13,14 @@ class StatusBoardTooltipLabels {
  public static var estimated(default,null):String="Estimated";
  public static var noExpiry(default,null):String="No expiry";
  public static var durationUnavailable(default,null):String="Duration unavailable";
+ public static var cooldown(default,null):String="Cooldown";
+ public static var charges(default,null):String="Charges";
+ public static var owned(default,null):String="Owned";
+ public static var key(default,null):String="Key";
+ public static var notUsable(default,null):String="Not usable";
+ public static var noResources(default,null):String="Not enough resources";
+ public static var duration(default,null):String="Duration";
+ public static var ready(default,null):String="Ready";
  public static function refresh():Void {
   #if (hl || status_tooltip_native_test)
   var lang="en";
@@ -50,5 +58,19 @@ class StatusBoardTooltipLabels {
    default: ["Stacks","Remaining","Estimated","No expiry","Duration unavailable"];
   };
   stacks=words[0]; remaining=words[1]; estimated=words[2]; noExpiry=words[3]; durationUnavailable=words[4];
+  words=switch(locale) {
+   case "fr": ["Recharge","Charges","Possédé","Touche","Inutilisable","Ressources insuffisantes","Durée","Prêt"];
+   case "de": ["Abklingzeit","Aufladungen","Besitz","Taste","Nicht nutzbar","Nicht genug Ressourcen","Dauer","Bereit"];
+   case "es": ["Enfriamiento","Cargas","Poseído","Tecla","No utilizable","Recursos insuficientes","Duración","Listo"];
+   case "pt": ["Recarga","Cargas","Possuído","Tecla","Inutilizável","Recursos insuficientes","Duração","Pronto"];
+   case "it": ["Ricarica","Cariche","Posseduto","Tasto","Non utilizzabile","Risorse insufficienti","Durata","Pronto"];
+   case "pl": ["Odnowienie","Ładunki","Posiadane","Klawisz","Nieużywalne","Za mało zasobów","Czas trwania","Gotowe"];
+   case "ru": ["Перезарядка","Заряды","В наличии","Клавиша","Недоступно","Недостаточно ресурсов","Длительность","Готово"];
+   case "ja": ["クールダウン","チャージ","所持数","キー","使用不可","リソース不足","持続時間","使用可能"];
+   case "ko": ["재사용 대기시간","충전","보유","키","사용 불가","자원 부족","지속 시간","준비됨"];
+   case "zh": ["冷却","充能","持有","按键","无法使用","资源不足","持续时间","就绪"];
+   default: ["Cooldown","Charges","Owned","Key","Not usable","Not enough resources","Duration","Ready"];
+  };
+  cooldown=words[0]; charges=words[1]; owned=words[2]; key=words[3]; notUsable=words[4]; noResources=words[5]; duration=words[6]; ready=words[7];
  }
 }

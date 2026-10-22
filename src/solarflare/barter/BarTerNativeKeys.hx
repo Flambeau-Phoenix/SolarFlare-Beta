@@ -14,6 +14,8 @@ class BarTerNativeKeys {
  public static var ownerGeneration(default,null):Int=0;
  public static var observationGeneration(default,null):Int=0;
  public static var epoch(default,null):Int=0;
+ /** Set by BarTer: told about each live skill the moment it is read, so cell tooltips share this populate event. */
+ public static var skillSeen:String->Dynamic->Dynamic->Void=null;
  public static var lastEntries(default,null):Int=0;
  public static var lastSeconds(default,null):Float=0;
  public static var maxSeconds(default,null):Float=0;
@@ -57,6 +59,7 @@ class BarTerNativeKeys {
      var name=solarflare.cdb.AuraCatalog.label(row.icon); row.label=name.length>0 ? name : row.id;
      lastSeen.set(actionName,now); known=true;
      GeauxCache.observeNativeSkill(native.effective,row.id);
+     if (skillSeen!=null) skillSeen(row.id,native.effective,hero);
      addAlias(row.id,actionName); addAlias(row.baseId,actionName); addAlias(row.icon,actionName);
      try { addAlias(solarflare.EngineText.cleanId((cast native.effective:st.skill.Skill).kind),actionName); } catch (_:Dynamic) {}
      solarflare.ui.GameIcons.get(row.icon);

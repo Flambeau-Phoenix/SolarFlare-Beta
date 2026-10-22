@@ -1,6 +1,8 @@
 package solarflare.barter;
 
 import imgui.ImGui;
+import imgui.Enums.ImGuiHoveredFlags;
+import solarflare.ui.CursorCaptureFix;
 import solarflare.ui.GameIcons;
 import solarflare.ui.HudChrome;
 import solarflare.ui.HUDWidgetWindow;
@@ -29,6 +31,27 @@ class BarTerOverlay {
 		hudBodyFn = hudBody;
 		hudResizeFn = hudResize;
 	}
+ /** ImGui ids built once per bar, not concatenated for every cell every frame. */
+ static var useIds:Map<String,Array<String>> = new Map();
+ static var windowIds:Map<String,String> = new Map();
+ static var idCacheCount:Int = 0;
+ static function retainBarId(barId:String):Void {
+  if (windowIds.exists(barId)) return;
+  // Deleted bars and old profiles must not retain strings for the whole session.
+  if (idCacheCount >= 256) { useIds.clear(); windowIds.clear(); idCacheCount=0; }
+  windowIds.set(barId,"SolarFlare.BarTer."+barId); idCacheCount++;
+ }
+ static function useId(barId:String,i:Int):String {
+  retainBarId(barId);
+  var ids=useIds.get(barId);
+  if (ids == null) { ids=[]; useIds.set(barId,ids); }
+  while (ids.length <= i) ids.push("##bt_use_"+barId+"_"+ids.length);
+  return ids[i];
+ }
+ static function windowId(barId:String):String {
+  retainBarId(barId);
+  return windowIds.get(barId);
+ }
  public function draw(bar:BarTerBarConfig,snaps:Array<BarTerSnap>,chrome:HudChrome,
   edit:Void->Void,hide:Void->Void,click:Int->Void,showHotkeys:Bool=true,context:Int->Void=null,barMenu:Void->Void=null):Void {
   var w:Single=BarTerLayout.width(bar.columns,bar.slotSize);
@@ -44,7 +67,7 @@ class BarTerOverlay {
   var reach=bar.glow.reach(bar.slotSize);
   for(s in snaps) if(s.glow!=null) reach=Math.max(reach,s.glow.reach(bar.slotSize));
   visualBounds.reset(w,h); visualBounds.include(-reach,-reach,w+reach*2,h+reach*2);
-  HUDWidgetWindow.draw("SolarFlare.BarTer."+bar.id,bar.name,chrome,w,h,hudBodyFn,edit,hide,false,barMenu,hudResizeFn,visualBounds);
+  HUDWidgetWindow.draw(windowId(bar.id),bar.name,chrome,w,h,hudBodyFn,edit,hide,false,barMenu,hudResizeFn,visualBounds);
   hudBar = null; hudSnaps = null; hudClick = null; hudContext = null;
  }
  public static function tooltip(s:BarTerSnap):String {
@@ -65,6 +88,12 @@ class BarTerOverlay {
  public static function drawTooltip(s:BarTerSnap):Void {
   if (s.kind=="status" && s.available && s.status.instanceId.length>0)
    solarflare.statusboard.StatusBoardTooltipRenderer.draw(s.status.instanceId,s.label);
+  else if (BarTerTipCache.eligible(s)) {
+   // Draw posts a primitive hover key; BarTer.observe resolves the game text (see BarTerTipCache).
+   var key=BarTerTipCache.keyOf(s);
+   BarTerTipCache.request(key,haxe.Timer.stamp(),s.label,s);
+   solarflare.statusboard.StatusBoardTooltipRenderer.drawRow(BarTerTipCache.get(key),s.label);
+  }
   else ImGui.setTooltip(tooltip(s));
  }
  public static function drawCell(dl:Dynamic,s:BarTerSnap,x:Single,y:Single,size:Single,
@@ -105,10 +134,10 @@ class BarTerOverlay {
    ImGui.ImDrawList_PathArcTo(dl,ImGui.vec2(x+size/2,y+size/2),size*0.48,-Math.PI/2,-Math.PI/2+s.remaining*Math.PI*2,28);
    ImGui.ImDrawList_PathFillConvex(dl,0x99000000);
   }
-  if (active && s.cdLeft > 0.05) badge(dl,x+size/2,y+size-3,Std.string(Std.int(Math.ceil(s.cdLeft))),true);
+  if (active && s.cdLeft > 0.05) badge(dl,x+size/2,y+size-3,solarflare.util.IntText.of(Std.int(Math.ceil(s.cdLeft))),true);
   var counts=bar==null || bar.showCounts;
   var countFont=solarflare.ui.SlotBadgeMetrics.font(ImGui.getFontSize(),bar!=null ? bar.chargeScale : 1,size);
-  var count=counts ? (s.isItem && s.count>0 ? Std.string(s.count) : active && s.chargesMax>1 ? Std.string(s.charges) : active && s.stacks>1 ? Std.string(s.stacks) : "") : "";
+  var count=counts ? (s.isItem && s.count>0 ? solarflare.util.IntText.of(s.count) : active && s.chargesMax>1 ? solarflare.util.IntText.of(s.charges) : active && s.stacks>1 ? solarflare.util.IntText.of(s.stacks) : "") : "";
   if(count.length>0) solarflare.ui.SlotBadgeRenderer.draw(dl,count,x+size*0.58,y+1,size*0.42-2,size*0.45,countFont,ImGui.colorConvertFloat4ToU32(theme.text),true);
   if (s.flashUntil > now) ImGui.ImDrawList_AddRect(dl,ImGui.vec2(x+1,y+1),ImGui.vec2(x+size-1,y+size-1),accent,4,2);
   if (showHotkeys && s.keyLabel.length > 0 && s.keyLabel!="Unknown") {
@@ -137,8 +166,13 @@ class BarTerOverlay {
 		 var x:Single=origin.x+(i%bar.columns)*(bar.slotSize+BarTerLayout.GAP);
 		 var y:Single=origin.y+Std.int(i/bar.columns)*(bar.slotSize+BarTerLayout.GAP);
 		 ImGui.setCursorScreenPos(ImGui.vec2(x,y));
-		 var pressed=ImGui.invisibleButton("##bt_use_"+bar.id+"_"+i,ImGui.vec2(bar.slotSize,bar.slotSize));
-		 var hovered=ImGui.isItemHovered();
+		 var pressed=ImGui.invisibleButton(useId(bar.id,i),ImGui.vec2(bar.slotSize,bar.slotSize));
+		 // Nearby HUD hosts include invisible glow/padding/footer space. That space must not
+		 // shrink a cell's tooltip target. Keep normal window blocking while an editor is open;
+		 // popup, active-item and clipping checks still apply in both cases. Clicks stay native.
+		 var hoverFlags=ImGuiHoveredFlags.NoNavOverride;
+		 if (!CursorCaptureFix.interactiveActive) hoverFlags |= ImGuiHoveredFlags.AllowWhenOverlappedByWindow;
+		 var hovered=CursorCaptureFix.cursorFree && ImGui.isItemHovered(hoverFlags);
 		 if (context != null) context(i);
 		 drawCell(dl,snap,x,y,bar.slotSize,now,time,hovered,showHotkeys,bar);
 		 if (hovered && snap != null && snap.kind != "empty") drawTooltip(snap);

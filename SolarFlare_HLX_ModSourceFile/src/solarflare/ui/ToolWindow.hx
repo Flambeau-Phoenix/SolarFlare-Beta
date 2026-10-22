@@ -7,7 +7,7 @@ import imgui.Enums.ImGuiWindowFlags;
 import imgui.ref.BoolRef;
 
 /**
- * Floating tool windows (builders, Notebook, F6 hub).
+ * Floating tool windows (builders, F6 hub).
  * Geometry is ImGui/imgui.ini owned — never HudChrome.
  * Native title bar + MenuBar; the shared chrome family for every editor.
  */

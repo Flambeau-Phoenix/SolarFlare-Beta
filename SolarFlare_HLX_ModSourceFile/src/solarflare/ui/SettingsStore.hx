@@ -85,7 +85,13 @@ class SettingsStore {
 	static var saberMigrated = false;
 	static var combatMigrated = false;
 
-	public static function markDirty():Void {
+	/** Cosmetic persistence with the exact existing debounce, retry and durability policy. */
+    public static function markPresentationDirty():Void {
+        var stamp=haxe.Timer.stamp()*1000;
+        if(!dirty || dirtySinceMs<=0) dirtySinceMs=stamp;
+        dirty=true; lastEditMs=stamp;
+    }
+    public static function markDirty():Void {
 		var stamp = haxe.Timer.stamp() * 1000;
 		if (!dirty || dirtySinceMs <= 0)
 			dirtySinceMs = stamp;
@@ -104,6 +110,17 @@ class SettingsStore {
 	public static function markDirtyLazy():Void {
 		if (lazyDirtySinceMs <= 0)
 			lazyDirtySinceMs = haxe.Timer.stamp() * 1000;
+	}
+
+	/**
+	 * Automatic or UI-only state that must persist but never justifies its own save: the same demand invalidation as
+	 * markDirty, with the save coalesced into the lazy window (LAZY_MS, or logout/title/any other save).
+	 */
+	public static function markDirtyDeferred():Void {
+		markDirtyLazy();
+		try
+			solarflare.ObserveDemand.markStatusDemandDirty()
+		catch (_:Dynamic) {}
 	}
 
 	static function promoteLazy():Void {

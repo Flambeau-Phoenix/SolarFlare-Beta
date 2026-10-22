@@ -35,6 +35,11 @@ class AuraOverlay {
 	var hudGroupHideFn:Void->Void;
 	var hudGroupResizeFn:Single->Single->Void;
 	var groupMembers:Array<AuraDef> = [];
+    var membership=new solarflare.util.MembershipIndex<AuraDef>();
+    var groupKeyFn:AuraDef->String;
+    static function auraGroupKey(aura:AuraDef):String return aura==null ? null : aura.group;
+    function refreshGroupStructure():Void { membership.refresh(cfg.auras,groupKeyFn); }
+
 	var groupW:Array<Float> = [];
 	var groupH:Array<Float> = [];
 	var groupLayout = new AuraGroupLayout();
@@ -43,6 +48,7 @@ class AuraOverlay {
 
 	public function new(cfg:AuraConfig) {
 		hudBodyFn = hudBody;
+        groupKeyFn=auraGroupKey;
 		hudHideFn = hudHide;
 		hudQuickActionsFn = hudQuickActions;
 		hudResizeFn = hudResize;
@@ -134,6 +140,7 @@ class AuraOverlay {
 
 
 	function hudAll():Void {
+		refreshGroupStructure();
 		for (a in cfg.auras) {
 			try drawOne(a) catch (_:Dynamic) {}
 		}
@@ -159,9 +166,11 @@ class AuraOverlay {
 		if (g == null) return;
 		var chrome = cfg.groupChrome(g);
 		var layout = !chrome.locked.get();
-		groupMembers.splice(0, groupMembers.length);
-		for (a in cfg.auras) {
-			if (a == null || a.group != g.id || !a.enabled.get() || !a.visual.get()) continue;
+		groupMembers.resize(0);
+        var structural=membership.get(g.id);
+        if(structural==null) return;
+        for(a in structural) {
+            if(!a.enabled.get() || !a.visual.get()) continue;
 			if (!a.show && !layout) continue;
 			groupMembers.push(a);
 		}

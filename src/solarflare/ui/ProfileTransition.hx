@@ -5,11 +5,14 @@ class ProfileTransition {
  public var owner(default,null):String="";
  public var ready(default,null):Bool=false;
  public var generation(default,null):Int=0;
+ public var resumed(default,null):Bool=false;
+ var appliedOwner:String="";
  var identityGeneration:Int=-1;
  var pendingOutgoing:String="";
  public function new(initialGeneration:Int=0) generation=initialGeneration;
  /** Returns true only when a confirmed destination needs restoration. Outgoing capture always runs first. */
  public function begin(id:String,confirmed:Bool,identity:Int,save:String->Void,cancel:Void->Void):Bool {
+  resumed=false;
   confirmed=confirmed && ProfileBank.heroId(id)!="";
   if(confirmed && ready && owner==id && identityGeneration==identity) return false;
   if(ready) { ready=false; generation++; pendingOutgoing=owner; }
@@ -19,10 +22,13 @@ class ProfileTransition {
    cancel();
   }
   if(!confirmed) return false;
-  owner=id; identityGeneration=identity; generation++; return true;
+  owner=id; identityGeneration=identity; generation++;
+  // A map load changes native identity without replacing the live profile configuration.
+  if(appliedOwner==id) { ready=true; resumed=true; return false; }
+  appliedOwner=""; return true;
  }
- public function complete():Void ready=true;
- public function restoring():Void { ready=false; generation++; }
+ public function complete():Void { appliedOwner=owner; ready=true; }
+ public function restoring():Void { appliedOwner=""; ready=false; generation++; }
  public function changed():Void generation++;
  public function accepts(token:Int,wasReady:Bool):Bool return ready && wasReady && token==generation;
 }

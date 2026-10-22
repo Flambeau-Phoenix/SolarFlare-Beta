@@ -4,9 +4,18 @@ import solarflare.barter.BarTerWeaponLayouts.BarTerNativeSkill;
 /** Native input identity follows the assigned skill, independent of its cell position. */
 class BarTerBindingResolver {
  /** Unreadable is explained in the tooltip, never rendered as a guessed key. */
+ static var badgeMemo:Map<String,String> = new Map();
+ static var badgeMemoCount:Int = 0;
  public static function badgeLabel(text:String):String {
   if (text==null || text.length==0 || text=="Unknown") return "";
-  return text=="Unbound" ? "-" : primaryLabel(text);
+  if (text=="Unbound") return "-";
+  // Drawn per cell per frame; the label is a pure function of the binding text.
+  var label=badgeMemo.get(text);
+  if (label == null) {
+   if (badgeMemoCount >= 256) { badgeMemo.clear(); badgeMemoCount=0; }
+   label=primaryLabel(text); badgeMemo.set(text,label); badgeMemoCount++;
+  }
+  return label;
  }
  /** Chip text: first binding, with the engine's long mouse names shortened to fit a cell. */
  public static function primaryLabel(text:String):String {

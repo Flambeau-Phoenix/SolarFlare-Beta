@@ -31,6 +31,11 @@ class CombatLogRecorder {
 
 	static var buf:Array<String> = [];
 	static var bufBytes:Int = 0;
+    static var pending:Array<{transaction:solarflare.util.AppendTransaction,lines:Int}>=[];
+    static var pendingBytes=0;
+    static var requestedFlush=false;
+    static var retryAt=0.0;
+    static var storage=new solarflare.util.AppendTransaction.DiskAppendStorage();
 	static var sessionPath:String = "";
 	static var lastFlushAt:Float = 0;
 	static var lastEventAt:Float = 0;
@@ -47,6 +52,7 @@ class CombatLogRecorder {
 	 * and leaves the player's own filter choices alone.
 	 */
 	public static function setCapture(on:Bool):Void {
+        if(solarflare.ModEntry.inDraw) { solarflare.ui.UiActionQueue.custom(function() setCapture(on)); return; }
 		if (enabled.get() == on)
 			return;
 		enabled.set(on);
@@ -64,20 +70,20 @@ class CombatLogRecorder {
 	public static function queue(line:CombatLogLine):Void {
 		if (!enabled.get() || line == null)
 			return;
-		ensureSession(false);
+		// Session creation and disk work are serviced by tick/flush.
 		try {
 			var json = line.toJson();
 			buf.push(json);
-			bufBytes += json.length + 1;
+			bufBytes += haxe.io.Bytes.ofString(json).length + 1;
 		} catch (_:Dynamic) {}
 		lastEventAt = stamp();
 		// Passive durability: flush on our own cadence. A hidden overlay or a stalled
 		// frame loop (modal exception dialog) must never discard queued combat.
 		var now = stamp();
-		if (bufBytes >= MAX_BYTES || now - lastFlushAt >= FLUSH_S)
-			flush();
+		if (bufBytes+pendingBytes >= MAX_BYTES || now - lastFlushAt >= FLUSH_S)
+			requestedFlush=true;
 		// If the disk write failed we still bound RAM rather than grow forever.
-		if (bufBytes > MAX_BYTES)
+		if (bufBytes+pendingBytes > MAX_BYTES)
 			trimBuf();
 	}
 
@@ -93,45 +99,44 @@ class CombatLogRecorder {
 		}
 		if (sessionPath.length > 0 && lastEventAt > 0 && now - lastEventAt >= IDLE_S)
 			endSession();
-		if (buf.length == 0)
+		if (buf.length == 0 && pending.length==0)
 			return;
-		if (buf.length >= 24 || now - lastFlushAt >= 0.4)
+		if (now>=retryAt && (requestedFlush || buf.length >= 24 || now - lastFlushAt >= 0.4))
 			flush();
 	}
 
-	public static function flush():Void {
-		if (buf.length == 0)
-			return;
-		ensureSession(false);
-		if (sessionPath.length == 0)
-			return;
-		try {
-			var chunk = buf.join("\n") + "\n";
-			buf = [];
-			bufBytes = 0;
-			var out = sys.io.File.append(sessionPath);
-			out.writeString(chunk);
-			out.close();
-			written += chunk.split("\n").length - 1;
-			lastFlushAt = stamp();
-			sinceCheck += chunk.length;
-			if (sinceCheck >= CHECK_EVERY_BYTES)
-				pruneLogs();
-			lastStatus = "recording " + written + "  " + fileName()
-				+ (trimmed > 0 ? "  (trimmed " + trimmed + ")" : "");
-		} catch (_:Dynamic) {
-			lastStatus = "record fail";
-		}
-	}
+    public static function flush():Void {
+        if(solarflare.ModEntry.inDraw) { requestedFlush=true; return; }
+        requestedFlush=false;
+        if(buf.length>0) {
+            ensureSession(false);
+            if(sessionPath.length==0) return;
+            var bytes=haxe.io.Bytes.ofString(buf.join("\n")+"\n");
+            pending.push({transaction:new solarflare.util.AppendTransaction(sessionPath,bytes),lines:buf.length});
+            pendingBytes+=bytes.length; buf=[]; bufBytes=0;
+        }
+        while(pending.length>0) {
+            var batch=pending[0];
+            if(!batch.transaction.commit(storage)) { lastStatus="record fail: "+batch.transaction.error; retryAt=stamp()+2.0; return; }
+            retryAt=0; pending.shift(); pendingBytes-=batch.transaction.bytes.length;
+            written+=batch.lines; sinceCheck+=batch.transaction.bytes.length; lastFlushAt=stamp();
+        }
+        if(sinceCheck>=CHECK_EVERY_BYTES) pruneLogs();
+        lastStatus="recording "+written+"  "+fileName()+(trimmed>0 ? "  (trimmed "+trimmed+")" : "");
+    }
 
 	/** Bounds in-RAM queue when a disk write fails, so a stuck loop cannot leak. */
-	static function trimBuf():Void {
-		while (bufBytes > MAX_BYTES && buf.length > 0) {
-			var first = buf.shift();
-			bufBytes -= first.length + 1;
-			trimmed++;
-		}
-	}
+    static function trimBuf():Void {
+        while(bufBytes+pendingBytes>MAX_BYTES) {
+            var discard=-1;
+            for(i in 0...pending.length) if(pending[i].transaction.offset<0) { discard=i; break; }
+            if(discard>=0) {
+                var batch=pending.splice(discard,1)[0]; pendingBytes-=batch.transaction.bytes.length; trimmed+=batch.lines;
+            } else if(buf.length>0) {
+                var first=buf.shift(); bufBytes-=haxe.io.Bytes.ofString(first).length+1; trimmed++;
+            } else break;
+        }
+    }
 
 	/**
 	 * Folder cap: when the clog-*.jsonl files total more than PRUNE_ABOVE_BYTES, delete the oldest files and then
@@ -162,6 +167,8 @@ class CombatLogRecorder {
 				if (excess <= 0)
 					break;
 				var path = haxe.io.Path.join([dir, f.name]);
+				var protectedFile=false; for(batch in pending) if(batch.transaction.path==path) protectedFile=true;
+				if(protectedFile) continue;
 				if (f.size <= excess && path != sessionPath) {
 					sys.FileSystem.deleteFile(path);
 					excess -= f.size;
@@ -186,14 +193,16 @@ class CombatLogRecorder {
 	}
 
 	public static function endSession():Void {
+        if(solarflare.ModEntry.inDraw) { solarflare.ui.UiActionQueue.custom(endSession); return; }
 		flush();
 		if (sessionPath.length == 0)
 			return;
-		lastStatus = "saved " + fileName() + "  " + written + " events";
+		lastStatus = pending.length>0 ? "record fail: pending data retained" : "saved " + fileName() + "  " + written + " events";
 		sessionPath = "";
 	}
 
 	public static function newSession():Void {
+        if(solarflare.ModEntry.inDraw) { solarflare.ui.UiActionQueue.custom(newSession); return; }
 		endSession();
 		ensureSession(true);
 	}
@@ -216,6 +225,7 @@ class CombatLogRecorder {
 			+ "-" + pad(d.getHours(), 2) + pad(d.getMinutes(), 2) + pad(d.getSeconds(), 2)
 			+ ".jsonl";
 		sessionPath = haxe.io.Path.join([logDir, name]);
+        var collision=1; while(sys.FileSystem.exists(sessionPath)) sessionPath=haxe.io.Path.join([logDir,name.substr(0,name.length-6)+"-"+(collision++)+".jsonl"]);
 		lastPath = sessionPath;
 		written = 0;
 		try {
@@ -251,6 +261,7 @@ class CombatLogRecorder {
 			return;
 		try {
 			flush();
+            for(batch in pending) if(batch.transaction.path==sessionPath) return;
 			if (!sys.FileSystem.exists(sessionPath))
 				return;
 			var content = sys.io.File.getContent(sessionPath);

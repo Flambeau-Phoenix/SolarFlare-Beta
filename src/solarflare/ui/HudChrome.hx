@@ -106,7 +106,7 @@ class HudChrome {
 	public function captureSize(w:FloatRef, h:FloatRef):Void {
 		if (w != null && h != null && winW > 0 && winH > 0) {
 			if (Math.abs(winW - w.get()) > 1 || Math.abs(winH - h.get()) > 1)
-				SettingsStore.markDirty();
+				SettingsStore.markPresentationDirty();
 			w.set(winW);
 			h.set(winH);
 		}
@@ -358,7 +358,7 @@ class HudChrome {
 		if (UiChrome.toggleChip("Transparent##" + id, transparent, chip))
 			changed = true;
 		if (changed)
-			SettingsStore.markDirty();
+			SettingsStore.markPresentationDirty();
 		return changed;
 	}
 
@@ -403,7 +403,7 @@ class HudChrome {
   x.set(horizontal ? value : otherX); y.set(horizontal ? otherY : value);
   referenceWidth=viewportWidth; referenceHeight=viewportHeight;
 		posDirty = true;
-		SettingsStore.markDirty();
+		SettingsStore.markPresentationDirty();
 		return true;
 	}
 
@@ -437,7 +437,7 @@ class HudChrome {
 				changed = true;
 		});
 		if (changed)
-			SettingsStore.markDirty();
+			SettingsStore.markPresentationDirty();
 		return changed;
 	}
 
@@ -562,14 +562,14 @@ class HudChrome {
 			ImGui.separatorText('$title');
 
 			if (ImGui.checkbox("Lock Window##ctx_lock", locked)) {
-				SettingsStore.markDirty();
+				SettingsStore.markPresentationDirty();
 				ToastManager.info(locked.get() ? '$title locked' : '$title unlocked');
 			}
 			if (ImGui.checkbox("Transparent Window##ctx_trans", transparent)) {
-				SettingsStore.markDirty();
+				SettingsStore.markPresentationDirty();
 			}
 			if (ImGui.checkbox("Collapse Window##ctx_col", collapsed)) {
-				SettingsStore.markDirty();
+				SettingsStore.markPresentationDirty();
 			}
 
 			ImGui.separator();
@@ -577,7 +577,7 @@ class HudChrome {
 				x.set(40);
 				y.set(40); resetReference();
 				posDirty = true;
-				SettingsStore.markDirty();
+				SettingsStore.markPresentationDirty();
 				ToastManager.info('$title position reset');
 			}
 
@@ -725,7 +725,7 @@ class HudChrome {
 			var placed = clampDrag(mouse.x - surfaceGrabX, mouse.y - surfaceGrabY);
 			setDisplayPosition(HUDVisualBounds.anchorCoordinate(placed.x,visualOffsetX),HUDVisualBounds.anchorCoordinate(placed.y,visualOffsetY));
 			ImGui.setWindowPos(placed);
-			SettingsStore.markDirty();
+			SettingsStore.markPresentationDirty();
 			return;
 		}
 		if (ImGui.isWindowHovered() && ImGui.isMouseClicked(ImGuiMouseButton.Left)
@@ -804,7 +804,7 @@ class HudChrome {
 				var placed = clampDrag(m.x - dragOffX, m.y - dragOffY);
 				setDisplayPosition(HUDVisualBounds.anchorCoordinate(placed.x,visualOffsetX),HUDVisualBounds.anchorCoordinate(placed.y,visualOffsetY));
 				ImGui.setWindowPos(placed);
-				SettingsStore.markDirty();
+				SettingsStore.markPresentationDirty();
 			}
 		}
 		if (ImGui.isItemDeactivated()) {
@@ -832,6 +832,6 @@ class HudChrome {
 			collapsed.set(false);
 			expandSizeDirty = true;
 		}
-		SettingsStore.markDirty();
+		SettingsStore.markPresentationDirty();
 	}
 }

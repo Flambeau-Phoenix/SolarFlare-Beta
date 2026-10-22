@@ -23,6 +23,7 @@ class StatusBoardTooltip {
  public var factsDuration:Int=-2;
  public var factsState:Int=-1;
  public var factsLocale:String="";
+ public var factsKey:String="";
  public function new(id:String) instanceId=id;
 }
 
