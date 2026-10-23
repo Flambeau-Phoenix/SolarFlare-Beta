@@ -47,7 +47,8 @@ class AuraSharePackage {
  }
  public static function validateRule(rule:Dynamic):Void {
   if(rule==null) return;
-  if(rule.version!=1 || (rule.mode!="all" && rule.mode!="any")) throw "Unsupported Aura rule version or mode.";
+  if((rule.version!=1 && rule.version!=2) || (rule.mode!="all" && rule.mode!="any")) throw "Unsupported Aura rule version or mode.";
+  if(rule.version==2) { var error=solarflare.aura.signal.AuraRuleStructure.validateObject(rule); if(error!="") throw error; }
   var conditions=list(rule.conditions,"Rule conditions",solarflare.aura.signal.AuraRuleDef.MAX_CONDITIONS);
   if(conditions.length>0 && (!Std.isOfType(rule.presentationSource,Int) || rule.presentationSource<0 || rule.presentationSource>=conditions.length)) throw "Invalid rule presentation source.";
   for(c in conditions) {
@@ -60,6 +61,14 @@ class AuraSharePackage {
    if(c.signal=="custom.script" && haxe.io.Bytes.ofString(c.subject).length>4096) throw "Expression exceeds 4,096 UTF-8 bytes; source was not truncated.";
    if(c.numberValue!=null && ((!Std.isOfType(c.numberValue,Float) && !Std.isOfType(c.numberValue,Int)) || !Math.isFinite(c.numberValue))) throw "Invalid condition threshold.";
   }
+ }
+ /** Legacy clipboard/pack imports must reject unsupported nested rules before any library edit. */
+ public static function validateNestedAura(a:Dynamic):Void {
+  if(a==null) return;
+  if(a.activationGate!=null && !AuraActivationGate.supported(a.activationGate)) throw "Unsupported Aura activation requirement.";
+  if(a.rule!=null && a.rule.version!=1) validateRule(a.rule);
+  if(Std.isOfType(a.states,Array)) { var states:Array<Dynamic>=cast a.states; for(st in states) if(st!=null && st.rule!=null && st.rule.version!=1) validateRule(st.rule); }
+  if(Std.isOfType(a.canvasElements,Array)) { var elements:Array<Dynamic>=cast a.canvasElements; for(el in elements) if(el!=null && el.visibilityRule!=null && el.visibilityRule.version!=1) validateRule(el.visibilityRule); }
  }
  public static function validatePack(pack:Dynamic):Void {
   if(pack==null || pack.kind!="solarflare.aura_pack" || pack.v!=1) throw "Unsupported Aura definitions.";
@@ -84,6 +93,7 @@ class AuraSharePackage {
    if(a.fight!=null && a.fight!="" && !setIds.exists(a.fight)) throw "Missing Aura set for "+a.name;
    if(a.trigger!=null && ["resource","prayer","cooldown","status","combatlog","combo","chaincast","conduit","script","custom"].indexOf(a.trigger)<0) throw "Unsupported Aura trigger: "+a.trigger;
    if(a.region!=null && ["bar","ring","text","icon","canvas"].indexOf(a.region)<0) throw "Unsupported Aura style: "+a.region;
+   if(a.activationGate!=null && !AuraActivationGate.supported(a.activationGate)) throw "Unsupported Aura activation requirement.";
    validateRule(a.rule);
    if(a.effects!=null) for(e in list(a.effects,"Effects",8)) {
     if(e==null || ["window","alert","icon","audio"].indexOf(e.kind)<0 || ["whileTrue","whileFalse","onRise","onFall","onRiseHold","onFallHold","sticky"].indexOf(e.when)<0) throw "Unsupported Aura effect.";

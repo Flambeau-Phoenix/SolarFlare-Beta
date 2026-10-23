@@ -4,13 +4,21 @@ class AuraRuleEvaluator {
 	static inline var EPS:Float = 1e-9;
 	public static function evaluate(rule:AuraRuleDef, frame:AuraSignalFrame, result:AuraRuleResult, statusesAtCast:Bool = false):Void {
 		result.reset();
-		if (rule == null || frame == null || rule.conditions == null || rule.conditions.length == 0 || rule.version != AuraRuleDef.CURRENT_VERSION) { result.code = EMPTY_RULE; return; }
+		if (rule == null || frame == null || rule.conditions == null) { result.code = EMPTY_RULE; return; }
+		if (rule.version != 1 && rule.version != 2) { result.code = INVALID_RULE; return; }
+		var plan = rule.version == 2 ? rule.prepared() : null;
+		if (plan != null && plan.error != "") { result.code = INVALID_RULE; return; }
+		if (rule.conditions.length == 0) { result.code = EMPTY_RULE; return; }
 		var n = rule.conditions.length; if (n > AuraRuleDef.MAX_CONDITIONS) n = AuraRuleDef.MAX_CONDITIONS; result.totalCount = n; result.ensure(n);
+		if (plan != null) {
+			evaluateTree(rule, frame, result, plan, statusesAtCast);
+			presentation(rule, result, n); return;
+		}
 		var castEvent:EnemyCastSignalSnap = null;
 		if (statusesAtCast && rule.mode == "all") {
 			for (c in rule.conditions) {
 				if (c == null || c.signal != "event.playerCast.recent" || c.op != "within" || c.negate) continue;
-				var key = StringTools.trim(c.subject).toLowerCase();
+				var key = c.castSubject();
 				for (i in 0...frame.playerCastCount) {
 					var candidate = frame.playerCasts[i];
 					if (candidate.skillId == key && candidate.known && candidate.age <= c.numberValue + EPS
@@ -26,8 +34,52 @@ class AuraRuleEvaluator {
 				&& !c.negate && result.conditions[i].hit)
 				result.eventSerial = Std.int(Math.max(result.eventSerial, result.resolved[i].eventSerial));
 		}
+		presentation(rule, result, n);
+	}
+	static function presentation(rule:AuraRuleDef, result:AuraRuleResult, n:Int):Void {
 		var pi = rule.presentationSource; if (pi < 0 || pi >= n) pi = 0;
 		var p = result.conditions[pi]; result.progress = p.progress; result.stacks = p.stacks; result.timeLeft = p.timeLeft;
+	}
+	static function evaluateTree(rule:AuraRuleDef, frame:AuraSignalFrame, r:AuraRuleResult, plan:AuraRulePlan, statusesAtCast:Bool):Void {
+		r.plan = plan; r.ensureNodes(plan.entries.length);
+		for (e in plan.entries) if (e.conditionIndex >= 0) {
+			var index = e.conditionIndex;
+			var castEvent:EnemyCastSignalSnap = null;
+			if (statusesAtCast && rule.conditions[index].signal == "status.present") for (ci in e.casts) {
+				var c = rule.conditions[ci];
+				if (c.signal != "event.playerCast.recent" || c.op != "within" || c.negate) continue;
+				var key = c.castSubject();
+				for (i in 0...frame.playerCastCount) {
+					var candidate = frame.playerCasts[i];
+					if (candidate.skillId == key && candidate.known && candidate.age <= c.numberValue + EPS
+						&& (castEvent == null || candidate.serial > castEvent.serial)) castEvent = candidate;
+				}
+			}
+			evalCondition(rule.conditions[index], frame, r.resolved[index], r.conditions[index], castEvent);
+			if (r.conditions[index].known) { r.knownCount++; if (r.conditions[index].hit) r.hitCount++; }
+		}
+		var index = plan.entries.length;
+		while (index-- > 0) {
+			var e = plan.entries[index]; var known = false; var hit = false; var serial = 0;
+			if (e.conditionIndex >= 0) {
+				var c = rule.conditions[e.conditionIndex]; var answer = r.conditions[e.conditionIndex];
+				known = answer.known; hit = answer.hit;
+				if (known && hit && !c.negate && ((AuraConditionValidator.isElapsedEvent(c.signal) && c.op == "within") || c.signal == "custom.script"))
+					serial = r.resolved[e.conditionIndex].eventSerial;
+			} else {
+				var unknown = false; var anyHit = false; var anyMiss = false;
+				for (child in e.children) {
+					if (!r.nodeKnown[child]) unknown = true;
+					else if (r.nodeHit[child]) { anyHit = true; if (r.nodeSerial[child] > serial) serial = r.nodeSerial[child]; }
+					else anyMiss = true;
+				}
+				known = e.mode == "all" ? (anyMiss || !unknown) : (anyHit || !unknown);
+				hit = known && (e.mode == "all" ? !anyMiss : anyHit);
+				if (e.negate) { if (known) hit = !hit; serial = 0; }
+			}
+			r.nodeKnown[index] = known; r.nodeHit[index] = known && hit; r.nodeSerial[index] = known && hit ? serial : 0;
+		}
+		r.known = r.nodeKnown[0]; r.hit = r.nodeHit[0]; r.eventSerial = r.nodeSerial[0]; r.code = r.known ? OK : UNKNOWN_DOMAIN;
 	}
 	static function evalCondition(c:AuraConditionDef, frame:AuraSignalFrame, value:AuraResolvedValue, out:AuraConditionResult, castEvent:EnemyCastSignalSnap):Void {
 		out.reset(); value.reset();

@@ -13,6 +13,12 @@ class AuraConditionDef {
 	public var boolValue:Bool = false;
 	public var stringValue:String = "";
 	public var negate:Bool = false;
+	var castKeySource:String = null;
+	var castKey:String = "";
+	public function castSubject():String {
+		if (castKeySource != subject) { castKeySource = subject; castKey = subject == null ? "" : StringTools.trim(subject).toLowerCase(); }
+		return castKey;
+	}
 	public function new() {
 		uiKey = nextUiKey++;
 		if (nextUiKey < 1)

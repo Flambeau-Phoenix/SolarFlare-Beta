@@ -337,7 +337,7 @@ class AuraBossPortraitStrip {
 			c.op = "is";
 			c.boolValue = true;
 		}
-		a.rule.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(a.rule, c);
 		SettingsStore.markDirty();
 		return true;
 	}

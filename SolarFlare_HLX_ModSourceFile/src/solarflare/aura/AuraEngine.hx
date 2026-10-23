@@ -301,10 +301,13 @@ class AuraEngine {
 		// Status-hold fallback keeps a countdown alive while the catalog hold drains.
 		if (!Math.isFinite(buffLeft) && hit && !a.dormant.get() && a.until > now)
 			buffLeft = a.until - now;
+		var gated = AuraActivationGate.combine(known, hit, AuraActivationGate.read(a.activationGate, frame));
+		if (a.activationGate != "none") { known = gated >= 0; hit = gated == 1; }
 		var scriptRestart=known && hit && !a.invert.get() && scriptSerial>0 && scriptSerial!=a.timerEventSerial;
 		if(scriptSerial>0) a.timerEventSerial=scriptSerial;
 		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf, scriptRestart, t == "cooldown",
 			t == "cooldown" ? frame.findSkill(a.skillId) : null);
+		enforceActivationGate(a, known, hit);
 		a.stacks = stacks < 1 ? 1 : stacks;
 		if (a.resolvedIcon.length == 0) {
 			if (a.iconId != null && a.iconId.length > 0)
@@ -332,8 +335,13 @@ class AuraEngine {
 	}
 	static function evalDeclarative(a:AuraDef, now:Float):Void {
 		AuraRuleEvaluator.evaluate(a.rule, frame, a.ruleResult, AuraTimer.keepsAura(a) && a.timerSource == AuraTimer.SRC_FIXED);
+		if (a.ruleResult.code == INVALID_RULE) { AuraEffects.clearPresentation(a); return; }
 		var hit = a.ruleResult.hit;
 		var known = a.ruleResult.known;
+		if (a.activationGate != "none") {
+			var gated = AuraActivationGate.combine(known, hit, AuraActivationGate.read(a.activationGate, frame));
+			known = gated >= 0; hit = gated == 1;
+		}
 		if (!known && (usesTargetStatus(a) || usesTypeSignal(a,"statusType.present") || usesTypeSignal(a,"target.statusType.present"))) { clearTargetPresentation(a); return; }
 		var prog = a.ruleResult.progress;
 		if (!Math.isFinite(prog)) prog = hit ? 1 : 0;
@@ -352,6 +360,7 @@ class AuraEngine {
 		var cooldownDriven = presentation != null && AuraTimingReferencePolicy.isCooldown(presentation.signal);
 		AuraEffects.apply(a, hit, known, now, prog, buffLeft, buffInf, restart, cooldownDriven,
 			cooldownDriven ? (StringTools.startsWith(presentation.signal,"dash.") ? AuraMovementObserver.cooldown : frame.findSkill(presentation.subject)) : null);
+		enforceActivationGate(a, known, hit);
 		a.stacks = stacks;
 		if (a.iconId != null && a.iconId.length > 0) {
 			a.resolvedIcon = a.iconId;
@@ -365,6 +374,10 @@ class AuraEngine {
 		resolveIconFallback(a);
 	}
 
+	static function enforceActivationGate(a:AuraDef, known:Bool, hit:Bool):Void {
+		// Timers keep running, but neither their hold nor Always On bypasses an explicit AND requirement.
+		if (a.activationGate != "none" && (!known || !hit)) { a.show = false; a.alertShow = false; a.iconGlow = false; }
+	}
 	static function resolveIconFallback(a:AuraDef):Void {
 		if (a.resolvedIcon.length > 0) return;
 		if (a.iconId != null && a.iconId.length > 0) a.resolvedIcon = a.iconId;
@@ -593,6 +606,7 @@ class AuraEngine {
 			requireAfford: boolRef(a.requireAfford, true),
 			dormant: boolRef(a.dormant, false),
 			alwaysOn: boolRef(a.alwaysOn, false),
+			activationGate: safeString(a.activationGate, "none"),
 			visual: boolRef(a.visual, true),
 			audio: boolRef(a.audio, false),
 			cue: safeString(a.cue),

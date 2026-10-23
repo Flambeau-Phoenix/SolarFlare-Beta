@@ -31,6 +31,8 @@ class AuraDef {
 	public var dormant:BoolRef;
 	/** Keep presentation visible while triggers continue to count normally. */
 	public var alwaysOn = new BoolRef(false);
+	/** Extra requirement selected by Show aura. "none" preserves legacy behavior. */
+	public var activationGate:String = "none";
 	/** DRM-parity toggles (visual used live; audio/cue/volume stored for DRM export). */
 	public var visual:BoolRef;
 	public var audio:BoolRef;

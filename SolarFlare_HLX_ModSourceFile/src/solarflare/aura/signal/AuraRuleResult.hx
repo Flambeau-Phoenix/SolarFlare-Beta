@@ -14,6 +14,14 @@ class AuraRuleResult {
 	public var hitCount:Int = 0;
 	public var totalCount:Int = 0;
 	public var code:AuraDiagnosticCode = EMPTY_RULE;
+	/** Frozen group answers, indexed by the prepared traversal that produced them. */
+	public var plan:AuraRulePlan = null;
+	public var nodeKnown:Array<Bool> = [];
+	public var nodeHit:Array<Bool> = [];
+	public var nodeSerial:Array<Int> = [];
+	public function ensureNodes(n:Int):Void {
+		while (nodeKnown.length < n) { nodeKnown.push(false); nodeHit.push(false); nodeSerial.push(0); }
+	}
 
 	public function new() {}
 
@@ -26,6 +34,7 @@ class AuraRuleResult {
 		}
 	}
 	public function reset():Void {
+		plan = null;
 		eventSerial = 0;
 		known = false; hit = false; progress = Math.NaN; stacks = -1; timeLeft = Math.NaN;
 		var used = totalCount; if (used > conditions.length) used = conditions.length;

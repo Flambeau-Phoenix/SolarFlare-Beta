@@ -92,11 +92,17 @@ class CanvasEditor {
 	var nextCanvasRowId:Int = 1;
 	var imageLibrary:ImageLibraryPanel;
 	var iconPicker = new GameIconPicker();
+	var conditionPicker:AuraConditionPicker;
+	var externalPickerOpen:Void->Bool;
+	public function conditionBrowserOpen():Bool return conditionPicker != null && conditionPicker.isOpen();
+	function pickerBlocksInput():Bool return conditionBrowserOpen() || (externalPickerOpen != null && externalPickerOpen());
 	var preciseFn:Void->Void;
 	var stageMaxH:Single = 280;
 
-	public function new(host:CanvasHost) {
+	public function new(host:CanvasHost, externalPickerOpen:Void->Bool = null) {
 		this.host = host;
+		this.externalPickerOpen = externalPickerOpen;
+		conditionPicker = new AuraConditionPicker("Canvas", conditionPickerOwnerValid);
 		preciseFn = function() host.canvasPrecise();
 		ByteUtil.clearBytes(canvasContentBuf, CANVAS_CONTENT_BUF);
 		ByteUtil.clearBytes(canvasImportBuf, CANVAS_IMPORT_BUF);
@@ -122,7 +128,10 @@ class CanvasEditor {
 	}
 
 	public function invalidateColor():Void { lastCanvasColorAuraId = ""; lastCanvasColorSel = -1; }
-	public function resetRuleContexts():Void canvasRuleContexts = new haxe.ds.ObjectMap();
+	public function resetRuleContexts():Void {
+		if (conditionPicker != null) conditionPicker.cancel();
+		canvasRuleContexts = new haxe.ds.ObjectMap();
+	}
 
 	public function clearTransientState():Void {
 		releasePreview();
@@ -139,9 +148,21 @@ class CanvasEditor {
 	// ---- Window -----------------------------------------------------------------------------
 
 	public function draw():Void {
-		if (!open.get()) { if (haxe.Timer.stamp() - lastPreviewSync > 0.3) releasePreview(); return; }
-		if (!CursorCaptureFix.cursorFree) return;
-		EditorWindow.drawMenuWindow("Canvas Editor###SolarFlare.CanvasEditor", open, 1360, 860, drawBody);
+		if (!open.get()) { conditionPicker.cancel(); if (haxe.Timer.stamp() - lastPreviewSync > 0.3) releasePreview(); return; }
+		if (!CursorCaptureFix.cursorFree) { conditionPicker.cancel(); return; }
+		EditorWindow.drawMenuWindow("Canvas Editor###SolarFlare.CanvasEditor", open, 1360, 860, function() {
+			ImGui.beginDisabled(pickerBlocksInput());
+			try { drawBody(); } catch (e:Dynamic) { ImGui.endDisabled(); throw e; }
+			ImGui.endDisabled(); conditionPicker.draw();
+		});
+	}
+	function conditionPickerOwnerValid():Bool {
+		if (!open.get() || !CursorCaptureFix.cursorFree) return false;
+		var a = host.canvasSelectedAura(); var r = conditionPicker.model.targetRule;
+		if (a == null || host.canvasAuras().indexOf(a) < 0) return false;
+		if (a.states != null) for (st in a.states) if (st != null && st.rule == r) return true;
+		if (a.canvasElements != null) for (el in a.canvasElements) if (el != null && el.visibilityRule == r) return true;
+		return false;
 	}
 
 
@@ -428,6 +449,7 @@ class CanvasEditor {
 
 	/** Window-level shortcuts. Returns true when the frame should end (undo/redo replaced the document). */
 	function handleGlobalKeys(a:AuraDef):Bool {
+		if (pickerBlocksInput()) return false;
 		if (!ImGui.isWindowFocused(imgui.Enums.ImGuiFocusedFlags.RootAndChildWindows) || ImGui.isAnyItemActive()) return false;
 		var ctrl = ImGui.isKeyDown(ImGuiKey.LeftCtrl) || ImGui.isKeyDown(ImGuiKey.RightCtrl);
 		var shift = ImGui.isKeyDown(ImGuiKey.LeftShift) || ImGui.isKeyDown(ImGuiKey.RightShift);
@@ -633,6 +655,7 @@ class CanvasEditor {
 	}
 
 	function penStep(a:AuraDef, mx:Float, my:Float, s:Float, active:Bool, activated:Bool, alt:Bool, hovered:Bool):Void {
+		if (pickerBlocksInput()) return;
 		var snap = canvasSnap.get() && !alt;
 		if (activated) {
 			var px = canvasSnapValue(mx, snap), py = canvasSnapValue(my, snap);
@@ -759,6 +782,7 @@ class CanvasEditor {
 
 	/** Delete and arrow keys act on the selected nodes. Returns true when a key was used. */
 	function nodesKeys(a:AuraDef, shift:Bool):Bool {
+		if (pickerBlocksInput()) return false;
 		var el = pathLayer(a);
 		if (el == null || nodeSel.length == 0) return false;
 		var path = el.path;
@@ -1440,7 +1464,7 @@ class CanvasEditor {
 	}
 
 	/** Builder card: tabs, hints and the selected look's settings, all in one column. */
-	public function drawStatesPanel(a:AuraDef):Void {
+	public function drawStatesPanel(a:AuraDef, picker:AuraConditionPicker = null):Void {
 		syncPreview(a);
 		drawStateTabs(a);
 		ImGui.spacing();
@@ -1449,12 +1473,12 @@ class CanvasEditor {
 		if (st != null) {
 			ImGui.separator();
 			UiChrome.subHeader("Settings for " + st.name);
-			drawStateSettings(a, st);
+			drawStateSettings(a, st, picker);
 		}
 	}
 
 
-	function drawStateSettings(a:AuraDef, st:AuraStateDef):Void {
+	function drawStateSettings(a:AuraDef, st:AuraStateDef, picker:AuraConditionPicker = null):Void {
 		if (stateNameFor != st.id) { ByteUtil.fillBuf(stateNameBuf, AuraStateDef.MAX_NAME * 4, st.name); stateNameFor = st.id; }
 		UiLayout.propertyGrid("##cv_state_props", function() {
 			UiLayout.propertyRow("Name", function() {
@@ -1485,7 +1509,7 @@ class CanvasEditor {
 				}
 			}, "The first state in this order whose conditions match is the one shown. If none match, the Default look shows.");
 		});
-		drawStateTrigger(a, st);
+		drawStateTrigger(a, st, picker);
 	}
 
 	function deleteState(a:AuraDef, st:AuraStateDef):Void {
@@ -1498,7 +1522,7 @@ class CanvasEditor {
 		SettingsStore.markDirty();
 	}
 
-	function drawStateTrigger(a:AuraDef, st:AuraStateDef):Void {
+	function drawStateTrigger(a:AuraDef, st:AuraStateDef, picker:AuraConditionPicker = null):Void {
 		UiChrome.subHeader("When this look is used");
 		var mates:Array<AuraDef> = [];
 		if (a.group != null && a.group.length > 0) for (o in host.canvasAuras()) if (o != null && o != a && o.group == a.group) mates.push(o);
@@ -1510,7 +1534,7 @@ class CanvasEditor {
 					host.canvasSnapshot("State Trigger");
 					var c = new solarflare.aura.signal.AuraConditionDef();
 					c.signal = "aura.active"; c.subject = m.id; c.subjectLabel = m.displayLabel(); c.op = "is"; c.boolValue = true;
-					if (st.rule.conditions.length < solarflare.aura.signal.AuraRuleDef.MAX_CONDITIONS) st.rule.conditions.push(c);
+					if (st.rule.conditions.length < solarflare.aura.signal.AuraRuleDef.MAX_CONDITIONS) solarflare.aura.signal.AuraRuleMutations.addCondition(st.rule, c);
 					SettingsStore.markDirty();
 				}
 			}
@@ -1519,8 +1543,11 @@ class CanvasEditor {
 		if (context == null) {
 			context = new solarflare.aura.signal.AuraRuleEditorContext(a.id + "_state_" + nextStateRuleId++, st.rule, st.result, [], false);
 			stateRuleContexts.set(st, context);
+			context.pickerOwnerValid = function() return host.canvasSelectedAura() == a && host.canvasAuras().indexOf(a) >= 0
+				&& a.states.indexOf(st) >= 0 && editState == st.id && st.rule == context.rule;
 		}
 		context.rule = st.rule;
+		context.picker = picker == null ? conditionPicker : picker;
 		context.snapshot = preciseFn;
 		ImGui.textDisabled(st.result.known ? (st.result.hit ? "This state is active now." : "Conditions do not match right now.") : "No conditions yet, or the game state is unknown. An empty state never activates.");
 		solarflare.aura.signal.AuraConditionEditor.drawContext(context);
@@ -1905,10 +1932,10 @@ class CanvasEditor {
 		var ox:Single = origin.x + (availW - auraW * s) * 0.5 + panX;
 		var oy:Single = origin.y + (stageH - auraH * s) * 0.5 + panY;
 		ImGui.invisibleButton("##ab_cv_stage", ImGui.vec2(availW, stageH));
-		var hovered = ImGui.isItemHovered();
+		var hovered = !pickerBlocksInput() && ImGui.isItemHovered();
 		var active = ImGui.isItemActive();
 		var activated = ImGui.isItemActivated();
-		var focused = ImGui.isItemFocused();
+		var focused = !pickerBlocksInput() && ImGui.isItemFocused();
 		var mouse = ImGui.getMousePos();
 		var mx:Float = (mouse.x - ox) / s;
 		var my:Float = (mouse.y - oy) / s;
@@ -2586,7 +2613,7 @@ class CanvasEditor {
 				if (AuraCanvasGroups.rename(els, name, next)) { var key = AuraCanvasGroups.clean(next); if (folded) { groupFolded.remove(name); groupFolded.set(key, true); } SettingsStore.markDirty(); }
 				else solarflare.ui.ToastManager.warn("Pick a name that is not already used.");
 				renamingGroup = "";
-			} else if (ImGui.isKeyPressed(ImGuiKey.Escape, false)) renamingGroup = "";
+			} else if (!pickerBlocksInput() && ImGui.isKeyPressed(ImGuiKey.Escape, false)) renamingGroup = "";
 		} else {
 			if (allSelected) ImGui.pushStyleColor(ImGuiCol.Text, solarflare.ui.ThemePalette.current().accent);
 			var clicked = ImGui.selectable("[group] " + name + "  (" + members.length + ")###cv_grp_row", allSelected, 0, ImGui.vec2(w, rowH));
@@ -2758,8 +2785,11 @@ class CanvasEditor {
 				var ui:Array<solarflare.aura.signal.AuraConditionUiState> = [];
 				context = new solarflare.aura.signal.AuraRuleEditorContext(a.id + "_canvas_" + nextCanvasRuleId++, el.visibilityRule, el.visibilityResult, ui, false);
 				canvasRuleContexts.set(el, context);
+				context.pickerOwnerValid = function() return host.canvasSelectedAura() == a && host.canvasAuras().indexOf(a) >= 0
+					&& a.canvasElements.indexOf(el) >= 0 && canvasSel == a.canvasElements.indexOf(el) && el.visibilityRule == context.rule;
 			}
 			context.rule = el.visibilityRule;
+			context.picker = conditionPicker;
 			context.snapshot = preciseFn;
 			ImGui.textDisabled(el.visibilityResult.known ? (el.visibilityResult.hit ? "Conditions match" : "Conditions do not match") : "Conditions unavailable or incomplete");
 			solarflare.aura.signal.AuraConditionEditor.drawContext(context);

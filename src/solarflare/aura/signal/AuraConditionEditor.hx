@@ -35,6 +35,7 @@ class AuraConditionEditor {
 
 	public static function drawContext(a:AuraRuleEditorContext, prominent:Bool = false, bossFocusId:String = ""):Void {
 		if (a == null || a.rule == null) return;
+		if (a.rule.version != 1) { AuraNestedConditionEditor.draw(a, prominent, bossFocusId); return; }
 		var r = a.rule;
 		var onBatchSnapshot = a.snapshot;
 		UiChrome.subHeader("Require");
@@ -52,6 +53,15 @@ class AuraConditionEditor {
 		}
 
 		// Sentence summary
+		if (ImGui.smallButton("+ Add Group##rule_group_" + a.id)) {
+			if (a.snapshot != null) a.snapshot();
+			AuraRuleMutations.addGroup(r); SettingsStore.markDirty(); return;
+		}
+		ImGui.sameLine();
+		if (ImGui.smallButton("NOT group##rule_not_" + a.id)) {
+			if (a.snapshot != null) a.snapshot();
+			AuraRuleMutations.upgrade(r); r.negate = true; SettingsStore.markDirty(); return;
+		}
 		ImGui.spacing();
 		var count = r.conditions != null ? r.conditions.length : 0;
 		if (count == 0) {
@@ -101,9 +111,7 @@ class AuraConditionEditor {
 
 			if (removed) {
 				if (onBatchSnapshot != null) onBatchSnapshot();
-				r.conditions.splice(ci, 1);
-				if (r.presentationSource >= r.conditions.length)
-					r.presentationSource = r.conditions.length > 0 ? r.conditions.length - 1 : 0;
+				AuraRuleMutations.removeCondition(r, ci);
 				SettingsStore.markDirty();
 				continue;
 			}
@@ -120,7 +128,7 @@ class AuraConditionEditor {
 				newCond.signal = "resource.health.ratio";
 				newCond.op = "lte";
 				newCond.numberValue = 0.35;
-				r.conditions.push(newCond);
+				AuraRuleMutations.addCondition(r, newCond);
 				SettingsStore.markDirty();
 			}
 		}
@@ -209,7 +217,7 @@ class AuraConditionEditor {
 		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(px + 8, cy - ts.y * 0.5), line, label);
 	}
 
-	static function drawConditionCard(a:AuraRuleEditorContext, r:AuraRuleDef, c:AuraConditionDef, index:Int, bossFocusId:String):Bool {
+	public static function drawConditionCard(a:AuraRuleEditorContext, r:AuraRuleDef, c:AuraConditionDef, index:Int, bossFocusId:String, nested:Bool = false):Bool {
 		solarflare.aura.StatusTypeDemand.requestEditor(c.signal,c.subject);
 		var tag = a.id + "_" + c.uiKey;
 		while (a.conditionUi.length <= index)
@@ -224,21 +232,15 @@ class AuraConditionEditor {
 		// Header row
 		ImGui.textDisabled("Condition " + (index + 1));
 		ImGui.sameLine();
-		if (index > 0 && ImGui.smallButton("^##cond_up_" + tag)) {
+		if (!nested && index > 0 && ImGui.smallButton("^##cond_up_" + tag)) {
 			if (a.snapshot != null) a.snapshot();
-			var p = r.conditions[index - 1];
-			r.conditions[index - 1] = c;
-			r.conditions[index] = p;
-			adjustPresentation(r, index, index - 1);
+			AuraRuleMutations.reorderFlat(r, index, index - 1);
 			SettingsStore.markDirty();
 		}
 		ImGui.sameLine();
-		if (index + 1 < r.conditions.length && ImGui.smallButton("v##cond_dn_" + tag)) {
+		if (!nested && index + 1 < r.conditions.length && ImGui.smallButton("v##cond_dn_" + tag)) {
 			if (a.snapshot != null) a.snapshot();
-			var n = r.conditions[index + 1];
-			r.conditions[index + 1] = c;
-			r.conditions[index] = n;
-			adjustPresentation(r, index, index + 1);
+			AuraRuleMutations.reorderFlat(r, index, index + 1);
 			SettingsStore.markDirty();
 		}
 		ImGui.sameLine();
@@ -284,28 +286,32 @@ class AuraConditionEditor {
 		var compact = ImGui.getContentRegionAvail().x < 700;
 		var d = AuraSignalCatalog.find(c.signal);
 		var preview = d != null ? d.label : (c.signal.length > 0 ? c.signal : "Select signalâ€¦");
-		ImGui.setNextItemWidth(210);
-		if (ImGui.beginCombo("##cond_sig_" + tag, preview)) {
-			var currentGroup = "";
-			for (item in AuraSignalCatalog.all()) {
-				if (item.group != currentGroup) {
-					currentGroup = item.group;
-					ImGui.separatorText(item.group);
+		if (a.picker != null) {
+			if (UiChrome.ghostButton(preview + "###condition_picker_" + tag, ImGui.vec2(210, ImGui.getFrameHeight()))) a.picker.request(a, c, ui);
+		} else {
+			ImGui.setNextItemWidth(210);
+			if (ImGui.beginCombo("##cond_sig_" + tag, preview)) {
+				var currentGroup = "";
+				for (item in AuraSignalCatalog.all()) {
+					if (item.group != currentGroup) {
+						currentGroup = item.group;
+						ImGui.separatorText(item.group);
+					}
+					if (ImGui.selectable(item.label + "##sig_" + tag + item.id, c.signal == item.id)) {
+						if (a.snapshot != null) a.snapshot();
+						c.signal = item.id;
+						c.op = AuraConditionValidator.defaultOperator(item);
+						c.subject = "";
+						c.subjectLabel = "";
+						c.numberValue = item.kind == Percent ? 0.35 : 1;
+						c.boolValue = true;
+						ui.sync(c);
+						ui.flashContext();
+						SettingsStore.markDirty();
+					}
 				}
-				if (ImGui.selectable(item.label + "##sig_" + tag + item.id, c.signal == item.id)) {
-					if (a.snapshot != null) a.snapshot();
-					c.signal = item.id;
-					c.op = AuraConditionValidator.defaultOperator(item);
-					c.subject = "";
-					c.subjectLabel = "";
-					c.numberValue = item.kind == Percent ? 0.35 : 1;
-					c.boolValue = true;
-					ui.sync(c);
-					ui.flashContext();
-					SettingsStore.markDirty();
-				}
+				ImGui.endCombo();
 			}
-			ImGui.endCombo();
 		}
 
 		d = AuraSignalCatalog.find(c.signal);

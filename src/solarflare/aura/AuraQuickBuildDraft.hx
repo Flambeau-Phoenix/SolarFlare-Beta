@@ -26,7 +26,7 @@ class AuraQuickBuildDraft {
 		briefHold = aura.effects[0].hold;
 		aura.rule = new AuraRuleDef();
 		condition = new AuraConditionDef();
-		aura.rule.conditions.push(condition);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(aura.rule, condition);
 	}
 
 	/** Builds a new owned template; never adopts or mutates a library aura. */
@@ -38,7 +38,7 @@ class AuraQuickBuildDraft {
 		var a = draft.aura;
 		draft.condition = choice.condition.clone();
 		a.rule = new AuraRuleDef();
-		a.rule.conditions.push(draft.condition);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(a.rule, draft.condition);
 		a.name = label + " - " + choice.title;
 		a.syncNameBuf();
 		a.announce = label; a.syncAnnounceBuf();
@@ -76,7 +76,7 @@ class AuraQuickBuildDraft {
 		c.signal = signal; c.subject = subject; c.subjectLabel = subjectLabel;
 		c.op = "is"; c.boolValue = true; c.numberValue = 1;
 		requirements.push(c);
-		aura.rule.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(aura.rule, c);
 	}
 
 	/** "When this enemy is at or below X% health" - needs the enemy targeted. Unit id may be empty for any boss. */

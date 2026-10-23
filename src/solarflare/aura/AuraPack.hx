@@ -160,11 +160,13 @@ class AuraPack {
 		else if (d.auras != null)
 			list = cast d.auras;
 		else if (d.id != null) {
+			AuraSharePackage.validateNestedAura(d);
 			out.push(AuraConfig.fromDyn(d));
 			return out;
 		}
 		if (list == null)
 			return out;
+		for (item in list) AuraSharePackage.validateNestedAura(item);
 		var i = 0;
 		while (i < list.length) {
 			var item = list[i];

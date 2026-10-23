@@ -194,6 +194,7 @@ class ObserveDemand {
 			if (cfg.auras != null) {
 				for (a in cfg.auras.auras) if (a != null && a.enabled.get()) {
 					solarflare.aura.signal.AuraRuleDemand.append(a.rule, a.canvasElements, auraConditions, a.states);
+					solarflare.aura.AuraActivationGate.appendDemand(a.activationGate, auraConditions);
 					if(a.rule==null && (a.trigger=="script" || a.trigger=="custom")) scriptCodes.push(a.skillId);
 					if (a.rule == null && a.trigger == "cooldown") pushAuraSkillId(a.skillId);
 					if (a.trigger == "status") addStatusId(a.skillId);

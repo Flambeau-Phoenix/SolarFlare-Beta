@@ -84,6 +84,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 
 	var advancedPreview = new solarflare.aura.preview.AdvancedAuraPreview();
 	var quickBuild = new solarflare.aura.ui.AuraQuickBuildPopup();
+	var conditionPicker:solarflare.aura.ui.AuraConditionPicker;
 	var combatLogBrowser = new solarflare.aura.ui.CombatLogBrowser();
 	var combatLogsOpen:Bool = false;
 
@@ -154,7 +155,8 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		solarflare.ui.ByteUtil.clearBytes(groupNameBuf, 64);
 		this.cfg = cfg;
 		this.host = host;
-		canvasEditor = new solarflare.aura.ui.CanvasEditor(this);
+		conditionPicker = new solarflare.aura.ui.AuraConditionPicker("Builder", conditionPickerOwnerValid);
+		canvasEditor = new solarflare.aura.ui.CanvasEditor(this, ownConditionPickerOpen);
 		undoCoordinator = new AuraUndoCoordinator(undoManager, snapshotJson, captureCanvasById, restoreSnapshot, restoreCanvas);
 		solarflare.aura.signal.AuraConditionEditor.auraChoices = auraChoicesForConditions;
 		solarflare.aura.signal.AuraConditionEditor.auraConditionChoices = auraConditionSummaries;
@@ -186,9 +188,15 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	}
 
 	function restoreSnapshot(jsonStr:String):Void {
+		if (conditionPicker != null) conditionPicker.cancel();
 		try {
 			var data = AuraPack.decode(jsonStr);
-			var imported = AuraPack.unpackAuras(data);
+			// Undo is trusted editor state, including unfinished nested groups and script subjects.
+			// External pack validation deliberately rejects those drafts and must not filter history.
+			var rows:Array<Dynamic> = cast data.auras;
+			if (rows == null) return;
+			var imported:Array<AuraDef> = [];
+			for (row in rows) if (row != null && row.id != null) imported.push(AuraConfig.fromDyn(row));
 			AuraCounterState.apply(imported, data.counterState);
 			cfg.auras = imported;
 			if(data.sets!=null) cfg.applySets(data.sets); else cfg.ensureSets();
@@ -208,6 +216,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	}
 
 	public function clearTransientState():Void {
+		if (conditionPicker != null) conditionPicker.cancel();
 		if (canvasEditor != null) canvasEditor.clearTransientState();
 		StatusTypeDemand.beginEditorFrame();
 		shareEpoch++; shareService.cancel();
@@ -309,10 +318,11 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 
 	public function draw():Void {
 		StatusTypeDemand.beginEditorFrame();
-		if (!open.get() || cfg == null) return;
-		if (!CursorCaptureFix.cursorFree) return;
+		if (!open.get() || cfg == null || !CursorCaptureFix.cursorFree) { conditionPicker.cancel(); return; }
 
 		EditorWindow.drawMenuWindow("Aura Builder###SolarFlare.AuraBuilder", open, 1480, 920, function() {
+			ImGui.beginDisabled(conditionBrowserBusy());
+			try {
 			drawMenuBar();
 			drawTopToolbar();
 			ImGui.separator();
@@ -332,11 +342,24 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 			solarflare.ui.UiChrome.celChild("##ab_workspace", ImGui.vec2(rightW > 0 ? rightW : 0, paneH), drawWorkspace,
 				ImGuiWindowFlags.NoScrollbar);
 
+			} catch (e:Dynamic) { ImGui.endDisabled(); throw e; }
+			ImGui.endDisabled();
+			conditionPicker.draw();
 			drawIoModal();
 			drawWizardModal();
 			quickBuild.draw(cfg, commitQuickBuild);
 		}, false, true);
 	}
+	function conditionPickerOwnerValid():Bool {
+		if (!open.get() || cfg == null || !CursorCaptureFix.cursorFree || creationHomeOpen || combatLogsOpen || activeGroup() != null) return false;
+		var a = selectedAura(); var r = conditionPicker.model.targetRule;
+		if (a == null || cfg.auras.indexOf(a) < 0) return false;
+		if (a.rule == r) return true;
+		if (a.states != null) for (st in a.states) if (st != null && st.rule == r) return true;
+		return false;
+	}
+	function ownConditionPickerOpen():Bool return conditionPicker != null && conditionPicker.isOpen();
+	function conditionBrowserBusy():Bool return ownConditionPickerOpen() || (canvasEditor != null && canvasEditor.conditionBrowserOpen());
 
 	/** F6-style native menu bar — workspace navigation + IO without cluttering the strip. */
 	function drawMenuBar():Void {
@@ -962,7 +985,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		buff.signal = "status.present";
 		buff.subject = "Staff_SummonDemon_Passive_Buff";
 		buff.op = "present";
-		a.rule.conditions = [castCondition, buff];
+		solarflare.aura.signal.AuraRuleMutations.replaceConditions(a.rule, [castCondition, buff]);
 		a.rule.mode = "all";
 		a.timerMode = AuraTimer.MODE_DOWN;
 		a.timerSource = AuraTimer.SRC_FIXED;
@@ -1017,6 +1040,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 
 	function drawWhenColumn(a:AuraDef):Void {
 		drawSectionCard("WHEN", "Conditions that trigger this Aura", true, function() {
+			a.ruleEditor.picker = conditionPicker;
 			AuraConditionEditor.draw(a, true, function() snapshot("Condition batch"), buildFocusBossId);
 			ImGui.spacing();
 			var issue = setupIssue(a);
@@ -1152,24 +1176,14 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 			return "Always show " + regionLabel(a.region) + ". Add conditions if you want a trigger.";
 		var parts = new StringBuf();
 		if (a.rule != null && a.rule.conditions != null && a.rule.conditions.length > 0) {
-			var isAll = a.rule.mode == "all";
-			parts.add("When ");
-			var condParts:Array<String> = [];
-			for (c in a.rule.conditions) {
-				if (c == null) continue;
-				condParts.push(AuraConditionEditor.humanConditionSummary(c));
-			}
-			if (condParts.length == 1) parts.add(condParts[0]);
-			else if (condParts.length > 1) {
-				parts.add("(");
-				parts.add(condParts.join(isAll ? " AND " : " OR "));
-				parts.add(")");
-			}
+			a.ruleEditor.rule = a.rule;
+			parts.add("When " + a.ruleEditor.summaryText());
 		} else if (a.trigger != null && a.trigger.length > 0) {
 			parts.add("When " + a.trigger);
 			if (a.skillId != null && a.skillId.length > 0) parts.add(' ["${a.skillId}"]');
 		} else return "";
 		var mode = behaviorMode2(a);
+		if (a.activationGate != "none") parts.add(" AND " + AuraActivationGate.label(a.activationGate));
 		parts.add(" -> ");
 		var visual = regionLabel(a.region);
 		switch (mode) {
@@ -1180,7 +1194,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 			default: parts.add('show $visual while true');
 		}
 		if (AuraTimer.keepsAura(a))
-			parts.add('; also show during ' + (a.timerSource == AuraTimer.SRC_FIXED ? 'the ${a.timerSeconds.get()}s timer' : "the timer") + ' started when conditions ' + (a.timerStartEdge == 1 ? "stop being true" : "become true"));
+			parts.add((a.activationGate == "none" ? '; also show during ' : '; track ') + (a.timerSource == AuraTimer.SRC_FIXED ? 'the ${a.timerSeconds.get()}s timer' : "the timer") + ' started when conditions ' + (a.timerStartEdge == 1 ? "stop being true" : "become true"));
 		if (a.showFuse.get()) parts.add(" + fuse");
 		if (a.showCountdown.get()) parts.add(a.timerMode == AuraTimer.MODE_UP ? " + countup" : " + countdown");
 		if (AuraEffects.hasIconGlow(a)) parts.add(" + glow");
@@ -1577,7 +1591,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 			drawCanvasLauncher(a, previewW);
 			if (isCanvas) {
 				ImGui.spacing();
-				drawSectionCard("Looks", "States", false, function() canvasEditor.drawStatesPanel(a));
+				drawSectionCard("Looks", "States", false, function() canvasEditor.drawStatesPanel(a, conditionPicker));
 				drawSectionCard("Display shortcuts", "", false, function() drawFxTiles(a));
 			}
 			ImGui.tableSetColumnIndex(1);
@@ -2022,7 +2036,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 				c.numberValue = desc.kind == AuraValueKind.Percent ? 0.35 : 1;
 				c.boolValue = true;
 			}
-			a.rule.conditions.push(c);
+			solarflare.aura.signal.AuraRuleMutations.addCondition(a.rule, c);
 		}
 		// Keep the declarative condition authoritative while also synchronizing the
 		// legacy/presentation fields used by icon lookup and older Aura consumers.
@@ -2843,7 +2857,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		if (ImGui.isItemHovered()) ImGui.setTooltip("Put the selected auras in one window that packs them together");
 		ImGui.sameLine();
 		if (ImGui.smallButton("Clear Selection##ab_batch_clr")) { selectedIds = new Map(); rangeAnchorId = ""; }
-		if (ImGui.isKeyPressed(ImGuiKey.Escape, false)) { selectedIds = new Map(); rangeAnchorId = ""; }
+		if (!conditionBrowserBusy() && ImGui.isKeyPressed(ImGuiKey.Escape, false)) { selectedIds = new Map(); rangeAnchorId = ""; }
 	}
 
 	function countSelected():Int { var n = 0; for (_ in selectedIds.keys()) n++; return n; }
@@ -2942,6 +2956,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	function performRedo():Void undoCoordinator.redo();
 
 	function restoreCanvas(state:String):Bool {
+		if (conditionPicker != null) conditionPicker.cancel();
 		var parsed = AuraCanvasSnapshot.parse(state);
 		var a = parsed != null ? auraById(parsed.id) : null;
 		if (a == null) { ToastManager.warn("That aura no longer exists."); return false; }
@@ -3237,14 +3252,15 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		UiLayout.propertyGrid("##ab_behavior_props", function() {
 			UiLayout.propertyRow("Show aura", function() {
 				if (ImGui.beginCombo("##ab_behavior", behaviorLabel(mode))) {
-					for (key in ["whileTrue", "onRiseHold", "whileFalse"])
+					for (key in ["whileTrue", "onRiseHold", "whileFalse", "inCombat", "outOfCombat", "alive", "hasTarget", "inRift", "bossFight"])
 						if (ImGui.selectable(behaviorLabel(key) + "##ab_behavior_" + key, mode == key)) {
+							snapshot("Show aura");
 							applyBehavior(a, key);
 							SettingsStore.markDirty();
 						}
 					ImGui.endCombo();
 				}
-			}, "Conditions control the normal display. A running countdown or countup also keeps the aura visible.");
+			}, "State options require BOTH matching conditions and the selected state. An unmet or unknown state hides the aura even during a countdown.");
 			var wantDuration = mode == "onRiseHold" || (a.showBanner != null && a.showBanner.get());
 			if (wantDuration) {
 				UiLayout.propertyRow("Duration", function() {
@@ -3402,6 +3418,10 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		var d:Dynamic = Json.parse(json);
 		if (d == null) return [];
 		var isPack = Std.isOfType(d, Array) || (d.auras != null) || (d.kind != null && Std.string(d.kind) == AuraPack.KIND);
+		if (isPack) {
+			var rows:Array<Dynamic> = Std.isOfType(d, Array) ? cast d : cast d.auras;
+			if (rows != null) for (row in rows) AuraSharePackage.validateNestedAura(row);
+		} else AuraSharePackage.validateNestedAura(d);
 		// A pack that carries groups re-forms them under fresh ids; otherwise tags survive only if the group exists here.
 		pendingImportGroups = null;
 		if (isPack && !Std.isOfType(d, Array) && d.groups != null && d.auras != null)
@@ -3448,12 +3468,15 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	}
 
 	function applyBehavior(a:AuraDef, key:String):Void {
+		a.activationGate = AuraActivationGate.KEYS.indexOf(key) >= 0 ? key : "none";
+		if (a.activationGate != "none") a.alwaysOn.set(false);
 		if (key == "onRiseHold") AuraEffects.applyPresetDormant(a);
 		else if (key == "whileFalse") AuraEffects.applyPresetOnCd(a);
 		else AuraEffects.applyPresetContinuous(a);
 	}
 
 	function behaviorMode(a:AuraDef):String {
+		if (a.activationGate != "none") return a.activationGate;
 		if (a.effects != null)
 			for (e in a.effects) if (e != null && e.enabled.get() && (e.kind == AuraEffect.KIND_WINDOW || e.kind == AuraEffect.KIND_ICON)) {
 				if (e.when == AuraEffect.WHEN_WHILE_FALSE) return "whileFalse";
@@ -3463,6 +3486,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	}
 
 	static function behaviorLabel(key:String):String {
+		if (AuraActivationGate.KEYS.indexOf(key) >= 0) return "Show when conditions match and " + AuraActivationGate.label(key);
 		return switch (key) {
 			case "onRiseHold": "Show briefly when conditions become true";
 			case "whileFalse": "Show while conditions are not true";
@@ -3472,6 +3496,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 
 	function setupIssue(a:AuraDef):String {
 		if (a == null) return "Select an Aura.";
+		if (a.rule != null && a.rule.version == 2 && a.rule.prepared().error != "") return a.rule.prepared().error;
 		if (StringTools.trim(a.name).length == 0) return "Give this Aura a name.";
 		if ((a.rule == null || a.rule.conditions == null || a.rule.conditions.length == 0) && !a.alwaysOn.get()) return "Add at least one condition.";
 		if (a.rule != null && a.rule.conditions != null) for (c in a.rule.conditions) {

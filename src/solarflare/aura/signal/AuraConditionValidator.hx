@@ -4,6 +4,12 @@ class AuraConditionValidator {
 	public static function validateRule(rule:AuraRuleDef):Array<String> {
 		var out:Array<String> = [];
 		if (rule == null) { out.push("rule is null"); return out; }
+		if (rule.version != 1) {
+			if (rule.version != 2) out.push("unsupported rule version");
+			else { var error = rule.prepared().error; if (error != "") out.push(error); }
+			if (rule.conditions != null) for (c in rule.conditions) if (c != null) for (d in validateCondition(c)) out.push(d);
+			return out;
+		}
 		if (rule.mode != "all" && rule.mode != "any") { rule.mode = "all"; out.push("mode reset to all"); }
 		if (rule.version < 1 || rule.version > AuraRuleDef.CURRENT_VERSION) out.push("unsupported rule version");
 		if (rule.conditions == null) { rule.conditions = []; out.push("conditions initialized"); }

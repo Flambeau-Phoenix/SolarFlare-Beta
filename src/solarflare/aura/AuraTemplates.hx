@@ -32,7 +32,7 @@ class AuraTemplates {
 		c.signal = signal; c.subject = id; c.subjectLabel = entry.name;
 		c.op = signal == "consumable.count" ? "gte" : "is";
 		c.numberValue = 1; c.boolValue = true;
-		a.rule.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(a.rule, c);
 		if (signal == "consumable.active") {
 			a.timerMode = AuraTimer.MODE_DOWN;
 			a.timerSource = AuraTimer.SRC_FOLLOW;
@@ -67,7 +67,7 @@ class AuraTemplates {
 		c.signal = "resource.health.ratio";
 		c.op = "lte";
 		c.numberValue = 0.35;
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_ALERT, AuraEffect.WHEN_WHILE_TRUE)];
@@ -93,7 +93,7 @@ class AuraTemplates {
 		c.numberValue = 1;
 		c.subject = "";
 		c.subjectLabel = "Target Buff";
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
@@ -123,7 +123,7 @@ class AuraTemplates {
 		c.op = "present";
 		c.subject = "";
 		c.subjectLabel = "";
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		var win = new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE);
@@ -176,7 +176,7 @@ class AuraTemplates {
 		c.op = "present";
 		c.subject = "Warrior_IgnorePainStatus";
 		c.subjectLabel = "Ignore Pain";
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		var win = new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE);
@@ -214,7 +214,7 @@ class AuraTemplates {
 		c.boolValue = true;
 		c.subject = "Staff_Craft_S1";
 		c.subjectLabel = "Pyroclasm";
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		var win = new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE);
@@ -247,7 +247,7 @@ class AuraTemplates {
 		c.numberValue = 5.0;
 		c.subject = "";
 		c.subjectLabel = "";
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		var win = new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_ON_RISE_HOLD);
@@ -284,7 +284,7 @@ class AuraTemplates {
 		c.boolValue = true;
 		c.subject = "FairieSuperElite_Clones";
 		c.subjectLabel = "Deceitful Illusions";
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		var win = new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE);
@@ -318,7 +318,7 @@ class AuraTemplates {
 		c.numberValue = 1;
 		c.subject = "Staff_SummonDemon_Skill1_Status";
 		c.subjectLabel = "Demonic Charge";
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
@@ -340,7 +340,7 @@ class AuraTemplates {
 		c.signal = "conduit.effectiveStacks";
 		c.op = "gte";
 		c.numberValue = 1;
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
@@ -361,7 +361,7 @@ class AuraTemplates {
 		c.signal = "chaincast.ready";
 		c.op = "is";
 		c.boolValue = true;
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		var win = new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE);
@@ -386,7 +386,7 @@ class AuraTemplates {
 		c.signal = "prayer.lifeReady";
 		c.op = "is";
 		c.boolValue = true;
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_WINDOW, AuraEffect.WHEN_WHILE_TRUE)];
@@ -407,7 +407,7 @@ class AuraTemplates {
 		c.signal = "encounter.inBossFight";
 		c.op = "is";
 		c.boolValue = true;
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_ALERT, AuraEffect.WHEN_WHILE_TRUE)];
@@ -431,7 +431,7 @@ class AuraTemplates {
 		c.signal = "combat.damageTakenRecent";
 		c.op = "gte";
 		c.numberValue = 500;
-		r.conditions.push(c);
+		solarflare.aura.signal.AuraRuleMutations.addCondition(r, c);
 		a.rule = r;
 
 		a.effects = [new AuraEffect("win", AuraEffect.KIND_ALERT, AuraEffect.WHEN_ON_RISE_HOLD)];

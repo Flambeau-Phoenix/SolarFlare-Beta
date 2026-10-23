@@ -36,6 +36,16 @@ typedef AuraRuleImportModel = {
 	@:optional var mode:String;
 	@:optional var presentationSource:Int;
 	@:optional var conditions:Array<AuraConditionImportModel>;
+	@:optional var negate:Bool;
+	@:optional var nodes:Array<AuraRuleNodeImportModel>;
+}
+
+typedef AuraRuleNodeImportModel = {
+	var kind:String;
+	@:optional var conditionIndex:Int;
+	@:optional var mode:String;
+	@:optional var negate:Bool;
+	@:optional var nodes:Array<AuraRuleNodeImportModel>;
 }
 
 /** Per-state replacement values for one canvas element. */
@@ -76,6 +86,7 @@ typedef AuraEdgeImportModel = {
 
 /** Nested canvas element — mirrors AuraCanvasElement.toObj. */
 typedef AuraCanvasImportModel = {
+	@:optional var visibilityRule:AuraRuleImportModel;
 	@:optional var kind:String;
 	@:optional var content:String;
 	@:optional var x:Float;
@@ -135,6 +146,7 @@ typedef AuraImportExportModel = {
 	@:optional var requireAfford:Bool;
 	@:optional var dormant:Bool;
 	@:optional var alwaysOn:Bool;
+	@:optional var activationGate:String;
 	@:optional var visual:Bool;
 	@:optional var audio:Bool;
 	@:optional var cue:String;

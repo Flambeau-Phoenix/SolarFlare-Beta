@@ -423,6 +423,7 @@ class AuraConfig {
 		if (d.requireAfford == false)
 			a.requireAfford.set(false);
 		a.alwaysOn.set(d.alwaysOn == true);
+		if (d.activationGate != null) a.activationGate = Std.string(d.activationGate);
 		if (d.dormant == true)
 			a.dormant.set(true);
 		if (d.visual == false)
