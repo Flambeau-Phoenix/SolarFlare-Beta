@@ -150,7 +150,7 @@ class AuraSharePackage {
    if(chunks++==0) {
     if(type!="IHDR" || length!=13) throw "Missing PNG header.";
     var head=new BytesInput(bytes.sub(dataAt,13)); head.bigEndian=true; width=head.readInt32(); height=head.readInt32();
-    if(width<1 || height<1 || width>1024 || height>1024) throw "PNG dimensions must be 1..1024 pixels.";
+    solarflare.ui.RasterImagePolicy.dimensions(width,height);
    } else if(type=="IHDR") throw "Duplicate PNG header.";
    if(type=="IDAT") idat.write(bytes.sub(dataAt,length));
    if(type=="IEND") { if(length!=0 || input.position!=bytes.length) throw "Invalid PNG end marker."; ended=true; break; }
@@ -172,8 +172,9 @@ class AuraSharePackage {
   var images:Array<AuraShareImage>=[]; var hashes=new Map<String,Bool>(); var keys=new Map<String,Bool>();
   for(raw in list(manifest.images,"Images",256)) {
    if(raw==null || !Std.isOfType(raw.sha256,String) || !~/^[a-f0-9]{64}$/.match(raw.sha256) || hashes.exists(raw.sha256)
-    || raw.entry!="images/"+raw.sha256+".png" || !Std.isOfType(raw.bytes,Int) || raw.bytes<1 || raw.bytes>solarflare.ui.RasterImagePolicy.MAX_FILE_BYTES
-    || !Std.isOfType(raw.width,Int) || !Std.isOfType(raw.height,Int) || raw.width<1 || raw.height<1 || raw.width>1024 || raw.height>1024) throw "Invalid image manifest.";
+    || raw.entry!="images/"+raw.sha256+".png" || !Std.isOfType(raw.bytes,Int) || raw.bytes<1
+    || !Std.isOfType(raw.width,Int) || !Std.isOfType(raw.height,Int) || raw.width<1 || raw.height<1) throw "Invalid image manifest.";
+   solarflare.ui.RasterImagePolicy.dimensions(raw.width,raw.height);
    var aliases:Array<String>=[];
    for(key in list(raw.keys,"Image aliases",8192)) {
     if(!Std.isOfType(key,String) || !StringTools.startsWith(key,"custom:") || keys.exists(key.toLowerCase())) throw "Invalid or duplicate image alias.";

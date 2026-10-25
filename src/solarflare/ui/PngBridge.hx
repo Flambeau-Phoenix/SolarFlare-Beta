@@ -19,7 +19,7 @@ class PngBridge {
 		if (b.length < 24) throw "Not a readable PNG image.";
 		var w = (b.get(16) << 24) | (b.get(17) << 16) | (b.get(18) << 8) | b.get(19);
 		var h = (b.get(20) << 24) | (b.get(21) << 16) | (b.get(22) << 8) | b.get(23);
-		if (w <= 0 || h <= 0 || w > 16384 || h > 16384) throw "Image dimensions are out of range (" + w + "x" + h + ").";
+		RasterImagePolicy.dimensions(w,h);
 		try {
 			var pixels:hxd.Pixels = hxd.res.Image.decodePNG(cast b, w, h, hxd.PixelFormat.BGRA);
 			if (pixels == null) throw "no pixels returned";

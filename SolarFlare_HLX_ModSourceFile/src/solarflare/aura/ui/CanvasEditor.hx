@@ -1279,10 +1279,10 @@ class CanvasEditor {
 	function imageBox(a:AuraDef, stem:String):{w:Float, h:Float} {
 		var side = Math.max(16, Math.min(auraBoxW(a), auraBoxH(a)) * 0.6);
 		var aspect = CustomImages.aspectOf(stem);
-		if (!(aspect > 0.01 && aspect < 100)) aspect = 1;
+		if (!(aspect > 0) || !Math.isFinite(aspect)) aspect = 1;
 		var w = aspect >= 1 ? side : side * aspect;
 		var h = aspect >= 1 ? side / aspect : side;
-		return {w: Math.max(4, Math.round(w)), h: Math.max(4, Math.round(h))};
+		return {w: w, h: h};
 	}
 
 	function insertImage(a:AuraDef):Void {
@@ -3383,7 +3383,7 @@ class CanvasEditor {
 				if (canvasImportErr) ImGui.textColored(ImGui.vec4(0.95, 0.45, 0.4, 1), canvasImportMsg);
 				else ImGui.textDisabled(canvasImportMsg);
 			}
-		}, "PNG, JPG, GIF, BMP or TGA up to 16 MiB per source file; converted to PNG and scaled to 1024px. Sources above 4 million pixels must be resized first. SVG paths use vector limits. Export Design bundles PNGs; Export settings saves without requiring artwork.");
+		}, "PNG, JPG, GIF, BMP or TGA; converted to PNG at their original dimensions. SVG paths use vector limits. Export Design bundles PNGs; Export settings saves without requiring artwork.");
 	}
 
 	public function resetCanvasTransient():Void {

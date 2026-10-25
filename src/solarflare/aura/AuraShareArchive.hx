@@ -35,7 +35,7 @@ class AuraShareArchive {
    var name=input.readString(nameLength); input.position+=extra;
    if(version>20 || (flags & ~0x800)!=0 || (method!=0 && method!=8)) throw "Unsupported ZIP feature (encryption, streaming or ZIP64).";
    if(!safeName(name) || entries.exists(name)) throw "Unexpected, unsafe or duplicate ZIP entry: "+name;
-   var limit=name=="manifest.json" || name=="auras.json" ? MAX_JSON : solarflare.ui.RasterImagePolicy.MAX_FILE_BYTES;
+   var limit=name=="manifest.json" || name=="auras.json" ? MAX_JSON : MAX_BYTES;
    if(size<0 || size>limit || compressed<0 || compressed>MAX_BYTES || (method==0 && compressed!=size)) throw "Invalid entry size: "+name;
    room(compressed); total+=size;
    if(total>MAX_BYTES || names.length>=MAX_IMAGES+2) throw "Share package exceeds its size or image limit.";

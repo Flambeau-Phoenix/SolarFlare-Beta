@@ -9,14 +9,11 @@ typedef BgraImage = {w:Int, h:Int, bgra:Bytes};
 
 /**
  * Turns user image files into PNG bytes so the rest of the pipeline (scan, textures, share archives) stays
- * PNG-only. Native-free: pure `format` library decoding, safe to unit test. Oversized images are
- * box-filter downscaled instead of rejected.
+	 * PNG-only. Native-free: pure `format` library decoding, safe to unit test.
  */
 class ImageConvert {
 	/** Extensions the importer accepts, lower-case without the dot. */
 	public static var EXTENSIONS:Array<String> = ["png", "jpg", "gif", "bmp", "tga"];
-	/** Hard ceiling on decoded pixels, checked before any scaling buffer is allocated. */
-	public static inline var MAX_PIXELS:Int = RasterImagePolicy.MAX_SOURCE_PIXELS;
 
 	/** JPEG decoder installed at runtime by JpegBridge (the game's own decoder); unset in tests and headless builds. */
 	public static var jpegDecoder:Bytes->BgraImage = null;
@@ -151,7 +148,7 @@ class ImageConvert {
 
 	/** Box-filter downscale so the longest side is at most `maxDim`; returns the input when it already fits. */
 	public static function fit(img:BgraImage, maxDim:Int):BgraImage {
-		if (img.w <= maxDim && img.h <= maxDim) return img;
+		if (maxDim <= 0 || (img.w <= maxDim && img.h <= maxDim)) return img;
 		var s = maxDim / Math.max(img.w, img.h);
 		var nw = Std.int(Math.max(1, Math.round(img.w * s))), nh = Std.int(Math.max(1, Math.round(img.h * s)));
 		var out = Bytes.alloc(nw * nh * 4);
@@ -183,13 +180,13 @@ class ImageConvert {
 	}
 
 	/**
-	 * Any supported file -> PNG bytes no larger than `maxDim` on a side. A PNG that already fits is returned
+	 * Any supported file -> PNG bytes, optionally fitted when `maxDim` is positive. A PNG that already fits is returned
 	 * untouched so its bytes (and any share hash) are preserved.
 	 */
 	public static function toPng(b:Bytes, ext:String, maxDim:Int):Bytes {
 		var kind = sniff(b, ext);
 		var img = decode(b, ext);
-		if (kind == "png" && !pngNeedsNative(b) && img.w <= maxDim && img.h <= maxDim) return b;
+		if (kind == "png" && !pngNeedsNative(b) && (maxDim <= 0 || (img.w <= maxDim && img.h <= maxDim))) return b;
 		return encodePng(fit(img, maxDim));
 	}
 }

@@ -17,12 +17,8 @@ typedef ConformJob = {id:String, stem:String, src:String, dest:String, sig:Strin
 class CustomImages {
 	public static inline var FOLDER:String = "custom_images";
 	public static inline var PREFIX:String = CustomImageKey.PREFIX;
-	public static inline var MAX_DIM:Int = 1024;
-	public static inline var MAX_BYTES:Int = RasterImagePolicy.MAX_FILE_BYTES;
-	/** Apply the same limit before reading or decoding a source file. */
-	public static inline var MAX_SOURCE_BYTES:Int = MAX_BYTES;
 	static var CONVERTIBLE:Array<String> = ["jpg", "jpeg", "gif", "bmp", "tga"];
-	/** Files in the active folders that cannot be used as they are (other formats, or too big), shown as a fix-it offer. */
+	/** Files in the active folders that need format conversion, shown as a fix-it offer. */
 	public static var fixable(default, null):Int = 0;
 
 	static var cachedDir:String = null;
@@ -33,7 +29,7 @@ class CustomImages {
 	static var listed:Array<String> = [];
 	static var scanned = false;
 	static var refreshRequested = true;
-	/** Loadable file per id: the user's PNG, or its conformed copy when the original is too big or unreadable. */
+	/** Loadable file per id: the user's PNG, or its format-compatible copy. */
 	static var paths = new Map<String, String>();
 	/** The user's real file per id, used for rename and delete. */
 	static var originals = new Map<String, String>();
@@ -43,7 +39,7 @@ class CustomImages {
 	/** Decode each unchanged candidate once; a valid header alone does not make it usable. */
 	static var pngChecks = new Map<String, {sig:String, reason:String}>();
 	static var pngChecksSeen = new Map<String, Bool>();
-	/** PNGs waiting to be shrunk, one per observe tick. Originals are never touched. */
+	/** PNGs waiting for format conversion, one per observe tick. Originals are never touched. */
 	static var conformQueue:Array<ConformJob> = [];
 	/** id -> {signature of the file that failed, reason}. A changed file is tried again. */
 	static var conformFailed = new Map<String, {sig:String, reason:String}>();
@@ -106,7 +102,7 @@ class CustomImages {
 		if (refreshRequested) refresh();
 		else if (conformQueue.length > 0) conformNext();
 	}
-	/** Images still being optimised in the background (for status text). */
+	/** Images still being converted in the background (for status text). */
 	public static function conforming():Int return conformQueue.length;
 	/** True when the source is known, including pending/rejected files retained only for diagnostics. Cache-only. */
 	public static function has(stem:String):Bool return stem != null && originals.exists(stem.toLowerCase());
@@ -128,11 +124,11 @@ class CustomImages {
 		return f != null ? f.reason : "conforming";
 	}
 
-	/** Cache directory for shrunk copies; never scanned as a user folder. */
+	/** Cache directory for format-compatible copies; never scanned as a user folder. */
 	static function conformDir():String return Path.join([shareDir(), "_conformed"]);
 
 	static function conformedPath(id:String, stat:sys.FileStat):String {
-		return Path.join([conformDir(), sanitize(id) + "__" + stat.size + "_" + Std.int(stat.mtime.getTime() / 1000) + ".png"]);
+		return Path.join([conformDir(), sanitize(id) + "__" + stat.size + "_" + Std.int(stat.mtime.getTime() / 1000) + "_native.png"]);
 	}
 
 	/** 16-bit, interlaced and sub-8-bit greyscale PNGs decode wrongly (or not at all) in the pure reader. */
@@ -140,20 +136,14 @@ class CustomImages {
 		return h.interlace == 1 || (h.ctype != 3 && h.depth != 8);
 	}
 
-	/** Shrinks one queued PNG into the cache folder. A failure is remembered against the file's signature. */
+	/** Converts one queued PNG into the cache folder without resizing. Failures follow the file's signature. */
 	static function conformNext():Void {
 		var job = conformQueue.shift();
 		if (job == null) return;
 		try {
 			RasterImagePolicy.fileSize(FileSystem.stat(job.src).size);
 			var img = ImageConvert.decode(File.getBytes(job.src), "png");
-			var dim = MAX_DIM;
-			var png = ImageConvert.encodePng(ImageConvert.fit(img, dim));
-			while (png.length > MAX_BYTES && dim > 64) {
-				dim = Std.int(dim * 0.75);
-				png = ImageConvert.encodePng(ImageConvert.fit(img, dim));
-			}
-			if (png.length > MAX_BYTES) throw "still over "+RasterImagePolicy.FILE_LIMIT+" after shrinking";
+			var png = ImageConvert.encodePng(img);
 			var d = conformDir();
 			if (!FileSystem.exists(d)) FileSystem.createDirectory(d);
 			File.saveBytes(job.dest, png);
@@ -168,7 +158,7 @@ class CustomImages {
 		return CustomImageKey.stemOf(key);
 	}
 
-	/** Absolute path of the file to load for a stem (the optimised copy when one exists), or null. Observe-phase only. */
+	/** Absolute path of the file to load for a stem, or null. Observe-phase only. */
 	public static function pathFor(stem:String):String {
 		if (!validStem(stem)) return null;
 		if (!scanned || refreshRequested) refresh();
@@ -178,7 +168,7 @@ class CustomImages {
 
 	/** Cache-only: only decoded, usable files can be selected by builders. */
 	public static function names():Array<String> return listed;
-	/** Texture upload can fail after file validation (for example, a full texture budget). Observe-phase only. */
+	/** Texture upload can fail after file validation. Observe-phase only. */
 	public static function rejectLoaded(stem:String):Void {
 		if (stem == null) return;
 		var id = stem.toLowerCase();
@@ -232,17 +222,15 @@ class CustomImages {
 					var hdr = pngHeader(path);
 					if(hdr==null) { rejectImage("Not a readable PNG header."); continue; }
 					try RasterImagePolicy.dimensions(hdr.w,hdr.h) catch(e:Dynamic) { rejectImage(Std.string(e)); continue; }
-					if(managed && (hdr.w>MAX_DIM || hdr.h>MAX_DIM || risky(hdr))) { rejectImage("Managed PNG exceeds the supported dimensions or format."); continue; }
+					if(managed && risky(hdr)) { rejectImage("Managed PNG uses an unsupported format."); continue; }
 					if (hdr != null && hdr.w > 0 && hdr.h > 0) nextAspects.set(id, hdr.w / hdr.h);
 					if (!managed) {
-						var needs = stat.size > MAX_BYTES || (hdr != null && (hdr.w > MAX_DIM || hdr.h > MAX_DIM || risky(hdr)));
+						var needs = risky(hdr);
 						if (needs) {
 							var sig = stat.size + "|" + stat.mtime.getTime();
 							var dest = conformedPath(id, stat);
-							var sibling = Path.join([directory, stem + "_resized.png"]);
 							var failure = conformFailed.get(id);
 							if (usablePng(dest)) loadPath = dest;
-							else if (usablePng(sibling)) loadPath = sibling;
 							else if (failure != null && failure.sig == sig) { rejectImage(failure.reason); continue; }
 							else { loadPath = null; jobs.set(id, {id: id, stem: stem, src: path, dest: dest, sig: sig}); }
 						}
@@ -284,7 +272,7 @@ class CustomImages {
 		status = folderError ? (folder.length == 0 ? "The default custom_images folder could not be read. Choose another images folder."
 			: "Selected folder is unavailable. Images from the default custom_images folder remain available.")
 			: listed.length + " PNG image(s) available. Original custom_images files remain available.";
-		if (conformQueue.length > 0) status += " Optimizing " + conformQueue.length + " large image(s)...";
+		if (conformQueue.length > 0) status += " Converting " + conformQueue.length + " image(s)...";
 		var failedReason = "";
 		var failedCount = 0;
 		for (id => f in conformFailed) { failedCount++; if (failedReason.length == 0) failedReason = id + ": " + f.reason; }
@@ -306,7 +294,7 @@ class CustomImages {
 			try {
 				RasterImagePolicy.fileSize(stat.size);
 				var h = pngHeader(path);
-				if (h == null || h.w <= 0 || h.h <= 0 || h.w > MAX_DIM || h.h > MAX_DIM || risky(h)) throw "PNG is not in a usable 8-bit format within 1024 pixels per side.";
+				if (h == null || h.w <= 0 || h.h <= 0 || risky(h)) throw "PNG is not in a usable 8-bit format.";
 				var bytes = File.getBytes(path);
 				ImageConvert.guardPng(bytes);
 				var data = new Reader(new BytesInput(bytes)).read();
@@ -341,8 +329,7 @@ class CustomImages {
 	}
 
 	/**
-	 * Make unusable files in the images folder usable: other formats become PNG, and PNGs over the size or
-	 * 1024 px limits are scaled down into a new `_resized` copy. Originals are never touched.
+	 * Make unsupported formats usable as PNG copies at their original dimensions. Originals are never touched.
 	 */
 	public static function convertFolder():ImportReport {
 		var report:ImportReport = {imported: [], errors: []};
@@ -355,17 +342,15 @@ class CustomImages {
 				if (FileSystem.isDirectory(path) || CustomImageKey.isManagedStem(stem)) continue;
 				var base:String;
 				if (ext == "png") {
-					var oversized = FileSystem.stat(path).size > MAX_BYTES;
-					if (!oversized) { var dims = pngHeader(path); oversized = dims != null && (dims.w > MAX_DIM || dims.h > MAX_DIM || risky(dims)); }
-					if (!oversized || converted(d, stem, "png")) continue;
+					var dims = pngHeader(path);
+					if (dims == null || !risky(dims) || converted(d, stem, "png")) continue;
 					base = stem + "_resized";
 				} else if (CONVERTIBLE.indexOf(ext) >= 0) {
 					if (converted(d, stem, ext)) continue;
 					base = sanitize(stem);
 				} else continue;
 				RasterImagePolicy.fileSize(FileSystem.stat(path).size);
-				var png = ImageConvert.toPng(File.getBytes(path), ext, MAX_DIM);
-				if (png.length > MAX_BYTES) throw "still larger than "+RasterImagePolicy.FILE_LIMIT+" after resizing";
+				var png = ImageConvert.toPng(File.getBytes(path), ext, 0);
 				var name = base, n = 2;
 				while (FileSystem.exists(Path.join([d, name + ".png"]))) name = base + "_" + (n++);
 				File.saveBytes(Path.join([d, name + ".png"]), png);
@@ -459,8 +444,7 @@ class CustomImages {
 		var stat = FileSystem.stat(src);
 		RasterImagePolicy.fileSize(stat.size);
 		var bytes = File.getBytes(src);
-		var png = try ImageConvert.toPng(bytes, ext, MAX_DIM) catch (e:String) throw e catch (_:Dynamic) throw "Not a readable " + ext.toUpperCase() + " image.";
-		if (png.length > MAX_BYTES) throw "Converted image is larger than "+RasterImagePolicy.FILE_LIMIT+".";
+		var png = try ImageConvert.toPng(bytes, ext, 0) catch (e:String) throw e catch (_:Dynamic) throw "Not a readable " + ext.toUpperCase() + " image.";
 		var base = sanitize(Path.withoutExtension(Path.withoutDirectory(src)));
 		var stem = base;
 		var n = 2;

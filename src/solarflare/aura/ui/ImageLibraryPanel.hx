@@ -73,7 +73,7 @@ class ImageLibraryPanel {
 		}
 		ImGui.textWrapped(CustomImages.status);
 		if (ImageDrop.lastDrop.length > 0) ImGui.textDisabled(ImageDrop.lastDrop);
-		ImGui.textWrapped("Raster sources: up to 16 MiB; larger dimensions are fitted to 1024 px. " + GameIcons.customImageMemory() + ". SVG paths use vector limits.");
+		ImGui.textWrapped("Images retain their original dimensions. SVG paths use vector limits.");
 		ImGui.textDisabled(ImageDrop.available() ? "Drop " + ImageConvert.EXTENSIONS.join(", ").toUpperCase() + " files onto the game window to import." : ImageDrop.support);
 	}
 
@@ -179,8 +179,8 @@ class ImageLibraryPanel {
 	/** Offer to convert or shrink files the picker cannot list as they are. */
 	function drawFixOffer(id:String):Void {
 		if (CustomImages.fixable <= 0) return;
-		wrappedNote(CustomImages.fixable + " file" + (CustomImages.fixable == 1 ? "" : "s") + " in your images folder can't be used as they are (JPG, GIF, BMP or TGA). Large PNGs are optimized automatically.");
-		if (UiChrome.ghostButton("Convert and resize them##" + id + "_fix", ImGui.vec2(-1, 28))) {
+		wrappedNote(CustomImages.fixable + " file" + (CustomImages.fixable == 1 ? "" : "s") + " in your images folder need conversion to PNG (JPG, GIF, BMP or TGA).");
+		if (UiChrome.ghostButton("Convert to PNG##" + id + "_fix", ImGui.vec2(150, 28))) {
 			UiActionQueue.custom(function() {
 				var report = CustomImages.convertFolder();
 				var parts:Array<String> = [];
@@ -189,7 +189,7 @@ class ImageLibraryPanel {
 				say(parts.length > 0 ? parts.join("  ") : "Nothing needed converting.", report.imported.length == 0 && report.errors.length > 0);
 			});
 		}
-		if (ImGui.isItemHovered()) ImGui.setTooltip("Converts raster sources up to 16 MiB into PNG copies (1024 px). The decoded-pixel limit still applies. Originals are kept.");
+		if (ImGui.isItemHovered()) ImGui.setTooltip("Converts images into PNG copies at their original dimensions. Originals are kept.");
 	}
 
 	function wrappedNote(text:String):Void {
@@ -222,7 +222,7 @@ class ImageLibraryPanel {
 		var used = usedCount;
 		ImGui.textDisabled("Selected: " + selected + "  -  used " + used + " time" + (used == 1 ? "" : "s"));
 		var state=CustomImages.stateOf(selected); var usable=state=="ready";
-		if(!usable) ImGui.textWrapped(state=="conforming" ? "Wait for image optimization to finish." : "Image blocked: "+state);
+		if(!usable) ImGui.textWrapped(state=="conforming" ? "Wait for image conversion to finish." : "Image blocked: "+state);
 		ImGui.beginDisabled(!usable);
 		if (UiChrome.ghostButton(pickLabel + "##" + id + "_use", ImGui.vec2(ImGui.getContentRegionAvail().x * 0.34, 26))) { onPick(selected); syncRename(); }
 		ImGui.endDisabled();

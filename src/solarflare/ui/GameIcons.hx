@@ -76,10 +76,8 @@ class GameIcons {
 	static var contours = new Map<String, Array<Array<Float>>>();
 	static var dimW = new Map<String, Int>();
 	static var dimH = new Map<String, Int>();
-	static var customBudget=new RasterImagePolicy();
 	static var customErrors=new Map<String,String>();
 	public static function customImageError(id:String):String { var message=id==null ? null : customErrors.get(id.toLowerCase()); return message==null ? "" : message; }
-	public static function customImageMemory():String return "Custom image memory: "+Std.int(customBudget.used/1048576)+" / 64 MB this session";
 
 	public static var lastRequestedKey:String = null;
 	public static var lastFailedKey:String = null;
@@ -623,7 +621,7 @@ class GameIcons {
 
 	static function loadPng(id:String):TextureHandle {
 		if (StringTools.startsWith(id, CustomImageKey.PREFIX))
-			return loadFilePng(CustomImages.pathFor(CustomImages.stemOf(id)), id, CustomImages.MAX_DIM);
+			return loadFilePng(CustomImages.pathFor(CustomImages.stemOf(id)), id, true);
 		if (id == CHROME_SUN) {
 			var icoPath = resolvePath(id + ".ico");
 			if (icoPath != null) {
@@ -672,36 +670,28 @@ class GameIcons {
 	/** Outline loops (unit square, solid side on the left) for a loaded custom image; null until it has loaded. */
 	public static function contourFor(id:String):Array<Array<Float>> return id == null ? null : contours.get(id);
 
-	static function loadFilePng(path:String, id:String, maxDim:Int = 0):TextureHandle {
+	static function loadFilePng(path:String, id:String, custom:Bool = false):TextureHandle {
 		#if !hl
 		return 0;
 		#else
 		try {
 			if (path == null || !FileSystem.exists(path))
 				return 0;
-			if (maxDim > 0) RasterImagePolicy.fileSize(FileSystem.stat(path).size);
 			var fileBytes = File.getBytes(path);
 			if (fileBytes == null || fileBytes.length == 0)
 				return 0;
-			var content="";
-			if(maxDim>0) {
-				ImageConvert.guardPng(fileBytes);
-				content=haxe.crypto.Sha256.make(fileBytes).toHex();
-			}
+			if(custom) ImageConvert.guardPng(fileBytes);
 			var data = new Reader(new BytesInput(iconPng(fileBytes))).read();
 			if (data == null)
 				return 0;
 			var header = Tools.getHeader(data);
 			if (header == null || header.width <= 0 || header.height <= 0)
 				return 0;
-			if (maxDim > 0 && (header.width > maxDim || header.height > maxDim))
-				throw "Custom PNG must fit within "+maxDim+" pixels per side.";
-			if(maxDim>0) customBudget.checkTexture(content,header.width,header.height);
 			var bgra = Tools.extract32(data);
 			if (bgra == null || bgra.length < header.width * header.height * 4)
 				return 0;
 			// Found once per load, never while drawing: the outline layer effect follows the picture's visible shape.
-			if (maxDim > 0) {
+			if (custom) {
 				try contours.set(id, solarflare.aura.AuraAlphaContour.trace(bgra, header.width, header.height))
 				catch (_:Dynamic) contours.remove(id);
 			}
@@ -719,10 +709,10 @@ class GameIcons {
 			dimW.set(id, header.width);
 			dimH.set(id, header.height);
 			var texture=ImGui.registerTexture(rgba.getData(), header.width, header.height, pitch);
-			if(maxDim>0 && texture!=(0:TextureHandle)) { customBudget.registeredTexture(content,header.width,header.height); customErrors.remove(id.toLowerCase()); }
+			if(custom && texture!=(0:TextureHandle)) customErrors.remove(id.toLowerCase());
 			return texture;
 		} catch (error:Dynamic) {
-			if(maxDim>0) customErrors.set(id.toLowerCase(),Std.string(error));
+			if(custom) customErrors.set(id.toLowerCase(),Std.string(error));
 			return 0;
 		}
 		#end
