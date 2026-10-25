@@ -15,7 +15,7 @@ import imgui.ImGui;
  * Persist SolarFlare layout + toggles next to the installed mod.
  */
 class SettingsStore {
-	static inline var VERSION:Int = 35;
+	static inline var VERSION:Int = 36;
 	static inline var TMP_SUFFIX:String = ".tmp";
 	static var dirty = false;
 	static var saveBlocked = false;
@@ -35,20 +35,30 @@ class SettingsStore {
 	static inline var QUIET_MS:Float = 1500;
 	static inline var MIN_GAP_MS:Float = 4000;
 	static inline var MAX_DEFER_MS:Float = 30000;
-	static var activeTheme:String = "purple_gold";
+	static var activeTheme:String = ProfileMigration.DEFAULT_THEME;
 	static var lastCaptureWarning:String = "";
+	/** Retained until a verified save succeeds; a toast alone is too easy to miss. */
+	public static var lastSaveError(default,null):String = "";
+	public static function saveFeedback():String {
+		if(saveBlocked) return "Saving is blocked. Export your design to keep a copy.";
+		if(lastSaveError.length>0) return "Save failed - changes are unsaved. Retry Save or export your design.";
+		if(!FeatureProfiles.ready) return "Saving paused until the character profile is ready.";
+		if(isDirty()) return "Unsaved changes";
+		return lastSaveMs>0 ? "Saved" : "No unsaved changes";
+	}
 
 	/** A partially recovered/newer layout must never be autosaved over its source. */
 	public static function blockSaving(reason:String):Void {
 		ProfileTrace.note("save","BLOCKED: "+reason); if (!saveBlocked) ToastManager.error(reason + " Saving is off this session.", 8.0);
 		saveBlocked=true;
+		lastSaveError=reason;
 	}
 	public static function ensureEditorLayout():Void tryLoadIni();
 
 	public static function currentTheme():String return activeTheme;
 
 	public static function setActiveTheme(t:String):Void {
-		activeTheme = t != null ? t : "purple_gold";
+		activeTheme = ProfileMigration.themeOrDefault(t);
 		markDirty();
 	}
 
@@ -57,6 +67,7 @@ class SettingsStore {
 	}
 
 	public static function saveNow():Void {
+		if(lastCfg==null) { lastSaveError="Settings are not ready to save."; return; }
 		if (lastCfg != null) {
 			if (save(lastCfg))
 				ToastManager.success("Solar Flare layout saved!");
@@ -189,8 +200,10 @@ class SettingsStore {
 					blockSaving("Could not back up settings before the one-time format conversion (" + Std.string(e) + ").");
 				}
 			}
+			// v36 changes existing preset users once, preserving Custom and all saved channels.
+			var upgradeThemeDefault = ProfileMigration.upgradeSettingsTheme(data, oldVersion);
 			apply(cfg, data);
-			FeatureProfiles.load(cfg, data);
+			FeatureProfiles.load(cfg, data, upgradeThemeDefault);
 				ProfileTrace.note("load","settings v"+oldVersion+" -> "+VERSION+"; "+FeatureProfiles.summary());
 			if (oldVersion < VERSION || convert) dirty = true;
 			// v24: the first cast-bar build persisted the new overlay as hidden,
@@ -208,6 +221,7 @@ class SettingsStore {
 ").join(" <- "));
 			// A partial apply would be saved over the user's file on the next edit; leave the file untouched.
 			saveBlocked = true;
+			lastSaveError=Std.string(e);
 			ToastManager.error("SolarFlare settings could not be loaded (" + Std.string(e)
 				+ "). Saving is off this session so the file is left as it is.", 8.0);
 		}
@@ -266,6 +280,7 @@ class SettingsStore {
 	/** Explicit saves always attempt; returns whether the file was replaced. */
 	public static function save(cfg:ConfigPanel):Bool {
 		if (cfg == null || saveBlocked || !FeatureProfiles.ready) {
+			if(cfg!=null) dirty=true;
 			// Back off: otherwise the 4 Hz tick retries (and appends a trace line to disk) until profiles are ready.
 			if (cfg != null && haxe.Timer.stamp() * 1000 >= retryAtMs) {
 				ProfileTrace.note("save","SKIPPED blocked="+saveBlocked+" ready="+FeatureProfiles.ready);
@@ -275,8 +290,7 @@ class SettingsStore {
 		}
 		try {
 			var path = jsonPath();
-			if (path == null)
-				return false;
+			if (path == null) throw "The settings file path is unavailable.";
 			ensureDir(haxe.io.Path.directory(path));
 			var data=dump(cfg);
    if(lastCaptureWarning.length>0) throw lastCaptureWarning;
@@ -298,6 +312,7 @@ class SettingsStore {
 				ToastManager.info("Settings file converted to the new format. The original is kept as a .bak beside it.", 6.0);
 			}
 			dirty = false;
+			lastSaveError = "";
 			dirtySinceMs = 0;
 			lazyDirtySinceMs = 0;
 			lastSaveMs = haxe.Timer.stamp() * 1000;
@@ -310,6 +325,9 @@ class SettingsStore {
 			} catch (_:Dynamic) {}
 			return true;
 		} catch (e:Dynamic) {
+			lastSaveError=Std.string(e);
+			dirty=true;
+			if(dirtySinceMs<=0) dirtySinceMs=haxe.Timer.stamp()*1000;
 			ProfileTrace.note("save","FAILED: "+Std.string(e)+" | "+haxe.CallStack.toString(haxe.CallStack.exceptionStack()).split("
 ").join(" <- "));
 			failCount++;
@@ -904,7 +922,7 @@ class SettingsStore {
 		if (cfg.statusBoard != null)
 			cfg.statusBoard.apply(Reflect.field(data, "statusBoard"));
 		if (cfg.stacks != null) cfg.stacks.apply(Reflect.field(data, "stacks"));
-		try if (data.activeTheme != null) activeTheme = Std.string(data.activeTheme) catch (_:Dynamic) {}
+		try if (data.activeTheme != null) activeTheme = ProfileMigration.themeOrDefault(Std.string(data.activeTheme)) catch (_:Dynamic) {}
 		try if (data.customTheme != null) ThemePalette.applyCustomDump(data.customTheme) catch (_:Dynamic) {}
 		applyVitals(cfg.vitals, data.vitals);
 		// Migrate flat v1 fields into vitals when nested block is absent.

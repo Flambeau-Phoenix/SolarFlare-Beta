@@ -34,7 +34,6 @@ class CombatLogCache {
 	static var count:Int = 0;
 	public static var latestSequence(default, null):Float = 0;
 	static var currentTarget:Dynamic = null;
-	public static var targetDistance(default,null):Float=Math.NaN;
 	static var lastTargetRef:Dynamic = null;
 	static var targetSnap:TargetSnap = new TargetSnap();
 	static var targetSnapOut:TargetSnap = new TargetSnap();
@@ -86,13 +85,7 @@ class CombatLogCache {
 	 * HP at ObserveDemand target cadence while the Target HUD is shown.
 	 */
 	public static function tick(localHero:Dynamic):Void {
-		targetDistance=Math.NaN;
 		currentTarget = resolveCurrentTarget(localHero);
-		if(localHero!=null && currentTarget!=null && solarflare.ObserveDemand.aurasNeedTarget) try {
-			var a:ent.Entity=cast localHero; var b:ent.Entity=cast currentTarget;
-			var pa=a.get_pos2D(); var pb=b.get_pos2D();
-			if(pa!=null && pb!=null) targetDistance=pa.distance(pb);
-		} catch(_:Dynamic) {}
 		solarflare.aura.StatusTypeService.setTarget(currentTarget);
 		solarflare.aura.TargetStatusCache.observe(localHero,currentTarget,haxe.Timer.stamp());
 		if (localHero == null) {

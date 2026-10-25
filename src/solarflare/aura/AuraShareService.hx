@@ -15,7 +15,7 @@ import solarflare.aura.AuraSharePackage.AuraShareImage;
 class AuraShareService {
  public var busy(default,null):Bool=false;
  public var error(default,null):Bool=false;
- public var status(default,null):String="Export a creation with its images, or choose a share ZIP to import.";
+ public var status(default,null):String="Export with images as ZIP, or save settings as JSON without bundling images.";
  public var folder(default,null):String="aura_shares";
  public var files(default,null):Array<String>=[];
  public var summary(default,null):String="";
@@ -35,6 +35,7 @@ class AuraShareService {
  var references:Array<String>=[];
  var cursor=0;
  var totalBytes=0;
+ var assetWaitStart:Float=-1;
  var archive:AuraShareArchive;
  var staging:String;
  var created:Array<String>=[];
@@ -50,7 +51,16 @@ class AuraShareService {
   if(!FileSystem.isDirectory(path)) throw "A folder is required: "+path;
  }
  public function requestRefresh():Void refreshWanted=true;
+ /** Validation can fail before a job starts; keep that failure visible after its toast disappears. */
+ public function rejectRequest(message:String):Void {
+  if(busy) return;
+  error=true; status=message; summary="";
+ }
  public function cancel():Void cancelled=true;
+ /** A frozen export must survive closing/alt-tabbing the editor. Imports still need their live destination. */
+ public function cancelForEditorClose():Void {
+  if(operation!="export" && operation!="exportSettings") cancel();
+ }
  public function choose(path:String):Void { if(busy) throw "A share operation is already running."; selectedPath=cleanPath(path); summary=""; }
  public static function cleanPath(path:String):String {
   var value=path==null ? "" : StringTools.trim(path);
@@ -60,12 +70,18 @@ class AuraShareService {
  function start(kind:String,alive:Void->Bool):Void {
   if(busy) throw "A share operation is already running.";
   operation=kind; phase="start"; busy=true; cancelled=false; error=false; progress=0; status="Preparing "+kind+"...";
-  lifetime=alive; images=[]; imageBytes.clear(); references=[]; cursor=0; totalBytes=0; archive=null; created=[];
+  lifetime=alive; images=[]; imageBytes.clear(); references=[]; cursor=0; totalBytes=0; assetWaitStart=-1; archive=null; created=[];
  }
  public function requestExport(snapshot:Dynamic,alive:Void->Bool=null):Void {
   if(busy) throw "A share operation is already running.";
   var copy=AuraSharePackage.clone(snapshot);
   start("export",alive); pack=copy; summary="";
+ }
+ /** A progress/settings backup never depends on local artwork being available or loadable. */
+ public function requestExportSettings(snapshot:Dynamic,alive:Void->Bool=null):Void {
+  if(busy) throw "A share operation is already running.";
+  var copy=AuraSharePackage.clone(snapshot);
+  start("exportSettings",alive); pack=copy; summary="";
  }
  public function requestInspect(path:String,check:Dynamic->Void=null,alive:Void->Bool=null):Void {
   if(busy) throw "A share operation is already running.";
@@ -78,7 +94,7 @@ class AuraShareService {
  function refreshFiles():Void {
   refreshWanted=false; ensure(root());
   var next:Array<String>=[];
-  for(name in FileSystem.readDirectory(folder)) if(Path.extension(name).toLowerCase()=="zip" && !FileSystem.isDirectory(Path.join([folder,name]))) next.push(name);
+  for(name in FileSystem.readDirectory(folder)) if(["zip","json"].indexOf(Path.extension(name).toLowerCase())>=0 && !FileSystem.isDirectory(Path.join([folder,name]))) next.push(name);
   next.sort(Reflect.compare); files=next;
  }
  public function observe():Void {
@@ -88,7 +104,7 @@ class AuraShareService {
   }
   try {
    if(cancelled || (lifetime!=null && !lifetime())) { cleanup(); finish("Share operation cancelled.",false); return; }
-   if(operation=="export") exportStep(); else importStep();
+   if(operation=="export") exportStep(); else if(operation=="exportSettings") exportSettingsStep(); else importStep();
   } catch(e:Dynamic) {
    var message=Std.string(e);
    try cleanup() catch(cleanupError:Dynamic) message+=" Cleanup could not finish: "+Std.string(cleanupError);
@@ -107,9 +123,18 @@ class AuraShareService {
     beginStaging(); phase="collect";
    case "collect":
     if(cursor<references.length) {
-     var key=references[cursor++]; var path=CustomImages.pathFor(CustomImageKey.stemOf(key));
-     if(path==null) throw "Missing custom image: "+key;
-     if(FileSystem.stat(path).size>4*1024*1024) throw "Image exceeds 4 MiB: "+key;
+     var key=references[cursor]; var path=CustomImages.pathFor(CustomImageKey.stemOf(key));
+     if(path==null) {
+      var reason=CustomImages.stateOf(CustomImageKey.stemOf(key));
+      if(reason=="conforming") {
+       if(assetWaitStart<0) assetWaitStart=haxe.Timer.stamp();
+       if(haxe.Timer.stamp()-assetWaitStart<30) { status="Preparing image "+key+"..."; return; }
+       reason="image preparation did not finish within 30 seconds";
+      } else if(reason=="") reason="not found in the images folder";
+      throw "Cannot bundle "+key+": "+reason+". Use Export settings (.json) to save without images.";
+     }
+     assetWaitStart=-1; cursor++;
+     solarflare.ui.RasterImagePolicy.fileSize(FileSystem.stat(path).size);
      var bytes=File.getBytes(path); var dimensions;
      try dimensions=AuraSharePackage.validatePng(bytes) catch(e:Dynamic) throw key+": "+Std.string(e);
      var hash=AuraSharePackage.hash(bytes); var existing:AuraShareImage=null;
@@ -149,11 +174,39 @@ class AuraShareService {
   var entry:Entry={fileName:name,fileSize:bytes.length,fileTime:Date.now(),compressed:false,dataSize:bytes.length,data:bytes,crc32:null};
   writer.writeEntryHeader(entry); output.writeFullBytes(bytes,0,bytes.length);
  }
+ function exportSettingsStep():Void {
+  switch(phase) {
+   case "start":
+    AuraSharePackage.validatePack(pack); beginStaging(); phase="writeSettings";
+   case "writeSettings":
+    var bytes=Bytes.ofString(haxe.Json.stringify(pack));
+    if(bytes.length>AuraShareArchive.MAX_JSON) throw "Settings file exceeds 4 MiB.";
+    archivePath=Path.join([staging,"settings.json"]); File.saveBytes(archivePath,bytes);
+    var saved=File.getBytes(archivePath);
+    if(saved.compare(bytes)!=0) throw "Settings export verification failed.";
+    AuraSharePackage.validatePack(AuraSharePackage.json(saved));
+    var base=sanitize(pack.name)+"-settings-"+DateTools.format(Date.now(),"%Y%m%d-%H%M%S"); var name=base+".json"; var n=2;
+    while(FileSystem.exists(Path.join([root(),name]))) name=base+"-"+(n++)+".json";
+    var destination=Path.join([folder,name]); FileSystem.rename(archivePath,destination); lastExport=destination; selectedPath=destination;
+    cleanup(); refreshWanted=true; finish("Saved settings for "+pack.auras.length+" Aura(s): "+name+". Custom images are referenced, not included.",false);
+   default: throw "Invalid settings export state.";
+  }
+ }
  function importStep():Void {
   switch(phase) {
    case "start":
-    if(selectedPath.length==0 || !FileSystem.exists(selectedPath) || FileSystem.isDirectory(selectedPath)) throw "Choose an existing share ZIP file.";
-    if(Path.extension(selectedPath).toLowerCase()!="zip" || FileSystem.stat(selectedPath).size>AuraShareArchive.MAX_BYTES) throw "Choose a share ZIP no larger than 64 MiB.";
+    if(selectedPath.length==0 || !FileSystem.exists(selectedPath) || FileSystem.isDirectory(selectedPath)) throw "Choose an existing ZIP or JSON share file.";
+    var extension=Path.extension(selectedPath).toLowerCase();
+    if(extension=="json") {
+     if(FileSystem.stat(selectedPath).size>AuraShareArchive.MAX_JSON) throw "Settings file exceeds 4 MiB.";
+     pack=AuraSharePackage.json(File.getBytes(selectedPath)); AuraSharePackage.validatePack(pack);
+     summary=Std.string(pack.name)+": "+pack.auras.length+" Aura(s), settings only. Custom images are not bundled.";
+     if(preflight!=null) preflight(pack);
+     if(operation=="inspect") finish("Settings file validated. "+summary,false);
+     else { phase="publishSettings"; status="Importing settings..."; }
+     return;
+    }
+    if(extension!="zip" || FileSystem.stat(selectedPath).size>AuraShareArchive.MAX_BYTES) throw "Choose a share ZIP no larger than 64 MiB, or a settings JSON file.";
     archive=new AuraShareArchive(File.getBytes(selectedPath));
     var manifest=AuraSharePackage.json(archive.read("manifest.json")); var auraBytes=archive.read("auras.json");
     if(manifest==null || manifest.aurasSha256!=AuraSharePackage.hash(auraBytes)) throw "Aura definitions checksum mismatch.";
@@ -162,6 +215,11 @@ class AuraShareService {
     summary=Std.string(pack.name)+": "+images.length+" PNG(s). Requires "+pack.auras.length+" Aura, "+pack.groups.length+" group and "+pack.sets.length+" set slot(s).";
     if(preflight!=null) preflight(pack);
     phase="validate"; status="Validating bundled images...";
+   case "publishSettings":
+    if(preflight!=null) preflight(pack);
+    if(publish==null) throw "No import destination is available.";
+    publish(pack);
+    finish("Imported settings for "+pack.auras.length+" Aura(s). Custom images were not included; add any missing artwork to the images folder.",false);
    case "validate":
     if(cursor<images.length) {
      var image=images[cursor++]; var bytes=archive.read(image.entry);

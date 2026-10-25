@@ -528,7 +528,7 @@ class ConfigPanel {
 		} catch (_:Dynamic) {}
 	}
 
-	/** Close hub on Escape only â€” never letter keys (typing must not dismiss). */
+	/** Close hub on Escape only — never letter keys (typing must not dismiss). */
 	function pollHubDismissKeys():Void {
 		if (!open.get())
 			return;

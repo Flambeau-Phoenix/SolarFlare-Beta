@@ -65,9 +65,9 @@ class UtilitiesPanel {
 	public static function drawAutoHide():Void {
 		UiLayout.propertyGrid("##util_auto_hide", function() {
 			UiLayout.propertyRow("On game windows", function() {
-				if (ImGui.checkbox("Hide overlays while one is open##util_ah_on", WindowAutoHide.enabled))
+				if (ImGui.checkbox("Hide overlays automatically##util_ah_on", WindowAutoHide.enabled))
 					SettingsStore.markDirty();
-			}, "Hides all HUD overlays while selected native windows are open. Settings stay accessible. Off by default.");
+			}, "Hides SolarFlare HUD overlays while selected game windows are open. Settings stay accessible. Off by default.");
 			ImGui.beginDisabled(!WindowAutoHide.enabled.get());
 			UiLayout.propertyRow("Inventory", function() {
 				if (ImGui.checkbox("##util_ah_inventory",WindowAutoHide.inventory)) SettingsStore.markDirty();
@@ -77,7 +77,10 @@ class UtilitiesPanel {
 			});
 			UiLayout.propertyRow("Crafting / upgrades", function() {
 				if (ImGui.checkbox("##util_ah_craft",WindowAutoHide.craftUpgrade)) SettingsStore.markDirty();
-			});
+			}, "Includes the Infusion Table.");
+			UiLayout.propertyRow("Collection pages", function() {
+				if (ImGui.checkbox("##util_ah_mount",WindowAutoHide.mountGlider)) SettingsStore.markDirty();
+			}, "Mount, Glider, Emotes, Companion and Appearance pages. Riding and gliding keep your overlays visible.");
 			UiLayout.propertyRow("Travel / portals", function() {
 				if (ImGui.checkbox("##util_ah_travel",WindowAutoHide.travel)) SettingsStore.markDirty();
 			});
@@ -99,7 +102,7 @@ class UtilitiesPanel {
 			ImGui.endDisabled();
 		});
 		ImGui.textWrapped(WindowAutoHide.reason);
-		ImGui.textDisabled("HUD returns after the last selected window closes, unless manually hidden.");
+		ImGui.textWrapped("HUD returns when selected windows close, unless manually hidden.");
 	}
 
 	/** Record fights for the Combat Log Aura Builder, plus a shortcut straight into it. */

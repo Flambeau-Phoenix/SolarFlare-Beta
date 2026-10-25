@@ -233,7 +233,7 @@ class AuraCanvasElement {
 	public var name:String = "";
 
 	static function clampSeconds(v:Dynamic, lo:Float, hi:Float, fallback:Float):Float {
-		if (!Std.isOfType(v, Float) && !Std.isOfType(v, Int)) return fallback;
+		if (!solarflare.util.FiniteNumber.isFinite(v)) return fallback;
 		var f:Float = v;
 		return Math.isFinite(f) ? Math.max(lo, Math.min(hi, f)) : fallback;
 	}

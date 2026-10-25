@@ -108,7 +108,7 @@ class BarTerBuilder {
     }
    }
   });
-  UiChrome.centeredHeader("Selected bar Â· click a cell to edit",30);
+  UiChrome.centeredHeader("Selected bar · click a cell to edit",30);
   UiLayout.inlinePair("##bt_preview_row",function(w) {
    var height:Single=Math.min(220,Math.max(68,bar.rows*48+10));
    UiScope.child("##bt_preview",ImGui.vec2(w,height),function() { drawPreview(bar); },
@@ -119,8 +119,8 @@ class BarTerBuilder {
    ImGui.textWrapped("Right-click a cell to clear it or clear this bar. Replacement keeps consumables and statuses.");
   },8);
   drawNativeStrip(bar);
-  ImGui.textDisabled("Weapon arrangement Â· "+owner.comboLabel);
-  if (!owner.managedEditsReady) ImGui.textDisabled("Resolving weapon change Â· native cell moves are paused.");
+  ImGui.textDisabled("Weapon arrangement · "+owner.comboLabel);
+  if (!owner.managedEditsReady) ImGui.textDisabled("Resolving weapon change · native cell moves are paused.");
   UiLayout.inlinePair("##bt_native_tools",function(w) {
    ImGui.beginDisabled(!owner.managedEditsReady);
    try { if (UiChrome.ghostButton("Repair native skill cells##bt_repair",ImGui.vec2(w,28))) owner.requestRepair(); }
@@ -240,7 +240,7 @@ class BarTerBuilder {
      catalogRow(b,"skill",entry.id,entry.name,entry.id,available); if (++shown >= 200) break;
     }
     if (shown == 0) ImGui.textDisabled("No skills match.");
-    if (shown >= 200) ImGui.textDisabled("First 200 matches Â· refine search.");
+    if (shown >= 200) ImGui.textDisabled("First 200 matches · refine search.");
    }
   },ImGuiChildFlags.Borders);
  }
@@ -248,7 +248,7 @@ class BarTerBuilder {
   var p=ImGui.getCursorScreenPos();
   GameIcons.drawKey(ImGui.getWindowDrawList(),icon,p.x,p.y,22,22,available ? 0xFFFFFFFF : 0x88777777);
   ImGui.setCursorScreenPos(ImGui.vec2(p.x+27,p.y));
-  if (ImGui.selectable(label+(available ? "" : " Â· unavailable")+"##bt_catalog_"+kind+"_"+id,false,0,ImGui.vec2(0,24)))
+  if (ImGui.selectable(label+(available ? "" : " · unavailable")+"##bt_catalog_"+kind+"_"+id,false,0,ImGui.vec2(0,24)))
    assign(b,selection.cell,kind,id);
   if (ImGui.isItemHovered()) ImGui.setTooltip(id+"\nClick assigns to the selected cell; drag chooses a destination.");
   beginSource(kind,id,label);
@@ -264,7 +264,7 @@ class BarTerBuilder {
     if (!AuraCatalog.matchesSearch(entry.id,entry.name,query)) continue;
     var inv=ConsumableCache.find(entry.id); var count=inv == null ? 0 : inv.count;
     if (inventoryOnly.get() && (inv == null || !inv.known || !inv.owned)) continue;
-    catalogRow(b,"item",entry.id,entry.name+"  Ã—"+count,ConsumableCatalog.iconKey(entry.id),count > 0);
+    catalogRow(b,"item",entry.id,entry.name+"  ×"+count,ConsumableCatalog.iconKey(entry.id),count > 0);
     if (++shown >= 200) break;
    }
    if (shown == 0) ImGui.textWrapped(inventoryOnly.get() ? "No matching items in your inventory. Turn off the filter to browse all consumables." : "No consumables match.");
@@ -276,10 +276,10 @@ class BarTerBuilder {
   var snap=selection.cell < snaps.length ? snaps[selection.cell] : null;
   UiLayout.propertyGrid("##bt_details",function() {
    UiLayout.propertyRow("Content",function() {
-    ImGui.textWrapped(s.hasStatus() ? "Status Â· "+s.statusId : s.hasItem() ? "Consumable Â· "+s.itemKind : s.nativeActionId.length>0 ? s.nativeActionId+" Â· "+(snap==null ? "Resolvingâ€¦" : snap.label) : s.hasSkill() ? "Pinned skill Â· "+s.skillId : "Empty");
+    ImGui.textWrapped(s.hasStatus() ? "Status · "+s.statusId : s.hasItem() ? "Consumable · "+s.itemKind : s.nativeActionId.length>0 ? s.nativeActionId+" · "+(snap==null ? "Resolving…" : snap.label) : s.hasSkill() ? "Pinned skill · "+s.skillId : "Empty");
    });
    UiLayout.propertyRow("Binding",function() {
-    ImGui.textWrapped(s.hasStatus() ? "Display only" : s.hasSkill() ? (snap == null ? "Unknown" : snap.keyLabel)+" Â· native keyboard activation" : "No mod hotkey Â· uses the in-game consumable binding");
+    ImGui.textWrapped(s.hasStatus() ? "Display only" : s.hasSkill() ? (snap == null ? "Unknown" : snap.keyLabel)+" · native keyboard activation" : "No mod hotkey · uses the in-game consumable binding");
    });
   });
   UiLayout.inlineSplit("##bt_details_actions",1,function(i,w) {
@@ -292,7 +292,7 @@ class BarTerBuilder {
   else if (rightClicked) ImGui.openPopup(id);
   if (!ContextMenuSystem.begin(id)) return;
   try {
-   ContextMenuSystem.separatorLabel(b.name+" Â· Cell "+(index+1));
+   ContextMenuSystem.separatorLabel(b.name+" · Cell "+(index+1));
    if (ContextMenuSystem.menuItem("Edit cell")) { selectBar(b); selection.selectCell(index,b.slotCount); owner.config.open.set(true); }
    if (ContextMenuSystem.menuItem("Clear cell","","",false,b.slots[index].hasContent())) owner.clearCell(b,index);
    if(b.slots[index].hasSkill() && ContextMenuSystem.menuItem("Skill glow override")) editSkillGlow(b,index);
@@ -345,7 +345,7 @@ class BarTerBuilder {
   var cfg=owner.config;
   var g=editGlowSkill.length>0 ? cfg.glowFor(editGlowSkill,b) : b.glow;
   if(editGlowSkill.length>0) {
-   ImGui.textWrapped("Skill glow override Â· "+editGlowSkill);
+   ImGui.textWrapped("Skill glow override · "+editGlowSkill);
    var own=cfg.glowOverrides.exists(editGlowSkill);
    UiLayout.inlinePair("##bt_glow_override_actions",function(w) {
     if(UiChrome.ghostButton(own ? "Use bar defaults##bt_glow_inherit" : "Create override##bt_glow_create",ImGui.vec2(w,26))) {

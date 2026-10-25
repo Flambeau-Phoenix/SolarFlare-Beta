@@ -26,8 +26,9 @@ class UiLayouts {
  public function new() { ByteUtil.clearBytes(nameBuf,96); }
  public function clearTransientState():Void { nameAction=""; openFor=""; ByteUtil.clearBytes(nameBuf,96); }
  public function retain(c:ConfigPanel):Void {
-  if(!initialized) { bank=HudLayoutModel.load(null,HudLayoutBindings.capture(c)); initialized=true; }
-  else bank.retain(HudLayoutBindings.capture(c));
+  var rows=HudLayoutBindings.capture(c,initialized ? bank.layouts.get(bank.active) : null,defaults,function(message) ProfileTrace.note("layout-repair",message));
+  if(!initialized) { bank=HudLayoutModel.load(null,rows); initialized=true; }
+  else bank.retain(rows);
  }
  public function dumpCurrent(c:ConfigPanel):Dynamic { retain(c); return bank.dump(); }
  public function load(c:ConfigPanel,data:Dynamic,fallback:Array<HudLayoutRow>):Void {

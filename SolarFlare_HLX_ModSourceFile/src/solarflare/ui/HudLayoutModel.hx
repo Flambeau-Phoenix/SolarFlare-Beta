@@ -23,7 +23,7 @@ class HudLayoutModel {
  public var loadWarning(default,null):String="";
  public function new() {}
  public static function clone(rows:Array<HudLayoutRow>):Array<HudLayoutRow> return validate(rows);
- public static function finite(v:Dynamic):Bool return (Std.isOfType(v,Float) || Std.isOfType(v,Int)) && Math.isFinite(v);
+ public static function finite(v:Dynamic):Bool return solarflare.util.FiniteNumber.isFinite(v);
  public static function validate(data:Dynamic):Array<HudLayoutRow> {
   if(!Std.isOfType(data,Array)) throw "Layout widgets must be an array.";
   var input:Array<Dynamic>=cast data;
@@ -31,12 +31,19 @@ class HudLayoutModel {
   var rows:Array<HudLayoutRow>=[]; var seen=new Map<String,Bool>();
   for(r in input) {
    if(r==null || !Std.isOfType(r.id,String) || r.id.length==0 || r.id.length>256 || seen.exists(r.id)) throw "Invalid or duplicate widget ID.";
-   if(!finite(r.x) || !finite(r.y) || Math.abs(r.x)>100 || Math.abs(r.y)>100
-    || !finite(r.referenceWidth) || !finite(r.referenceHeight) || r.referenceWidth<320 || r.referenceWidth>32768 || r.referenceHeight<240 || r.referenceHeight>32768) throw "Invalid layout coordinates.";
-   var row:HudLayoutRow={id:r.id,x:r.x,y:r.y,referenceWidth:r.referenceWidth,referenceHeight:r.referenceHeight};
+   if(!finite(r.x) || !finite(r.y) || !finite(r.referenceWidth) || !finite(r.referenceHeight)) throw "Invalid layout coordinates.";
+   var x:Float=r.x, y:Float=r.y, rw:Float=r.referenceWidth, rh:Float=r.referenceHeight;
+   if(Math.abs(x)>100 || Math.abs(y)>100 || rw<320 || rw>32768 || rh<240 || rh>32768) throw "Invalid layout coordinates.";
+   var row:HudLayoutRow={id:r.id,x:x,y:y,referenceWidth:rw,referenceHeight:rh};
    for(key in ["w","h","scale","cellSize"]) {
-    var v=Reflect.field(r,key);
-    if(v!=null) { if(!finite(v) || v<0 || v>10000 || key=="scale" && (v<0.1 || v>8)) throw "Invalid widget size."; Reflect.setField(row,key,v); }
+    var raw:Dynamic=Reflect.field(r,key);
+    if(raw!=null) {
+     if(!finite(raw)) throw "Invalid widget size: "+r.id+"."+key+"="+Std.string(raw);
+     // Comparing a Dynamic with integer literals makes HL truncate it, including the value subsequently stored.
+     var v:Float=raw;
+     if(v<0 || v>10000 || key=="scale" && (v<0.1 || v>8)) throw "Invalid widget size: "+r.id+"."+key+"="+Std.string(v);
+     Reflect.setField(row,key,v);
+    }
    }
    if(r.id=="statusBoard.chrome" && Reflect.field(r,"growthDirection")!=null) row.growthDirection=Reflect.field(r,"growthDirection")=="up" ? "up" : "down";
    rows.push(row); seen.set(r.id,true);
@@ -118,8 +125,10 @@ class HudLayoutModel {
   }
   function add(id:String,c:Dynamic,d:Dynamic,w:String="w",h:String="h"):Void {
    if(c==null || !finite(c.x) || !finite(c.y)) return;
-   var rw=finite(c.referenceWidth) && c.referenceWidth>=320 ? c.referenceWidth : defaultWidth;
-   var rh=finite(c.referenceHeight) && c.referenceHeight>=240 ? c.referenceHeight : defaultHeight;
+   var rw:Float=finite(c.referenceWidth) ? c.referenceWidth : defaultWidth;
+   var rh:Float=finite(c.referenceHeight) ? c.referenceHeight : defaultHeight;
+   if(rw<320) rw=defaultWidth;
+   if(rh<240) rh=defaultHeight;
    var r:HudLayoutRow={id:id,x:c.x/rw,y:c.y/rh,referenceWidth:rw,referenceHeight:rh};
    if(d!=null) for(pair in [{from:w,to:"w"},{from:h,to:"h"},{from:"scale",to:"scale"}]) {
     var v=Reflect.field(d,pair.from); if(finite(v)) Reflect.setField(r,pair.to,v);

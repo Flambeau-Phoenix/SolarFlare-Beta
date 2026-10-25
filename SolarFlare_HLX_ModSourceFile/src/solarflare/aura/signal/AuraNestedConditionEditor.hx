@@ -44,7 +44,9 @@ class AuraNestedConditionEditor {
 	static function drawGroup(a:AuraRuleEditorContext, group:AuraRuleNodeDef, depth:Int, bossFocusId:String):Bool {
 		var r = a.rule; var key = a.id + (group == null ? "_root" : "_group_" + group.uiKey);
 		var mode = group == null ? r.mode : group.mode; var negate = group == null ? r.negate : group.negate;
+		ImGui.pushStyleColor(imgui.Enums.ImGuiCol.Text, ThemePalette.status(ThemePalette.STATUS_SUCCESS));
 		var open = UiChrome.groupHeader((negate ? "NOT " : "") + (mode == "all" ? "ALL" : "ANY") + "  -  " + status(a, group) + "###" + key, true);
+		ImGui.popStyleColor();
 		if (!open) return false;
 		if (ImGui.radioButton("ALL##all_" + key, mode == "all")) {
 			snapshot(a); if (group == null) r.mode = "all"; else group.mode = "all"; return changed(a);
@@ -54,10 +56,10 @@ class AuraNestedConditionEditor {
 			snapshot(a); if (group == null) r.mode = "any"; else group.mode = "any"; return changed(a);
 		}
 		ImGui.sameLine();
-		if (ImGui.smallButton((negate ? "NOT: on###not_" : "NOT: off###not_") + key)) {
+		if (AuraRuleChrome.button((negate ? "NOT: on###not_" : "NOT: off###not_") + key)) {
 			snapshot(a); if (group == null) r.negate = !r.negate; else group.negate = !group.negate; return changed(a);
 		}
-		if (group != null && toolbar(a, group)) return true;
+		if (group != null) { AuraRuleChrome.sameLineIfFits(ImGui.calcTextSize("Arrange...").x + 24); if (toolbar(a, group)) return true; }
 		var nodes = AuraRuleMutations.children(r, group);
 		if (nodes == null) { ImGui.textDisabled("Invalid group nodes."); return false; }
 		if (nodes.length == 0) ImGui.textDisabled(group == null ? "No conditions yet." : "Add a condition or remove this empty group.");
@@ -73,36 +75,51 @@ class AuraNestedConditionEditor {
 				if (edited) return true;
 			} else if (node.kind == "condition" && node.conditionIndex >= 0 && node.conditionIndex < r.conditions.length) {
 				var c = r.conditions[node.conditionIndex]; if (c == null) continue;
-				if (toolbar(a, node)) return true;
 				var remove = false;
-				UiScope.child("##nested_card_" + a.id + "_" + c.uiKey, ImGui.vec2(0, 0), function() {
+				var edited = false;
+				AuraRuleChrome.card("##nested_card_" + a.id + "_" + c.uiKey, a.presentation && r.presentationSource == node.conditionIndex, function() {
 					remove = AuraConditionEditor.drawConditionCard(a, r, c, node.conditionIndex, bossFocusId, true);
-				}, imgui.Enums.ImGuiChildFlags.AutoResizeY | imgui.Enums.ImGuiChildFlags.Borders);
+					if (!remove) edited = toolbar(a, node);
+				});
+				if (edited) return true;
 				if (remove) { snapshot(a); AuraRuleMutations.removeNode(r, node); return changed(a); }
 			}
 		}
 		ImGui.beginDisabled(r.conditions.length >= AuraRuleDef.MAX_CONDITIONS);
-		var add = ImGui.smallButton("+ Condition##add_" + key);
+		var add = AuraRuleChrome.action("+ Condition##add_" + key, "add");
 		ImGui.endDisabled();
 		if (add) {
 			snapshot(a); var c = new AuraConditionDef(); c.signal = "resource.health.ratio"; c.op = "lte"; c.numberValue = 0.35;
 			AuraRuleMutations.addCondition(r, c, group); return changed(a);
 		}
-		ImGui.sameLine();
+		AuraRuleChrome.sameLineIfFits(ImGui.calcTextSize("Group").x * 1.15 + 44);
 		ImGui.beginDisabled(!AuraRuleMutations.canAddGroup(r, group));
-		var addGroup = ImGui.smallButton("+ Group##add_group_" + key);
+		var addGroup = AuraRuleChrome.action("+ Group##add_group_" + key, "group");
 		ImGui.endDisabled();
 		if (addGroup) { snapshot(a); AuraRuleMutations.addGroup(r, group); return changed(a); }
 		return false;
 	}
 	static function toolbar(a:AuraRuleEditorContext, node:AuraRuleNodeDef):Bool {
+		var key = a.id + "_node_" + node.uiKey;
+		if (AuraRuleChrome.button("Arrange...##arrange_" + key)) ImGui.openPopup("##arrange_popup_" + key);
+		if (!ImGui.beginPopup("##arrange_popup_" + key)) return false;
+		var edited = false;
+		var failed = false;
+		var failure:Dynamic = null;
+		try { edited = toolbarContents(a, node); } catch (e:Dynamic) { failed = true; failure = e; }
+		if (edited) ImGui.closeCurrentPopup();
+		ImGui.endPopup();
+		if (failed) throw failure;
+		return edited;
+	}
+	static function toolbarContents(a:AuraRuleEditorContext, node:AuraRuleNodeDef):Bool {
 		var r = a.rule; var p = r.prepared(); var parent = AuraRuleMutations.parentOf(r, node);
 		if (parent == null) return false;
 		var key = a.id + "_node_" + node.uiKey; var index = parent.indexOf(node);
 		ImGui.beginDisabled(index == 0);
-		var up = ImGui.smallButton("Up##up_" + key); ImGui.endDisabled(); ImGui.sameLine();
+		var up = AuraRuleChrome.action("Up##up_" + key, "up"); ImGui.endDisabled(); ImGui.sameLine();
 		ImGui.beginDisabled(index >= parent.length - 1);
-		var down = ImGui.smallButton("Down##down_" + key); ImGui.endDisabled();
+		var down = AuraRuleChrome.action("Down##down_" + key, "down"); ImGui.endDisabled();
 		if (up || down) { snapshot(a); AuraRuleMutations.reorder(r, node, up ? -1 : 1); return changed(a); }
 		var parentNode:AuraRuleNodeDef = null; var grandparent:AuraRuleNodeDef = null;
 		for (e in p.entries) if (e.node == node) {
@@ -111,12 +128,12 @@ class AuraNestedConditionEditor {
 		}
 		ImGui.sameLine();
 		ImGui.beginDisabled(parentNode == null);
-		var out = ImGui.smallButton("Move out##out_" + key); ImGui.endDisabled();
+		var out = AuraRuleChrome.button("Move out##out_" + key); ImGui.endDisabled();
 		if (out) {
 			snapshot(a); var destination = AuraRuleMutations.children(r, grandparent);
 			AuraRuleMutations.move(r, node, grandparent, destination.indexOf(parentNode) + 1); return changed(a);
 		}
-		ImGui.setNextItemWidth(150);
+		ImGui.setNextItemWidth(240);
 		if (ImGui.beginCombo("##into_" + key, "Move into group")) {
 			var ordinal = 0;
 			for (sibling in parent) if (sibling != null && sibling.kind == "group") {
@@ -129,7 +146,7 @@ class AuraNestedConditionEditor {
 			}
 			ImGui.endCombo();
 		}
-		if (node.kind == "group" && ImGui.smallButton("Delete group##delete_" + key)) {
+		if (node.kind == "group" && AuraRuleChrome.action("Delete group##delete_" + key, "delete")) {
 			snapshot(a); AuraRuleMutations.removeNode(r, node); return changed(a);
 		}
 		return false;

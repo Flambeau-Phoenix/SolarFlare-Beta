@@ -10,6 +10,8 @@ import solarflare.cdb.AuraQuickStartCatalog;
 import solarflare.geaux.GeauxCache;
 import solarflare.ui.EditorWindow;
 import solarflare.ui.UiChrome;
+import solarflare.ui.ThemePalette;
+import solarflare.aura.signal.AuraRuleChrome;
 import solarflare.ui.UiLayout;
 import solarflare.ui.UiScope;
 import solarflare.ui.NumberField;
@@ -122,7 +124,6 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	var buildFocusBossId:String = "";
 
 	static inline var JSON_BUF:Int = 32768;
-	var exportBuf = new hl.Bytes(JSON_BUF);
 	var importBuf = new hl.Bytes(JSON_BUF);
 	var exportString:String = "";
 	var ioStatus:String = "";
@@ -160,10 +161,9 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		undoCoordinator = new AuraUndoCoordinator(undoManager, snapshotJson, captureCanvasById, restoreSnapshot, restoreCanvas);
 		solarflare.aura.signal.AuraConditionEditor.auraChoices = auraChoicesForConditions;
 		solarflare.aura.signal.AuraConditionEditor.auraConditionChoices = auraConditionSummaries;
-		sharePanel=new solarflare.aura.ui.AuraSharePanel(shareService,queueShareScope,queueShareInspect,queueShareImport);
+		sharePanel=new solarflare.aura.ui.AuraSharePanel(shareService,function(scope,settingsOnly) queueShareScope(scope,settingsOnly,false),queueShareInspect,queueShareImport);
 		glowColBuf = ImGui.v4(1, 0.53, 0, 1);
 		solarflare.ui.ByteUtil.clearBytes(iconSearchBuf, 80);
-		solarflare.ui.ByteUtil.clearBytes(exportBuf, JSON_BUF);
 		solarflare.ui.ByteUtil.clearBytes(importBuf, JSON_BUF);
 		solarflare.ui.ByteUtil.clearBytes(canvasQuickBuf, CANVAS_CONTENT_BUF);
 		solarflare.ui.ByteUtil.clearBytes(wizardSubjectBuf, 128);
@@ -219,7 +219,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		if (conditionPicker != null) conditionPicker.cancel();
 		if (canvasEditor != null) canvasEditor.clearTransientState();
 		StatusTypeDemand.beginEditorFrame();
-		shareEpoch++; shareService.cancel();
+		shareEpoch++; shareService.cancelForEditorClose();
 		combatLogsOpen = false;
 		combatLogBrowser.suspend();
 		selectedGroupId = "";
@@ -245,18 +245,23 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
  }
 
 	public function observeShares():Void { shareService.observe(); }
-	function queueShareMembers(ids:Array<String>,label:String,wholeLibrary:Bool=false):Void {
-		ioModalRequest=true;
-		var epoch=shareEpoch; var owner=cfg.auras;
+	function queueShareMembers(ids:Array<String>,label:String,wholeLibrary:Bool=false,settingsOnly:Bool=false,showDialog:Bool=true):Void {
+		if(showDialog) ioModalRequest=true;
+		var generation=FeatureProfiles.statusOwnerGen; var imageGeneration=CustomImages.generation; var owner=cfg.auras;
 		UiActionQueue.custom(function() {
-			if(!open.get() || epoch!=shareEpoch || cfg.auras!=owner) return;
-			var members:Array<AuraDef>=[];
-			for(id in ids) { var found:AuraDef=null; for(a in cfg.auras) if(a!=null && a.id==id) { found=a; break; } if(found==null) throw "The export selection changed."; members.push(found); }
-			var data=AuraShareImport.capture(cfg,members,label,wholeLibrary);
-			shareService.requestExport(data,function() return open.get() && epoch==shareEpoch && cfg.auras==owner);
+			if(generation!=FeatureProfiles.statusOwnerGen || cfg.auras!=owner) return;
+			try {
+				var members:Array<AuraDef>=[];
+				for(id in ids) { var found:AuraDef=null; for(a in cfg.auras) if(a!=null && a.id==id) { found=a; break; } if(found==null) throw "The export selection changed."; members.push(found); }
+				var data=AuraShareImport.capture(cfg,members,label,wholeLibrary);
+				var alive=function() return generation==FeatureProfiles.statusOwnerGen && (settingsOnly || imageGeneration==CustomImages.generation);
+				if(settingsOnly) shareService.requestExportSettings(data,alive); else shareService.requestExport(data,alive);
+			} catch(e:Dynamic) {
+				shareService.rejectRequest(Std.string(e)); ToastManager.error("Aura export failed: "+Std.string(e),8);
+			}
 		});
 	}
-	function queueShareScope(scope:String):Void {
+	function queueShareScope(scope:String,settingsOnly:Bool=false,showDialog:Bool=true):Void {
 		var current=selectedAura(); var members:Array<AuraDef>=[]; var label="Aura library";
 		switch(scope) {
 		 case "Aura": if(current!=null) { members=[current]; label=current.name; }
@@ -265,51 +270,85 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		 case "Set": if(current!=null) { var id=AuraConfig.tagOf(current); for(a in cfg.auras) if(AuraConfig.tagOf(a)==id) members.push(a); var set=cfg.findSet(id); label=set!=null ? set.name : id; }
 		 default: members=cfg.auras.copy();
 		}
-		queueShareMembers([for(a in members) a.id],label,scope=="Library");
+		queueShareMembers([for(a in members) a.id],label,scope=="Library",settingsOnly,showDialog);
 	}
 	function queueShareInspect(path:String):Void { queueShareFile(path,false); }
 	function queueShareImport(path:String):Void { queueShareFile(path,true); }
-	function queueShareFile(path:String,importing:Bool):Void {
+	function queueShareFile(path:String,importing:Bool,designOnly:Bool=false):Void {
 		var epoch=shareEpoch; var owner=cfg.auras;
 		UiActionQueue.custom(function() {
-			if(!open.get() || epoch!=shareEpoch || cfg.auras!=owner) return;
-			var alive=function() return open.get() && epoch==shareEpoch && cfg.auras==owner;
-			var check=function(data:Dynamic) AuraShareImport.preflight(data,cfg);
+			var alive=function() return (designOnly ? canvasEditor.open.get() : open.get()) && epoch==shareEpoch && cfg.auras==owner;
+			if(!alive()) return;
+			var check=function(data:Dynamic) { if(designOnly) CanvasDesignPackage.validate(data); AuraShareImport.preflight(data,cfg); };
 			if(!importing) { shareService.requestInspect(path,check,alive); return; }
 			shareService.requestImport(path,check,function(data:Dynamic) {
-				var before=snapshotJson(); var transaction=new AuraShareImport(data,cfg);
-				var bank=host.uiLayouts.bank; var layout=bank.active; var oldRows=bank.layouts.get(layout);
-				var rows=solarflare.ui.HudLayoutModel.merge(oldRows,transaction.layoutRows());
-				try {
-				 transaction.commit();
-				 bank.layouts.set(layout,rows);
-				 host.uiLayouts.requestReconcile(); SettingsStore.markDirty(); solarflare.ObserveDemand.markStatusDemandDirty();
-				 undoManager.push("Import share file",before);
-				 selected=cfg.auras.length-1; selectedGroupId=""; creationHomeOpen=false; boundEditorAura=null; canvasEditor.canvasSel=-1;
-				} catch(e:Dynamic) { bank.layouts.set(layout,oldRows); transaction.rollback(); throw e; }
+				commitSharedPack(data,"Import share file");
 			},alive);
+		});
+	}
+	function commitSharedPack(data:Dynamic,label:String):Void {
+		var before=snapshotJson(); var transaction=new AuraShareImport(data,cfg);
+		var bank=host.uiLayouts.bank; var layout=bank.active; var oldRows=bank.layouts.get(layout);
+		var rows=solarflare.ui.HudLayoutModel.merge(oldRows,transaction.layoutRows());
+		try {
+			transaction.commit(); bank.layouts.set(layout,rows);
+			host.uiLayouts.requestReconcile(); SettingsStore.markDirty(); solarflare.ObserveDemand.markStatusDemandDirty();
+			undoManager.push(label,before);
+			selected=cfg.auras.length-1; selectedGroupId=""; creationHomeOpen=false; boundEditorAura=null; canvasEditor.canvasSel=-1;
+		} catch(e:Dynamic) { bank.layouts.set(layout,oldRows); transaction.rollback(); throw e; }
+	}
+	public function canvasShares():AuraShareService return shareService;
+	public function canvasInspectDesign(path:String):Void queueShareFile(path,false,true);
+	public function canvasImportDesign(path:String):Void queueShareFile(path,true,true);
+	public function canvasExportDesign(settingsOnly:Bool=false):Void {
+		var a=selectedAura(); var generation=FeatureProfiles.statusOwnerGen; var imageGeneration=CustomImages.generation; var owner=cfg.auras;
+		UiActionQueue.custom(function() {
+			var alive=function() return generation==FeatureProfiles.statusOwnerGen && (settingsOnly || imageGeneration==CustomImages.generation);
+			if(!alive() || cfg.auras!=owner || a==null || cfg.auras.indexOf(a)<0) return;
+			try {
+				var data=CanvasDesignPackage.capture(AuraEngine.toObjStrict(a));
+				if(settingsOnly) shareService.requestExportSettings(data,alive); else shareService.requestExport(data,alive);
+			} catch(e:Dynamic) {
+				shareService.rejectRequest(Std.string(e)); ToastManager.error("Design export failed: "+Std.string(e));
+			}
 		});
 	}
 
 	public function importFromClipboardQueued():Void {
 		try {
 			var clipBytes = ImGui.getClipboardText();
-			var clip = clipBytes != null ? ByteUtil.readString(clipBytes, JSON_BUF, true) : null;
+			var clip = AuraShareText.readClipboard(clipBytes);
 			if (clip == null || clip.length < 2) { ToastManager.error("Clipboard contains no valid share key or JSON."); return; }
-			ByteUtil.fillBuf(importBuf, JSON_BUF, clip);
-			applyImportBuffer();
-		} catch (e:Dynamic) { ToastManager.error("Import failed: " + e); }
+			if(haxe.io.Bytes.ofString(clip).length<JSON_BUF) ByteUtil.fillBuf(importBuf,JSON_BUF,clip);
+			else ByteUtil.clearBytes(importBuf,JSON_BUF);
+			importShareText(clip);
+		} catch (e:Dynamic) { var message="Import failed: "+Std.string(e); setIoStatus(message,true); ToastManager.error(message,8); }
 	}
-
-	function applyImportBuffer():Void { importJson(); }
 
 	public function exportPackQueued():Void {
 		if (cfg == null) return;
 		try {
-			var share = AuraPack.encode("shared", "export", "pack", cfg.auras, cfg.dumpGroups());
+			var data=AuraShareImport.capture(cfg,cfg.auras.copy(),"Aura library",true);
+			// Keep the legacy DRM payload while using strict, complete Aura/set/group definitions.
+			var legacy=AuraPack.toObj("shared","export","pack",cfg.auras,cfg.dumpGroups());
+			data.drm=legacy.drm; data.fight=legacy.fight; data.id=legacy.id;
+			var share = AuraShareText.encode(data);
 			ImGui.setClipboardText(share);
 			ToastManager.success(cfg.auras.length + " Auras copied as share key!");
-		} catch (e:Dynamic) { ToastManager.error("Export failed: " + e); }
+		} catch (e:Dynamic) { var message="Export failed: "+Std.string(e); setIoStatus(message,true); ToastManager.error(message,8); }
+	}
+	function queueCopySelected(a:AuraDef):Void {
+		var generation=FeatureProfiles.statusOwnerGen; var owner=cfg.auras;
+		UiActionQueue.custom(function() {
+			if(generation!=FeatureProfiles.statusOwnerGen || cfg.auras!=owner || cfg.auras.indexOf(a)<0) return;
+			try {
+				var data=a.region=="canvas" ? CanvasDesignPackage.capture(AuraEngine.toObjStrict(a)) : AuraShareImport.capture(cfg,[a],a.name);
+				var share=AuraShareText.encode(data);
+				ImGui.setClipboardText(share);
+				exportString=share.length>4096 ? share.substr(0,4096)+"\n... (preview shortened)" : share;
+				setIoStatus('Aura "${a.name}" copied to clipboard.',false); ToastManager.success("Aura share key copied!");
+			} catch(e:Dynamic) { var message="Export failed: "+Std.string(e); setIoStatus(message,true); ToastManager.error(message,8); }
+		});
 	}
 
 	// ----------------------------------------------------------------
@@ -1027,8 +1066,9 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 			});
 			return;
 		}
-		var gap:Single = 8;
-		var whenW:Single = (avail.x - gap) * 0.45;
+		var gap:Single = 12;
+		// Conditions own the working canvas; the preview/appearance rail stays readable.
+		var whenW:Single = (avail.x - gap) * 0.60;
 		var thenW:Single = avail.x - gap - whenW;
 		var paneH:Single = Math.max(1, avail.y - 4);
 		UiChrome.celChild("##ab_build_when", ImGui.vec2(whenW, paneH),
@@ -1039,13 +1079,13 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	}
 
 	function drawWhenColumn(a:AuraDef):Void {
-		drawSectionCard("WHEN", "Conditions that trigger this Aura", true, function() {
+		drawSectionCard("WHEN", "Conditions that trigger this Aura", false, function() {
 			a.ruleEditor.picker = conditionPicker;
 			AuraConditionEditor.draw(a, true, function() snapshot("Condition batch"), buildFocusBossId);
 			ImGui.spacing();
 			var issue = setupIssue(a);
 			if (issue.length > 0)
-				ImGui.textColored(ImGui.vec4(0.95, 0.72, 0.25, 1), "! " + issue);
+				ImGui.textColored(ThemePalette.status(ThemePalette.STATUS_WARN), "! " + issue);
 		});
 		if (ImGui.collapsingHeader("Preview controls##ab_preview_controls_fold")) {
 			advancedPreview.drawControls();
@@ -1126,6 +1166,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 	 */
 	function drawSectionCard(title:String, subtitle:String, primary:Bool, body:Void->Void):Void {
 		var theme = solarflare.ui.ThemePalette.current();
+		var conditionSection = title == "WHEN";
 		var vars = 0;
 		var colors = 0;
 		var failed = false;
@@ -1134,14 +1175,14 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 			ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, ImGui.vec2(8, 8)); vars++;
 			ImGui.pushStyleVar(ImGuiStyleVar.ChildBorderSize, 1); vars++;
 			ImGui.pushStyleVar(ImGuiStyleVar.ChildRounding, 4); vars++;
-			ImGui.pushStyleColor(ImGuiCol.Border, primary ? theme.accent : theme.border); colors++;
+			ImGui.pushStyleColor(ImGuiCol.Border, conditionSection ? ThemePalette.status(ThemePalette.STATUS_SUCCESS) : primary ? theme.accent : theme.border); colors++;
 			ImGui.pushStyleColor(ImGuiCol.ChildBg, theme.cellBg); colors++;
 			UiScope.child("##ab_card_" + title, ImGui.vec2(0, 0), function() {
 				var p = ImGui.getCursorScreenPos();
 				var w = ImGui.getContentRegionAvail().x;
 				var dl = ImGui.getWindowDrawList();
 				var bandH:Single = 24;
-				var mix:Single = primary ? 0.24 : 0.12;
+				var mix:Single = conditionSection ? 0 : primary ? 0.24 : 0.12;
 				var bg = ImGui.vec4(
 					theme.cellBg.x * (1 - mix) + theme.accent.x * mix,
 					theme.cellBg.y * (1 - mix) + theme.accent.y * mix,
@@ -3374,17 +3415,15 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 
 	function drawShare(a:AuraDef):Void {
 		if (ImGui.collapsingHeader("Share or Back Up##ab_export_sec", imgui.Enums.ImGuiTreeNodeFlags.DefaultOpen)) {
-			ImGui.textWrapped("Clipboard keys contain settings only. Export with images below includes the custom PNG files.");
+			ImGui.textWrapped("Clipboard keys contain settings only. Use Export with images above for a ZIP, or Export settings (.json) for a settings file.");
 			if (UiChrome.ghostButton("Copy Selected to Clipboard##ab_copy_sel", ImGui.vec2(190, 26))) {
-				exportString = ShareCodec.wrapJson(Json.stringify(AuraEngine.toObj(a)));
-				fillBuf(exportBuf, JSON_BUF, exportString);
-				UiActionQueue.copyText(exportString, 'Aura "${a.name}" share key copied!');
+				queueCopySelected(a);
 				setIoStatus('Aura "${a.name}" queued for clipboard copy.', false);
 			}
 			ImGui.sameLine();
 			if (UiChrome.ghostButton("Copy Entire Library##ab_copy_all", ImGui.vec2(160, 26))) { UiActionQueue.enqueue(UiActionKind.ExportAuraPack); setIoStatus("Aura pack export queued.", false); }
 			if (exportString.length > 0) {
-				ImGui.textDisabled("Share key preview (canonical string unchanged - use Copy):");
+				ImGui.textDisabled("Share key preview (shortened for large keys; Copy uses the full key):");
 				ImGui.beginChild("##ab_export_preview", ImGui.vec2(-1, 80), ImGuiChildFlags.Borders);
 				ImGui.textWrapped(exportString);
 				ImGui.endChild();
@@ -3401,21 +3440,29 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 
 	function importJson():Void {
 		var raw = StringTools.trim(readBytes(importBuf, JSON_BUF));
+		var generation=FeatureProfiles.statusOwnerGen; var owner=cfg.auras;
+		UiActionQueue.custom(function() { if(generation==FeatureProfiles.statusOwnerGen && cfg.auras==owner) importShareText(raw); });
+	}
+	function importShareText(raw:String):Void {
 		if (raw.length < 2) { setIoStatus("Paste Aura share key or JSON before importing.", true); ToastManager.error("Paste Aura share key or JSON before importing."); return; }
 		try {
-			var json = ShareCodec.unwrapToJson(raw);
-			if (json == null) { setIoStatus("Import failed: invalid share key or JSON.", true); ToastManager.error("Import failed: invalid share key or JSON."); return; }
+			var json = AuraShareText.decode(raw);
+			var data=AuraSharePackage.json(haxe.io.Bytes.ofString(json));
+			if(data!=null && data.kind==AuraPack.KIND && Std.isOfType(data.groups,Array) && Std.isOfType(data.sets,Array)) {
+				commitSharedPack(data,"Import clipboard settings");
+				setIoStatus("Aura settings imported successfully.",false); ToastManager.success("Aura settings imported!"); return;
+			}
 			var imported = importAurasFromJson(json);
 			var added = 0; snapshot("Import JSON");
 			for (item in imported) { if (item == null || cfg.auras.length >= AuraEngine.MAX) break; item.id = uniqueAuraId(item.id); cfg.auras.push(item); added++; } cfg.ensureSets();
 			cfg.addImportedGroups(pendingImportGroups); pendingImportGroups = null; cfg.ensureGroups();
 			if (added == 0) { setIoStatus(cfg.auras.length >= AuraEngine.MAX ? "The Aura library is full." : "No valid Aura objects were found.", true); ToastManager.error("No valid Aura objects found."); }
 			else { selected = cfg.auras.length - 1; creationHomeOpen = false; deleteArmed = -1; SettingsStore.markDirty(); var msg = added + " Aura(s) imported successfully!"; setIoStatus(msg, false); ToastManager.success(msg); }
-		} catch (_:Dynamic) { setIoStatus("Import failed: invalid Aura share key or JSON.", true); ToastManager.error("Import failed: invalid Aura share key or JSON."); }
+		} catch (e:Dynamic) { var message="Import failed: "+Std.string(e); setIoStatus(message,true); ToastManager.error(message,8); }
 	}
 
 	function importAurasFromJson(json:String):Array<AuraDef> {
-		var d:Dynamic = Json.parse(json);
+		var d:Dynamic = AuraSharePackage.json(haxe.io.Bytes.ofString(json));
 		if (d == null) return [];
 		var isPack = Std.isOfType(d, Array) || (d.auras != null) || (d.kind != null && Std.string(d.kind) == AuraPack.KIND);
 		if (isPack) {
@@ -3426,7 +3473,7 @@ class AuraBuilder implements solarflare.aura.ui.BossModsHost implements solarfla
 		pendingImportGroups = null;
 		if (isPack && !Std.isOfType(d, Array) && d.groups != null && d.auras != null)
 			pendingImportGroups = AuraGroupDef.remapImport(d.groups, cast d.auras, function(id) return cfg.findGroup(id) != null);
-		if (!isPack && d.id != null) { JsonSchema.parseAuraImport(json); var a = AuraConfig.fromDyn(d); return a != null ? [a] : []; }
+		if (!isPack && d.id != null) { if(JsonSchema.parseAuraImport(json)==null) throw "Invalid Aura definition."; var a = AuraConfig.fromDyn(d); return a != null ? [a] : []; }
 		return AuraPack.unpackAuras(d);
 	}
 

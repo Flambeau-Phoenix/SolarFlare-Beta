@@ -29,7 +29,6 @@ class AuraSignalFrame {
 	public var dashRecharge:Float=Math.NaN;
 	public var dashRechargeTotal:Float=Math.NaN;
 	public var dashRechargeProgress:Float=0;
-	public var targetDistance:Float=Math.NaN;
 	public var damageTakenAge:Float=1e9;
 	public var damageAgeKnown:Bool=false;
 	public var critAge:Float=1e9;

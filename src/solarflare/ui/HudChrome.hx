@@ -51,10 +51,12 @@ class HudChrome {
  public var referenceHeight:Float=0;
  /** Missing legacy extents clear the old owner's reference instead of inheriting it. */
  public function restoreReference(data:Dynamic):Void {
-  var w:Dynamic=data==null ? null : Reflect.field(data,"referenceWidth");
-  var h:Dynamic=data==null ? null : Reflect.field(data,"referenceHeight");
-  referenceWidth=HudLayoutModel.finite(w) && w>=320 && w<=32768 ? w : 0;
-  referenceHeight=HudLayoutModel.finite(h) && h>=240 && h<=32768 ? h : 0;
+  var rawW:Dynamic=data==null ? null : Reflect.field(data,"referenceWidth");
+  var rawH:Dynamic=data==null ? null : Reflect.field(data,"referenceHeight");
+  var w:Float=HudLayoutModel.finite(rawW) ? rawW : 0;
+  var h:Float=HudLayoutModel.finite(rawH) ? rawH : 0;
+  referenceWidth=w>=320 && w<=32768 ? w : 0;
+  referenceHeight=h>=240 && h<=32768 ? h : 0;
   posDirty=true;
  }
  public var screenX(default,null):Single=40;

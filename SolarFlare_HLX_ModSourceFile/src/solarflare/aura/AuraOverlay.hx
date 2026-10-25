@@ -264,6 +264,7 @@ class AuraOverlay {
 
 	function hudResize(newW:Single, newH:Single):Void {
 		var a = hudAura;
+		if(!Math.isFinite(newW) || !Math.isFinite(newH)) return;
 		if (a.region == "canvas") {
 			// A canvas keeps its layout and grows as a whole: dragging the window changes the Scale, not the design size.
 			a.scale.set(AuraCanvasScale.fromResize(a.displayScale(), newW, newH, a.w.get(), a.h.get()));
@@ -271,8 +272,8 @@ class AuraOverlay {
 			return;
 		}
 		var sc:Single = a.displayScale();
-		a.w.set(Math.max(24, newW) / sc);
-		a.h.set(Math.max(24, newH) / sc);
+		a.w.set(Math.min(10000, Math.max(24, newW) / sc));
+		a.h.set(Math.min(10000, Math.max(24, newH) / sc));
 		SettingsStore.markDirty();
 	}
 }

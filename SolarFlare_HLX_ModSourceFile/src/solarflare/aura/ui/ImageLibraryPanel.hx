@@ -71,9 +71,9 @@ class ImageLibraryPanel {
 			if (messageError) ImGui.textColored(ThemePalette.status(ThemePalette.STATUS_DANGER), message);
 			else ImGui.textWrapped(message);
 		}
-		if (CustomImages.folderError) ImGui.textColored(ThemePalette.status(ThemePalette.STATUS_WARN), CustomImages.status);
-		else ImGui.textDisabled(CustomImages.status);
+		ImGui.textWrapped(CustomImages.status);
 		if (ImageDrop.lastDrop.length > 0) ImGui.textDisabled(ImageDrop.lastDrop);
+		ImGui.textWrapped("Raster sources: up to 16 MiB; larger dimensions are fitted to 1024 px. " + GameIcons.customImageMemory() + ". SVG paths use vector limits.");
 		ImGui.textDisabled(ImageDrop.available() ? "Drop " + ImageConvert.EXTENSIONS.join(", ").toUpperCase() + " files onto the game window to import." : ImageDrop.support);
 	}
 
@@ -126,11 +126,12 @@ class ImageLibraryPanel {
 					// Only rows on screen are laid out, so long folders stay cheap.
 					if (!ImGui.isRectVisible(ImGui.vec2(ImGui.getContentRegionAvail().x, ROW_H))) { ImGui.dummy(ImGui.vec2(1, ROW_H)); continue; }
 					var key = CustomImages.key(stem);
+					var usable=CustomImages.stateOf(stem)=="ready";
 					if (!GameIcons.imageKey(key, 28, 28)) ImGui.dummy(ImGui.vec2(28, 28));
 					ImGui.sameLine(0, 8);
 					if (ImGui.selectable(stem + "##" + id + "_row_" + stem, stem == selected, 0, ImGui.vec2(0, 28))) { selected = stem; armDelete = ""; syncRename(); }
-					if (ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(0)) { onPick(stem); syncRename(); }
-					if (ImGui.beginDragDropSource(0)) {
+					if (usable && ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(0)) { onPick(stem); syncRename(); }
+					if (usable && ImGui.beginDragDropSource(0)) {
 						var payload = haxe.io.Bytes.ofString(stem);
 						ImGui.setDragDropPayload(PAYLOAD_IMAGE, payload.getData(), payload.length + 1);
 						GameIcons.imageKey(key, 40, 40);
@@ -163,7 +164,7 @@ class ImageLibraryPanel {
 		var iw = GameIcons.texW(key), ih = GameIcons.texH(key);
 		if (iw <= 0 || ih <= 0) {
 			var state = CustomImages.stateOf(selected);
-			var note = state == "conforming" ? "Optimizing this image..." : (state == "ready" || state == "" ? "Loading..." : "Could not use this image: " + state);
+			var note = state == "conforming" ? "Optimizing this image..." : (state == "ready" || state == "" ? "Loading..." : "Image blocked - see the reason below.");
 			ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(p.x + 10, p.y + 10), ImGui.colorConvertFloat4ToU32(ImGui.vec4(0.55, 0.6, 0.7, 1)), note);
 			return;
 		}
@@ -188,7 +189,7 @@ class ImageLibraryPanel {
 				say(parts.length > 0 ? parts.join("  ") : "Nothing needed converting.", report.imported.length == 0 && report.errors.length > 0);
 			});
 		}
-		if (ImGui.isItemHovered()) ImGui.setTooltip("Makes a PNG copy (1024 px, under 4 MB) of each. Your original files are left untouched.");
+		if (ImGui.isItemHovered()) ImGui.setTooltip("Converts raster sources up to 16 MiB into PNG copies (1024 px). The decoded-pixel limit still applies. Originals are kept.");
 	}
 
 	function wrappedNote(text:String):Void {
@@ -220,7 +221,11 @@ class ImageLibraryPanel {
 		var managed = solarflare.ui.CustomImageKey.isManagedStem(selected);
 		var used = usedCount;
 		ImGui.textDisabled("Selected: " + selected + "  -  used " + used + " time" + (used == 1 ? "" : "s"));
+		var state=CustomImages.stateOf(selected); var usable=state=="ready";
+		if(!usable) ImGui.textWrapped(state=="conforming" ? "Wait for image optimization to finish." : "Image blocked: "+state);
+		ImGui.beginDisabled(!usable);
 		if (UiChrome.ghostButton(pickLabel + "##" + id + "_use", ImGui.vec2(ImGui.getContentRegionAvail().x * 0.34, 26))) { onPick(selected); syncRename(); }
+		ImGui.endDisabled();
 		if (managed) return;
 		ImGui.setNextItemWidth(Math.max(60, ImGui.getContentRegionAvail().x - 160));
 		var enter = ImGui.inputText("##" + id + "_rename", renameBuf, NAME_BUF, imgui.Enums.ImGuiInputTextFlags.EnterReturnsTrue);

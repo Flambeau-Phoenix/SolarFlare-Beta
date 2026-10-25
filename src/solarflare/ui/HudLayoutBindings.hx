@@ -68,7 +68,16 @@ class HudLayoutBindings {
   }
   return out;
  }
- public static function capture(c:ConfigPanel):Array<HudLayoutRow> return [for(b in build(c)) b.capture()];
+ public static function capture(c:ConfigPanel,previous:Array<HudLayoutRow>=null,defaults:Array<HudLayoutRow>=null,report:String->Void=null):Array<HudLayoutRow> {
+  var saved=new Map<String,HudLayoutRow>(); var initial=new Map<String,HudLayoutRow>();
+  if(previous!=null) for(row in previous) saved.set(row.id,row);
+  if(defaults!=null) for(row in defaults) initial.set(row.id,row);
+  return [for(b in build(c)) {
+   var row=b.capture(saved.get(b.id),initial.get(b.id));
+   if(report!=null && b.captureWarning.length>0) report(b.captureWarning);
+   row;
+  }];
+ }
  public static function apply(c:ConfigPanel,rows:Array<HudLayoutRow>):Int {
   return HudLayoutBinding.applyRows(build(c),rows);
  }

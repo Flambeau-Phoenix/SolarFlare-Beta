@@ -111,7 +111,6 @@ class AuraSignalCatalog {
 		add("combat.damageTakenAge", "Time since taking damage (seconds)", "Combat", Duration);
 		add("event.combat.critical", "My critical hit (seconds ago)", "Combat", Duration);
 		add("event.combat.block", "My block (seconds ago)", "Combat", Duration);
-		add("target.distance", "Target distance (game units)", "Target", Number);
 		add("custom.script", "Custom Haxe Expression", "Scripting", Boolean, "script");
 	}
 	static function add(id:String, label:String, group:String, kind:AuraValueKind, subjectKind:String = ""):Void {

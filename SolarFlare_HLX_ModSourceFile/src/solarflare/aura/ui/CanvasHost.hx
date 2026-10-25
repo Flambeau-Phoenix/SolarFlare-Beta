@@ -22,4 +22,8 @@ interface CanvasHost {
 	/** Snapshot callback handed to typed fields. */
 	function canvasPrecise():Void;
 	function canvasHostOpen():Bool;
+	function canvasShares():solarflare.aura.AuraShareService;
+	function canvasExportDesign(settingsOnly:Bool=false):Void;
+	function canvasInspectDesign(path:String):Void;
+	function canvasImportDesign(path:String):Void;
 }

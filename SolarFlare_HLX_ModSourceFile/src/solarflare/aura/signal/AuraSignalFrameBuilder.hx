@@ -143,7 +143,6 @@ class AuraSignalFrameBuilder {
 	}
 
 	static function fillTarget(frame:AuraSignalFrame):Void {
-		frame.targetDistance=CombatLogCache.targetDistance;
 		var snap = CombatLogCache.currentTargetSnap();
 		frame.targetKnown = true;
 		frame.targetValid = snap != null && snap.valid;

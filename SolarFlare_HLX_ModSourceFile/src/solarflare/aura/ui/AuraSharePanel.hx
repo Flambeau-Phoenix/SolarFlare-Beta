@@ -16,17 +16,17 @@ class AuraSharePanel {
  var pathBuffer=new hl.Bytes(1024);
  var requestedRefresh=false;
  var service:AuraShareService;
- var exportAction:String->Void;
+ var exportAction:String->Bool->Void;
  var inspectAction:String->Void;
  var importAction:String->Void;
  static function label(value:String):String return value;
- public function new(service:AuraShareService,exportAction:String->Void,inspectAction:String->Void,importAction:String->Void) {
+ public function new(service:AuraShareService,exportAction:String->Bool->Void,inspectAction:String->Void,importAction:String->Void) {
   this.service=service; this.exportAction=exportAction; this.inspectAction=inspectAction; this.importAction=importAction;
  }
  public function draw(hasAura:Bool,hasSelection:Bool,hasGroup:Bool,hasSet:Bool):Void {
   if(!requestedRefresh) { service.requestRefresh(); requestedRefresh=true; }
-  UiChrome.sectionHeader("Share files with images");
-  ImGui.textWrapped("One ZIP carries the Aura artwork and settings. Import it directly without extracting images.");
+  UiChrome.sectionHeader("Share or back up settings");
+  ImGui.textWrapped("ZIP bundles artwork and settings. JSON saves settings and image references only, even when artwork is missing or blocked.");
   ImGui.beginDisabled(service.busy);
   UiLayout.propertyGrid("##aura_share_export",function() {
    UiLayout.propertyRow("Export",function() {
@@ -36,19 +36,21 @@ class AuraSharePanel {
   });
   var available=switch(scope) { case "Aura": hasAura; case "Selection": hasSelection; case "Group": hasGroup; case "Set": hasSet; default: true; };
   ImGui.beginDisabled(!available);
-  if(UiChrome.ghostButton("Export with images##aura_share_export")) exportAction(scope);
+  if(UiChrome.ghostButton("Export with images##aura_share_export")) exportAction(scope,false);
+  ImGui.sameLine();
+  if(UiChrome.ghostButton("Export settings (.json)##aura_share_settings")) exportAction(scope,true);
   ImGui.endDisabled();
   ImGui.sameLine();
   if(UiChrome.ghostButton("Refresh files##aura_share_refresh")) service.requestRefresh();
   UiLayout.propertyGrid("##aura_share_import",function() {
-   UiLayout.propertyRow("Share ZIP",function() {
+   UiLayout.propertyRow("Share file",function() {
     var chosen=UiLayout.stringCombo("##aura_share_file",file,service.files,label);
     if(chosen!=null) {
      file=chosen; path=haxe.io.Path.join([service.folder,chosen]); ByteUtil.fillBuf(pathBuffer,1024,path); inspectAction(path);
     }
    });
    UiLayout.propertyRow("Or file path",function() {
-    if(ImGui.inputTextWithHint("##aura_share_path","Paste a ZIP path from Downloads...",pathBuffer,1024)) { path=ByteUtil.readBytes(pathBuffer,1024); service.choose(path); }
+    if(ImGui.inputTextWithHint("##aura_share_path","Paste a ZIP or JSON path...",pathBuffer,1024)) { path=ByteUtil.readBytes(pathBuffer,1024); service.choose(path); }
    });
   });
   ImGui.beginDisabled(StringTools.trim(path).length==0);
@@ -67,7 +69,7 @@ class AuraSharePanel {
   ImGui.textDisabled("Share folder: "+service.folder);
   if(UiChrome.ghostButton("Copy folder path##aura_share_folder")) UiActionQueue.copyText(service.folder);
   if(service.lastExport.length>0) {
-   ImGui.sameLine();
+   ImGui.textWrapped("Saved file: "+service.lastExport);
    if(UiChrome.ghostButton("Copy exported file path##aura_share_export_path")) UiActionQueue.copyText(service.lastExport);
   }
  }

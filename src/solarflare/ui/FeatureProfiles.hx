@@ -33,7 +33,7 @@ class FeatureProfiles {
  public static function init(cfg:ConfigPanel):Void {
   ensureBuffer(); captureFactory(cfg); if(bank==null) bank=new ProfileBank(factory);
  }
- public static function load(cfg:ConfigPanel,data:Dynamic):Void {
+ public static function load(cfg:ConfigPanel,data:Dynamic,upgradeThemeDefault:Bool=false):Void {
   init(cfg); bank=new ProfileBank(factory); owner=""; transition=new ProfileTransition(transition.generation+1);
   var universal=Reflect.field(data,"universalProfiles");
   // Retain domain banks without mixing them with the outgoing/live configuration.
@@ -49,6 +49,7 @@ class FeatureProfiles {
   var saved=captureAll(cfg);
   // Pure migration shares the same policy used by the preservation replay tests.
   bank.load(universal,saved,Reflect.field(data,"extraBarsCharacters"),data,HudChrome.viewportWidth,HudChrome.viewportHeight);
+  if(upgradeThemeDefault) ProfileMigration.upgradeBankThemes(bank);
   activeProfile=bank.active;
  }
  public static function summary():String {
@@ -206,6 +207,10 @@ class FeatureProfiles {
    if(transition.resumed) {
     HUDWidgetWindow.invalidateGeometry(); cfg.uiLayouts.requestReconcile();
     ProfileTrace.note("profile","RESUME hero="+id+" -> "+describe(activeProfile)+" (live profile/layout retained)");
+    if(transition.captureWarning.length>0) {
+     ProfileTrace.note("profile","Capture retry needed after same-owner resume: "+transition.captureWarning);
+     SettingsStore.markDirty();
+    }
    }
    return;
   }
@@ -235,6 +240,8 @@ class FeatureProfiles {
 
 	static function captureAll(cfg:ConfigPanel):Dynamic {
 		if (cfg == null) return {};
+		// Repair live geometry before any module copies it into the profile snapshot.
+		var layouts=cfg.uiLayouts.dumpCurrent(cfg);
 		return {
 			geaux: {layout: SettingsStore.geauxDump(cfg.geaux)},
 			barter: cfg.barter != null ? cfg.barter.dump() : {},
@@ -242,7 +249,7 @@ class FeatureProfiles {
 			stacks: cfg.stacks != null ? cfg.stacks.dump() : {},
 			auras: {config: SettingsStore.aurasDump(cfg.auras)},
 			resources: captureResources(cfg),
-			uiLayouts: cfg.uiLayouts.dumpCurrent(cfg),
+			uiLayouts: layouts,
 			theme: SettingsStore.currentTheme(),
    extraBars:cfg.extraBarsPrototype.model.dump(),extraBarsPlacement:cfg.extraBarsPrototype.dumpPlacement(),
    auxiliary:SettingsStore.captureProfileAuxiliary(cfg)
@@ -293,7 +300,7 @@ class FeatureProfiles {
 			SettingsStore.applyGeauxProfile(cfg.geaux, Reflect.field(geauxSnap, "layout"));
 		}
 
-		// 1b. BarTer (bars + chrome positions â€” per profile)
+		// 1b. BarTer (bars + chrome positions — per profile)
 		var barterSnap = Reflect.field(snap, "barter");
 		if (barterSnap != null && cfg.barter != null)
 			cfg.barter.apply(barterSnap);

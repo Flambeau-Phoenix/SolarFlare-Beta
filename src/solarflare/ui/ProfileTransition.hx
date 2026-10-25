@@ -6,6 +6,7 @@ class ProfileTransition {
  public var ready(default,null):Bool=false;
  public var generation(default,null):Int=0;
  public var resumed(default,null):Bool=false;
+ public var captureWarning(default,null):String="";
  var appliedOwner:String="";
  var identityGeneration:Int=-1;
  var pendingOutgoing:String="";
@@ -13,12 +14,21 @@ class ProfileTransition {
  /** Returns true only when a confirmed destination needs restoration. Outgoing capture always runs first. */
  public function begin(id:String,confirmed:Bool,identity:Int,save:String->Void,cancel:Void->Void):Bool {
   resumed=false;
+  captureWarning="";
   confirmed=confirmed && ProfileBank.heroId(id)!="";
   if(confirmed && ready && owner==id && identityGeneration==identity) return false;
   if(ready) { ready=false; generation++; pendingOutgoing=owner; }
   if(pendingOutgoing!="") {
-   // Fail closed. A failed capture retries before any destination can replace the live configuration.
-   try { save(pendingOutgoing); pendingOutgoing=""; } catch(e:Dynamic) { cancel(); throw e; }
+   // A different character must never replace configuration that could not be captured.
+   try { save(pendingOutgoing); pendingOutgoing=""; } catch(e:Dynamic) {
+    cancel();
+    // The same character can keep its live state; saving is retried independently.
+    if(confirmed && appliedOwner==id && pendingOutgoing==id) {
+     pendingOutgoing=""; owner=id; identityGeneration=identity; generation++;
+     captureWarning=Std.string(e); ready=true; resumed=true; return false;
+    }
+    throw e;
+   }
    cancel();
   }
   if(!confirmed) return false;

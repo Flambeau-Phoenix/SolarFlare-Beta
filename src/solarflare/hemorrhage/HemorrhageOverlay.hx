@@ -62,7 +62,7 @@ class HemorrhageOverlay {
      var art=solarflare.resourcetracker.ResourceArtwork.active;
      var skin=art!=null ? art.get("hemorrhage") : null;
      if(skin!=null) skin.paint(start.x,start.y,available.x,available.y,skin.progress,false);
-     ImGui.setCursorScreenPos(start);
+     // ResourceSkin.paint is draw-list-only: it does not move the layout cursor.
      if(skin==null || skin.keepContent.get() || !skin.ready()) {
      ImGui.textUnformatted(HemorrhageService.hudStatus);
      ImGui.sameLine(); ImGui.textDisabled(HemorrhageService.hudElapsed);
@@ -71,7 +71,7 @@ class HemorrhageOverlay {
      ImGui.textUnformatted(HemorrhageService.hudShare);
      if(cfg.floatingText.get()) drawFloating();
      } else ImGui.dummy(available);
-     if(skin!=null) { var end=ImGui.getCursorScreenPos(); skin.paint(start.x,start.y,available.x,available.y,skin.progress,true); ImGui.setCursorScreenPos(end); }
+     if(skin!=null) skin.paint(start.x,start.y,available.x,available.y,skin.progress,true);
      chrome.contentLeadX=start.x-parentPos.x; chrome.contentLeadY=start.y-parentPos.y;
      chrome.contentWidth=available.x; chrome.contentHeight=available.y;
     }

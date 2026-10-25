@@ -16,7 +16,7 @@ class ImageConvert {
 	/** Extensions the importer accepts, lower-case without the dot. */
 	public static var EXTENSIONS:Array<String> = ["png", "jpg", "gif", "bmp", "tga"];
 	/** Hard ceiling on decoded pixels, checked before any scaling buffer is allocated. */
-	public static inline var MAX_PIXELS:Int = 64 * 1024 * 1024 >> 2;
+	public static inline var MAX_PIXELS:Int = RasterImagePolicy.MAX_SOURCE_PIXELS;
 
 	/** JPEG decoder installed at runtime by JpegBridge (the game's own decoder); unset in tests and headless builds. */
 	public static var jpegDecoder:Bytes->BgraImage = null;
@@ -65,6 +65,20 @@ class ImageConvert {
 	}
 
 	public static function decode(b:Bytes, ext:String):BgraImage {
+		RasterImagePolicy.fileSize(b.length);
+		// Check header dimensions before any reader or native decoder can allocate pixel buffers.
+		switch(sniff(b,ext)) {
+			case "png":
+				guardPng(b);
+			case "gif": if(b.length<10) throw "Truncated GIF header."; else guard(b.getUInt16(6),b.getUInt16(8));
+			case "bmp":
+				if(b.length<26) throw "Truncated BMP header.";
+				if(b.getInt32(14)==12) guard(b.getUInt16(18),b.getUInt16(20));
+				else guard(b.getInt32(18),Std.int(Math.abs(b.getInt32(22))));
+			case "tga": if(b.length<18) throw "Truncated TGA header."; else guard(b.getUInt16(12),b.getUInt16(14));
+			case "jpg": var size=jpegSize(b); if(size==null) throw "Not a readable JPEG header."; else guard(size.w,size.h);
+			default:
+		}
 		switch (sniff(b, ext)) {
 			case "png":
 				if (pngDecoder != null && pngNeedsNative(b)) {
@@ -110,7 +124,29 @@ class ImageConvert {
 	}
 
 	static function guard(w:Int, h:Int):Void {
-		if (w <= 0 || h <= 0 || w > 16384 || h > 16384 || w * h > MAX_PIXELS) throw "Image dimensions are out of range (" + w + "x" + h + ").";
+		RasterImagePolicy.dimensions(w,h);
+	}
+	static inline function big32(b:Bytes,p:Int):Int return (b.get(p)<<24)|(b.get(p+1)<<16)|(b.get(p+2)<<8)|b.get(p+3);
+	/** Bound zlib expansion before either PNG decoder sees an untrusted stream. */
+	public static function guardPng(b:Bytes):Void {
+		RasterImagePolicy.fileSize(b.length);
+		if(b.length<33 || b.sub(0,8).toHex()!="89504e470d0a1a0a" || b.getString(12,4)!="IHDR" || big32(b,8)!=13) throw "Not a readable PNG header.";
+		var w=big32(b,16), h=big32(b,20); guard(w,h);
+		var compressed=new BytesOutput(); var p=8; var ended=false;
+		while(p<=b.length-12) {
+			var n=big32(b,p), kind=b.getString(p+4,4);
+			if(n<0 || n>b.length-p-12) throw "Truncated PNG chunk.";
+			if(kind=="IDAT") compressed.write(b.sub(p+8,n));
+			p+=n+12;
+			if(kind=="IEND") { ended=true; break; }
+		}
+		if(!ended || compressed.length==0) throw "Incomplete PNG image.";
+		var input=compressed.getBytes(), output=Bytes.alloc(w*h*8+h*7+1024), z=new haxe.zip.Uncompress(15);
+		try {
+			var result=z.execute(input,0,output,0);
+			if(!result.done || result.read!=input.length) throw "PNG data exceeds its image bounds.";
+		} catch(error:Dynamic) { z.close(); throw error; }
+		z.close();
 	}
 
 	/** Box-filter downscale so the longest side is at most `maxDim`; returns the input when it already fits. */
@@ -153,7 +189,7 @@ class ImageConvert {
 	public static function toPng(b:Bytes, ext:String, maxDim:Int):Bytes {
 		var kind = sniff(b, ext);
 		var img = decode(b, ext);
-		if (kind == "png" && img.w <= maxDim && img.h <= maxDim) return b;
+		if (kind == "png" && !pngNeedsNative(b) && img.w <= maxDim && img.h <= maxDim) return b;
 		return encodePng(fit(img, maxDim));
 	}
 }

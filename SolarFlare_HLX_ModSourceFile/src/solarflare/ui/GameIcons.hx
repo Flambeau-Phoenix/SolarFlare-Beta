@@ -76,6 +76,10 @@ class GameIcons {
 	static var contours = new Map<String, Array<Array<Float>>>();
 	static var dimW = new Map<String, Int>();
 	static var dimH = new Map<String, Int>();
+	static var customBudget=new RasterImagePolicy();
+	static var customErrors=new Map<String,String>();
+	public static function customImageError(id:String):String { var message=id==null ? null : customErrors.get(id.toLowerCase()); return message==null ? "" : message; }
+	public static function customImageMemory():String return "Custom image memory: "+Std.int(customBudget.used/1048576)+" / 64 MB this session";
 
 	public static var lastRequestedKey:String = null;
 	public static var lastFailedKey:String = null;
@@ -347,6 +351,10 @@ class GameIcons {
 		if (tex == 0) {
 			lastFailedKey = id;
 			failed.set(id, true);
+			if (StringTools.startsWith(id, CustomImageKey.PREFIX)) {
+				if (customImageError(id).length == 0) customErrors.set(id.toLowerCase(), "The image could not be loaded as a texture.");
+				CustomImages.rejectLoaded(CustomImageKey.stemOf(id));
+			}
 			requested.remove(id);
 			return 0;
 		}
@@ -453,6 +461,7 @@ class GameIcons {
 	public static function invalidateCustomImage(id:String, changed:Bool = true):Void {
 		if (id == null || !StringTools.startsWith(id, CustomImageKey.PREFIX)) return;
 		failed.remove(id); requested.remove(id);
+		customErrors.remove(id.toLowerCase());
 		if (changed) { cache.remove(id); dimW.remove(id); dimH.remove(id); contours.remove(id); }
 	}
 	/** One pass over retained custom keys also handles old/share keys with different filename casing. */
@@ -670,10 +679,15 @@ class GameIcons {
 		try {
 			if (path == null || !FileSystem.exists(path))
 				return 0;
-			if (maxDim > 0 && FileSystem.stat(path).size > CustomImages.MAX_BYTES) return 0;
+			if (maxDim > 0) RasterImagePolicy.fileSize(FileSystem.stat(path).size);
 			var fileBytes = File.getBytes(path);
 			if (fileBytes == null || fileBytes.length == 0)
 				return 0;
+			var content="";
+			if(maxDim>0) {
+				ImageConvert.guardPng(fileBytes);
+				content=haxe.crypto.Sha256.make(fileBytes).toHex();
+			}
 			var data = new Reader(new BytesInput(iconPng(fileBytes))).read();
 			if (data == null)
 				return 0;
@@ -681,7 +695,8 @@ class GameIcons {
 			if (header == null || header.width <= 0 || header.height <= 0)
 				return 0;
 			if (maxDim > 0 && (header.width > maxDim || header.height > maxDim))
-				return 0;
+				throw "Custom PNG must fit within "+maxDim+" pixels per side.";
+			if(maxDim>0) customBudget.checkTexture(content,header.width,header.height);
 			var bgra = Tools.extract32(data);
 			if (bgra == null || bgra.length < header.width * header.height * 4)
 				return 0;
@@ -703,8 +718,11 @@ class GameIcons {
 			var pitch = header.width * 4;
 			dimW.set(id, header.width);
 			dimH.set(id, header.height);
-			return ImGui.registerTexture(rgba.getData(), header.width, header.height, pitch);
-		} catch (_:Dynamic) {
+			var texture=ImGui.registerTexture(rgba.getData(), header.width, header.height, pitch);
+			if(maxDim>0 && texture!=(0:TextureHandle)) { customBudget.registeredTexture(content,header.width,header.height); customErrors.remove(id.toLowerCase()); }
+			return texture;
+		} catch (error:Dynamic) {
+			if(maxDim>0) customErrors.set(id.toLowerCase(),Std.string(error));
 			return 0;
 		}
 		#end

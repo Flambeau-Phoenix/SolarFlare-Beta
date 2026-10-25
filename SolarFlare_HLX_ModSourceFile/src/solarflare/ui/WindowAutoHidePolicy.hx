@@ -17,7 +17,10 @@ class WindowAutoHidePolicy {
 	public static inline var MAP:Int = 64;
 	public static inline var ESC_MENU:Int = 128;
 	public static inline var CODEX:Int = 256;
-	public static inline var ALL:Int = 511;
+	public static inline var COLLECTION:Int = 512;
+	/** Compatibility alias; the category now covers every collection page. */
+	public static inline var MOUNT_GLIDER:Int = COLLECTION;
+	public static inline var ALL:Int = 1023;
 	/** The narrower travel/portal subset of MapWindow, independent of the general Map category. */
 	public static inline var TRAVEL_MAP:Int = TRAVEL;
 
@@ -27,6 +30,8 @@ class WindowAutoHidePolicy {
 	 */
 	public static function kindOfType(typeName:String):Int {
 		return switch (typeName) {
+			case "ui.win.CollectionUI": COLLECTION;
+			case "ui.win.InfusionUI": CRAFT_UPGRADE;
 			case "ui.win.InventoryUI" | "ui.win.InventoryWindow": INVENTORY;
 			case "ui.win.BankWindow" | "ui.win.ShopUI": BANK_VENDOR;
 			case "ui.win.CraftUI" | "ui.win.GearUpgrade" | "ui.win.WeaponSkills": CRAFT_UPGRADE;
@@ -53,6 +58,7 @@ class WindowAutoHidePolicy {
 		if ((mask & MAP) != 0) return "Map open";
 		if ((mask & ESC_MENU) != 0) return "ESC Menu open";
 		if ((mask & CODEX) != 0) return "Codex open";
+		if ((mask & COLLECTION) != 0) return "Collection open";
 		return "No selected game window is open";
 	}
 	public static inline function suppress(manual:Bool, automatic:Bool):Bool return manual || automatic;

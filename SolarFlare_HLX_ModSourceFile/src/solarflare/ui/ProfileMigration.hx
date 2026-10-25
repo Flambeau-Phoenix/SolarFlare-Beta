@@ -6,6 +6,28 @@ package solarflare.ui;
  */
 class ProfileMigration {
 	public static inline var VERSION:Int = 19;
+	/** Only an absent theme uses the current factory default; saved choices are authoritative. */
+	public static inline var DEFAULT_THEME:String = "high_contrast";
+	public static function themeOrDefault(name:String):String {
+		return name == null || name == "" ? DEFAULT_THEME : name;
+	}
+	/** Settings v36 upgrade only. Later explicit preset selections remain valid. */
+	public static function highContrastUpgrade(name:Dynamic):String {
+		return Std.isOfType(name, String) && Std.string(name).toLowerCase() == "custom" ? "custom" : DEFAULT_THEME;
+	}
+	public static function upgradeSettingsTheme(data:Dynamic, savedVersion:Int):Bool {
+		if (savedVersion >= 36) return false;
+		Reflect.setField(data, "activeTheme", highContrastUpgrade(Reflect.field(data, "activeTheme")));
+		return true;
+	}
+	/** Upgrade working profile copies, including the deferred first-login recovery snapshot. */
+	public static function upgradeBankThemes(bank:ProfileBank):Void {
+		for (profile in bank.profiles) {
+			Reflect.setField(profile.snapshot, "theme", highContrastUpgrade(Reflect.field(profile.snapshot, "theme")));
+		}
+		if (bank.compatibilitySnapshot != null)
+			Reflect.setField(bank.compatibilitySnapshot, "theme", highContrastUpgrade(Reflect.field(bank.compatibilitySnapshot, "theme")));
+	}
 
 	/** Remove retired feature-local profile banks from one universal snapshot and enforce schema v18. */
 	public static function normalizeProfileSnapshot(data:Dynamic):Dynamic {
@@ -31,7 +53,7 @@ class ProfileMigration {
 
 	/** Pure migration for legacy theme names to v18 ThemeKind constants. */
 	public static function migrateThemeName(name:Dynamic):String {
-		if (name == null) return "purple_gold";
+		if (name == null || name == "") return DEFAULT_THEME;
 		var s = Std.string(name).toLowerCase();
 		return switch (s) {
 			case "volcanic": "obsidian_ember";

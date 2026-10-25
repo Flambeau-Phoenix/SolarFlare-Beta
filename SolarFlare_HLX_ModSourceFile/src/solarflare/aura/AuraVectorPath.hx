@@ -279,7 +279,7 @@ class AuraVectorPath {
 	}
 
 	static function clampCoord(v:Dynamic):Null<Float> {
-		if (!Std.isOfType(v, Float) && !Std.isOfType(v, Int)) return null;
+		if (!solarflare.util.FiniteNumber.isFinite(v)) return null;
 		var f:Float = v;
 		return Math.isFinite(f) ? Math.max(COORD_MIN, Math.min(COORD_MAX, f)) : null;
 	}

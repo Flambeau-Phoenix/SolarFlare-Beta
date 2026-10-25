@@ -31,7 +31,7 @@ class AuraConditionValidator {
 		else if(haxe.io.Bytes.ofString(c.subject).length>4096) out.push("Expression exceeds 4,096 UTF-8 bytes; source preserved.");
 		c.subjectLabel = limit(c.subjectLabel); c.stringValue = limit(c.stringValue);
 		var d = AuraSignalCatalog.find(c.signal);
-		if (d == null) out.push("unknown signal");
+		if (d == null) out.push(c.signal == "target.distance" ? "Target distance was removed because it cannot be resolved reliably. Choose another condition." : "unknown signal");
 		else {
 			if (d.subjectKind.length > 0 && c.subject.length == 0) out.push("subject required");
 			if (d.subjectKind=="statusType") {

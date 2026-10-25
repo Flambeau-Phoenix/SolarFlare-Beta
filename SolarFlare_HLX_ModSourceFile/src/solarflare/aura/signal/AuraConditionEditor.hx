@@ -35,6 +35,10 @@ class AuraConditionEditor {
 
 	public static function drawContext(a:AuraRuleEditorContext, prominent:Bool = false, bossFocusId:String = ""):Void {
 		if (a == null || a.rule == null) return;
+		AuraRuleChrome.controls(function() drawContextBody(a, prominent, bossFocusId));
+	}
+
+	static function drawContextBody(a:AuraRuleEditorContext, prominent:Bool, bossFocusId:String):Void {
 		if (a.rule.version != 1) { AuraNestedConditionEditor.draw(a, prominent, bossFocusId); return; }
 		var r = a.rule;
 		var onBatchSnapshot = a.snapshot;
@@ -45,7 +49,7 @@ class AuraConditionEditor {
 			r.mode = "all";
 			SettingsStore.markDirty();
 		}
-		ImGui.sameLine();
+		AuraRuleChrome.sameLineIfFits(ImGui.calcTextSize("ANY condition (OR)").x + ImGui.getFrameHeight() + 8);
 		if (ImGui.radioButton("ANY condition (OR)##rule_any_" + a.id, !allMode)) {
 			if (a.snapshot != null) a.snapshot();
 			r.mode = "any";
@@ -53,19 +57,19 @@ class AuraConditionEditor {
 		}
 
 		// Sentence summary
-		if (ImGui.smallButton("+ Add Group##rule_group_" + a.id)) {
+		if (AuraRuleChrome.action("+ Add Group##rule_group_" + a.id, "group")) {
 			if (a.snapshot != null) a.snapshot();
 			AuraRuleMutations.addGroup(r); SettingsStore.markDirty(); return;
 		}
-		ImGui.sameLine();
-		if (ImGui.smallButton("NOT group##rule_not_" + a.id)) {
+		AuraRuleChrome.sameLineIfFits(ImGui.calcTextSize("NOT group").x + 24);
+		if (AuraRuleChrome.button("NOT group##rule_not_" + a.id)) {
 			if (a.snapshot != null) a.snapshot();
 			AuraRuleMutations.upgrade(r); r.negate = true; SettingsStore.markDirty(); return;
 		}
 		ImGui.spacing();
 		var count = r.conditions != null ? r.conditions.length : 0;
 		if (count == 0) {
-			ImGui.textDisabled("No conditions yet â€” add one below.");
+			ImGui.textDisabled("No conditions yet — add one below.");
 		} else {
 			ImGui.textColored(ThemePalette.status(ThemePalette.STATUS_INFO),
 				allMode ? "Show when ALL of these are true:" : "Show when ANY of these is true:");
@@ -83,23 +87,9 @@ class AuraConditionEditor {
 		while (ci < r.conditions.length) {
 			var c = r.conditions[ci];
 			var removed = false;
-			var border = ThemePalette.status(c.negate ? ThemePalette.STATUS_DANGER : ThemePalette.STATUS_SUCCESS);
-
-			ImGui.pushStyleColor(ImGuiCol.Border, border);
-			ImGui.pushStyleVar(ImGuiStyleVar.ChildBorderSize, prominent ? 2.0 : 1.5);
-			ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, ImGui.vec2(10, 8));
-
-			ImGui.beginChild("##condition_card_" + c.uiKey, ImGui.vec2(0, 0),
-				ImGuiChildFlags.Borders | ImGuiChildFlags.AutoResizeY | ImGuiChildFlags.AlwaysUseWindowPadding, 0);
-			try {
+			AuraRuleChrome.card("##condition_card_" + c.uiKey, a.presentation && r.presentationSource == ci, function() {
 				removed = drawConditionCard(a, r, c, ci, bossFocusId);
-			} catch (e:Dynamic) {
-				UiScope.reportOnce("condition card", a.id + "_" + c.uiKey, e);
-			}
-			ImGui.endChild();
-
-			ImGui.popStyleVar(2);
-			ImGui.popStyleColor();
+			});
 
 			var cardUi = ci < a.conditionUi.length ? a.conditionUi[ci] : null;
 			if (cardUi != null && cardUi.focusUntil > haxe.Timer.stamp()) {
@@ -122,7 +112,7 @@ class AuraConditionEditor {
 		}
 
 		if (r.conditions.length < AuraRuleDef.MAX_CONDITIONS) {
-			if (UiChrome.ghostButton("+ Add Condition##add_cond_" + a.id, ImGui.vec2(-1, 32))) {
+			if (AuraRuleChrome.button("+ Add Condition##add_cond_" + a.id, Math.min(240, ImGui.getContentRegionAvail().x), 34)) {
 				if (onBatchSnapshot != null) onBatchSnapshot();
 				var newCond = new AuraConditionDef();
 				newCond.signal = "resource.health.ratio";
@@ -200,7 +190,8 @@ class AuraConditionEditor {
 		ImGui.dummy(ImGui.vec2(avail, h));
 
 		var dl = ImGui.getWindowDrawList();
-		var cx = p.x + 22;
+		var ts = ImGui.calcTextSize(label);
+		var cx = p.x + (avail - ts.x - 30) * 0.5;
 		var cy = p.y + h * 0.5;
 		ImGui.ImDrawList_AddLine(dl, ImGui.vec2(cx, p.y + 2), ImGui.vec2(cx, p.y + h - 9), line, 2.5);
 		ImGui.ImDrawList_AddTriangleFilled(dl,
@@ -208,12 +199,11 @@ class AuraConditionEditor {
 			ImGui.vec2(cx - 6, p.y + h - 10),
 			ImGui.vec2(cx + 6, p.y + h - 10), line);
 
-		var ts = ImGui.calcTextSize(label);
 		var px = cx + 14;
 		var y0 = cy - ts.y * 0.5 - 3;
 		var y1 = cy + ts.y * 0.5 + 3;
-		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(px, y0), ImGui.vec2(px + ts.x + 16, y1), fill, 5);
-		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(px, y0), ImGui.vec2(px + ts.x + 16, y1), line, 5, 1.5);
+		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(px, y0), ImGui.vec2(px + ts.x + 16, y1), fill, 2);
+		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(px, y0), ImGui.vec2(px + ts.x + 16, y1), line, 2, 1.5);
 		ImGui.ImDrawList_AddText_Vec2(dl, ImGui.vec2(px + 8, cy - ts.y * 0.5), line, label);
 	}
 
@@ -229,36 +219,30 @@ class AuraConditionEditor {
 		}
 		ui.bind(c);
 
-		// Header row
-		ImGui.textDisabled("Condition " + (index + 1));
-		ImGui.sameLine();
-		if (!nested && index > 0 && ImGui.smallButton("^##cond_up_" + tag)) {
-			if (a.snapshot != null) a.snapshot();
-			AuraRuleMutations.reorderFlat(r, index, index - 1);
-			SettingsStore.markDirty();
-		}
-		ImGui.sameLine();
-		if (!nested && index + 1 < r.conditions.length && ImGui.smallButton("v##cond_dn_" + tag)) {
-			if (a.snapshot != null) a.snapshot();
-			AuraRuleMutations.reorderFlat(r, index, index + 1);
-			SettingsStore.markDirty();
-		}
-		ImGui.sameLine();
-
-		// Destructive action stays outlined; its rim and caption communicate danger.
 		var theme = ThemePalette.current();
-		ImGui.pushStyleColor(ImGuiCol.Button, theme.cellBg);
-		ImGui.pushStyleColor(ImGuiCol.ButtonHovered, theme.windowBg);
-		ImGui.pushStyleColor(ImGuiCol.ButtonActive, theme.windowBg);
-		var danger = ThemePalette.status(ThemePalette.STATUS_DANGER);
-		ImGui.pushStyleColor(ImGuiCol.Border, danger);
-		ImGui.pushStyleColor(ImGuiCol.Text, danger);
-		ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.5);
-		ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, 4.0);
-		var remove = ImGui.smallButton("Remove##cond_rm_" + tag);
-		ImGui.popStyleVar(2);
-		ImGui.popStyleColor(5);
-
+		var isMain = a.presentation && r.presentationSource == index;
+		AuraRuleChrome.conditionHeader(index, isMain);
+		if (c.signal == "target.distance")
+			ImGui.textWrapped("Target distance is unavailable. Select another signal or remove this condition.");
+		if (!nested && index > 0) {
+			if (AuraRuleChrome.action("Up##cond_up_" + tag, "up")) {
+				if (a.snapshot != null) a.snapshot();
+				AuraRuleMutations.reorderFlat(r, index, index - 1);
+				SettingsStore.markDirty();
+			}
+			ImGui.sameLine();
+		}
+		if (!nested && index + 1 < r.conditions.length) {
+			if (AuraRuleChrome.action("Down##cond_dn_" + tag, "down")) {
+				if (a.snapshot != null) a.snapshot();
+				AuraRuleMutations.reorderFlat(r, index, index + 1);
+				SettingsStore.markDirty();
+			}
+			ImGui.sameLine();
+		}
+		ImGui.pushStyleColor(ImGuiCol.Text, ThemePalette.status(ThemePalette.STATUS_DANGER));
+		var remove = AuraRuleChrome.action("Remove##cond_rm_" + tag, "delete");
+		ImGui.popStyleColor();
 		ImGui.sameLine();
 		if (ImGui.checkbox("Invert##cond_neg_" + tag, ui.negateRef)) {
 			if (a.snapshot != null) a.snapshot();
@@ -266,119 +250,71 @@ class AuraConditionEditor {
 			ui.flashContext();
 			SettingsStore.markDirty();
 		}
-		if (a.presentation && r.conditions.length > 1) {
-			if (ImGui.getContentRegionAvail().x > 230) ImGui.sameLine();
-			var isMain = r.presentationSource == index;
-			if (ImGui.smallButton(isMain ? "Main Trigger##cond_main_" + tag : "Use as Main Trigger##cond_main_" + tag)) {
+		if (a.presentation && r.conditions.length > 1 && !isMain) {
+			AuraRuleChrome.sameLineIfFits(ImGui.calcTextSize("Make main trigger").x + 24);
+			if (AuraRuleChrome.button("Make main trigger##cond_main_" + tag)) {
 				if (a.snapshot != null) a.snapshot();
 				r.presentationSource = index;
 				SettingsStore.markDirty();
 			}
 		}
+		UiChrome.gap(UiChrome.SP_S);
 
-		ImGui.dummy(ImGui.vec2(0, 2));
-
-		// Natural language row: Show when [signal] is [op] [value]
-		ImGui.alignTextToFramePadding();
-		ImGui.text("Show when");
-		ImGui.sameLine();
-
-		var compact = ImGui.getContentRegionAvail().x < 700;
 		var d = AuraSignalCatalog.find(c.signal);
-		var preview = d != null ? d.label : (c.signal.length > 0 ? c.signal : "Select signalâ€¦");
-		if (a.picker != null) {
-			if (UiChrome.ghostButton(preview + "###condition_picker_" + tag, ImGui.vec2(210, ImGui.getFrameHeight()))) a.picker.request(a, c, ui);
-		} else {
-			ImGui.setNextItemWidth(210);
-			if (ImGui.beginCombo("##cond_sig_" + tag, preview)) {
-				var currentGroup = "";
-				for (item in AuraSignalCatalog.all()) {
-					if (item.group != currentGroup) {
-						currentGroup = item.group;
-						ImGui.separatorText(item.group);
+		UiLayout.propertyGrid("##condition_properties_" + tag, function() {
+		UiLayout.propertyRow("Signal", function() {
+
+			d = AuraSignalCatalog.find(c.signal);
+			var preview = d != null ? d.label : (c.signal.length > 0 ? c.signal : "Select signal…");
+			if (a.picker != null) {
+				if (AuraRuleChrome.button(preview + "###condition_picker_" + tag, ImGui.getContentRegionAvail().x, isMain ? 38 : 32)) a.picker.request(a, c, ui);
+			} else {
+				ImGui.setNextItemWidth(-1);
+				if (ImGui.beginCombo("##cond_sig_" + tag, preview)) {
+					var currentGroup = "";
+					for (item in AuraSignalCatalog.all()) {
+						if (item.group != currentGroup) {
+							currentGroup = item.group;
+							ImGui.separatorText(item.group);
+						}
+						if (ImGui.selectable(item.label + "##sig_" + tag + item.id, c.signal == item.id)) {
+							if (a.snapshot != null) a.snapshot();
+							c.signal = item.id;
+							c.op = AuraConditionValidator.defaultOperator(item);
+							c.subject = "";
+							c.subjectLabel = "";
+							c.numberValue = item.kind == Percent ? 0.35 : 1;
+							c.boolValue = true;
+							ui.sync(c);
+							ui.flashContext();
+							SettingsStore.markDirty();
+						}
 					}
-					if (ImGui.selectable(item.label + "##sig_" + tag + item.id, c.signal == item.id)) {
-						if (a.snapshot != null) a.snapshot();
-						c.signal = item.id;
-						c.op = AuraConditionValidator.defaultOperator(item);
-						c.subject = "";
-						c.subjectLabel = "";
-						c.numberValue = item.kind == Percent ? 0.35 : 1;
-						c.boolValue = true;
-						ui.sync(c);
-						ui.flashContext();
-						SettingsStore.markDirty();
-					}
+					ImGui.endCombo();
 				}
-				ImGui.endCombo();
 			}
-		}
 
+		});
 		d = AuraSignalCatalog.find(c.signal);
-		if (d != null && d.subjectKind.length > 0 && d.subjectKind!="script") {
-			if (!compact) ImGui.sameLine();
-			drawSubjectInline(a, c, ui, d.subjectKind, tag, bossFocusId);
+		if (d != null && d.subjectKind.length > 0 && d.subjectKind != "script") {
+			UiLayout.propertyRow("Subject", function() drawSubjectInline(a, c, ui, d.subjectKind, tag, bossFocusId));
 		}
 
-		if (d != null && d.id == "dash.charges") {
-			UiLayout.propertyGrid("##cond_dash_properties_" + tag, function() {
-				UiLayout.propertyRow("Comparison", function() {
+		if (d != null) {
+			UiLayout.propertyRow("Match", function() {
+				if (AuraConditionValidator.isStatusPresence(d.id)) {
 					drawOperatorInline(c, ui, d, tag, a.snapshot, -1);
-				});
-				UiLayout.propertyRow("Value (dashes)", function() {
-					if (solarflare.ui.NumberField.draw("##cond_cnt_" + tag, ui.numberRef, 0, 9999, "%.0f", a.snapshot)) {
-						ui.numberRef.set(Math.round(ui.numberRef.get()));
-						ui.pull(c);
-						ui.flashContext();
-						SettingsStore.markDirty();
-					}
-				});
+				} else if (ImGui.getContentRegionAvail().x >= 240) {
+					UiLayout.inlinePair("##match_" + tag,
+						function(w:Single) drawOperatorInline(c, ui, d, tag, a.snapshot, -1),
+						function(w:Single) drawValue(a, c, ui, d, tag), 12);
+				} else {
+					drawOperatorInline(c, ui, d, tag, a.snapshot, -1);
+					drawValue(a, c, ui, d, tag);
+				}
 			});
-		} else if (d != null) {
-			if (!compact) ImGui.sameLine();
-			drawOperatorInline(c, ui, d, tag, a.snapshot);
 		}
-
-		if (d != null && d.id != "dash.charges" && !AuraConditionValidator.isStatusPresence(d.id)) {
-			ImGui.sameLine();
-			switch (d.kind) {
-				case Boolean:
-					if (ImGui.checkbox("active##cond_bool_" + tag, ui.boolRef)) {
-						if (a.snapshot != null) a.snapshot();
-						ui.pull(c);
-						ui.flashContext();
-						SettingsStore.markDirty();
-					}
-				case Percent:
-					ImGui.setNextItemWidth(100);
-					if (solarflare.ui.NumberField.draw("##cond_pct_" + tag, ui.percentRef, 0, 100, "%.0f%%", a.snapshot)) {
-						ui.pullPercent(c);
-						ui.flashContext();
-						SettingsStore.markDirty();
-					}
-				case Count:
-					ImGui.setNextItemWidth(90);
-					if (solarflare.ui.NumberField.draw("##cond_cnt_" + tag, ui.numberRef, 0, 9999, "%.0f", a.snapshot)) {
-						ui.pull(c);
-						ui.flashContext();
-						SettingsStore.markDirty();
-					}
-				case Duration:
-					ImGui.setNextItemWidth(100);
-					if (solarflare.ui.NumberField.draw("##cond_dur_" + tag, ui.numberRef, 0, 3600, "%.1fs", a.snapshot)) {
-						ui.pull(c);
-						ui.flashContext();
-						SettingsStore.markDirty();
-					}
-				default:
-					ImGui.setNextItemWidth(90);
-					if (solarflare.ui.NumberField.draw("##cond_num_" + tag, ui.numberRef, 0, 1e12, "%.1f", a.snapshot)) {
-						ui.pull(c);
-						ui.flashContext();
-						SettingsStore.markDirty();
-					}
-			}
-		}
+		}, 0, 92, 34);
 
 		// Help tips when relevant
 		if(c.signal=="custom.script") drawScriptEditor(a,c,ui,tag,bossFocusId);
@@ -408,8 +344,49 @@ class AuraConditionEditor {
 		}
 
 		ImGui.dummy(ImGui.vec2(0, 2));
-		ImGui.textColored(theme.accent, "Active: " + humanConditionSummary(c));
+		ImGui.textWrapped(humanConditionSummary(c));
 		return remove;
+	}
+
+	static function drawValue(a:AuraRuleEditorContext, c:AuraConditionDef, ui:AuraConditionUiState, d:AuraSignalDescriptor, tag:String):Void {
+			switch (d.kind) {
+				case Boolean:
+					if (ImGui.checkbox("active##cond_bool_" + tag, ui.boolRef)) {
+						if (a.snapshot != null) a.snapshot();
+						ui.pull(c);
+						ui.flashContext();
+						SettingsStore.markDirty();
+					}
+				case Percent:
+					ImGui.setNextItemWidth(-1);
+					if (solarflare.ui.NumberField.draw("##cond_pct_" + tag, ui.percentRef, 0, 100, "%.0f%%", a.snapshot)) {
+						ui.pullPercent(c);
+						ui.flashContext();
+						SettingsStore.markDirty();
+					}
+				case Count:
+					ImGui.setNextItemWidth(-1);
+					if (solarflare.ui.NumberField.draw("##cond_cnt_" + tag, ui.numberRef, 0, 9999, "%.0f", a.snapshot)) {
+						if (d.id == "dash.charges") ui.numberRef.set(Math.round(ui.numberRef.get()));
+						ui.pull(c);
+						ui.flashContext();
+						SettingsStore.markDirty();
+					}
+				case Duration:
+					ImGui.setNextItemWidth(-1);
+					if (solarflare.ui.NumberField.draw("##cond_dur_" + tag, ui.numberRef, 0, 3600, "%.1fs", a.snapshot)) {
+						ui.pull(c);
+						ui.flashContext();
+						SettingsStore.markDirty();
+					}
+				default:
+					ImGui.setNextItemWidth(-1);
+					if (solarflare.ui.NumberField.draw("##cond_num_" + tag, ui.numberRef, 0, 1e12, "%.1f", a.snapshot)) {
+						ui.pull(c);
+						ui.flashContext();
+						SettingsStore.markDirty();
+					}
+			}
 	}
 
 	static function drawOperatorInline(c:AuraConditionDef, ui:AuraConditionUiState, d:AuraSignalDescriptor, tag:String, beforeEdit:Void->Void, width:Single = 104):Void {
@@ -459,9 +436,9 @@ class AuraConditionEditor {
 		}
 		if(!ImGui.isItemActive()) ui.scriptEditing=false;
 		ImGui.textDisabled(ui.scriptBytes+" / 4096 UTF-8 bytes");
-		if(ImGui.smallButton("Check##script_check_"+tag)) ui.scriptSession.request(c.subject,0,true,false);
+		if(AuraRuleChrome.button("Check##script_check_"+tag)) ui.scriptSession.request(c.subject,0,true,false);
 		ImGui.sameLine();
-		if(ImGui.smallButton("Test##script_test_"+tag)) ui.scriptSession.request(c.subject,0,true,true);
+		if(AuraRuleChrome.button("Test##script_test_"+tag)) ui.scriptSession.request(c.subject,0,true,true);
 		ImGui.setNextItemWidth(-1);
 		if(ImGui.beginCombo("##script_example_"+tag,"Insert example...")) {
 			try {
@@ -493,8 +470,8 @@ class AuraConditionEditor {
 			ImGui.textDisabled("Inserts at the end. Combine the value with a comparison, && or ||.");
 			ImGui.textDisabled(descriptor.kind==Percent ? "Percent: 0..1 (legacy hp/mana/rage/spark variables use 0..100)." :
 				descriptor.kind==Duration ? "Seconds. Event signals are elapsed age; recharge/status signals are remaining time." :
-				insert.signal=="target.distance" ? "Horizontal distance in game units." : "Boolean, count, or current amount as named above.");
-			if(ImGui.smallButton("Insert signal##script_add_"+tag)) {
+				"Boolean, count, or current amount as named above.");
+			if(AuraRuleChrome.button("Insert signal##script_add_"+tag)) {
 				if(descriptor.subjectKind=="" || insert.subject!="") {
 					var subject=StringTools.replace(StringTools.replace(insert.subject,"\\","\\\\"),'"','\\"');
 					var expression='signal("'+insert.signal+'"'+(subject=="" ? "" : ', "'+subject+'"')+')';
@@ -545,8 +522,8 @@ class AuraConditionEditor {
 
 		// Same beginCombo pattern as AuraBuilder.drawWizardCatalogPicker / signal combo.
 		// ghostButton+popup inside AutoResizeY condition cards eats clicks and sticks.
-		var previewText = name.length > 0 ? name : "Select " + kindLabel + "â€¦";
-		ImGui.setNextItemWidth(210);
+		var previewText = name.length > 0 ? name : "Select " + kindLabel + "…";
+		ImGui.setNextItemWidth(-1);
 		ImGui.setNextWindowSize(ImGui.vec2(480, 420), ImGuiCond.Always);
 		if (!ImGui.beginCombo("##cond_subj_" + tag, previewText)) {
 			if (ImGui.isItemHovered() && c.subject != null && c.subject.length > 0)
@@ -560,7 +537,7 @@ class AuraConditionEditor {
 			ImGui.text("Search " + kindLabel + " catalog");
 			if (ImGui.inputText("##cond_subj_search_" + tag, ui.searchBuf, AuraConditionUiState.SEARCH_BUF))
 				ui.search = ByteUtil.readString(ui.searchBuf, AuraConditionUiState.SEARCH_BUF, true).toLowerCase();
-			if (kind == "weapon" && ui.search.length > 0 && ImGui.smallButton("Use typed weapon ID##cond_weapon_id_" + tag)) {
+			if (kind == "weapon" && ui.search.length > 0 && AuraRuleChrome.button("Use typed weapon ID##cond_weapon_id_" + tag)) {
 				if (a.snapshot != null) a.snapshot();
 				c.subject = solarflare.cdb.WeaponCatalog.canonicalId(ByteUtil.readString(ui.searchBuf, AuraConditionUiState.SEARCH_BUF, true));
 				c.subjectLabel = solarflare.cdb.AuraCatalog.label(c.subject);
@@ -713,7 +690,7 @@ class AuraConditionEditor {
 	 * Status pickers can list either the real stacking status (Status / Proc IDs, Currently
 	 * on your character) or the ability that grants it (Other skills). Picking the ability by
 	 * mistake used to leave `status.stacks`/`status.present` pointed at an id the engine never
-	 * stacks â€” the granted status underneath it does. Redirect to the granted status id here so
+	 * stacks — the granted status underneath it does. Redirect to the granted status id here so
 	 * every entry point (wizard, Home templates, manual edit) lands on the trackable id.
 	 */
 	static function drawSubjectRow(c:AuraConditionDef, ui:AuraConditionUiState, id:String, name:String, entryKind:String, tag:String,
@@ -726,7 +703,7 @@ class AuraConditionEditor {
 		ImGui.sameLine();
 		var resolvedId = subjectKind == "status" ? solarflare.cdb.CdbAuraTable.statusSubjectId(id) : id;
 		var kindTag = entryKind == "statustype" ? "category" : entryKind;
-		if (ImGui.selectable(name + " [" + id + "] Â· " + kindTag + "##subject_" + tag + id, c.subject == resolvedId)) {
+		if (ImGui.selectable(name + " [" + id + "] · " + kindTag + "##subject_" + tag + id, c.subject == resolvedId)) {
 			if (beforeEdit != null) beforeEdit();
 			c.subject = resolvedId;
 			// Keep the catalog identity stable; the tooltip shows the resolved id.

@@ -36,7 +36,6 @@ class AuraSignalReader {
 			case "dash.available": bool(out,frame.dashKnown,frame.dashCharges>0); out.progress=frame.dashRechargeProgress; out.timeLeft=frame.dashKnown ? frame.dashRecharge : Math.NaN;
 			case "dash.full": bool(out,frame.dashKnown,frame.dashMax>0 && frame.dashCharges>=frame.dashMax); out.progress=frame.dashRechargeProgress; out.timeLeft=frame.dashKnown ? frame.dashRecharge : Math.NaN;
 			case "dash.rechargeLeft": duration(out,frame.dashKnown,frame.dashRecharge); out.progress=frame.dashRechargeProgress; out.timeLeft=frame.dashKnown ? frame.dashRecharge : Math.NaN;
-			case "target.distance": number(out,frame.targetKnown && frame.targetValid,frame.targetDistance);
 			case "combat.damageTakenAge":
 				duration(out,frame.heroKnown && frame.damageAgeKnown,frame.damageTakenAge); out.timeLeft=Math.NaN;
 			case "event.combat.critical", "event.combat.block":

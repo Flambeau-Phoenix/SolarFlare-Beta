@@ -9,7 +9,7 @@ class AuraBadgePolicy {
 		return raw == 0 ? 0 : raw == 1 ? 1 : raw == 2 ? 2 : fallback;
 	}
 	public static function scale(raw:Dynamic, fallback:Float = 1):Float {
-		if (!Std.isOfType(raw, Int) && !Std.isOfType(raw, Float)) return fallback;
+		if (!solarflare.util.FiniteNumber.isFinite(raw)) return fallback;
 		var n:Float = raw;
 		return Math.isFinite(n) ? Math.max(0.5, Math.min(3, n)) : fallback;
 	}

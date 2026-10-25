@@ -434,7 +434,7 @@ class ThemePalette {
 	}
 
 	static function themeLabel(k:String):String {
-		if (k == ThemeKind.PurpleGold) return "Purple & Gold (Default)";
+		if (k == ThemeKind.PurpleGold) return "Purple & Gold";
 		if (k == ThemeKind.ObsidianEmber) return "Obsidian Ember";
 		if (k == ThemeKind.VoidsteelBlue) return "Voidsteel Blue";
 		if (k == ThemeKind.AshGold) return "Ash & Gold";
@@ -461,6 +461,7 @@ class ThemePalette {
 
 	static function resolvePreset(kind:String):ThemeColors {
 		if (!initialized) init();
+		if (kind == null || kind == "") return HIGH_CONTRAST;
 		if (kind == ThemeKind.ObsidianEmber) return OBSIDIAN_EMBER;
 		if (kind == ThemeKind.VoidsteelBlue) return VOIDSTEEL_BLUE;
 		if (kind == ThemeKind.AshGold) return ASH_GOLD;

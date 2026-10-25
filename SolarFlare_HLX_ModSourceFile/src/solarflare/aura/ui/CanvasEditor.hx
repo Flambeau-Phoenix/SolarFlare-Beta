@@ -78,6 +78,13 @@ class CanvasEditor {
 	var cvBoxW:Float = 0;
 	var cvBoxH:Float = 0;
 	var canvasImgComboOpen:Bool = false;
+	var canvasImageOwner:AuraDef;
+	var canvasImageLayer:AuraCanvasElement;
+	var designDialogOpen=new BoolRef(false);
+	var designDialogWanted=false;
+	var designOwnerGeneration:Int=-1;
+	var designPathBuffer=new hl.Bytes(1024);
+	var designFile:String="";
 	static inline var CANVAS_IMPORT_BUF:Int = 520;
 	var canvasImportBuf = new hl.Bytes(CANVAS_IMPORT_BUF);
 	var canvasImportMsg:String = "";
@@ -95,7 +102,7 @@ class CanvasEditor {
 	var conditionPicker:AuraConditionPicker;
 	var externalPickerOpen:Void->Bool;
 	public function conditionBrowserOpen():Bool return conditionPicker != null && conditionPicker.isOpen();
-	function pickerBlocksInput():Bool return conditionBrowserOpen() || (externalPickerOpen != null && externalPickerOpen());
+	function pickerBlocksInput():Bool return designDialogOpen.get() || conditionBrowserOpen() || (externalPickerOpen != null && externalPickerOpen());
 	var preciseFn:Void->Void;
 	var stageMaxH:Single = 280;
 
@@ -107,11 +114,13 @@ class CanvasEditor {
 		ByteUtil.clearBytes(canvasContentBuf, CANVAS_CONTENT_BUF);
 		ByteUtil.clearBytes(canvasImportBuf, CANVAS_IMPORT_BUF);
 		ByteUtil.clearBytes(canvasFolderBuf, CANVAS_FOLDER_BUF);
+		ByteUtil.clearBytes(designPathBuffer,1024);
 		imageLibrary = new ImageLibraryPanel(function() return host.canvasAuras(), function(name) host.canvasSnapshotAll(name));
 	}
 
 	/** Called after undo/redo rewrote this aura's elements and states behind the editor's back. */
 	public function afterExternalRestore():Void {
+		canvasImgComboOpen=false; canvasImageOwner=null; canvasImageLayer=null;
 		resetPathTools();
 		canvasSel = -1;
 		canvasMulti = [];
@@ -134,6 +143,7 @@ class CanvasEditor {
 	}
 
 	public function clearTransientState():Void {
+		designDialogOpen.set(false); designDialogWanted=false;
 		releasePreview();
 		for (a in host.canvasAuras()) if (a != null) a.previewState = null;
 		imageLibrary.clearTransientState();
@@ -153,7 +163,7 @@ class CanvasEditor {
 		EditorWindow.drawMenuWindow("Canvas Editor###SolarFlare.CanvasEditor", open, 1360, 860, function() {
 			ImGui.beginDisabled(pickerBlocksInput());
 			try { drawBody(); } catch (e:Dynamic) { ImGui.endDisabled(); throw e; }
-			ImGui.endDisabled(); conditionPicker.draw();
+			ImGui.endDisabled(); drawDesignModal(); conditionPicker.draw();
 		});
 	}
 	function conditionPickerOwnerValid():Bool {
@@ -204,6 +214,7 @@ class CanvasEditor {
 		var a = host.canvasSelectedAura();
 		if (a == null) {
 			ImGui.textDisabled("Select an aura in the Aura Builder to edit its canvas.");
+			if(ImGui.button("Import Design...##cv_empty_import")) showDesignFiles();
 			return;
 		}
 		if (a.region != "canvas") {
@@ -216,6 +227,7 @@ class CanvasEditor {
 		syncPreview(a);
 		drawMenuBar(a);
 		if (handleGlobalKeys(a)) return;
+		drawPersistenceStatus();
 		drawToolbar(a);
 		drawLookBar(a);
 		ImGui.separator();
@@ -444,14 +456,26 @@ class CanvasEditor {
 			ImGui.textColored(solarflare.ui.ThemePalette.current().accent, hintText);
 		}
 	}
+	/** Near the menu so an error stays visible even when the stage fills a short window. */
+	function drawPersistenceStatus():Void {
+		ImGui.textWrapped(SettingsStore.saveFeedback());
+		if(SettingsStore.lastSaveError.length>0 && ImGui.isItemHovered()) ImGui.setTooltip(SettingsStore.lastSaveError);
+		var share=host.canvasShares();
+		if(share.busy || share.error || share.lastExport.length>0) {
+			ImGui.textWrapped(share.status);
+			if(share.lastExport.length>0 && ImGui.smallButton("Copy exported file path##cv_last_export")) UiActionQueue.copyText(share.lastExport);
+		}
+	}
 
 	// ---- Keyboard ----------------------------------------------------------------------------
 
 	/** Window-level shortcuts. Returns true when the frame should end (undo/redo replaced the document). */
 	function handleGlobalKeys(a:AuraDef):Bool {
 		if (pickerBlocksInput()) return false;
-		if (!ImGui.isWindowFocused(imgui.Enums.ImGuiFocusedFlags.RootAndChildWindows) || ImGui.isAnyItemActive()) return false;
+		if (!ImGui.isWindowFocused(imgui.Enums.ImGuiFocusedFlags.RootAndChildWindows)) return false;
 		var ctrl = ImGui.isKeyDown(ImGuiKey.LeftCtrl) || ImGui.isKeyDown(ImGuiKey.RightCtrl);
+		if(ctrl && ImGui.isKeyPressed(ImGuiKey.S,false)) UiActionQueue.save();
+		if(ImGui.isAnyItemActive()) return false;
 		var shift = ImGui.isKeyDown(ImGuiKey.LeftShift) || ImGui.isKeyDown(ImGuiKey.RightShift);
 		if (ctrl) {
 			if (ImGui.isKeyPressed(ImGuiKey.Z, false)) { if (shift) host.canvasRedo(); else host.canvasUndo(); return true; }
@@ -524,12 +548,84 @@ class CanvasEditor {
 	}
 
 	function drawFileMenu(a:AuraDef):Void {
+		if(ImGui.menuItem("Save##cv_m_save","Ctrl+S")) UiActionQueue.save();
+		if(ImGui.menuItem("Export Design...##cv_m_export")) { showDesignFiles(); host.canvasExportDesign(); }
+		if(ImGui.menuItem("Export settings (.json)...##cv_m_settings")) { showDesignFiles(); host.canvasExportDesign(true); }
+		if(ImGui.menuItem("Import Design...##cv_m_import")) showDesignFiles();
+		ImGui.separator();
 		if (ImGui.menuItem("Copy all layers to clipboard##cv_m_copyall")) copyAll(a);
 		if (ImGui.menuItem("Paste layers from clipboard", "Ctrl+V")) pasteLayers(a);
 		ImGui.separator();
 		if (ImGui.menuItem("Clear all layers##cv_m_clear", null, false, a.canvasElements.length > 0)) clearAll(a);
 		ImGui.separator();
 		if (ImGui.menuItem("Close editor##cv_m_close")) open.set(false);
+	}
+
+	function showDesignFiles():Void {
+		designDialogWanted=true;
+		host.canvasShares().requestRefresh();
+	}
+	/** Root-owned modal. The host performs all serialization and file work during observation. */
+	function drawDesignModal():Void {
+		if(designDialogWanted) {
+			designOwnerGeneration=solarflare.ui.FeatureProfiles.statusOwnerGen;
+			designDialogOpen.set(true); designDialogWanted=false;
+			ImGui.openPopup("Canvas Design Files##cv_design_files");
+		}
+		if(!designDialogOpen.get()) return;
+		ImGui.setNextWindowSize(ImGui.vec2(620,460),imgui.Enums.ImGuiCond.FirstUseEver);
+		ImGui.setNextWindowSizeConstraints(ImGui.vec2(420,300),ImGui.vec2(Math.max(420,solarflare.ui.HudChrome.viewportWidth-32),Math.max(300,solarflare.ui.HudChrome.viewportHeight-32)));
+		if(ImGui.beginPopupModal("Canvas Design Files##cv_design_files",designDialogOpen,0)) {
+			try {
+				if(designOwnerGeneration!=solarflare.ui.FeatureProfiles.statusOwnerGen) {
+					designDialogOpen.set(false); ImGui.closeCurrentPopup();
+				} else {
+					var service=host.canvasShares(); var a=host.canvasSelectedAura();
+					UiChrome.sectionHeader("Save or share this design");
+					ImGui.textWrapped("Export Design bundles this canvas and its images as ZIP. Export settings saves JSON without bundling images, so missing or blocked artwork cannot prevent a backup. Both include only this item's design and window settings. Import adds a new independent canvas.");
+					var disabled=0;
+					try {
+						ImGui.beginDisabled(service.busy); disabled++;
+						ImGui.beginDisabled(a==null || a.region!="canvas"); disabled++;
+						if(ImGui.button("Export Design##cv_design_export")) host.canvasExportDesign();
+						ImGui.sameLine();
+						if(ImGui.button("Export settings (.json)##cv_design_settings")) host.canvasExportDesign(true);
+						ImGui.endDisabled(); disabled--;
+						if(ImGui.button("Refresh files##cv_design_refresh")) service.requestRefresh();
+						UiLayout.propertyGrid("##cv_design_input",function() {
+							UiLayout.propertyRow("Design file",function() {
+								var chosen=UiLayout.stringCombo("cv_design_zip",designFile,service.files,function(value) return value);
+								if(chosen!=null) { designFile=chosen; ByteUtil.fillBuf(designPathBuffer,1024,haxe.io.Path.join([service.folder,chosen])); }
+							});
+							UiLayout.propertyRow("Or file path",function() {
+								ImGui.inputTextWithHint("##cv_design_path","Paste a ZIP or JSON path...",designPathBuffer,1024);
+							});
+						});
+						var path=ByteUtil.readBytes(designPathBuffer,1024);
+						ImGui.beginDisabled(StringTools.trim(path).length==0); disabled++;
+						if(ImGui.button("Inspect##cv_design_inspect")) host.canvasInspectDesign(path);
+						ImGui.sameLine();
+						if(ImGui.button("Import Design##cv_design_import")) host.canvasImportDesign(path);
+						ImGui.endDisabled(); disabled--;
+						ImGui.endDisabled(); disabled--;
+					} catch(e:Dynamic) { while(disabled>0) { ImGui.endDisabled(); disabled--; } throw e; }
+					if(service.summary.length>0) ImGui.textWrapped(service.summary);
+					ImGui.textWrapped(service.status);
+					if(service.busy) {
+						ImGui.textDisabled(Std.int(service.progress*100)+"%");
+						if(ImGui.button("Cancel operation##cv_design_cancel")) service.cancel();
+					}
+					ImGui.textWrapped("Share folder: "+service.folder);
+					if(ImGui.button("Copy folder path##cv_design_folder")) UiActionQueue.copyText(service.folder);
+					if(service.lastExport.length>0) {
+						ImGui.textWrapped(service.lastExport);
+						if(ImGui.button("Copy exported file path##cv_design_copy")) UiActionQueue.copyText(service.lastExport);
+					}
+					if(ImGui.button("Close##cv_design_close")) { designDialogOpen.set(false); ImGui.closeCurrentPopup(); }
+				}
+			} catch(e:Dynamic) { ImGui.endPopup(); throw e; }
+			ImGui.endPopup();
+		}
 	}
 
 	function drawEditMenu(a:AuraDef):Void {
@@ -3227,23 +3323,39 @@ class CanvasEditor {
 	function drawCanvasImageRows(el:AuraCanvasElement):Void {
 		UiLayout.propertyRow("Image", function() {
 			var stem = CustomImages.stemOf(el.content);
+			var owner=host.canvasSelectedAura();
+			var changed=owner!=canvasImageOwner || el!=canvasImageLayer;
+			canvasImageOwner=owner; canvasImageLayer=el;
+			ImGui.setNextWindowSizeConstraints(ImGui.vec2(260,0),ImGui.vec2(420,360));
 			var opened = ImGui.beginCombo("##ab_cv_img", stem.length > 0 ? stem : "Choose an image...");
 			if (opened) {
 				try {
+				 if(changed) { ImGui.closeCurrentPopup(); canvasImgComboOpen=false; }
+				 else {
 					if (!canvasImgComboOpen) CustomImages.requestRefresh();
 					canvasImgComboOpen = true;
 					var names = CustomImages.names();
 					if (names.length == 0) ImGui.textDisabled("No images yet. Import one below or drop PNGs in the folder.");
+					var start=ImGui.getCursorPos();
+					var rowWidth:Single=Math.max(80,ImGui.getContentRegionAvail().x);
+					var rowHeight:Single=Math.max(24,ImGui.getTextLineHeightWithSpacing()+4);
+					var index=0;
 					for (n in names) {
+						var rowY:Single=start.y+(index++)*(rowHeight+2);
+						ImGui.setCursorPos(ImGui.vec2(start.x,rowY));
 						if (!GameIcons.imageKey(CustomImages.key(n), 20, 20)) ImGui.dummy(ImGui.vec2(20, 20));
-						ImGui.sameLine(0, 6);
-						if (ImGui.selectable(n + "##ab_cv_img_" + n, n == stem)) {
+						ImGui.setCursorPos(ImGui.vec2(start.x+26,rowY));
+						if (ImGui.selectable(n + "##ab_cv_img_" + n, n == stem,0,ImGui.vec2(rowWidth-26,rowHeight))) {
 							host.canvasSnapshot("Canvas Image");
 							el.content = CustomImages.key(n);
 							GameIcons.get(el.content);
 							SettingsStore.markDirty();
 						}
+						if(ImGui.isItemHovered()) ImGui.setTooltip(n);
+						ImGui.setCursorPos(ImGui.vec2(start.x,rowY+rowHeight));
+						ImGui.dummy(ImGui.vec2(rowWidth,2));
 					}
+				 }
 				} catch (e:Dynamic) { ImGui.endCombo(); throw e; }
 				ImGui.endCombo();
 			} else canvasImgComboOpen = false;
@@ -3271,7 +3383,7 @@ class CanvasEditor {
 				if (canvasImportErr) ImGui.textColored(ImGui.vec4(0.95, 0.45, 0.4, 1), canvasImportMsg);
 				else ImGui.textDisabled(canvasImportMsg);
 			}
-		}, "PNG, JPG, GIF, BMP or TGA, converted to PNG; larger than 1024px is scaled down; 4 MB max. Import copies into the selected images folder. The picker lists PNGs in that folder itself. Clipboard keys carry only filenames. Use Export with images to share a ZIP containing the PNGs.");
+		}, "PNG, JPG, GIF, BMP or TGA up to 16 MiB per source file; converted to PNG and scaled to 1024px. Sources above 4 million pixels must be resized first. SVG paths use vector limits. Export Design bundles PNGs; Export settings saves without requiring artwork.");
 	}
 
 	public function resetCanvasTransient():Void {
@@ -3283,6 +3395,7 @@ class CanvasEditor {
 		canvasFieldUndoState = null;
 		canvasColorEditing = false;
 		canvasImgComboOpen = false;
+		canvasImageOwner=null; canvasImageLayer=null;
 		lastCanvasColorEl = null;
 		canvasImportMsg = "";
 		canvasFolderGeneration = -1;

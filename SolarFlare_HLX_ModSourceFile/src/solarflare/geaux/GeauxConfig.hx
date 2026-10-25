@@ -15,7 +15,7 @@ import imgui.ref.FloatRef;
 import imgui.ref.IntRef;
 
 /**
- * F6 â†’ Geaux layout only. Slots come from hero.skillSlots / skill-book drag.
+ * F6 → Geaux layout only. Slots come from hero.skillSlots / skill-book drag.
  */
 class GeauxConfig {
 	public static inline var MIN_DIM:Int = 1;

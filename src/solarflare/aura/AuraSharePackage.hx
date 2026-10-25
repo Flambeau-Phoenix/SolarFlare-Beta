@@ -48,7 +48,8 @@ class AuraSharePackage {
  public static function validateRule(rule:Dynamic):Void {
   if(rule==null) return;
   if((rule.version!=1 && rule.version!=2) || (rule.mode!="all" && rule.mode!="any")) throw "Unsupported Aura rule version or mode.";
-  if(rule.version==2) { var error=solarflare.aura.signal.AuraRuleStructure.validateObject(rule); if(error!="") throw error; }
+  // Empty editor groups are portable drafts, not corrupt data. The evaluator keeps them inactive until repaired.
+  if(rule.version==2) { var error=solarflare.aura.signal.AuraRuleStructure.validateObject(rule,true); if(error!="") throw error; }
   var conditions=list(rule.conditions,"Rule conditions",solarflare.aura.signal.AuraRuleDef.MAX_CONDITIONS);
   if(conditions.length>0 && (!Std.isOfType(rule.presentationSource,Int) || rule.presentationSource<0 || rule.presentationSource>=conditions.length)) throw "Invalid rule presentation source.";
   for(c in conditions) {
@@ -56,10 +57,12 @@ class AuraSharePackage {
    var descriptor=AuraSignalCatalog.find(c.signal);
    if(descriptor==null) throw "This mod build does not support signal: "+c.signal;
    if(!AuraConditionValidator.isValidOperator(c.op,descriptor)) throw "Unsupported comparison for "+c.signal;
-   if(descriptor.subjectKind.length>0 && (!Std.isOfType(c.subject,String) || StringTools.trim(c.subject).length==0)) throw "Missing subject for "+c.signal;
-   if(descriptor.subjectKind=="statusType" && solarflare.cdb.StatusTypeCatalog.index(c.subject)<0) throw "Unsupported status type: "+c.subject;
-   if(c.signal=="custom.script" && haxe.io.Bytes.ofString(c.subject).length>4096) throw "Expression exceeds 4,096 UTF-8 bytes; source was not truncated.";
-   if(c.numberValue!=null && ((!Std.isOfType(c.numberValue,Float) && !Std.isOfType(c.numberValue,Int)) || !Math.isFinite(c.numberValue))) throw "Invalid condition threshold.";
+   if(c.subject!=null && !Std.isOfType(c.subject,String)) throw "Invalid subject type for "+c.signal;
+   // An unselected subject is an editor draft. Persist it; runtime evaluation still treats it as unknown/inactive.
+   var hasSubject=Std.isOfType(c.subject,String) && StringTools.trim(c.subject).length>0;
+   if(descriptor.subjectKind=="statusType" && hasSubject && solarflare.cdb.StatusTypeCatalog.index(c.subject)<0) throw "Unsupported status type: "+c.subject;
+   if(c.signal=="custom.script" && Std.isOfType(c.subject,String) && haxe.io.Bytes.ofString(c.subject).length>4096) throw "Expression exceeds 4,096 UTF-8 bytes; source was not truncated.";
+   if(c.numberValue!=null && !solarflare.util.FiniteNumber.isFinite(c.numberValue)) throw "Invalid condition threshold.";
   }
  }
  /** Legacy clipboard/pack imports must reject unsupported nested rules before any library edit. */
@@ -133,7 +136,8 @@ class AuraSharePackage {
   visitImages(pack,function(object,field,key) { var next=mapping.get(key.toLowerCase()); if(next==null) throw "Missing bundled image: "+key; Reflect.setField(object,field,next); });
  }
  public static function validatePng(bytes:Bytes):{width:Int,height:Int} {
-  if(bytes==null || bytes.length<33 || bytes.length>4*1024*1024) throw "PNG must be at most 4 MiB.";
+  if(bytes==null || bytes.length<33) throw "Not a readable PNG image.";
+  solarflare.ui.RasterImagePolicy.fileSize(bytes.length);
   if(bytes.sub(0,8).toHex()!="89504e470d0a1a0a") throw "Not a PNG image.";
   var input=new BytesInput(bytes); input.bigEndian=true; input.position=8;
   var width=0; var height=0; var ended=false; var idat=new BytesOutput(); var chunks=0;
@@ -168,7 +172,7 @@ class AuraSharePackage {
   var images:Array<AuraShareImage>=[]; var hashes=new Map<String,Bool>(); var keys=new Map<String,Bool>();
   for(raw in list(manifest.images,"Images",256)) {
    if(raw==null || !Std.isOfType(raw.sha256,String) || !~/^[a-f0-9]{64}$/.match(raw.sha256) || hashes.exists(raw.sha256)
-    || raw.entry!="images/"+raw.sha256+".png" || !Std.isOfType(raw.bytes,Int) || raw.bytes<1 || raw.bytes>4*1024*1024
+    || raw.entry!="images/"+raw.sha256+".png" || !Std.isOfType(raw.bytes,Int) || raw.bytes<1 || raw.bytes>solarflare.ui.RasterImagePolicy.MAX_FILE_BYTES
     || !Std.isOfType(raw.width,Int) || !Std.isOfType(raw.height,Int) || raw.width<1 || raw.height<1 || raw.width>1024 || raw.height>1024) throw "Invalid image manifest.";
    var aliases:Array<String>=[];
    for(key in list(raw.keys,"Image aliases",8192)) {
