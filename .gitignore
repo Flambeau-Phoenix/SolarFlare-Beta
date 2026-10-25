@@ -1,6 +1,4 @@
-# Release archives are stored with Git LFS (see .gitattributes); do not add stray zips.
-# Files that are already tracked are unaffected by this rule.
-*.zip
+
 
 # Local build output and machine-specific files
 build/
