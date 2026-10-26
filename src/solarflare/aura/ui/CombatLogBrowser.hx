@@ -518,8 +518,6 @@ class CombatLogBrowser {
 		var unit = unitFor(name);
 		var start = ImGui.getCursorScreenPos();
 		var avail = ImGui.getContentRegionAvail().x;
-		ImGui.dummy(ImGui.vec2(avail, 80));
-		var after = ImGui.getCursorScreenPos();
 		drawPortrait(start.x, start.y + 2, 72, unit, name);
 		var font = ImGui.getFont();
 		ImGui.setCursorScreenPos(ImGui.vec2(start.x + 88, start.y + 6));
@@ -532,7 +530,10 @@ class CombatLogBrowser {
 				+ (Math.isFinite(enemyInfo.firstT) ? " | first seen " + CombatLogDocument.clock(enemyInfo.firstT) : ""));
 		ImGui.setCursorScreenPos(ImGui.vec2(start.x + 88, start.y + 58));
 		ImGui.textDisabled((bossNames.exists(name) ? "Boss | " : "") + (unit.id.length > 0 ? "Unit: " + unit.id : "Unit not identified"));
-		ImGui.setCursorScreenPos(after);
+		// Submit the reserved header after absolute drawing: a bare cursor restore
+		// can extend CursorMaxPos and assert when ImGui ends this table cell.
+		ImGui.setCursorScreenPos(start);
+		ImGui.dummy(ImGui.vec2(avail, 80));
 	}
 
 	function drawHealthAlert(name:String):Void {

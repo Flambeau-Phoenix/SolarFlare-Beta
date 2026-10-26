@@ -424,7 +424,7 @@ class SettingsStore {
 		assignDump(data, "combo", function() return comboDump(cfg.combo));
 		assignDump(data, "chaincast", function() return chaincastDump(cfg.chaincast));
 		assignDump(data, "conduit", function() return conduitDump(cfg.conduit));
-		assignDump(data, "hemorrhage", function() return hemorrhageDump(cfg.hemorrhage));
+		assignDump(data, "hemorrhage", function() return cfg.archivedHemorrhage);
 		assignDump(data, "attackCombo", function() return attackComboDump(cfg.attackCombo));
 		assignDump(data, "resourceTracker", function() return resourceTrackerDump(cfg));
 		assignDump(data, "clog", function() return clogDump(cfg.combatLog));
@@ -666,23 +666,6 @@ class SettingsStore {
 			h: c.height.get(),
 			chrome: chromeDump(c.chrome)
 		};
-	}
-
-	public static function hemorrhageDump(c:solarflare.hemorrhage.HemorrhageConfig):Dynamic {
-		return c == null ? {} : {hidden:c.hidden.get(),autoScroll:c.autoScroll.get(),floatingText:c.floatingText.get(),
-			textSize:c.textSize.get(),textLifetime:c.textLifetime.get(),w:c.width.get(),h:c.height.get(),chrome:chromeDump(c.chrome)};
-	}
-
-	public static function applyHemorrhage(c:solarflare.hemorrhage.HemorrhageConfig,data:Dynamic):Void {
-		if(c==null) return;
-		if(data==null) { c.hidden.set(true); c.autoScroll.set(true); c.floatingText.set(false); return; }
-		setBool(c.hidden,data.hidden); setBool(c.autoScroll,data.autoScroll); setBool(c.floatingText,data.floatingText);
-		setFloat(c.textSize,data.textSize); setFloat(c.textLifetime,data.textLifetime);
-		setFloat(c.width,data.w); setFloat(c.height,data.h);
-		c.textSize.set(Math.max(12,Math.min(28,c.textSize.get())));
-		c.textLifetime.set(Math.max(0.5,Math.min(3,c.textLifetime.get())));
-		c.width.set(Math.max(300,Math.min(1600,c.width.get()))); c.height.set(Math.max(150,Math.min(1200,c.height.get())));
-		applyChrome(c.chrome,data.chrome); c.sizeDirty=true;
 	}
 
 	public static function chaincastDump(c:ChaincastConfig):Dynamic {
@@ -962,7 +945,7 @@ class SettingsStore {
 		applyCombo(cfg.combo, data.combo);
 		applyChaincast(cfg.chaincast, data.chaincast);
 		applyConduit(cfg.conduit, data.conduit);
-		applyHemorrhage(cfg.hemorrhage, data.hemorrhage);
+		cfg.archivedHemorrhage = Reflect.field(data, "hemorrhage");
 		applyAttackCombo(cfg.attackCombo, data.attackCombo);
 		applyResourceTracker(cfg, data);
 		applyClog(cfg.combatLog, data.clog);

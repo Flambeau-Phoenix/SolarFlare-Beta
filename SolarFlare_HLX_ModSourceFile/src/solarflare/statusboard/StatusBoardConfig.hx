@@ -197,7 +197,13 @@ class StatusBoardConfig {
   if (ImGui.smallButton("Copy tooltip coverage##sb_tooltip_audit")) solarflare.ui.UiActionQueue.custom(copyTooltipCoverageFn);
   if (ImGui.isItemHovered()) ImGui.setTooltip("Copies resolution details for hovered status applications. Hover an effect first; unhovered effects have not been formatted.");
   if (AuraStatusCache.lastAudit.length > 0) ImGui.textWrapped(AuraStatusCache.lastAudit);
-  if (!AuraStatusCache.domainKnown) ImGui.textWrapped("Status observation is incomplete; unavailable values are not treated as absence.");
+  // A routine refresh does not turn the last completed sweep into a failed one.
+  // Keep a notice row mounted; gameplay still uses the stricter domainKnown flag.
+  ImGui.textWrapped(switch (AuraStatusCache.discoveryCoverage) {
+   case AuraStatusCache.DISCOVERY_COMPLETE: "Status observation: last scan complete.";
+   case AuraStatusCache.DISCOVERY_INCOMPLETE: "Status observation is incomplete; unavailable values are not treated as absence.";
+   default: "Status observation: checking coverage.";
+  });
   var q=search.draw("##sb_search");
   UiChrome.centeredHeader("Active statuses",30);
   UiScope.child("##sb_active",ImGui.vec2(0,170),function() {

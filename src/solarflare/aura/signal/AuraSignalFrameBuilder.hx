@@ -132,12 +132,13 @@ class AuraSignalFrameBuilder {
 			var src = AuraStatusCache.snaps[i]; if (src == null || src.id == null || src.id.length == 0) continue;
 			var dst = frame.statuses[frame.statusCount++]; dst.rawId = src.id; dst.label = "";
 			dst.instanceId = src.instanceId; dst.sourceItemId = src.sourceItemId; dst.sourceItemKnown = src.sourceItemKnown;
-			dst.ids = src.ids.copy(); dst.present = src.present; dst.durationKnown = src.durationKnown;
+			dst.copyAliases(src.ids); dst.present = src.present; dst.durationKnown = src.durationKnown;
 			dst.durationNative=src.stampSource=="live";
 			dst.stacks = src.stacks; dst.stacksKnown = src.stacksKnown; dst.durationLeft = src.left; dst.durationProgress = clamp01(src.progress);
 			dst.infinite = src.infinite;
 			dst.known = src.known && AuraStatusCache.isCurrent(HealthCache.localHero);
 		}
+		frame.sealLookups();
 		changes.observe(frame,now,HealthCache.identityGen,HealthCache.statusOwnerGen,solarflare.ObserveDemand.auraEventStatusIds,solarflare.ObserveDemand.auraEventSkillIds);
 		solarflare.scripting.ScriptEditorSession.observe(frame,now);
 	}

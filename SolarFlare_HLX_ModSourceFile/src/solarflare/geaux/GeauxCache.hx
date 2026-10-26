@@ -1530,6 +1530,12 @@ class GeauxCache {
 		roots.push(node);
 	}
 
+	static var actionBarFollowFields:Array<String> = [
+		"button", "skillBar", "skillBarPad", "primaryWeaponBar", "weapons",
+		"secondaryWeaponBar", "offhandWeaponBar", "arsenalWeaponBar", "extraWeaponBar",
+		"weaponBar", "classSkills", "skills"
+	];
+	static var actionBarCollectionFields:Array<String> = ["skillSlots", "slots", "buttons", "skillButtons", "weaponBars", "children"];
 	static function walkActionBarAll(node:Dynamic, depth:Int):Void {
 		if (node == null || depth > 18 || hudWalkNodes > 1800)
 			return;
@@ -1538,14 +1544,9 @@ class GeauxCache {
 		hudWalkVisited.set(node, true);
 		hudWalkNodes++;
 		ingestAnyBarSlot(node);
-		var follow = [
-			"button", "skillBar", "skillBarPad", "primaryWeaponBar", "weapons",
-			"secondaryWeaponBar", "offhandWeaponBar", "arsenalWeaponBar", "extraWeaponBar",
-			"weaponBar", "classSkills", "skills"
-		];
-		for (name in follow)
+		for (name in actionBarFollowFields)
 			walkActionBarAll(plainField(node, name), depth + 1);
-		for (name in ["skillSlots", "slots", "buttons", "skillButtons", "weaponBars", "children"]) {
+		for (name in actionBarCollectionFields) {
 			var arr = plainField(node, name);
 			var n = arrayLen(arr);
 			if (n <= 0 || n > 64)
@@ -1913,7 +1914,7 @@ class GeauxCache {
 		if (mem == null || skill == null)
 			return null;
 		try
-			return HlxRuntime.callResolved(mem, [skill])
+			return solarflare.ResolvedCalls.one(mem, skill)
 		catch (_:Dynamic) {}
 		return null;
 	}
@@ -2033,7 +2034,7 @@ class GeauxCache {
 		if (mem == null || skill == null)
 			return false;
 		try
-			return HlxRuntime.callResolved(mem, [skill])
+			return solarflare.ResolvedCalls.one(mem, skill)
 		catch (_:Dynamic) {}
 		return false;
 	}
@@ -2068,7 +2069,7 @@ class GeauxCache {
 			if (levelMem == null)
 				levelMem = HlxRuntime.resolveMember(HlxRuntime.resolveType("ent.Unit"), "get_level");
 			if (levelMem != null)
-				level = HlxRuntime.callResolved(levelMem, [hero]);
+				level = solarflare.ResolvedCalls.one(levelMem, hero);
 		} catch (_:Dynamic) {}
 		if (level < 1)
 			level = Std.int(FieldWalk.extractNumber(hero, "level", 1));
@@ -2400,7 +2401,7 @@ class GeauxCache {
 			if (overrideMem == null)
 				overrideMem = HlxRuntime.resolveMember(HlxRuntime.resolveType("ent.Hero"), "getSkillOverride");
 			if (overrideMem != null)
-				return HlxRuntime.callResolved(overrideMem, [hero, id]);
+				return solarflare.ResolvedCalls.two(overrideMem, hero, id);
 		} catch (_:Dynamic) {}
 		return null;
 	}
@@ -2693,7 +2694,7 @@ class GeauxCache {
 			try {
 				var mem = resolveMem(t, "getOverrideSkill");
 				if (mem != null) {
-					var s = HlxRuntime.callResolved(mem, [obj]);
+					var s = solarflare.ResolvedCalls.one(mem, obj);
 					if (s != null)
 						return s;
 				}
@@ -3047,12 +3048,6 @@ class GeauxCache {
 		snap.procReady=state.procReady; snap.procStart=state.procStart;
 	}
 
-	static var scriptMems:Map<String, ResolvedMember> = new Map();
-	static var scriptMemMiss:Map<String, Bool> = new Map();
-	static var procMems:Map<String, ResolvedMember> = new Map();
-	static var procMemMiss:Map<String, Bool> = new Map();
-	static var highlightMems:Map<String, ResolvedMember> = new Map();
-	static var highlightMemMiss:Map<String, Bool> = new Map();
 
 	/**
 	 * SkillScript.shouldPlayInstantly on the skill's own script. A typed `SkillScript` call binds
@@ -3060,16 +3055,16 @@ class GeauxCache {
 	 * resolved on the script object's live type, as the engine's own virtual call does.
 	 */
 	public static function scriptProc(skill:Dynamic, id:String):Null<Bool> {
-		return scriptBool(skill, id, "shouldPlayInstantly", procMems, procMemMiss);
+		return scriptBool(skill, id, "shouldPlayInstantly");
 	}
 
 	public static function scriptHighlight(skill:Dynamic, id:String):Null<Bool> {
-		return scriptBool(skill, id, "shouldHighlightSkill", highlightMems, highlightMemMiss);
+		return scriptBool(skill, id, "shouldHighlightSkill");
 	}
 
 	/** SkillScript.get_stacks: Status.stacks when the script belongs to a Status, else 0. */
 	public static function scriptStacks(skill:Dynamic, id:String):Int {
-		var v = scriptCall(skill, id, "get_stacks", scriptMems, scriptMemMiss);
+		var v = scriptCall(skill, id, "get_stacks");
 		if (v == null)
 			return 0;
 		try {
@@ -3079,8 +3074,8 @@ class GeauxCache {
 		return 0;
 	}
 
-	static function scriptBool(skill:Dynamic, id:String, method:String, mems:Map<String, ResolvedMember>, miss:Map<String, Bool>):Null<Bool> {
-		var v = scriptCall(skill, id, method, mems, miss);
+	static function scriptBool(skill:Dynamic, id:String, method:String):Null<Bool> {
+		var v = scriptCall(skill, id, method);
 		if (v == null)
 			return null;
 		try {
@@ -3089,8 +3084,8 @@ class GeauxCache {
 		return null;
 	}
 
-	/** One member per skill id, bound once on the script's live type; per call only [script]. */
-	static function scriptCall(skill:Dynamic, id:String, method:String, mems:Map<String, ResolvedMember>, miss:Map<String, Bool>):Dynamic {
+	/** Member metadata belongs to the live script type; receivers and return values are always read anew. */
+	static function scriptCall(skill:Dynamic, id:String, method:String):Dynamic {
 		if (skill == null || id == null || id.length == 0)
 			return null;
 		var sc:Dynamic = null;
@@ -3100,29 +3095,7 @@ class GeauxCache {
 		} catch (_:Dynamic) {}
 		if (sc == null)
 			return null;
-		var liveType=FieldWalk.liveTypeName(sc);
-		var cacheKey=id+"|"+liveType;
-		if(miss.exists(cacheKey)) return null;
-		var mem = mems.get(cacheKey);
-		if (mem == null) {
-			try {
-				var typeName = FieldWalk.liveTypeName(sc);
-				if (typeName.length > 0) {
-					var rt = HlxRuntime.resolveType(typeName);
-					if (rt != null)
-						mem = HlxRuntime.resolveMember(rt, method);
-				}
-			} catch (_:Dynamic) {}
-			if (mem == null) {
-				miss.set(cacheKey, true);
-				return null;
-			}
-			mems.set(cacheKey, mem);
-		}
-		try {
-			return HlxRuntime.callResolved(mem, [sc]);
-		} catch (_:Dynamic) {}
-		return null;
+		return FieldWalk.callLive(sc, method);
 	}
 
 	static function bindSlotSkill(hero:ent.Hero, snap:GeauxSlotSnap):Dynamic {
@@ -3890,7 +3863,7 @@ class GeauxCache {
 			return Math.NaN;
 		if (mem != null) {
 			try {
-				var v:Dynamic = HlxRuntime.callResolved(mem, [obj]);
+				var v:Dynamic = solarflare.ResolvedCalls.one(mem, obj);
 				if (v != null) {
 					var f:Float = v;
 					if (!Math.isNaN(f))

@@ -73,7 +73,7 @@ class ImageLibraryPanel {
 		}
 		ImGui.textWrapped(CustomImages.status);
 		if (ImageDrop.lastDrop.length > 0) ImGui.textDisabled(ImageDrop.lastDrop);
-		ImGui.textWrapped("Images retain their original dimensions. SVG paths use vector limits.");
+		ImGui.textWrapped("Images retain original dimensions within safety limits: 64 MiB/file, 16M pixels/image, 512 MiB custom textures/session. SVG paths use vector limits.");
 		ImGui.textDisabled(ImageDrop.available() ? "Drop " + ImageConvert.EXTENSIONS.join(", ").toUpperCase() + " files onto the game window to import." : ImageDrop.support);
 	}
 

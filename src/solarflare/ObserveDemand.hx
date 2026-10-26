@@ -26,7 +26,6 @@ class ObserveDemand {
 	 * The damage/cast hooks return before attribution when false.
 	 */
 	public static var combatLines:Bool = false;
-	public static var hemorrhage:Bool = false;
 	public static var geaux:Bool = false;
 	public static var geauxBuilder:Bool = false;
 	/** BarTer skill bars — light sampleBarTer path, not full Geaux skills demand. */
@@ -291,8 +290,7 @@ class ObserveDemand {
 		mapContext = auraBuilderOpen || recording || (cfg.auras != null && cfg.auras.anySetUsesMaps());
 		var saber = cfg.lightsaber != null && (!cfg.lightsaber.hidden.get() || cfg.lightsaber.showLog.get());
 		var sparkCube = cfg.extraBarsPrototype != null && cfg.extraBarsPrototype.model.sparkEnabled;
-		hemorrhage = solarflare.hemorrhage.HemorrhageService.active();
-		combatLines = combatLog || recording || saber || auras || auraBuilderOpen || sparkCube || hemorrhage;
+		combatLines = combatLog || recording || saber || auras || auraBuilderOpen || sparkCube;
 		#if solarflare_telemetry
 		riftFlag = riftFlag || solarflare.debug.ResolutionLedger.armed();
 		#end

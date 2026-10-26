@@ -686,7 +686,6 @@ class CombatLogCache {
 		stampRift(line);
 		line.sequence = ++latestSequence;
 		// Independent subscriber: consume once before the shared history can roll over.
-		solarflare.hemorrhage.HemorrhageService.consume(line);
 		if (line.kind != KIND_ENCOUNTER) {
 			if (lines.length < CAP) {
 				lines.push(line);

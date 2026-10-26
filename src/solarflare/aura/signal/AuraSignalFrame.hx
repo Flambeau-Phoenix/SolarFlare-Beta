@@ -127,6 +127,52 @@ class AuraSignalFrame {
 	public var statusContainerKnown:Bool = false;
 	public var statusContainerCount:Int = 0;
 	public var statusOverflow:Bool = false;
+	// Index only completed publications. A mutable/incomplete fixture keeps the original scan semantics.
+	var lookupsSealed:Bool = false;
+	var lookupGeneration:Int = -1;
+	var indexedSkillCount:Int = -1;
+	var indexedStatusCount:Int = -1;
+	var skillIndexReady:Bool = false;
+	var statusIndexReady:Bool = false;
+	var skillExactIndex:Map<String,Int> = new Map();
+	var skillLowerIndex:Map<String,Int> = new Map();
+	var statusIndex:Map<String,Int> = new Map();
+	var skillIndexBuilds:Int = 0;
+	var statusIndexBuilds:Int = 0;
+
+	/** Structural publication edge; build an index only if a consumer actually asks for it. */
+	public function sealLookups():Void {
+		lookupsSealed = true; lookupGeneration = generation;
+		indexedSkillCount = skillCount; indexedStatusCount = statusCount;
+		skillIndexReady = statusIndexReady = false;
+	}
+	function indexSkills():Void {
+		if (skillIndexReady) return;
+		skillExactIndex.clear(); skillLowerIndex.clear();
+		for (i in 0...skillCount) {
+			var s = skills[i];
+			if (!skillExactIndex.exists(s.rawId)) skillExactIndex.set(s.rawId, i);
+			if (!skillExactIndex.exists(s.aliasId)) skillExactIndex.set(s.aliasId, i);
+			var raw = s.rawId.toLowerCase(); var alias = s.aliasId.toLowerCase();
+			if (!skillLowerIndex.exists(raw)) skillLowerIndex.set(raw, i);
+			if (!skillLowerIndex.exists(alias)) skillLowerIndex.set(alias, i);
+		}
+		skillIndexReady = true; skillIndexBuilds++;
+	}
+	function noteStatusKey(key:String, index:Int, rank:Int):Void {
+		var previous = statusIndex.get(key);
+		if (previous == null || (previous & 3) > rank) statusIndex.set(key, (index << 2) | rank);
+	}
+	function indexStatuses():Void {
+		if (statusIndexReady) return;
+		statusIndex.clear();
+		for (i in 0...statusCount) {
+			var s = statuses[i];
+			noteStatusKey(s.rawId.toLowerCase(), i, s.present ? 0 : 1);
+			for (alias in s.ids) noteStatusKey(alias.toLowerCase(), i, s.present ? 2 : 3);
+		}
+		statusIndexReady = true; statusIndexBuilds++;
+	}
 
 	public function setStatusContainerLength(length:Int):Void {
 		statusContainerKnown = length >= 0;
@@ -144,6 +190,7 @@ class AuraSignalFrame {
 		for (_ in 0...solarflare.aura.LocalCastHistory.MAX) playerCasts.push(new EnemyCastSignalSnap());
 	}
 	public function resetCollections():Void {
+		lookupsSealed = false; skillIndexReady = statusIndexReady = false;
 		myStatusTypeKnown=myStatusTypePresent=enemyStatusTypeKnown=enemyStatusTypePresent=0;
 		for (i in 0...weaponCount) weapons[i].reset();
 		weaponCount = 0;
@@ -199,6 +246,12 @@ class AuraSignalFrame {
 	}
 	public function findSkill(id:String):SkillSignalSnap {
 		if (id == null || id.length == 0) return null;
+		if (lookupsSealed && lookupGeneration == generation && indexedSkillCount == skillCount) {
+			indexSkills();
+			var index = skillExactIndex.get(id);
+			if (index == null) index = skillLowerIndex.get(solarflare.geaux.GeauxCache.sanitizeSkillId(id).toLowerCase());
+			return index == null ? null : skills[index];
+		}
 		for (i in 0...skillCount) { var s = skills[i]; if (s.rawId == id || s.aliasId == id) return s; }
 		var key = solarflare.geaux.GeauxCache.sanitizeSkillId(id).toLowerCase();
 		for (i in 0...skillCount) { var s = skills[i]; if (s.rawId.toLowerCase() == key || s.aliasId.toLowerCase() == key) return s; }
@@ -221,6 +274,11 @@ class AuraSignalFrame {
 	}
 	public function findStatus(id:String):StatusSignalSnap {
 		if (id == null || id.length == 0) return null;
+		if (lookupsSealed && lookupGeneration == generation && indexedStatusCount == statusCount) {
+			indexStatuses();
+			var index = statusIndex.get(StringTools.trim(id).toLowerCase());
+			return index == null ? null : statuses[index >> 2];
+		}
 		return findStatusExact(StringTools.trim(id).toLowerCase());
 	}
 

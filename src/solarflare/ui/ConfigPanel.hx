@@ -70,7 +70,8 @@ class ConfigPanel {
 	public var combo:ComboConfig;
 	public var chaincast:ChaincastConfig;
 	public var conduit:ConduitConfig;
-	public var hemorrhage:solarflare.hemorrhage.HemorrhageConfig;
+	/** Inert legacy settings; archived feature code is outside the active source tree. */
+	public var archivedHemorrhage:Dynamic = null;
 	public var combatLog:CombatLogConfig;
 	public var target:TargetConfig;
 	public var castBar:CastBarConfig;
@@ -165,7 +166,6 @@ class ConfigPanel {
 		combo = new ComboConfig();
 		chaincast = new ChaincastConfig();
 		conduit = new ConduitConfig();
-		hemorrhage = new solarflare.hemorrhage.HemorrhageConfig();
 		combatLog = new CombatLogConfig();
 		target = new TargetConfig();
 		castBar = new CastBarConfig();
@@ -229,7 +229,6 @@ class ConfigPanel {
 		registerInteractive(solarflare.debug.ResolutionLedger.enabled);
 		#end
 		if (resourceTracker != null) registerInteractive(resourceTracker.open);
-		if (hemorrhage != null) registerInteractive(hemorrhage.tool.open);
 		if (geauxBuilder != null) registerInteractive(geauxBuilder.open);
 		if (auraBuilder != null) { registerInteractive(auraBuilder.open); registerInteractive(auraBuilder.canvasEditor.open); }
 		if (stacks != null) registerInteractive(stacks.open);
@@ -300,7 +299,6 @@ class ConfigPanel {
 		if (stacks != null) stacks.clearTransientState();
 		if (lootBrowser != null) lootBrowser.clearTransientState();
 		if (barter != null) barter.clearTransientState();
-		if (hemorrhage != null) hemorrhage.tool.clearTransientState();
 		if (chaincast != null) chaincast.modules.clearTransientState();
 		uiLayouts.clearTransientState();
 	}
@@ -1007,7 +1005,6 @@ class ConfigPanel {
 		if (attackCombo != null) items.push({id: "attack", label: "Combo Tracker", hidden: attackCombo.hidden});
 		if (chaincast != null) items.push({id: "chaincast", label: "Chaincast", hidden: chaincast.hidden});
 		if (conduit != null) items.push({id: "conduit", label: "Conduits", hidden: conduit.hidden});
-		if (hemorrhage != null) items.push({id: "hemorrhage", label: "Hemorrhage", hidden: hemorrhage.hidden});
 		if (target != null) items.push({id: "target", label: "Target Frame", hidden: target.hidden});
 		if (castBar != null) items.push({id: "castbar", label: "Player Cast Bar", hidden: castBar.hidden});
 		items.push({id:"dash",label:"Dash / Recharge",hidden:dash.hidden});

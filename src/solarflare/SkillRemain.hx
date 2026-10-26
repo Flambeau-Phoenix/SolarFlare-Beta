@@ -297,7 +297,7 @@ class SkillRemain {
 		ensureMems();
 		if (mem != null) {
 			try {
-				var v:Dynamic = HlxRuntime.callResolved(mem, [item]);
+				var v:Dynamic = ResolvedCalls.one(mem, item);
 				if (v != null) {
 					var f:Float = v;
 					if (!Math.isNaN(f))

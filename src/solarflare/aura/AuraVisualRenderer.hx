@@ -65,7 +65,7 @@ class AuraVisualRenderer {
 				if (el.kind == AuraCanvasElement.KIND_ICON || el.kind == AuraCanvasElement.KIND_SHAPE || el.kind == AuraCanvasElement.KIND_PATH) {
 					if (el.kind == AuraCanvasElement.KIND_ICON && !a.showIcon.get()) continue;
 					var bw:Float = el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : w, bh:Float = el.hAt(sid) > 1 ? el.hAt(sid) * vectorScale : h;
-					var ep:Float = el.edgePad() * vectorScale;
+					var ep:Float = Math.max(el.edgePad(), el.pulsePad()) * vectorScale;
 					if ((el.kind == AuraCanvasElement.KIND_SHAPE || el.kind == AuraCanvasElement.KIND_PATH) && el.rotationAt(sid) != 0) {
 						var ext = AuraCanvasElement.rotatedHalfExtent(bw, bh, el.rotationAt(sid));
 						out.include(el.xAt(sid) * vectorScale + bw * 0.5 - ext.hx - ep, el.yAt(sid) * vectorScale + bh * 0.5 - ext.hy - ep, ext.hx * 2 + ep * 2, ext.hy * 2 + ep * 2);
@@ -259,7 +259,7 @@ class AuraVisualRenderer {
 	}
 
 	/** When true, pulses also play in the editor and previews (fades only run in game or with Live conditions). */
-	public static var animateInEditor:Bool = false;
+	public static var animateInEditor:Bool = true;
 
 	/** Freeform element placements + optional glow / fuse / countdown overlays. */
 	static function drawCanvas(dl:Dynamic, a:AuraDef, x:Single, y:Single, w:Single, h:Single,
@@ -281,25 +281,34 @@ class AuraVisualRenderer {
 				continue;
 			var elAlpha = alpha * el.opacityAt(sid);
 			var elCol = el.colorAt(sid);
+			var elCol2 = el.color2;
+			var elStroke = el.strokeColor != null ? el.strokeColor : elCol;
+			var elEdge = el.edgeColor;
+			var animate = live || animateInEditor;
+			var wave = el.pulseKind != AuraCanvasElement.PULSE_NONE && animate ? el.pulseWave(animNow) : 0.0;
 			if (live && el.hasFade()) elAlpha *= el.fadeAlpha(animNow);
-			if (el.pulseKind != AuraCanvasElement.PULSE_NONE && (live || animateInEditor)) {
-				var wave = el.pulseWave(animNow);
+			if (el.pulseKind != AuraCanvasElement.PULSE_NONE && animate) {
 				if (el.pulseKind == AuraCanvasElement.PULSE_FADE) elAlpha *= 1 - el.pulseDepth * wave;
-				else elCol = lerpPacked(elCol, el.pulseColor, el.pulseDepth * wave);
+				else if (el.pulseKind == AuraCanvasElement.PULSE_COLOR) {
+					elCol = el.pulseTint(elCol, wave);
+					if (elCol2 != null) elCol2 = el.pulseTint(elCol2, wave);
+					elStroke = el.pulseTint(elStroke, wave);
+					elEdge = el.pulseTint(elEdge, wave);
+				}
 			}
 			if (elAlpha <= 0.002) continue;
 			if (el.kind == AuraCanvasElement.KIND_SHAPE) {
 				drawCanvasShape(dl, el.content, x + el.xAt(sid) * vectorScale, y + el.yAt(sid) * vectorScale,
 					el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : w, el.hAt(sid) > 1 ? el.hAt(sid) * vectorScale : h,
 					applyAlphaToPacked(elCol, elAlpha), el.stroke * vectorScale, el.rotationAt(sid), el.sides,
-					el.color2 != null ? applyAlphaToPacked(el.color2, elAlpha) : null, el.gradDir);
+					elCol2 != null ? applyAlphaToPacked(elCol2, elAlpha) : null, el.gradDir);
 			} else if (el.kind == AuraCanvasElement.KIND_PATH) {
 				if (el.path != null)
 					drawVectorPath(dl, el.path, x + el.xAt(sid) * vectorScale, y + el.yAt(sid) * vectorScale,
 						el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : w, el.hAt(sid) > 1 ? el.hAt(sid) * vectorScale : h,
 						el.fill, applyAlphaToPacked(elCol, elAlpha),
-						el.color2 != null ? applyAlphaToPacked(el.color2, elAlpha) : null, el.gradDir,
-						el.stroke * vectorScale, applyAlphaToPacked(el.strokeColor != null ? el.strokeColor : elCol, elAlpha), el.rotationAt(sid));
+						elCol2 != null ? applyAlphaToPacked(elCol2, elAlpha) : null, el.gradDir,
+						el.stroke * vectorScale, applyAlphaToPacked(elStroke, elAlpha), el.rotationAt(sid));
 			} else if (el.kind == AuraCanvasElement.KIND_ICON) {
 				if (!a.showIcon.get()) continue;
 				var iw:Single = el.wAt(sid) > 1 ? el.wAt(sid) * vectorScale : w;
@@ -342,7 +351,9 @@ class AuraVisualRenderer {
 				ImGui.popFont();
 			}
 			if (el.edgeOn && el.kind != AuraCanvasElement.KIND_TEXT)
-				drawEdge(dl, el, sid, x, y, w, h, vectorScale, applyAlphaToPacked(el.edgeColor, elAlpha), progress, live);
+				drawEdge(dl, el, sid, x, y, w, h, vectorScale, applyAlphaToPacked(elEdge, elAlpha), progress, live);
+			if (el.pulseKind == AuraCanvasElement.PULSE_OUTLINE && animate)
+				drawOutlinePulse(dl, a, el, sid, x, y, w, h, vectorScale, elAlpha, wave);
 		}
 
 		if (faceFx && wantFuse(a, progress)) {
@@ -356,6 +367,62 @@ class AuraVisualRenderer {
 
 	static var edgePts:hl.Bytes = new hl.Bytes(8 * AuraVectorPath.MAX_FLAT_POINTS);
 	static var EDGE_BOX:Array<Float> = [0, 0, 0, 1, 1, 1, 1, 0];
+
+	/** Uses loaded alpha contours and retained path points. No image load or placeholder rectangle. */
+	static function drawOutlinePulse(dl:Dynamic, a:AuraDef, el:AuraCanvasElement, sid:String,
+			ox:Float, oy:Float, cw:Float, ch:Float, scale:Float, alpha:Float, wave:Float):Void {
+		if (el.kind == AuraCanvasElement.KIND_TEXT) return;
+		var intensity = el.outlineIntensity(wave);
+		if (intensity <= 0.001) return;
+		var x = ox + el.xAt(sid) * scale, y = oy + el.yAt(sid) * scale;
+		var w = el.wAt(sid) > 1 ? el.wAt(sid) * scale : cw;
+		var h = el.hAt(sid) > 1 ? el.hAt(sid) * scale : ch;
+		var rotation = el.kind == AuraCanvasElement.KIND_ICON ? 0.0 : el.rotationAt(sid);
+		var core = Math.max(1, el.stroke) * scale;
+		var spread = el.pulseSpread * scale;
+		if (el.kind == AuraCanvasElement.KIND_SHAPE) {
+			for (pass in 0...7) {
+				var t = (6 - pass) / 6.0;
+				if (spread <= 0 && pass != 6) continue;
+				var light = intensity * alpha * (pass == 6 ? 0.9 : 0.15 * (1 - t * 0.8));
+				var col = applyAlphaToPacked(el.pulseColor, light);
+				if (el.content == "ring") {
+					// Keep the original ring's centreline fixed as the light gets wider.
+					var body = el.stroke > 0 ? el.stroke * scale : Math.max(scale, Math.min(w, h) * 0.18);
+					ImGui.ImDrawList_AddEllipse(dl, ImGui.vec2(x + w * 0.5, y + h * 0.5),
+						ImGui.vec2(Math.max(1, (w - body) * 0.5), Math.max(1, (h - body) * 0.5)), col,
+						rotation * Math.PI / 180, 0, core + spread * t * 2);
+				} else drawCanvasShape(dl, el.content, x, y, w, h, col, core + spread * t * 2, rotation, el.sides);
+			}
+		} else if (el.kind == AuraCanvasElement.KIND_PATH) {
+			if (el.path != null) drawPulseLoop(dl, el.path.flatPoints(), el.path.closed, x, y, w, h, rotation, core, spread, el.pulseColor, intensity * alpha);
+		} else if (el.kind == AuraCanvasElement.KIND_ICON) {
+			var id = el.content != null && el.content.length > 0 ? el.content : a.preferredIconId();
+			var loops = GameIcons.contourFor(id);
+			if (loops != null) for (loop in loops)
+				drawPulseLoop(dl, loop, true, x, y, w, h, 0, core, spread, el.pulseColor, intensity * alpha);
+		}
+	}
+
+	static function drawPulseLoop(dl:Dynamic, loop:Array<Float>, closed:Bool, x:Float, y:Float, w:Float, h:Float,
+			rotation:Float, core:Float, spread:Float, packed:Int, intensity:Float):Void {
+		var n = Std.int(Math.min(AuraVectorPath.MAX_FLAT_POINTS, loop.length >> 1));
+		if (n < 2) return;
+		var cx = x + w * 0.5, cy = y + h * 0.5;
+		var r = rotation * Math.PI / 180, cr = Math.cos(r), sr = Math.sin(r);
+		for (i in 0...n) {
+			var dx = (loop[i * 2] - 0.5) * w, dy = (loop[i * 2 + 1] - 0.5) * h;
+			edgePts.setF32(i * 8, cx + dx * cr - dy * sr);
+			edgePts.setF32(i * 8 + 4, cy + dx * sr + dy * cr);
+		}
+		for (pass in 0...7) {
+			var t = (6 - pass) / 6.0;
+			if (spread <= 0 && pass != 6) continue;
+			var light = intensity * (pass == 6 ? 0.9 : 0.15 * (1 - t * 0.8));
+			ImGui.ImDrawList_AddPolyline(dl, edgePts, n, applyAlphaToPacked(packed, light), core + spread * t * 2,
+				closed && n >= 3 ? imgui.Enums.ImDrawFlags.Closed : 0);
+		}
+	}
 
 	/**
 	 * Coloured outline along a layer's edge: an image's visible shape (found once at load), a shape, or a path.

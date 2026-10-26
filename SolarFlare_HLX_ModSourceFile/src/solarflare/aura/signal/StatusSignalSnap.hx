@@ -19,5 +19,11 @@ class StatusSignalSnap {
 	public var infinite:Bool = false;
 	public var known:Bool = false;
 	public function new() {}
+	/** Destination owns this retained buffer; source aliases never escape into a frozen frame. */
+	public function copyAliases(source:Array<String>):Void {
+		if (source == ids) return;
+		ids.resize(0);
+		for (alias in source) ids.push(alias);
+	}
 	public function reset():Void { observedAt=0; instanceId = ""; rawId = ""; sourceItemId = ""; sourceItemKnown = false; ids.resize(0); present = true; durationKnown = durationNative = false; label = ""; stacks = 0; stacksKnown = false; durationLeft = 0; durationProgress = 0; infinite = false; known = false; }
 }

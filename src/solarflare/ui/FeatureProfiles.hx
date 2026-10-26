@@ -266,7 +266,7 @@ class FeatureProfiles {
 			castBar: SettingsStore.castBarDump(cfg.castBar),
 			chaincast: SettingsStore.chaincastDump(cfg.chaincast),
 			conduit: SettingsStore.conduitDump(cfg.conduit),
-			hemorrhage: SettingsStore.hemorrhageDump(cfg.hemorrhage)
+			hemorrhage: cfg.archivedHemorrhage
 		};
 	}
 
@@ -277,7 +277,6 @@ class FeatureProfiles {
 
 	static function applyUniversal(cfg:ConfigPanel, key:String):Void {
 		ProfileTrace.note("profile","APPLY "+describe(key)+" snapshotKeys="+(bank.profiles.get(key)==null ? "MISSING" : Reflect.fields(bank.profiles.get(key).snapshot).join(",")));
-		solarflare.hemorrhage.HemorrhageService.interrupt("Configuration profile changed");
 		transition.restoring();
 		if (cfg == null) return;
   cfg.clearTransientState(); cfg.extraBarsPrototype.clearTransientState();
@@ -328,7 +327,7 @@ class FeatureProfiles {
 			SettingsStore.applyCastBar(cfg.castBar, Reflect.field(resSnap, "castBar"));
 			SettingsStore.applyChaincast(cfg.chaincast, Reflect.field(resSnap, "chaincast"));
 			SettingsStore.applyConduit(cfg.conduit, Reflect.field(resSnap, "conduit"));
-			SettingsStore.applyHemorrhage(cfg.hemorrhage, Reflect.field(resSnap, "hemorrhage"));
+			cfg.archivedHemorrhage = Reflect.field(resSnap, "hemorrhage");
 		}
 
   cfg.extraBarsPrototype.applyProfile(snap.extraBars,snap.extraBarsPlacement);

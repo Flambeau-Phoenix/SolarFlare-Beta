@@ -110,6 +110,9 @@ class AuraCanvasElement {
 	public static inline var PULSE_FADE:Int = 1;
 	/** Blends the layer colour towards `pulseColor` and back. */
 	public static inline var PULSE_COLOR:Int = 2;
+	/** Pulsing light following the layer's artwork outline, without changing its size. */
+	public static inline var PULSE_OUTLINE:Int = 3;
+	public static inline var MAX_PULSE_SPREAD:Float = 48;
 	public static inline var MAX_FADE:Float = 5;
 
 	/** Seconds to fade in when the layer appears (0 = instant). */
@@ -122,6 +125,10 @@ class AuraCanvasElement {
 	/** 0..1: how far opacity dips, or how far the colour travels towards `pulseColor`. */
 	public var pulseDepth:Float = 0.6;
 	public var pulseColor:Int = 0xFFFFFFFF;
+	/** Outline brightness multiplier (0..2); independent of pulse modulation. */
+	public var pulseIntensity:Float = 1;
+	/** Outline glow reach in canvas pixels (0..48). */
+	public var pulseSpread:Float = 12;
 	/** Sound file stems from custom_sounds, played when the layer appears / goes away in game. */
 	public var soundShow:String = "";
 	public var soundHide:String = "";
@@ -172,6 +179,28 @@ class AuraCanvasElement {
 	public function pulseWave(now:Float):Float {
 		var period = Math.max(0.2, pulsePeriod);
 		return 0.5 - 0.5 * Math.cos(2 * Math.PI * ((now % period) / period));
+	}
+
+	/** Same colour modulation for fill, gradient endpoints, explicit strokes and edge outlines. */
+	public function pulseTint(base:Int, wave:Float):Int {
+		if (pulseKind != PULSE_COLOR) return base;
+		var t = Math.max(0, Math.min(1, pulseDepth * wave));
+		var result = 0;
+		for (shift in 0...4) {
+			var bits = shift * 8;
+			var from = (base >>> bits) & 255, to = (pulseColor >>> bits) & 255;
+			result |= Std.int(from + (to - from) * t + 0.5) << bits;
+		}
+		return result;
+	}
+
+	public function outlineIntensity(wave:Float):Float {
+		return pulseIntensity * (1 - pulseDepth + pulseDepth * wave);
+	}
+
+	/** Maximum reach, independent of time, so pulsing never resizes the HUD host. */
+	public function pulsePad():Float {
+		return pulseKind == PULSE_OUTLINE && kind != KIND_TEXT ? pulseSpread + Math.max(1, stroke * 0.5) + 2 : 0;
 	}
 
 	/** Path layers: the outline, in the unit square of the layer's box. */
@@ -327,7 +356,8 @@ class AuraCanvasElement {
 		if (fadeOut > 0) o.fadeOut = fadeOut;
 		if (pulseKind != PULSE_NONE) {
 			o.pulseKind = pulseKind; o.pulsePeriod = pulsePeriod; o.pulseDepth = pulseDepth;
-			if (pulseKind == PULSE_COLOR) o.pulseColor = pulseColor;
+			if (pulseKind == PULSE_COLOR || pulseKind == PULSE_OUTLINE) o.pulseColor = pulseColor;
+			if (pulseKind == PULSE_OUTLINE) { o.pulseIntensity = pulseIntensity; o.pulseSpread = pulseSpread; }
 		}
 		if (soundShow.length > 0) o.soundShow = soundShow;
 		if (soundHide.length > 0) o.soundHide = soundHide;
@@ -382,9 +412,11 @@ class AuraCanvasElement {
 		el.fadeIn = clampSeconds(d.fadeIn, 0, MAX_FADE, 0);
 		el.fadeOut = clampSeconds(d.fadeOut, 0, MAX_FADE, 0);
 		var pk:Null<Int> = d.pulseKind != null ? Std.int(d.pulseKind) : null;
-		el.pulseKind = pk == PULSE_FADE || pk == PULSE_COLOR ? pk : PULSE_NONE;
+		el.pulseKind = pk == PULSE_FADE || pk == PULSE_COLOR || pk == PULSE_OUTLINE && kind != KIND_TEXT ? pk : PULSE_NONE;
 		el.pulsePeriod = clampSeconds(d.pulsePeriod, 0.2, 30, 2);
 		el.pulseDepth = clampSeconds(d.pulseDepth, 0, 1, 0.6);
+		el.pulseIntensity = clampSeconds(d.pulseIntensity, 0, 2, 1);
+		el.pulseSpread = clampSeconds(d.pulseSpread, 0, MAX_PULSE_SPREAD, 12);
 		if (d.pulseColor != null && (Std.isOfType(d.pulseColor, Int) || Std.isOfType(d.pulseColor, Float))) el.pulseColor = Std.int(d.pulseColor);
 		el.soundShow = cleanSound(d.soundShow);
 		el.soundHide = cleanSound(d.soundHide);

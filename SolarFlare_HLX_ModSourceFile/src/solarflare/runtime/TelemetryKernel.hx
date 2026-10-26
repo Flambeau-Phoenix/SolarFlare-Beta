@@ -74,15 +74,12 @@ class TelemetryKernel {
 			settingsInitialized = true;
 			try solarflare.ui.SettingsStore.tick(cfg) catch (_:Dynamic) {}
 		}
-		solarflare.hemorrhage.HemorrhageService.beforeDrain(now);
-		cfg.hemorrhage.observe(HealthCache.localHero, now);
 		if(cfg.auraBuilder!=null) cfg.auraBuilder.observeShares();
 		ObserveDemand.publish(cfg);
 		if((solarflare.aura.StatusTypeDemand.meMask|solarflare.aura.StatusTypeDemand.enemyMask)==0) solarflare.aura.StatusTypeService.reset();
 		demand.capture(cfg);
 		if(!ObserveDemand.aurasNeedTargetStatus) solarflare.aura.TargetStatusCache.reset();
 		EventRing.drain(solarflare.combatlog.CombatLogCache.consumeHookEvent, 128, 0.0005);
-		solarflare.hemorrhage.HemorrhageService.afterDrain(now, !cfg.hemorrhage.hidden.get() || cfg.hemorrhage.tool.open.get());
 
 		try solarflare.ui.HideAllBind.ensureCodes() catch (_:Dynamic) {}
 		try solarflare.ui.WindowAutoHide.observe(app, now) catch (_:Dynamic) {}

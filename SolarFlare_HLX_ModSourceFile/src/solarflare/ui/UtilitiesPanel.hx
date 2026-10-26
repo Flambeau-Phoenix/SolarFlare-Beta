@@ -99,6 +99,9 @@ class UtilitiesPanel {
 			UiLayout.propertyRow("Codex", function() {
 				if (ImGui.checkbox("##util_ah_codex", WindowAutoHide.codex)) SettingsStore.markDirty();
 			});
+			UiLayout.propertyRow("Social", function() {
+				if (ImGui.checkbox("##util_ah_social", WindowAutoHide.social)) SettingsStore.markDirty();
+			}, "Party, Friends and social settings pages.");
 			ImGui.endDisabled();
 		});
 		ImGui.textWrapped(WindowAutoHide.reason);

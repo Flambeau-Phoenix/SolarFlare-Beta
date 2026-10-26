@@ -300,7 +300,7 @@ class GameIcons {
 
 	/** Queue-only from draw; actual file/PNG/texture work runs in observe(). */
 	static function request(id:String):Void {
-		if (id == null || id.length == 0 || requested.exists(id))
+		if (id == null || id.length == 0 || requested.exists(id) || pending.length >= 128)
 			return;
 		requested.set(id, true);
 		pending.push(id);
@@ -677,9 +677,11 @@ class GameIcons {
 		try {
 			if (path == null || !FileSystem.exists(path))
 				return 0;
+			if(custom) RasterImagePolicy.fileSize(FileSystem.stat(path).size);
 			var fileBytes = File.getBytes(path);
 			if (fileBytes == null || fileBytes.length == 0)
 				return 0;
+			var budgetKey = custom ? CustomTextureBudget.admitPng(fileBytes) : "";
 			if(custom) ImageConvert.guardPng(fileBytes);
 			var data = new Reader(new BytesInput(iconPng(fileBytes))).read();
 			if (data == null)
@@ -709,7 +711,7 @@ class GameIcons {
 			dimW.set(id, header.width);
 			dimH.set(id, header.height);
 			var texture=ImGui.registerTexture(rgba.getData(), header.width, header.height, pitch);
-			if(custom && texture!=(0:TextureHandle)) customErrors.remove(id.toLowerCase());
+			if(custom && texture!=(0:TextureHandle)) { CustomTextureBudget.commit(budgetKey,header.width,header.height); customErrors.remove(id.toLowerCase()); }
 			return texture;
 		} catch (error:Dynamic) {
 			if(custom) customErrors.set(id.toLowerCase(),Std.string(error));

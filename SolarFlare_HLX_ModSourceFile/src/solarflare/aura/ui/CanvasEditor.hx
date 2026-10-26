@@ -3074,6 +3074,9 @@ class CanvasEditor {
 	var canvasAnimOut = new FloatRef(0);
 	var canvasAnimPeriod = new FloatRef(2);
 	var canvasAnimDepth = new FloatRef(60);
+	var canvasAnimIntensity = new FloatRef(100);
+	var canvasAnimSpread = new FloatRef(12);
+	var canvasAnimatePreview = new BoolRef(true);
 	var canvasAnimVol = new FloatRef(70);
 	var canvasPulseBuf:hl.Bytes = ImGui.v4(1, 1, 1, 1);
 	var canvasPulseEditing:Bool = false;
@@ -3081,7 +3084,7 @@ class CanvasEditor {
 	var soundMsg:String = "";
 	var soundMsgError:Bool = false;
 	var soundScanQueued:Bool = false;
-	static var PULSE_LABELS:Array<String> = ["None", "Breathe (opacity)", "Colour shift"];
+	static var PULSE_LABELS:Array<String> = ["None", "Breathe (opacity)", "Colour shift", "Outline pulse"];
 
 	function soundPicker(id:String, current:String, onPick:String->Void, volume:Float):Void {
 		ImGui.setNextItemWidth(Math.max(60, ImGui.getContentRegionAvail().x - 58));
@@ -3105,7 +3108,11 @@ class CanvasEditor {
 		if (!CustomSounds.hasScanned() && !soundScanQueued) { soundScanQueued = true; UiActionQueue.custom(function() CustomSounds.refresh()); }
 		canvasAnimIn.set(el.fadeIn); canvasAnimOut.set(el.fadeOut);
 		canvasAnimPeriod.set(el.pulsePeriod); canvasAnimDepth.set(Math.round(el.pulseDepth * 100));
+		canvasAnimIntensity.set(Math.round(el.pulseIntensity * 100)); canvasAnimSpread.set(el.pulseSpread);
 		canvasAnimVol.set(Math.round(el.soundVolume * 100));
+		var outlineImage = el.content != null && el.content.length > 0 ? el.content : a.preferredIconId();
+		var outlineSupported = el.kind == AuraCanvasElement.KIND_SHAPE || el.kind == AuraCanvasElement.KIND_PATH
+			|| el.kind == AuraCanvasElement.KIND_ICON && outlineImage != null && StringTools.startsWith(outlineImage, AuraCanvasElement.CUSTOM_PREFIX);
 		UiLayout.propertyGrid("##cv_anim_props", function() {
 			UiLayout.propertyRow("Fade in", function() {
 				if (NumberField.draw("##cv_fin", canvasAnimIn, 0, AuraCanvasElement.MAX_FADE, "%.1f s (0 = instant)", preciseFn)) { el.fadeIn = canvasAnimIn.get(); SettingsStore.markDirty(); }
@@ -3116,20 +3123,33 @@ class CanvasEditor {
 			UiLayout.propertyRow("Pulse", function() {
 				ImGui.setNextItemWidth(-1);
 				if (ImGui.beginCombo("##cv_pulse_kind", PULSE_LABELS[el.pulseKind])) {
-					for (i in 0...PULSE_LABELS.length) if (ImGui.selectable(PULSE_LABELS[i] + "##cv_pk_" + i, el.pulseKind == i) && el.pulseKind != i) {
-						host.canvasSnapshot("Canvas Pulse"); el.pulseKind = i; SettingsStore.markDirty();
-					}
+					try {
+						for (i in 0...PULSE_LABELS.length) {
+							if (i == AuraCanvasElement.PULSE_OUTLINE && !outlineSupported) continue;
+							if (ImGui.selectable(PULSE_LABELS[i] + "##cv_pk_" + i, el.pulseKind == i) && el.pulseKind != i) {
+								host.canvasSnapshot("Canvas Pulse"); el.pulseKind = i; SettingsStore.markDirty();
+							}
+						}
+					} catch (e:Dynamic) { ImGui.endCombo(); throw e; }
 					ImGui.endCombo();
 				}
-			}, "A steady loop: breathe the opacity, or shift the colour towards another and back.");
+			}, "Breathe opacity, shift colours, or pulse light along this layer's visible artwork outline.");
 			if (el.pulseKind != AuraCanvasElement.PULSE_NONE) {
 				UiLayout.propertyRow("Speed", function() {
 					if (NumberField.draw("##cv_pperiod", canvasAnimPeriod, 0.2, 30, "%.1f s per pulse", preciseFn)) { el.pulsePeriod = canvasAnimPeriod.get(); SettingsStore.markDirty(); }
 				});
-				UiLayout.propertyRow("Strength", function() {
+				UiLayout.propertyRow("Pulse amount", function() {
 					if (NumberField.draw("##cv_pdepth", canvasAnimDepth, 0, 100, "%.0f%%", preciseFn)) { el.pulseDepth = canvasAnimDepth.get() / 100; SettingsStore.markDirty(); }
 				});
-				if (el.pulseKind == AuraCanvasElement.PULSE_COLOR) {
+				if (el.pulseKind == AuraCanvasElement.PULSE_OUTLINE) {
+					UiLayout.propertyRow("Intensity", function() {
+						if (NumberField.draw("##cv_pintensity", canvasAnimIntensity, 0, 200, "%.0f%%", preciseFn)) { el.pulseIntensity = canvasAnimIntensity.get() / 100; SettingsStore.markDirty(); }
+					}, "Brightness of the outline light. Zero turns the light off.");
+					UiLayout.propertyRow("Depth", function() {
+						if (NumberField.draw("##cv_pspread", canvasAnimSpread, 0, AuraCanvasElement.MAX_PULSE_SPREAD, "%.1f px", preciseFn)) { el.pulseSpread = canvasAnimSpread.get(); SettingsStore.markDirty(); }
+					}, "How far the glow reaches from the artwork's edge. The artwork itself stays the same size.");
+				}
+				if (el.pulseKind == AuraCanvasElement.PULSE_COLOR || el.pulseKind == AuraCanvasElement.PULSE_OUTLINE) {
 					UiLayout.propertyRow("Pulse colour", function() {
 						if (!canvasPulseEditing) fillColorBuf(canvasPulseBuf, el.pulseColor);
 						if (ImGui.colorEdit4("##cv_pcolor", canvasPulseBuf, PICKER_FLAGS)) {
@@ -3140,6 +3160,10 @@ class CanvasEditor {
 						} else if (!ImGui.isAnyItemActive()) canvasPulseEditing = false;
 					});
 				}
+				UiLayout.propertyRow("Preview pulses", function() {
+					canvasAnimatePreview.set(AuraVisualRenderer.animateInEditor);
+					if (ImGui.checkbox("##cv_animate_preview", canvasAnimatePreview)) AuraVisualRenderer.animateInEditor = canvasAnimatePreview.get();
+				}, "Editor preview only; gameplay animation always runs.");
 			}
 			UiLayout.propertyRow("Show cue", function() {
 				soundPicker("show", el.soundShow, function(n) { host.canvasSnapshot("Canvas Sound"); el.soundShow = n; SettingsStore.markDirty(); }, el.soundVolume);
@@ -3153,7 +3177,7 @@ class CanvasEditor {
 				});
 			}
 		});
-		wrappedHint("Fades and sound cues run in game, and in the preview with Live conditions. Pulses can be previewed with View > Animate pulses here. Sound names are not carried by share keys; friends need the same file in their custom_sounds folder.");
+		wrappedHint("Pulses play here by default. Outline pulses follow custom image silhouettes, shapes and vector paths; a missing image never pulses its placeholder box. Fades and sound cues run in game or with Live conditions. Shared sound cues need the same file in custom_sounds.");
 		ImGui.setNextItemWidth(Math.max(60, ImGui.getContentRegionAvail().x - 150));
 		var enter = ImGui.inputTextWithHint("##cv_snd_import", "Path to a .wav, .ogg or .mp3 (2 MB max)", soundImportBuf, 520, imgui.Enums.ImGuiInputTextFlags.EnterReturnsTrue);
 		ImGui.sameLine(0, 4);

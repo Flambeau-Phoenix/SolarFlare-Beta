@@ -62,6 +62,12 @@ class AuraStatusCache {
 	public static var count:Int = 0;
 	public static var revision:Int = 0;
 	public static var domainKnown:Bool = false;
+	public static inline var DISCOVERY_PENDING:Int = 0;
+	public static inline var DISCOVERY_COMPLETE:Int = 1;
+	public static inline var DISCOVERY_INCOMPLETE:Int = 2;
+	/** Presentation only: result of the last finished sweep, retained during a refresh.
+	 * Never used to certify absence; domainKnown keeps its stricter current-pass semantics. */
+	public static var discoveryCoverage(default, null):Int = DISCOVERY_PENDING;
 	/** Full container length before scan cap; -1 when unavailable. */
 	public static var containerLength:Int = -1;
 	static var sampledHero:Dynamic;
@@ -230,6 +236,7 @@ class AuraStatusCache {
 		discovered.clear(); discoveredCount = 0; scanSeen.clear(); scanArray = null;
 		scanCursor = 0; scanLength = -1; scanActive = scanComplete = discoveryWanted = false; sweepUnresolved = lastSweepUnresolved = 0;
 		nextDiscoveryAt = 0; lastDiscoveryStart = -1;
+		discoveryCoverage = DISCOVERY_PENDING;
 		work.lastSliceEntries = 0; work.lastSliceSeconds = 0;
 	}
 
@@ -433,7 +440,7 @@ class AuraStatusCache {
 			&& !(dirty && now - lastDiscoveryStart >= DISCOVERY_WAKE_S)) { finishDiscoveryWork(started); return; }
 		if (arr == null) arr = readContainer(hero);
 		var len = FieldWalk.arrayLen(arr, -1);
-		if (len < 0) { scanActive = false; scanArray = null; scanComplete = false; nextDiscoveryAt = now + DISCOVERY_INTERVAL_S; finishDiscoveryWork(started); return; }
+		if (len < 0) { scanActive = false; scanArray = null; scanComplete = false; discoveryCoverage = DISCOVERY_INCOMPLETE; nextDiscoveryAt = now + DISCOVERY_INTERVAL_S; finishDiscoveryWork(started); return; }
 		if (!scanActive || arr != scanArray) {
 			sweep++;
 			scanArray = arr; scanLength = len; scanCursor = 0; scanSeen.clear();
@@ -492,6 +499,7 @@ class AuraStatusCache {
 				work.discoveryCompletions++;
 				discoveryCompletedThisPass = true;
 			} else scanComplete = false;
+			discoveryCoverage = scanComplete ? DISCOVERY_COMPLETE : DISCOVERY_INCOMPLETE;
 		}
 		// An incomplete sweep cannot certify a complete present-state capture.
 		domainKnown = domainKnown && !scanActive && scanComplete;
@@ -527,12 +535,17 @@ class AuraStatusCache {
 		containerLength = -1;
 		domainKnown = false;
 		var arr = readContainer(owner);
-		if (arr == null)
+		if (arr == null) {
+			discoveryCoverage = DISCOVERY_INCOMPLETE;
 			return;
+		}
 		var len = FieldWalk.arrayLen(arr, -1);
-		if (len < 0)
+		if (len < 0) {
+			discoveryCoverage = DISCOVERY_INCOMPLETE;
 			return;
+		}
 		containerLength = len;
+		if (len > MAX) discoveryCoverage = DISCOVERY_INCOMPLETE;
 		domainKnown = true;
 	}
 

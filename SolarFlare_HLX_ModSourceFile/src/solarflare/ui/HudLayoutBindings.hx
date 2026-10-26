@@ -28,7 +28,6 @@ class HudLayoutBindings {
    for(m in c.chaincast.modules.all) add("resources.chaincast.modules."+m.key,m.chrome,m.width,m.height);
   }
   if(c.conduit!=null) add("resources.conduit.chrome",c.conduit.chrome,c.conduit.width,c.conduit.height);
-  if(c.hemorrhage!=null) { var h=c.hemorrhage; var b=add("resources.hemorrhage.chrome",h.chrome,h.width,h.height); b.changed=function() h.sizeDirty=true; }
   if(c.barter!=null) for(bar in c.barter.config.bars) {
    var item=bar; var b=add("barter.chromes."+bar.id,c.barter.config.chromeFor(bar.id));
    b.sizeGet=function() return item.slotSize;

@@ -24,6 +24,12 @@ class FieldWalk {
 	static var fieldMiss:Map<String, Bool> = new Map();
 	static var mapGetMems:Array<ResolvedMember> = null;
 	static var arrayLenMem:ResolvedMember;
+	// Runtime type metadata only; never an engine receiver, payload or observed value.
+	static var typeNames:Array<FieldTypeName> = [];
+	static var lastTypeName:FieldTypeName;
+	static var typeNameCursor:Int = 0;
+	static var routeKeys:Map<String, FieldRouteKeys> = new Map();
+	static var routeTypeCount:Int = 0;
 	#if hl
 	static var hashLinkArrayBase:hl.Type;
 	#end
@@ -35,8 +41,20 @@ class FieldWalk {
 	];
 
 	public static function resolveNamed(obj:Dynamic, name:String):Dynamic {
-		var hit = ladder(obj, name, true);
-		return hit.usable ? hit.value : null;
+		if (obj == null || name == null || name.length == 0 || isMutatingName(name))
+			return null;
+		var tname = liveTypeName(obj);
+		var key = routeKey(tname, name);
+		var win = namedWins.get(key);
+		if (win != null) {
+			var cached = applyWin(obj, name, win);
+			// The winning route still reads this object now; never cache its value or owner.
+			if (cached != null)
+				return cached;
+			namedWins.remove(key);
+		}
+		// Value discovery needs no diagnostic object; explicit probes still own independent results.
+		return discoverValue(obj, name, true, tname, key);
 	}
 
 	public static function extractObject(obj:Dynamic, propertyName:String):Dynamic {
@@ -55,6 +73,16 @@ class FieldWalk {
 		return callResolvedChain(obj, methodName);
 	}
 
+	/** Exact live-type dispatch for script overrides; never bind the static base implementation. */
+	public static function callLive(obj:Dynamic, methodName:String):Dynamic {
+		if (obj == null || methodName == null || methodName.length == 0 || isMutatingName(methodName)) return null;
+		var typeName = liveTypeName(obj);
+		if (typeName.length == 0) return null;
+		var member = memberOf(typeName, methodName);
+		if (member == null) return null;
+		try return ResolvedCalls.one(member, obj) catch (_:Dynamic) return null;
+	}
+
 	public static function liveTypeName(obj:Dynamic):String {
 		if (obj == null)
 			return "";
@@ -62,10 +90,37 @@ class FieldWalk {
 			var t = hl.Type.getDynamic(obj);
 			if (t == null)
 				return "";
-			var n = t.getTypeName();
-			return n != null ? n : "";
+			return nameOfType(t);
 		} catch (_:Dynamic) {}
 		return "";
+	}
+
+	static function nameOfType(type:hl.Type):String {
+		if (lastTypeName != null && lastTypeName.type == type) return lastTypeName.name;
+		for (entry in typeNames) if (entry.type == type) {
+			lastTypeName = entry; return entry.name;
+		}
+		var name = type.getTypeName();
+		if (name == null || name.length == 0) return "";
+		var entry = new FieldTypeName(type, name);
+		if (typeNames.length < 32) typeNames.push(entry);
+		else { typeNames[typeNameCursor] = entry; typeNameCursor = (typeNameCursor + 1) % 32; }
+		lastTypeName = entry;
+		return name;
+	}
+
+	static function routeKey(typeName:String, memberName:String):String {
+		var names = routeKeys.get(typeName);
+		if (names == null) {
+			// Bound metadata even for arbitrary external callers. Uncached overflow remains correct.
+			if (routeTypeCount >= 256) return typeName + "#" + memberName;
+			names = new FieldRouteKeys(); routeKeys.set(typeName, names); routeTypeCount++;
+		}
+		var key = names.keys.get(memberName);
+		if (key != null) return key;
+		key = typeName + "#" + memberName;
+		if (names.count < 128) { names.keys.set(memberName, key); names.count++; }
+		return key;
 	}
 
 	/**
@@ -171,7 +226,7 @@ class FieldWalk {
 			if (arrayLenMem == null)
 				arrayLenMem = resolveMem("hxbit.ArrayProxyData", "get_length");
 			if (arrayLenMem != null) {
-				var v:Dynamic = HlxRuntime.callResolved(arrayLenMem, [arr]);
+				var v:Dynamic = ResolvedCalls.one(arrayLenMem, arr);
 				if (v != null)
 					return Std.int((v : Float));
 			}
@@ -194,53 +249,34 @@ class FieldWalk {
 		// storage layouts; an ArrayObj method must never be called on ArrayDyn or NativeArray.
 		if (isHashLinkArray(arr)) try {
 			var getter = memberOf(liveTypeName(arr), "getDyn");
-			if (getter != null) return HlxRuntime.callResolved(getter, [arr, i]);
+			if (getter != null) return ResolvedCalls.two(getter, arr, i);
 		} catch (_:Dynamic) {}
 		#end
 		return null;
 	}
 
 
-	static function ladder(obj:Dynamic, name:String, remember:Bool):ProbeHit {
+	static function ladder(obj:Dynamic, name:String, remember:Bool, knownType:String = null, knownKey:String = null):ProbeHit {
 		var hit = new ProbeHit();
 		hit.name = name != null ? name : "";
+		discoverValue(obj, name, remember, knownType, knownKey, hit);
+		return hit;
+	}
+
+	/** Shared lookup order. A diagnostic sink is local to an explicit probe, never shared across reads. */
+	static function discoverValue(obj:Dynamic, name:String, remember:Bool, knownType:String = null, knownKey:String = null, hit:ProbeHit = null):Dynamic {
 		if (obj == null || name == null || name.length == 0 || isMutatingName(name)) {
-			hit.step = "miss";
-			return hit;
+			if (hit != null) hit.step = "miss";
+			return null;
 		}
-		var tname = liveTypeName(obj);
-		var key = tname + "#" + name;
-		if (remember) {
-			var win = namedWins.get(key);
-			if (win != null) {
-				var cached = applyWin(obj, name, win);
-				// Step already validated once — null check only (no Reflect.isFunction every frame).
-				if (cached != null) {
-					hit.step = win.step;
-					hit.value = cached;
-					hit.usable = true;
-					return hit;
-				}
-				namedWins.remove(key);
-			}
-		}
+		var tname = knownType != null ? knownType : liveTypeName(obj);
+		var key = knownKey != null ? knownKey : routeKey(tname, name);
 		var threw = false;
 		if (!fieldMiss.exists(key)) {
 			try {
 				var underscored = resolveOneField(obj, "_" + name);
 				if (usable(underscored)) {
-					if (remember) {
-						rememberWin(key, "_field", "", null);
-						#if solarflare_telemetry
-						try
-							solarflare.debug.FieldWalkLog.noteWin(tname, name, "_field")
-						catch (_:Dynamic) {}
-						#end
-					}
-					hit.step = "_field";
-					hit.value = underscored;
-					hit.usable = true;
-					return hit;
+					return winValue(hit, remember, key, tname, name, "_field", "", underscored);
 				}
 			} catch (_:Dynamic) {
 				threw = true;
@@ -248,18 +284,7 @@ class FieldWalk {
 			try {
 				var plain = resolveOneField(obj, name);
 				if (usable(plain)) {
-					if (remember) {
-						rememberWin(key, "field", "", null);
-						#if solarflare_telemetry
-						try
-							solarflare.debug.FieldWalkLog.noteWin(tname, name, "field")
-						catch (_:Dynamic) {}
-						#end
-					}
-					hit.step = "field";
-					hit.value = plain;
-					hit.usable = true;
-					return hit;
+					return winValue(hit, remember, key, tname, name, "field", "", plain);
 				}
 			} catch (_:Dynamic) {
 				threw = true;
@@ -268,18 +293,18 @@ class FieldWalk {
 		}
 		var g = callTyped(obj, "get_" + name);
 		if (usable(g))
-			return winHit(hit, remember, key, tname, name, "typed", "get_" + name, g);
+			return winValue(hit, remember, key, tname, name, "typed", "get_" + name, g);
 		g = callTyped(obj, "is_" + name);
 		if (usable(g))
-			return winHit(hit, remember, key, tname, name, "typed", "is_" + name, g);
+			return winValue(hit, remember, key, tname, name, "typed", "is_" + name, g);
 		g = callResolvedChain(obj, "get_" + name);
 		if (usable(g))
-			return winHit(hit, remember, key, tname, name, "get_", "get_" + name, g);
+			return winValue(hit, remember, key, tname, name, "get_", "get_" + name, g);
 		g = callResolvedChain(obj, "is_" + name);
 		if (usable(g))
-			return winHit(hit, remember, key, tname, name, "is_", "is_" + name, g);
-		hit.step = threw ? "throw" : "miss";
-		return hit;
+			return winValue(hit, remember, key, tname, name, "is_", "is_" + name, g);
+		if (hit != null) hit.step = threw ? "throw" : "miss";
+		return null;
 	}
 
 	static function applyWin(obj:Dynamic, name:String, win:FieldWin):Dynamic {
@@ -302,7 +327,7 @@ class FieldWalk {
 		return null;
 	}
 
-	static function winHit(hit:ProbeHit, remember:Bool, key:String, tname:String, name:String, step:String, getter:String, value:Dynamic):ProbeHit {
+	static function winValue(hit:ProbeHit, remember:Bool, key:String, tname:String, name:String, step:String, getter:String, value:Dynamic):Dynamic {
 		if (remember) {
 			rememberWin(key, step, getter, null);
 			#if solarflare_telemetry
@@ -311,10 +336,12 @@ class FieldWalk {
 			catch (_:Dynamic) {}
 			#end
 		}
-		hit.step = step;
-		hit.value = value;
-		hit.usable = true;
-		return hit;
+		if (hit != null) {
+			hit.step = step;
+			hit.value = value;
+			hit.usable = true;
+		}
+		return value;
 	}
 
 	static function rememberWin(key:String, step:String, getter:String, mem:ResolvedMember):Void {
@@ -358,7 +385,7 @@ class FieldWalk {
 		if (obj == null || methodName == null || methodName.length == 0)
 			return null;
 		var t = liveTypeName(obj);
-		var chainKey = t + "#" + methodName;
+		var chainKey = routeKey(t, methodName);
 		if (chainMiss.exists(chainKey))
 			return null;
 		var guard = 0;
@@ -366,7 +393,7 @@ class FieldWalk {
 			var mem = memberOf(t, methodName);
 			if (mem != null) {
 				try {
-					var v:Dynamic = HlxRuntime.callResolved(mem, [obj]);
+					var v:Dynamic = ResolvedCalls.one(mem, obj);
 					if (usable(v))
 						return v;
 				} catch (_:Dynamic) {}
@@ -379,7 +406,7 @@ class FieldWalk {
 	}
 
 	static function memberOf(typeName:String, methodName:String):ResolvedMember {
-		var key = typeName + "#" + methodName;
+		var key = routeKey(typeName, methodName);
 		if (memMiss.exists(key))
 			return null;
 		var cached = memCache.get(key);
@@ -478,5 +505,17 @@ class FieldWin {
 	public var getter:String = "";
 	public var mem:ResolvedMember;
 
+	public function new() {}
+}
+
+private class FieldTypeName {
+	public var type:hl.Type;
+	public var name:String;
+	public function new(type:hl.Type, name:String) { this.type = type; this.name = name; }
+}
+
+private class FieldRouteKeys {
+	public var keys:Map<String, String> = new Map();
+	public var count:Int = 0;
 	public function new() {}
 }

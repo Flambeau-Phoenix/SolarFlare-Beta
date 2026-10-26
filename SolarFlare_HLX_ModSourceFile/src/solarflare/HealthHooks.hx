@@ -28,6 +28,10 @@ class HealthHooks {
 	static var conduitProcScratch:Array<ConduitProcSnap> = [];
 	static var conduitProcCount:Int = 0;
 	static var conduitSeen:Map<String, Bool> = new Map();
+	static var regionFields:Array<String> = ["region", "serverRegion", "server", "serverName", "shard", "gateway", "world", "realm", "cluster", "datacenter", "dc"];
+	static var manaFields:Array<String> = ["specialEnergy", "mana", "mp"];
+	static var manaMaxFields:Array<String> = ["specialEnergyMax", "maxSpecialEnergy", "maxMana", "manaMax"];
+	static var sparkMaxFields:Array<String> = ["maxSpark", "sparkMax"];
 
 	/**
 	 * Layer 1 per-present poll of HUD resource bars from identity-only `HealthCache.localHero`.
@@ -254,11 +258,7 @@ class HealthHooks {
 	static function firstRegionString(obj:Dynamic):String {
 		if (obj == null)
 			return "";
-		var names = [
-			"region", "serverRegion", "server", "serverName", "shard", "gateway",
-			"world", "realm", "cluster", "datacenter", "dc"
-		];
-		for (n in names) {
+		for (n in regionFields) {
 			var s = cleanIdent(FieldWalk.extractString(obj, n));
 			if (s.length > 0)
 				return s;
@@ -398,7 +398,7 @@ class HealthHooks {
 				m = ua.specialEnergy;
 		} catch (_:Dynamic) {}
 		if (Math.isNaN(m)) {
-			m = FieldWalk.extractNumberAny(attr, ["specialEnergy", "mana", "mp"], -1);
+			m = FieldWalk.extractNumberAny(attr, manaFields, -1);
 			method = "fieldwalk";
 		}
 		if (m < 0) {
@@ -409,7 +409,7 @@ class HealthHooks {
 		// attribute class, so these names never resolve on v6. Probe once, then stop.
 		var mx = 100.0;
 		if (!manaMaxMissing) {
-			var found = FieldWalk.extractNumberAny(attr, ["specialEnergyMax", "maxSpecialEnergy", "maxMana", "manaMax"], -1);
+			var found = FieldWalk.extractNumberAny(attr, manaMaxFields, -1);
 			if (found > 0)
 				mx = found;
 			else if (found < 0)
@@ -453,7 +453,7 @@ class HealthHooks {
 		// MaxSpark is a CDB attribute, not a field; the probed names do not exist on v6.
 		var mx = 100.0;
 		if (!sparkMaxMissing) {
-			var found = FieldWalk.extractNumberAny(attr, ["maxSpark", "sparkMax"], -1);
+			var found = FieldWalk.extractNumberAny(attr, sparkMaxFields, -1);
 			if (found > 0)
 				mx = found;
 			else if (found < 0)

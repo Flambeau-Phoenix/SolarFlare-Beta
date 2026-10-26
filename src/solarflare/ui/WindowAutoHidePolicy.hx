@@ -20,7 +20,8 @@ class WindowAutoHidePolicy {
 	public static inline var COLLECTION:Int = 512;
 	/** Compatibility alias; the category now covers every collection page. */
 	public static inline var MOUNT_GLIDER:Int = COLLECTION;
-	public static inline var ALL:Int = 1023;
+	public static inline var SOCIAL:Int = 1024;
+	public static inline var ALL:Int = 2047;
 	/** The narrower travel/portal subset of MapWindow, independent of the general Map category. */
 	public static inline var TRAVEL_MAP:Int = TRAVEL;
 
@@ -41,6 +42,7 @@ class WindowAutoHidePolicy {
 			case "ui.win.DialogBar":
 				DIALOGUE | OBELISK;
 			case "ui.win.EscapeMenu": ESC_MENU;
+			case "ui.win.SocialUI" | "ui.win.SocialSettings": SOCIAL;
 			case "ui.win.codex.CodexWindow": CODEX;
 			default:
 				OTHER;
@@ -59,6 +61,7 @@ class WindowAutoHidePolicy {
 		if ((mask & ESC_MENU) != 0) return "ESC Menu open";
 		if ((mask & CODEX) != 0) return "Codex open";
 		if ((mask & COLLECTION) != 0) return "Collection open";
+		if ((mask & SOCIAL) != 0) return "Social (Party / Friends) open";
 		return "No selected game window is open";
 	}
 	public static inline function suppress(manual:Bool, automatic:Bool):Bool return manual || automatic;

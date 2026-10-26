@@ -14,7 +14,7 @@ import solarflare.conduit.Conduit.ConduitCache;
 /** Reuses the custom image library and GameIcons' deferred, cache-only draw API. */
 class ResourceArtwork {
 	public static var active(default,null):ResourceArtwork;
-	public static final IDS=["health","rage","mana","prayers","combo","attack","target","castbar","chaincast","conduit","dash","hemorrhage"];
+	public static final IDS=["health","rage","mana","prayers","combo","attack","target","castbar","chaincast","conduit","dash"];
 	/** Image slots that fit each element. Elements not listed use only Background / Fill / Frame. */
 	public static final SLOT_LABELS:Map<String,Array<String>>=[
 		"attack"=>["Idle","Hit 1","Hit 2","Hit 3","Finisher"],
@@ -27,6 +27,8 @@ class ResourceArtwork {
 	static final NO_FILL=["attack","combo","conduit","prayers"];
 	static final DIRECTIONS=["Left to right","Right to left","Bottom to top","Top to bottom"];
 	var skins:Map<String,ResourceSkin>=new Map();
+	/** Archived artwork stays serialized without an active resource or observer. */
+	var archivedHemorrhage:Dynamic = null;
 	var folderBuf=new hl.Bytes(1024);
 	var importBuf=new hl.Bytes(2048);
 	var folderGeneration:Int=-1;
@@ -43,8 +45,8 @@ class ResourceArtwork {
 		};
 		return active.get(key);
 	}
-	public function dump():Dynamic { var out:Dynamic={}; for(id in IDS) Reflect.setField(out,id,get(id).dump()); return out; }
-	public function apply(d:Dynamic):Void { for(id in IDS) get(id).apply(d==null ? null : Reflect.field(d,id)); }
+	public function dump():Dynamic { var out:Dynamic={}; for(id in IDS) Reflect.setField(out,id,get(id).dump()); if(archivedHemorrhage!=null) Reflect.setField(out,"hemorrhage",archivedHemorrhage); return out; }
+	public function apply(d:Dynamic):Void { archivedHemorrhage=d==null ? null : Reflect.field(d,"hemorrhage"); for(id in IDS) get(id).apply(d==null ? null : Reflect.field(d,id)); }
 	function value(id:String,known:Bool,n:Float):Void get(id).progress=known ? ResourceArtGeometry.fraction(n) : 0;
 	public function observe(c:ConfigPanel):Void {
 		value("health",HealthCache.valid,HealthCache.ratio()); value("rage",HealthCache.rageValid,HealthCache.rageRatio());
@@ -57,8 +59,6 @@ class ResourceArtwork {
 		var target=solarflare.combatlog.CombatLogCache.currentTargetSnap(); value("target",target.valid && target.healthValid,target.ratio);
 		var castSnap=solarflare.castbar.CastCache.playerSnap(); value("castbar",castSnap.active,castSnap.progress);
 		var dash=solarflare.aura.AuraMovementObserver.state; value("dash",dash.known,dash.left>0 ? dash.remaining : dash.charges>0 ? 1 : 0);
-		var metrics=solarflare.hemorrhage.HemorrhageService.run.metrics;
-		value("hemorrhage",metrics.damage>0,metrics.damage>0 ? metrics.bleed()/metrics.damage : 0);
 	}
 	public function drawEditor(id:String):Void {
 		var s=get(id); if(s==null) return;
@@ -105,7 +105,7 @@ class ResourceArtwork {
 		});
 		if(solarflare.ui.UiChrome.ghostButton("Refresh images##rt_art_refresh_"+id)) CustomImages.requestRefresh();
 		ImGui.sameLine(); if(solarflare.ui.UiChrome.ghostButton("Copy folder path##rt_art_folder_"+id)) solarflare.ui.UiActionQueue.copyText(CustomImages.displayDir,"Images folder path copied.");
-		solarflare.ui.UiHints.noteWrapped("Use transparent PNGs from custom_images or your selected images folder. Layers stretch to the resource's size; the fill is cropped to its current value. Dash follows the next-charge fuse; Hemorrhage follows bleed share. Missing images keep the built-in display available.");
+		solarflare.ui.UiHints.noteWrapped("Use transparent PNGs from custom_images or your selected images folder. Layers stretch to the resource's size; the fill is cropped to its current value. Dash follows the next-charge fuse. Missing images keep the built-in display available.");
 		ImGui.textDisabled(CustomImages.status);
 		if(message.length>0) ImGui.textWrapped(message);
 		if(s.enabled.get()) for(k in [s.background,s.fill,s.frame].concat(s.slots)) if(k.length>0 && GameIcons.get(k)==0) ImGui.textDisabled("Image unavailable: "+k);

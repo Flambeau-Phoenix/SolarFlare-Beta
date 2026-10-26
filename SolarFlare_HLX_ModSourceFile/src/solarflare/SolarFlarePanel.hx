@@ -51,7 +51,6 @@ class SolarFlarePanel {
 	var comboOverlay:ComboOverlay;
 	var chaincastOverlay:ChaincastOverlay;
 	var conduitOverlay:ConduitOverlay;
-	var hemorrhageOverlay:solarflare.hemorrhage.HemorrhageOverlay;
 	var attackComboOverlay:AttackComboOverlay;
 	var combatLogOverlay:CombatLogOverlay;
 	var targetOverlay:TargetOverlay;
@@ -97,7 +96,6 @@ class SolarFlarePanel {
 		comboOverlay = new ComboOverlay();
 		chaincastOverlay = new ChaincastOverlay();
 		conduitOverlay = new ConduitOverlay();
-		hemorrhageOverlay = new solarflare.hemorrhage.HemorrhageOverlay();
 		attackComboOverlay = new AttackComboOverlay();
 		combatLogOverlay = new CombatLogOverlay();
 		targetOverlay = new TargetOverlay();
@@ -138,7 +136,6 @@ class SolarFlarePanel {
 
 	/** UI assets also load at the title screen, before GameApp exists. */
 	public function resetExtraBarsSession():Void {
-		solarflare.hemorrhage.HemorrhageService.interrupt("World unloaded");
 		if (config.extraBarsPrototype != null) config.extraBarsPrototype.clearSession();
 		if (config.stacks != null) config.stacks.reset();
 	}
@@ -255,9 +252,6 @@ class SolarFlarePanel {
 		try
 			config.draw()
 		catch (_:Dynamic) {}
-		try {
-			config.hemorrhage.tool.draw(config.hemorrhage.autoScroll);
-		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 
 		// Editors remain reachable while automatic/manual HUD suppression is active.
 		try {
@@ -295,9 +289,6 @@ class SolarFlarePanel {
 		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try { if(!suppressed) config.dash.draw(); } catch(_:Dynamic) HudChrome.unwindPanels(panelBase);
 		// Each overlay isolated — a Geaux throw must not skip Lightsaber / Auras.
-		try {
-			if (!suppressed) hemorrhageOverlay.draw(config.hemorrhage);
-		} catch (_:Dynamic) HudChrome.unwindPanels(panelBase);
 		try {
 			if (!suppressed)
 				geauxBar.draw(config.geaux);
