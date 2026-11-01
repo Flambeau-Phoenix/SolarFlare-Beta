@@ -338,6 +338,7 @@ class ConfigPanel {
 
 	/** F6 toggle polled from draw(). */
 	public function pollToggle():Void {
+		if(lfg!=null)lfg.pollHotkey();
 		var now = 0.0;
 		try
 			now = haxe.Timer.stamp()

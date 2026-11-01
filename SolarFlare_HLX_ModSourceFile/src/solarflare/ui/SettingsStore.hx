@@ -405,7 +405,7 @@ class SettingsStore {
 
 	static function dumpCore(cfg:ConfigPanel):Dynamic {
 		lastCaptureWarning = "";
-		var data:Dynamic = {v: VERSION, format: SettingsFormat.CURRENT, activeTheme: activeTheme,lfg:{watch:cfg.lfg.watching.get(),overlay:cfg.lfg.overlay.get(),width:cfg.lfg.overlayWidth.get(),height:cfg.lfg.overlayHeight.get(),chrome:chromeDump(cfg.lfg.chrome)},preventCtrlFullscreen:cfg.preventCtrlFullscreen.get(),blockClickThrough:cfg.blockClickThrough.get()};
+		var data:Dynamic = {v: VERSION, format: SettingsFormat.CURRENT, activeTheme: activeTheme,lfg:{preferences:cfg.lfg.controller.feed.config.data(),watch:cfg.lfg.watching.get(),overlay:cfg.lfg.overlay.get(),width:cfg.lfg.overlayWidth.get(),height:cfg.lfg.overlayHeight.get(),chrome:chromeDump(cfg.lfg.chrome)},preventCtrlFullscreen:cfg.preventCtrlFullscreen.get(),blockClickThrough:cfg.blockClickThrough.get()};
 		assignDump(data, "customTheme", function() return ThemePalette.dumpCustom());
 		assignDump(data, "uiPack", function() return cfg.uiPack != null ? cfg.uiPack.dump() : {id: "custom"});
 		assignDump(data, "nativeHide", function() return cfg.nativeHide.dump());
@@ -893,6 +893,7 @@ class SettingsStore {
 			return;
 		var lfgSettings:Dynamic=Reflect.field(data,"lfg");
 		if(lfgSettings!=null){
+			cfg.lfg.controller.applySettings(Reflect.field(lfgSettings,"preferences"));
 			cfg.lfg.watching.set(Reflect.field(lfgSettings,"watch")==true);cfg.lfg.overlay.set(Reflect.field(lfgSettings,"overlay")==true);cfg.lfg.chrome.locked.set(Reflect.field(lfgSettings,"locked")==true);
 			var lx:Dynamic=Reflect.field(lfgSettings,"x");var ly:Dynamic=Reflect.field(lfgSettings,"y");
 			if(Std.isOfType(lx,Float)&&Math.isFinite(lx))cfg.lfg.chrome.x.set(lx);if(Std.isOfType(ly,Float)&&Math.isFinite(ly))cfg.lfg.chrome.y.set(ly);

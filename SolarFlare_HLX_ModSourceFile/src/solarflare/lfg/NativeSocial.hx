@@ -14,7 +14,7 @@ class NativeSocial implements GameSocialAdapter {
         var result:SocialSnapshot={code:"",people:[],available:false};
         var app=GameApp.get();if(app==null||!solarflare.runtime.NativeTypes.is(app.me,"st.Player")||app.get_isLoading())return result;
         var me=app.me;var friends=me.friendList;
-        if(me.accountProgress!=null&&me.accountProgress.social!=null)result.code=me.accountProgress.social.inviteCode;
+        if(me.accountProgress!=null&&me.accountProgress.social!=null)result.code=Config.clean(me.accountProgress.social.inviteCode,32);
         result.party=partyOf(me);
         if(!solarflare.runtime.NativeTypes.is(friends,"st.FriendList"))return result;result.available=true;
         for(uid=>stamp in pending)if(Sys.time()-stamp>30)pending.remove(uid);
@@ -23,14 +23,14 @@ class NativeSocial implements GameSocialAdapter {
         var list=friends.friends;
         if(list!=null)for(i in 0...Std.int(Math.min(200,list.length))){
             var raw=list.getDyn(i);if(raw==null)continue;
-            var uid:String=HlxRuntime.resolveField(raw,"uid");if(uid==null||uid==me.uid||uid.length>128)continue;
+            var uid:String=HlxRuntime.resolveField(raw,"uid");if(uid==null||uid==me.uid||uid.length>128)continue;uid=Config.clean(uid,128);
             var info=friends.getFriendInfo(uid);if(info==null||info.metadata==null)continue;
             var meta=info.metadata;
             var p:SocialPerson={uid:uid,name:Config.clean(meta.heroName,80),online:meta.connected,friend:friends.isFriend(uid),pending:pending.exists(uid),realm:false,detail:Config.clean(meta.zone,80),level:meta.level};
             if(p.name=="")p.name="Friend";seen.set(uid,p);result.people.push(p);
         }
         for(p in playersOf(me.layer==null?null:me.layer.players,me)){
-            var uid=p.uid;if(uid==null||uid==me.uid||uid.length>128)continue;
+            var uid=p.uid;if(uid==null||uid==me.uid||uid.length>128)continue;uid=Config.clean(uid,128);
             if(seen.exists(uid)){var known=seen.get(uid);known.realm=true;known.online=true;}
             else {var person:SocialPerson={uid:uid,name:Config.clean(p.getName(),80),online:true,friend:friends.isFriend(uid),pending:pending.exists(uid),realm:true,detail:"Same game realm"};seen.set(uid,person);result.people.push(person);}
         }
@@ -52,7 +52,7 @@ class NativeSocial implements GameSocialAdapter {
         var result=SocialService.emptyParty();var group=me.group;if(!solarflare.runtime.NativeTypes.is(group,"st.Group"))return result;
         var leaderUid="";try{var leader=group.get_leader();if(leader!=null)leaderUid=leader.uid;}catch(_:Dynamic){}
         for(p in playersOf(group.players,me)){
-            var uid=p.uid;if(uid==null||uid.length>128||result.members.length>=8)continue;
+            var uid=p.uid;if(uid==null||uid.length>128||result.members.length>=8)continue;uid=Config.clean(uid,128);
             result.members.push({uid:uid,name:Config.clean(p.getName(),80),leader:uid==leaderUid,self:uid==me.uid});
         }
         var together=result.members.length>1;
