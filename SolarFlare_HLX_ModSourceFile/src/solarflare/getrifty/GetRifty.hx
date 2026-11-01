@@ -703,7 +703,6 @@ class GetRiftyOverlay {
 				var origin = ImGui.getCursorScreenPos();
 				// Reserve body size with a real item first — GameIcons.draw uses SetCursorScreenPos.
 				ImGui.dummy(ImGui.vec2(winW, winH));
-				var settle = ImGui.getCursorScreenPos();
 				var dl = ImGui.getWindowDrawList();
 				var sunY:Single = origin.y + bannerH;
 				if (GetRiftyCache.alertKind != GetRiftyCache.ALERT_NONE)
@@ -730,9 +729,11 @@ class GetRiftyOverlay {
 					drawTemplateText(dl, origin.x, sunY, size, style);
 				else
 					drawHoleText(dl, origin.x, sunY, size, cfg, light);
-				// Settle cursor with an item so EndChild does not see a bare SetCursorScreenPos extend.
-				ImGui.setCursorScreenPos(settle);
-				ImGui.dummy(ImGui.vec2(1, 1));
+				// Re-submit the actual canvas after artwork restores its cursor. The cursor
+				// after Dummy already includes ItemSpacing; using it as a new item origin
+				// would grow the child beyond the configured sun/banner allocation.
+				ImGui.setCursorScreenPos(origin);
+				ImGui.dummy(ImGui.vec2(winW, winH));
 				}
 				if (cfg.chrome != null) {
 					cfg.chrome.closeBodyChild();
@@ -748,6 +749,10 @@ class GetRiftyOverlay {
 						});
 					cfg.chrome.pollTransparentSurfaceDrag("getrifty", !cfg.chrome.isLocked());
 				}
+				// Close layout in the parent too, including collapsed/locked/camera paths
+				// where the resize control may not submit an item.
+				ImGui.setCursorPos(ImGui.vec2(0, 0));
+				ImGui.dummy(ImGui.vec2(0, 0));
 			}
 		} catch (e:Dynamic) failure = e;
 		// End must run on every path or later overlays submit into this window.

@@ -25,6 +25,10 @@ class LearnedCastTimes {
 		return store.book.observe(id, rank, episode, elapsed, remaining, actorSource, utcNow());
 	}
 	public static function tick(now:Float, shutdown:Bool = false):Void { if (store != null) store.flush(now, shutdown); }
+	/** Explicit Utilities export; never writes or turns session learning into constants. */
+	public static function exportJson():String {
+		keep(); return store.book.toJson();
+	}
 	static function utcNow():String {
 		var date = Date.now();
 		return date.getUTCFullYear() + "-" + pad(date.getUTCMonth() + 1) + "-" + pad(date.getUTCDate()) + "T"

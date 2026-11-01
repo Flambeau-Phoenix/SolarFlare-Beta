@@ -26,7 +26,8 @@ class ToolWindow {
 	}
 
 	static function beginWithMenuBar(title:String, open:BoolRef, defaultW:Single = 520,
-			defaultH:Single = 640, dockable:Bool = false, rememberLayout:Bool = true):Bool {
+			defaultH:Single = 640, dockable:Bool = false, rememberLayout:Bool = true,
+			minimumWidth:Single = 0, minimumHeight:Single = 0):Bool {
 		// Native title + MenuBar — same chrome family as F6 ConfigPanel hub.
 		if (open != null && !open.get()) {
 			lastOpen.set(title, false);
@@ -44,6 +45,8 @@ class ToolWindow {
 		ImGui.setNextWindowSize(ImGui.vec2(defaultW, defaultH), sizeCond);
 		var minW:Single = defaultW >= 1000 ? 960 : 520;
 		var minH:Single = defaultH >= 700 ? 640 : 400;
+		if (minimumWidth > 0) minW = minimumWidth;
+		if (minimumHeight > 0) minH = minimumHeight;
 		if (compactTitles.exists(title) && compactTitles.get(title)) {
 			minW = 300;
 			minH = 360;
@@ -80,12 +83,13 @@ class ToolWindow {
 	/** Callback-owned menu-bar tool window with the same balance guarantee. */
 	public static function drawMenuWindow(title:String, open:BoolRef,
 			defaultW:Single, defaultH:Single, body:Void->Void,
-			dockable:Bool = false, rememberLayout:Bool = true):Void {
+			dockable:Bool = false, rememberLayout:Bool = true,
+			minimumWidth:Single = 0, minimumHeight:Single = 0):Void {
 		if (open != null && !open.get())
 			return;
 
 		var shown = beginWithMenuBar(title, open, defaultW, defaultH,
-			dockable, rememberLayout);
+			dockable, rememberLayout, minimumWidth, minimumHeight);
 		var failed = false;
 		var failure:Dynamic = null;
 		if (shown && body != null) {

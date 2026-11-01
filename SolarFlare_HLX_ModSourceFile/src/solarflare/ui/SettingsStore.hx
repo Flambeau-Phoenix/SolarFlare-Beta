@@ -405,7 +405,7 @@ class SettingsStore {
 
 	static function dumpCore(cfg:ConfigPanel):Dynamic {
 		lastCaptureWarning = "";
-		var data:Dynamic = {v: VERSION, format: SettingsFormat.CURRENT, activeTheme: activeTheme,preventCtrlFullscreen:cfg.preventCtrlFullscreen.get(),blockClickThrough:cfg.blockClickThrough.get()};
+		var data:Dynamic = {v: VERSION, format: SettingsFormat.CURRENT, activeTheme: activeTheme,lfg:{watch:cfg.lfg.watching.get(),overlay:cfg.lfg.overlay.get(),width:cfg.lfg.overlayWidth.get(),height:cfg.lfg.overlayHeight.get(),chrome:chromeDump(cfg.lfg.chrome)},preventCtrlFullscreen:cfg.preventCtrlFullscreen.get(),blockClickThrough:cfg.blockClickThrough.get()};
 		assignDump(data, "customTheme", function() return ThemePalette.dumpCustom());
 		assignDump(data, "uiPack", function() return cfg.uiPack != null ? cfg.uiPack.dump() : {id: "custom"});
 		assignDump(data, "nativeHide", function() return cfg.nativeHide.dump());
@@ -880,6 +880,7 @@ class SettingsStore {
 			referenceWidth: c.referenceWidth, referenceHeight: c.referenceHeight,
 			lock: c.locked.get(),
 			trans: c.transparent.get(),
+			opacity: c.opacity.get(),
 			collapsed: c.collapsed.get(),
 			sun: c.showGrip.get(),
 			x: c.x.get(),
@@ -890,6 +891,17 @@ class SettingsStore {
 	static function apply(cfg:ConfigPanel, data:Dynamic):Void {
 		if (data == null)
 			return;
+		var lfgSettings:Dynamic=Reflect.field(data,"lfg");
+		if(lfgSettings!=null){
+			cfg.lfg.watching.set(Reflect.field(lfgSettings,"watch")==true);cfg.lfg.overlay.set(Reflect.field(lfgSettings,"overlay")==true);cfg.lfg.chrome.locked.set(Reflect.field(lfgSettings,"locked")==true);
+			var lx:Dynamic=Reflect.field(lfgSettings,"x");var ly:Dynamic=Reflect.field(lfgSettings,"y");
+			if(Std.isOfType(lx,Float)&&Math.isFinite(lx))cfg.lfg.chrome.x.set(lx);if(Std.isOfType(ly,Float)&&Math.isFinite(ly))cfg.lfg.chrome.y.set(ly);
+			cfg.lfg.chrome.posDirty=true;
+			var lc:Dynamic=Reflect.field(lfgSettings,"chrome");if(lc!=null)applyChrome(cfg.lfg.chrome,lc);
+			var lw:Dynamic=Reflect.field(lfgSettings,"width");var lh:Dynamic=Reflect.field(lfgSettings,"height");
+			if(Std.isOfType(lw,Float)&&Math.isFinite(lw))cfg.lfg.overlayWidth.set(Math.max(240,Math.min(1200,lw)));
+			if(Std.isOfType(lh,Float)&&Math.isFinite(lh))cfg.lfg.overlayHeight.set(Math.max(120,Math.min(1000,lh)));
+		}
 		cfg.preventCtrlFullscreen.set(Reflect.field(data,"preventCtrlFullscreen")==true);
 		cfg.blockClickThrough.set(Reflect.field(data,"blockClickThrough")!=false);
 		CustomImages.apply(Reflect.field(data, "customImages"));
@@ -1267,6 +1279,7 @@ class SettingsStore {
 		c.hudLayoutVersion = data.hudLayoutVersion != null ? Std.int(data.hudLayoutVersion) : 0;
 		setBool(c.locked, data.lock);
 		setBool(c.transparent, data.trans);
+		setFloat(c.opacity, data.opacity);
 		setBool(c.collapsed, data.collapsed);
 		if (data.sun != null)
 			setBool(c.showGrip, data.sun);

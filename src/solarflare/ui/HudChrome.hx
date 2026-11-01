@@ -41,6 +41,8 @@ class HudChrome {
 	/** Runtime widgets persist content-anchor migration independently of legacy tool chrome. */
 	public var hudLayoutVersion:Int = 0;
 	public var transparent = new BoolRef(false);
+	/** Frame opacity in percent (20-100). Scales the window backdrop; HUD bodies may also scale their own art via opacityFactor(). */
+	public var opacity = new FloatRef(100);
 	public var collapsed = new BoolRef(false);
 	/** Kept for solarflare.json; no longer shown in UI. */
 	public var showGrip = new BoolRef(true);
@@ -250,6 +252,11 @@ class HudChrome {
 		return transparent.get();
 	}
 
+	/** 0.2-1 multiplier for the opacity setting. */
+	public inline function opacityFactor():Single {
+		return Math.max(0.2, Math.min(1, opacity.get() / 100));
+	}
+
 	public function isCollapsed():Bool {
 		return collapsed.get();
 	}
@@ -435,6 +442,10 @@ class HudChrome {
 					}
 				);
 			});
+			UiLayout.propertyRow("Opacity", function() {
+				if (NumberField.draw("##" + id + "_opacity", opacity, 20, 100, "%.0f%%"))
+					changed = true;
+			}, "Fades the window backdrop. Text stays readable.");
 			if (drawPositionRow(id + "_win"))
 				changed = true;
 		});

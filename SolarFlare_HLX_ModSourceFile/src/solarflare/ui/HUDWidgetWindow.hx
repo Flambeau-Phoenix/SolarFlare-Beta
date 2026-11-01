@@ -146,7 +146,7 @@ class HUDWidgetWindow {
 		var measured = ovH.exists(id);
 		var oW:Single = measured ? ovW.get(id) : SEED_PAD;
 		var oH:Single = measured ? ovH.get(id) : HudChrome.STRIP + 2 + SEED_PAD + RESIZE_FOOTER;
-		ImGui.setNextWindowBgAlpha(chrome.isTransparent() ? 0 : 0.82);
+		ImGui.setNextWindowBgAlpha(chrome.isTransparent() ? 0 : 0.82 * chrome.opacityFactor());
 		// Until the chrome has been measured once the seed above is a guess, so the size
 		// has to be asserted every frame; FirstUseEver would freeze the guess in place.
 		var locked = chrome.isLocked() && !layoutOverride;
@@ -252,7 +252,7 @@ class HUDWidgetWindow {
 				chrome.drawResizeCorner(id, editable,
 					minFaceW + extraW + oW, MIN_CONTENT_H + extraH + oH,
 					10000, 10000, resizeFn, PADDING);
-				chrome.pollTransparentSurfaceDrag(id, editable);
+				chrome.pollTransparentSurfaceDrag(id, editable); /* chrome/grip code leaves the cursor moved with no item after it; park it inside the window and submit a zero-size item so the parent boundary is closed */ ImGui.setCursorPos(ImGui.vec2(0, 0)); ImGui.dummy(ImGui.vec2(0, 0));
 			}
 		} catch (e:Dynamic) {
 			failed = true;

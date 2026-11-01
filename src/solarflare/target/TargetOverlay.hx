@@ -48,6 +48,8 @@ class TargetOverlay {
 	var castSnap:CastSnap;
 	var lastBodyW:Single = 0;
 	var lastBodyH:Single = 0;
+	/** Frame opacity for the draw in progress (set at the top of drawBody). */
+	var op:Single = 1;
 
 	public function new() {
 		hudBodyFn = hudBody;
@@ -102,6 +104,11 @@ class TargetOverlay {
 		hudCfg = null;
 	}
 
+	/** Scales a packed color's alpha byte by the frame opacity. */
+	inline function fade(col:Int):Int {
+		return (col & 0x00FFFFFF) | (Std.int(((col >>> 24) & 0xFF) * op) << 24);
+	}
+
 	static inline function touchDraw(method:String, name:String, kind:String, hasIcon:Bool, bw:Single, bh:Single):Void {
 		#if solarflare_telemetry
 		if (!solarflare.debug.ResolutionLedger.armed())
@@ -116,6 +123,7 @@ class TargetOverlay {
 	function drawBody(cfg:TargetConfig, w:Single, h:Single):Void {
 		var dl = ImGui.getWindowDrawList();
 		var origin = ImGui.getCursorScreenPos();
+		op = cfg.chrome != null ? cfg.chrome.opacityFactor() : 1;
 		ImGui.dummy(ImGui.vec2(w, h));
 
 		var contentH:Single = Math.max(8, h - PAD * 2);
@@ -134,11 +142,12 @@ class TargetOverlay {
 		var barY:Single = origin.y + PAD + Math.max(0, (contentH - side) * 0.5);
 		var barH:Single = side;
 		if (cfg.showPortrait.get()) {
-			drawPortrait(cfg, dl, contentX, barY, side);
+			// Portrait sits on the right of the bar.
+			var portraitX:Single = origin.x + w - PAD - side;
+			drawPortrait(cfg, dl, portraitX, barY, side);
 			ImGui.setCursorScreenPos(origin);
 			ImGui.dummy(ImGui.vec2(w, h));
-			contentX = contentX + side + PORTRAIT_GAP;
-			contentW = Math.max(1, origin.x + w - PAD - contentX);
+			contentW = Math.max(1, portraitX - PORTRAIT_GAP - contentX);
 		}
 		var rounding:Single = Math.max(0, cfg.barRounding.get());
 
@@ -159,19 +168,19 @@ class TargetOverlay {
 			lowPct = 50;
 		var low = lowPct / 100;
 
-		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(contentX, barY), ImGui.vec2(contentX + contentW, barY + barH), 0xCC12141A, rounding);
+		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(contentX, barY), ImGui.vec2(contentX + contentW, barY + barH), fade(0xCC12141A), rounding);
 		var fillW = contentW * ratio;
 		if (fillW > 1) {
 			var top = lighten(fillCol, 0.25);
 			ImGui.ImDrawList_AddRectFilledMultiColor(dl,
 				ImGui.vec2(contentX, barY), ImGui.vec2(contentX + fillW, barY + barH),
-				top, top, fillCol, fillCol);
+				fade(top), fade(top), fade(fillCol), fade(fillCol));
 			var shineH = barH * 0.28;
 			if (shineH > 2)
 				ImGui.ImDrawList_AddRectFilled(dl,
 					ImGui.vec2(contentX + 2, barY + 1),
 					ImGui.vec2(contentX + fillW - 2, barY + shineH),
-					0x22FFFFFF, Math.max(0, rounding - 1));
+					fade(0x22FFFFFF), Math.max(0, rounding - 1));
 		}
 
 		if (snap.healthValid && !confirmedDead && cfg.lowHpPulse.get() && ratio < low) {
@@ -181,11 +190,11 @@ class TargetOverlay {
 			ImGui.ImDrawList_AddRectFilled(dl,
 				ImGui.vec2(contentX - 2, barY - 2),
 				ImGui.vec2(contentX + contentW + 2, barY + barH + 2),
-				glow, rounding + 2);
+				fade(glow), rounding + 2);
 		}
 
 		var border = snap.healthValid && ratio < low ? UiCol.rgb(0xFF5555) : UiCol.rgba(255, 255, 255, 0x88);
-		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(contentX, barY), ImGui.vec2(contentX + contentW, barY + barH), border, rounding, 1.5);
+		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(contentX, barY), ImGui.vec2(contentX + contentW, barY + barH), fade(border), rounding, 1.5);
 
 		// Target cast: a smaller strip inside the bottom of the bar, over the fill.
 		var castH:Single = 0;
@@ -262,8 +271,10 @@ class TargetOverlay {
 	}
 
 	function drawPortrait(cfg:TargetConfig, dl:Dynamic, px:Single, py:Single, side:Single):Void {
-		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(px, py), ImGui.vec2(px + side, py + side), 0xCC16100E, 3);
+		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(px, py), ImGui.vec2(px + side, py + side), fade(0xCC16100E), 3);
 		ImGui.pushClipRect(ImGui.vec2(px, py), ImGui.vec2(px + side, py + side), true);
+		// Style alpha fades the portrait image (ImGui.image tint is multiplied by it).
+		ImGui.pushStyleVar(ImGuiStyleVar.Alpha, op);
 		try {
 			var key = snap.valid ? snap.kind : "";
 			var drew = false;
@@ -290,18 +301,19 @@ class TargetOverlay {
 				drawSilhouette(dl, px, py, side)
 			catch (__:Dynamic) {}
 		}
+		ImGui.popStyleVar();
 		ImGui.popClipRect();
 
 		var elite = snap.valid && (snap.isBoss || snap.isMiniboss || snap.isElite);
 		var trim = elite ? UiCol.rgb(0xD6AD55) : 0x88888888;
 		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(px - 1, py - 1), ImGui.vec2(px + side + 1, py + side + 1),
-			trim, 3, elite ? 2 : 1);
+			fade(trim), 3, elite ? 2 : 1);
 		if (elite && cfg.showBadge.get()) {
 			var wingY:Single = py + side * 0.25;
 			for (i in 0...3) {
 				var yy:Single = wingY + i * 5;
-				ImGui.ImDrawList_AddLine(dl, ImGui.vec2(px, yy + 5), ImGui.vec2(px - 3, yy), trim, 2);
-				ImGui.ImDrawList_AddLine(dl, ImGui.vec2(px + side, yy + 5), ImGui.vec2(px + side + 3, yy), trim, 2);
+				ImGui.ImDrawList_AddLine(dl, ImGui.vec2(px, yy + 5), ImGui.vec2(px - 3, yy), fade(trim), 2);
+				ImGui.ImDrawList_AddLine(dl, ImGui.vec2(px + side, yy + 5), ImGui.vec2(px + side + 3, yy), fade(trim), 2);
 			}
 		}
 		if (cfg.showBadge.get() && snap.valid)
@@ -353,12 +365,12 @@ class TargetOverlay {
 			return;
 		}
 
-		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, barY), ImGui.vec2(x + w, barY + barH), 0xAA0E1016, rounding);
+		ImGui.ImDrawList_AddRectFilled(dl, ImGui.vec2(x, barY), ImGui.vec2(x + w, barY + barH), fade(0xAA0E1016), rounding);
 		ImGui.ImDrawList_AddRectFilled(dl,
 			ImGui.vec2(x + 3, barY + barH * 0.35),
 			ImGui.vec2(x + w - 3, barY + barH * 0.55),
-			0x22FFFFFF, 2);
-		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, barY), ImGui.vec2(x + w, barY + barH), 0x66888888, rounding, 1.5);
+			fade(0x22FFFFFF), 2);
+		ImGui.ImDrawList_AddRect(dl, ImGui.vec2(x, barY), ImGui.vec2(x + w, barY + barH), fade(0x66888888), rounding, 1.5);
 
 		var showName = cfg.showName.get();
 		if (showName)

@@ -7,6 +7,17 @@ import imgui.ImGui;
  * The Hide All rows are shared with the Resources builder so there is one implementation.
  */
 class UtilitiesPanel {
+	public static function drawLiveApiExport():Void {
+		UiHints.noteWrapped("Gather runtime skill descriptions and cast-time observations for the Farever API tools. Files are saved inside the mod's exports/api-live folder.");
+		ImGui.beginDisabled(solarflare.runtime.LiveApiExport.busy);
+		if(UiChrome.ghostButton("Gather live API files##util_api_gather",ImGui.vec2(170,28)))solarflare.runtime.LiveApiExport.request();
+		ImGui.endDisabled();
+		ImGui.textWrapped(solarflare.runtime.LiveApiExport.status);
+		if(solarflare.runtime.LiveApiExport.output!=""){
+			ImGui.textWrapped(solarflare.runtime.LiveApiExport.output);
+			if(UiChrome.ghostButton("Copy folder path##util_api_path",ImGui.vec2(140,26)))ImGui.setClipboardText(solarflare.runtime.LiveApiExport.output);
+		}
+	}
 	/** Hide All: toggle, hotkey dropdown, middle mouse, and the current state line. */
 	public static function drawHideAll():Void {
 		UiLayout.propertyGrid("##util_hide_all", function() {
@@ -37,7 +48,7 @@ class UtilitiesPanel {
 			}, "Also toggle on middle click, but only while the cursor is free.");
 		});
 		if (HudSuppress.hideAll.get())
-			ImGui.textColored(ImGui.vec4(0.95, 0.72, 0.25, 1), "Hidden now — press the hotkey to bring the HUD back.");
+			ImGui.textColored(ImGui.vec4(0.95, 0.72, 0.25, 1), "Hidden now - press the hotkey to bring the HUD back.");
 		else
 			ImGui.textDisabled("Never saved as hidden; every launch starts visible.");
 	}
