@@ -1,7 +1,5 @@
 package solarflare.runtime;
 
-import solarflare.simulator.BuildIdentity;
-import solarflare.simulator.BuildCatalog;
 import solarflare.ui.ModPaths;
 
 /** On-demand native text collection. Only owned primitive records cross the writer thread boundary. */
@@ -10,8 +8,8 @@ class LiveApiExport {
     public static var output(default,null)="";
     public static var busy(default,null)=false;
     static var requested=false;static var epoch=-1;static var cursor=0;static var count=0;static var errors=0;
-    static var identity=new BuildIdentity();
-    static var catalog:BuildCatalog;
+    static var identity=new GameBuildIdentity();
+    static var catalog:LiveApiCatalog;
     static var ids:Array<String>=[];
     static var rendered:Dynamic;
     static var mailbox:sys.thread.Deque<String>;
@@ -26,8 +24,8 @@ class LiveApiExport {
                 if(current==""){requested=false;status="Enter the world with a character before gathering.";return;}
                 requested=false;busy=true;epoch=generation;cursor=count=errors=0;ids=[];rendered={};mailbox=null;output="";
                 character=current;
-                if(catalog==null)catalog=BuildCatalog.load();
-                for(id in catalog.rawSkills.keys())ids.push(id);ids.sort(Reflect.compare);
+                if(catalog==null)catalog=LiveApiCatalog.load();
+                ids=catalog.skillIds.copy();
                 capturedAt=Date.now().toString();status="Checking the running build...";
             }
             if(epoch!=generation||character!=current){busy=false;rendered=null;ids=[];status="Gather cancelled because the character changed.";return;}

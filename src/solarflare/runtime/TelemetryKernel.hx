@@ -102,10 +102,6 @@ class TelemetryKernel {
 			}
 		}
 
-		// On-demand capture/computation. The controller does no discovery or simulation while idle.
-		if (cfg.buildSimulator != null)
-			cfg.buildSimulator.observe(HealthCache.identityGen, solarflare.ui.FeatureProfiles.statusOwnerGen);
-
 		solarflare.runtime.LiveApiExport.observe(HealthCache.identityGen,app);
 		if(cfg.lfg!=null) { try cfg.lfg.observe(app,now) catch(_:Dynamic) {} }
 

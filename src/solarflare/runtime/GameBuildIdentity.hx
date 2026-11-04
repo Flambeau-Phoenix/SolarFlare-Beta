@@ -1,7 +1,7 @@
-package solarflare.simulator;
+package solarflare.runtime;
 
 /** File hashing runs on a worker containing strings/bytes only; it never receives game objects. */
-class BuildIdentity {
+class GameBuildIdentity {
     public var hash(default,null):String="";
     public var message(default,null):String="";
     public var done(default,null):Bool=false;

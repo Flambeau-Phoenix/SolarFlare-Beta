@@ -57,7 +57,6 @@ class ConfigPanel {
 	static inline var TAB_NATIVE_UI:Int = 15;
 	static inline var TAB_LOOT:Int = 16;
 	static inline var TAB_STACKS:Int = 17;
-	static inline var TAB_SIMULATOR:Int = 18;
 	static inline var TAB_LFG:Int = 19;
 	public var open:BoolRef;
 	public var vitals:VitalsConfig;
@@ -78,7 +77,6 @@ class ConfigPanel {
 	public var target:TargetConfig;
 	public var castBar:CastBarConfig;
 	public var lootBrowser:LootBrowser;
-	public var buildSimulator:solarflare.simulator.BuildSimulatorWindow;
 	public var lfg:solarflare.lfg.LfgWindow;
 	public var launchers:HudLaunchers;
 	public var auras:solarflare.aura.AuraConfig;
@@ -174,7 +172,6 @@ class ConfigPanel {
 		target = new TargetConfig();
 		castBar = new CastBarConfig();
 		lootBrowser = new LootBrowser();
-		buildSimulator = new solarflare.simulator.BuildSimulatorWindow();
 		lfg = new solarflare.lfg.LfgWindow();
 		lfg.openLoot=function(){lootBrowser.open.set(true);};
 		launchers = new HudLaunchers();
@@ -242,7 +239,6 @@ class ConfigPanel {
 		if (extraBarsPrototype != null) registerInteractive(extraBarsPrototype.open);
 		if (barter != null && barter.config != null) registerInteractive(barter.config.open);
 		if (lootBrowser != null) registerInteractive(lootBrowser.open);
-		if (buildSimulator != null) registerInteractive(buildSimulator.open);
 		if (lfg != null) registerInteractive(lfg.open);
 		if (vitals != null) registerInteractive(vitals.open);
 		if (geaux != null) registerInteractive(geaux.open);
@@ -307,7 +303,6 @@ class ConfigPanel {
 		if (extraBarsPrototype != null) extraBarsPrototype.clearTransientState();
 		if (stacks != null) stacks.clearTransientState();
 		if (lootBrowser != null) lootBrowser.clearTransientState();
-		if (buildSimulator != null) buildSimulator.clearTransientState();
 		if (lfg != null) lfg.clearTransientState();
 		if (barter != null) barter.clearTransientState();
 		if (chaincast != null) chaincast.modules.clearTransientState();
@@ -483,8 +478,6 @@ class ConfigPanel {
 			UiScope.guard("Player Cast Bar", castBar.draw);
 		if (lootBrowser != null)
 			UiScope.guard("Loot Browser", lootBrowser.draw);
-		if (buildSimulator != null)
-			UiScope.guard("Build Simulator", buildSimulator.draw);
 		if (lfg != null) UiScope.guard("LFG", lfg.draw);
 		if (lightsaber != null)
 			UiScope.guard("Lightsaber", lightsaber.draw);
@@ -512,8 +505,6 @@ class ConfigPanel {
 			if (ImGui.menuItem("Loot Browser"))
 				lootBrowser.open.set(true);
 			if (ImGui.menuItem("LFG")) lfg.open.set(true);
-			if (ImGui.menuItem("Build Simulator"))
-				buildSimulator.open.set(true);
 			if (ImGui.menuItem("Lightsaber"))
 				lightsaber.open.set(true);
 			if (ImGui.menuItem("GetRifty"))
@@ -583,7 +574,7 @@ class ConfigPanel {
 	static var NAV_GROUPS:Array<Array<Int>> = [
 		[TAB_RESOURCES, TAB_GEAUX, TAB_BARTER, TAB_EXTRABARS, TAB_ATTACK, TAB_STATUS, TAB_STACKS, TAB_NATIVE_UI],
 		[TAB_AURAS, TAB_COMBAT_LOG],
-		[TAB_LOOT, TAB_SIMULATOR, TAB_LFG, TAB_LIGHTSABER, TAB_THEME, TAB_GETRIFTY, TAB_UTILITIES, TAB_SETTINGS]
+		[TAB_LOOT, TAB_LFG, TAB_LIGHTSABER, TAB_THEME, TAB_GETRIFTY, TAB_UTILITIES, TAB_SETTINGS]
 	];
 
 	static function tabLabel(id:Int):String {
@@ -602,7 +593,6 @@ class ConfigPanel {
 			case TAB_NATIVE_UI: "Native UI";
 			case TAB_LOOT: "Loot Browser";
 			case TAB_STACKS: "Stacks";
-			case TAB_SIMULATOR: "Build Simulator";
 			case TAB_LFG: "LFG";
 			case TAB_SETTINGS: "Hub Settings";
 			default: "Status Board";
@@ -669,7 +659,6 @@ class ConfigPanel {
 	function onModuleChosen(id:Int):Void {
 		if (id == TAB_LOOT) lootBrowser.open.set(true);
 		if (id == TAB_LFG) lfg.open.set(true);
-		if (id == TAB_SIMULATOR && buildSimulator != null) buildSimulator.open.set(true);
 		if (id == TAB_EXTRABARS) extraBarsPrototype.open.set(true);
 		if (id == TAB_STACKS && stacks != null) stacks.open.set(true);
 		if (id == TAB_BARTER && barter != null) barter.config.open.set(true);
@@ -759,7 +748,6 @@ class ConfigPanel {
 			case TAB_ATTACK: if (resourceTracker != null) resourceTracker.openFor("attack");
 			case TAB_LOOT | TAB_EXTRABARS | TAB_BARTER | TAB_STACKS:
 			case TAB_LFG: lfg.open.set(true);
-			case TAB_SIMULATOR: if (buildSimulator != null) buildSimulator.open.set(true);
 			default: setRail(false);
 		}
 	}
@@ -858,10 +846,6 @@ class ConfigPanel {
 			case TAB_LFG:
 				if (drawModuleHeader("LFG", "Local chat watcher, friends and party actions", "Open LFG", "tab_lfg_open")) lfg.open.set(true);
 				UiHints.noteWrapped("Watch ordinary game chat and show recently advertised groups in a compact ten-minute overlay.");
-			case TAB_SIMULATOR:
-				if (drawModuleHeader("Build Simulator", "On-demand gear, talent and stat comparisons", "Open simulator", "tab_sim_open"))
-					buildSimulator.open.set(true);
-				UiHints.noteWrapped("Compare physical, magic and mixed allocations with sustained and burst estimates. Inspect model coverage before using recommendations.");
 			case TAB_SETTINGS:
 				drawHubSettings();
 			default:
@@ -1125,7 +1109,8 @@ class ConfigPanel {
 	public function profileUiTab():Int return activeHubTab;
 	public function statusSettingsOpen():Bool return open.get() && activeHubTab == TAB_STATUS;
 	public function applyProfileUiTab(value:Int):Void {
-		if (value == TAB_NATIVE || value == TAB_RETIRED_NOTEBOOK)
+		// 18 belonged to the removed build tool; retain the other modules' IDs.
+		if (value == TAB_NATIVE || value == TAB_RETIRED_NOTEBOOK || value == 18)
 			activeHubTab = TAB_RESOURCES;
 		else if (value >= TAB_RESOURCES && value <= TAB_LFG)
 			activeHubTab = value;
