@@ -96,6 +96,7 @@ class ConfigPanel {
 	public var hubSizeDirty = true;
 	public var rememberHubLayout = new BoolRef(true);
 	public var uiLayouts=new UiLayouts();
+ public var profileLayoutManager=new ProfileLayoutManager();
 	public var preventCtrlFullscreen=new BoolRef(false);
 	/** Clicks on open SolarFlare windows stay off the game's own UI (needs the sfcursor.hdll that ships with this build). */
 	public var blockClickThrough=new BoolRef(true);
@@ -307,6 +308,7 @@ class ConfigPanel {
 		if (barter != null) barter.clearTransientState();
 		if (chaincast != null) chaincast.modules.clearTransientState();
 		uiLayouts.clearTransientState();
+  profileLayoutManager.clearTransientState();
 	}
 
 	/**

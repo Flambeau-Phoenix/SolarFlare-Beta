@@ -58,6 +58,15 @@ class ProfileBank {
   if(heroId(hero)=="") throw "Character unavailable";
   return insert(uniqueName(hero,name),hero,snapshot==null ? factory : snapshot);
  }
+ /** Names are labels: IDs, character defaults, snapshots and source links stay stable. */
+ public function rename(hero:String,id:String,requested:String):Bool {
+  var p=profiles.get(id);
+  if(heroId(hero)=="" || p==null || p.ownerHeroId!=hero) return false;
+  var name=StringTools.trim(requested);
+  if(name=="" || name.length>48 || name.indexOf("\n")>=0 || name.indexOf("\r")>=0) return false;
+  for(other in profiles) if(other.id!=id && other.ownerHeroId==hero && other.name.toLowerCase()==name.toLowerCase()) return false;
+  p.name=name; return true;
+ }
  function uniqueName(hero:String,name:String):String {
   var candidate=name; var n=2;
   while(true) {
@@ -107,6 +116,28 @@ class ProfileBank {
   if(active==id) active=ensureDefault(hero);
   sessionActive.set(hero,active);
   return active;
+ }
+
+ public function canRemoveMany(hero:String,ids:Array<String>):Bool {
+  if(heroId(hero)=="" || ids==null || ids.length==0) return false;
+  var owned=0; for(p in profiles) if(p.ownerHeroId==hero) owned++;
+  if(ids.length>=owned) return false;
+  var seen=new Map<String,Bool>();
+  for(id in ids) {
+   var p=profiles.get(id);
+   if(p==null || p.ownerHeroId!=hero || seen.exists(id)) return false;
+   seen.set(id,true);
+  }
+  return true;
+ }
+ /** Preserve one owned profile; repair defaults once, after all selected records are gone. */
+ public function removeMany(hero:String,ids:Array<String>):Bool {
+  if(!canRemoveMany(hero,ids)) return false;
+  for(id in ids) { profiles.remove(id); order.remove(id); }
+  var fallback=ensureDefault(hero);
+  if(!profiles.exists(active)) active=fallback;
+  sessionActive.set(hero,active);
+  return true;
  }
  public function store(hero:String,snapshot:Dynamic):Void {
   var p=profiles.get(active); if(p==null || p.ownerHeroId!=hero) throw "Profile owner mismatch";

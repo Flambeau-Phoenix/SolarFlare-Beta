@@ -56,6 +56,781 @@
       "kind": "icon"
     },
     {
+      "id": "Infusion_Swarowl_DPS_R3Status",
+      "name": "::ref2_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mace_Benediction_Skill1_Proc",
+      "name": "::ref2_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Slam_SmashAoe",
+      "name": "::ref2_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Hasaki_Skill2_Status",
+      "name": "::ref3_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Activity_BallonBouncing_StatusCounter",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "BagonKing_BlazingArm_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_Frozenground_Skill2_Dot",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_Frozenground_Skill2_HoT",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_Frozenground_Skill2_Speed_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_Frozenground_Skill2_Speed_Slow",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_WaterOrbs_Passive_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_WaterOrbs_Skill1_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_WaterOrbs_Skill1_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_WaterOrbs_Skill2_Recast_Proc",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Cleodora_MiniElite_Sleep",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Crescent_Dance_Passive_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Crescent_Dance_Passive_Debuff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Crescent_Dance_Skill1_Recast1_Proc",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Crescent_Dance_Skill1_Recast2_Proc",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Crescent_Dance_Skill2_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Crimson_Book_Aura",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Crimson_SwordShield_Consecration_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "DA_Lightning_Passive_Cooldown",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "DA_Lightning_Passive_Ready",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "DA_Lightning_Skill1_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "DA_Lightning_Skill2_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "DA_Lightning_Skill2_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "DA_Water_Passive_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "DA_Water_Passive_Status_R3",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "DM_Multispin_Combo_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "DM_Multispin_Skill1_Recast",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "DM_Multispin_Skill1_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Daggers_Demondash_Passive_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Daggers_Demondash_Skill2_Counter",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Dead_Hidden",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Dead_Resurrect",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "DebugShieldStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Demon_Spear_Skill_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_FeatherBuff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "FairieSuperElite_Clones_Stealth",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Fists_LightMonk_Passive_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Fists_WaterUppercut_P_Status_Slow",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "GA_Craft_Passive_Proc",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "GM_Winter_Combo_Debuff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "GM_Winter_Skill2_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "GS_Nova_Combo_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "GS_Nova_Skill2_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Golcano_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Halos_Demon_Passive_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Halos_Demon_Skill1_Recast",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Hatchling_ViolentScreech_Debuff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Heavy2HS_Auto_Skill_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Support_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Support_Counter",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Tank_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Bee_Tank_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_DPS_Magic",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Crimson_DPS_Physical",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_DPS_Ultimate_Counter",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_DPS_Ultimate_Proc",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Support_Ultimate_Counter",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Manfish_Tank_Cooldown",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Support_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Support_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Nightling_Support_Status_Tracker",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Swarowl_DPS_R3Status2",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Swarowl_DPS_Stack",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Swarowl_Support_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Swarowl_Tank_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Swarowl_Tank_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Hasaki_Skill1_Status_Proc",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mace_Ice_Skill1_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_ShieldOfSpark_Status2",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_BeaconOfSafety_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_CadenceSurge_Accum_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_ChronostaticOrb_Cooldown",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_ConductiveVulnerability_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_DefensiveDischarge_Accum_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_FeedTheCore_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_FulminatingMark_Accum_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_Overload_Accum_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_Overload_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_RedirectionCore_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_RedirectionCore_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_SparkChargedBolt_Accum_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_SparkChargedBolt_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_StaticAffliction_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_SuppressivePulse_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_SymbioticCharge_Armor_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_SymbioticCharge_MagicArmor_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_Bubble_Roam_Status_Slow",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_WaterBreath_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "ManfishBoss_WaterVolley_Target",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Marylyn_Monrowl_Infused_Vortex_Blade_Charge",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Marylyn_Monrowl_Surtenstion_Negative_Charge",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_ChaosOrbStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_EternalNightStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_OpenRiftStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_BeaconOfHope_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_BeaconOfHope_Status_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_BeaconOfHope_Status_Debuff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_PenanceStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_LuonHand_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_PotentFortitude_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_ProtectivePrayer_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_PurgingStrikes_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_SkillfulPrayer_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "R1CrabBoss_HuntDownStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Ratsar_Heroic_Attack_Bleed",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Ratsar_SparklingShield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "RobinHoof_Heroic_Caltrops_Slow",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "RobinHoof_Heroic_Dog_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Poison_DeadlyStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_ImprovedMixture_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Scepter_Start_Skill2_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Scepter_Storm_Combo_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Shield_Avalanche_Passive_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Shield_Avalanche_Skill1_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "SnowPile_Simple_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Censer_Combo_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Censer_Passive_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Censer_Skill2_Slow",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Craft_C_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Craft_S1_Proc",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Craft_S1_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Magefrost_Passive_Stack",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Magefrost_Skill2_Debuff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_SummonDemon_Combo_R3_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_SummonDemon_Passive_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_SummonDemon_Passive_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "SuperEliteDemon_Bomb_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "SuperEliteDemon_Rage_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Thrown_Thunderlink_Passive_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Thrown_Thunderlink_Passive_Free_FCA",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Thrown_Thunderlink_Passive_Shield",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Thrown_Thunderlink_Skill_Dash_Buff",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Combat_Focus_AccumStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Combat_Science_DexterityStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Combat_Science_FaithStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Combat_Science_IntellectStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Combat_Science_StrengthStatus",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Indomitable_Spirit_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_One_Handed_Master_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Second_Breath_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Two_Handed_Master_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Unbroken_Streak_Status",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Yetina_BearWrath",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Yetina_FelineWrath",
+      "name": "::ref_name::",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Swarowl_Tank_Shield_CooldownStatus",
+      "name": "::ref_name:: cooldown",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Enduring_Fortitude_CooldownStatus",
+      "name": "::ref_name:: cooldown",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Infinite_Rage_CooldownStatus",
+      "name": "::ref_name:: Cooldown",
+      "kind": "skill"
+    },
+    {
+      "id": "ItemStatus",
+      "name": "::sourceItemName::",
+      "kind": "skill"
+    },
+    {
+      "id": "VesselPotion_Status",
+      "name": "::sourceItemName::",
+      "kind": "skill"
+    },
+    {
+      "id": "Weighstone_Status",
+      "name": "::sourceItemName::",
+      "kind": "skill"
+    },
+    {
+      "id": "Whetstone_Status",
+      "name": "::sourceItemName::",
+      "kind": "skill"
+    },
+    {
       "id": "Phrixes_NightGod",
       "name": "???",
       "kind": "unit"
@@ -146,8 +921,8 @@
       "kind": "skill"
     },
     {
-      "id": "Activity_BallonBouncing_StatusCounter",
-      "name": "Activity_BallonBouncing_StatusCounter",
+      "id": "Activity_Snowball_Status",
+      "name": "Activity_Snowball_Status",
       "kind": "skill"
     },
     {
@@ -226,6 +1001,11 @@
       "kind": "unit"
     },
     {
+      "id": "Wolf_Z4W_Alpha",
+      "name": "Alpha Wolf",
+      "kind": "unit"
+    },
+    {
       "id": "Mage_Talent_Amplification",
       "name": "Amplification",
       "kind": "skill"
@@ -233,6 +1013,11 @@
     {
       "id": "Ulserous_Summon",
       "name": "Ancient Manifestation",
+      "kind": "skill"
+    },
+    {
+      "id": "Activity_Snowball_Bonus_SnowballBig",
+      "name": "Anger Release",
       "kind": "skill"
     },
     {
@@ -411,9 +1196,39 @@
       "kind": "icon"
     },
     {
+      "id": "Priest_Talent_Ascendancy",
+      "name": "Ascendancy",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_AscendantBlame",
+      "name": "Ascendant Blame",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_AscendantCrusader",
+      "name": "Ascendant Crusader",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_AscendantVerdict",
+      "name": "Ascendant Verdict",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_AscendedFortitude",
+      "name": "Ascended Fortitude",
+      "kind": "skill"
+    },
+    {
       "id": "ImpDemon_Z2_Soulstone",
       "name": "Asmodeaf",
       "kind": "unit"
+    },
+    {
+      "id": "Rogue_Talent_Assassins_Vitality",
+      "name": "Assassin's Vitality",
+      "kind": "skill"
     },
     {
       "id": "Skill_SlotAssign",
@@ -446,6 +1261,16 @@
       "kind": "unit"
     },
     {
+      "id": "Shield_Avalanche_Skill1",
+      "name": "Avalanche",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_AwakenMind",
+      "name": "Awaken Mind",
+      "kind": "skill"
+    },
+    {
       "id": "Axe_Base_Attack",
       "name": "Axe_Base_Attack",
       "kind": "skill"
@@ -471,6 +1296,76 @@
       "kind": "icon"
     },
     {
+      "id": "OgreBagon_Z4W_Claw",
+      "name": "Bagon Brawler",
+      "kind": "unit"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_Book",
+      "name": "Bagon Frost Sculptor",
+      "kind": "unit"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_2H",
+      "name": "Bagon Icecaller",
+      "kind": "unit"
+    },
+    {
+      "id": "OgreBagon_Z4W_2H",
+      "name": "Bagon Savage",
+      "kind": "unit"
+    },
+    {
+      "id": "OgreBagon_Z4W_2H_FS",
+      "name": "Bagon Savage",
+      "kind": "unit"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_Caster",
+      "name": "Bagon Shaman",
+      "kind": "unit"
+    },
+    {
+      "id": "OgreBagon_Z4W_Dual",
+      "name": "Bagon Smasher",
+      "kind": "unit"
+    },
+    {
+      "id": "OgreBagon_Z4W_Dual_FS",
+      "name": "Bagon Smasher",
+      "kind": "unit"
+    },
+    {
+      "id": "Yetina_BagonStamina",
+      "name": "Bagon Stamina",
+      "kind": "skill"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_Crescent",
+      "name": "Bagon Tracker",
+      "kind": "unit"
+    },
+    {
+      "id": "BagonKing_BlazingArm",
+      "name": "BagonKing_BlazingArm",
+      "kind": "skill"
+    },
+    {
+      "id": "BagonKing_BreakFloor",
+      "name": "BagonKing_BreakFloor",
+      "kind": "skill"
+    },
+    {
+      "id": "BagonKing_FrostStrike",
+      "name": "BagonKing_FrostStrike",
+      "kind": "skill"
+    },
+    {
+      "id": "BagonKing_FrozenCyclone",
+      "name": "BagonKing_FrozenCyclone",
+      "kind": "skill"
+    },
+    {
       "id": "Infusion_Crimson_DPS",
       "name": "Balance of Justice",
       "kind": "skill"
@@ -489,6 +1384,16 @@
       "id": "Demon_Z1_Claws_Soulstone",
       "name": "Baphometal",
       "kind": "unit"
+    },
+    {
+      "id": "Cleodora_Summon_Barrage",
+      "name": "Barrage",
+      "kind": "skill"
+    },
+    {
+      "id": "Cleodora_Summon_Barrage_Bounce",
+      "name": "Barrage",
+      "kind": "skill"
     },
     {
       "id": "Gatsbee_Barrage",
@@ -536,8 +1441,23 @@
       "kind": "unit"
     },
     {
+      "id": "BaseNPC",
+      "name": "BaseNPC",
+      "kind": "unit"
+    },
+    {
       "id": "BaseSummon",
       "name": "BaseSummon",
+      "kind": "unit"
+    },
+    {
+      "id": "SpaBoss_SpawnCube",
+      "name": "Bath Ice Cube",
+      "kind": "skill"
+    },
+    {
+      "id": "Elemental_Z4W_Lava",
+      "name": "Bath Warmer Pyrh Sparkle",
       "kind": "unit"
     },
     {
@@ -559,6 +1479,36 @@
       "id": "Priest_BeaconOfHope",
       "name": "Beacon of Hope",
       "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_BeaconOfSafety",
+      "name": "Beacon of Safety",
+      "kind": "skill"
+    },
+    {
+      "id": "Yetina_BearClaw",
+      "name": "Bear Claw",
+      "kind": "skill"
+    },
+    {
+      "id": "Yetina_BearFrenzy",
+      "name": "Bear Frenzy",
+      "kind": "skill"
+    },
+    {
+      "id": "Bear_Cristal_E_2",
+      "name": "Bear Gates",
+      "kind": "unit"
+    },
+    {
+      "id": "Yetina_BearTotem",
+      "name": "Bear Totem",
+      "kind": "skill"
+    },
+    {
+      "id": "Bear_Cristal_Z4W_2",
+      "name": "Bear_Cristal_Z4W_2",
+      "kind": "unit"
     },
     {
       "id": "Luck_Mount_Status",
@@ -701,8 +1651,23 @@
       "kind": "icon"
     },
     {
+      "id": "Book_Frozenground_Skill2_Debuff",
+      "name": "Biting Cold",
+      "kind": "skill"
+    },
+    {
       "id": "Gastbee_Heroic_Swarm_Status",
       "name": "Biting Swarm",
+      "kind": "skill"
+    },
+    {
+      "id": "GM_Winter_Passive_Buff",
+      "name": "Bitter Cold",
+      "kind": "skill"
+    },
+    {
+      "id": "GM_Winter_Passive",
+      "name": "Bitter Winter",
       "kind": "skill"
     },
     {
@@ -726,18 +1691,73 @@
       "kind": "unit"
     },
     {
-      "id": "TODO_FaerieSwarowl_Z3W_Claws",
+      "id": "Swarowl_Z4D_Sniper",
+      "name": "Blackbird Bullet",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Z4W_Claws_2",
+      "name": "Blackbird Ferocious Harpy",
+      "kind": "unit"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Claws_2",
+      "name": "Blackbird Fighter",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Bat_Baby_Z4W",
+      "name": "Blackbird Fledgling",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Z4W_Claws",
       "name": "Blackbird Harpy",
       "kind": "unit"
     },
     {
-      "id": "Swarowl_Bat",
+      "id": "SwarowlHB_Z4W_Caster",
+      "name": "Blackbird Stormbringer",
+      "kind": "unit"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Caster_FS",
+      "name": "Blackbird Stormbringer",
+      "kind": "unit"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Tank",
+      "name": "Blackbird Stormshield",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Z4W_Caster",
+      "name": "Blackbird Thunderbearer",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Z4W_Caster_2",
+      "name": "Blackbird Trained Thunderbearer",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Bat_Z4W",
       "name": "Blackbird Volture",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Z4D_Watcher",
+      "name": "Blackbird Watcher",
       "kind": "unit"
     },
     {
       "id": "DS_Bladeleaf_Combo_Status",
       "name": "Bladeleaf",
+      "kind": "skill"
+    },
+    {
+      "id": "Thrown_Thunderlink_Skill2",
+      "name": "Blades Maelstrom",
       "kind": "skill"
     },
     {
@@ -761,6 +1781,11 @@
       "kind": "statustype"
     },
     {
+      "id": "Feline_Auto_Status",
+      "name": "Bleeding",
+      "kind": "skill"
+    },
+    {
       "id": "Skunk_Auto_Status",
       "name": "Bleeding",
       "kind": "skill"
@@ -772,6 +1797,11 @@
     },
     {
       "id": "Wolf_Robin_Hoof_Status",
+      "name": "Bleeding",
+      "kind": "skill"
+    },
+    {
+      "id": "Yetina_Bleed",
       "name": "Bleeding",
       "kind": "skill"
     },
@@ -823,6 +1853,11 @@
     {
       "id": "Mage_Blink",
       "name": "Blink",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Magefrost_Combo",
+      "name": "Blizzard",
       "kind": "skill"
     },
     {
@@ -896,6 +1931,41 @@
       "kind": "skill"
     },
     {
+      "id": "Frog_Crystal_Blue",
+      "name": "Blue Crystalflopper",
+      "kind": "unit"
+    },
+    {
+      "id": "Frog_Crystal_Blue02",
+      "name": "Blue Crystalflopper",
+      "kind": "unit"
+    },
+    {
+      "id": "Frog_Crystal_BluePurple",
+      "name": "Blue Crystalflopper",
+      "kind": "unit"
+    },
+    {
+      "id": "Frog_Crystal_Demon",
+      "name": "Blue Crystalflopper",
+      "kind": "unit"
+    },
+    {
+      "id": "Frog_Crystal_Green",
+      "name": "Blue Crystalflopper",
+      "kind": "unit"
+    },
+    {
+      "id": "Frog_Crystal_Purple",
+      "name": "Blue Crystalflopper",
+      "kind": "unit"
+    },
+    {
+      "id": "Frog_Crystal_Spark",
+      "name": "Blue Crystalflopper",
+      "kind": "unit"
+    },
+    {
       "id": "DemonDog_Blue02",
       "name": "Blue Demodoggo",
       "kind": "unit"
@@ -913,11 +1983,6 @@
     {
       "id": "Boar_Z1W",
       "name": "Boar",
-      "kind": "unit"
-    },
-    {
-      "id": "Boar_Z4W_E",
-      "name": "Boar Burnham",
       "kind": "unit"
     },
     {
@@ -976,23 +2041,18 @@
       "kind": "skill"
     },
     {
-      "id": "Book_WaterOrbs_Passive_Status",
-      "name": "Book_WaterOrbs_Passive_Status",
+      "id": "Book_Frozenground_Combo_Mortars",
+      "name": "Book_Frozenground_Combo_Mortars",
       "kind": "skill"
     },
     {
-      "id": "Book_WaterOrbs_Skill1_Buff",
-      "name": "Book_WaterOrbs_Skill1_Buff",
+      "id": "Book_Frozenground_Passive_Area",
+      "name": "Book_Frozenground_Passive_Area",
       "kind": "skill"
     },
     {
-      "id": "Book_WaterOrbs_Skill1_Shield",
-      "name": "Book_WaterOrbs_Skill1_Shield",
-      "kind": "skill"
-    },
-    {
-      "id": "Book_WaterOrbs_Skill2_Recast_Proc",
-      "name": "Book_WaterOrbs_Skill2_Recast_Proc",
+      "id": "SpaBoss_Charge",
+      "name": "Bouncer Charge",
       "kind": "skill"
     },
     {
@@ -1068,6 +2128,11 @@
     {
       "id": "Crimson_Z3W_Monk_U",
       "name": "Brother Tuk",
+      "kind": "unit"
+    },
+    {
+      "id": "Bear_Z4W",
+      "name": "Brown Bear",
       "kind": "unit"
     },
     {
@@ -1151,6 +2216,11 @@
       "kind": "statustype"
     },
     {
+      "id": "Bear_Cristal_E",
+      "name": "Buffalo Bear",
+      "kind": "unit"
+    },
+    {
       "id": "Rogue_Talent_BullyingTheWeak",
       "name": "Bullying the Weak",
       "kind": "skill"
@@ -1211,6 +2281,11 @@
       "kind": "skill"
     },
     {
+      "id": "Mage_Talent_CadenceSurge",
+      "name": "Cadence Surge",
+      "kind": "skill"
+    },
+    {
       "id": "DemonDog_Beige",
       "name": "Camel Demodoggo",
       "kind": "unit"
@@ -1224,6 +2299,11 @@
       "id": "CameraCursor",
       "name": "CameraCursor",
       "kind": "icon"
+    },
+    {
+      "id": "Swarowl_Bat_Z4W_E",
+      "name": "Canary Volt",
+      "kind": "unit"
     },
     {
       "id": "Cancel",
@@ -1296,6 +2376,11 @@
       "kind": "icon"
     },
     {
+      "id": "Swarowl_Z4D_Caster",
+      "name": "Caster Harpi",
+      "kind": "unit"
+    },
+    {
       "id": "CasterManfish_Auto",
       "name": "CasterManfish_Auto",
       "kind": "skill"
@@ -1306,9 +2391,9 @@
       "kind": "skill"
     },
     {
-      "id": "TODO_SnowPanther_Black",
-      "name": "Cave Leopard",
-      "kind": "unit"
+      "id": "Mage_Talent_CatalystRecovery",
+      "name": "Catalyst Recovery",
+      "kind": "skill"
     },
     {
       "id": "Crimson_Z2W_Peasant_E",
@@ -1606,6 +2691,11 @@
       "kind": "icon"
     },
     {
+      "id": "Shop_ChristmasSnowBall",
+      "name": "ChristmasSnowBall",
+      "kind": "unit"
+    },
+    {
       "id": "chrome-sun",
       "name": "chrome-sun",
       "kind": "icon"
@@ -1613,6 +2703,11 @@
     {
       "id": "Mage_ChronoReset",
       "name": "Chrono Reset",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_ChronostaticOrb",
+      "name": "Chronostatic Orb",
       "kind": "skill"
     },
     {
@@ -1633,6 +2728,11 @@
     {
       "id": "Shield_Firebreath_Passive_Status",
       "name": "Cinder Coat",
+      "kind": "skill"
+    },
+    {
+      "id": "Crescent_Dance_Combo_Attack",
+      "name": "Circle of Cold",
       "kind": "skill"
     },
     {
@@ -1691,11 +2791,6 @@
       "kind": "skill"
     },
     {
-      "id": "Cleodora_MiniElite_Sleep",
-      "name": "Cleodora_MiniElite_Sleep",
-      "kind": "skill"
-    },
-    {
       "id": "Cleodora_Phase3Entry",
       "name": "Cleodora_Phase3Entry",
       "kind": "skill"
@@ -1731,6 +2826,11 @@
       "kind": "skill"
     },
     {
+      "id": "Cleodora_Summon_Barrage_Puddle",
+      "name": "Cleodora_Summon_Barrage_Puddle",
+      "kind": "skill"
+    },
+    {
       "id": "CleodoraChamp_Spawn",
       "name": "CleodoraChamp_Spawn",
       "kind": "skill"
@@ -1749,11 +2849,6 @@
       "id": "cleric",
       "name": "cleric",
       "kind": "icon"
-    },
-    {
-      "id": "TODO_SnowPanther_DarkBrown",
-      "name": "Cliff Leopard",
-      "kind": "unit"
     },
     {
       "id": "CliffDefenderFire",
@@ -1804,6 +2899,16 @@
       "id": "Collection",
       "name": "Collection",
       "kind": "icon"
+    },
+    {
+      "id": "Warrior_Talent_Combat_Focus",
+      "name": "Combat Focus",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Combat_Science",
+      "name": "Combat Science",
+      "kind": "skill"
     },
     {
       "id": "Rogue_ComboMax",
@@ -1878,6 +2983,16 @@
     {
       "id": "Mage_Talent_ConcentratedPower",
       "name": "Concentrated Power",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_ConductiveServant",
+      "name": "Conductive Servant",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_ConductiveVulnerability",
+      "name": "Conductive Vulnerability",
       "kind": "skill"
     },
     {
@@ -2216,8 +3331,18 @@
       "kind": "icon"
     },
     {
+      "id": "consumable_ScrollOfDexterity_2",
+      "name": "consumable_ScrollOfDexterity_2",
+      "kind": "icon"
+    },
+    {
       "id": "consumable_ScrollOfFaith",
       "name": "consumable_ScrollOfFaith",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ScrollOfFaith_2",
+      "name": "consumable_ScrollOfFaith_2",
       "kind": "icon"
     },
     {
@@ -2226,13 +3351,28 @@
       "kind": "icon"
     },
     {
+      "id": "consumable_ScrollOfIntelligence_2",
+      "name": "consumable_ScrollOfIntelligence_2",
+      "kind": "icon"
+    },
+    {
       "id": "consumable_ScrollOfStrength",
       "name": "consumable_ScrollOfStrength",
       "kind": "icon"
     },
     {
+      "id": "consumable_ScrollOfStrength_2",
+      "name": "consumable_ScrollOfStrength_2",
+      "kind": "icon"
+    },
+    {
       "id": "consumable_ScrollOfVitality",
       "name": "consumable_ScrollOfVitality",
+      "kind": "icon"
+    },
+    {
+      "id": "consumable_ScrollOfVitality_2",
+      "name": "consumable_ScrollOfVitality_2",
       "kind": "icon"
     },
     {
@@ -2626,11 +3766,6 @@
       "kind": "unit"
     },
     {
-      "id": "Crimson_Book_Aura",
-      "name": "Crimson_Book_Aura",
-      "kind": "skill"
-    },
-    {
       "id": "Crimson_Book_Auto",
       "name": "Crimson_Book_Auto",
       "kind": "skill"
@@ -2713,11 +3848,6 @@
     {
       "id": "Crimson_SwordShield_Auto",
       "name": "Crimson_SwordShield_Auto",
-      "kind": "skill"
-    },
-    {
-      "id": "Crimson_SwordShield_Consecration_Shield",
-      "name": "Crimson_SwordShield_Consecration_Shield",
       "kind": "skill"
     },
     {
@@ -2866,6 +3996,16 @@
       "kind": "unit"
     },
     {
+      "id": "TODO_Spirit_Lava_01",
+      "name": "da'Rius",
+      "kind": "unit"
+    },
+    {
+      "id": "TODO_Spirit_Lava_Elite_01",
+      "name": "da'Rius",
+      "kind": "unit"
+    },
+    {
       "id": "DA_Base_Attack1",
       "name": "DA_Base_Attack1",
       "kind": "skill"
@@ -2883,16 +4023,6 @@
     {
       "id": "DA_Base_Attack4",
       "name": "DA_Base_Attack4",
-      "kind": "skill"
-    },
-    {
-      "id": "DA_Water_Passive_Status",
-      "name": "DA_Water_Passive_Status",
-      "kind": "skill"
-    },
-    {
-      "id": "DA_Water_Passive_Status_R3",
-      "name": "DA_Water_Passive_Status_R3",
       "kind": "skill"
     },
     {
@@ -2926,16 +4056,6 @@
       "kind": "skill"
     },
     {
-      "id": "Daggers_Demondash_Passive_Status",
-      "name": "Daggers_Demondash_Passive_Status",
-      "kind": "skill"
-    },
-    {
-      "id": "Daggers_Demondash_Skill2_Counter",
-      "name": "Daggers_Demondash_Skill2_Counter",
-      "kind": "skill"
-    },
-    {
       "id": "DemonDog_Blue",
       "name": "Dark Demodoggo",
       "kind": "unit"
@@ -2966,23 +4086,23 @@
       "kind": "skill"
     },
     {
+      "id": "Katana_Hasaki_EXDash",
+      "name": "Dash",
+      "kind": "skill"
+    },
+    {
       "id": "Dash_Status",
       "name": "Dash_Status",
       "kind": "skill"
     },
     {
+      "id": "Scepter_Storm_Skill2",
+      "name": "Dazzling Storm",
+      "kind": "skill"
+    },
+    {
       "id": "Dead",
       "name": "Dead",
-      "kind": "skill"
-    },
-    {
-      "id": "Dead_Hidden",
-      "name": "Dead_Hidden",
-      "kind": "skill"
-    },
-    {
-      "id": "Dead_Resurrect",
-      "name": "Dead_Resurrect",
       "kind": "skill"
     },
     {
@@ -3006,6 +4126,11 @@
       "kind": "skill"
     },
     {
+      "id": "Swarowl_Elite_2",
+      "name": "Deagle",
+      "kind": "unit"
+    },
+    {
       "id": "Rogue_DeathMark",
       "name": "Death Mark",
       "kind": "skill"
@@ -3021,13 +4146,18 @@
       "kind": "statustype"
     },
     {
-      "id": "DebugShield",
-      "name": "DebugShield",
+      "id": "Debug_MagicAOE",
+      "name": "Debug_MagicAOE",
       "kind": "skill"
     },
     {
-      "id": "DebugShieldStatus",
-      "name": "DebugShieldStatus",
+      "id": "Debug_PhysAOE",
+      "name": "Debug_PhysAOE",
+      "kind": "skill"
+    },
+    {
+      "id": "DebugShield",
+      "name": "DebugShield",
       "kind": "skill"
     },
     {
@@ -3041,19 +4171,19 @@
       "kind": "skill"
     },
     {
-      "id": "Halos_Demon_Skill2_Leash",
-      "name": "Deceiver Trick",
-      "kind": "skill"
-    },
-    {
-      "id": "Halos_Demon_Skill2_R3_Counter",
-      "name": "Deceiver Trick",
-      "kind": "skill"
-    },
-    {
       "id": "Refuse",
       "name": "Decline",
       "kind": "icon"
+    },
+    {
+      "id": "Mage_Talent_DefensiveDischarge",
+      "name": "Defensive Discharge",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Defiance",
+      "name": "Defiance",
+      "kind": "skill"
     },
     {
       "id": "Item_Delete",
@@ -3103,11 +4233,6 @@
     {
       "id": "Demon_Spear_Skill",
       "name": "Demon_Spear_Skill",
-      "kind": "skill"
-    },
-    {
-      "id": "Demon_Spear_Skill_Status",
-      "name": "Demon_Spear_Skill_Status",
       "kind": "skill"
     },
     {
@@ -3236,6 +4361,11 @@
       "kind": "skill"
     },
     {
+      "id": "Priest_Talent_DivineAura",
+      "name": "Divine Aura",
+      "kind": "skill"
+    },
+    {
       "id": "DM_Base_Attack1",
       "name": "DM_Base_Attack1",
       "kind": "skill"
@@ -3256,23 +4386,8 @@
       "kind": "skill"
     },
     {
-      "id": "DM_Multispin_Combo_Status",
-      "name": "DM_Multispin_Combo_Status",
-      "kind": "skill"
-    },
-    {
       "id": "DM_Multispin_Passive_Status_Max_Stacks",
       "name": "DM_Multispin_Passive_Status_Max_Stacks",
-      "kind": "skill"
-    },
-    {
-      "id": "DM_Multispin_Skill1_Recast",
-      "name": "DM_Multispin_Skill1_Recast",
-      "kind": "skill"
-    },
-    {
-      "id": "DM_Multispin_Skill1_Status",
-      "name": "DM_Multispin_Skill1_Status",
       "kind": "skill"
     },
     {
@@ -3318,6 +4433,11 @@
     {
       "id": "Rogue_Talent_LethalPoison_Dose_WeaponSkill",
       "name": "Dose : Weapon Skill",
+      "kind": "skill"
+    },
+    {
+      "id": "Phrixes_H_NG_NightSalvo",
+      "name": "Double Crash",
       "kind": "skill"
     },
     {
@@ -3441,6 +4561,106 @@
       "kind": "unit"
     },
     {
+      "id": "Egglektra_Attack",
+      "name": "Egglektra_Attack",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_CrashLand",
+      "name": "Egglektra_CrashLand",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_Dissapear",
+      "name": "Egglektra_Dissapear",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_DropFeathers",
+      "name": "Egglektra_DropFeathers",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_Egg",
+      "name": "Egglektra_Egg",
+      "kind": "unit"
+    },
+    {
+      "id": "Egglektra_Egg_Hatching",
+      "name": "Egglektra_Egg_Hatching",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_ElectricBreath",
+      "name": "Egglektra_ElectricBreath",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_EnergyAccumulation",
+      "name": "Egglektra_EnergyAccumulation",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_EnergyAccumulation_Buff",
+      "name": "Egglektra_EnergyAccumulation_Buff",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_Flying",
+      "name": "Egglektra_Flying",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_Land",
+      "name": "Egglektra_Land",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_LayEgg",
+      "name": "Egglektra_LayEgg",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_LightningStrike_Projectiles",
+      "name": "Egglektra_LightningStrike_Projectiles",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_LightningStrikes",
+      "name": "Egglektra_LightningStrikes",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_Mines",
+      "name": "Egglektra_Mines",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_TakeOff",
+      "name": "Egglektra_TakeOff",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_WaitInAmbush",
+      "name": "Egglektra_WaitInAmbush",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_World",
+      "name": "Egglektra_World",
+      "kind": "unit"
+    },
+    {
+      "id": "Egglektra_World_LightningStrikes",
+      "name": "Egglektra_World_LightningStrikes",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Hasaki_Skill2",
+      "name": "Electrified Ground",
+      "kind": "skill"
+    },
+    {
       "id": "EliteOutnumbered",
       "name": "EliteOutnumbered",
       "kind": "skill"
@@ -3458,6 +4678,41 @@
     {
       "id": "Shield_Start_Skill1_Status",
       "name": "Empowered Shield Bash",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Enduring_Fortitude",
+      "name": "Enduring Fortitude",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Swarowl_Support",
+      "name": "Energizing Flux",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Hasaki_EnergyAccumulation",
+      "name": "Energy Accumulation",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Hasaki_Passive",
+      "name": "Energy Accumulation",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Enrage",
+      "name": "Enrage",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Enrage_Accum_Status",
+      "name": "Enrage",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Enrage_Status",
+      "name": "Enraged",
       "kind": "skill"
     },
     {
@@ -3503,6 +4758,11 @@
     {
       "id": "Phrixes_EternalNight",
       "name": "Eternal Night",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_EtherealTether",
+      "name": "Ethereal Tether",
       "kind": "skill"
     },
     {
@@ -3606,11 +4866,6 @@
       "kind": "skill"
     },
     {
-      "id": "FairieSuperElite_Clones_Stealth",
-      "name": "FairieSuperElite_Clones_Stealth",
-      "kind": "skill"
-    },
-    {
       "id": "Priest_FaithfulWinds",
       "name": "Faithful Winds",
       "kind": "skill"
@@ -3651,6 +4906,11 @@
       "kind": "icon"
     },
     {
+      "id": "Mage_Talent_FeedTheCore",
+      "name": "Feed the Core",
+      "kind": "skill"
+    },
+    {
       "id": "CleodoraFeeder_Beam",
       "name": "Feed the Queen",
       "kind": "skill"
@@ -3663,6 +4923,26 @@
     {
       "id": "GA_Demon_Combo",
       "name": "Feeding the Beast",
+      "kind": "skill"
+    },
+    {
+      "id": "Yetina_FelineFrenzy",
+      "name": "Feline Frenzy",
+      "kind": "skill"
+    },
+    {
+      "id": "Yetina_FelineTotem",
+      "name": "Feline Totem",
+      "kind": "skill"
+    },
+    {
+      "id": "Feline_Attack",
+      "name": "Feline_Attack",
+      "kind": "skill"
+    },
+    {
+      "id": "Yetina_FeralJump",
+      "name": "Feral Jump",
       "kind": "skill"
     },
     {
@@ -3856,11 +5136,6 @@
       "kind": "skill"
     },
     {
-      "id": "Fists_LightMonk_Passive_Shield",
-      "name": "Fists_LightMonk_Passive_Shield",
-      "kind": "skill"
-    },
-    {
       "id": "Fists_LightMonk_Skill1_Recast",
       "name": "Fists_LightMonk_Skill1_Recast",
       "kind": "skill"
@@ -3871,8 +5146,8 @@
       "kind": "skill"
     },
     {
-      "id": "Fists_WaterUppercut_P_Status_Slow",
-      "name": "Fists_WaterUppercut_P_Status_Slow",
+      "id": "FlagBearer",
+      "name": "FlagBearer",
       "kind": "skill"
     },
     {
@@ -3936,6 +5211,11 @@
       "kind": "skill"
     },
     {
+      "id": "Warrior_Talent_Flurry_Of_Fury",
+      "name": "Flurry of Fury",
+      "kind": "skill"
+    },
+    {
       "id": "DialogObeliskFly",
       "name": "Fly to another obelisk",
       "kind": "icon"
@@ -3948,6 +5228,16 @@
     {
       "id": "FlyHarvester_Auto",
       "name": "FlyHarvester_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "Flight",
+      "name": "Flying",
+      "kind": "statustype"
+    },
+    {
+      "id": "ObeliskFlight",
+      "name": "Flying",
       "kind": "skill"
     },
     {
@@ -4016,9 +5306,69 @@
       "kind": "unit"
     },
     {
+      "id": "GM_Winter_Skill1",
+      "name": "Freezing Blast",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Magefrost_Passive",
+      "name": "Freezing Cold",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_Frozenground_Combo",
+      "name": "Frigid Frostball",
+      "kind": "skill"
+    },
+    {
       "id": "Mage_RayOfSpark_Status",
       "name": "Frost Infusion",
       "kind": "skill"
+    },
+    {
+      "id": "Staff_Magefrost_Combo_Counter",
+      "name": "Frost Pillar",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Magefrost_Combo_Pillar",
+      "name": "Frost Pillar",
+      "kind": "skill"
+    },
+    {
+      "id": "SpaBoss_FrostRay",
+      "name": "Frost Ray",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_Frozenground_Passive",
+      "name": "Frozen Ground",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Magefrost_Skill2",
+      "name": "Frozen Orb",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Fueled_By_Anger",
+      "name": "Fueled by Anger",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_FulminatingEcho",
+      "name": "Fulminating Echo",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_FulminatingMark",
+      "name": "Fulminating Mark",
+      "kind": "skill"
+    },
+    {
+      "id": "OgreBagon_Z4W_Claw_2",
+      "name": "Furious Bagon Brawler",
+      "kind": "unit"
     },
     {
       "id": "Shield_Firebreath_Skill1",
@@ -4048,11 +5398,6 @@
     {
       "id": "GA_Base_Attack3",
       "name": "GA_Base_Attack3",
-      "kind": "skill"
-    },
-    {
-      "id": "GA_Craft_Passive_Proc",
-      "name": "GA_Craft_Passive_Proc",
       "kind": "skill"
     },
     {
@@ -4191,6 +5536,11 @@
       "kind": "skill"
     },
     {
+      "id": "Egglektra_GiganticGusts",
+      "name": "Gigantic Gusts",
+      "kind": "skill"
+    },
+    {
       "id": "OgreManfish_Z2W_Claws_E",
       "name": "Gilliver",
       "kind": "unit"
@@ -4206,9 +5556,14 @@
       "kind": "icon"
     },
     {
-      "id": "TODO_MOG_Merchant",
-      "name": "Glory Merchant",
-      "kind": "unit"
+      "id": "Mace_Ice_Skill1",
+      "name": "Glacial Fissure",
+      "kind": "skill"
+    },
+    {
+      "id": "GM_Winter_Skill2",
+      "name": "Glacial Sash",
+      "kind": "skill"
     },
     {
       "id": "GM_Base_Attack",
@@ -4283,11 +5638,6 @@
     {
       "id": "Golcano_Minion_Explosion",
       "name": "Golcano_Minion_Explosion",
-      "kind": "skill"
-    },
-    {
-      "id": "Golcano_Shield",
-      "name": "Golcano_Shield",
       "kind": "skill"
     },
     {
@@ -4476,16 +5826,6 @@
       "kind": "skill"
     },
     {
-      "id": "GS_Nova_Combo_Status",
-      "name": "GS_Nova_Combo_Status",
-      "kind": "skill"
-    },
-    {
-      "id": "GS_Nova_Skill2_Buff",
-      "name": "GS_Nova_Skill2_Buff",
-      "kind": "skill"
-    },
-    {
       "id": "StableMaster",
       "name": "Guild Merchant",
       "kind": "unit"
@@ -4511,14 +5851,19 @@
       "kind": "skill"
     },
     {
-      "id": "Halos_Demon_Passive_Status",
-      "name": "Halos_Demon_Passive_Status",
+      "id": "Halos_Demon_Skill2_Area",
+      "name": "Halos_Demon_Skill2_Area",
       "kind": "skill"
     },
     {
-      "id": "Halos_Demon_Skill1_Recast",
-      "name": "Halos_Demon_Skill1_Recast",
-      "kind": "skill"
+      "id": "Halos_Demon_Skill2_Leash",
+      "name": "Halos_Demon_Skill2_Leash",
+      "kind": "icon"
+    },
+    {
+      "id": "Halos_Demon_Skill2_R3_Counter",
+      "name": "Halos_Demon_Skill2_R3_Counter",
+      "kind": "icon"
     },
     {
       "id": "Halos_Totem_Passive_Aoe",
@@ -4526,8 +5871,53 @@
       "kind": "skill"
     },
     {
+      "id": "Staff_Magefrost_Passive_Proc",
+      "name": "Hand of Frost",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Hardened_Aegis",
+      "name": "Hardened Aegis",
+      "kind": "skill"
+    },
+    {
       "id": "Thrown_Seeds_Skill1",
       "name": "Harvesting Scythe",
+      "kind": "skill"
+    },
+    {
+      "id": "Egglektra_Hatchling",
+      "name": "Hatchling",
+      "kind": "unit"
+    },
+    {
+      "id": "Hatchling_Attack",
+      "name": "Hatchling_Attack",
+      "kind": "skill"
+    },
+    {
+      "id": "Hatchling_FeathersOnDeath",
+      "name": "Hatchling_FeathersOnDeath",
+      "kind": "skill"
+    },
+    {
+      "id": "Hatchling_PowerfulFlap",
+      "name": "Hatchling_PowerfulFlap",
+      "kind": "skill"
+    },
+    {
+      "id": "Hatchling_ViolentScreech",
+      "name": "Hatchling_ViolentScreech",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Havoc_Reaper",
+      "name": "Havor Reaper",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Havoc_Reaper_Status",
+      "name": "Havor Reaper",
       "kind": "skill"
     },
     {
@@ -4576,6 +5966,56 @@
       "kind": "skill"
     },
     {
+      "id": "Warrior_Talent_Heavy_Handed",
+      "name": "Heavy Handed",
+      "kind": "skill"
+    },
+    {
+      "id": "Heavy2HS_Auto",
+      "name": "Heavy2HS_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "Heavy2HS_Auto_Skill",
+      "name": "Heavy2HS_Auto_Skill",
+      "kind": "skill"
+    },
+    {
+      "id": "HeavyCommonCaster_Auto",
+      "name": "HeavyCommonCaster_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "HeavyCommonCaster_Lava_Auto",
+      "name": "HeavyCommonCaster_Lava_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "HeavyCrescent_Auto",
+      "name": "HeavyCrescent_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "HeavySpellbook_Auto",
+      "name": "HeavySpellbook_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "HeavySpellbook_Lava_Auto",
+      "name": "HeavySpellbook_Lava_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "HeavySpellbook_Lava_Skill",
+      "name": "HeavySpellbook_Lava_Skill",
+      "kind": "skill"
+    },
+    {
+      "id": "HeavySpellbook_Skill1",
+      "name": "HeavySpellbook_Skill1",
+      "kind": "skill"
+    },
+    {
       "id": "Hemorage",
       "name": "Hemorage",
       "kind": "statustype"
@@ -4593,6 +6033,51 @@
     {
       "id": "OgreKobold_Z1W_E_Claws",
       "name": "Heraclette",
+      "kind": "unit"
+    },
+    {
+      "id": "Herald_Monk_Elite_F",
+      "name": "Herald_Monk_Elite_F",
+      "kind": "unit"
+    },
+    {
+      "id": "Herald_Monk_Elite_M",
+      "name": "Herald_Monk_Elite_M",
+      "kind": "unit"
+    },
+    {
+      "id": "Herald_Monk_Elite_N",
+      "name": "Herald_Monk_Elite_N",
+      "kind": "unit"
+    },
+    {
+      "id": "Herald_Monk_Melee_F",
+      "name": "Herald_Monk_Melee_F",
+      "kind": "unit"
+    },
+    {
+      "id": "Herald_Monk_Melee_M",
+      "name": "Herald_Monk_Melee_M",
+      "kind": "unit"
+    },
+    {
+      "id": "Herald_Monk_Melee_N",
+      "name": "Herald_Monk_Melee_N",
+      "kind": "unit"
+    },
+    {
+      "id": "Herald_Monk_Ranged_F",
+      "name": "Herald_Monk_Ranged_F",
+      "kind": "unit"
+    },
+    {
+      "id": "Herald_Monk_Ranged_M",
+      "name": "Herald_Monk_Ranged_M",
+      "kind": "unit"
+    },
+    {
+      "id": "Herald_Monk_Ranged_N",
+      "name": "Herald_Monk_Ranged_N",
       "kind": "unit"
     },
     {
@@ -4661,16 +6146,6 @@
       "kind": "unit"
     },
     {
-      "id": "TODO_SnowPanther_Spark",
-      "name": "Hill Leopard",
-      "kind": "unit"
-    },
-    {
-      "id": "TODO_SnowPanther_Yellow",
-      "name": "Hill Leopard",
-      "kind": "unit"
-    },
-    {
       "id": "Spear_Goo_Combo",
       "name": "Hive Assault",
       "kind": "skill"
@@ -4736,6 +6211,11 @@
       "kind": "unit"
     },
     {
+      "id": "Book_Frozenground_Skill2",
+      "name": "Hoarfrost",
+      "kind": "skill"
+    },
+    {
       "id": "Warrior_Talent_HoldTheLine",
       "name": "Hold the Line",
       "kind": "skill"
@@ -4787,6 +6267,11 @@
     },
     {
       "id": "Slime_Z1D_Honey_NoXP",
+      "name": "Honey Slime of the Hivetree",
+      "kind": "unit"
+    },
+    {
+      "id": "TODO_Slime_Ice_01",
       "name": "Honey Slime of the Hivetree",
       "kind": "unit"
     },
@@ -4843,6 +6328,41 @@
     {
       "id": "GS_Nova_Passive_Stack",
       "name": "Hysteria",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_HystericalPrayer",
+      "name": "Hysterical Prayer",
+      "kind": "skill"
+    },
+    {
+      "id": "Shield_Avalanche_Passive",
+      "name": "Ice Block",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Magefrost_Skill1",
+      "name": "Ice Lance",
+      "kind": "skill"
+    },
+    {
+      "id": "OgreDual_Skill_Shield",
+      "name": "Ice Shield",
+      "kind": "skill"
+    },
+    {
+      "id": "GM_Winter_Combo",
+      "name": "Ice Smash",
+      "kind": "skill"
+    },
+    {
+      "id": "Staff_Magefrost_Combo_Stack",
+      "name": "Ice Stake",
+      "kind": "skill"
+    },
+    {
+      "id": "Crescent_Dance_Passive",
+      "name": "Ice-infused Blades",
       "kind": "skill"
     },
     {
@@ -4916,12 +6436,22 @@
       "kind": "icon"
     },
     {
+      "id": "Warrior_Talent_Indomitable_Spirit",
+      "name": "Indomitable Spirit",
+      "kind": "skill"
+    },
+    {
       "id": "Daggers_Demondash_Skill1",
       "name": "Infernal Plunge",
       "kind": "skill"
     },
     {
       "id": "Warrior_InfiniteRage",
+      "name": "Infinite Rage",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Infinite_Rage",
       "name": "Infinite Rage",
       "kind": "skill"
     },
@@ -4956,6 +6486,11 @@
       "kind": "skill"
     },
     {
+      "id": "Marylyn_Monrowl_Infused_Vortex_Blade",
+      "name": "Infused Vortex Blade",
+      "kind": "skill"
+    },
+    {
       "id": "Warrior_Talent_InfusedWound",
       "name": "Infused Wound",
       "kind": "skill"
@@ -4971,71 +6506,6 @@
       "kind": "icon"
     },
     {
-      "id": "Infusion_Bee_Support_Buff",
-      "name": "Infusion_Bee_Support_Buff",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Bee_Support_Counter",
-      "name": "Infusion_Bee_Support_Counter",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Bee_Tank_Shield",
-      "name": "Infusion_Bee_Tank_Shield",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Bee_Tank_Status",
-      "name": "Infusion_Bee_Tank_Status",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Crimson_DPS_Magic",
-      "name": "Infusion_Crimson_DPS_Magic",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Crimson_DPS_Physical",
-      "name": "Infusion_Crimson_DPS_Physical",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Manfish_DPS_Ultimate_Counter",
-      "name": "Infusion_Manfish_DPS_Ultimate_Counter",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Manfish_DPS_Ultimate_Proc",
-      "name": "Infusion_Manfish_DPS_Ultimate_Proc",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Manfish_Support_Ultimate_Counter",
-      "name": "Infusion_Manfish_Support_Ultimate_Counter",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Manfish_Tank_Cooldown",
-      "name": "Infusion_Manfish_Tank_Cooldown",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Nightling_Support_Shield",
-      "name": "Infusion_Nightling_Support_Shield",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Nightling_Support_Status",
-      "name": "Infusion_Nightling_Support_Status",
-      "kind": "skill"
-    },
-    {
-      "id": "Infusion_Nightling_Support_Status_Tracker",
-      "name": "Infusion_Nightling_Support_Status_Tracker",
-      "kind": "skill"
-    },
-    {
       "id": "Infusion_Nightling_Tank_Summon_Auto",
       "name": "Infusion_Nightling_Tank_Summon_Auto",
       "kind": "skill"
@@ -5048,6 +6518,11 @@
     {
       "id": "Fists_LightMonk_Passive",
       "name": "Inner Peace",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_InquisitorsHaste",
+      "name": "Inquisitor's Haste",
       "kind": "skill"
     },
     {
@@ -5121,6 +6596,41 @@
       "kind": "unit"
     },
     {
+      "id": "OgreBagon_Z4W_Claw_FS",
+      "name": "Invoked Bagon Brawler",
+      "kind": "unit"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Claws_FS",
+      "name": "Invoked Blackbird Fighter",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Z4W_Claws_FS",
+      "name": "Invoked Blackbird Harpy",
+      "kind": "unit"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Tank_FS",
+      "name": "Invoked Blackbird Stormshield",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Z4W_Caster_FS",
+      "name": "Invoked Blackbird Thunderbearer",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Bat_Z4W_FS",
+      "name": "Invoked Blackbird Volture",
+      "kind": "unit"
+    },
+    {
+      "id": "Bear_Z4W_FS",
+      "name": "Invoked Brown Bear",
+      "kind": "unit"
+    },
+    {
       "id": "Crimson_Z2W_Peasant_FS",
       "name": "Invoked Crimson Farmhand",
       "kind": "unit"
@@ -5141,8 +6651,28 @@
       "kind": "unit"
     },
     {
+      "id": "Bagon_Heavy_Z4W_Book_FS",
+      "name": "Invoked Frost Sculptor",
+      "kind": "unit"
+    },
+    {
       "id": "Golem_Z1_FS",
       "name": "Invoked Golem",
+      "kind": "unit"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_FS",
+      "name": "Invoked Icecaller",
+      "kind": "unit"
+    },
+    {
+      "id": "Bear_Cristal_Z4W_FS",
+      "name": "Invoked Irradiated Bear",
+      "kind": "unit"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_Book_Lava",
+      "name": "Invoked Magma Sculptor",
       "kind": "unit"
     },
     {
@@ -5226,14 +6756,19 @@
       "kind": "skill"
     },
     {
+      "id": "Bear_Cristal_Z4W",
+      "name": "Irradiated Bear",
+      "kind": "unit"
+    },
+    {
+      "id": "CrystalPanther_Z4W_2",
+      "name": "Irradiated Leopard",
+      "kind": "unit"
+    },
+    {
       "id": "DialogCompleteObjective",
       "name": "It's done!",
       "kind": "icon"
-    },
-    {
-      "id": "ItemStatus",
-      "name": "ItemStatus",
-      "kind": "skill"
     },
     {
       "id": "Sprout_Rice_Z2W_Plantivore_6",
@@ -5271,9 +6806,44 @@
       "kind": "skill"
     },
     {
+      "id": "Katana_Base_Attack1",
+      "name": "Katana_Base_Attack1",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Base_Attack2",
+      "name": "Katana_Base_Attack2",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Base_Attack3",
+      "name": "Katana_Base_Attack3",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Base_Attack4",
+      "name": "Katana_Base_Attack4",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Test_Combo",
+      "name": "Katana_Test_Combo",
+      "kind": "skill"
+    },
+    {
       "id": "Ulserous_Keekoho",
       "name": "Kee Ko Ho",
       "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Keeping_The_Tempo",
+      "name": "Keeping the Tempo",
+      "kind": "skill"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_E",
+      "name": "Khal’Ot D’Semor",
+      "kind": "unit"
     },
     {
       "id": "Daggers_Start_Skill2_Status",
@@ -5286,9 +6856,19 @@
       "kind": "icon"
     },
     {
+      "id": "Rogue_Talent_Kinetic_Energy",
+      "name": "Kinetic Energy",
+      "kind": "skill"
+    },
+    {
       "id": "Mage_Talent_KineticSurge",
       "name": "Kinetic Surge",
       "kind": "skill"
+    },
+    {
+      "id": "CrystalPanther_Z4W_E",
+      "name": "King Leo Pard",
+      "kind": "unit"
     },
     {
       "id": "Ratsar",
@@ -5304,6 +6884,11 @@
       "id": "Slime_Demonic_Z3W_E",
       "name": "Knight Slime",
       "kind": "unit"
+    },
+    {
+      "id": "Rogue_Talent_Knives_Storm",
+      "name": "Knives Storm",
+      "kind": "skill"
     },
     {
       "id": "Rogue_KnivesTempest",
@@ -5436,6 +7021,11 @@
       "kind": "skill"
     },
     {
+      "id": "Feline_Skill1",
+      "name": "Leap",
+      "kind": "skill"
+    },
+    {
       "id": "SuperEliteDemon_Leap",
       "name": "Leap",
       "kind": "skill"
@@ -5474,6 +7064,11 @@
       "id": "Luck_LegendaryWeapon_Status",
       "name": "Legendary Insight",
       "kind": "skill"
+    },
+    {
+      "id": "Panther_Z4_E",
+      "name": "Leopard Da Vinci",
+      "kind": "unit"
     },
     {
       "id": "Rogue_Talent_LethalPoison_Dose",
@@ -5531,9 +7126,39 @@
       "kind": "skill"
     },
     {
+      "id": "Infusion_Swarowl_Tank",
+      "name": "Lightning Rod",
+      "kind": "skill"
+    },
+    {
+      "id": "Marylyn_Monrowl_Lightning_Rush",
+      "name": "Lightning Rush",
+      "kind": "skill"
+    },
+    {
+      "id": "Scepter_Storm_Passive_Counter",
+      "name": "Lightning Speed",
+      "kind": "skill"
+    },
+    {
+      "id": "DA_Lightning_Combo",
+      "name": "Lightning Strike",
+      "kind": "skill"
+    },
+    {
+      "id": "Scepter_Storm_Skill1",
+      "name": "Lightning Strike",
+      "kind": "skill"
+    },
+    {
       "id": "LightningBolt",
       "name": "LightningBolt",
       "kind": "icon"
+    },
+    {
+      "id": "LightningRod_Area",
+      "name": "LightningRod_Area",
+      "kind": "skill"
     },
     {
       "id": "lightsaber",
@@ -5548,6 +7173,41 @@
     {
       "id": "FaerieDemon_Z2_Soulstone",
       "name": "Lilithium",
+      "kind": "unit"
+    },
+    {
+      "id": "Crab_Ice01",
+      "name": "Little Crab",
+      "kind": "unit"
+    },
+    {
+      "id": "Crab_Ice02",
+      "name": "Little Crab",
+      "kind": "unit"
+    },
+    {
+      "id": "Crab_Ice03",
+      "name": "Little Crab",
+      "kind": "unit"
+    },
+    {
+      "id": "Crab_IceCrystal",
+      "name": "Little Crab",
+      "kind": "unit"
+    },
+    {
+      "id": "Crab_IceCrystal02",
+      "name": "Little Crab",
+      "kind": "unit"
+    },
+    {
+      "id": "Crab_IceSpark",
+      "name": "Little Crab",
+      "kind": "unit"
+    },
+    {
+      "id": "Lizard_Shop_Dragon",
+      "name": "Lizhazard Saladmander",
       "kind": "unit"
     },
     {
@@ -5606,8 +7266,18 @@
       "kind": "unit"
     },
     {
+      "id": "Priest_Talent_LuminescentCleave",
+      "name": "Luminescent Cleave",
+      "kind": "skill"
+    },
+    {
       "id": "Priest_Talent_LuminousBastion",
       "name": "Luminous Bastion",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_LuminousPath",
+      "name": "Luminous Path",
       "kind": "skill"
     },
     {
@@ -5641,6 +7311,11 @@
       "kind": "skill"
     },
     {
+      "id": "Priest_Talent_LuonHand",
+      "name": "Luon Shield",
+      "kind": "skill"
+    },
+    {
       "id": "Mace_Base_Attack",
       "name": "Mace_Base_Attack",
       "kind": "skill"
@@ -5656,8 +7331,18 @@
       "kind": "skill"
     },
     {
-      "id": "Mace_Benediction_Skill1_Proc",
-      "name": "Mace_Benediction_Skill1_Proc",
+      "id": "Mace_Ice_Combo_Status",
+      "name": "Mace_Ice_Combo_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Mace_Ice_Combo_Status_Buff",
+      "name": "Mace_Ice_Combo_Status_Buff",
+      "kind": "skill"
+    },
+    {
+      "id": "Mace_Ice_Passive",
+      "name": "Mace_Ice_Passive",
       "kind": "skill"
     },
     {
@@ -5669,6 +7354,11 @@
       "id": "GM_MassGrab_Passive",
       "name": "Mad Buzz",
       "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Elite",
+      "name": "Madpie",
+      "kind": "unit"
     },
     {
       "id": "Mage",
@@ -5686,14 +7376,29 @@
       "kind": "skill"
     },
     {
-      "id": "Mage_ShieldOfSpark_Status2",
-      "name": "Mage_ShieldOfSpark_Status2",
+      "id": "Mage_SparkGolem_RayOfSpark",
+      "name": "Mage_SparkGolem_RayOfSpark",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_SparkGolem_SparkShard",
+      "name": "Mage_SparkGolem_SparkShard",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_SparkGolem_StaticNova",
+      "name": "Mage_SparkGolem_StaticNova",
       "kind": "skill"
     },
     {
       "id": "Magic",
       "name": "Magic",
       "kind": "statustype"
+    },
+    {
+      "id": "Mage_Talent_MagicBurnMark",
+      "name": "Magic Burn Mark",
+      "kind": "skill"
     },
     {
       "id": "Warrior_Talent_MagicConduction",
@@ -5721,28 +7426,13 @@
       "kind": "skill"
     },
     {
-      "id": "ManfishBoss_Bubble_Roam_Status_Slow",
-      "name": "ManfishBoss_Bubble_Roam_Status_Slow",
-      "kind": "skill"
-    },
-    {
       "id": "ManfishBoss_Totem_HealBeam",
       "name": "ManfishBoss_Totem_HealBeam",
       "kind": "skill"
     },
     {
-      "id": "ManfishBoss_WaterBreath_Shield",
-      "name": "ManfishBoss_WaterBreath_Shield",
-      "kind": "skill"
-    },
-    {
       "id": "ManfishBoss_WaterBreathStun",
       "name": "ManfishBoss_WaterBreathStun",
-      "kind": "skill"
-    },
-    {
-      "id": "ManfishBoss_WaterVolley_Target",
-      "name": "ManfishBoss_WaterVolley_Target",
       "kind": "skill"
     },
     {
@@ -5816,6 +7506,11 @@
       "kind": "icon"
     },
     {
+      "id": "Mace_Ice_Skill1_Status",
+      "name": "Mark of Ice",
+      "kind": "skill"
+    },
+    {
       "id": "Rogue_AssassinMark_Status",
       "name": "Marked",
       "kind": "skill"
@@ -5823,6 +7518,61 @@
     {
       "id": "Dog_Z3W_RamPatrol02",
       "name": "Marshall",
+      "kind": "unit"
+    },
+    {
+      "id": "SwarowlHB_Z4D_Caster",
+      "name": "Mary'Lyn's Stormbringer",
+      "kind": "unit"
+    },
+    {
+      "id": "SwarowlHB_Z4D_Tank",
+      "name": "Mary'Lyn's Stormshield",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Bat_Z4D",
+      "name": "Mary'Lyn's Volture",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Z4D_Claws",
+      "name": "Marylin's Chosen",
+      "kind": "unit"
+    },
+    {
+      "id": "Marylyn_Monrowl_Infused_Vortex_Blade_Swirl",
+      "name": "Marylyn_Monrowl_Infused_Vortex_Blade_Swirl",
+      "kind": "skill"
+    },
+    {
+      "id": "Marylyn_Monrowl_Rotating_Windwall_Wall",
+      "name": "Marylyn_Monrowl_Rotating_Windwall_Wall",
+      "kind": "skill"
+    },
+    {
+      "id": "Marylyn_Monrowl_Scratch",
+      "name": "Marylyn_Monrowl_Scratch",
+      "kind": "skill"
+    },
+    {
+      "id": "Marylyn_Monrowl_Surtension_Charge_Apply",
+      "name": "Marylyn_Monrowl_Surtension_Charge_Apply",
+      "kind": "skill"
+    },
+    {
+      "id": "Marylyn_Monrowl_Surtenstion_Positive_Charge",
+      "name": "Marylyn_Monrowl_Surtenstion_Positive_Charge",
+      "kind": "skill"
+    },
+    {
+      "id": "Marylyn_Monrowl_Vortex_Blade_Swirl",
+      "name": "Marylyn_Monrowl_Vortex_Blade_Swirl",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Z4D_Marylyn_Monrowl",
+      "name": "Mary’Lyn Monrowl",
       "kind": "unit"
     },
     {
@@ -5848,11 +7598,6 @@
     {
       "id": "MChuck_Heroic",
       "name": "MChuck_Heroic",
-      "kind": "skill"
-    },
-    {
-      "id": "MChuck_IsolatedHeal",
-      "name": "MChuck_IsolatedHeal",
       "kind": "skill"
     },
     {
@@ -5956,6 +7701,16 @@
       "kind": "skill"
     },
     {
+      "id": "Priest_Talent_MiraculousSurge",
+      "name": "Miraculous Surge",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_MiraculousSurge_Status",
+      "name": "Miraculous Surge",
+      "kind": "skill"
+    },
+    {
       "id": "Rabbit_Grey",
       "name": "Misty Buttontail",
       "kind": "unit"
@@ -6029,6 +7784,21 @@
       "id": "Mount",
       "name": "Mount",
       "kind": "skill"
+    },
+    {
+      "id": "Boar_Z4W",
+      "name": "Mountain Boars",
+      "kind": "unit"
+    },
+    {
+      "id": "Panther_Z4W",
+      "name": "Mountain Lion",
+      "kind": "unit"
+    },
+    {
+      "id": "Wolf_Z4W",
+      "name": "Mountain Wolf",
+      "kind": "unit"
     },
     {
       "id": "MountGoat_01",
@@ -6241,11 +8011,6 @@
       "kind": "unit"
     },
     {
-      "id": "Phrixes_H_NG_NightSalvo",
-      "name": "Night Salvo",
-      "kind": "skill"
-    },
-    {
       "id": "Phrixes_NightSalvo",
       "name": "Night Salvo",
       "kind": "skill"
@@ -6431,6 +8196,11 @@
       "kind": "unit"
     },
     {
+      "id": "Priest_Talent_NovaOfAbsolution",
+      "name": "Nova of Absolution",
+      "kind": "skill"
+    },
+    {
       "id": "Rogue_Talent_NoxiousStrategem",
       "name": "Noxious Stratagem",
       "kind": "skill"
@@ -6516,6 +8286,11 @@
       "kind": "icon"
     },
     {
+      "id": "Ogre2H_Ice_Spin_E",
+      "name": "Ogre2H_Ice_Spin_E",
+      "kind": "skill"
+    },
+    {
       "id": "Ogre2H_Spin",
       "name": "Ogre2H_Spin",
       "kind": "skill"
@@ -6531,8 +8306,28 @@
       "kind": "skill"
     },
     {
+      "id": "OgreDual_Auto",
+      "name": "OgreDual_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "OgreDual_Skill",
+      "name": "OgreDual_Skill",
+      "kind": "skill"
+    },
+    {
+      "id": "OgreElite_Ice_Skill",
+      "name": "OgreElite_Ice_Skill",
+      "kind": "skill"
+    },
+    {
       "id": "OgreElite_Skill1",
       "name": "OgreElite_Skill1",
+      "kind": "skill"
+    },
+    {
+      "id": "OgreEliteDocker_Skill1",
+      "name": "OgreEliteDocker_Skill1",
       "kind": "skill"
     },
     {
@@ -6561,6 +8356,16 @@
       "kind": "icon"
     },
     {
+      "id": "Book_Frozenground_Passive_Status",
+      "name": "On Frozen Ground",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_One_Handed_Master",
+      "name": "One-handed Master",
+      "kind": "skill"
+    },
+    {
       "id": "Sprout_Onion_Z2W",
       "name": "Onion Seedling",
       "kind": "unit"
@@ -6586,6 +8391,11 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_Oppressive_Shadows",
+      "name": "Oppressive Shadows",
+      "kind": "skill"
+    },
+    {
       "id": "Options",
       "name": "Options",
       "kind": "icon"
@@ -6601,12 +8411,32 @@
       "kind": "unit"
     },
     {
+      "id": "Rogue_Talent_Orbiting_Blades_Charge",
+      "name": "Orbiting Blade",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Orbiting_Blades",
+      "name": "Orbiting Blades",
+      "kind": "skill"
+    },
+    {
       "id": "GS_Nova_Skill2",
       "name": "Outburst",
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_Overwhelming_Shadows",
+      "name": "Overhwelming Shadows",
+      "kind": "skill"
+    },
+    {
       "id": "Mage_Overload",
+      "name": "Overload",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_Overload",
       "name": "Overload",
       "kind": "skill"
     },
@@ -6796,6 +8626,11 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_Phantom_Blades",
+      "name": "Phantom Blades",
+      "kind": "skill"
+    },
+    {
       "id": "Mage_Blink_Mastery3",
       "name": "Phase Strike",
       "kind": "skill"
@@ -6806,11 +8641,6 @@
       "kind": "skill"
     },
     {
-      "id": "Phrixes_ChaosOrbStatus",
-      "name": "Phrixes_ChaosOrbStatus",
-      "kind": "skill"
-    },
-    {
       "id": "Phrixes_Demon_Gate_Summon",
       "name": "Phrixes_Demon_Gate_Summon",
       "kind": "skill"
@@ -6818,11 +8648,6 @@
     {
       "id": "Phrixes_DemonicStrike",
       "name": "Phrixes_DemonicStrike",
-      "kind": "skill"
-    },
-    {
-      "id": "Phrixes_EternalNightStatus",
-      "name": "Phrixes_EternalNightStatus",
       "kind": "skill"
     },
     {
@@ -6878,11 +8703,6 @@
     {
       "id": "Phrixes_NC_Bonus_Scale",
       "name": "Phrixes_NC_Bonus_Scale",
-      "kind": "skill"
-    },
-    {
-      "id": "Phrixes_OpenRiftStatus",
-      "name": "Phrixes_OpenRiftStatus",
       "kind": "skill"
     },
     {
@@ -6951,9 +8771,19 @@
       "kind": "icon"
     },
     {
+      "id": "Pick_LootableContainer",
+      "name": "Pick_LootableContainer",
+      "kind": "icon"
+    },
+    {
       "id": "Priest_Talent_PiercingLight",
       "name": "Piercing Light",
       "kind": "skill"
+    },
+    {
+      "id": "Boar_Z4W_E",
+      "name": "Pigglet, the Food Lover",
+      "kind": "unit"
     },
     {
       "id": "Pilgrims_FlaskSpeed_Status",
@@ -7081,6 +8911,16 @@
       "kind": "skill"
     },
     {
+      "id": "DA_Lightning_Passive",
+      "name": "Power of Lightning",
+      "kind": "skill"
+    },
+    {
+      "id": "DA_Lightning_Passive_Debuff",
+      "name": "Power of Lightning",
+      "kind": "skill"
+    },
+    {
       "id": "Halos_Totem_Passive",
       "name": "Power of the Tides",
       "kind": "skill"
@@ -7096,9 +8936,24 @@
       "kind": "skill"
     },
     {
+      "id": "Scepter_Storm_Passive",
+      "name": "Power-driven Current",
+      "kind": "skill"
+    },
+    {
+      "id": "Volture_Skill",
+      "name": "Powerful Flap",
+      "kind": "skill"
+    },
+    {
       "id": "Rogue_Talent_LethalDose",
       "name": "Powerful Toxins",
       "kind": "skill"
+    },
+    {
+      "id": "Powerless",
+      "name": "Powerless",
+      "kind": "statustype"
     },
     {
       "id": "Sword_Start_Combo",
@@ -7136,38 +8991,43 @@
       "kind": "unit"
     },
     {
-      "id": "Priest_BeaconOfHope_Status",
-      "name": "Priest_BeaconOfHope_Status",
-      "kind": "skill"
-    },
-    {
-      "id": "Priest_BeaconOfHope_Status_Buff",
-      "name": "Priest_BeaconOfHope_Status_Buff",
-      "kind": "skill"
-    },
-    {
-      "id": "Priest_BeaconOfHope_Status_Debuff",
-      "name": "Priest_BeaconOfHope_Status_Debuff",
-      "kind": "skill"
-    },
-    {
       "id": "Priest_Penance",
       "name": "Priest_Penance",
       "kind": "skill"
     },
     {
-      "id": "Priest_PenanceStatus",
-      "name": "Priest_PenanceStatus",
+      "id": "Priest_Talent_Ascendancy_Accum_Status",
+      "name": "Priest_Talent_Ascendancy_Accum_Status",
       "kind": "skill"
     },
     {
-      "id": "Priest_Talent_PotentFortitude_Status",
-      "name": "Priest_Talent_PotentFortitude_Status",
+      "id": "Priest_Talent_Ascendancy_Status",
+      "name": "Priest_Talent_Ascendancy_Status",
       "kind": "skill"
     },
     {
-      "id": "Priest_Talent_PurgingStrikes_Status",
-      "name": "Priest_Talent_PurgingStrikes_Status",
+      "id": "Priest_Talent_AscendantBlame_Status",
+      "name": "Priest_Talent_AscendantBlame_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_AwakenMind_Status",
+      "name": "Priest_Talent_AwakenMind_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_DivineAura_Buff",
+      "name": "Priest_Talent_DivineAura_Buff",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_HystericalPrayer_Status",
+      "name": "Priest_Talent_HystericalPrayer_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_UnstoppableZealot_Buff",
+      "name": "Priest_Talent_UnstoppableZealot_Buff",
       "kind": "skill"
     },
     {
@@ -7226,6 +9086,16 @@
       "kind": "skill"
     },
     {
+      "id": "Book_Frozenground_Skill2_Buff",
+      "name": "Protective Cold",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_ProtectivePrayer",
+      "name": "Protective Prayer",
+      "kind": "skill"
+    },
+    {
       "id": "Crescent_FlowerSpiral_Skill_1_Charge",
       "name": "Psychoactive Petal",
       "kind": "skill"
@@ -7233,6 +9103,16 @@
     {
       "id": "PunchingBag",
       "name": "Punching Bag",
+      "kind": "unit"
+    },
+    {
+      "id": "PunchingBag_MagicAOE",
+      "name": "Punching Bag (Magic AOE)",
+      "kind": "unit"
+    },
+    {
+      "id": "PunchingBag_PhysAOE",
+      "name": "Punching Bag (Phys AOE)",
       "kind": "unit"
     },
     {
@@ -7346,11 +9226,6 @@
       "kind": "skill"
     },
     {
-      "id": "R1CrabBoss_HuntDownStatus",
-      "name": "R1CrabBoss_HuntDownStatus",
-      "kind": "skill"
-    },
-    {
       "id": "R1CrabBoss_NayasFuryMoveStatus",
       "name": "R1CrabBoss_NayasFuryMoveStatus",
       "kind": "skill"
@@ -7373,6 +9248,11 @@
     {
       "id": "Scepter_Start_Skill2",
       "name": "Radiance",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_RadiantAnnihilation",
+      "name": "Radiant Annihilation",
       "kind": "skill"
     },
     {
@@ -7476,6 +9356,16 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_Ramping_Up",
+      "name": "Ramping Up",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Rapid_Assault",
+      "name": "Rapid Assault",
+      "kind": "skill"
+    },
+    {
       "id": "Warrior_RashSoul",
       "name": "Rash Soul",
       "kind": "skill"
@@ -7506,11 +9396,6 @@
       "kind": "skill"
     },
     {
-      "id": "Ratsar_Heroic_Attack_Bleed",
-      "name": "Ratsar_Heroic_Attack_Bleed",
-      "kind": "skill"
-    },
-    {
       "id": "Ratsar_Heroic_Burn",
       "name": "Ratsar_Heroic_Burn",
       "kind": "skill"
@@ -7523,11 +9408,6 @@
     {
       "id": "Ratsar_KingRageSuccessState",
       "name": "Ratsar_KingRageSuccessState",
-      "kind": "skill"
-    },
-    {
-      "id": "Ratsar_SparklingShield",
-      "name": "Ratsar_SparklingShield",
       "kind": "skill"
     },
     {
@@ -7601,6 +9481,11 @@
       "kind": "unit"
     },
     {
+      "id": "Mage_Talent_RedirectionCore",
+      "name": "Redirection Core",
+      "kind": "skill"
+    },
+    {
       "id": "OgreKobold_Z2W_Claws",
       "name": "Reliable Kobold Docker",
       "kind": "unit"
@@ -7632,7 +9517,7 @@
     },
     {
       "id": "Infusion_Bee_Tank",
-      "name": "Resine Armor",
+      "name": "Resin Armor",
       "kind": "skill"
     },
     {
@@ -7741,6 +9626,11 @@
       "kind": "skill"
     },
     {
+      "id": "Yetina_FeralRip",
+      "name": "Rip",
+      "kind": "skill"
+    },
+    {
       "id": "Slime_Z2W_FS",
       "name": "Ripe Invoked Slime",
       "kind": "unit"
@@ -7771,16 +9661,6 @@
       "kind": "skill"
     },
     {
-      "id": "RobinHoof_Heroic_Caltrops_Slow",
-      "name": "RobinHoof_Heroic_Caltrops_Slow",
-      "kind": "skill"
-    },
-    {
-      "id": "RobinHoof_Heroic_Dog_Buff",
-      "name": "RobinHoof_Heroic_Dog_Buff",
-      "kind": "skill"
-    },
-    {
       "id": "RobinHoof_Meat_Status",
       "name": "RobinHoof_Meat_Status",
       "kind": "skill"
@@ -7789,11 +9669,6 @@
       "id": "RobinHoof_Summon",
       "name": "RobinHoof_Summon",
       "kind": "skill"
-    },
-    {
-      "id": "TODO_SnowPanther_Grey",
-      "name": "Rock Leopard",
-      "kind": "unit"
     },
     {
       "id": "Dog_Z3W_RamPatrol04",
@@ -7831,11 +9706,6 @@
       "kind": "skill"
     },
     {
-      "id": "Rogue_Poison_DeadlyStatus",
-      "name": "Rogue_Poison_DeadlyStatus",
-      "kind": "skill"
-    },
-    {
       "id": "Rogue_Talent_CripplingPoison_Status",
       "name": "Rogue_Talent_CripplingPoison_Status",
       "kind": "skill"
@@ -7846,8 +9716,43 @@
       "kind": "icon"
     },
     {
-      "id": "Rogue_Talent_ImprovedMixture_Status",
-      "name": "Rogue_Talent_ImprovedMixture_Status",
+      "id": "Rogue_Talent_Kinetic_Energy_Buff",
+      "name": "Rogue_Talent_Kinetic_Energy_Buff",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Oppressive_Shadows_Counter",
+      "name": "Rogue_Talent_Oppressive_Shadows_Counter",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Ramping_Up_Status",
+      "name": "Rogue_Talent_Ramping_Up_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Set_The_Stage_Buff",
+      "name": "Rogue_Talent_Set_The_Stage_Buff",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Sharpened_Metal_Dot",
+      "name": "Rogue_Talent_Sharpened_Metal_Dot",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Skillfull_Tricks_Buff",
+      "name": "Rogue_Talent_Skillfull_Tricks_Buff",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Thousand_Blades_Counter",
+      "name": "Rogue_Talent_Thousand_Blades_Counter",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Weak_Points_Debuff",
+      "name": "Rogue_Talent_Weak_Points_Debuff",
       "kind": "skill"
     },
     {
@@ -7858,6 +9763,11 @@
     {
       "id": "Priest_Rosary",
       "name": "Rosary",
+      "kind": "skill"
+    },
+    {
+      "id": "Marylyn_Monrowl_Rotating_Windwall",
+      "name": "Rotating Windwalls",
       "kind": "skill"
     },
     {
@@ -7988,7 +9898,7 @@
     {
       "id": "Scepter_Flamie_S2_R3",
       "name": "Scepter_Flamie_S2_R3",
-      "kind": "skill"
+      "kind": "icon"
     },
     {
       "id": "Scepter_Flamie_Skill1_Area",
@@ -8001,8 +9911,8 @@
       "kind": "skill"
     },
     {
-      "id": "Scepter_Start_Skill2_Shield",
-      "name": "Scepter_Start_Skill2_Shield",
+      "id": "Scepter_Storm_Skill2_Debuff",
+      "name": "Scepter_Storm_Skill2_Debuff",
       "kind": "skill"
     },
     {
@@ -8056,6 +9966,11 @@
       "kind": "skill"
     },
     {
+      "id": "Warrior_Talent_Second_Breath",
+      "name": "Second Breath",
+      "kind": "skill"
+    },
+    {
       "id": "Warrior_SecondWind",
       "name": "Second Wind",
       "kind": "skill"
@@ -8101,9 +10016,19 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_Serrated_Bladestorm",
+      "name": "Serrated Bladestorm",
+      "kind": "skill"
+    },
+    {
       "id": "DialogSetTeleport",
       "name": "Set point of teleportation",
       "kind": "icon"
+    },
+    {
+      "id": "Rogue_Talent_Set_The_Stage",
+      "name": "Set the Stage",
+      "kind": "skill"
     },
     {
       "id": "BtnPause",
@@ -8136,6 +10061,16 @@
       "kind": "unit"
     },
     {
+      "id": "Rogue_Talent_Shadow_Blades",
+      "name": "Shadow Blades",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Shadow_Infusion",
+      "name": "Shadow Infusion",
+      "kind": "skill"
+    },
+    {
       "id": "Daggers_Start_Skill2",
       "name": "Shadow Jump",
       "kind": "skill"
@@ -8143,6 +10078,11 @@
     {
       "id": "Rogue_Shadowstep",
       "name": "Shadowstep",
+      "kind": "skill"
+    },
+    {
+      "id": "Yetina_Shapeshift",
+      "name": "Shapeshift",
       "kind": "skill"
     },
     {
@@ -8166,13 +10106,28 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_Sharpened_Metal",
+      "name": "Sharpened Metal",
+      "kind": "skill"
+    },
+    {
       "id": "Warrior_Talent_ShatteredRage",
       "name": "Shattered Rage",
       "kind": "skill"
     },
     {
+      "id": "Priest_Talent_ShatteredSmite",
+      "name": "Shattered Smite",
+      "kind": "skill"
+    },
+    {
       "id": "Shield_OrbitWater_P",
       "name": "Shell of the Devourer",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_Frozenground_Passive_Shield",
+      "name": "Shield",
       "kind": "skill"
     },
     {
@@ -8316,6 +10271,16 @@
       "kind": "skill"
     },
     {
+      "id": "Priest_Talent_SkillfulPrayer",
+      "name": "Skillful Prayer",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Skillfull_Tricks",
+      "name": "Skillfull Tricks",
+      "kind": "skill"
+    },
+    {
       "id": "Skip",
       "name": "Skip",
       "kind": "icon"
@@ -8361,6 +10326,16 @@
       "kind": "skill"
     },
     {
+      "id": "Warrior_Talent_Slam",
+      "name": "Slam",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Slam_Stack",
+      "name": "Slam Fury",
+      "kind": "skill"
+    },
+    {
       "id": "OgreManfish_Z2D_Claws",
       "name": "Slick Nepsid Whale",
       "kind": "unit"
@@ -8376,37 +10351,7 @@
       "kind": "unit"
     },
     {
-      "id": "TODO_OgreBagon_Beige",
-      "name": "Slick Nepsid Whale",
-      "kind": "unit"
-    },
-    {
-      "id": "TODO_OgreBagon_BlueGrey",
-      "name": "Slick Nepsid Whale",
-      "kind": "unit"
-    },
-    {
-      "id": "TODO_OgreBagon_Brown",
-      "name": "Slick Nepsid Whale",
-      "kind": "unit"
-    },
-    {
-      "id": "TODO_OgreBagon_Brown02",
-      "name": "Slick Nepsid Whale",
-      "kind": "unit"
-    },
-    {
-      "id": "TODO_OgreBagon_DarkBlue",
-      "name": "Slick Nepsid Whale",
-      "kind": "unit"
-    },
-    {
-      "id": "TODO_OgreBagon_Grey",
-      "name": "Slick Nepsid Whale",
-      "kind": "unit"
-    },
-    {
-      "id": "TODO_OgreBagon_Spark",
+      "id": "TODO_OgreBagon_Elite_2",
       "name": "Slick Nepsid Whale",
       "kind": "unit"
     },
@@ -8456,6 +10401,11 @@
       "kind": "statustype"
     },
     {
+      "id": "Feline_Skill1_Status",
+      "name": "Slowed",
+      "kind": "skill"
+    },
+    {
       "id": "Golem_Z1W_Earth_E",
       "name": "Smeagolem",
       "kind": "unit"
@@ -8501,9 +10451,49 @@
       "kind": "unit"
     },
     {
-      "id": "TODO_SnowPanther_White",
-      "name": "Snow Leopard",
-      "kind": "unit"
+      "id": "Crescent_Dance_Skill1",
+      "name": "Snow Dance",
+      "kind": "skill"
+    },
+    {
+      "id": "Crescent_Dance_Skill1_Recast_1",
+      "name": "Snow Dance 2",
+      "kind": "skill"
+    },
+    {
+      "id": "Crescent_Dance_Skill1_Recast_2",
+      "name": "Snow Dance 3",
+      "kind": "skill"
+    },
+    {
+      "id": "Activity_Snowball",
+      "name": "Snowball",
+      "kind": "skill"
+    },
+    {
+      "id": "Activity_Snowball_Big",
+      "name": "Snowball",
+      "kind": "skill"
+    },
+    {
+      "id": "Snowball_Activity_SpeedBonus",
+      "name": "Snowball_Activity_SpeedBonus",
+      "kind": "skill"
+    },
+    {
+      "id": "Crescent_Dance_Skill2_Buff",
+      "name": "Snowballs",
+      "kind": "skill"
+    },
+    {
+      "id": "Book_Frozenground_Skill1",
+      "name": "Snowballs Volley",
+      "kind": "skill"
+    },
+    {
+      "id": "SnowPile_Simple",
+      "name": "SnowPile_Simple",
+      "kind": "skill"
     },
     {
       "id": "BtnSocial",
@@ -8561,6 +10551,41 @@
       "kind": "icon"
     },
     {
+      "id": "Bagon_Guest",
+      "name": "Spa Client",
+      "kind": "unit"
+    },
+    {
+      "id": "OgreBagon_Z4D_Claw",
+      "name": "Spa Client Bagon Brawler",
+      "kind": "unit"
+    },
+    {
+      "id": "OgreBagon_Z4D_2H",
+      "name": "Spa Client Bagon Savage",
+      "kind": "unit"
+    },
+    {
+      "id": "OgreBagon_Z4D_Dual",
+      "name": "Spa Client Bagon Smasher",
+      "kind": "unit"
+    },
+    {
+      "id": "Bagon_Heavy_Z4D_Book",
+      "name": "Spa Client Frost Sculptor",
+      "kind": "unit"
+    },
+    {
+      "id": "SpaBoss_Auto",
+      "name": "SpaBoss_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "SpaBoss_SpawnCube_Cube",
+      "name": "SpaBoss_SpawnCube_Cube",
+      "kind": "skill"
+    },
+    {
       "id": "Ratsar_SparkAbsorption",
       "name": "Spark Absorption",
       "kind": "skill"
@@ -8571,8 +10596,28 @@
       "kind": "skill"
     },
     {
+      "id": "Mage_SparkGolem_Bolt",
+      "name": "Spark Bolt",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_MagicBurnMark_Burn",
+      "name": "Spark Burn",
+      "kind": "skill"
+    },
+    {
       "id": "Mage_Talent_SparkFlask",
       "name": "Spark Flask",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_SparkGolem",
+      "name": "Spark Golem",
+      "kind": "unit"
+    },
+    {
+      "id": "Mage_Talent_SparkGolem",
+      "name": "Spark Golem",
       "kind": "skill"
     },
     {
@@ -8586,9 +10631,24 @@
       "kind": "skill"
     },
     {
+      "id": "Mage_Talent_MagicBurnMark_Mark",
+      "name": "Spark Mark",
+      "kind": "skill"
+    },
+    {
+      "id": "Yetina_SparkOutbreak",
+      "name": "Spark Outbreak",
+      "kind": "skill"
+    },
+    {
       "id": "Scrap",
       "name": "Spark Recycler",
       "kind": "icon"
+    },
+    {
+      "id": "Mage_Talent_SparkShard",
+      "name": "Spark Shard",
+      "kind": "skill"
     },
     {
       "id": "Mage_ShieldOfSpark",
@@ -8616,8 +10676,18 @@
       "kind": "skill"
     },
     {
+      "id": "Mage_Talent_SparkChargedBolt",
+      "name": "Spark-charged Bolt",
+      "kind": "skill"
+    },
+    {
       "id": "Cleodora_SparkRay",
       "name": "Spark-infused Ray",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_SparkLinkResonance",
+      "name": "Spark-Link Resonance",
       "kind": "skill"
     },
     {
@@ -8638,6 +10708,21 @@
     {
       "id": "StinkBug_Spark",
       "name": "Sparkling Aromabug",
+      "kind": "unit"
+    },
+    {
+      "id": "OgreBagon_Spark",
+      "name": "Sparkling Bagon Brawler",
+      "kind": "unit"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_U",
+      "name": "Sparkling Bagon Frost Sculptor",
+      "kind": "unit"
+    },
+    {
+      "id": "Bear_Z4W_U",
+      "name": "Sparkling Bear",
       "kind": "unit"
     },
     {
@@ -8686,6 +10771,11 @@
       "kind": "unit"
     },
     {
+      "id": "Swarowl_Z4W_U",
+      "name": "Sparkling Harpy",
+      "kind": "unit"
+    },
+    {
       "id": "Bee_Z1W_U",
       "name": "Sparkling Harvester",
       "kind": "unit"
@@ -8701,8 +10791,53 @@
       "kind": "unit"
     },
     {
+      "id": "Beetle_Cristal_01",
+      "name": "Sparkling Leggybug",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Cristal_Dark",
+      "name": "Sparkling Leggybug",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Cristal_Lava",
+      "name": "Sparkling Leggybug",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Cristal_Metal",
+      "name": "Sparkling Leggybug",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Cristal_Spark",
+      "name": "Sparkling Leggybug",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Ice_01",
+      "name": "Sparkling Leggybug",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Ice_02",
+      "name": "Sparkling Leggybug",
+      "kind": "unit"
+    },
+    {
       "id": "Ladybug_Spark",
       "name": "Sparkling Leggybug",
+      "kind": "unit"
+    },
+    {
+      "id": "Ladybug_Spark1",
+      "name": "Sparkling Leggybug",
+      "kind": "unit"
+    },
+    {
+      "id": "Panther_Z4_U",
+      "name": "Sparkling Leopard",
       "kind": "unit"
     },
     {
@@ -8751,8 +10886,18 @@
       "kind": "unit"
     },
     {
+      "id": "SwarowlHB_Z4W_U",
+      "name": "Sparkling Stormshield",
+      "kind": "unit"
+    },
+    {
       "id": "Turtle_Spark",
       "name": "Sparkling Tortrock",
+      "kind": "unit"
+    },
+    {
+      "id": "Swarowl_Bat_Z4W_U",
+      "name": "Sparkling Volture",
       "kind": "unit"
     },
     {
@@ -8821,8 +10966,18 @@
       "kind": "skill"
     },
     {
+      "id": "Snowball_Activity_SpeedBonus_Status",
+      "name": "Speed-up!",
+      "kind": "skill"
+    },
+    {
       "id": "SpeedBoost",
       "name": "SpeedBoost",
+      "kind": "skill"
+    },
+    {
+      "id": "Crescent_Dance_Skill2",
+      "name": "Spinning Crescent",
       "kind": "skill"
     },
     {
@@ -8853,6 +11008,21 @@
     {
       "id": "Spirit_Skill",
       "name": "Spirit_Skill",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Spiritual_Blade",
+      "name": "Spiritual Blade",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Spiritual_Blade_Shield",
+      "name": "Spiritual Blades",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Spiritual_Shrapnel",
+      "name": "Spiritual Shrapnel",
       "kind": "skill"
     },
     {
@@ -8946,48 +11116,13 @@
       "kind": "skill"
     },
     {
-      "id": "Staff_Censer_Combo_Buff",
-      "name": "Staff_Censer_Combo_Buff",
+      "id": "Staff_Magefrost_Skill2_Orb",
+      "name": "Staff_Magefrost_Skill2_Orb",
       "kind": "skill"
     },
     {
-      "id": "Staff_Censer_Passive_Buff",
-      "name": "Staff_Censer_Passive_Buff",
-      "kind": "skill"
-    },
-    {
-      "id": "Staff_Censer_Skill2_Slow",
-      "name": "Staff_Censer_Skill2_Slow",
-      "kind": "skill"
-    },
-    {
-      "id": "Staff_Craft_C_Status",
-      "name": "Staff_Craft_C_Status",
-      "kind": "skill"
-    },
-    {
-      "id": "Staff_Craft_S1_Proc",
-      "name": "Staff_Craft_S1_Proc",
-      "kind": "skill"
-    },
-    {
-      "id": "Staff_Craft_S1_Status",
-      "name": "Staff_Craft_S1_Status",
-      "kind": "skill"
-    },
-    {
-      "id": "Staff_SummonDemon_Combo_R3_Buff",
-      "name": "Staff_SummonDemon_Combo_R3_Buff",
-      "kind": "skill"
-    },
-    {
-      "id": "Staff_SummonDemon_Passive_Buff",
-      "name": "Staff_SummonDemon_Passive_Buff",
-      "kind": "skill"
-    },
-    {
-      "id": "Staff_SummonDemon_Passive_Shield",
-      "name": "Staff_SummonDemon_Passive_Shield",
+      "id": "Mace_Ice_Combo",
+      "name": "Stalagsmite",
       "kind": "skill"
     },
     {
@@ -9006,8 +11141,18 @@
       "kind": "statustype"
     },
     {
+      "id": "Mage_Talent_StaticAffliction",
+      "name": "Static Affliction",
+      "kind": "skill"
+    },
+    {
       "id": "MChuck_StaticBomb",
       "name": "Static Bomb",
+      "kind": "skill"
+    },
+    {
+      "id": "Infusion_Swarowl_DPS",
+      "name": "Static Chain",
       "kind": "skill"
     },
     {
@@ -9036,8 +11181,43 @@
       "kind": "unit"
     },
     {
+      "id": "Stealth",
+      "name": "Stealth",
+      "kind": "statustype"
+    },
+    {
+      "id": "Stealth_Fading",
+      "name": "Stealth",
+      "kind": "skill"
+    },
+    {
+      "id": "Stealth_Permanent",
+      "name": "Stealth",
+      "kind": "skill"
+    },
+    {
+      "id": "Snowball_Activity_Invisible_Status",
+      "name": "Stealthed",
+      "kind": "skill"
+    },
+    {
       "id": "FoeStealth",
       "name": "Stealthy",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Hasaki_Skill1_B",
+      "name": "Steel Storm",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Hasaki_Skill1_Status",
+      "name": "Steel Storm",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Hasaki_Skill1",
+      "name": "Steel Thrust",
       "kind": "skill"
     },
     {
@@ -9096,6 +11276,26 @@
       "kind": "skill"
     },
     {
+      "id": "Warrior_Talent_Stonewall_Stance",
+      "name": "Stonewall Stance",
+      "kind": "skill"
+    },
+    {
+      "id": "Thrown_Thunderlink_Skill1",
+      "name": "Storm Flip",
+      "kind": "skill"
+    },
+    {
+      "id": "Scepter_Storm_Passive_Mark",
+      "name": "Storm Mark",
+      "kind": "skill"
+    },
+    {
+      "id": "DA_Lightning_Skill1",
+      "name": "Stormtongue Infusion",
+      "kind": "skill"
+    },
+    {
       "id": "Infusion_Nightling_DPS_Summon_Auto",
       "name": "Strike",
       "kind": "skill"
@@ -9106,9 +11306,19 @@
       "kind": "skill"
     },
     {
+      "id": "CinematicStun",
+      "name": "Stun",
+      "kind": "skill"
+    },
+    {
       "id": "Stun",
       "name": "Stun",
       "kind": "statustype"
+    },
+    {
+      "id": "SpaBoss_Charge_Stunned",
+      "name": "Stunned",
+      "kind": "skill"
     },
     {
       "id": "Style_01ComboAttack",
@@ -9161,6 +11371,11 @@
       "kind": "skill"
     },
     {
+      "id": "Summon_Test",
+      "name": "Summon_Test",
+      "kind": "unit"
+    },
+    {
       "id": "SummonBee_HoneyBolt",
       "name": "SummonBee_HoneyBolt",
       "kind": "skill"
@@ -9186,18 +11401,18 @@
       "kind": "skill"
     },
     {
-      "id": "SuperEliteDemon_Bomb_Status",
-      "name": "SuperEliteDemon_Bomb_Status",
-      "kind": "skill"
-    },
-    {
       "id": "SuperEliteDemon_FireWall",
       "name": "SuperEliteDemon_FireWall",
       "kind": "skill"
     },
     {
-      "id": "SuperEliteDemon_Rage_Status",
-      "name": "SuperEliteDemon_Rage_Status",
+      "id": "Mage_Talent_SuppressivePulse",
+      "name": "Suppressive Pulse",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_Supremacy",
+      "name": "Supremacy",
       "kind": "skill"
     },
     {
@@ -9223,6 +11438,11 @@
     {
       "id": "Phrixes_Phase2Entry",
       "name": "Surrendering to Darkness",
+      "kind": "skill"
+    },
+    {
+      "id": "Marylyn_Monrowl_Surtension",
+      "name": "Surtension : Positive",
       "kind": "skill"
     },
     {
@@ -9253,6 +11473,71 @@
     {
       "id": "DS_Bladeleaf_Skill2_Status",
       "name": "Swarmstrike Accord",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Caster_Auto",
+      "name": "Swarowl_Caster_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Caster_Skill1",
+      "name": "Swarowl_Caster_Skill1",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Claws_Auto",
+      "name": "Swarowl_Claws_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Harpy_Caster_Auto",
+      "name": "Swarowl_Harpy_Caster_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Harpy_Caster_Skill",
+      "name": "Swarowl_Harpy_Caster_Skill",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Harpy_Scratch",
+      "name": "Swarowl_Harpy_Scratch",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Harpy_Surveillance",
+      "name": "Swarowl_Harpy_Surveillance",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Harpy_Surveillance_Status",
+      "name": "Swarowl_Harpy_Surveillance_Status",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Harpy_ThunderSnipe",
+      "name": "Swarowl_Harpy_ThunderSnipe",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Harpy_Vortex_Blade_Small_Swirl",
+      "name": "Swarowl_Harpy_Vortex_Blade_Small_Swirl",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Harpy_Vortex_Blade_Swirl",
+      "name": "Swarowl_Harpy_Vortex_Blade_Swirl",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Tank_Auto",
+      "name": "Swarowl_Tank_Auto",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Tank_Block",
+      "name": "Swarowl_Tank_Block",
       "kind": "skill"
     },
     {
@@ -9301,9 +11586,19 @@
       "kind": "icon"
     },
     {
+      "id": "Panther_Z4_E_2",
+      "name": "Sylvester",
+      "kind": "unit"
+    },
+    {
       "id": "Symbiosis",
       "name": "Symbiosis",
       "kind": "icon"
+    },
+    {
+      "id": "Mage_Talent_SymbioticCharge",
+      "name": "Symbiotic Charge",
+      "kind": "skill"
     },
     {
       "id": "Sword_Craft_Combo",
@@ -9314,6 +11609,11 @@
       "id": "Interact_Talk",
       "name": "Talk",
       "kind": "skill"
+    },
+    {
+      "id": "SnowPanther_Z4W",
+      "name": "Tamed Snow Leopard",
+      "kind": "unit"
     },
     {
       "id": "TankFairy_Auto",
@@ -9341,6 +11641,11 @@
       "kind": "skill"
     },
     {
+      "id": "Swarowl_Harpy_Scratch_Bleed",
+      "name": "Tear",
+      "kind": "skill"
+    },
+    {
       "id": "GA_Demon_Skill1",
       "name": "Tear Reality",
       "kind": "skill"
@@ -9349,6 +11654,11 @@
       "id": "GA_Demon_Skill1_Status",
       "name": "Tear Reality",
       "kind": "skill"
+    },
+    {
+      "id": "Bear_Z4W_E_2",
+      "name": "Teddy",
+      "kind": "unit"
     },
     {
       "id": "FaerieEliteDemon_Teleport",
@@ -9363,6 +11673,11 @@
     {
       "id": "Mage_Talent_TemporalCompression",
       "name": "Temporal Compression",
+      "kind": "skill"
+    },
+    {
+      "id": "Katana_Hasaki_Combo",
+      "name": "Tense Slash",
       "kind": "skill"
     },
     {
@@ -9381,14 +11696,19 @@
       "kind": "skill"
     },
     {
-      "id": "Cleodora_Heroic_Dark_Champion",
-      "name": "The Usurper",
-      "kind": "unit"
-    },
-    {
       "id": "ThinBackDrop",
       "name": "ThinBackDrop",
       "kind": "icon"
+    },
+    {
+      "id": "OgreBagon_Z4W_E",
+      "name": "Thor Nioldsemor",
+      "kind": "unit"
+    },
+    {
+      "id": "Rogue_Talent_Thousand_Blades",
+      "name": "Thousand Blades",
+      "kind": "skill"
     },
     {
       "id": "Bow_BigGame_Passive",
@@ -9416,9 +11736,44 @@
       "kind": "skill"
     },
     {
+      "id": "Thrown_Thunderlink_Skill1_Recast",
+      "name": "Thrown_Thunderlink_Skill1_Recast",
+      "kind": "skill"
+    },
+    {
+      "id": "Thrown_Thunderlink_Skill1_TP",
+      "name": "Thrown_Thunderlink_Skill1_TP",
+      "kind": "skill"
+    },
+    {
       "id": "ThumbsUp",
       "name": "ThumbsUp",
       "kind": "icon"
+    },
+    {
+      "id": "Scepter_Storm_Combo",
+      "name": "Thunder",
+      "kind": "skill"
+    },
+    {
+      "id": "DA_Lightning_Skill2",
+      "name": "Thunder Stance",
+      "kind": "skill"
+    },
+    {
+      "id": "Thunder_Orb",
+      "name": "Thunder_Orb",
+      "kind": "skill"
+    },
+    {
+      "id": "Thrown_Thunderlink_Passive",
+      "name": "Thunderlink",
+      "kind": "skill"
+    },
+    {
+      "id": "Thrown_Thunderlink_Passive_Link",
+      "name": "Thunderlink",
+      "kind": "skill"
     },
     {
       "id": "Infusion_Manfish_Tank_Shield",
@@ -9491,19 +11846,24 @@
       "kind": "skill"
     },
     {
+      "id": "CrystalPanther_Z4_E",
+      "name": "Tigger, the Mad",
+      "kind": "unit"
+    },
+    {
       "id": "Bee_Z1W_3",
       "name": "Tipsy Apix Harvester",
       "kind": "unit"
     },
     {
-      "id": "TODO_Toad",
-      "name": "Toad",
-      "kind": "unit"
+      "id": "Ursid_Crystal_Skill1",
+      "name": "Titanic Charge",
+      "kind": "skill"
     },
     {
-      "id": "Lizard_Shop_Dragon",
-      "name": "TODO",
-      "kind": "unit"
+      "id": "Yetina_TitanicCharge",
+      "name": "Titanic Charge",
+      "kind": "skill"
     },
     {
       "id": "Phrixes_H_NGGate_Beam",
@@ -9511,9 +11871,64 @@
       "kind": "skill"
     },
     {
+      "id": "Beetle_Blue",
+      "name": "TODO Beetl",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_BlueGreen",
+      "name": "TODO Beetl",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Brown",
+      "name": "TODO Beetl",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Demon",
+      "name": "TODO Beetl",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Green",
+      "name": "TODO Beetl",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Lava",
+      "name": "TODO Beetl",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Purple",
+      "name": "TODO Beetl",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Spark",
+      "name": "TODO Beetl",
+      "kind": "unit"
+    },
+    {
+      "id": "Beetle_Yellow",
+      "name": "TODO Beetl",
+      "kind": "unit"
+    },
+    {
       "id": "Turtle_Grey",
       "name": "Tortrock",
       "kind": "unit"
+    },
+    {
+      "id": "Thrown_Thunderlink_Combo",
+      "name": "Touch of the Storm",
+      "kind": "skill"
+    },
+    {
+      "id": "Thrown_Thunderlink_Combo_Stack",
+      "name": "Touch of the Storm",
+      "kind": "skill"
     },
     {
       "id": "Rogue_Talent_RegeneratingMiasmas",
@@ -9546,6 +11961,11 @@
       "kind": "unit"
     },
     {
+      "id": "Priest_Talent_Transcendance",
+      "name": "Transcendance",
+      "kind": "skill"
+    },
+    {
       "id": "Item_Transfer",
       "name": "Transfer item",
       "kind": "icon"
@@ -9556,6 +11976,21 @@
       "kind": "skill"
     },
     {
+      "id": "SwarowlHB_Z4W_Claws",
+      "name": "Treacherous Blackbird Fighter",
+      "kind": "unit"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Caster_2",
+      "name": "Treacherous Blackbird Stormbringer",
+      "kind": "unit"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Tank_2",
+      "name": "Treacherous Blackbird Stormshield",
+      "kind": "unit"
+    },
+    {
       "id": "Trinket_Bee_Status",
       "name": "Trinket_Bee_Status",
       "kind": "skill"
@@ -9564,6 +11999,31 @@
       "id": "Kobold_Z1W_Daggers_2",
       "name": "Trustworthy Kobold Thief",
       "kind": "unit"
+    },
+    {
+      "id": "TS_SS",
+      "name": "TS_SS",
+      "kind": "skill"
+    },
+    {
+      "id": "TS_SS2",
+      "name": "TS_SS2",
+      "kind": "skill"
+    },
+    {
+      "id": "TS_SS_Auto1",
+      "name": "TS_SS_Auto1",
+      "kind": "skill"
+    },
+    {
+      "id": "TS_SS_Auto2",
+      "name": "TS_SS_Auto2",
+      "kind": "skill"
+    },
+    {
+      "id": "TS_SS_Skill1",
+      "name": "TS_SS_Skill1",
+      "kind": "skill"
     },
     {
       "id": "Sprout_Rice_Z2W_Plantivore_3",
@@ -9581,7 +12041,12 @@
       "kind": "skill"
     },
     {
-      "id": "TODO_BaseNPC_01",
+      "id": "Warrior_Talent_Two_Handed_Master",
+      "name": "Two-handed Master",
+      "kind": "skill"
+    },
+    {
+      "id": "BaseNPC_01",
       "name": "Tyra Firma",
       "kind": "unit"
     },
@@ -9606,13 +12071,28 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_Umbral_Ricochet",
+      "name": "Umbral Ricochet",
+      "kind": "skill"
+    },
+    {
       "id": "Skill_Unassign",
       "name": "Unassign",
       "kind": "icon"
     },
     {
+      "id": "Warrior_Talent_Unbroken_Streak",
+      "name": "Unbroken Streak",
+      "kind": "skill"
+    },
+    {
       "id": "UnderWater",
-      "name": "Under water",
+      "name": "UnderWater",
+      "kind": "icon"
+    },
+    {
+      "id": "Priest_Talent_UndyingWill",
+      "name": "Undying Will",
       "kind": "skill"
     },
     {
@@ -9661,6 +12141,16 @@
       "kind": "skill"
     },
     {
+      "id": "Warrior_Talent_Unstoppable_Momentum",
+      "name": "Unstoppable Momentum",
+      "kind": "skill"
+    },
+    {
+      "id": "Priest_Talent_UnstoppableZealot",
+      "name": "Unstoppable Zealot",
+      "kind": "skill"
+    },
+    {
       "id": "Rogue_Talent_UpTheAnte",
       "name": "Up the Ante",
       "kind": "skill"
@@ -9681,9 +12171,49 @@
       "kind": "skill"
     },
     {
+      "id": "Rogue_Talent_Urge_To_Slice",
+      "name": "Urge To Slice",
+      "kind": "skill"
+    },
+    {
+      "id": "Ursid_Attack",
+      "name": "Ursid_Attack",
+      "kind": "skill"
+    },
+    {
+      "id": "Ursid_Elite_Attack",
+      "name": "Ursid_Elite_Attack",
+      "kind": "skill"
+    },
+    {
+      "id": "Ursid_Elite_Skill1",
+      "name": "Ursid_Elite_Skill1",
+      "kind": "skill"
+    },
+    {
+      "id": "Ursid_Skill1",
+      "name": "Ursid_Skill1",
+      "kind": "skill"
+    },
+    {
       "id": "Item_Use",
       "name": "Use",
       "kind": "icon"
+    },
+    {
+      "id": "Rogue_Talent_Vampiric_Mark",
+      "name": "Vampiric Mark",
+      "kind": "skill"
+    },
+    {
+      "id": "Rogue_Talent_Vampiric_Mark_Stack",
+      "name": "Vampiric Mark",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Vanguard_Vigor",
+      "name": "Vanguard's Vigor",
+      "kind": "skill"
     },
     {
       "id": "VaultChestMarker",
@@ -9693,6 +12223,11 @@
     {
       "id": "Halos_Demon_Passive",
       "name": "Veil of the Unkillable Demon King",
+      "kind": "skill"
+    },
+    {
+      "id": "Mage_Talent_VelocityInflux",
+      "name": "Velocity Influx",
       "kind": "skill"
     },
     {
@@ -9723,11 +12258,6 @@
     {
       "id": "Thrown_Seeds_Skill2_Status",
       "name": "Verdant Impetus",
-      "kind": "skill"
-    },
-    {
-      "id": "VesselPotion_Status",
-      "name": "VesselPotion_Status",
       "kind": "skill"
     },
     {
@@ -9791,9 +12321,34 @@
       "kind": "skill"
     },
     {
-      "id": "TODO_SnowPanther_LightBrown",
-      "name": "Volcano Leopard",
-      "kind": "unit"
+      "id": "Infusion_Swarowl_Tank_Stack",
+      "name": "Voltage",
+      "kind": "skill"
+    },
+    {
+      "id": "Volture_Attack",
+      "name": "Volture_Attack",
+      "kind": "skill"
+    },
+    {
+      "id": "Volture_Elite_Attack",
+      "name": "Volture_Elite_Attack",
+      "kind": "skill"
+    },
+    {
+      "id": "Marylyn_Monrowl_Vortex_Blade",
+      "name": "Vortex Blade",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Harpy_Vortex_Blade",
+      "name": "Vortex Blade",
+      "kind": "skill"
+    },
+    {
+      "id": "Swarowl_Harpy_Vortex_Blade_Small",
+      "name": "Vortex Blade",
+      "kind": "skill"
     },
     {
       "id": "W_Assassin",
@@ -9861,6 +12416,11 @@
       "kind": "skill"
     },
     {
+      "id": "Warrior_Talent_Defiance_Shield",
+      "name": "Warrior_Talent_Defiance_Shield",
+      "kind": "skill"
+    },
+    {
       "id": "Warrior_Talent_HoldTheLine_Status",
       "name": "Warrior_Talent_HoldTheLine_Status",
       "kind": "skill"
@@ -9914,6 +12474,11 @@
       "id": "Manfish_Z1D_Caster",
       "name": "Wavemonger of the Lost City",
       "kind": "unit"
+    },
+    {
+      "id": "Rogue_Talent_Weak_Points",
+      "name": "Weak Points",
+      "kind": "skill"
     },
     {
       "id": "WeaponSkills",
@@ -10026,18 +12591,8 @@
       "kind": "icon"
     },
     {
-      "id": "Weighstone_Status",
-      "name": "Weighstone_Status",
-      "kind": "skill"
-    },
-    {
       "id": "Infusion_Manfish_DPS_Status",
       "name": "Wet",
-      "kind": "skill"
-    },
-    {
-      "id": "Whetstone_Status",
-      "name": "Whetstone_Status",
       "kind": "skill"
     },
     {
@@ -10059,6 +12614,11 @@
       "id": "Luck_Glider_Status",
       "name": "Windborn",
       "kind": "skill"
+    },
+    {
+      "id": "Bear_Z4W_E",
+      "name": "Winnie The Beast",
+      "kind": "unit"
     },
     {
       "id": "Wishlist",
@@ -10151,6 +12711,36 @@
       "kind": "icon"
     },
     {
+      "id": "BagonKing",
+      "name": "Yeti Bo In Shape",
+      "kind": "unit"
+    },
+    {
+      "id": "OgreBagon_Z4W_E_2",
+      "name": "Yetimothay Sha'Lamay",
+      "kind": "unit"
+    },
+    {
+      "id": "Yetina",
+      "name": "Yetina Turr'ner",
+      "kind": "unit"
+    },
+    {
+      "id": "Bagon_Host",
+      "name": "Yetiri An’Ri",
+      "kind": "unit"
+    },
+    {
+      "id": "TODO_OgreBagon_MiniBoss",
+      "name": "Yetiri An’Ri",
+      "kind": "unit"
+    },
+    {
+      "id": "OgreBagon_Z4W_E_3",
+      "name": "Yetweety",
+      "kind": "unit"
+    },
+    {
       "id": "DM_Multispin_Passive",
       "name": "Zeal",
       "kind": "skill"
@@ -10178,6 +12768,11 @@
     {
       "id": "Priest_Talent_ZealousFighter",
       "name": "Zealous Fighter",
+      "kind": "skill"
+    },
+    {
+      "id": "Warrior_Talent_Zealous_Rage",
+      "name": "Zealous Rage",
       "kind": "skill"
     },
     {

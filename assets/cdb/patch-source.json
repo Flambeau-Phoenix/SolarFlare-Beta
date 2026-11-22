@@ -1,40 +1,46 @@
 {
   "source": "E:\\Solar_Flare_2_Mod\\tools\\current_cdb\\data.cdb",
-  "sha256": "ae3b19a30a190d9500858af469750ef9c989a531b058a630a3e9728e5ce88280",
+  "sha256": "045f0d2791b4136613c6478f8ca7a3333ee8e1d0ef7b4626bf8de4afbe4a27be",
   "generator": "tools/refresh_cdb_assets.py",
   "files": {
     "aura-catalog.json": {
-      "sha256": "a694d35aba55a916ed218b5ca080d03357f12f1f7c9a43fef9b249d5f39a9341"
+      "sha256": "f80593215a4dc1859fdf7f53507edb843bdcf84ccda0b0d1f01da642d25881b3"
     },
     "aura-quickstart.json": {
-      "sha256": "a8744a192e78ffd10be31368864111cade1cdebef66961d7d0aa0bdcb7218e40"
+      "sha256": "8ef3a36f8fc28c51f787a75489a9ba5b6f6db89cbc27e4ab40456d79c99d3b0e"
     },
     "class-signatures.json": {
-      "sha256": "55647312abace36b2a74eefebb828bd1ea1fd06271c77779fd21a347cb242adc"
+      "sha256": "6f68081f1cfbffb3724e3400c882c8b75840ccb6a050ba9e4970780f89a4ff67"
     },
     "combat-catalog.json": {
-      "sha256": "2996ef3e1de23a5a10910f1f8d193022baaa29cd0d3e9634c09dc2320e607425"
+      "sha256": "8ff2b4858208ba92f22aef1fc7bd5b744b33938f27e5da3ed0751caa6451e3d9"
     },
     "consumables.json": {
-      "sha256": "c1e625178155b119c32de77615b4afb855d75fe77d27623399b66d4becafa533"
+      "sha256": "255bab3303c78a2b7ef3b8e31200d868cc5203c586dcff5fd0c59654623942a5"
     },
     "geaux-skill-feed.json": {
-      "sha256": "845f45fa41fdfde68f5187f5f6ca71fbd88cb77b42b344495fad4663505bca1d"
+      "sha256": "e9635c284c18a845ce620fba95d8e3fe0198b6f1b06ef46129e341674da51fdb"
     },
     "skill-cooldowns.json": {
-      "sha256": "201b41021e8bba118f3a3d301914873fe57604d4897ccbdbbdbd084b28c4ad28"
+      "sha256": "5808942dbc5c35e758ee2c87805b02d166325158935306d76caaf89c38ab8d98"
     },
     "status-durations.json": {
-      "sha256": "6c51c32bc58f809352ec17cb428d75aa7aafeb778b15e1ef7bb8875dc3ae1341"
+      "sha256": "3fa018b73d16037537f08e3bf3f7323022d66c33527158e94b0f60fa32267361"
     },
     "summon-units.json": {
-      "sha256": "122ff35ba1ff84d8f5f631d09cd53ef9f23f80b140d8d36e75b01a296fc76cb8"
+      "sha256": "3d03a83c7bea1b96a5e1a758a926b7a9e7621bdfd73d204586f4ae2d57308375"
     },
     "talent-effects.json": {
-      "sha256": "9893218760058d9829dffae51e059560916cea876f044de8004d6eef4943367e"
+      "sha256": "ea6b41c5b41a27fc78515a02a445e1e4d5e052fb6833e81485eba33ff25e6760"
     },
     "unit-names.json": {
-      "sha256": "fece106392b719ddec3a8e77b6edc973f7a9827be40f7bc1cd9a519c932fbf8b"
+      "sha256": "dcda1f64bc6a1b523753265e875be82d9d981238dfc68b03816e3c778fe89475"
+    },
+    "weapon-timing.json": {
+      "sha256": "c3d0735e05c9e5b4896e92086fd961631fda86a7fdcae8b865a2dd368f8d3ca5"
+    },
+    "weapons.json": {
+      "sha256": "c08334d6d1c8117fbf2d83645921796af394c6cfad46ca46baca5eb7ec4cdcbd"
     }
   }
 }

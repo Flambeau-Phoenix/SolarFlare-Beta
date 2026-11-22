@@ -1,9 +1,4 @@
 {
-  "meta": {
-    "width": 1024,
-    "height": 1152,
-    "total_packed": 67
-  },
   "frames": {
     "consumable_Cook_13.png": {
       "x": 0,
@@ -405,8 +400,24 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_ScrollOfFaith.png": {
+    "consumable_ScrollOfDexterity_2.png": {
       "x": 256,
+      "y": 768,
+      "w": 128,
+      "h": 128,
+      "atlas_w": 1024,
+      "atlas_h": 1152
+    },
+    "consumable_ScrollOfFaith.png": {
+      "x": 384,
+      "y": 768,
+      "w": 128,
+      "h": 128,
+      "atlas_w": 1024,
+      "atlas_h": 1152
+    },
+    "consumable_ScrollOfFaith_2.png": {
+      "x": 512,
       "y": 768,
       "w": 128,
       "h": 128,
@@ -414,7 +425,15 @@
       "atlas_h": 1152
     },
     "consumable_ScrollOfIntelligence.png": {
-      "x": 384,
+      "x": 640,
+      "y": 768,
+      "w": 128,
+      "h": 128,
+      "atlas_w": 1024,
+      "atlas_h": 1152
+    },
+    "consumable_ScrollOfIntelligence_2.png": {
+      "x": 768,
       "y": 768,
       "w": 128,
       "h": 128,
@@ -422,30 +441,6 @@
       "atlas_h": 1152
     },
     "consumable_ScrollOfStrength.png": {
-      "x": 512,
-      "y": 768,
-      "w": 128,
-      "h": 128,
-      "atlas_w": 1024,
-      "atlas_h": 1152
-    },
-    "consumable_ScrollOfVitality.png": {
-      "x": 640,
-      "y": 768,
-      "w": 128,
-      "h": 128,
-      "atlas_w": 1024,
-      "atlas_h": 1152
-    },
-    "consumable_Cook_16.png": {
-      "x": 768,
-      "y": 768,
-      "w": 128,
-      "h": 128,
-      "atlas_w": 1024,
-      "atlas_h": 1152
-    },
-    "consumable_ShieldPotion_Z2.png": {
       "x": 896,
       "y": 768,
       "w": 128,
@@ -453,7 +448,7 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_Cook_Demon_2.png": {
+    "consumable_ScrollOfStrength_2.png": {
       "x": 0,
       "y": 896,
       "w": 128,
@@ -461,7 +456,7 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_Cook_10.png": {
+    "consumable_ScrollOfVitality.png": {
       "x": 128,
       "y": 896,
       "w": 128,
@@ -469,7 +464,7 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_Cook_6.png": {
+    "consumable_ScrollOfVitality_2.png": {
       "x": 256,
       "y": 896,
       "w": 128,
@@ -477,7 +472,7 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_Cook_9.png": {
+    "consumable_Cook_16.png": {
       "x": 384,
       "y": 896,
       "w": 128,
@@ -485,7 +480,7 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_SparkCube.png": {
+    "consumable_ShieldPotion_Z2.png": {
       "x": 512,
       "y": 896,
       "w": 128,
@@ -493,7 +488,7 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_TeleportationStone.png": {
+    "consumable_Cook_Demon_2.png": {
       "x": 640,
       "y": 896,
       "w": 128,
@@ -501,7 +496,7 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_Cook_Demon_5.png": {
+    "consumable_Cook_10.png": {
       "x": 768,
       "y": 896,
       "w": 128,
@@ -509,7 +504,7 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_VesselPotion.png": {
+    "consumable_Cook_6.png": {
       "x": 896,
       "y": 896,
       "w": 128,
@@ -517,7 +512,7 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_Weightstone.png": {
+    "consumable_Cook_9.png": {
       "x": 0,
       "y": 1024,
       "w": 128,
@@ -525,7 +520,7 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_Whetstone.png": {
+    "consumable_SparkCube.png": {
       "x": 128,
       "y": 1024,
       "w": 128,
@@ -533,13 +528,57 @@
       "atlas_w": 1024,
       "atlas_h": 1152
     },
-    "consumable_Cook_1.png": {
+    "consumable_TeleportationStone.png": {
       "x": 256,
       "y": 1024,
       "w": 128,
       "h": 128,
       "atlas_w": 1024,
       "atlas_h": 1152
+    },
+    "consumable_Cook_Demon_5.png": {
+      "x": 384,
+      "y": 1024,
+      "w": 128,
+      "h": 128,
+      "atlas_w": 1024,
+      "atlas_h": 1152
+    },
+    "consumable_VesselPotion.png": {
+      "x": 512,
+      "y": 1024,
+      "w": 128,
+      "h": 128,
+      "atlas_w": 1024,
+      "atlas_h": 1152
+    },
+    "consumable_Weightstone.png": {
+      "x": 640,
+      "y": 1024,
+      "w": 128,
+      "h": 128,
+      "atlas_w": 1024,
+      "atlas_h": 1152
+    },
+    "consumable_Whetstone.png": {
+      "x": 768,
+      "y": 1024,
+      "w": 128,
+      "h": 128,
+      "atlas_w": 1024,
+      "atlas_h": 1152
+    },
+    "consumable_Cook_1.png": {
+      "x": 896,
+      "y": 1024,
+      "w": 128,
+      "h": 128,
+      "atlas_w": 1024,
+      "atlas_h": 1152
     }
+  },
+  "meta": {
+    "width": 1024,
+    "height": 1152
   }
 }

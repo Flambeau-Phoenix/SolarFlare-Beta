@@ -217,16 +217,15 @@ current state:
 1. Skill cast started
 2. Skill cast stopped
 3. Local skill use for prayer classification
-4. Local incoming damage
-5. Outgoing damage
-6. SolarFlare UI drag start
-7. HUD visibility update (keeps the native-UI hide setting applied)
-8. Attack combo count change (wake-up for the Attack Combo Tracker)
+4. Client damage display receive event (shared Combat Log/Lightsaber ingress)
+5. HUD visibility update
+6. Game update service phase
+7. Attack combo count change (legacy target; absent in the current PTR)
+8. Ground-skill aim start
 
-The earlier six-hook release was tested live with **Priest, Mage, Warrior and Rogue**
-across five combat captures with no hook installation failures, dropped events,
-SolarFlare exceptions or crashes. Diagnostic hooks are excluded from the normal
-`solarflare.hl` release and remain available only in the separate telemetry build.
+The current PTR requires an updated compatible HLX loader. Damage packets can omit
+skill names; unknown result fields remain unknown. Investigation probes are packaged
+separately and are not included in this release.
 
 ## For developers
 

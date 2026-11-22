@@ -97,14 +97,27 @@ class UiLayouts {
   switch(action) {
    case "Rename":
     if(bank.layouts.exists(name) && name!=bank.active) { ToastManager.warn("A layout named \""+name+"\" already exists."); return; }
-    var old=bank.active; var rows=bank.layouts.get(old); var index=bank.order.indexOf(old);
-    bank.layouts.remove(old); bank.order[index]=name; bank.layouts.set(name,rows); bank.active=name;
+    if(!bank.rename(bank.active,name)) { ToastManager.warn("Use a unique, non-empty layout name."); return; }
     ToastManager.success("Renamed layout to \""+name+"\"");
    default:
     var key=bank.add(name,bank.layouts.get(bank.active));
     ToastManager.success("Created layout \""+key+"\"!");
   }
   SettingsStore.markDirty();
+ }
+
+ public function renameSelected(c:ConfigPanel,key:String,name:String):Bool {
+  if(!FeatureProfiles.ready || !bank.saveSafe || !bank.layouts.exists(key)) return false;
+  retain(c);
+  if(!bank.rename(key,name)) return false;
+  SettingsStore.markDirty(); return true;
+ }
+ public function removeSelected(c:ConfigPanel,keys:Array<String>):Bool {
+  if(!FeatureProfiles.ready || !bank.canRemoveMany(keys)) return false;
+  retain(c); var previous=bank.active;
+  bank.removeMany(keys);
+  if(previous!=bank.active) applySelected(c);
+  SettingsStore.markDirty(); return true;
  }
  function remove(c:ConfigPanel):Void {
   if(bank.order.length<=1) return;
@@ -152,7 +165,8 @@ class UiLayouts {
   try {
    if(ImGui.menuItem("New layout...##layout_new_"+id)) { nameAction="New"; openFor=id; ImGui.closeCurrentPopup(); }
    if(ImGui.menuItem("Copy this layout##layout_copy_"+id)) UiActionQueue.custom(function() copy(c));
-   if(ImGui.menuItem("Rename layout...##layout_rename_"+id)) { nameAction="Rename"; openFor=id; ImGui.closeCurrentPopup(); }
+   if(ImGui.menuItem("Change name##layout_rename_"+id)) { nameAction="Rename"; openFor=id; ImGui.closeCurrentPopup(); }
+   if(ImGui.menuItem("Manage layouts...##layout_manage_"+id)) { c.profileLayoutManager.request(c,id,true); ImGui.closeCurrentPopup(); }
    ImGui.beginDisabled(bank.order.length<=1);
    var deleted=ImGui.menuItem("Delete this layout##layout_delete_"+id); ImGui.endDisabled();
    if(deleted) UiActionQueue.custom(function() remove(c));

@@ -34,6 +34,18 @@
       "cooldown": 6.0
     },
     {
+      "id": "GM_Winter_Skill1",
+      "name": "Freezing Blast",
+      "charges": 2,
+      "cooldown": 15.0
+    },
+    {
+      "id": "Katana_Hasaki_EXDash",
+      "name": "Dash",
+      "charges": 2,
+      "cooldown": 10.0
+    },
+    {
       "id": "Rogue_KnivesTempest",
       "name": "Knives Tempest",
       "charges": 2,
@@ -47,8 +59,12 @@
     }
   ],
   "cooldownTalents": [
+    "Mage_Talent_CadenceSurge",
+    "Mage_Talent_ChronostaticOrb",
     "Mage_Talent_NimbleFingers",
     "Mage_Talent_TemporalCompression",
+    "Mage_Talent_VelocityInflux",
+    "Priest_Talent_InquisitorsHaste",
     "Priest_Talent_Prosecutor",
     "Priest_Talent_SharpMind",
     "Priest_Talent_SwiftJustice",

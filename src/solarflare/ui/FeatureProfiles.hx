@@ -82,6 +82,12 @@ class FeatureProfiles {
 
 	/** Set from the More menu, consumed outside the popup scope so the modal's ID stack matches. */
 	static var openNewFor:String = "";
+ static var openRenameFor:String="";
+ static var renameKey:String="";
+ static var renameError:String="";
+ static var renameDone=false;
+ static var renamePending=false;
+ static var renameButton:imgui.Structs.ImVec2;
  static var modalGeneration:Int=-1;
 
 	static function drawStrip(cfg:ConfigPanel, id:String, compact:Bool):Void {
@@ -134,6 +140,13 @@ class FeatureProfiles {
 			ImGui.openPopup("New Universal Profile##fp_new_popup_" + id);
 		}
 		drawNewProfileModal(cfg, id);
+  if(openRenameFor==id) {
+   openRenameFor="";renameKey=activeProfile;renameError="";renameDone=false;renamePending=false;
+   modalGeneration=statusOwnerGen;ByteUtil.fillBuf(nameBuf,49,label(renameKey));
+   ImGui.openPopup("Rename Profile##fp_rename_popup_"+id);
+  }
+  drawRenameProfileModal(cfg,id);
+  cfg.profileLayoutManager.draw(cfg,id);
 	}
 
 	static function drawMoreMenu(cfg:ConfigPanel, id:String, uid:String, follows:Bool):Void {
@@ -147,8 +160,14 @@ class FeatureProfiles {
 			if (ImGui.menuItem("Copy this profile##fp_copy_" + id))
 				UiActionQueue.custom(function() duplicateCurrent(cfg));
 			ImGui.beginDisabled(!ready || bank.profiles.get(activeProfile)==null || bank.profiles.get(activeProfile).ownerHeroId!=uid);
-			var deleteClicked = ImGui.menuItem("Delete this profile##fp_del_" + id);
+   var deleteClicked=false;var ownedFailure:Dynamic=null;
+   try {
+    if(ImGui.menuItem("Change name##fp_rename_"+id)){openRenameFor=id;ImGui.closeCurrentPopup();}
+    if(ImGui.menuItem("Manage profiles...##fp_manage_"+id)){cfg.profileLayoutManager.request(cfg,id,false);ImGui.closeCurrentPopup();}
+    deleteClicked=ImGui.menuItem("Delete this profile##fp_del_"+id);
+   }catch(e:Dynamic)ownedFailure=e;
 			ImGui.endDisabled();
+   if(ownedFailure!=null)throw ownedFailure;
 			if (deleteClicked)
 				{ var chosen=activeProfile; UiActionQueue.custom(function() delete(cfg,chosen)); }
 			ImGui.separator();
@@ -195,6 +214,36 @@ class FeatureProfiles {
  public static function save(cfg:ConfigPanel):Void {
   if(!ready) return; storeCurrent(cfg); SettingsStore.markDirty(); SettingsStore.saveNow();
  }
+ static function drawRenameProfileModal(cfg:ConfigPanel,id:String):Void {
+  if(!ImGui.beginPopupModal("Rename Profile##fp_rename_popup_"+id,null,imgui.Enums.ImGuiWindowFlags.AlwaysAutoResize|imgui.Enums.ImGuiWindowFlags.NoDocking))return;
+  var failure:Dynamic=null;
+  try {
+   if(!ready || modalGeneration!=statusOwnerGen || renameDone){ImGui.closeCurrentPopup();}
+   else {
+    ImGui.setNextItemWidth(280);ImGui.inputText("Name##fp_rename_name_"+id,nameBuf,49);
+    if(renameError!="")ImGui.textDisabled(renameError);
+    ImGui.beginDisabled(renamePending);var error:Dynamic=null;
+    try {
+     if(UiChrome.ghostButton("Rename##fp_rename_apply_"+id,renameButton)){
+      var key=renameKey,requested=ByteUtil.readBytes(nameBuf,49),generation=modalGeneration;
+      renamePending=true;
+      UiActionQueue.custom(function(){
+       renameDone=rename(cfg,key,requested,generation);renamePending=false;
+       if(!renameDone)renameError="Use a unique name for this character.";
+      });
+     }
+    }catch(e:Dynamic)error=e;
+    ImGui.endDisabled();if(error!=null)throw error;
+    ImGui.sameLine(0,8);if(UiChrome.ghostButton("Cancel##fp_rename_cancel_"+id,renameButton))ImGui.closeCurrentPopup();
+   }
+  }catch(e:Dynamic)failure=e;
+  ImGui.endPopup();if(failure!=null)throw failure;
+ }
+ public static function rename(cfg:ConfigPanel,key:String,requested:String,generation:Int=-1):Bool {
+  if(!ready || cfg==null || (generation>=0 && generation!=statusOwnerGen))return false;
+  if(!bank.rename(owner,key,normalizeName(requested)))return false;
+  SettingsStore.markDirty();return true;
+ }
  public static function switchTo(cfg:ConfigPanel,key:String,automatic:Bool=false):Void {
   if(!ready || cfg==null) return;
   storeCurrent(cfg); ProfileTrace.note("profile","SELECT requested="+describe(key)+" hero="+owner); activeProfile=bank.select(owner,key); applyUniversal(cfg,activeProfile); SettingsStore.markDirty();
@@ -236,6 +285,17 @@ class FeatureProfiles {
  }
  public static function delete(cfg:ConfigPanel,key:String):Void {
   if(!ready) return; activeProfile=bank.remove(owner,key); applyUniversal(cfg,activeProfile); SettingsStore.markDirty();
+ }
+
+ /** Batch changes are validated before mutation; restore the HUD only if its active profile was removed. */
+ public static function removeSelected(cfg:ConfigPanel,keys:Array<String>):Bool {
+  if(!ready || cfg==null) return false;
+  var previous=activeProfile;
+  if(!bank.canRemoveMany(owner,keys)) return false;
+  storeCurrent(cfg);
+  bank.removeMany(owner,keys); activeProfile=bank.active;
+  if(activeProfile!=previous) applyUniversal(cfg,activeProfile);
+  SettingsStore.markDirty(); return true;
  }
 
 	static function captureAll(cfg:ConfigPanel):Dynamic {
@@ -280,7 +340,7 @@ class FeatureProfiles {
 		transition.restoring();
 		if (cfg == null) return;
   cfg.clearTransientState(); cfg.extraBarsPrototype.clearTransientState();
-  openNewFor=""; modalGeneration=-1; ImageDrop.disarm();
+  openNewFor="";openRenameFor="";renameKey="";renameError="";renameDone=false;renamePending=false; modalGeneration=-1; ImageDrop.disarm();
   if(cfg.geauxBuilder!=null) cfg.geauxBuilder.resetProfileState();
   if(cfg.auraBuilder!=null) cfg.auraBuilder.resetProfileState();
 		var snap = bank.normalized(key);
@@ -344,6 +404,7 @@ class FeatureProfiles {
 	}
 
 	static function ensureBuffer():Void {
+		if(renameButton==null)renameButton=ImGui.vec2(120,28);
 		if (nameBuf == null) {
 			nameBuf = new hl.Bytes(49);
 			ByteUtil.clearBytes(nameBuf, 49);

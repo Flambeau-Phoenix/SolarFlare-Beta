@@ -1600,7 +1600,7 @@ class GeauxCache {
 			if (slot != null) {
 				var sSkill:Dynamic = null;
 				try
-					sSkill = slot.getOverrideSkill()
+					sSkill = (slot.skill == null ? null : slot.skill.getEffectiveSkill())
 				catch (_:Dynamic) {}
 				if (sSkill == null)
 					sSkill = callOverrideSkill(node);
@@ -1658,7 +1658,7 @@ class GeauxCache {
 					skill = typed.skill
 				catch (_:Dynamic) {}
 				try {
-					var over = typed.getOverrideSkill();
+					var over = (typed.skill == null ? null : typed.skill.getEffectiveSkill());
 					if (over != null)
 						skill = over;
 				} catch (_:Dynamic) {}
@@ -3271,7 +3271,8 @@ class GeauxCache {
 			candidates = [id];
 		for (cid in candidates) {
 			try {
-				var over = hero.getSkillOverride(cid);
+				var overrideId = hero.getSkillOverride(cid);
+				var over = overrideId == null ? null : hero.getSkill(overrideId);
 				if (over != null && skillMatches(over, id))
 					return over;
 			} catch (_:Dynamic) {}

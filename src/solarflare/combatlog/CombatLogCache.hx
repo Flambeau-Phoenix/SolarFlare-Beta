@@ -374,6 +374,47 @@ class CombatLogCache {
 		solarflare.aura.EnemyCastCache.noteStart(skill, sid);
 	}
 
+	/** Read the already-normalized native UID map. refs is resolved by GameLib's abstract accessor. */
+	@:hlNative("std", "hi64get")
+	static function networkUidGet(refs:hl.Abstract<"hl_int64_map">, uid:haxe.Int64):Dynamic {
+		return null;
+	}
+
+	/** Client RPC payload, frozen into the normal event ring without retaining game objects. */
+	public static function noteNetworkDamage(victim:Dynamic, packet:st.skill.DamageInfo):Void {
+		if (victim == null || packet == null || !solarflare.ObserveDemand.combatLines) return;
+		var amount = packet.amount;
+		if (!Math.isFinite(amount) || amount < 0) return;
+		var rawSource:Dynamic = null;
+		try {
+			var base:st.BaseState = cast victim;
+			var host = base.__host;
+			if (host == null) host = hxbit.NetworkHost.current;
+			if (host != null && host.globalCtx != null) {
+				var refs = host.globalCtx.refs;
+				if (refs != null) rawSource = networkUidGet(refs, packet.source);
+			}
+		} catch (_:Dynamic) {}
+		var source = CombatOwnership.resolve(rawSource, extractObject, ownerOfSkill);
+		if (source == null) source = rawSource;
+		if (!shouldCapture(source, victim) && !shouldCapture(rawSource, victim)) return;
+		var skill = solarflare.ui.ByteUtil.materialize(packet.skill);
+		var line = beginLine(KIND_HIT, skill, source, victim, amount);
+		line.networkDamageInfo = true;
+		line.sourceUid = haxe.Int64.toStr(packet.source);
+		line.targetUid = haxe.Int64.toStr(packet.target);
+		line.crit = packet.critical;
+		line.auto = packet.attack;
+		line.blockerId = solarflare.ui.ByteUtil.materialize(packet.blocker);
+		line.minionName = minionNameOf(rawSource, source);
+		if (line.minionName.length == 0) line.minionName = minionNameFromSkill(skill);
+		try line.affinity = solarflare.ui.ByteUtil.materialize(packet.get_affinity()) catch (_:Dynamic) {}
+		// This packet has no kill, block amount, hit count or absorbed-shield amount.
+		// Do not use DamageResult getters or infer kills from a later health sample.
+		// One RPC is one observation; identical simultaneous packets are not duplicates.
+		commit(line);
+	}
+
 	public static function noteHit(victim:Dynamic, dmg:Dynamic, hook:String = ""):Void {
 		if (dmg == null)
 			return;

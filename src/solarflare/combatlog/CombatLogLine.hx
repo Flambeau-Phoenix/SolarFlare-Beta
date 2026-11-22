@@ -16,6 +16,11 @@ class CombatLogLine {
 	public var targetRole:Int = 0;
 	public var amount:Float = 0;
 	public var blockAmt:Float = 0;
+	/** Network payload provenance; unavailable DamageResult fields stay null in JSON. */
+	public var networkDamageInfo:Bool = false;
+	public var sourceUid:String = "";
+	public var targetUid:String = "";
+	public var blockerId:String = "";
 	public var crit:Bool = false;
 	public var kill:Bool = false;
 	public var blocked:Bool = false;
@@ -95,6 +100,19 @@ class CombatLogLine {
 			t: round2(t),
 			ms: wallMs
 		};
+		if (networkDamageInfo) {
+			o.payload = "DamageInfo";
+			o.sourceUid = sourceUid;
+			o.targetUid = targetUid;
+			o.blocker = blockerId;
+			o.block = null;
+			o.blocked = null;
+			o.kill = null;
+			o.hitCount = null;
+			o.shield = null;
+			o.physical = null;
+			o.magic = null;
+		}
 		return haxe.Json.stringify(o);
 	}
 

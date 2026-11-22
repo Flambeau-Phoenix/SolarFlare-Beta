@@ -43,7 +43,13 @@ class BarTerNativeSlotAccess {
    #end
    if (base!=null && !BarTerNativeAccess.owned(base,hero)) return {readable:false,base:null,effective:null};
    if (base!=null && ((cast base:st.skill.Skill).inf.flags & 4096)!=0) base=null;
-   var effective:Dynamic=base; var over=slot.getOverrideSkill(); if (over!=null) effective=over;
+   var effective:Dynamic=base;
+   #if hl
+   var over=slot.skill==null ? null : slot.skill.getEffectiveSkill();
+   #else
+   var over=slot.getOverrideSkill();
+   #end
+   if (over!=null) effective=over;
    if (base!=null && !BarTerNativeAccess.owned(base,hero) || effective!=null && !BarTerNativeAccess.owned(effective,hero))
     return {readable:false,base:null,effective:null};
    return {readable:true,base:base,effective:effective};

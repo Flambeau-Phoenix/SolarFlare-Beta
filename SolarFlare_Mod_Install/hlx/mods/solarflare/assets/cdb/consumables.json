@@ -1,5 +1,5 @@
 {
-  "sourceSha256": "ae3b19a30a190d9500858af469750ef9c989a531b058a630a3e9728e5ce88280",
+  "sourceSha256": "045f0d2791b4136613c6478f8ca7a3333ee8e1d0ef7b4626bf8de4afbe4a27be",
   "entries": [
     {
       "id": "Cook_13",
@@ -789,7 +789,7 @@
       "refillable": false,
       "statuses": [],
       "gfx": {
-        "file": "UI/Portraits/Items/Consumable/Items_Loot_Miscellaneous_TeleportationStone_03.prefab.png",
+        "file": "UI/Portraits/Items/Usable/Items_Loot_Miscellaneous_TeleportationStone_03.prefab.png",
         "size": 256,
         "x": 0,
         "y": 0
@@ -910,6 +910,27 @@
       }
     },
     {
+      "id": "ScrollOfDexterity_2",
+      "name": "Scroll Of Dexterity II",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources_02.png",
+        "size": 32,
+        "x": 54,
+        "y": 57,
+        "height": 3,
+        "width": 3
+      }
+    },
+    {
       "id": "ScrollOfFaith",
       "name": "Scroll Of Faith I",
       "type": "Consumable",
@@ -926,6 +947,27 @@
         "size": 256,
         "x": 0,
         "y": 0
+      }
+    },
+    {
+      "id": "ScrollOfFaith_2",
+      "name": "Scroll Of Faith II",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources_02.png",
+        "size": 32,
+        "x": 54,
+        "y": 57,
+        "height": 3,
+        "width": 3
       }
     },
     {
@@ -948,6 +990,27 @@
       }
     },
     {
+      "id": "ScrollOfIntelligence_2",
+      "name": "Scroll Of Intelligence II",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources_02.png",
+        "size": 32,
+        "x": 54,
+        "y": 57,
+        "height": 3,
+        "width": 3
+      }
+    },
+    {
       "id": "ScrollOfStrength",
       "name": "Scroll Of Strength I",
       "type": "Consumable",
@@ -967,6 +1030,27 @@
       }
     },
     {
+      "id": "ScrollOfStrength_2",
+      "name": "Scroll Of Strength II",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources_02.png",
+        "size": 32,
+        "x": 54,
+        "y": 57,
+        "height": 3,
+        "width": 3
+      }
+    },
+    {
       "id": "ScrollOfVitality",
       "name": "Scroll Of Vitality I",
       "type": "Consumable",
@@ -983,6 +1067,27 @@
         "size": 256,
         "x": 0,
         "y": 0
+      }
+    },
+    {
+      "id": "ScrollOfVitality_2",
+      "name": "Scroll Of Vitality II",
+      "type": "Consumable",
+      "refillable": false,
+      "statuses": [
+        {
+          "id": "ItemStatus",
+          "duration": 1800,
+          "shared": true
+        }
+      ],
+      "gfx": {
+        "file": "UI/Placeholder/Icons_Resources_02.png",
+        "size": 32,
+        "x": 54,
+        "y": 57,
+        "height": 3,
+        "width": 3
       }
     },
     {

@@ -1,6 +1,6 @@
 {
   "source": {
-    "sha256": "ae3b19a30a190d9500858af469750ef9c989a531b058a630a3e9728e5ce88280",
+    "sha256": "045f0d2791b4136613c6478f8ca7a3333ee8e1d0ef7b4626bf8de4afbe4a27be",
     "toolVersion": "refresh_cdb_assets"
   },
   "bosses": [
@@ -35,6 +35,56 @@
         {
           "id": "R1CrabBoss_ChitinousExoskeleton_Spike",
           "name": "R1CrabBoss_ChitinousExoskeleton_Spike"
+        }
+      ]
+    },
+    {
+      "id": "Egglektra",
+      "name": "Egglektra",
+      "skills": [
+        {
+          "id": "Egglektra_Attack",
+          "name": "Egglektra_Attack"
+        },
+        {
+          "id": "Egglektra_GiganticGusts",
+          "name": "Gigantic Gusts"
+        },
+        {
+          "id": "Egglektra_ElectricBreath",
+          "name": "Egglektra_ElectricBreath"
+        },
+        {
+          "id": "Egglektra_LightningStrikes",
+          "name": "Egglektra_LightningStrikes"
+        },
+        {
+          "id": "Egglektra_TakeOff",
+          "name": "Egglektra_TakeOff"
+        },
+        {
+          "id": "Egglektra_Land",
+          "name": "Egglektra_Land"
+        },
+        {
+          "id": "Egglektra_CrashLand",
+          "name": "Egglektra_CrashLand"
+        },
+        {
+          "id": "Egglektra_Dissapear",
+          "name": "Egglektra_Dissapear"
+        },
+        {
+          "id": "Egglektra_WaitInAmbush",
+          "name": "Egglektra_WaitInAmbush"
+        },
+        {
+          "id": "Egglektra_LayEgg",
+          "name": "Egglektra_LayEgg"
+        },
+        {
+          "id": "Egglektra_Mines",
+          "name": "Egglektra_Mines"
         }
       ]
     },
@@ -241,6 +291,36 @@
       ]
     },
     {
+      "id": "Swarowl_Z4D_Marylyn_Monrowl",
+      "name": "Mary’Lyn Monrowl",
+      "skills": [
+        {
+          "id": "Marylyn_Monrowl_Scratch",
+          "name": "Marylyn_Monrowl_Scratch"
+        },
+        {
+          "id": "Marylyn_Monrowl_Vortex_Blade",
+          "name": "Vortex Blade"
+        },
+        {
+          "id": "Marylyn_Monrowl_Rotating_Windwall",
+          "name": "Rotating Windwalls"
+        },
+        {
+          "id": "Marylyn_Monrowl_Lightning_Rush",
+          "name": "Lightning Rush"
+        },
+        {
+          "id": "Marylyn_Monrowl_Infused_Vortex_Blade",
+          "name": "Infused Vortex Blade"
+        },
+        {
+          "id": "Marylyn_Monrowl_Surtension",
+          "name": "Surtension : Positive"
+        }
+      ]
+    },
+    {
       "id": "MunsterChuck",
       "name": "Munster Chuck",
       "skills": [
@@ -259,10 +339,6 @@
         {
           "id": "MChuck_CheeseCatapult",
           "name": "Cheese catapult"
-        },
-        {
-          "id": "MChuck_IsolatedHeal",
-          "name": "MChuck_IsolatedHeal"
         },
         {
           "id": "MChuck_Heroic",
@@ -447,6 +523,58 @@
           "name": "Bubble Wall"
         }
       ]
+    },
+    {
+      "id": "BagonKing",
+      "name": "Yeti Bo In Shape",
+      "skills": [
+        {
+          "id": "BagonKing_FrostStrike",
+          "name": "BagonKing_FrostStrike"
+        },
+        {
+          "id": "BagonKing_FrozenCyclone",
+          "name": "BagonKing_FrozenCyclone"
+        },
+        {
+          "id": "BagonKing_BlazingArm",
+          "name": "BagonKing_BlazingArm"
+        },
+        {
+          "id": "BagonKing_BreakFloor",
+          "name": "BagonKing_BreakFloor"
+        }
+      ]
+    },
+    {
+      "id": "Yetina",
+      "name": "Yetina Turr'ner",
+      "skills": [
+        {
+          "id": "Yetina_SparkOutbreak",
+          "name": "Spark Outbreak"
+        },
+        {
+          "id": "Yetina_Shapeshift",
+          "name": "Shapeshift"
+        },
+        {
+          "id": "Yetina_BearClaw",
+          "name": "Bear Claw"
+        },
+        {
+          "id": "Yetina_TitanicCharge",
+          "name": "Titanic Charge"
+        },
+        {
+          "id": "Yetina_FeralRip",
+          "name": "Rip"
+        },
+        {
+          "id": "Yetina_FeralJump",
+          "name": "Feral Jump"
+        }
+      ]
     }
   ],
   "excludedBosses": [
@@ -455,8 +583,8 @@
       "reason": "Unidentified phase variant: CDB name is ??? and portrait is portal artwork."
     },
     {
-      "id": "Cleodora_Heroic_Dark_Champion",
-      "reason": "The Usurper: user has not confirmed this encounter in game."
+      "id": "Queenslayer",
+      "reason": "Renamed from Cleodora_Heroic_Dark_Champion; encounter remains unconfirmed in game."
     },
     {
       "id": "Ulserous",

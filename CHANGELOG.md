@@ -4,6 +4,21 @@ Every SolarFlare release, newest first, with its download on the
 [Releases page](https://github.com/Flambeau-Phoenix/SolarFlare-Beta/releases). Full patch
 notes for each version are in its release description; the most recent are repeated below.
 
+## v7.1b: PTR refresh and damage logging (2026-11-22)
+
+SolarFlare v7.1b updates the mod for the new PTR assets and restores damage tracking in Combat Log and Lightsaber.
+
+- Refreshed game metadata, CastleDB catalogs and skill, unit, consumable and loot atlases for the PTR build.
+- Restored damage capture through the live client damage receive event. Combat Log remains the shared source for Lightsaber totals.
+- Preserved exact source/target IDs and known damage values; unavailable result fields remain unknown instead of becoming fabricated zeros.
+- Includes profile and layout renaming, previously delivered as a silent update.
+
+Use the latest HLX loader compatible with the current PTR. Install this ZIP over the Farever directory; existing personal settings are not included in the archive.
+
+Known limits: the observed damage packet does not carry the skill name, so hit rows can have a blank Skill cell. The old attack-combo setter hook is absent in this PTR build; this release does not repair that separate tracker issue. No threat meter is introduced.
+
+Validation: release and telemetry builds, eight-hook architecture guard, damage JSON boundary regression and profile UI source checks passed. Damage appeared in live Combat Log/Lightsaber testing. Engine Atlas availability analysis passed its 96-test suite.
+
 ## v6.3b: Misc QoL (2026-10-20)
 
 #### Custom images

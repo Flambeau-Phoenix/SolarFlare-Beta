@@ -9,13 +9,9 @@ class IdentityVitalsHooks {
 		try solarflare.HealthHooks.hookHeroSkillUse(self, skill) catch (_:Dynamic) {}
 	}
 
-	@:hlx.postfix(ent.Hero.onReceiveDamage)
-	static function onHeroReceiveDamage(self:Dynamic, dmgObj:Dynamic, result:Void):Void {
-		try solarflare.HealthHooks.hookHeroDamage(self, dmgObj) catch (_:Dynamic) {}
-	}
-
-	@:hlx.postfix(ent.Unit.onInflictDamage)
-	static function onInflictDamage(self:Dynamic, dmgObj:Dynamic, result:Void):Void {
-		try solarflare.HealthHooks.hookInflictDamage(self, dmgObj) catch (_:Dynamic) {}
+	/** PTR client receive boundary; DamageInfo is not a DamageResult. */
+	@:hlx.postfix(ent.Unit.rpcDisplayDamage__impl)
+	static function onNetworkDamage(self:Dynamic, dmgObj:Dynamic, result:Void):Void {
+		try solarflare.combatlog.CombatLogCache.noteNetworkDamage(self, cast dmgObj) catch (_:Dynamic) {}
 	}
 }

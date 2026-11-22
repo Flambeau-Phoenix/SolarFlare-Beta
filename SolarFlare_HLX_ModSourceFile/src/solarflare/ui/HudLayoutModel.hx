@@ -50,6 +50,33 @@ class HudLayoutModel {
   }
   return rows;
  }
+
+ /** Renaming preserves the stored geometry and active selection. */
+ public function rename(key:String,requested:String):Bool {
+  if(!saveSafe || !layouts.exists(key) || requested==null) return false;
+  var name=StringTools.trim(requested);
+  if(name=="" || name.length>80 || name.indexOf("\n")>=0 || name.indexOf("\r")>=0) return false;
+  for(other in order) if(other!=key && other.toLowerCase()==name.toLowerCase()) return false;
+  var rows=layouts.get(key),index=order.indexOf(key);
+  layouts.remove(key); layouts.set(name,rows); order[index]=name;
+  if(active==key) active=name;
+  return true;
+ }
+ public function canRemoveMany(keys:Array<String>):Bool {
+  if(!saveSafe || keys==null || keys.length==0 || keys.length>=order.length) return false;
+  var seen=new Map<String,Bool>();
+  for(key in keys) {
+   if(!layouts.exists(key) || seen.exists(key)) return false;
+   seen.set(key,true);
+  }
+  return true;
+ }
+ public function removeMany(keys:Array<String>):Bool {
+  if(!canRemoveMany(keys)) return false;
+  for(key in keys) { layouts.remove(key); order.remove(key); }
+  if(!layouts.exists(active)) active=order[0];
+  return true;
+ }
  public function unique(name:String):String {
   name=StringTools.trim(name==null ? "" : name); if(name.length==0) name="Layout";
   name=name.substr(0,80); var key=name; var n=2;

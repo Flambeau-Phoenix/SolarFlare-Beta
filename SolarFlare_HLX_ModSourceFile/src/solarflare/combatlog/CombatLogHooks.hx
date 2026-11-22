@@ -1,8 +1,8 @@
 ﻿package solarflare.combatlog;
 
 /**
- * Read-only cast lifecycle capture. Damage is owned by the local Hero receive
- * and Unit inflict adapters so SolarFlare does not install nested receive hooks.
+ * Read-only cast lifecycle capture. Client damage packets are owned by the
+ * rpcDisplayDamage__impl adapter in IdentityVitalsHooks.
  */
 class CombatLogHooks {
 	public static function keep():Void {

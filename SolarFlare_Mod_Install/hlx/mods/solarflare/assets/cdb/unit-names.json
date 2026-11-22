@@ -33,6 +33,10 @@
       "name": "Alpha Wolf"
     },
     {
+      "id": "Wolf_Z4W_Alpha",
+      "name": "Alpha Wolf"
+    },
+    {
       "id": "Summon_Bee",
       "name": "Angry Bee"
     },
@@ -101,6 +105,42 @@
       "name": "Autumnal Leafcutter"
     },
     {
+      "id": "OgreBagon_Z4W_Claw",
+      "name": "Bagon Brawler"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_Book",
+      "name": "Bagon Frost Sculptor"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_2H",
+      "name": "Bagon Icecaller"
+    },
+    {
+      "id": "OgreBagon_Z4W_2H",
+      "name": "Bagon Savage"
+    },
+    {
+      "id": "OgreBagon_Z4W_2H_FS",
+      "name": "Bagon Savage"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_Caster",
+      "name": "Bagon Shaman"
+    },
+    {
+      "id": "OgreBagon_Z4W_Dual",
+      "name": "Bagon Smasher"
+    },
+    {
+      "id": "OgreBagon_Z4W_Dual_FS",
+      "name": "Bagon Smasher"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_Crescent",
+      "name": "Bagon Tracker"
+    },
+    {
       "id": "Demon_Z1_Claws_Soulstone",
       "name": "Baphometal"
     },
@@ -133,8 +173,24 @@
       "name": "BaseMount"
     },
     {
+      "id": "BaseNPC",
+      "name": "BaseNPC"
+    },
+    {
       "id": "BaseSummon",
       "name": "BaseSummon"
+    },
+    {
+      "id": "Elemental_Z4W_Lava",
+      "name": "Bath Warmer Pyrh Sparkle"
+    },
+    {
+      "id": "Bear_Cristal_E_2",
+      "name": "Bear Gates"
+    },
+    {
+      "id": "Bear_Cristal_Z4W_2",
+      "name": "Bear_Cristal_Z4W_2"
     },
     {
       "id": "Crimson_Z2W_Beekeeper2",
@@ -181,12 +237,52 @@
       "name": "Black Woolybell"
     },
     {
-      "id": "TODO_FaerieSwarowl_Z3W_Claws",
+      "id": "Swarowl_Z4D_Sniper",
+      "name": "Blackbird Bullet"
+    },
+    {
+      "id": "Swarowl_Z4W_Claws_2",
+      "name": "Blackbird Ferocious Harpy"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Claws_2",
+      "name": "Blackbird Fighter"
+    },
+    {
+      "id": "Swarowl_Bat_Baby_Z4W",
+      "name": "Blackbird Fledgling"
+    },
+    {
+      "id": "Swarowl_Z4W_Claws",
       "name": "Blackbird Harpy"
     },
     {
-      "id": "Swarowl_Bat",
+      "id": "SwarowlHB_Z4W_Caster",
+      "name": "Blackbird Stormbringer"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Caster_FS",
+      "name": "Blackbird Stormbringer"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Tank",
+      "name": "Blackbird Stormshield"
+    },
+    {
+      "id": "Swarowl_Z4W_Caster",
+      "name": "Blackbird Thunderbearer"
+    },
+    {
+      "id": "Swarowl_Z4W_Caster_2",
+      "name": "Blackbird Trained Thunderbearer"
+    },
+    {
+      "id": "Swarowl_Bat_Z4W",
       "name": "Blackbird Volture"
+    },
+    {
+      "id": "Swarowl_Z4D_Watcher",
+      "name": "Blackbird Watcher"
     },
     {
       "id": "Golem_Z2W_FireExplosive_E",
@@ -205,6 +301,34 @@
       "name": "Bloodred Hound"
     },
     {
+      "id": "Frog_Crystal_Blue",
+      "name": "Blue Crystalflopper"
+    },
+    {
+      "id": "Frog_Crystal_Blue02",
+      "name": "Blue Crystalflopper"
+    },
+    {
+      "id": "Frog_Crystal_BluePurple",
+      "name": "Blue Crystalflopper"
+    },
+    {
+      "id": "Frog_Crystal_Demon",
+      "name": "Blue Crystalflopper"
+    },
+    {
+      "id": "Frog_Crystal_Green",
+      "name": "Blue Crystalflopper"
+    },
+    {
+      "id": "Frog_Crystal_Purple",
+      "name": "Blue Crystalflopper"
+    },
+    {
+      "id": "Frog_Crystal_Spark",
+      "name": "Blue Crystalflopper"
+    },
+    {
       "id": "DemonDog_Blue02",
       "name": "Blue Demodoggo"
     },
@@ -219,10 +343,6 @@
     {
       "id": "Boar_Z1W",
       "name": "Boar"
-    },
-    {
-      "id": "Boar_Z4W_E",
-      "name": "Boar Burnham"
     },
     {
       "id": "Crimson_Z3_Fist_U2",
@@ -257,6 +377,10 @@
       "name": "Brother Tuk"
     },
     {
+      "id": "Bear_Z4W",
+      "name": "Brown Bear"
+    },
+    {
       "id": "Rabbit_Brown",
       "name": "Brown Buttontail"
     },
@@ -281,6 +405,10 @@
       "name": "Bucolic Crimson Farmhand"
     },
     {
+      "id": "Bear_Cristal_E",
+      "name": "Buffalo Bear"
+    },
+    {
       "id": "Rabbit_Yellow",
       "name": "Buttontail"
     },
@@ -291,6 +419,10 @@
     {
       "id": "Goat_Beige01",
       "name": "Camel Raminiature"
+    },
+    {
+      "id": "Swarowl_Bat_Z4W_E",
+      "name": "Canary Volt"
     },
     {
       "id": "CannonPlant",
@@ -317,8 +449,8 @@
       "name": "Carmine Hound"
     },
     {
-      "id": "TODO_SnowPanther_Black",
-      "name": "Cave Leopard"
+      "id": "Swarowl_Z4D_Caster",
+      "name": "Caster Harpi"
     },
     {
       "id": "Crimson_Z2W_Peasant_E",
@@ -345,16 +477,16 @@
       "name": "Chase"
     },
     {
+      "id": "Shop_ChristmasSnowBall",
+      "name": "ChristmasSnowBall"
+    },
+    {
       "id": "RobinHoofMeat",
       "name": "Chunk of Meat"
     },
     {
       "id": "Kobold_Z2W_Daggers",
       "name": "Cleanhanded Kobold Thief"
-    },
-    {
-      "id": "TODO_SnowPanther_DarkBrown",
-      "name": "Cliff Leopard"
     },
     {
       "id": "Frog_BluePurple",
@@ -585,8 +717,20 @@
       "name": "da'Rius"
     },
     {
+      "id": "TODO_Spirit_Lava_01",
+      "name": "da'Rius"
+    },
+    {
+      "id": "TODO_Spirit_Lava_Elite_01",
+      "name": "da'Rius"
+    },
+    {
       "id": "DemonDog_Blue",
       "name": "Dark Demodoggo"
+    },
+    {
+      "id": "Swarowl_Elite_2",
+      "name": "Deagle"
     },
     {
       "id": "FaerieDemon_Rift_Caster_Major",
@@ -639,6 +783,14 @@
     {
       "id": "Egglektra",
       "name": "Egglektra"
+    },
+    {
+      "id": "Egglektra_Egg",
+      "name": "Egglektra_Egg"
+    },
+    {
+      "id": "Egglektra_World",
+      "name": "Egglektra_World"
     },
     {
       "id": "World",
@@ -705,6 +857,10 @@
       "name": "Freelance Kobold Miner"
     },
     {
+      "id": "OgreBagon_Z4W_Claw_2",
+      "name": "Furious Bagon Brawler"
+    },
+    {
       "id": "Dummy_FX",
       "name": "FXTest"
     },
@@ -731,10 +887,6 @@
     {
       "id": "OgreManfish_Z2W_Claws_E",
       "name": "Gilliver"
-    },
-    {
-      "id": "TODO_MOG_Merchant",
-      "name": "Glory Merchant"
     },
     {
       "id": "Golem_Z2W_E",
@@ -829,8 +981,48 @@
       "name": "Guild Merchant"
     },
     {
+      "id": "Egglektra_Hatchling",
+      "name": "Hatchling"
+    },
+    {
       "id": "OgreKobold_Z1W_E_Claws",
       "name": "Heraclette"
+    },
+    {
+      "id": "Herald_Monk_Elite_F",
+      "name": "Herald_Monk_Elite_F"
+    },
+    {
+      "id": "Herald_Monk_Elite_M",
+      "name": "Herald_Monk_Elite_M"
+    },
+    {
+      "id": "Herald_Monk_Elite_N",
+      "name": "Herald_Monk_Elite_N"
+    },
+    {
+      "id": "Herald_Monk_Melee_F",
+      "name": "Herald_Monk_Melee_F"
+    },
+    {
+      "id": "Herald_Monk_Melee_M",
+      "name": "Herald_Monk_Melee_M"
+    },
+    {
+      "id": "Herald_Monk_Melee_N",
+      "name": "Herald_Monk_Melee_N"
+    },
+    {
+      "id": "Herald_Monk_Ranged_F",
+      "name": "Herald_Monk_Ranged_F"
+    },
+    {
+      "id": "Herald_Monk_Ranged_M",
+      "name": "Herald_Monk_Ranged_M"
+    },
+    {
+      "id": "Herald_Monk_Ranged_N",
+      "name": "Herald_Monk_Ranged_N"
     },
     {
       "id": "Boar_Z2W_2",
@@ -843,14 +1035,6 @@
     {
       "id": "HildaLambert",
       "name": "Hilda Lambert"
-    },
-    {
-      "id": "TODO_SnowPanther_Spark",
-      "name": "Hill Leopard"
-    },
-    {
-      "id": "TODO_SnowPanther_Yellow",
-      "name": "Hill Leopard"
     },
     {
       "id": "FaerieBee_Z1D_Spear",
@@ -889,6 +1073,10 @@
       "name": "Honey Slime of the Hivetree"
     },
     {
+      "id": "TODO_Slime_Ice_01",
+      "name": "Honey Slime of the Hivetree"
+    },
+    {
       "id": "FaerieBee_Z1W_GreatMace_E",
       "name": "Honey Zucca"
     },
@@ -921,6 +1109,34 @@
       "name": "Invoked Aoyl Sparkle"
     },
     {
+      "id": "OgreBagon_Z4W_Claw_FS",
+      "name": "Invoked Bagon Brawler"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Claws_FS",
+      "name": "Invoked Blackbird Fighter"
+    },
+    {
+      "id": "Swarowl_Z4W_Claws_FS",
+      "name": "Invoked Blackbird Harpy"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Tank_FS",
+      "name": "Invoked Blackbird Stormshield"
+    },
+    {
+      "id": "Swarowl_Z4W_Caster_FS",
+      "name": "Invoked Blackbird Thunderbearer"
+    },
+    {
+      "id": "Swarowl_Bat_Z4W_FS",
+      "name": "Invoked Blackbird Volture"
+    },
+    {
+      "id": "Bear_Z4W_FS",
+      "name": "Invoked Brown Bear"
+    },
+    {
       "id": "Crimson_Z2W_Peasant_FS",
       "name": "Invoked Crimson Farmhand"
     },
@@ -937,8 +1153,24 @@
       "name": "Invoked Docker"
     },
     {
+      "id": "Bagon_Heavy_Z4W_Book_FS",
+      "name": "Invoked Frost Sculptor"
+    },
+    {
       "id": "Golem_Z1_FS",
       "name": "Invoked Golem"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_FS",
+      "name": "Invoked Icecaller"
+    },
+    {
+      "id": "Bear_Cristal_Z4W_FS",
+      "name": "Invoked Irradiated Bear"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_Book_Lava",
+      "name": "Invoked Magma Sculptor"
     },
     {
       "id": "Elemental_Z1_FS_Underwater",
@@ -1001,6 +1233,14 @@
       "name": "Invu"
     },
     {
+      "id": "Bear_Cristal_Z4W",
+      "name": "Irradiated Bear"
+    },
+    {
+      "id": "CrystalPanther_Z4W_2",
+      "name": "Irradiated Leopard"
+    },
+    {
       "id": "Sprout_Rice_Z2W_Plantivore_6",
       "name": "Jared Lettuce"
     },
@@ -1015,6 +1255,14 @@
     {
       "id": "ProfessionTrainer",
       "name": "Job Welldon"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_E",
+      "name": "Khal’Ot D’Semor"
+    },
+    {
+      "id": "CrystalPanther_Z4W_E",
+      "name": "King Leo Pard"
     },
     {
       "id": "Ratsar",
@@ -1093,12 +1341,44 @@
       "name": "Left Wing"
     },
     {
+      "id": "Panther_Z4_E",
+      "name": "Leopard Da Vinci"
+    },
+    {
       "id": "Elemental_Z2W_2",
       "name": "Lightweight Aoyl Sparkle"
     },
     {
       "id": "FaerieDemon_Z2_Soulstone",
       "name": "Lilithium"
+    },
+    {
+      "id": "Crab_Ice01",
+      "name": "Little Crab"
+    },
+    {
+      "id": "Crab_Ice02",
+      "name": "Little Crab"
+    },
+    {
+      "id": "Crab_Ice03",
+      "name": "Little Crab"
+    },
+    {
+      "id": "Crab_IceCrystal",
+      "name": "Little Crab"
+    },
+    {
+      "id": "Crab_IceCrystal02",
+      "name": "Little Crab"
+    },
+    {
+      "id": "Crab_IceSpark",
+      "name": "Little Crab"
+    },
+    {
+      "id": "Lizard_Shop_Dragon",
+      "name": "Lizhazard Saladmander"
     },
     {
       "id": "Elemental_Z1_FS_Earth_2",
@@ -1125,6 +1405,10 @@
       "name": "Lunatic Kobold Overseer"
     },
     {
+      "id": "Swarowl_Elite",
+      "name": "Madpie"
+    },
+    {
       "id": "Mage",
       "name": "Mage"
     },
@@ -1135,6 +1419,26 @@
     {
       "id": "Dog_Z3W_RamPatrol02",
       "name": "Marshall"
+    },
+    {
+      "id": "SwarowlHB_Z4D_Caster",
+      "name": "Mary'Lyn's Stormbringer"
+    },
+    {
+      "id": "SwarowlHB_Z4D_Tank",
+      "name": "Mary'Lyn's Stormshield"
+    },
+    {
+      "id": "Swarowl_Bat_Z4D",
+      "name": "Mary'Lyn's Volture"
+    },
+    {
+      "id": "Swarowl_Z4D_Claws",
+      "name": "Marylin's Chosen"
+    },
+    {
+      "id": "Swarowl_Z4D_Marylyn_Monrowl",
+      "name": "Mary’Lyn Monrowl"
     },
     {
       "id": "Rabbit_Grey",
@@ -1151,6 +1455,18 @@
     {
       "id": "Demon_Z2_Claws_Soulstone",
       "name": "Mortalkombaal"
+    },
+    {
+      "id": "Boar_Z4W",
+      "name": "Mountain Boars"
+    },
+    {
+      "id": "Panther_Z4W",
+      "name": "Mountain Lion"
+    },
+    {
+      "id": "Wolf_Z4W",
+      "name": "Mountain Wolf"
     },
     {
       "id": "MountGoat_01",
@@ -1437,6 +1753,10 @@
       "name": "Patrolfly Invader"
     },
     {
+      "id": "Boar_Z4W_E",
+      "name": "Pigglet, the Food Lover"
+    },
+    {
       "id": "Rabbit_Pink",
       "name": "Pink Buttontail"
     },
@@ -1463,6 +1783,14 @@
     {
       "id": "PunchingBag",
       "name": "Punching Bag"
+    },
+    {
+      "id": "PunchingBag_MagicAOE",
+      "name": "Punching Bag (Magic AOE)"
+    },
+    {
+      "id": "PunchingBag_PhysAOE",
+      "name": "Punching Bag (Phys AOE)"
     },
     {
       "id": "StinkBug_Purple",
@@ -1567,10 +1895,6 @@
     {
       "id": "RobinHoof",
       "name": "Robin Hoof"
-    },
-    {
-      "id": "TODO_SnowPanther_Grey",
-      "name": "Rock Leopard"
     },
     {
       "id": "Dog_Z3W_RamPatrol04",
@@ -1701,31 +2025,7 @@
       "name": "Slick Nepsid Whale"
     },
     {
-      "id": "TODO_OgreBagon_Beige",
-      "name": "Slick Nepsid Whale"
-    },
-    {
-      "id": "TODO_OgreBagon_BlueGrey",
-      "name": "Slick Nepsid Whale"
-    },
-    {
-      "id": "TODO_OgreBagon_Brown",
-      "name": "Slick Nepsid Whale"
-    },
-    {
-      "id": "TODO_OgreBagon_Brown02",
-      "name": "Slick Nepsid Whale"
-    },
-    {
-      "id": "TODO_OgreBagon_DarkBlue",
-      "name": "Slick Nepsid Whale"
-    },
-    {
-      "id": "TODO_OgreBagon_Grey",
-      "name": "Slick Nepsid Whale"
-    },
-    {
-      "id": "TODO_OgreBagon_Spark",
+      "id": "TODO_OgreBagon_Elite_2",
       "name": "Slick Nepsid Whale"
     },
     {
@@ -1753,10 +2053,6 @@
       "name": "Snapping Invoked Crab"
     },
     {
-      "id": "TODO_SnowPanther_White",
-      "name": "Snow Leopard"
-    },
-    {
       "id": "Golem_Z1W_Earth_2",
       "name": "Solid  Golem"
     },
@@ -1767,6 +2063,30 @@
     {
       "id": "Crab_Z1W_5",
       "name": "Solist Crab"
+    },
+    {
+      "id": "Bagon_Guest",
+      "name": "Spa Client"
+    },
+    {
+      "id": "OgreBagon_Z4D_Claw",
+      "name": "Spa Client Bagon Brawler"
+    },
+    {
+      "id": "OgreBagon_Z4D_2H",
+      "name": "Spa Client Bagon Savage"
+    },
+    {
+      "id": "OgreBagon_Z4D_Dual",
+      "name": "Spa Client Bagon Smasher"
+    },
+    {
+      "id": "Bagon_Heavy_Z4D_Book",
+      "name": "Spa Client Frost Sculptor"
+    },
+    {
+      "id": "Mage_SparkGolem",
+      "name": "Spark Golem"
     },
     {
       "id": "Elemental_Z1W_Earth",
@@ -1783,6 +2103,18 @@
     {
       "id": "StinkBug_Spark",
       "name": "Sparkling Aromabug"
+    },
+    {
+      "id": "OgreBagon_Spark",
+      "name": "Sparkling Bagon Brawler"
+    },
+    {
+      "id": "Bagon_Heavy_Z4W_U",
+      "name": "Sparkling Bagon Frost Sculptor"
+    },
+    {
+      "id": "Bear_Z4W_U",
+      "name": "Sparkling Bear"
     },
     {
       "id": "Boar_Z2W_U",
@@ -1821,6 +2153,10 @@
       "name": "Sparkling Grassflopper"
     },
     {
+      "id": "Swarowl_Z4W_U",
+      "name": "Sparkling Harpy"
+    },
+    {
       "id": "Bee_Z1W_U",
       "name": "Sparkling Harvester"
     },
@@ -1833,8 +2169,44 @@
       "name": "Sparkling Leafcutter"
     },
     {
+      "id": "Beetle_Cristal_01",
+      "name": "Sparkling Leggybug"
+    },
+    {
+      "id": "Beetle_Cristal_Dark",
+      "name": "Sparkling Leggybug"
+    },
+    {
+      "id": "Beetle_Cristal_Lava",
+      "name": "Sparkling Leggybug"
+    },
+    {
+      "id": "Beetle_Cristal_Metal",
+      "name": "Sparkling Leggybug"
+    },
+    {
+      "id": "Beetle_Cristal_Spark",
+      "name": "Sparkling Leggybug"
+    },
+    {
+      "id": "Beetle_Ice_01",
+      "name": "Sparkling Leggybug"
+    },
+    {
+      "id": "Beetle_Ice_02",
+      "name": "Sparkling Leggybug"
+    },
+    {
       "id": "Ladybug_Spark",
       "name": "Sparkling Leggybug"
+    },
+    {
+      "id": "Ladybug_Spark1",
+      "name": "Sparkling Leggybug"
+    },
+    {
+      "id": "Panther_Z4_U",
+      "name": "Sparkling Leopard"
     },
     {
       "id": "Kobold_Z1W_Mace_U",
@@ -1873,8 +2245,16 @@
       "name": "Sparkling Sparkle"
     },
     {
+      "id": "SwarowlHB_Z4W_U",
+      "name": "Sparkling Stormshield"
+    },
+    {
       "id": "Turtle_Spark",
       "name": "Sparkling Tortrock"
+    },
+    {
+      "id": "Swarowl_Bat_Z4W_U",
+      "name": "Sparkling Volture"
     },
     {
       "id": "Manfish_Z1W_U_Caster",
@@ -1925,6 +2305,10 @@
       "name": "Subjugator Invader"
     },
     {
+      "id": "Summon_Test",
+      "name": "Summon_Test"
+    },
+    {
       "id": "ImpDemon_Summoned",
       "name": "Summoned Nightspawn"
     },
@@ -1933,8 +2317,20 @@
       "name": "Swamp Grassflopper"
     },
     {
-      "id": "Cleodora_Heroic_Dark_Champion",
-      "name": "The Usurper"
+      "id": "Panther_Z4_E_2",
+      "name": "Sylvester"
+    },
+    {
+      "id": "SnowPanther_Z4W",
+      "name": "Tamed Snow Leopard"
+    },
+    {
+      "id": "Bear_Z4W_E_2",
+      "name": "Teddy"
+    },
+    {
+      "id": "OgreBagon_Z4W_E",
+      "name": "Thor Nioldsemor"
     },
     {
       "id": "Nepsilon_Totem",
@@ -1949,16 +2345,48 @@
       "name": "Tidal Totem"
     },
     {
+      "id": "CrystalPanther_Z4_E",
+      "name": "Tigger, the Mad"
+    },
+    {
       "id": "Bee_Z1W_3",
       "name": "Tipsy Apix Harvester"
     },
     {
-      "id": "TODO_Toad",
-      "name": "Toad"
+      "id": "Beetle_Blue",
+      "name": "TODO Beetl"
     },
     {
-      "id": "Lizard_Shop_Dragon",
-      "name": "TODO"
+      "id": "Beetle_BlueGreen",
+      "name": "TODO Beetl"
+    },
+    {
+      "id": "Beetle_Brown",
+      "name": "TODO Beetl"
+    },
+    {
+      "id": "Beetle_Demon",
+      "name": "TODO Beetl"
+    },
+    {
+      "id": "Beetle_Green",
+      "name": "TODO Beetl"
+    },
+    {
+      "id": "Beetle_Lava",
+      "name": "TODO Beetl"
+    },
+    {
+      "id": "Beetle_Purple",
+      "name": "TODO Beetl"
+    },
+    {
+      "id": "Beetle_Spark",
+      "name": "TODO Beetl"
+    },
+    {
+      "id": "Beetle_Yellow",
+      "name": "TODO Beetl"
     },
     {
       "id": "Turtle_Grey",
@@ -1981,6 +2409,18 @@
       "name": "Trained Crimson Soldier"
     },
     {
+      "id": "SwarowlHB_Z4W_Claws",
+      "name": "Treacherous Blackbird Fighter"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Caster_2",
+      "name": "Treacherous Blackbird Stormbringer"
+    },
+    {
+      "id": "SwarowlHB_Z4W_Tank_2",
+      "name": "Treacherous Blackbird Stormshield"
+    },
+    {
       "id": "Kobold_Z1W_Daggers_2",
       "name": "Trustworthy Kobold Thief"
     },
@@ -1993,7 +2433,7 @@
       "name": "Turnip Seedling"
     },
     {
-      "id": "TODO_BaseNPC_01",
+      "id": "BaseNPC_01",
       "name": "Tyra Firma"
     },
     {
@@ -2031,10 +2471,6 @@
     {
       "id": "Crab_Z1W_FS_1",
       "name": "Virtuoso Invoked Crab"
-    },
-    {
-      "id": "TODO_SnowPanther_LightBrown",
-      "name": "Volcano Leopard"
     },
     {
       "id": "W_Assassin",
@@ -2085,6 +2521,10 @@
       "name": "White Raminiature"
     },
     {
+      "id": "Bear_Z4W_E",
+      "name": "Winnie The Beast"
+    },
+    {
       "id": "Wolf_Z1W",
       "name": "Wolf"
     },
@@ -2119,6 +2559,30 @@
     {
       "id": "YellowRabbits",
       "name": "YellowRabbits"
+    },
+    {
+      "id": "BagonKing",
+      "name": "Yeti Bo In Shape"
+    },
+    {
+      "id": "OgreBagon_Z4W_E_2",
+      "name": "Yetimothay Sha'Lamay"
+    },
+    {
+      "id": "Yetina",
+      "name": "Yetina Turr'ner"
+    },
+    {
+      "id": "Bagon_Host",
+      "name": "Yetiri An’Ri"
+    },
+    {
+      "id": "TODO_OgreBagon_MiniBoss",
+      "name": "Yetiri An’Ri"
+    },
+    {
+      "id": "OgreBagon_Z4W_E_3",
+      "name": "Yetweety"
     },
     {
       "id": "Dog_Z3W_RamPatrol05",

@@ -14,7 +14,7 @@
       },
       "aiProps": null,
       "gfx": {
-        "file": "UI/icons/atlas_class_Warrior_96PX.png",
+        "file": "UI/icons/skills/atlas_class_Warrior_96PX.png",
         "size": 96,
         "x": 0,
         "y": 0
@@ -86,7 +86,7 @@
       },
       "aiProps": null,
       "gfx": {
-        "file": "UI/icons/atlas_class_Mage_96PX.png",
+        "file": "UI/icons/skills/atlas_class_Mage_96PX.png",
         "size": 96,
         "x": 0,
         "y": 0
@@ -96,7 +96,7 @@
         {
           "id": "ChannelTick",
           "on": 0,
-          "type": 22,
+          "type": 21,
           "delay": 0.2,
           "duration": "dur1",
           "range": 40,
@@ -195,7 +195,7 @@
       "vars": {},
       "aiProps": null,
       "gfx": {
-        "file": "UI/icons/atlas_class_Priest_96PX.png",
+        "file": "UI/icons/skills/atlas_class_Priest_96PX.png",
         "size": 96,
         "x": 0,
         "y": 0
@@ -226,7 +226,7 @@
       },
       "aiProps": null,
       "gfx": {
-        "file": "UI/icons/atlas_class_Rogue_96PX.png",
+        "file": "UI/icons/skills/atlas_class_Rogue_96PX.png",
         "size": 96,
         "x": 0,
         "y": 0
@@ -356,7 +356,7 @@
         {
           "id": null,
           "on": 0,
-          "type": 24,
+          "type": 23,
           "delay": null,
           "duration": 0.55,
           "range": null,

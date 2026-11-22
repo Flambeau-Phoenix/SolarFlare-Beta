@@ -25,6 +25,64 @@
       "rankDescs": []
     },
     {
+      "id": "Mage_Talent_BeaconOfSafety",
+      "name": "Beacon of Safety",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_BeaconOfSafety_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "If you would die, your [Mage_SparkGolem] dies instead and revives after ::ref_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_CadenceSurge",
+      "name": "Cadence Surge",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "reduceWeaponSkills"
+      ],
+      "scope": "weaponSkills",
+      "affectedSkills": [
+        "Mage_SparkGolem_Bolt"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": 0.5,
+      "selfCooldown": null,
+      "desc": "Every ::var1:: ::ref_name:: cast by your [Mage_SparkGolem], the cooldown of your [WeaponSkill]s is reduced by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_CatalystRecovery",
+      "name": "Catalyst Recovery",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Mage_SparkGolem] heals you for ::damage%:: of the damage it deals.",
+      "rankDescs": []
+    },
+    {
       "id": "Mage_Talent_ChainStrike",
       "name": "Chainstrike",
       "class": "Mage",
@@ -66,6 +124,26 @@
       "rankDescs": []
     },
     {
+      "id": "Mage_Talent_ChronostaticOrb",
+      "name": "Chronostatic Orb",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "selfCooldown"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Blink"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": 20,
+      "desc": "After you cast ::ref_name::, your [Mage_SparkGolem] drops an orb on the ground for ::dur1::. Picking it up resets the cooldown of ::ref_name:: (::cooldown:: cooldown).",
+      "rankDescs": []
+    },
+    {
       "id": "Mage_Talent_ConcentratedPower",
       "name": "Concentrated Power",
       "class": "Mage",
@@ -94,6 +172,47 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "[SpellPenetration] increased by ::val1::%.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_ConductiveServant",
+      "name": "Conductive Servant",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_SparkGolem_Bolt"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.15,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Mage_SparkGolem]'s ::ref_name:: has a ::chance:: chance to bounce to up to ::var1:: enemies. When ::ref_name:: bounces, it trigger one of your [Conduit]s without consuming [Spark].",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_ConductiveVulnerability",
+      "name": "Conductive Vulnerability",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_SparkGolem_Bolt",
+        "Mage_Talent_ConductiveVulnerability_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Mage_SparkGolem]'s ::ref2_name:: increases all [Magic] damage suffered by enemies by ::ref_var1%:: for ::ref_duration::.",
       "rankDescs": []
     },
     {
@@ -155,6 +274,24 @@
       "rankDescs": []
     },
     {
+      "id": "Mage_Talent_DefensiveDischarge",
+      "name": "Defensive Discharge",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "When you take damage, your [Mage_SparkGolem] gains a stack. At ::var1:: stacks, it heals you for ::var2%:: of your [MaxHealth].",
+      "rankDescs": []
+    },
+    {
       "id": "Mage_Talent_Discipline",
       "name": "Discipline",
       "class": "Mage",
@@ -205,6 +342,26 @@
       "rankDescs": []
     },
     {
+      "id": "Mage_Talent_EtherealTether",
+      "name": "Ethereal Tether",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_RayOfSpark"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[Mage_SparkGolem] cast a reduced version of ::ref_name::.",
+      "rankDescs": []
+    },
+    {
       "id": "Mage_Talent_ExpandedSpirit",
       "name": "Expanded Spirit",
       "class": "Mage",
@@ -233,6 +390,27 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "Increases your maximum [Spark] gauge by ::var1:: points.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_FeedTheCore",
+      "name": "Feed the Core",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_SparkGolem_Bolt",
+        "Mage_Talent_FeedTheCore_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [ComboAttack] reduces the cast time of your [Mage_SparkGolem]'s ::ref2_name:: by ::ref_time:: for ::ref_duration::, stacking up to ::ref_stacks:: times.",
       "rankDescs": []
     },
     {
@@ -282,6 +460,46 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "While in combat, heal yourself for ::var1%:: of your [MaxHealth] every ::var2:: [Spark] point spent.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_FulminatingEcho",
+      "name": "Fulminating Echo",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_MagicBurnMark_Burn"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "When an enemy affected by ::ref_name:: dies, they leave an area dealing ::dmg:: every ::time:: for ::dur1::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_FulminatingMark",
+      "name": "Fulminating Mark",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_MagicBurnMark_Mark"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Consuming ::ref_name:: ::var1:: times triggers your [Conduit]s for free, dealing ::damage%:: increased damage.",
       "rankDescs": []
     },
     {
@@ -363,6 +581,27 @@
       "rankDescs": []
     },
     {
+      "id": "Mage_Talent_MagicBurnMark",
+      "name": "Magic Burn Mark",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_MagicBurnMark_Burn",
+        "Mage_Talent_MagicBurnMark_Mark"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [WeaponSkill]s apply ::ref_name:: to enemies for ::ref_duration::. Your [Mage_SparkGolem]'s damage consumes ::ref_name:: to apply ::ref2_name::, dealing ::ref2_dmg:: over ::ref2_duration::.",
+      "rankDescs": []
+    },
+    {
       "id": "Mage_Talent_NimbleFingers",
       "name": "Nimble Fingers",
       "class": "Mage",
@@ -378,6 +617,27 @@
       "reduceSeconds": 0.5,
       "selfCooldown": null,
       "desc": "Your [Attack]s have a ::chance:: chance to reduce the cooldown of your [WeaponSkill]s by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_Overload",
+      "name": "Overload",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_SparkGolem_Bolt",
+        "Mage_Talent_Overload_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Every ::var1:: [ComboAttack]s, your [Mage_SparkGolem] gets oveloaded for ::ref_duration::, causing its ::ref2_name:: to chain damage to all nearby enemies and deal ::ref2_dmg2::.",
       "rankDescs": []
     },
     {
@@ -419,6 +679,27 @@
       "rankDescs": []
     },
     {
+      "id": "Mage_Talent_RedirectionCore",
+      "name": "Redirection Core",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_ShieldOfSpark",
+        "Mage_Talent_RedirectionCore_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "When you cast ::ref_name::, it also affects your [Mage_SparkGolem] and redirects ::ref2_var1%:: of the damage you suffer to it.",
+      "rankDescs": []
+    },
+    {
       "id": "Mage_Talent_Reverberate",
       "name": "Reverberate",
       "class": "Mage",
@@ -436,6 +717,27 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "Consuming ::ref_name:: triggers your [Conduit]s twice.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_SparkChargedBolt",
+      "name": "Spark-charged Bolt",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_SparkGolem_Bolt",
+        "Mage_Talent_SparkChargedBolt_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Every ::var1:: [Attack]s, your [Mage_SparkGolem]'s next ::ref_name:: deals ::ref2_damage%:: increased damage and explodes, dealing ::dmg:: to nearby enemies.",
       "rankDescs": []
     },
     {
@@ -457,6 +759,129 @@
       "rankDescs": []
     },
     {
+      "id": "Mage_Talent_SparkGolem",
+      "name": "Mage_SparkGolem",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_SparkGolem_Bolt"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "You are permanently followed by a [Mage_SparkGolem] attacking your enemies every ::time:: with a ::ref_name:: dealing ::ref_dmg::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_SparkLinkResonance",
+      "name": "Spark-Link Resonance",
+      "class": "Mage",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_StaticNova"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[Mage_SparkGolem] cast a reduced version of ::ref_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_SparkShard",
+      "name": "Spark Shard",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_SparkGolem_SparkShard"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "If a [WeaponSkill] hits ::var1:: or more enemies, your [Mage_SparkGolem] throws a spark shard at them, dealing ::ref_dmg:: and knocking them up.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_StaticAffliction",
+      "name": "Static Affliction",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_Talent_StaticAffliction_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Mage_SparkGolem] deals ::var1%:: increased damage and slows enemies down by ::ref_val1%:: for ::ref_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_SuppressivePulse",
+      "name": "Suppressive Pulse",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_SparkGolem_Bolt",
+        "Mage_Talent_SuppressivePulse_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Mage_SparkGolem]'s ::ref2_name:: reduces all damage dealt by enemies hit by ::ref_val1%:: for ::ref_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_SymbioticCharge",
+      "name": "Symbiotic Charge",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Mage_SparkGolem_Bolt",
+        "Mage_Talent_SymbioticCharge_Armor_Status",
+        "Mage_Talent_SymbioticCharge_MagicArmor_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Mage_SparkGolem]'s ::ref3_name:: applies a status for ::ref_duration:: depending on your main hand weapon:\n- Ranged: [MagicArmor] reduced by ::ref_val1%::.\n- Melee: [Armor] reduced by ::ref2_val1%::.",
+      "rankDescs": []
+    },
+    {
       "id": "Mage_Talent_TemporalCompression",
       "name": "Temporal Compression",
       "class": "Mage",
@@ -472,6 +897,154 @@
       "reduceSeconds": 1,
       "selfCooldown": null,
       "desc": "Each [Spark] point spent has a ::chance:: chance to reduce the cooldown of your [WeaponSkill]s by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Mage_Talent_VelocityInflux",
+      "name": "Velocity Influx",
+      "class": "Mage",
+      "maxPoints": 2,
+      "kinds": [
+        "cooldownReductionPct"
+      ],
+      "scope": "global",
+      "affectedSkills": [],
+      "cooldownReduction": [
+        {
+          "attribute": "CooldownReduction",
+          "val": 3,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "CooldownReduction",
+          "val": 6,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "affixes": [
+        {
+          "attribute": "CooldownReduction",
+          "val": 3,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "CooldownReduction",
+          "val": 6,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[CooldownReduction] increased by ::val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_Ascendancy",
+      "name": "Ascendancy",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Sig_DivineIntervention",
+        "Priest_Talent_Ascendancy_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Activating all ::var1:: [Prayer]s with ::ref2_name:: grant a stack of Ascendancy. At ::var2:: stacks, you consum them to enter the Ascendancy state : you move ::ref_val1%:: faster, take ::ref_val2%:: reduced damage and deal ::ref_val3%:: increased damage.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_AscendantBlame",
+      "name": "Ascendant Blame",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_AscendantBlame_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.25,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your Light Chains have a ::chance:: chance to blame the target, increasing all damage they take by ::ref_val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_AscendantCrusader",
+      "name": "Ascendant Crusader",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Crusader",
+        "Priest_Talent_Ascendancy"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref_name:: makes you enter the ::ref2_name:: state.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_AscendantVerdict",
+      "name": "Ascendant Verdict",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_RadiantVerdict",
+        "Priest_Sig_DivineIntervention",
+        "Priest_Talent_Ascendancy"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Under ::ref_name::, ::ref2_name:: also casts ::ref3_name:: for ::damage%:: of the damage.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_AscendedFortitude",
+      "name": "Ascended Fortitude",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Ascendancy"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Perfect blocking extends the duration of ::ref_name:: by ::time::.",
       "rankDescs": []
     },
     {
@@ -492,6 +1065,27 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "::ref_name:: damage is increased by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_AwakenMind",
+      "name": "Awaken Mind",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Ascendancy",
+        "Priest_Talent_AwakenMind_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Under ::ref2_name::, you have ::ref_val1%:: [CooldownReduction].",
       "rankDescs": []
     },
     {
@@ -567,6 +1161,27 @@
       "rankDescs": []
     },
     {
+      "id": "Priest_Talent_DivineAura",
+      "name": "Divine Aura",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Ascendancy",
+        "Priest_Talent_DivineAura_Buff"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Under ::ref2_name::, you and your nearby allies gain ::ref_val%:: [PhysicalMastery] and [MagicMastery].",
+      "rankDescs": []
+    },
+    {
       "id": "Priest_Talent_FerventDefender",
       "name": "Fervent Defender",
       "class": "Priest",
@@ -598,6 +1213,68 @@
       "rankDescs": []
     },
     {
+      "id": "Priest_Talent_HystericalPrayer",
+      "name": "Hysterical Prayer",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Prayer_Smite",
+        "Priest_Talent_Ascendancy",
+        "Priest_Talent_HystericalPrayer_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Under ::ref2_name::, activating [Prayer]s increases your next [ComboAttack] damage by ::ref_damage%::, stacking up to ::ref_stacks:: times. If you have ::ref_stacks:: stacks, it will also freely activates ::ref3_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_InquisitorsHaste",
+      "name": "Inquisitor's Haste",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "reduceNamedSkill"
+      ],
+      "scope": "skill",
+      "affectedSkills": [
+        "Priest_Sig_DivineIntervention"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.15,
+      "reduceSeconds": 0.5,
+      "selfCooldown": null,
+      "desc": "[WeaponSkill]s dealing critical damage have a ::chance%:: chance to reduce the cooldown of ::ref_name:: by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_LuminescentCleave",
+      "name": "Luminescent Cleave",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Ascendancy"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Under ::ref_name::, your [ComboAttack] trigger a Light Chain, spreading ::damage%:: of the damage up to ::var1:: other enemies.",
+      "rankDescs": []
+    },
+    {
       "id": "Priest_Talent_LuminousBastion",
       "name": "Luminous Bastion",
       "class": "Priest",
@@ -615,6 +1292,48 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "Blocking grants you ::ref_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_LuminousPath",
+      "name": "Luminous Path",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_FaithfulWinds",
+        "Priest_Talent_Ascendancy"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Entering ::ref_name:: resets ::ref2_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_LuonHand",
+      "name": "Luon Shield",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Ascendancy",
+        "Priest_Talent_LuonHand_Shield"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Entering ::ref2_name:: grants a [Shield] to you and your nearby allies absorbing ::ref_health%:: of your [MaxHealth].",
       "rankDescs": []
     },
     {
@@ -654,6 +1373,47 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "Your [Attack]s deal ::damage%:: increased critical damage.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_MiraculousSurge",
+      "name": "Miraculous Surge",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Ascendancy"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Entering ::ref_name:: makes your next [Attack] a [ComboAttack].",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_NovaOfAbsolution",
+      "name": "Nova of Absolution",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Sig_DivineIntervention",
+        "Priest_Talent_Ascendancy_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Gaining ::ref_name:: resets the cooldown of ::ref2_name::.",
       "rankDescs": []
     },
     {
@@ -768,6 +1528,27 @@
       "rankDescs": []
     },
     {
+      "id": "Priest_Talent_ProtectivePrayer",
+      "name": "Protective Prayer",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Ascendancy",
+        "Priest_Talent_ProtectivePrayer_Buff"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Under ::ref2_name::, activating [Prayer]s reduces the next source of damage you suffer by ::ref_damage%::, stacking up to ::ref_stacks:: times.  If you have ::ref_stacks:: stacks when taking damage, it will also freely activates [Priest_Prayer_Life].",
+      "rankDescs": []
+    },
+    {
       "id": "Priest_Talent_PurgingStrikes",
       "name": "Purging Strikes",
       "class": "Priest",
@@ -806,6 +1587,24 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "Your own ::ref_name:: damage is increased by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_RadiantAnnihilation",
+      "name": "Radiant Annihilation",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.12,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [BasicAttack]s also have a ::chance%:: chance to trigger a Light Chain.",
       "rankDescs": []
     },
     {
@@ -850,6 +1649,48 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "[CooldownReduction] increased by ::val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_ShatteredSmite",
+      "name": "Shattered Smite",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_LuonHand"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "When ::ref_name:: is destroyed, you deal ::damage%:: of the amount to nearby enemies.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_SkillfulPrayer",
+      "name": "Skillful Prayer",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Prayer_Shield",
+        "Priest_Talent_Ascendancy",
+        "Priest_Talent_SkillfulPrayer_Buff"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Under ::ref2_name::, activating [Prayer]s increases your next [WeaponSkill] damage by ::ref_damage%::, stacking up to ::ref_stacks:: times.  If you have ::ref_stacks:: stacks, it will also freely activates ::ref3_name::.",
       "rankDescs": []
     },
     {
@@ -931,6 +1772,24 @@
       "rankDescs": []
     },
     {
+      "id": "Priest_Talent_Supremacy",
+      "name": "Supremacy",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your Light Chains have an additional effect depending on your main hand weapon:\n- Melee : they ignore ::var1%:: of enemies' [Armor].\n- Ranged : they ignore ::var1%:: of enemies' [MagicArmor].",
+      "rankDescs": []
+    },
+    {
       "id": "Priest_Talent_SwiftJustice",
       "name": "Swift Justice",
       "class": "Priest",
@@ -948,6 +1807,67 @@
       "reduceSeconds": 1,
       "selfCooldown": null,
       "desc": "::ref_name:: reduces the cooldown of [WeaponSkill]s by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_Transcendance",
+      "name": "Transcendance",
+      "class": "Priest",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Ascendancy"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Entering ::ref_name:: resets the cooldown of your main [WeaponSkill]s.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_UndyingWill",
+      "name": "Undying Will",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_Ascendancy"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [ComboAttack] extends the duration of ::ref_name:: by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Priest_Talent_UnstoppableZealot",
+      "name": "Unstoppable Zealot",
+      "class": "Priest",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Priest_Talent_LuonHand",
+        "Priest_Talent_UnstoppableZealot_Buff"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "While ::ref2_name:: is active, you deal ::ref_val1%:: increased damage and take ::ref_val2%:: reduced damage.",
       "rankDescs": []
     },
     {
@@ -1011,6 +1931,24 @@
       "rankDescs": []
     },
     {
+      "id": "Rogue_Talent_Assassins_Vitality",
+      "name": "Assassin's Vitality",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Thrown blades heal you for ::heal%:: of the damage dealt.",
+      "rankDescs": []
+    },
+    {
       "id": "Rogue_Talent_AtrophicPoison",
       "name": "Atrophic Poison",
       "class": "Rogue",
@@ -1020,6 +1958,7 @@
       ],
       "scope": "other",
       "affectedSkills": [
+        "Rogue_Talent_AtrophicPoison_Status",
         "Rogue_Talent_LethalPoison_Status"
       ],
       "cooldownReduction": [],
@@ -1027,7 +1966,7 @@
       "procChance": null,
       "reduceSeconds": null,
       "selfCooldown": null,
-      "desc": "::ref_name:: reduces all damage dealt by affected enemies by ::damage%::.",
+      "desc": "::ref_name:: reduces all damage dealt by affected enemies by ::ref2_damage%::.",
       "rankDescs": []
     },
     {
@@ -1210,6 +2149,60 @@
       "rankDescs": []
     },
     {
+      "id": "Rogue_Talent_Keeping_The_Tempo",
+      "name": "Keeping the Tempo",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Blades dealing critical damage have a ::var1%:: chance to not be destroyed and be dropped nearby.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Kinetic_Energy",
+      "name": "Kinetic Energy",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Getting shielded by your blades empowers your next [WeaponSkill], reducing its cooldown by ::var1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Knives_Storm",
+      "name": "Knives Storm",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "When casting [Rogue_KnivesTempest], your blades also cast a reduced version of knives tempest, dealing ::damage%:: of the damage.",
+      "rankDescs": []
+    },
+    {
       "id": "Rogue_Talent_LeechingPoison",
       "name": "Recovery Toxins",
       "class": "Rogue",
@@ -1310,6 +2303,102 @@
       "rankDescs": []
     },
     {
+      "id": "Rogue_Talent_Oppressive_Shadows",
+      "name": "Oppressive Shadows",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Every ::var1:: blades that hit an enemy, they erupt, creating an area dealing ::dmg:: over ::dur1::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Orbiting_Blades",
+      "name": "Orbiting Blades",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Orbiting_Blades_Charge"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Walking on a blade reduces your [Dash_Base]'s cooldown by ::ref_time:: and picks them up to store them, orbiting around you, up to ::ref1_stacks::. Your [ComboAttack] also throws ::ref_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Overwhelming_Shadows",
+      "name": "Overhwelming Shadows",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Throwing ::var1:: blades at once resets the cooldown of [Rogue_Shadowstep].",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Phantom_Blades",
+      "name": "Phantom Blades",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Orbiting_Blades_Charge"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.05,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Attack]s have a ::chance%:: to thrown ::ref_name:: without destroying them.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Ramping_Up",
+      "name": "Ramping Up",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Ramping_Up_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Throwing ::var1:: blades at once grants ::ref_val1%:: [CooldownReduction] for ::ref_duration::.",
+      "rankDescs": []
+    },
+    {
       "id": "Rogue_Talent_RegeneratingMiasmas",
       "name": "Toxic Miasmas",
       "class": "Rogue",
@@ -1327,6 +2416,198 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "When an enemy affected by ::ref_name:: dies, they explode, dealing ::dmg:: to nearby enemies and spreading ::ref_name::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Serrated_Bladestorm",
+      "name": "Serrated Bladestorm",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Blades also deal ::damage%:: of their damage to all enemies nearby.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Set_The_Stage",
+      "name": "Set the Stage",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Set_The_Stage_Buff"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "After throwing blades, your next [WeaponSkill] deals ::ref_damage%:: increased damage for each blade thrown.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Shadow_Blades",
+      "name": "Shadow Blades",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [Dash_Base], [Rogue_Sig_Finisher] and movement [Skill]s drops a blade at your initial location, lasting ::dur1::, up to ::var1:: blades.\nYour [ComboAttack] throws them at your target, dealing ::dmg::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Shadow_Infusion",
+      "name": "Shadow Infusion",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Orbiting_Blades_Charge"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "For each ::ref1_name::, your [Attacks] damage is increased by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Sharpened_Metal",
+      "name": "Sharpened Metal",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Sharpened_Metal_Dot"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Blades dealing critical damage cause the enemies to bleed for ::ref_dmg:: over ::ref_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Skillfull_Tricks",
+      "name": "Skillfull Tricks",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Skillfull_Tricks_Buff"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Throwing ::var1:: blades at once grants you ::ref_val1%:: chance to dodge and ::ref_val2%:: [MoveSpeedFactor] for ::ref_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Spiritual_Blade",
+      "name": "Spiritual Blade",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Spiritual_Blade_Shield"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Thrown blades going through you or your allies grant a [Shield] absorbing ::ref_shield:: damage.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Spiritual_Shrapnel",
+      "name": "Spiritual Shrapnel",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "When the [Shield] granted by your blades is destroyed or expires, drop ::var1:: blade nearby.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Thousand_Blades",
+      "name": "Thousand Blades",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Thousand_Blades_Counter"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Every ::ref_stacks:: blades dropped, instantly cast a free [Rogue_KnivesTempest].",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Umbral_Ricochet",
+      "name": "Umbral Ricochet",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your blades have a ::var1%:: chance to bounce to another nearby enemy.",
       "rankDescs": []
     },
     {
@@ -1374,6 +2655,47 @@
       "rankDescs": []
     },
     {
+      "id": "Rogue_Talent_Urge_To_Slice",
+      "name": "Urge To Slice",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Orbiting_Blades_Charge",
+        "Rogue_UrgeToKill"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Using ::ref_name:: drops ::var1:: blades and grants ::var2:: ::ref2_name::. Under ::ref_name::, generates ::var3:: ::ref2_name:: every ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Vampiric_Mark",
+      "name": "Vampiric Mark",
+      "class": "Rogue",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Vampiric_Mark_Stack"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.5,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Blades have a ::chance%:: chance to mark the enemy, up to ::ref_stacks:: times. Your [Rogue_Sig_Finisher] consumes all marks, dealing ::ref_dmg:: and healing for ::ref_var1%:: of the damage.",
+      "rankDescs": []
+    },
+    {
       "id": "Rogue_Talent_VenomousFinisher",
       "name": "Venomous Assassin",
       "class": "Rogue",
@@ -1413,6 +2735,26 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "[WeaponSkill]s that critically strike poison enemies, dealing ::damage%:: of the amount over ::ref2_duration::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Rogue_Talent_Weak_Points",
+      "name": "Weak Points",
+      "class": "Rogue",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Rogue_Talent_Weak_Points_Debuff"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Blades reduces [Armor] by ::ref_val1%:: for ::ref_duration::.",
       "rankDescs": []
     },
     {
@@ -1594,6 +2936,44 @@
       "rankDescs": []
     },
     {
+      "id": "Warrior_Talent_Combat_Focus",
+      "name": "Combat Focus",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Every ::var1:: [Rage] spent, reduces your [ClassSkill]s and [WeaponSkill]s cooldown by ::time::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Combat_Science",
+      "name": "Combat Science",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Combat_Science_StrengthStatus"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Enrage increases your ::var1:: best Attributes amongst [Strength], [Dexterity], [Intellect] and [Faith] by ::ref_val1::%.",
+      "rankDescs": []
+    },
+    {
       "id": "Warrior_Talent_CrackingBlood",
       "name": "Cracking Blood",
       "class": "Warrior",
@@ -1631,6 +3011,69 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "::ref_name:: reduces all damage dealt by affected enemies by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Defiance",
+      "name": "Defiance",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Rage_Strike",
+        "Warrior_Talent_Defiance_Shield"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "While you are surrounded by ::var1:: enemies or more, ::ref2_name:: generates ::var2:: [Rage] and grants you a [Shield] absorbing ::ref_shield::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Enduring_Fortitude",
+      "name": "Enduring Fortitude",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Enduring_Fortitude_CooldownStatus",
+        "Warrior_Talent_Enrage"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Heal for ::heal:: when you take damage or gain ::ref2_name:: (::ref_duration:: cooldown).",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Enrage",
+      "name": "Enrage",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Enrage_Accum_Status",
+        "Warrior_Talent_Enrage_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Using ::var1:: [WeaponSkill]s or [ClassSkill]s within ::ref2_duration:: grants you ::ref_name:: for ::ref_duration::.",
       "rankDescs": []
     },
     {
@@ -1682,6 +3125,104 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "[CritChance] increased by ::val1%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Flurry_Of_Fury",
+      "name": "Flurry of Fury",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Enrage_Status",
+        "Warrior_Talent_Slam"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.05,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Under ::ref_name::, your [Attack]s deal ::damage%:: increased damage and ::ref2_name:: has a ::chance:: chance to generate ::var1:: [Rage].",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Fueled_By_Anger",
+      "name": "Fueled by Anger",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Enrage_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Under ::ref_name::, your [WeaponSkill]s generate ::var1:: additional [Rage].",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Hardened_Aegis",
+      "name": "Hardened Aegis",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "When a source of damage should deal ::var1%:: or more of your [MaxHealth], it is reduced by ::var2%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Havoc_Reaper",
+      "name": "Havor Reaper",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Rage_Strike",
+        "Warrior_Talent_Havoc_Reaper_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref2_name:: increases the damage of your next [WeaponSkill] by ::ref_damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Heavy_Handed",
+      "name": "Heavy Handed",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [WeaponSkill]s deal ::damage%:: increased critical damage.",
       "rankDescs": []
     },
     {
@@ -1750,6 +3291,54 @@
       "rankDescs": []
     },
     {
+      "id": "Warrior_Talent_Indomitable_Spirit",
+      "name": "Indomitable Spirit",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Enrage",
+        "Warrior_Talent_Indomitable_Spirit_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Under ::ref2_name::, you move ::ref_val1%:: faster, take ::ref_val2%:: less damage and your movement [Skill]s heal you for ::ref_heal::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Infinite_Rage",
+      "name": "Infinite Rage",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "stat:MaxRage"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Enrage",
+        "Warrior_Talent_Infinite_Rage_CooldownStatus"
+      ],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "MaxRage",
+          "val": 10,
+          "ref": "TAttribute_Flat"
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your maximum [Rage] is increased by ::val::, and reaching it grants you ::ref2_name:: (::ref_duration:: cooldown).",
+      "rankDescs": []
+    },
+    {
       "id": "Warrior_Talent_InfusedWound",
       "name": "Infused Wound",
       "class": "Warrior",
@@ -1809,6 +3398,28 @@
       "rankDescs": []
     },
     {
+      "id": "Warrior_Talent_One_Handed_Master",
+      "name": "One-handed Master",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Enrage",
+        "Warrior_Talent_One_Handed_Master_Status",
+        "Warrior_Talent_Slam"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "While equipped with a one-handed weapon in your main hand, ::ref2_name:: increases your [MoveSpeedFactor] by ::ref_val%:: and the chances for your [Attack]s and ::ref3_name:: to critically strike by ::ref_var1%::.",
+      "rankDescs": []
+    },
+    {
       "id": "Warrior_Talent_RageShield",
       "name": "Rage Shield",
       "class": "Warrior",
@@ -1830,6 +3441,27 @@
       "rankDescs": []
     },
     {
+      "id": "Warrior_Talent_Rapid_Assault",
+      "name": "Rapid Assault",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Rage_Strike",
+        "Warrior_Talent_Enrage"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.1,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your first ::ref_name:: in combat grants you ::ref2_name:: and each subsequent has a ::chance:: chance to grant you ::ref2_name::.",
+      "rankDescs": []
+    },
+    {
       "id": "Warrior_Talent_SeasonedSoldier",
       "name": "Seasoned Soldier",
       "class": "Warrior",
@@ -1845,6 +3477,26 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "Your [Physical] critical strikes grant ::var1:: [Rage].",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Second_Breath",
+      "name": "Second Breath",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Second_Breath_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Restores ::ref_heal%:: [Health] every ::ref_dur1:: after you have not taken damage for ::time::.",
       "rankDescs": []
     },
     {
@@ -1886,6 +3538,49 @@
       "rankDescs": []
     },
     {
+      "id": "Warrior_Talent_Slam",
+      "name": "Slam",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Rage_Strike",
+        "Warrior_Talent_Enrage_Status",
+        "Warrior_Talent_Slam_SmashAoe",
+        "Warrior_Talent_Slam_Stack"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.1,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Under ::ref3_name::, all your [Attacks] have a chance to trigger a ::name::, dealing ::dmg:: and granting a stack of ::ref_name::. At ::ref1_stacks:: stacks, your next ::ref4_name:: damages the floor, leaving an area dealing ::ref2_dmg:: every ::ref2_dur2:: for ::ref2_dur1::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Stonewall_Stance",
+      "name": "Stonewall Stance",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Enrage"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Blocking has a ::var1%:: chance (::var2%:: when perfect blocking) to grant you ::ref_name:: and refill your poise.",
+      "rankDescs": []
+    },
+    {
       "id": "Warrior_Talent_SurgeOfViolence",
       "name": "Surge of Violence",
       "class": "Warrior",
@@ -1903,6 +3598,135 @@
       "reduceSeconds": null,
       "selfCooldown": null,
       "desc": "Your [ComboAttack] has a ::chance:: chance to allow your next ::ref_name:: to critically strike and cost no [Rage].",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Two_Handed_Master",
+      "name": "Two-handed Master",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Enrage",
+        "Warrior_Talent_Slam",
+        "Warrior_Talent_Two_Handed_Master_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "While equipped with a two-handed weapon in your main hand, ::ref2_name:: increases the chances for ::ref3_name:: to trigger by ::ref_chance:: and its critical damage by ::ref_damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Two_Handed_Master_Status",
+      "name": "::ref_name::",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Slam",
+        "Warrior_Talent_Two_Handed_Master"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": 0.05,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Increases the chances for ::ref3_name:: to trigger by ::chance:: and its critical damage by ::damage%::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Unbroken_Streak",
+      "name": "Unbroken Streak",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Rage_Strike",
+        "Warrior_Talent_Unbroken_Streak_Status"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "::ref2_name:: increases the damage of your next [ComboAttack] by ::ref_damage%::, stacking up to ::ref_stacks:: times.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Unstoppable_Momentum",
+      "name": "Unstoppable Momentum",
+      "class": "Warrior",
+      "maxPoints": 1,
+      "kinds": [
+        "other"
+      ],
+      "scope": "other",
+      "affectedSkills": [
+        "Warrior_Talent_Enrage",
+        "Warrior_Talent_Slam"
+      ],
+      "cooldownReduction": [],
+      "affixes": [],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "Your [ComboAttack] and ::ref_name:: increase ::ref2_name:: duration by ::dur1::.",
+      "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Vanguard_Vigor",
+      "name": "Vanguard's Vigor",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:Vitality",
+        "stat:Armor"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "Vitality",
+          "val": 0.025,
+          "ref": "TAttribute_ARatio",
+          "maxRank": 1
+        },
+        {
+          "attribute": "Vitality",
+          "val": 0.05,
+          "ref": "TAttribute_ARatio",
+          "minRank": 2
+        },
+        {
+          "attribute": "Armor",
+          "val": 0.025,
+          "ref": "TAttribute_ARatio",
+          "maxRank": 1
+        },
+        {
+          "attribute": "Armor",
+          "val": 0.05,
+          "ref": "TAttribute_ARatio",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[Vitality] and [Armor] increased by ::val%::.",
       "rankDescs": []
     },
     {
@@ -1935,11 +3759,46 @@
       "selfCooldown": null,
       "desc": "[Fervor] increased by ::val1%::.",
       "rankDescs": []
+    },
+    {
+      "id": "Warrior_Talent_Zealous_Rage",
+      "name": "Zealous Rage",
+      "class": "Warrior",
+      "maxPoints": 2,
+      "kinds": [
+        "stat:Fervor"
+      ],
+      "scope": "other",
+      "affectedSkills": [],
+      "cooldownReduction": [],
+      "affixes": [
+        {
+          "attribute": "Fervor",
+          "val": 2,
+          "ref": "TAttribute_Flat",
+          "maxRank": 1
+        },
+        {
+          "attribute": "Fervor",
+          "val": 4,
+          "ref": "TAttribute_Flat",
+          "minRank": 2
+        }
+      ],
+      "procChance": null,
+      "reduceSeconds": null,
+      "selfCooldown": null,
+      "desc": "[Fervor] increased by ::val1%::.",
+      "rankDescs": []
     }
   ],
   "cooldownTalents": [
+    "Mage_Talent_CadenceSurge",
+    "Mage_Talent_ChronostaticOrb",
     "Mage_Talent_NimbleFingers",
     "Mage_Talent_TemporalCompression",
+    "Mage_Talent_VelocityInflux",
+    "Priest_Talent_InquisitorsHaste",
     "Priest_Talent_Prosecutor",
     "Priest_Talent_SharpMind",
     "Priest_Talent_SwiftJustice",

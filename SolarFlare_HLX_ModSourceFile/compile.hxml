@@ -4,9 +4,11 @@
 -resource assets/cdb/status-durations.json@status-durations
 -resource assets/cdb/consumables.json@consumables
 -resource assets/cdb/weapons.json@weapons
+-resource assets/cdb/weapon-timing.json@weapon-timing
 -resource assets/cdb/loot-tables.json@loot-tables
 -resource assets/cdb/skill-ids.json@skill-ids
 -resource assets/cdb/skill-links.json@skill-links
+-resource assets/cdb/live-api-catalog.json@live-api-catalog
 -lib farever-gamelib
 -lib hlx-runtime
 -lib hl-imgui

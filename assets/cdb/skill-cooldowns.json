@@ -6,10 +6,45 @@
   ],
   "skills": [
     {
+      "id": "Activity_Snowball",
+      "name": "Snowball",
+      "cooldown": 0.5,
+      "type": 7
+    },
+    {
+      "id": "Activity_Snowball_Big",
+      "name": "Snowball",
+      "cooldown": 0.5,
+      "type": 8
+    },
+    {
       "id": "Axe_Boomerang_Skill1",
       "name": "Bonethrow",
       "cooldown": 15.0,
       "type": 7
+    },
+    {
+      "id": "BagonKing_BlazingArm",
+      "name": "BagonKing_BlazingArm",
+      "cooldown": 5.0,
+      "type": 11
+    },
+    {
+      "id": "BagonKing_BreakFloor",
+      "name": "BagonKing_BreakFloor",
+      "cooldown": 15.0
+    },
+    {
+      "id": "BagonKing_FrostStrike",
+      "name": "BagonKing_FrostStrike",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "BagonKing_FrozenCyclone",
+      "name": "BagonKing_FrozenCyclone",
+      "cooldown": 25.0,
+      "type": 11
     },
     {
       "id": "BeeCombcutter_Strike",
@@ -111,6 +146,19 @@
       "name": "Boar_Skill1",
       "cooldown": 15.0,
       "type": 11
+    },
+    {
+      "id": "Book_Frozenground_Skill1",
+      "name": "Snowballs Volley",
+      "cooldown": 15.0,
+      "type": 7,
+      "spanMod": "reset"
+    },
+    {
+      "id": "Book_Frozenground_Skill2",
+      "name": "Hoarfrost",
+      "cooldown": 20.0,
+      "type": 7
     },
     {
       "id": "Book_Start_Skill1",
@@ -235,6 +283,12 @@
       "type": 0
     },
     {
+      "id": "Cleodora_Summon_Barrage",
+      "name": "Barrage",
+      "cooldown": 25.0,
+      "type": 11
+    },
+    {
       "id": "Crab_Attack",
       "name": "Crab_Attack",
       "cooldown": 3.0,
@@ -251,6 +305,25 @@
       "name": "Crab_Elite_Attack",
       "cooldown": 4.0,
       "type": 11
+    },
+    {
+      "id": "Crescent_Dance_Skill1",
+      "name": "Snow Dance",
+      "cooldown": 25.0,
+      "type": 7,
+      "rankCooldown": [
+        {
+          "cooldown": 20.0,
+          "minRank": 2
+        }
+      ],
+      "spanMod": "rank"
+    },
+    {
+      "id": "Crescent_Dance_Skill2",
+      "name": "Spinning Crescent",
+      "cooldown": 15.0,
+      "type": 7
     },
     {
       "id": "Crescent_FlowerSpiral_Skill_1",
@@ -379,6 +452,37 @@
       "type": 11
     },
     {
+      "id": "DA_Lightning_Combo",
+      "name": "Lightning Strike",
+      "cooldown": 1.0,
+      "type": 4
+    },
+    {
+      "id": "DA_Lightning_Passive",
+      "name": "Power of Lightning",
+      "cooldown": 30.0,
+      "type": 24,
+      "rankCooldown": [
+        {
+          "cooldown": 20.0,
+          "minRank": 2
+        }
+      ],
+      "spanMod": "rank"
+    },
+    {
+      "id": "DA_Lightning_Skill1",
+      "name": "Stormtongue Infusion",
+      "cooldown": 15.0,
+      "type": 7
+    },
+    {
+      "id": "DA_Lightning_Skill2",
+      "name": "Thunder Stance",
+      "cooldown": 20.0,
+      "type": 7
+    },
+    {
       "id": "DA_Water_Skill1",
       "name": "Abyssal Fury",
       "cooldown": 20.0,
@@ -499,6 +603,18 @@
       "type": 11
     },
     {
+      "id": "Debug_MagicAOE",
+      "name": "Debug_MagicAOE",
+      "cooldown": 3.0,
+      "type": 11
+    },
+    {
+      "id": "Debug_PhysAOE",
+      "name": "Debug_PhysAOE",
+      "cooldown": 3.0,
+      "type": 11
+    },
+    {
       "id": "Demon_Claws_Auto",
       "name": "Demon_Claws_Auto",
       "cooldown": 3.0,
@@ -507,13 +623,13 @@
     {
       "id": "Demon_Claws_Shield",
       "name": "Demon_Claws_Shield",
-      "cooldown": 20.0,
+      "cooldown": 10000.0,
       "type": 11
     },
     {
       "id": "Demon_Claws_Skill",
       "name": "Demon_Claws_Skill",
-      "cooldown": 9.0,
+      "cooldown": 12.0,
       "type": 11
     },
     {
@@ -539,6 +655,30 @@
       "name": "EarthGolem_Auto",
       "cooldown": 3.0,
       "type": 0
+    },
+    {
+      "id": "Egglektra_Attack",
+      "name": "Egglektra_Attack",
+      "cooldown": 2.0,
+      "type": 0
+    },
+    {
+      "id": "Egglektra_Dissapear",
+      "name": "Egglektra_Dissapear",
+      "cooldown": 1.0,
+      "type": 11
+    },
+    {
+      "id": "Egglektra_ElectricBreath",
+      "name": "Egglektra_ElectricBreath",
+      "cooldown": 15.0,
+      "type": 11
+    },
+    {
+      "id": "Egglektra_World_LightningStrikes",
+      "name": "Egglektra_World_LightningStrikes",
+      "cooldown": 4.0,
+      "type": 11
     },
     {
       "id": "Exit_Vehicle",
@@ -573,6 +713,18 @@
       "id": "Faerie_Demon_Summon",
       "name": "Faerie_Demon_Summon",
       "cooldown": 20.0,
+      "type": 11
+    },
+    {
+      "id": "Feline_Attack",
+      "name": "Feline_Attack",
+      "cooldown": 2.0,
+      "type": 0
+    },
+    {
+      "id": "Feline_Skill1",
+      "name": "Leap",
+      "cooldown": 12.0,
       "type": 11
     },
     {
@@ -707,6 +859,26 @@
       "type": 7
     },
     {
+      "id": "GM_Winter_Skill1",
+      "name": "Freezing Blast",
+      "cooldown": 15.0,
+      "type": 7,
+      "charges": 2,
+      "rankCooldown": [
+        {
+          "cooldown": 10.0,
+          "minRank": 2
+        }
+      ],
+      "spanMod": "reset,rank"
+    },
+    {
+      "id": "GM_Winter_Skill2",
+      "name": "Glacial Sash",
+      "cooldown": 15.0,
+      "type": 7
+    },
+    {
       "id": "GS_Nova_Skill1",
       "name": "Wild Whirlwind",
       "cooldown": 15.0,
@@ -823,7 +995,7 @@
           "minRank": 2
         }
       ],
-      "spanMod": "reset,rank"
+      "spanMod": "rank"
     },
     {
       "id": "Halos_Totem_Skill",
@@ -836,6 +1008,78 @@
       "name": "Riptide",
       "cooldown": 12.0,
       "type": 7
+    },
+    {
+      "id": "Hatchling_Attack",
+      "name": "Hatchling_Attack",
+      "cooldown": 2.0,
+      "type": 0
+    },
+    {
+      "id": "Hatchling_PowerfulFlap",
+      "name": "Hatchling_PowerfulFlap",
+      "cooldown": 15.0,
+      "type": 11
+    },
+    {
+      "id": "Hatchling_ViolentScreech",
+      "name": "Hatchling_ViolentScreech",
+      "cooldown": 15.0,
+      "type": 11
+    },
+    {
+      "id": "Heavy2HS_Auto",
+      "name": "Heavy2HS_Auto",
+      "cooldown": 2.0,
+      "type": 0
+    },
+    {
+      "id": "Heavy2HS_Auto_Skill",
+      "name": "Heavy2HS_Auto_Skill",
+      "cooldown": 10.0,
+      "type": 11
+    },
+    {
+      "id": "HeavyCommonCaster_Auto",
+      "name": "HeavyCommonCaster_Auto",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "HeavyCommonCaster_Lava_Auto",
+      "name": "HeavyCommonCaster_Lava_Auto",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "HeavyCrescent_Auto",
+      "name": "HeavyCrescent_Auto",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "HeavySpellbook_Auto",
+      "name": "HeavySpellbook_Auto",
+      "cooldown": 15.0,
+      "type": 0
+    },
+    {
+      "id": "HeavySpellbook_Lava_Auto",
+      "name": "HeavySpellbook_Lava_Auto",
+      "cooldown": 15.0,
+      "type": 0
+    },
+    {
+      "id": "HeavySpellbook_Lava_Skill",
+      "name": "HeavySpellbook_Lava_Skill",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "HeavySpellbook_Skill1",
+      "name": "HeavySpellbook_Skill1",
+      "cooldown": 15.0,
+      "type": 0
     },
     {
       "id": "HoneySlime_Auto",
@@ -872,6 +1116,31 @@
       "name": "Strike",
       "cooldown": 1.0,
       "type": 0
+    },
+    {
+      "id": "Katana_Hasaki_EXDash",
+      "name": "Dash",
+      "cooldown": 10.0,
+      "type": 8,
+      "charges": 2
+    },
+    {
+      "id": "Katana_Hasaki_Skill1",
+      "name": "Steel Thrust",
+      "cooldown": 3.0,
+      "type": 7
+    },
+    {
+      "id": "Katana_Hasaki_Skill1_B",
+      "name": "Steel Storm",
+      "cooldown": 3.0,
+      "type": 8
+    },
+    {
+      "id": "Katana_Hasaki_Skill2",
+      "name": "Electrified Ground",
+      "cooldown": 20.0,
+      "type": 7
     },
     {
       "id": "KoboldMiner_Auto",
@@ -940,6 +1209,12 @@
       "type": 7
     },
     {
+      "id": "Mace_Ice_Skill1",
+      "name": "Glacial Fissure",
+      "cooldown": 12.0,
+      "type": 7
+    },
+    {
       "id": "Mage_Blink",
       "name": "Blink",
       "cooldown": 15.0,
@@ -987,10 +1262,28 @@
       "type": 9
     },
     {
+      "id": "Mage_SparkGolem_RayOfSpark",
+      "name": "Mage_SparkGolem_RayOfSpark",
+      "cooldown": 10.0
+    },
+    {
+      "id": "Mage_SparkGolem_StaticNova",
+      "name": "Mage_SparkGolem_StaticNova",
+      "cooldown": 25.0
+    },
+    {
       "id": "Mage_StaticNova",
       "name": "Static Nova",
       "cooldown": 25.0,
       "type": 9
+    },
+    {
+      "id": "Mage_Talent_ChronostaticOrb",
+      "name": "Chronostatic Orb",
+      "cooldown": 0.0,
+      "type": 21,
+      "varsCooldown": 20.0,
+      "spanMod": "reset,vars"
     },
     {
       "id": "MagicBlock",
@@ -1023,6 +1316,41 @@
       "type": 11
     },
     {
+      "id": "Marylyn_Monrowl_Infused_Vortex_Blade",
+      "name": "Infused Vortex Blade",
+      "cooldown": 1.0,
+      "type": 11
+    },
+    {
+      "id": "Marylyn_Monrowl_Lightning_Rush",
+      "name": "Lightning Rush",
+      "cooldown": 20.0,
+      "type": 11
+    },
+    {
+      "id": "Marylyn_Monrowl_Scratch",
+      "name": "Marylyn_Monrowl_Scratch",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "Marylyn_Monrowl_Surtension",
+      "name": "Surtension : Positive",
+      "cooldown": 10.0,
+      "costs": [
+        {
+          "atb": "SpecialEnergy",
+          "amount": 100.0
+        }
+      ]
+    },
+    {
+      "id": "Marylyn_Monrowl_Vortex_Blade",
+      "name": "Vortex Blade",
+      "cooldown": 15.0,
+      "type": 11
+    },
+    {
       "id": "Mokshi_Barrage",
       "name": "Royal Barrage",
       "cooldown": 20.0,
@@ -1052,6 +1380,12 @@
       "cooldown": 0.5
     },
     {
+      "id": "Ogre2H_Ice_Spin_E",
+      "name": "Ogre2H_Ice_Spin_E",
+      "cooldown": 10.0,
+      "type": 11
+    },
+    {
       "id": "Ogre2H_Spin",
       "name": "Ogre2H_Spin",
       "cooldown": 10.0,
@@ -1062,6 +1396,28 @@
       "name": "Ogre2H_Spin_E",
       "cooldown": 10.0,
       "type": 11
+    },
+    {
+      "id": "OgreDual_Auto",
+      "name": "OgreDual_Auto",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "OgreDual_Skill",
+      "name": "OgreDual_Skill",
+      "cooldown": 30.0,
+      "type": 11
+    },
+    {
+      "id": "OgreEliteDocker_Skill1",
+      "name": "OgreEliteDocker_Skill1",
+      "cooldown": 15.0
+    },
+    {
+      "id": "OgreElite_Ice_Skill",
+      "name": "OgreElite_Ice_Skill",
+      "cooldown": 10.0
     },
     {
       "id": "OgreElite_Skill1",
@@ -1107,7 +1463,7 @@
     {
       "id": "Phrixes_DemonicStrike",
       "name": "Phrixes_DemonicStrike",
-      "cooldown": 5.0,
+      "cooldown": 3.0,
       "type": 0
     },
     {
@@ -1125,43 +1481,43 @@
     {
       "id": "Phrixes_H_NC_Spawn",
       "name": "Phrixes_H_NC_Spawn",
-      "cooldown": 15.0,
+      "cooldown": 10.0,
       "type": 14
     },
     {
       "id": "Phrixes_H_NG_ChaosBeam",
       "name": "Annihilation",
-      "cooldown": 12.0,
+      "cooldown": 30.0,
       "type": 11
     },
     {
       "id": "Phrixes_H_NG_ChaosMeteor",
       "name": "Chaos Meteor",
-      "cooldown": 20.0,
+      "cooldown": 40.0,
       "type": 11
     },
     {
       "id": "Phrixes_H_NG_CosmicPower",
       "name": "Cosmic Power",
-      "cooldown": 1200.0,
+      "cooldown": 40.0,
       "type": 11
     },
     {
       "id": "Phrixes_LightBolt",
       "name": "Light Bolt",
-      "cooldown": 5.0,
+      "cooldown": 16.0,
       "type": 0
     },
     {
       "id": "Phrixes_NightBolt",
       "name": "Night Bolt",
-      "cooldown": 5.0,
+      "cooldown": 16.0,
       "type": 0
     },
     {
       "id": "Phrixes_NightSalvo",
       "name": "Night Salvo",
-      "cooldown": 5.0,
+      "cooldown": 16.0,
       "type": 11
     },
     {
@@ -1173,13 +1529,13 @@
     {
       "id": "Phrixes_PowerExpulsion",
       "name": "Power Expulsion",
-      "cooldown": 20.0,
+      "cooldown": 30.0,
       "type": 11
     },
     {
       "id": "Phrixes_SigilOfWrath",
       "name": "Phrixes_SigilOfWrath",
-      "cooldown": 15.0,
+      "cooldown": 20.0,
       "type": 14
     },
     {
@@ -1266,7 +1622,7 @@
     {
       "id": "Queenslayer_ChaosAwakening",
       "name": "Chaos Awakening",
-      "cooldown": 22.0,
+      "cooldown": 26.0,
       "type": 11
     },
     {
@@ -1442,10 +1798,42 @@
       "type": 7
     },
     {
+      "id": "Scepter_Storm_Skill1",
+      "name": "Lightning Strike",
+      "cooldown": 8.0,
+      "type": 7
+    },
+    {
+      "id": "Scepter_Storm_Skill2",
+      "name": "Dazzling Storm",
+      "cooldown": 25.0,
+      "type": 7,
+      "rankCooldown": [
+        {
+          "cooldown": 20.0,
+          "minRank": 2
+        }
+      ],
+      "spanMod": "rank"
+    },
+    {
       "id": "ShieldBlock",
       "name": "Block",
       "cooldown": 0.1,
       "type": 6
+    },
+    {
+      "id": "Shield_Avalanche_Skill1",
+      "name": "Avalanche",
+      "cooldown": 16.0,
+      "type": 7,
+      "rankCooldown": [
+        {
+          "cooldown": 12.0,
+          "minRank": 2
+        }
+      ],
+      "spanMod": "rank"
     },
     {
       "id": "Shield_Craft_Passive",
@@ -1558,6 +1946,30 @@
       "id": "Slime_Slam_Skill_Elite",
       "name": "Slime_Slam_Skill_Elite",
       "cooldown": 12.0,
+      "type": 11
+    },
+    {
+      "id": "SpaBoss_Auto",
+      "name": "SpaBoss_Auto",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "SpaBoss_Charge",
+      "name": "Bouncer Charge",
+      "cooldown": 25.0,
+      "type": 11
+    },
+    {
+      "id": "SpaBoss_FrostRay",
+      "name": "Frost Ray",
+      "cooldown": 20.0,
+      "type": 11
+    },
+    {
+      "id": "SpaBoss_SpawnCube",
+      "name": "Bath Ice Cube",
+      "cooldown": 15.0,
       "type": 11
     },
     {
@@ -1696,6 +2108,19 @@
       "type": 7
     },
     {
+      "id": "Staff_Magefrost_Skill1",
+      "name": "Ice Lance",
+      "cooldown": 5.0,
+      "type": 7,
+      "spanMod": "reset"
+    },
+    {
+      "id": "Staff_Magefrost_Skill2",
+      "name": "Frozen Orb",
+      "cooldown": 20.0,
+      "type": 7
+    },
+    {
       "id": "Staff_SummonDemon_Passive",
       "name": "Inner Demon",
       "cooldown": 30.0,
@@ -1739,6 +2164,66 @@
       "type": 11
     },
     {
+      "id": "Swarowl_Caster_Auto",
+      "name": "Swarowl_Caster_Auto",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "Swarowl_Caster_Skill1",
+      "name": "Swarowl_Caster_Skill1",
+      "cooldown": 12.0,
+      "type": 11
+    },
+    {
+      "id": "Swarowl_Claws_Auto",
+      "name": "Swarowl_Claws_Auto",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "Swarowl_Harpy_Caster_Auto",
+      "name": "Swarowl_Harpy_Caster_Auto",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "Swarowl_Harpy_Caster_Skill",
+      "name": "Swarowl_Harpy_Caster_Skill",
+      "cooldown": 15.0,
+      "type": 11
+    },
+    {
+      "id": "Swarowl_Harpy_Scratch",
+      "name": "Swarowl_Harpy_Scratch",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "Swarowl_Harpy_Vortex_Blade",
+      "name": "Vortex Blade",
+      "cooldown": 15.0,
+      "type": 11
+    },
+    {
+      "id": "Swarowl_Harpy_Vortex_Blade_Small",
+      "name": "Vortex Blade",
+      "cooldown": 15.0,
+      "type": 11
+    },
+    {
+      "id": "Swarowl_Tank_Auto",
+      "name": "Swarowl_Tank_Auto",
+      "cooldown": 2.0,
+      "type": 0
+    },
+    {
+      "id": "Swarowl_Tank_Block",
+      "name": "Swarowl_Tank_Block",
+      "cooldown": 10.0,
+      "type": 11
+    },
+    {
       "id": "Sword_Craft_Skill1",
       "name": "Conquer",
       "cooldown": 9.0,
@@ -1756,6 +2241,24 @@
       "name": "Hive's Sunder",
       "cooldown": 18.0,
       "type": 7
+    },
+    {
+      "id": "TS_SS_Auto1",
+      "name": "TS_SS_Auto1",
+      "cooldown": 2.5,
+      "type": 0
+    },
+    {
+      "id": "TS_SS_Auto2",
+      "name": "TS_SS_Auto2",
+      "cooldown": 3.0,
+      "type": 0
+    },
+    {
+      "id": "TS_SS_Skill1",
+      "name": "TS_SS_Skill1",
+      "cooldown": 10.0,
+      "type": 11
     },
     {
       "id": "TankFairy_Auto",
@@ -1794,6 +2297,19 @@
       "type": 7
     },
     {
+      "id": "Thrown_Thunderlink_Skill1",
+      "name": "Storm Flip",
+      "cooldown": 12.0,
+      "type": 7
+    },
+    {
+      "id": "Thrown_Thunderlink_Skill2",
+      "name": "Blades Maelstrom",
+      "cooldown": 20.0,
+      "type": 7,
+      "spanMod": "reset"
+    },
+    {
       "id": "Ulserous_Auto",
       "name": "Luon Blast",
       "cooldown": 5.0,
@@ -1814,6 +2330,54 @@
     {
       "id": "Ulserous_Summon",
       "name": "Ancient Manifestation",
+      "cooldown": 15.0,
+      "type": 11
+    },
+    {
+      "id": "Ursid_Attack",
+      "name": "Ursid_Attack",
+      "cooldown": 2.0,
+      "type": 0
+    },
+    {
+      "id": "Ursid_Crystal_Skill1",
+      "name": "Titanic Charge",
+      "cooldown": 10.0,
+      "type": 11
+    },
+    {
+      "id": "Ursid_Elite_Attack",
+      "name": "Ursid_Elite_Attack",
+      "cooldown": 2.0,
+      "type": 0
+    },
+    {
+      "id": "Ursid_Elite_Skill1",
+      "name": "Ursid_Elite_Skill1",
+      "cooldown": 15.0,
+      "type": 11
+    },
+    {
+      "id": "Ursid_Skill1",
+      "name": "Ursid_Skill1",
+      "cooldown": 15.0,
+      "type": 11
+    },
+    {
+      "id": "Volture_Attack",
+      "name": "Volture_Attack",
+      "cooldown": 2.0,
+      "type": 0
+    },
+    {
+      "id": "Volture_Elite_Attack",
+      "name": "Volture_Elite_Attack",
+      "cooldown": 2.0,
+      "type": 0
+    },
+    {
+      "id": "Volture_Skill",
+      "name": "Powerful Flap",
       "cooldown": 15.0,
       "type": 11
     },
@@ -1896,6 +2460,42 @@
       "name": "Wolf_Skill2",
       "cooldown": 15.0,
       "type": 11
+    },
+    {
+      "id": "Yetina_BearClaw",
+      "name": "Bear Claw",
+      "cooldown": 2.0,
+      "type": 0
+    },
+    {
+      "id": "Yetina_FeralJump",
+      "name": "Feral Jump",
+      "cooldown": 10.0,
+      "type": 11,
+      "costs": [
+        {
+          "atb": "SpecialEnergy",
+          "amount": 100.0
+        }
+      ]
+    },
+    {
+      "id": "Yetina_FeralRip",
+      "name": "Rip",
+      "cooldown": 2.0,
+      "type": 0
+    },
+    {
+      "id": "Yetina_TitanicCharge",
+      "name": "Titanic Charge",
+      "cooldown": 10.0,
+      "type": 11,
+      "costs": [
+        {
+          "atb": "SpecialEnergy",
+          "amount": 100.0
+        }
+      ]
     }
   ]
 }

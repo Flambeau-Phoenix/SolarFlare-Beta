@@ -80,7 +80,7 @@ class BarTerNativeAccess {
  static function overridden(hero:Dynamic,action:String,base:Dynamic,selected:String,source:String):BarTerNativeRead {
   var effective:Dynamic=base;
   #if hl
-  var h:ent.Hero=hero; var over=h.getSkillOverride(action); if(over!=null) effective=over.getEffectiveSkill();
+  var h:ent.Hero=hero; var overrideId=h.getSkillOverride(action); var over=overrideId==null ? null : h.getSkill(overrideId); if(over!=null) effective=over.getEffectiveSkill();
   #else
   effective=(cast hero:ent.Hero).effective(action,base);
   #end

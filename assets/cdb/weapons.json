@@ -1,0 +1,205 @@
+{
+  "sourceSha256": "045f0d2791b4136613c6478f8ca7a3333ee8e1d0ef7b4626bf8de4afbe4a27be",
+  "entries": [
+    {
+      "id": "Mace_Benediction",
+      "name": "Amon Ram, the Creator"
+    },
+    {
+      "id": "Book_Start",
+      "name": "Apprentice's Grimoire"
+    },
+    {
+      "id": "Sword_Swarm",
+      "name": "Beefury, Blessed Blade of the Farseeker"
+    },
+    {
+      "id": "Book_WaterOrbs",
+      "name": "Book of Mi'Mizan"
+    },
+    {
+      "id": "Book_Frozenground",
+      "name": "Book_Frozenground"
+    },
+    {
+      "id": "Staff_Censer",
+      "name": "Censer of Wool Hollow"
+    },
+    {
+      "id": "Axe_Boomerang",
+      "name": "Cheese Moon"
+    },
+    {
+      "id": "Fists_WaterUppecut",
+      "name": "Clawdius"
+    },
+    {
+      "id": "Shield_OrbitWater",
+      "name": "Crabgantua's Kneecap"
+    },
+    {
+      "id": "Bow_Craft",
+      "name": "Credence"
+    },
+    {
+      "id": "Shield_Craft",
+      "name": "Dominion"
+    },
+    {
+      "id": "Scepter_Storm",
+      "name": "Eye of the Storm"
+    },
+    {
+      "id": "Scepter_Flamie",
+      "name": "Flame of Argol"
+    },
+    {
+      "id": "Halos_Totem",
+      "name": "Ghost Clams of the Low Tide"
+    },
+    {
+      "id": "Sword_Craft",
+      "name": "Glory"
+    },
+    {
+      "id": "Spear_Eruption",
+      "name": "Gorgon Ratsay’s Toothpick"
+    },
+    {
+      "id": "Katana_Hasaki",
+      "name": "Hasaki"
+    },
+    {
+      "id": "Bow_BigGame",
+      "name": "Horns of the Wind"
+    },
+    {
+      "id": "Thrown_Seeds",
+      "name": "Ipheion, Star Blossom"
+    },
+    {
+      "id": "DA_Water",
+      "name": "Iron Fins of the Leviathan"
+    },
+    {
+      "id": "GA_Craft",
+      "name": "Judgement"
+    },
+    {
+      "id": "Spear_Goo",
+      "name": "Lady Bee’s Ceremonial Stinger"
+    },
+    {
+      "id": "Net_Basic",
+      "name": "Large Butterfly Net"
+    },
+    {
+      "id": "Sword_Start",
+      "name": "Light Practice Sword"
+    },
+    {
+      "id": "Mace_Ice",
+      "name": "Mace_Ice"
+    },
+    {
+      "id": "Shield_Firebreath",
+      "name": "Magma Mia"
+    },
+    {
+      "id": "GS_Nova",
+      "name": "Martyr of Enripit"
+    },
+    {
+      "id": "Halos_Demon",
+      "name": "Mirrors of the Nightgoddesses"
+    },
+    {
+      "id": "Daggers_Demondash",
+      "name": "Nibsham's Liberators"
+    },
+    {
+      "id": "GM_MassGrab",
+      "name": "Pocket Hive"
+    },
+    {
+      "id": "Staff_Craft",
+      "name": "Radiance"
+    },
+    {
+      "id": "Fists_LightMonk",
+      "name": "Ramulus & Ramus"
+    },
+    {
+      "id": "Scepter_Start",
+      "name": "Rehearsal Scepter"
+    },
+    {
+      "id": "Shield_Start",
+      "name": "Rough Shield"
+    },
+    {
+      "id": "Daggers_Start",
+      "name": "Rusty Knives"
+    },
+    {
+      "id": "S_Test",
+      "name": "S_Test"
+    },
+    {
+      "id": "Shield_Avalanche",
+      "name": "Shield_Avalanche"
+    },
+    {
+      "id": "Staff_SummonDemon",
+      "name": "Silhouette of Almaz"
+    },
+    {
+      "id": "Snowball",
+      "name": "Snowball"
+    },
+    {
+      "id": "Snowball_Test",
+      "name": "Snowball_Test"
+    },
+    {
+      "id": "Crescent_FlowerSpiral",
+      "name": "Thornlace"
+    },
+    {
+      "id": "Thrown_Thunderlink",
+      "name": "Thunderlink"
+    },
+    {
+      "id": "Crescent_Dance",
+      "name": "TODO"
+    },
+    {
+      "id": "GM_Winter",
+      "name": "TODO"
+    },
+    {
+      "id": "Daggers_DuplicatePoison",
+      "name": "Twin Fangs of Ratsar"
+    },
+    {
+      "id": "DM_Multispin",
+      "name": "Twin Pillars of Justice"
+    },
+    {
+      "id": "DS_Z1RBee_AssWiz",
+      "name": "Wingsabers"
+    },
+    {
+      "id": "Staff_Magefrost",
+      "name": "Winterwaker"
+    },
+    {
+      "id": "GA_Demon",
+      "name": "Worldsplitter"
+    },
+    {
+      "id": "DA_Lightning",
+      "name": "Zerzurian Cleavers"
+    }
+  ]
+}

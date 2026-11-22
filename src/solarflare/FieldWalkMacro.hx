@@ -42,8 +42,8 @@ class FieldWalkMacro {
 			"isSignature", "isClassSkill", "isDash", "isPassive", "isWeaponSkill",
 			"isRunning", "isVisible"
 		],
-		"ui.hud.SkillButton" => ["getOverrideSkill"],
-		"ui.hud.SkillSlotButton" => ["getOverrideSkill"]
+		"ui.hud.SkillButton" => [],
+		"ui.hud.SkillSlotButton" => []
 	];
 
 	public static function build():Array<Field> {
